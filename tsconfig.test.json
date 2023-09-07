@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.development.json",
+  "compilerOptions": {
+    "types": ["node", "jest"],
+  },
+  "exclude": [],
+  "moduleDirectories": [
+    "./src"
+  ]
+}

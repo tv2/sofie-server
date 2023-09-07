@@ -1,4 +1,4 @@
-import { anything, capture, instance, mock, verify, when } from 'ts-mockito'
+import { anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown } from '../../../model/entities/rundown'
 import { RundownEventEmitter } from '../interfaces/rundown-event-emitter'
 import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
