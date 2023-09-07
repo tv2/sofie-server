@@ -11,7 +11,7 @@
     "test:ci": "jest",
     "lint": "eslint --ext .ts .",
     "lint-fix": "eslint --fix --ext .ts .",
-    "validate": "echo \"Not defined yet.\""
+    "validate": "yarn audit --level moderate --groups dependencies"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",
