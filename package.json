@@ -1,0 +1,14 @@
+{
+  "name": "sofie-server",
+  "version": "0.0.0",
+  "repository": "git@github.com:tv2/sofie-server.git",
+  "license": "MIT",
+  "scripts": {
+    "start": "echo \"Not defined yet.\"",
+    "build": "echo \"Not defined yet.\"",
+    "watch": "echo \"Not defined yet.\"",
+    "test": "echo \"Not defined yet.\"",
+    "lint": "echo \"Not defined yet.\"",
+    "validate": "echo \"Not defined yet.\""
+  }
+}
