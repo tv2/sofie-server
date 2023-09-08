@@ -1,7 +1,7 @@
 import { MongoPieceRepository } from '../mongo/mongo-piece-repository'
 import { MongoTestDatabase } from './mongo-test-database'
 import { MongoEntityConverter, MongoPiece } from '../mongo/mongo-entity-converter'
-import { anything, instance, mock, when } from 'ts-mockito'
+import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Db } from 'mongodb'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoDatabase } from '../mongo/mongo-database'

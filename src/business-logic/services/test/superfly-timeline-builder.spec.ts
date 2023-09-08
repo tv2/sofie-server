@@ -9,7 +9,7 @@ import { TimelineObject } from '../../../model/entities/timeline-object'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { ObjectCloner } from '../interfaces/object-cloner'
-import { anything, instance, mock, when } from 'ts-mockito'
+import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 
@@ -124,7 +124,7 @@ describe('superfly-timeline-builder', () => {
 
 				it('sets TimelineEnable.start set to now', () => {
 					const now: number = Date.now()
-					jest.useFakeTimers('modern').setSystemTime(now)
+					jest.useFakeTimers().setSystemTime(now)
 
 					const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
@@ -2382,7 +2382,7 @@ describe('superfly-timeline-builder', () => {
 
 				it('sets Timeline.autoNext.epochTimeToTakeNext to be now + active Part.expected duration + active Part.delayStartOffPiecesDuration - next Part.previousPartContinueIntoPartDuration', () => {
 					const now: number = Date.now()
-					jest.useFakeTimers('modern').setSystemTime(now)
+					jest.useFakeTimers().setSystemTime(now)
 
 					const delayStartOfPiecesDuration: number = 30
 					const continueIntoPartDuration: number = 50

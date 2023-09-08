@@ -1,0 +1,7 @@
+{
+  "watch": ["src"],
+  "ext": "ts,json",
+  "ignore": ["src/**/*.spec.ts"],
+  "exec": "cross-env TS_NODE_PROJECT=tsconfig.development.json node --inspect=0.0.0.0:9229 --require ts-node/register src"
+}
+

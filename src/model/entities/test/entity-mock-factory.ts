@@ -4,7 +4,7 @@ import { Piece, PieceInterface } from '../piece'
 import { PieceType } from '../../enums/piece-type'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { Rundown, RundownInterface } from '../rundown'
-import { anything, instance, mock, when } from 'ts-mockito'
+import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { TransitionType } from '../../enums/transition-type'
 import { PartTimings } from '../../value-objects/part-timings'
 

@@ -4,7 +4,7 @@ import { Part } from '../part'
 import { Piece } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance, verify, when } from 'ts-mockito'
+import { capture, instance, verify, when } from '@typestrong/ts-mockito'
 
 describe('Rundown', () => {
 	describe('instantiate already active Rundown', () => {
@@ -855,7 +855,7 @@ describe('Rundown', () => {
 
 				it('sets executedAt on the taken infinite Piece', () => {
 					const now: number = Date.now()
-					jest.useFakeTimers('modern').setSystemTime(now)
+					jest.useFakeTimers().setSystemTime(now)
 
 					const layer: string = 'someLayer'
 					const firstPiece: Piece = EntityMockFactory.createPiece({
@@ -1565,7 +1565,7 @@ describe('Rundown', () => {
 
 				it('sets executedAt on taken infinite Piece', () => {
 					const now: number = Date.now()
-					jest.useFakeTimers('modern').setSystemTime(now)
+					jest.useFakeTimers().setSystemTime(now)
 
 					const layer: string = 'someLayer'
 					const firstPiece: Piece = EntityMockFactory.createPiece({
