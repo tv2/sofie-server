@@ -2,7 +2,7 @@ import { RundownEventListener } from '../services/interfaces/rundown-event-liste
 import { RundownEventService } from '../services/rundown-event-service'
 
 export class EventEmitterFacade {
-	public static createRundownEventListener(): RundownEventListener {
-		return RundownEventService.getInstance()
-	}
+  public static createRundownEventListener(): RundownEventListener {
+    return RundownEventService.getInstance()
+  }
 }

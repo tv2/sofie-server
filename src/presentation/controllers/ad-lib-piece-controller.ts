@@ -8,34 +8,34 @@ import { RundownService } from '../../business-logic/services/interfaces/rundown
 
 @RestController('/adLibPieces')
 export class AdLibPieceController extends BaseController {
-	constructor(
-		private rundownService: RundownService,
-		private adLibPieceRepository: AdLibPieceRepository,
-		private httpErrorHandler: HttpErrorHandler
-	) {
-		super()
-	}
+  constructor(
+    private readonly rundownService: RundownService,
+    private readonly adLibPieceRepository: AdLibPieceRepository,
+    private readonly httpErrorHandler: HttpErrorHandler
+  ) {
+    super()
+  }
 
-	@GetRequest('/rundowns/:rundownId')
-	public async getAdLibPiecesForRundown(reg: Request, res: Response): Promise<void> {
-		try {
-			const rundownId: string = reg.params.rundownId
-			const identifiers: Identifier[] = await this.adLibPieceRepository.getAdLibPieceIdentifiers(rundownId)
-			res.send(identifiers)
-		} catch (error) {
-			this.httpErrorHandler.handleError(res, error as Exception)
-		}
-	}
+  @GetRequest('/rundowns/:rundownId')
+  public async getAdLibPiecesForRundown(reg: Request, res: Response): Promise<void> {
+    try {
+      const rundownId: string = reg.params.rundownId
+      const identifiers: Identifier[] = await this.adLibPieceRepository.getAdLibPieceIdentifiers(rundownId)
+      res.send(identifiers)
+    } catch (error) {
+      this.httpErrorHandler.handleError(res, error as Exception)
+    }
+  }
 
-	@PutRequest('/:adLibPieceId/rundowns/:rundownId')
-	public async executeAdLibPiece(reg: Request, res: Response): Promise<void> {
-		try {
-			const rundownId: string = reg.params.rundownId
-			const adLibId: string = reg.params.adLibPieceId
-			await this.rundownService.executeAdLibPiece(rundownId, adLibId)
-			res.send(`Successfully executed AdLib ${adLibId} on Rundown ${rundownId}`)
-		} catch (error) {
-			this.httpErrorHandler.handleError(res, error as Exception)
-		}
-	}
+  @PutRequest('/:adLibPieceId/rundowns/:rundownId')
+  public async executeAdLibPiece(reg: Request, res: Response): Promise<void> {
+    try {
+      const rundownId: string = reg.params.rundownId
+      const adLibId: string = reg.params.adLibPieceId
+      await this.rundownService.executeAdLibPiece(rundownId, adLibId)
+      res.send(`Successfully executed AdLib ${adLibId} on Rundown ${rundownId}`)
+    } catch (error) {
+      this.httpErrorHandler.handleError(res, error as Exception)
+    }
+  }
 }

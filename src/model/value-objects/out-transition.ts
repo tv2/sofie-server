@@ -1,3 +1,3 @@
 export interface OutTransition {
-	keepAliveDuration: number
+  keepAliveDuration: number
 }

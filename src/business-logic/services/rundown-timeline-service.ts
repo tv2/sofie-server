@@ -11,153 +11,155 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 import { RundownService } from './interfaces/rundown-service'
 import {
-	AdLibPieceInsertedEvent,
-	InfiniteRundownPieceAddedEvent,
-	RundownEvent,
+  AdLibPieceInsertedEvent,
+  InfiniteRundownPieceAddedEvent,
+  RundownEvent,
 } from '../../model/value-objects/rundown-event'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
 
 export class RundownTimelineService implements RundownService {
-	constructor(
-		private rundownEventEmitter: RundownEventEmitter,
-		private rundownRepository: RundownRepository,
-		private timelineRepository: TimelineRepository,
-		private adLibPieceRepository: AdLibPieceRepository,
-		private timelineBuilder: TimelineBuilder,
-		private rundownEventBuilder: RundownEventBuilder,
-		private callbackScheduler: CallbackScheduler
-	) {}
+  constructor(
+    private readonly rundownEventEmitter: RundownEventEmitter,
+    private readonly rundownRepository: RundownRepository,
+    private readonly timelineRepository: TimelineRepository,
+    private readonly adLibPieceRepository: AdLibPieceRepository,
+    private readonly timelineBuilder: TimelineBuilder,
+    private readonly rundownEventBuilder: RundownEventBuilder,
+    private readonly callbackScheduler: CallbackScheduler
+  ) {}
 
-	public async activateRundown(rundownId: string): Promise<void> {
-		const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+  public async activateRundown(rundownId: string): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
-		rundown.activate()
+    rundown.activate()
 
-		const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
-		this.timelineRepository.saveTimeline(timeline)
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
+    this.timelineRepository.saveTimeline(timeline)
 
-		this.emitAddInfinitePieces(rundown, [])
+    this.emitAddInfinitePieces(rundown, [])
 
-		await this.rundownRepository.saveRundown(rundown)
+    await this.rundownRepository.saveRundown(rundown)
 
-		const activateEvent: RundownEvent = this.rundownEventBuilder.buildActivateEvent(rundown)
-		this.rundownEventEmitter.emitRundownEvent(activateEvent)
+    const activateEvent: RundownEvent = this.rundownEventBuilder.buildActivateEvent(rundown)
+    this.rundownEventEmitter.emitRundownEvent(activateEvent)
 
-		const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-		this.rundownEventEmitter.emitRundownEvent(setNextEvent)
-	}
+    const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
+    this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+  }
 
-	public async deactivateRundown(rundownId: string): Promise<void> {
-		this.callbackScheduler.stop()
+  public async deactivateRundown(rundownId: string): Promise<void> {
+    this.callbackScheduler.stop()
 
-		const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
-		rundown.deactivate()
-		const timeline: Timeline = this.timelineBuilder.getBaseTimeline()
+    rundown.deactivate()
+    const timeline: Timeline = this.timelineBuilder.getBaseTimeline()
 
-		this.timelineRepository.saveTimeline(timeline)
-		await this.rundownRepository.saveRundown(rundown)
+    this.timelineRepository.saveTimeline(timeline)
+    await this.rundownRepository.saveRundown(rundown)
 
-		const deactivateEvent: RundownEvent = this.rundownEventBuilder.buildDeactivateEvent(rundown)
-		this.rundownEventEmitter.emitRundownEvent(deactivateEvent)
-	}
+    const deactivateEvent: RundownEvent = this.rundownEventBuilder.buildDeactivateEvent(rundown)
+    this.rundownEventEmitter.emitRundownEvent(deactivateEvent)
+  }
 
-	public async takeNext(rundownId: string): Promise<void> {
-		this.callbackScheduler.stop()
+  public async takeNext(rundownId: string): Promise<void> {
+    this.callbackScheduler.stop()
 
-		const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-		const infinitePiecesBefore: Piece[] = rundown.getInfinitePieces()
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const infinitePiecesBefore: Piece[] = rundown.getInfinitePieces()
 
-		rundown.takeNext()
+    rundown.takeNext()
 
-		const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
 
-		if (timeline.autoNext) {
-			this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
-		}
+    if (timeline.autoNext) {
+      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, () => {
+        this.takeNext(rundownId).catch(error => console.error('Failed doing auto next:', error))
+      })
+    }
 
-		this.timelineRepository.saveTimeline(timeline)
+    this.timelineRepository.saveTimeline(timeline)
 
-		this.emitAddInfinitePieces(rundown, infinitePiecesBefore)
-		// TODO: Emit if any infinite Pieces no longer exist e.g. we had a Segment infinite Piece and we changed Segment
-		// TODO: Should we just emit a list of current infinite Pieces? That would be easy, but it then we would potentially emit the same pieces over and over again.
+    this.emitAddInfinitePieces(rundown, infinitePiecesBefore)
+    // TODO: Emit if any infinite Pieces no longer exist e.g. we had a Segment infinite Piece and we changed Segment
+    // TODO: Should we just emit a list of current infinite Pieces? That would be easy, but it then we would potentially emit the same pieces over and over again.
 
-		await this.rundownRepository.saveRundown(rundown)
+    await this.rundownRepository.saveRundown(rundown)
 
-		const takeEvent: RundownEvent = this.rundownEventBuilder.buildTakeEvent(rundown)
-		this.rundownEventEmitter.emitRundownEvent(takeEvent)
+    const takeEvent: RundownEvent = this.rundownEventBuilder.buildTakeEvent(rundown)
+    this.rundownEventEmitter.emitRundownEvent(takeEvent)
 
-		const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-		this.rundownEventEmitter.emitRundownEvent(setNextEvent)
-	}
+    const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
+    this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+  }
 
-	private emitAddInfinitePieces(rundown: Rundown, infinitePiecesBefore: Piece[]): void {
-		const infinitePiecesAfter: Piece[] = rundown.getInfinitePieces()
-		infinitePiecesAfter
-			.filter((piece) => !infinitePiecesBefore.includes(piece))
-			.forEach((piece) => {
-				const infinitePieceAddedEvent: InfiniteRundownPieceAddedEvent =
+  private emitAddInfinitePieces(rundown: Rundown, infinitePiecesBefore: Piece[]): void {
+    const infinitePiecesAfter: Piece[] = rundown.getInfinitePieces()
+    infinitePiecesAfter
+      .filter((piece) => !infinitePiecesBefore.includes(piece))
+      .forEach((piece) => {
+        const infinitePieceAddedEvent: InfiniteRundownPieceAddedEvent =
 					this.rundownEventBuilder.buildInfiniteRundownPieceAddedEvent(rundown, piece)
-				this.rundownEventEmitter.emitRundownEvent(infinitePieceAddedEvent)
-			})
-	}
+        this.rundownEventEmitter.emitRundownEvent(infinitePieceAddedEvent)
+      })
+  }
 
-	public async setNext(rundownId: string, segmentId: string, partId: string): Promise<void> {
-		const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-		rundown.setNext(segmentId, partId)
-		await this.rundownRepository.saveRundown(rundown)
+  public async setNext(rundownId: string, segmentId: string, partId: string): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.setNext(segmentId, partId)
+    await this.rundownRepository.saveRundown(rundown)
 
-		const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-		this.rundownEventEmitter.emitRundownEvent(setNextEvent)
-	}
+    const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
+    this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+  }
 
-	public async resetRundown(rundownId: string): Promise<void> {
-		this.callbackScheduler.stop()
+  public async resetRundown(rundownId: string): Promise<void> {
+    this.callbackScheduler.stop()
 
-		const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-		rundown.reset()
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.reset()
 
-		const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
 
-		this.timelineRepository.saveTimeline(timeline)
-		await this.rundownRepository.saveRundown(rundown)
+    this.timelineRepository.saveTimeline(timeline)
+    await this.rundownRepository.saveRundown(rundown)
 
-		const resetEvent: RundownEvent = this.rundownEventBuilder.buildResetEvent(rundown)
-		this.rundownEventEmitter.emitRundownEvent(resetEvent)
-	}
+    const resetEvent: RundownEvent = this.rundownEventBuilder.buildResetEvent(rundown)
+    this.rundownEventEmitter.emitRundownEvent(resetEvent)
+  }
 
-	public async executeAdLibPiece(rundownId: string, adLibPieceId: string): Promise<void> {
-		// TODO: We don't need to recalculate the entire Rundown when an AdLib is added.
-		// TODO: E.g. it should be enough just to add an AdLibPiece to the "ActivePartGroup"
-		// TODO: An AdLibPart would require more, but the point still stand. We should aim to recalculate as little as possible.
+  public async executeAdLibPiece(rundownId: string, adLibPieceId: string): Promise<void> {
+    // TODO: We don't need to recalculate the entire Rundown when an AdLib is added.
+    // TODO: E.g. it should be enough just to add an AdLibPiece to the "ActivePartGroup"
+    // TODO: An AdLibPart would require more, but the point still stand. We should aim to recalculate as little as possible.
 
-		const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-		const adLibPiece: AdLibPiece = await this.adLibPieceRepository.getAdLibPiece(adLibPieceId)
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const adLibPiece: AdLibPiece = await this.adLibPieceRepository.getAdLibPiece(adLibPieceId)
 
-		adLibPiece.setExecutedAt(new Date().getTime())
-		rundown.adAdLibPiece(adLibPiece)
-		const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
+    adLibPiece.setExecutedAt(new Date().getTime())
+    rundown.adAdLibPiece(adLibPiece)
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
 
-		this.timelineRepository.saveTimeline(timeline)
-		await this.rundownRepository.saveRundown(rundown)
+    this.timelineRepository.saveTimeline(timeline)
+    await this.rundownRepository.saveRundown(rundown)
 
-		const adLibPieceInsertedEvent: AdLibPieceInsertedEvent = this.rundownEventBuilder.buildAdLibPieceInsertedEvent(
-			rundown,
-			adLibPiece
-		)
-		this.rundownEventEmitter.emitRundownEvent(adLibPieceInsertedEvent)
-	}
+    const adLibPieceInsertedEvent: AdLibPieceInsertedEvent = this.rundownEventBuilder.buildAdLibPieceInsertedEvent(
+      rundown,
+      adLibPiece
+    )
+    this.rundownEventEmitter.emitRundownEvent(adLibPieceInsertedEvent)
+  }
 
-	public async deleteRundown(rundownId: string): Promise<void> {
-		const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+  public async deleteRundown(rundownId: string): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
-		if (rundown.isActive()) {
-			throw new ActiveRundownException('Attempted to delete an active rundown')
-		}
+    if (rundown.isActive()) {
+      throw new ActiveRundownException('Attempted to delete an active rundown')
+    }
 
-		await this.rundownRepository.deleteRundown(rundownId)
+    await this.rundownRepository.deleteRundown(rundownId)
 
-		const deletedEvent: RundownEvent = this.rundownEventBuilder.buildDeletedEvent(rundown)
-		this.rundownEventEmitter.emitRundownEvent(deletedEvent)
-	}
+    const deletedEvent: RundownEvent = this.rundownEventBuilder.buildDeletedEvent(rundown)
+    this.rundownEventEmitter.emitRundownEvent(deletedEvent)
+  }
 }

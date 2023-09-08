@@ -1,4 +1,4 @@
 export interface InTransition {
-	keepPreviousPartAliveDuration: number
-	delayPiecesDuration: number
+  keepPreviousPartAliveDuration: number
+  delayPiecesDuration: number
 }
