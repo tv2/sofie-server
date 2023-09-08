@@ -3,7 +3,7 @@ import { RundownWebSocketEventServer } from '../emitters/rundown-web-socket-even
 import { EventEmitterFacade } from '../../business-logic/facades/event-emitter-facade'
 
 export class RundownEventServerFacade {
-	public static createRundownEventServer(): RundownEventServer {
-		return RundownWebSocketEventServer.getInstance(EventEmitterFacade.createRundownEventListener())
-	}
+  public static createRundownEventServer(): RundownEventServer {
+    return RundownWebSocketEventServer.getInstance(EventEmitterFacade.createRundownEventListener())
+  }
 }
