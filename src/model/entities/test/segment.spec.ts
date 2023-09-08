@@ -3,7 +3,7 @@ import { Piece } from '../piece'
 import { Part } from '../part'
 import { Segment, SegmentInterface } from '../segment'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance } from 'ts-mockito'
+import { capture, instance } from '@typestrong/ts-mockito'
 
 describe('Segment', () => {
 	describe('getFirstSpanningPieceForEachLayerBeforePart', () => {

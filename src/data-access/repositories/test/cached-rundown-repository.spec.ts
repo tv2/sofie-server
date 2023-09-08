@@ -1,6 +1,6 @@
 import { CachedRundownRepository } from '../cache/cached-rundown-repository'
 import { RundownRepository } from '../interfaces/rundown-repository'
-import { instance, mock, verify, when } from 'ts-mockito'
+import { instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown, RundownInterface } from '../../../model/entities/rundown'
 
 describe('cached-rundown-repository', () => {
