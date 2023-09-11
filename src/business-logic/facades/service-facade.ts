@@ -10,23 +10,23 @@ import { TimeoutCallbackScheduler } from '../services/timeout-callback-scheduler
 import { JsonObjectCloner } from '../services/json-object-cloner'
 
 export class ServiceFacade {
-	public static createRundownService(): RundownService {
-		return new RundownTimelineService(
-			RundownEventService.getInstance(),
-			RepositoryFacade.createRundownRepository(),
-			RepositoryFacade.createTimelineRepository(),
-			RepositoryFacade.createAdLibRepository(),
-			ServiceFacade.createTimelineBuilder(),
-			ServiceFacade.createRundownEventBuilder(),
-			TimeoutCallbackScheduler.getInstance()
-		)
-	}
+  public static createRundownService(): RundownService {
+    return new RundownTimelineService(
+      RundownEventService.getInstance(),
+      RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createTimelineRepository(),
+      RepositoryFacade.createAdLibRepository(),
+      ServiceFacade.createTimelineBuilder(),
+      ServiceFacade.createRundownEventBuilder(),
+      TimeoutCallbackScheduler.getInstance()
+    )
+  }
 
-	public static createTimelineBuilder(): TimelineBuilder {
-		return new SuperflyTimelineBuilder(new JsonObjectCloner())
-	}
+  public static createTimelineBuilder(): TimelineBuilder {
+    return new SuperflyTimelineBuilder(new JsonObjectCloner())
+  }
 
-	public static createRundownEventBuilder(): RundownEventBuilder {
-		return new RundownEventBuilderImplementation()
-	}
+  public static createRundownEventBuilder(): RundownEventBuilder {
+    return new RundownEventBuilderImplementation()
+  }
 }

@@ -17,46 +17,46 @@ import { RundownBaselineRepository } from '../repositories/interfaces/rundown-ba
 import { MongoRundownBaselineRepository } from '../repositories/mongo/mongo-rundown-baseline-repository'
 
 export class RepositoryFacade {
-	public static createRundownRepository(): RundownRepository {
-		const mongoRundownRepository: RundownRepository = new MongoRundownRepository(
-			MongoDatabase.getInstance(),
-			new MongoEntityConverter(),
-			this.createRundownBaselineRepository(),
-			this.createSegmentRepository()
-		)
+  public static createRundownRepository(): RundownRepository {
+    const mongoRundownRepository: RundownRepository = new MongoRundownRepository(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter(),
+      this.createRundownBaselineRepository(),
+      this.createSegmentRepository()
+    )
 
-		return CachedRundownRepository.getInstance(mongoRundownRepository)
-	}
+    return CachedRundownRepository.getInstance(mongoRundownRepository)
+  }
 
-	public static createRundownBaselineRepository(): RundownBaselineRepository {
-		return new MongoRundownBaselineRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
-	}
+  public static createRundownBaselineRepository(): RundownBaselineRepository {
+    return new MongoRundownBaselineRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
 
-	public static createSegmentRepository(): SegmentRepository {
-		return new MongoSegmentRepository(
-			MongoDatabase.getInstance(),
-			new MongoEntityConverter(),
-			this.createPartRepository()
-		)
-	}
+  public static createSegmentRepository(): SegmentRepository {
+    return new MongoSegmentRepository(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter(),
+      this.createPartRepository()
+    )
+  }
 
-	public static createPartRepository(): PartRepository {
-		return new MongoPartRepository(
-			MongoDatabase.getInstance(),
-			new MongoEntityConverter(),
-			this.createPieceRepository()
-		)
-	}
+  public static createPartRepository(): PartRepository {
+    return new MongoPartRepository(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter(),
+      this.createPieceRepository()
+    )
+  }
 
-	public static createPieceRepository(): PieceRepository {
-		return new MongoPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
-	}
+  public static createPieceRepository(): PieceRepository {
+    return new MongoPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
 
-	public static createTimelineRepository(): TimelineRepository {
-		return new MongoTimelineRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
-	}
+  public static createTimelineRepository(): TimelineRepository {
+    return new MongoTimelineRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
 
-	public static createAdLibRepository(): AdLibPieceRepository {
-		return new MongoAdLibPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
-	}
+  public static createAdLibRepository(): AdLibPieceRepository {
+    return new MongoAdLibPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
 }

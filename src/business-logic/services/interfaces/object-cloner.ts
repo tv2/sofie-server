@@ -1,3 +1,3 @@
 export interface ObjectCloner {
-	clone<T>(object: T): T
+  clone<T>(object: T): T
 }
