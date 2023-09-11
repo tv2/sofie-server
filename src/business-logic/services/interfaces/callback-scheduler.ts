@@ -1,4 +1,4 @@
 export interface CallbackScheduler {
-	start(epochTimeToExecuteCallback: number, callback: () => void): void
-	stop(): void
+  start(epochTimeToExecuteCallback: number, callback: () => void): void
+  stop(): void
 }
