@@ -16,6 +16,7 @@ export interface PartInterface {
   isOnAir: boolean
   isNext: boolean
   expectedDuration: number
+  executedAt?: number
 
   inTransition: InTransition
   outTransition: OutTransition
@@ -64,7 +65,7 @@ export class Part {
     this.disableNextInTransition = part.disableNextInTransition
     this.autoNext = part.autoNext
 
-    this.executedAt = 0
+    this.executedAt = part.executedAt ?? 0
   }
 
   public putOnAir(): void {
