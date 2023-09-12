@@ -4,44 +4,20 @@ import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Timeline } from '../../../model/entities/timeline'
-import { Identifier } from '../../../model/value-objects/identifier'
 import { AdLibPiece } from '../../../model/entities/ad-lib-piece'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { TransitionType } from '../../../model/enums/transition-type'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { TimelineObject } from '../../../model/entities/timeline-object'
-
-export interface MongoIdentifier {
-  _id: string
-  name: string
-}
-
-export interface MongoRundownPlaylist {
-  _id: string
-  externalId: string
-  name: string
-  activationId: string
-}
+import { Studio } from '../../../model/entities/studio'
+import { StudioLayer } from '../../../model/value-objects/studio-layer'
+import { LookAheadMode } from '../../../model/enums/look-ahead-mode'
+import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { TransitionType } from '../../../model/enums/transition-type'
+import { Identifier } from '../../../model/value-objects/identifier'
+import { ShowStyle } from '../../../model/entities/show-style'
 
 export interface MongoRundown {
   _id: string
-  externalId: string
   name: string
-  timing: {
-    type: string
-    expectedStart: number
-    expectedDuration: number
-    expectedEnd: number
-  }
-  playlistExternalId: string
-  metaData: {
-    rank: number
-  }
-  notes: unknown[]
-  organizationId: string
-  studioId: string
-  showStyleVariantId: string
-  showStyleBaseId: string
   modified: number
   isActive?: boolean // TODO: Remove optionality when we have control over data structure.
 }
@@ -75,6 +51,7 @@ export interface MongoPart {
   autoNext: boolean
   autoNextOverlap: number
   disableNextInTransition: boolean
+  endState?: unknown
 }
 
 export interface MongoPiece {
@@ -91,6 +68,9 @@ export interface MongoPiece {
   timelineObjectsString: string
   lifespan: string
   pieceType: string
+  metaData?: unknown
+  content?: unknown
+  tags?: string[]
 }
 
 export interface MongoTimeline {
@@ -106,6 +86,28 @@ export interface MongoAdLibPiece {
   name: string
   expectedDuration: number
   timelineObjectsString: string
+}
+
+export interface MongoStudio {
+  mappings: MongoLayerMappings
+  blueprintConfig: unknown
+}
+
+interface MongoLayerMappings {
+  [layerName: string]: MongoLayerMapping
+}
+
+export interface MongoShowStyle {
+  blueprintConfig: unknown
+}
+
+interface MongoLayerMapping {
+  // Which LookAhead "mode" we are in.
+  lookahead: number
+  // The minimum number of lookAhead objects to find.
+  lookaheadDepth: number
+  // The maximum distance to search for lookAhead
+  lookaheadMaxSearchDistance: number
 }
 
 export class MongoEntityConverter {
@@ -126,10 +128,6 @@ export class MongoEntityConverter {
       name: rundown.name,
       isActive: rundown.isActive(),
     } as MongoRundown
-  }
-
-  public convertToMongoRundowns(rundowns: Rundown[]): MongoRundown[] {
-    return rundowns.map(this.convertToMongoRundown.bind(this))
   }
 
   public convertToBasicRundown(mongoRundown: MongoRundown): BasicRundown {
@@ -195,6 +193,7 @@ export class MongoEntityConverter {
       },
       autoNext: mongoPart.autoNext ? { overlap: mongoPart.autoNextOverlap } : undefined,
       disableNextInTransition: mongoPart.disableNextInTransition,
+      endState: mongoPart.endState,
     })
   }
 
@@ -211,6 +210,7 @@ export class MongoEntityConverter {
       _rank: part.rank,
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
+      endState: part.getEndState() ?? undefined,
     } as MongoPart
   }
 
@@ -232,6 +232,9 @@ export class MongoEntityConverter {
       postRollDuration: mongoPiece.prerollDuration,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
+      metaData: mongoPiece.metaData,
+      content: mongoPiece.content,
+      tags: mongoPiece.tags ?? [],
     })
   }
 
@@ -300,6 +303,12 @@ export class MongoEntityConverter {
     }
   }
 
+  public convertToTimeline(mongoTimeline: MongoTimeline): Timeline {
+    return {
+      timelineGroups: JSON.parse(mongoTimeline.timelineBlob),
+    }
+  }
+
   public convertMongoAdLibPieceToIdentifier(mongoAdLibPiece: MongoAdLibPiece): Identifier {
     return {
       id: mongoAdLibPiece._id,
@@ -323,5 +332,48 @@ export class MongoEntityConverter {
 
   public convertAdLibs(mongoAdLibPieces: MongoAdLibPiece[]): AdLibPiece[] {
     return mongoAdLibPieces.map((piece) => this.convertAdLib(piece))
+  }
+
+  public convertStudio(mongoStudio: MongoStudio): Studio {
+    const defaultNumberOfObjects: number = 1
+    const defaultLookAheadDistance: number = 10
+    const layers: StudioLayer[] = []
+    for (const mapping in mongoStudio.mappings) {
+      layers.push({
+        name: mapping,
+        lookAheadMode: this.mapLookAheadNumberToEnum(mongoStudio.mappings[mapping].lookahead),
+        amountOfLookAheadObjectsToFind: mongoStudio.mappings[mapping].lookaheadDepth ?? defaultNumberOfObjects,
+        maximumLookAheadSearchDistance:
+            mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookAheadDistance,
+      })
+    }
+    return { layers, blueprintConfiguration: mongoStudio.blueprintConfig }
+  }
+
+  private mapLookAheadNumberToEnum(lookAheadNumber: number): LookAheadMode {
+    // These numbers are based on the "LookaheadMode" enum from BlueprintsIntegration
+    switch (lookAheadNumber) {
+      case 0: {
+        return LookAheadMode.NONE
+      }
+      case 1: {
+        return LookAheadMode.PRELOAD
+      }
+      case 3: {
+        return LookAheadMode.WHEN_CLEAR
+      }
+      default: {
+        console.log(`### Warning: Found unknown number for LookAhead: ${lookAheadNumber}`)
+        // TODO: Throw error. Currently we have some misconfiguration that uses an outdated lookAhead mode
+        // throw new UnsupportedOperation(`Found unknown number for LookAhead: ${lookAheadNumber}`)
+        return LookAheadMode.NONE
+      }
+    }
+  }
+
+  public convertShowStyle(mongoShowStyle: MongoShowStyle): ShowStyle {
+    return {
+      blueprintConfiguration: mongoShowStyle.blueprintConfig,
+    }
   }
 }
