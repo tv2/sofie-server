@@ -15,6 +15,12 @@ import { MongoAdLibPieceRepository } from '../repositories/mongo/mongo-ad-lib-pi
 import { CachedRundownRepository } from '../repositories/cache/cached-rundown-repository'
 import { RundownBaselineRepository } from '../repositories/interfaces/rundown-baseline-repository'
 import { MongoRundownBaselineRepository } from '../repositories/mongo/mongo-rundown-baseline-repository'
+import { StudioRepository } from '../repositories/interfaces/studio-repository'
+import { CachedStudioRepository } from '../repositories/cache/cached-studio-repository'
+import { MongoStudioRepository } from '../repositories/mongo/mongo-studio-repository'
+import { ShowStyleRepository } from '../repositories/interfaces/show-style-repository'
+import { CachedShowStyleRepository } from '../repositories/cache/cached-show-style-repository'
+import { MongoShowStyleRepository } from '../repositories/mongo/mongo-show-style-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -58,5 +64,21 @@ export class RepositoryFacade {
 
   public static createAdLibRepository(): AdLibPieceRepository {
     return new MongoAdLibPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  public static createStudioRepository(): StudioRepository {
+    const studioRepository: StudioRepository = new MongoStudioRepository(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter()
+    )
+    return CachedStudioRepository.getInstance(studioRepository)
+  }
+
+  public static createShowStyleRepository(): ShowStyleRepository {
+    const showStyleRepository: ShowStyleRepository = new MongoShowStyleRepository(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter()
+    )
+    return CachedShowStyleRepository.getInstance(showStyleRepository)
   }
 }
