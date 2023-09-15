@@ -2029,4 +2029,30 @@ describe('Rundown', () => {
       })
     })
   })
+
+  describe('activate', () => {
+
+    it('resets all segments', () => {
+      const mockedSegment1: Segment = EntityMockFactory.createSegmentMockInstance()
+      const mockedSegment2: Segment = EntityMockFactory.createSegmentMockInstance()
+      const mockedSegment3: Segment = EntityMockFactory.createSegmentMockInstance()
+
+      const segments: Segment[] = [
+        instance(mockedSegment1),
+        instance(mockedSegment2),
+        instance(mockedSegment3),
+      ]
+
+      const testee: Rundown = new Rundown({
+        segments,
+        isRundownActive: false,
+      } as RundownInterface)
+
+      testee.activate()
+
+      verify(mockedSegment1.reset()).once()
+      verify(mockedSegment2.reset()).once()
+      verify(mockedSegment3.reset()).once()
+    })
+  })
 })

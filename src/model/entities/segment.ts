@@ -52,8 +52,8 @@ export class Segment {
   }
 
   public setAsNext(): void {
+    this.reset()
     this.isSegmentNext = true
-    this.parts.forEach(part => part.reset())
   }
 
   public removeAsNext(): void {
@@ -132,5 +132,9 @@ export class Segment {
 
   public doesPieceBelongToSegment(piece: Piece): boolean {
     return this.parts.some((part) => part.id === piece.partId)
+  }
+
+  public reset(): void {
+    this.parts.forEach(part => part.reset())
   }
 }
