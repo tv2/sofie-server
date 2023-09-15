@@ -53,6 +53,7 @@ export class Segment {
 
   public setAsNext(): void {
     this.isSegmentNext = true
+    this.parts.forEach(part => part.reset())
   }
 
   public removeAsNext(): void {
