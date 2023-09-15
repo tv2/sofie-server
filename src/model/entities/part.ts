@@ -17,6 +17,7 @@ export interface PartInterface {
   isNext: boolean
   expectedDuration: number
   executedAt?: number
+  playedDuration?: number
 
   inTransition: InTransition
   outTransition: OutTransition
@@ -47,6 +48,7 @@ export class Part {
   private readonly adLibPieces: AdLibPiece[] = []
 
   private executedAt: number
+  private playedDuration: number
   private timings?: PartTimings
 
   constructor(part: PartInterface) {
@@ -66,6 +68,7 @@ export class Part {
     this.autoNext = part.autoNext
 
     this.executedAt = part.executedAt ?? 0
+    this.playedDuration = part.playedDuration ?? 0
   }
 
   public putOnAir(): void {
@@ -73,11 +76,13 @@ export class Part {
 
     const now: number = Date.now()
     this.executedAt = now
+    this.playedDuration = 0
     this.pieces.forEach((piece) => piece.setExecutedAt(now))
   }
 
   public takeOffAir(): void {
     this.isPartOnAir = false
+    this.playedDuration = Date.now() - this.executedAt
   }
 
   public isOnAir(): boolean {
@@ -114,6 +119,10 @@ export class Part {
 
   public getExecutedAt(): number {
     return this.executedAt
+  }
+
+  public getPlayedDuration(): number {
+    return this.playedDuration
   }
 
   // TODO: This implementation currently reflects how Core implemented it. It's in dire need of a refactor.
@@ -190,5 +199,10 @@ export class Part {
       throw new UnsupportedOperation(`No Timings has been calculated for Part: ${this.id}`)
     }
     return this.timings
+  }
+
+  public reset(): void {
+    this.executedAt = 0
+    this.playedDuration = 0
   }
 }

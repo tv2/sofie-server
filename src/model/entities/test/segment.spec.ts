@@ -3,7 +3,7 @@ import { Piece } from '../piece'
 import { Part } from '../part'
 import { Segment, SegmentInterface } from '../segment'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance } from '@typestrong/ts-mockito'
+import { capture, instance, mock, verify } from '@typestrong/ts-mockito'
 
 describe('Segment', () => {
   describe('getFirstSpanningPieceForEachLayerBeforePart', () => {
@@ -484,6 +484,35 @@ describe('Segment', () => {
           expect(result).toContain(pieceTwo)
         })
       })
+    })
+  })
+
+  describe('setAsNext', () => {
+    it('sets the segment as next', () => {
+      const testee = new Segment({ isNext: false } as SegmentInterface)
+
+      testee.setAsNext()
+
+      const result: boolean = testee.isNext()
+      expect(result).toBe(true)
+    })
+
+    it('resets all parts', () => {
+      const mockedPart1 = mock<Part>()
+      const mockedPart2 = mock<Part>()
+      const mockedPart3 = mock<Part>()
+      const parts = [
+          instance(mockedPart1),
+          instance(mockedPart2),
+          instance(mockedPart3),
+      ]
+      const testee = new Segment({ parts } as SegmentInterface)
+
+      testee.setAsNext()
+
+      verify(mockedPart1.reset()).once()
+      verify(mockedPart2.reset()).once()
+      verify(mockedPart3.reset()).once()
     })
   })
 })
