@@ -9,7 +9,8 @@ export class PartDto {
   public readonly isOnAir: boolean
   public readonly isNext: boolean
   public readonly expectedDuration: number
-  public readonly executedAt?: number
+  public readonly executedAt: number
+  public readonly playedDuration: number
 
   constructor(part: Part) {
     this.id = part.id
@@ -20,5 +21,6 @@ export class PartDto {
     this.isNext = part.isNext()
     this.expectedDuration = part.expectedDuration
     this.executedAt = part.getExecutedAt()
+    this.playedDuration = part.getPlayedDuration()
   }
 }
