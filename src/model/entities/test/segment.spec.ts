@@ -3,7 +3,7 @@ import { Piece } from '../piece'
 import { Part } from '../part'
 import { Segment, SegmentInterface } from '../segment'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance, mock, verify } from '@typestrong/ts-mockito'
+import { capture, instance, verify } from '@typestrong/ts-mockito'
 
 describe('Segment', () => {
   describe('getFirstSpanningPieceForEachLayerBeforePart', () => {
@@ -487,9 +487,29 @@ describe('Segment', () => {
     })
   })
 
+  describe('reset', () => {
+    it('resets all parts', () => {
+      const mockedPart1: Part = EntityMockFactory.createPartMockInstance()
+      const mockedPart2: Part = EntityMockFactory.createPartMockInstance()
+      const mockedPart3: Part = EntityMockFactory.createPartMockInstance()
+      const parts: Part[] = [
+        instance(mockedPart1),
+        instance(mockedPart2),
+        instance(mockedPart3),
+      ]
+      const testee: Segment = new Segment({ parts } as SegmentInterface)
+
+      testee.setAsNext()
+
+      verify(mockedPart1.reset()).once()
+      verify(mockedPart2.reset()).once()
+      verify(mockedPart3.reset()).once()
+    })
+  })
+
   describe('setAsNext', () => {
     it('sets the segment as next', () => {
-      const testee = new Segment({ isNext: false } as SegmentInterface)
+      const testee: Segment = new Segment({ isNext: false } as SegmentInterface)
 
       testee.setAsNext()
 
@@ -498,15 +518,15 @@ describe('Segment', () => {
     })
 
     it('resets all parts', () => {
-      const mockedPart1 = mock<Part>()
-      const mockedPart2 = mock<Part>()
-      const mockedPart3 = mock<Part>()
-      const parts = [
+      const mockedPart1: Part = EntityMockFactory.createPartMockInstance()
+      const mockedPart2: Part = EntityMockFactory.createPartMockInstance()
+      const mockedPart3: Part = EntityMockFactory.createPartMockInstance()
+      const parts: Part[] = [
           instance(mockedPart1),
           instance(mockedPart2),
           instance(mockedPart3),
       ]
-      const testee = new Segment({ parts } as SegmentInterface)
+      const testee: Segment = new Segment({ parts } as SegmentInterface)
 
       testee.setAsNext()
 

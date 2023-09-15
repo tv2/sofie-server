@@ -76,11 +76,16 @@ export class Rundown extends BasicRundown {
       throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated')
     }
     this.isRundownActive = true
+    this.resetSegments()
 
     this.nextSegment = this.findFirstSegment()
     this.nextPart = this.nextSegment.findFirstPart()
 
     this.takeNext()
+  }
+
+  private resetSegments(): void {
+    this.segments.forEach(segment => segment.reset())
   }
 
   private findFirstSegment(): Segment {

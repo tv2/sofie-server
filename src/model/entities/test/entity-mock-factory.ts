@@ -67,6 +67,7 @@ export class EntityMockFactory {
     return instance(mockedSegment)
   }
 
+  // TODO: Rename this to createSegmentMock (same for the other methods)
   public static createSegmentMockInstance(
     segmentInterface?: Partial<SegmentInterface>,
     misc?: Partial<{

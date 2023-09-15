@@ -68,7 +68,7 @@ describe('Part', () => {
     })
   })
 
-  describe('resetPart', () => {
+  describe('reset', () => {
     it('has an executedAt value of 0 after being reset', () => {
       const testee: Part = new Part({ executedAt: 123456789 } as PartInterface)
 
