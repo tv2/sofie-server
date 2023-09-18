@@ -18,9 +18,9 @@ import {
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
-import { RundownPersistentState } from '../../model/value-objects/rundown-persistent-state'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
+import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -40,21 +40,9 @@ export class RundownTimelineService implements RundownService {
 
     rundown.activate()
 
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
-
-    const onTimelineGenerate: { timeline: Timeline; rundownPersistentState: RundownPersistentState } =
-        this.blueprint.onTimelineGenerate(
-          configuration,
-          rundown.getPersistentState(),
-          rundown.getActivePart(),
-          rundown.getPreviousPart(),
-          timeline
-        )
-    rundown.setPersistentState(onTimelineGenerate.rundownPersistentState)
-
-    this.timelineRepository.saveTimeline(onTimelineGenerate.timeline)
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
     this.emitAddInfinitePieces(rundown, [])
 
@@ -67,8 +55,22 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
+  private async buildTimelineAndCallOnGenerate(rundown: Rundown): Promise<OnTimelineGenerateResult> {
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
+
+    return this.blueprint.onTimelineGenerate(
+      configuration,
+      rundown.getPersistentState(),
+      rundown.getActivePart(),
+      rundown.getPreviousPart(),
+      timeline
+    )
+  }
+
   public async deactivateRundown(rundownId: string): Promise<void> {
-    this.callbackScheduler.stop()
+    this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
@@ -77,59 +79,64 @@ export class RundownTimelineService implements RundownService {
 
     this.timelineRepository.saveTimeline(timeline)
 
-    const deactivateEvent: RundownEvent = this.rundownEventBuilder.buildDeactivateEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(deactivateEvent)
+    this.sendEvents(rundown, [this.rundownEventBuilder.buildDeactivateEvent])
 
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  public async takeNext(rundownId: string): Promise<void> {
+  private sendEvents(rundown: Rundown, buildEventCallbacks: ((rundown: Rundown) => RundownEvent)[]): void {
+    buildEventCallbacks.forEach(buildEventCallback => {
+      const event: RundownEvent = buildEventCallback(rundown)
+      this.rundownEventEmitter.emitRundownEvent(event)
+    })
+  }
+
+  private stopAutoNext(): void {
     this.callbackScheduler.stop()
+  }
+
+  public async takeNext(rundownId: string): Promise<void> {
+    this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBefore: Piece[] = rundown.getInfinitePieces()
 
     rundown.takeNext()
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-    const endStateForActivePart: PartEndState = this.blueprint.getEndStateForPart(
-      rundown.getActivePart(),
-      rundown.getPreviousPart(),
-      Date.now()
-    )
-    rundown.getActivePart().setEndState(endStateForActivePart)
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    this.startAutoNext(onTimelineGenerateResult.timeline, rundownId)
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
-
-    const onTimelineGenerate: { timeline: Timeline; rundownPersistentState: RundownPersistentState } =
-        this.blueprint.onTimelineGenerate(
-          configuration,
-          rundown.getPersistentState(),
-          rundown.getActivePart(),
-          rundown.getPreviousPart(),
-          timeline
-        )
-    rundown.setPersistentState(onTimelineGenerate.rundownPersistentState)
-
-    if (timeline.autoNext) {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
-    }
-
-    this.timelineRepository.saveTimeline(onTimelineGenerate.timeline)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
     this.emitAddInfinitePieces(rundown, infinitePiecesBefore)
     // TODO: Emit if any infinite Pieces no longer exist e.g. we had a Segment infinite Piece and we changed Segment
     // TODO: Should we just emit a list of current infinite Pieces? That would be easy, but it then we would potentially emit the same pieces over and over again.
 
-    const takeEvent: RundownEvent = this.rundownEventBuilder.buildTakeEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(takeEvent)
-
-    const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+    this.sendEvents(rundown, [
+      this.rundownEventBuilder.buildTakeEvent,
+      this.rundownEventBuilder.buildSetNextEvent
+    ])
 
     await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private getEndStateForActivePart(rundown: Rundown): PartEndState {
+    return this.blueprint.getEndStateForPart(
+      rundown.getActivePart(),
+      rundown.getPreviousPart(),
+      Date.now()
+    )
+  }
+
+  private startAutoNext(timeline: Timeline, rundownId: string): void {
+    if (timeline.autoNext) {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
+    }
   }
 
   private emitAddInfinitePieces(rundown: Rundown, infinitePiecesBefore: Piece[]): void {
@@ -147,41 +154,26 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.setNext(segmentId, partId)
 
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
-    const onTimelineGenerate: { timeline: Timeline; rundownPersistentState: RundownPersistentState } =
-        this.blueprint.onTimelineGenerate(
-          configuration,
-          rundown.getPersistentState(),
-          rundown.getActivePart(),
-          rundown.getPreviousPart(),
-          timeline
-        )
-    rundown.setPersistentState(onTimelineGenerate.rundownPersistentState)
-
-    this.timelineRepository.saveTimeline(onTimelineGenerate.timeline)
-
-    const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+    this.sendEvents(rundown, [this.rundownEventBuilder.buildSetNextEvent])
 
     await this.rundownRepository.saveRundown(rundown)
   }
 
   public async resetRundown(rundownId: string): Promise<void> {
-    this.callbackScheduler.stop()
+    this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.reset()
 
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
-
-    this.timelineRepository.saveTimeline(timeline)
-
-    const resetEvent: RundownEvent = this.rundownEventBuilder.buildResetEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(resetEvent)
+    this.sendEvents(rundown, [this.rundownEventBuilder.buildResetEvent])
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -221,7 +213,6 @@ export class RundownTimelineService implements RundownService {
 
     await this.rundownRepository.deleteRundown(rundownId)
 
-    const deletedEvent: RundownEvent = this.rundownEventBuilder.buildDeletedEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(deletedEvent)
+    this.sendEvents(rundown, [this.rundownEventBuilder.buildDeletedEvent])
   }
 }
