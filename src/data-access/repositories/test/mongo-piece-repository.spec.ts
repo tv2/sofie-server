@@ -115,16 +115,11 @@ describe(`${MongoPieceRepository.name}`, () => {
 
     // TODO: See this test fail.
     it('returns one piece when partId is given', async () => {
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId})]
       const pieces: Piece[] = [EntityFactory.createPiece({partId: partId})]
-      await testDatabase.populateDatabaseWithPieces(mongoPieces)
 
-      when(mongoConverter.convertPieces(anything())).thenReturn(pieces)
-      const testee: PieceRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: PieceRepository = await populateAndCreateTestee({}, {pieces: pieces, mongoPieces: mongoPieces})
 
       const result: Piece[] = await testee.getPieces(partId)
 
@@ -135,16 +130,11 @@ describe(`${MongoPieceRepository.name}`, () => {
 
     // TODO: See this test fail.
     it('returns multiple pieces when partId is given', async () => {
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId}), createMongoPiece({startPartId: partId})]
       const pieces: Piece[] = [EntityFactory.createPiece({partId: partId}), EntityFactory.createPiece({partId: partId})]
-      await testDatabase.populateDatabaseWithPieces(mongoPieces)
 
-      when(mongoConverter.convertPieces(anything())).thenReturn(pieces)
-      const testee: PieceRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: PieceRepository = await populateAndCreateTestee({}, {pieces: pieces, mongoPieces: mongoPieces})
 
       const result: Piece[] = await testee.getPieces(partId)
 
@@ -159,12 +149,10 @@ describe(`${MongoPieceRepository.name}`, () => {
       const partId: string = 'somePartId'
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId})]
       const pieces: Piece[] = [EntityFactory.createPiece({partId: partId})]
-      await testDatabase.populateDatabaseWithPieces(mongoPieces)
 
-      when(mongoConverter.convertPieces(anything())).thenReturn(pieces)
-      const testee: PieceRepository = createTestee({
+      const testee: PieceRepository = await populateAndCreateTestee({
         mongoConverter: mongoConverter,
-      })
+      }, {pieces: pieces, mongoPieces: mongoPieces})
 
       await testee.getPieces(partId)
 
@@ -182,10 +170,26 @@ describe(`${MongoPieceRepository.name}`, () => {
     } as MongoPiece
   }
 
-  function createTestee(params: {
+  interface TesteeParams {
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
-  }): MongoPieceRepository {
+  }
+
+  async function populateAndCreateTestee(params: TesteeParams, misc: {
+    pieces: Piece[],
+    mongoPieces: MongoPiece[]
+  }): Promise<MongoPieceRepository> {
+    if (!params.mongoConverter) {
+      params.mongoConverter = mock(MongoEntityConverter)
+    }
+
+    when(params.mongoConverter.convertPieces(anything())).thenReturn(misc.pieces)
+    await testDatabase.populateDatabaseWithPieces(misc.mongoPieces)
+
+    return createTestee(params)
+  }
+
+  function createTestee(params: TesteeParams): MongoPieceRepository {
     const mongoDb: MongoDatabase = params.mongoDb ?? mock(MongoDatabase)
     const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
 
