@@ -499,36 +499,7 @@ describe('Segment', () => {
       ]
       const testee: Segment = new Segment({ parts } as SegmentInterface)
 
-      testee.setAsNext()
-
-      verify(mockedPart1.reset()).once()
-      verify(mockedPart2.reset()).once()
-      verify(mockedPart3.reset()).once()
-    })
-  })
-
-  describe('setAsNext', () => {
-    it('sets the segment as next', () => {
-      const testee: Segment = new Segment({ isNext: false } as SegmentInterface)
-
-      testee.setAsNext()
-
-      const result: boolean = testee.isNext()
-      expect(result).toBe(true)
-    })
-
-    it('resets all parts', () => {
-      const mockedPart1: Part = EntityMockFactory.createPartMockInstance()
-      const mockedPart2: Part = EntityMockFactory.createPartMockInstance()
-      const mockedPart3: Part = EntityMockFactory.createPartMockInstance()
-      const parts: Part[] = [
-          instance(mockedPart1),
-          instance(mockedPart2),
-          instance(mockedPart3),
-      ]
-      const testee: Segment = new Segment({ parts } as SegmentInterface)
-
-      testee.setAsNext()
+      testee.reset()
 
       verify(mockedPart1.reset()).once()
       verify(mockedPart2.reset()).once()
