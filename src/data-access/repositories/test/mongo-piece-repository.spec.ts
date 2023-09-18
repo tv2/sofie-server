@@ -1,13 +1,14 @@
 import { MongoPieceRepository } from '../mongo/mongo-piece-repository'
 import { MongoTestDatabase } from './mongo-test-database'
 import { MongoEntityConverter, MongoPiece } from '../mongo/mongo-entity-converter'
-import { anything, instance, mock, when } from '@typestrong/ts-mockito'
+import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Db } from 'mongodb'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Piece } from '../../../model/entities/piece'
+import { EntityFactory } from '../../../model/entities/test/entity-factory'
 
 const COLLECTION_NAME = 'pieces'
 
@@ -21,7 +22,7 @@ describe(`${MongoPieceRepository.name}`, () => {
       const db: Db = testDatabase.getDatabase()
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
-      const mongoPiece: MongoPiece = createMongoPiece({ partId: partId })
+      const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
       const piece: Piece = EntityMockFactory.createPiece({ partId: partId })
       await testDatabase.populateDatabaseWithPieces([mongoPiece])
 
@@ -40,8 +41,8 @@ describe(`${MongoPieceRepository.name}`, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
       const mongoPieces: MongoPiece[] = [
-        createMongoPiece({ partId: partId }),
-        createMongoPiece({ partId: partId }),
+        createMongoPiece({ startPartId: partId }),
+        createMongoPiece({ startPartId: partId }),
       ]
       const pieces: Piece[] = [
         EntityMockFactory.createPiece({ partId: partId }),
@@ -64,7 +65,7 @@ describe(`${MongoPieceRepository.name}`, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const partId: string = 'somePartId'
-      const mongoPiece: MongoPiece = createMongoPiece({ partId: partId })
+      const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
       await testDatabase.populateDatabaseWithPieces([mongoPiece])
 
       when(mongoConverter.convertPieces(anything())).thenReturn([])
@@ -81,7 +82,7 @@ describe(`${MongoPieceRepository.name}`, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const partId: string = 'somePartId'
-      const mongoPiece: MongoPiece = createMongoPiece({ partId: partId })
+      const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
       await testDatabase.populateDatabaseWithPieces([mongoPiece])
       const db: Db = testDatabase.getDatabase()
 
@@ -96,11 +97,88 @@ describe(`${MongoPieceRepository.name}`, () => {
     })
   })
 
-  function createMongoPiece(params: { id?: string; name?: string; partId?: string }): MongoPiece {
+  describe(`${MongoPieceRepository.prototype.getPieces.name}`, () => {
+    // TODO: See this test fail.
+    it('returns zero pieces when no pieces for given partId exist', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const partId: string = 'somePartId'
+
+      when(mongoConverter.convertPieces(anything())).thenReturn([])
+      const testee: PieceRepository = createTestee({
+        mongoConverter: mongoConverter,
+      })
+
+      const result: Piece[] = await testee.getPieces(partId)
+
+      expect(result.length).toBe(0)
+    })
+
+    // TODO: See this test fail.
+    it('returns one piece when partId is given', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const partId: string = 'somePartId'
+      const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId})]
+      const pieces: Piece[] = [EntityFactory.createPiece({partId: partId})]
+      await testDatabase.populateDatabaseWithPieces(mongoPieces)
+
+      when(mongoConverter.convertPieces(anything())).thenReturn(pieces)
+      const testee: PieceRepository = createTestee({
+        mongoConverter: mongoConverter,
+      })
+
+      const result: Piece[] = await testee.getPieces(partId)
+
+      // TODO: Fix 'jasmine' not being defined.
+      //expect(mongoConverter.convertPieces).toBeCalledWith(arrayContaining(pieces.map((piece) => objectContaining(piece))))
+      expect(result.length).toBe(1)
+    })
+
+    // TODO: See this test fail.
+    it('returns multiple pieces when partId is given', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const partId: string = 'somePartId'
+      const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId}), createMongoPiece({startPartId: partId})]
+      const pieces: Piece[] = [EntityFactory.createPiece({partId: partId}), EntityFactory.createPiece({partId: partId})]
+      await testDatabase.populateDatabaseWithPieces(mongoPieces)
+
+      when(mongoConverter.convertPieces(anything())).thenReturn(pieces)
+      const testee: PieceRepository = createTestee({
+        mongoConverter: mongoConverter,
+      })
+
+      const result: Piece[] = await testee.getPieces(partId)
+
+      // TODO: Fix 'jasmine' not being defined.
+      //expect(mongoConverter.convertPieces).toBeCalledWith(arrayContaining(pieces.map((piece) => objectContaining(piece))))
+      expect(result.length).toBe(pieces.length)
+    })
+
+    // TODO: See this test fail.
+    it('converts from mongo pieces to our piece entity, when partId is given', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const partId: string = 'somePartId'
+      const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId})]
+      const pieces: Piece[] = [EntityFactory.createPiece({partId: partId})]
+      await testDatabase.populateDatabaseWithPieces(mongoPieces)
+
+      when(mongoConverter.convertPieces(anything())).thenReturn(pieces)
+      const testee: PieceRepository = createTestee({
+        mongoConverter: mongoConverter,
+      })
+
+      await testee.getPieces(partId)
+
+      verify(mongoConverter.convertPieces(anything())).once()
+      // TODO: Fix 'jasmine' not being defined.
+      //expect(mongoConverter.convertPieces).toBeCalledWith(arrayContaining(pieces.map((piece) => objectContaining(piece))))
+    })
+  })
+
+  function createMongoPiece(params: Partial<MongoPiece>): MongoPiece {
     return {
-      _id: params.id ?? 'id' + Math.random(),
+      _id: params._id ?? 'id' + Math.random(),
       name: params.name ?? 'name' + Math.random(),
-      startPartId: params.partId ?? 'segmentId' + Math.random(),
+      startPartId: params.startPartId ?? 'partId' + Math.floor(Math.random() * 10),
     } as MongoPiece
   }
 

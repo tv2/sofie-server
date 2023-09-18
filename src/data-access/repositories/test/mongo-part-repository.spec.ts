@@ -9,6 +9,7 @@ import { MongoTestDatabase } from './mongo-test-database'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
+import { EntityFactory } from '../../../model/entities/test/entity-factory'
 
 const COLLECTION_NAME = 'parts'
 
@@ -262,12 +263,112 @@ describe(`${MongoPartRepository.name}`, () => {
     })
   })
 
+  describe(`${MongoPartRepository.prototype.getParts.name}`, () => {
+    // TODO: See this test fail.
+    it('returns zero pars when no parts for given segmentId exist', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const segmentId: string = 'someSegmentId'
+
+      when(mongoConverter.convertParts(anything())).thenReturn([])
+      const testee: PartRepository = createTestee({
+        mongoConverter: mongoConverter,
+      })
+
+      const result: Part[] = await testee.getParts(segmentId)
+
+      expect(result.length).toBe(0)
+    })
+
+    // TODO: See this test fail.
+    it('returns one part when segmentId is given', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const segmentId: string = 'someSegmentId'
+      const mongoParts: MongoPart[] = [createMongoPart({segmentId: segmentId})]
+      const parts: Part[] = [EntityFactory.createPart({segmentId: segmentId})]
+      await testDatabase.populateDatabaseWithParts(mongoParts)
+
+      when(mongoConverter.convertParts(anything())).thenReturn(parts)
+      const testee: PartRepository = createTestee({
+        mongoConverter: mongoConverter,
+      })
+
+      const result: Part[] = await testee.getParts(segmentId)
+
+      // TODO: Fix 'jasmine' not being defined.
+      //expect(mongoConverter.convertParts).toBeCalledWith(arrayContaining(parts.map((part) => objectContaining(part))))
+      expect(result.length).toBe(1)
+    })
+
+    // TODO: See this test fail.
+    it('returns multiple parts when segmentId is given', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const segmentId: string = 'someSegmentId'
+      const mongoParts: MongoPart[] = [createMongoPart({segmentId: segmentId}), createMongoPart({segmentId: segmentId})]
+      const parts: Part[] = [EntityFactory.createPart({segmentId: segmentId}), EntityFactory.createPart({segmentId: segmentId})]
+      await testDatabase.populateDatabaseWithParts(mongoParts)
+
+      when(mongoConverter.convertParts(anything())).thenReturn(parts)
+      const testee: PartRepository = createTestee({
+        mongoConverter: mongoConverter,
+      })
+
+      const result: Part[] = await testee.getParts(segmentId)
+
+      // TODO: Fix 'jasmine' not being defined.
+      //expect(mongoConverter.convertParts).toBeCalledWith(arrayContaining(parts.map((part) => objectContaining(part))))
+      expect(result.length).toBe(parts.length)
+    })
+
+    // TODO: See this test fail.
+    it('retrieves pieces equal times to amount of parts retrieved', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const pieceRepository: PieceRepository = mock<PieceRepository>()
+      const segmentId: string = 'someSegmentId'
+      const mongoParts: MongoPart[] = [createMongoPart({segmentId: segmentId}), createMongoPart({segmentId: segmentId})]
+      const parts: Part[] = [EntityFactory.createPart({segmentId: segmentId}), EntityFactory.createPart({segmentId: segmentId})]
+      await testDatabase.populateDatabaseWithParts(mongoParts)
+
+      when(mongoConverter.convertParts(anything())).thenReturn(parts)
+      when(pieceRepository.getPieces(anyString())).thenResolve([])
+      const testee: PartRepository = createTestee({
+        mongoConverter: mongoConverter,
+        pieceRepository: pieceRepository
+      })
+
+      await testee.getParts(segmentId)
+
+      // TODO: Fix 'jasmine' not being defined.
+      //expect(mongoConverter.convertParts).toBeCalledWith(arrayContaining(parts.map((part) => objectContaining(part))))
+      verify(pieceRepository.getPieces(anyString())).times(parts.length)
+    })
+
+    // TODO: See this test fail.
+    it('converts from mongo parts to our part entity, when segmentId is given', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const segmentId: string = 'someSegmentId'
+      const mongoParts: MongoPart[] = [createMongoPart({segmentId: segmentId})]
+      const parts: Part[] = [EntityFactory.createPart({segmentId: segmentId})]
+      await testDatabase.populateDatabaseWithParts(mongoParts)
+
+      when(mongoConverter.convertParts(anything())).thenReturn(parts)
+      const testee: PartRepository = createTestee({
+        mongoConverter: mongoConverter,
+      })
+
+      await testee.getParts(segmentId)
+
+      verify(mongoConverter.convertParts(anything())).once()
+      // TODO: Fix 'jasmine' not being defined.
+      //expect(mongoConverter.convertParts).toBeCalledWith(arrayContaining(parts.map((part) => objectContaining(part))))
+    })
+  })
+
   function createMongoPart(mongoPartInterface?: Partial<MongoPart>): MongoPart {
     return {
       _id: mongoPartInterface?._id ?? 'id' + Math.random(),
       title: mongoPartInterface?.title ?? 'partTitle',
       _rank: mongoPartInterface?._rank ?? Math.random() * 100,
-      segmentId: mongoPartInterface?.segmentId ?? 'segmentId' + Math.random() * 10,
+      segmentId: mongoPartInterface?.segmentId ?? 'segmentId' + Math.floor(Math.random() * 10),
     } as MongoPart
   }
 

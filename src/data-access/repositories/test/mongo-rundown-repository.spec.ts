@@ -2,7 +2,7 @@ import { MongoRundownRepository } from '../mongo/mongo-rundown-repository'
 import { MongoTestDatabase } from './mongo-test-database'
 import { SegmentRepository } from '../interfaces/segment-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
-import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
+import { anyString, anything, instance, mock, objectContaining, spy, verify, when } from '@typestrong/ts-mockito'
 import { MongoEntityConverter, MongoRundown } from '../mongo/mongo-entity-converter'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Db } from 'mongodb'
@@ -10,6 +10,8 @@ import { RundownBaselineRepository } from '../interfaces/rundown-baseline-reposi
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
+import { Segment } from '../../../model/entities/segment'
+import { EntityFactory } from '../../../model/entities/test/entity-factory'
 
 const COLLECTION_NAME = 'rundowns'
 describe(`${MongoRundownRepository.name}`, () => {
@@ -111,7 +113,7 @@ describe(`${MongoRundownRepository.name}`, () => {
 
       await testee.deleteRundown(rundownId)
 
-      verify(segmentRepository.deleteSegmentsForRundown(anything())).calledBefore(
+      verify(segmentRepository.deleteSegmentsForRundown(anyString())).calledBefore(
         spiedCollection.deleteOne(anything())
       )
     })
@@ -183,6 +185,70 @@ describe(`${MongoRundownRepository.name}`, () => {
     })
   })
 
+  describe(`${MongoRundownRepository.prototype.getRundown.name}`, () => {
+    it('throws exception, when nonexistent rundownId is given', async () => {
+      const nonExistingId: string = 'nonExistingId'
+      const mongoRundown: MongoRundown = createMongoRundown()
+      await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
+
+      const testee: MongoRundownRepository = createTestee({})
+      const action: () => Promise<Rundown> = async () => testee.getRundown(nonExistingId)
+
+      await expect(action).rejects.toThrow(NotFoundException)
+    })
+
+    it('retrieves segments from the segment repository, when existing rundownId is given', async () => {
+      const segmentRepository: SegmentRepository = mock<SegmentRepository>()
+      const rundown: Rundown = EntityFactory.createRundown()
+
+      when(segmentRepository.getSegments(anyString())).thenResolve([])
+      const testee: RundownRepository = await populateAndCreateTestee({
+        segmentRepository: segmentRepository,
+      }, {rundown: rundown})
+
+      await testee.getRundown(rundown.id)
+
+      verify(segmentRepository.getSegments(rundown.id)).once()
+    })
+
+    it('sets the rundown segments, when existing rundownId is given', async () => {
+      const segmentRepository: SegmentRepository = mock<SegmentRepository>()
+      const rundown: Rundown = EntityFactory.createRundown()
+      const segments: Segment[] = [EntityFactory.createSegment({ rundownId: rundown.id }), EntityFactory.createSegment({ rundownId: rundown.id })]
+
+      when(segmentRepository.getSegments(rundown.id)).thenResolve(segments)
+      const testee: RundownRepository = await populateAndCreateTestee({
+        segmentRepository: segmentRepository,
+      }, {rundown: rundown})
+
+      await testee.getRundown(rundown.id)
+
+      expect(rundown.getSegments()).toBe(segments)
+    })
+
+    it('returns rundown, when existing rundownId is given', async () => {
+      const rundown: Rundown = EntityFactory.createRundown()
+      const testee: RundownRepository = await populateAndCreateTestee({}, {rundown: rundown})
+
+      const result: Rundown = await testee.getRundown(rundown.id)
+
+      expect(result).not.toBeNull()
+    })
+
+    it('converts from mongo rundown to our rundown entity, when existing rundownId is given', async () => {
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const rundown: Rundown = EntityFactory.createRundown()
+      const mongoRundown: MongoRundown = createMongoRundown({
+        _id: rundown.id,
+      })
+      const testee: RundownRepository = await populateAndCreateTestee({mongoConverter: mongoConverter}, {rundown: rundown, mongoRundown: mongoRundown})
+
+      await testee.getRundown(rundown.id)
+
+      verify(mongoConverter.convertRundown(objectContaining(mongoRundown), anything())).once()
+    })
+  })
+
   function createMongoRundown(mongoRundownInterface?: Partial<MongoRundown>): MongoRundown {
     return {
       _id: mongoRundownInterface?._id ?? 'id' + Math.random(),
@@ -190,16 +256,30 @@ describe(`${MongoRundownRepository.name}`, () => {
     } as MongoRundown
   }
 
-  function createTestee(params: {
+  interface TesteeParams {
     segmentRepository?: SegmentRepository
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
     baselineRepository?: RundownBaselineRepository
-  }): MongoRundownRepository {
-    const segmentRepository: SegmentRepository = params.segmentRepository ?? mock<SegmentRepository>()
+  }
+
+  async function populateAndCreateTestee(params: TesteeParams, misc: {rundown: Rundown, mongoRundown?: MongoRundown}): Promise<MongoRundownRepository> {
+    if (!params.mongoConverter) {
+      params.mongoConverter = mock(MongoEntityConverter)
+    }
+    if (!misc.mongoRundown) {
+      misc.mongoRundown = createMongoRundown({
+        _id: misc.rundown.id,
+      })
+    }
+    await testDatabase.populateDatabaseWithInactiveRundowns([misc.mongoRundown])
+    when(params.mongoConverter.convertRundown(objectContaining(misc.mongoRundown), anything())).thenReturn(misc.rundown)
+
+    return createTestee(params)
+  }
+
+  function createTestee(params: TesteeParams): MongoRundownRepository {
     const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
-    const baselineRepository: RundownBaselineRepository =
-			params.baselineRepository ?? mock<RundownBaselineRepository>()
 
     if (!params.mongoDb) {
       params.mongoDb = mock(MongoDatabase)
@@ -208,11 +288,21 @@ describe(`${MongoRundownRepository.name}`, () => {
       )
     }
 
+    if (!params.baselineRepository) {
+      params.baselineRepository = mock<RundownBaselineRepository>()
+      when(params.baselineRepository.getRundownBaseline(anyString())).thenResolve([])
+    }
+
+    if (!params.segmentRepository) {
+      params.segmentRepository = mock<SegmentRepository>()
+      when(params.segmentRepository.getSegments(anyString())).thenResolve([])
+    }
+
     return new MongoRundownRepository(
       instance(params.mongoDb),
       instance(mongoConverter),
-      instance(baselineRepository),
-      instance(segmentRepository)
+      instance(params.baselineRepository),
+      instance(params.segmentRepository)
     )
   }
 })
