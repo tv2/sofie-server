@@ -20,6 +20,7 @@ export interface MongoRundown {
   name: string
   modified: number
   isActive?: boolean // TODO: Remove optionality when we have control over data structure.
+  persistentState?: unknown
 }
 
 export interface MongoSegment {
@@ -119,6 +120,7 @@ export class MongoEntityConverter {
       baselineTimelineObjects: baselineTimelineObjects ?? [],
       segments: [],
       modifiedAt: mongoRundown.modified,
+      persistentState: mongoRundown.persistentState
     })
   }
 
@@ -127,6 +129,7 @@ export class MongoEntityConverter {
       _id: rundown.id,
       name: rundown.name,
       isActive: rundown.isActive(),
+      persistentState: rundown.getPersistentState()
     } as MongoRundown
   }
 

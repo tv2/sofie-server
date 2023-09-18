@@ -16,18 +16,11 @@ import {
   RundownEvent,
 } from '../../model/value-objects/rundown-event'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
-import { StudioRepository } from '../../data-access/repositories/interfaces/studio-repository'
-import { Studio } from '../../model/entities/studio'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
-import { ShowStyleRepository } from '../../data-access/repositories/interfaces/show-style-repository'
-import { ShowStyle } from '../../model/entities/show-style'
 import { RundownPersistentState } from '../../model/value-objects/rundown-persistent-state'
-
-// Sofie currently only uses one hardcoded studio.
-const STUDIO_ID: string = 'studio0'
-// Sofie currently only uses one hardcoded showStyle.
-const SHOW_STYLE_ID: string = 'show0'
+import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
+import { Configuration } from '../../model/entities/configuration'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -35,8 +28,7 @@ export class RundownTimelineService implements RundownService {
     private readonly rundownRepository: RundownRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly adLibPieceRepository: AdLibPieceRepository,
-    private readonly studioRepository: StudioRepository,
-    private readonly showStyleRepository: ShowStyleRepository,
+    private readonly configurationRepository: ConfigurationRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly rundownEventBuilder: RundownEventBuilder,
     private readonly callbackScheduler: CallbackScheduler,
@@ -48,10 +40,21 @@ export class RundownTimelineService implements RundownService {
 
     rundown.activate()
 
-    const studio: Studio = await this.studioRepository.getStudio(STUDIO_ID)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, studio)
-    this.timelineRepository.saveTimeline(timeline)
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
+
+    const onTimelineGenerate: { timeline: Timeline; rundownPersistentState: RundownPersistentState } =
+        this.blueprint.onTimelineGenerate(
+          configuration,
+          rundown.getPersistentState(),
+          rundown.getActivePart(),
+          rundown.getPreviousPart(),
+          timeline
+        )
+    rundown.setPersistentState(onTimelineGenerate.rundownPersistentState)
+
+    this.timelineRepository.saveTimeline(onTimelineGenerate.timeline)
 
     this.emitAddInfinitePieces(rundown, [])
 
@@ -95,16 +98,13 @@ export class RundownTimelineService implements RundownService {
     )
     rundown.getActivePart().setEndState(endStateForActivePart)
 
-    const studio: Studio = await this.studioRepository.getStudio(STUDIO_ID)
-    const showStyle: ShowStyle = await this.showStyleRepository.getShowStyle(SHOW_STYLE_ID)
-    showStyle.blueprintConfiguration
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, studio)
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
 
     const onTimelineGenerate: { timeline: Timeline; rundownPersistentState: RundownPersistentState } =
         this.blueprint.onTimelineGenerate(
-          studio,
-          {} as ShowStyle,
+          configuration,
           rundown.getPersistentState(),
           rundown.getActivePart(),
           rundown.getPreviousPart(),
@@ -147,6 +147,21 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.setNext(segmentId, partId)
 
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
+    const onTimelineGenerate: { timeline: Timeline; rundownPersistentState: RundownPersistentState } =
+        this.blueprint.onTimelineGenerate(
+          configuration,
+          rundown.getPersistentState(),
+          rundown.getActivePart(),
+          rundown.getPreviousPart(),
+          timeline
+        )
+    rundown.setPersistentState(onTimelineGenerate.rundownPersistentState)
+
+    this.timelineRepository.saveTimeline(onTimelineGenerate.timeline)
+
     const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
     this.rundownEventEmitter.emitRundownEvent(setNextEvent)
 
@@ -159,9 +174,9 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.reset()
 
-    const studio: Studio = await this.studioRepository.getStudio(STUDIO_ID)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, studio)
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
 
     this.timelineRepository.saveTimeline(timeline)
 
@@ -182,9 +197,9 @@ export class RundownTimelineService implements RundownService {
     adLibPiece.setExecutedAt(new Date().getTime())
     rundown.adAdLibPiece(adLibPiece)
 
-    const studio: Studio = await this.studioRepository.getStudio(STUDIO_ID)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, studio)
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
 
     this.timelineRepository.saveTimeline(timeline)
 

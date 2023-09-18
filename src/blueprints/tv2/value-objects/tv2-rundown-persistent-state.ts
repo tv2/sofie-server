@@ -1,11 +1,12 @@
+import { Tv2MediaPlayer } from './tv2-studio-blueprint-configuration'
+
 // These values are taken from "TimelinePersistentStateExt" in Blueprints
 export interface Tv2RundownPersistentState {
-  activeMediaPlayers: Map<string, Tv2MediaPlayerClaim[] | undefined>
+  activeMediaPlayerSessions: Tv2MediaPlayerSession[]
   isNewSegment?: boolean
 }
 
-export interface Tv2MediaPlayerClaim {
-  sessionId: string
-  playerId: number
-  lookAhead: boolean
+export interface Tv2MediaPlayerSession {
+  sessionId: string // Hardcoded ID from Blueprints
+  mediaPlayer: Tv2MediaPlayer
 }

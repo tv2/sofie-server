@@ -1,5 +1,10 @@
 export interface Tv2StudioBlueprintConfiguration {
-  mediaPlayers: Tv2MediaPlayerConfiguration[]
+  ABMediaPlayers: Tv2MediaPlayer[]
 }
 
-export type Tv2MediaPlayerConfiguration = { id: string; val: string }
+export interface Tv2MediaPlayer {
+  // These values need to match the values defined in Blueprints
+  _id: string
+  SourceName: string // This is used as the Id for the MediaPlayer...
+  SwitcherSource: number
+}

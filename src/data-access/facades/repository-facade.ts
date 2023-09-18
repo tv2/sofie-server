@@ -16,11 +16,12 @@ import { CachedRundownRepository } from '../repositories/cache/cached-rundown-re
 import { RundownBaselineRepository } from '../repositories/interfaces/rundown-baseline-repository'
 import { MongoRundownBaselineRepository } from '../repositories/mongo/mongo-rundown-baseline-repository'
 import { StudioRepository } from '../repositories/interfaces/studio-repository'
-import { CachedStudioRepository } from '../repositories/cache/cached-studio-repository'
 import { MongoStudioRepository } from '../repositories/mongo/mongo-studio-repository'
 import { ShowStyleRepository } from '../repositories/interfaces/show-style-repository'
-import { CachedShowStyleRepository } from '../repositories/cache/cached-show-style-repository'
+import { CachedConfigurationRepository } from '../repositories/cache/cached-configuration-repository'
 import { MongoShowStyleRepository } from '../repositories/mongo/mongo-show-style-repository'
+import { ConfigurationRepository } from '../repositories/interfaces/configuration-repository'
+import { MongoConfigurationRepository } from '../repositories/mongo/mongo-configuration-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -66,19 +67,19 @@ export class RepositoryFacade {
     return new MongoAdLibPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 
-  public static createStudioRepository(): StudioRepository {
-    const studioRepository: StudioRepository = new MongoStudioRepository(
-      MongoDatabase.getInstance(),
-      new MongoEntityConverter()
+  public static createConfigurationRepository(): ConfigurationRepository {
+    const configurationRepository: ConfigurationRepository = new MongoConfigurationRepository(
+      this.createStudioRepository(),
+      this.createShowStyleRepository()
     )
-    return CachedStudioRepository.getInstance(studioRepository)
+    return CachedConfigurationRepository.getInstance(configurationRepository)
   }
 
-  public static createShowStyleRepository(): ShowStyleRepository {
-    const showStyleRepository: ShowStyleRepository = new MongoShowStyleRepository(
-      MongoDatabase.getInstance(),
-      new MongoEntityConverter()
-    )
-    return CachedShowStyleRepository.getInstance(showStyleRepository)
+  private static createStudioRepository(): StudioRepository {
+    return new MongoStudioRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  private static createShowStyleRepository(): ShowStyleRepository {
+    return new MongoShowStyleRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 }

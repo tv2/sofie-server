@@ -12,9 +12,8 @@ import { RundownTimelineService } from '../rundown-timeline-service'
 import { CallbackScheduler } from '../interfaces/callback-scheduler'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { RundownEvent } from '../../../model/value-objects/rundown-event'
-import { StudioRepository } from '../../../data-access/repositories/interfaces/studio-repository'
 import { Blueprint } from '../../../model/value-objects/blueprint'
-import { ShowStyleRepository } from '../../../data-access/repositories/interfaces/show-style-repository'
+import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
 
 describe(`${RundownTimelineService.name}`, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -100,8 +99,7 @@ function createTestee(params: {
   rundownRepository?: RundownRepository
   timelineRepository?: TimelineRepository
   adLibPieceRepository?: AdLibPieceRepository
-  studioRepository?: StudioRepository
-  showStyleRepository?: ShowStyleRepository
+  configurationRepository?: ConfigurationRepository
   timelineBuilder?: TimelineBuilder
   rundownEventBuilder?: RundownEventBuilder
   callbackScheduler?: CallbackScheduler
@@ -112,8 +110,7 @@ function createTestee(params: {
     params.rundownRepository ?? instance(mock<RundownRepository>()),
     params.timelineRepository ?? instance(mock<TimelineRepository>()),
     params.adLibPieceRepository ?? instance(mock<AdLibPieceRepository>()),
-    params.studioRepository ?? instance(mock<StudioRepository>()),
-    params.showStyleRepository ?? instance(mock<ShowStyleRepository>()),
+    params.configurationRepository ?? instance(mock<ConfigurationRepository>()),
     params.timelineBuilder ?? instance(mock<TimelineBuilder>()),
     params.rundownEventBuilder ?? instance(mock<RundownEventBuilder>()),
     params.callbackScheduler ?? instance(mock<CallbackScheduler>()),
