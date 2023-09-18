@@ -23,6 +23,7 @@ export interface RundownInterface {
   baselineTimelineObjects: TimelineObject[]
   isRundownActive: boolean
   modifiedAt: number
+  persistentState?: RundownPersistentState
 
   alreadyActiveProperties?: {
     activePart: Part
@@ -150,6 +151,7 @@ export class Rundown extends BasicRundown {
     this.infinitePieces = new Map()
     this.isRundownActive = false
     this.previousPart = undefined
+    this.persistentState = undefined
   }
 
   private assertActive(operationName: string): void {

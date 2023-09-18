@@ -7,7 +7,7 @@ import { Tv2RundownPersistentState } from './value-objects/tv2-rundown-persisten
 import { Tv2TallyTags } from './value-objects/tv2-tally-tags'
 import { Tv2GraphicsContent } from './value-objects/tv2-content'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
-import { Tv2PieceMetaData, Tv2SisyfosPersistenceMetaData } from './value-objects/tv2-meta-data'
+import { Tv2SisyfosPersistenceMetaData } from './value-objects/tv2-meta-data'
 
 /*
  Disclaimer: The code in this file is almost a 1 to 1 copy of the code of the corresponding implementations in Blueprints.
@@ -25,10 +25,7 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     const endState: Tv2PartEndState = {
       sisyfosPersistenceMetaData: {
         sisyfosLayers: [],
-      },
-      mediaPlayerSessions: new Map(),
-      segmentId: part.segmentId, // TODO: Is this needed?
-      partId: part.id, // TODO: Is this needed?
+      }
     }
 
     // Blueprints finds all "active" Pieces, but the way it does it by saying Piece.start < time
@@ -50,14 +47,6 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     )
 
     for (const piece of part.getPieces()) {
-      if (piece.metaData) {
-        const mediaPlayerSessions: string[] | undefined = (piece.metaData as Tv2PieceMetaData)
-          .mediaPlayerSessions
-        if (mediaPlayerSessions && mediaPlayerSessions.length) {
-          endState.mediaPlayerSessions.set(piece.layer, mediaPlayerSessions)
-        }
-      }
-
       if (piece.tags.includes(Tv2TallyTags.JINGLE_IS_LIVE)) {
         endState.isJingle = true
       }

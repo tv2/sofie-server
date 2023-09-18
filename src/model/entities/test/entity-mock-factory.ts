@@ -184,6 +184,8 @@ export class EntityMockFactory {
       previousPartContinueIntoPartDuration: misc.partTimings?.previousPartContinueIntoPartDuration ?? 0,
     })
 
+    when(mockedPart.getEndState()).thenReturn(partInterface.endState)
+
     return mockedPart
   }
 
@@ -218,6 +220,8 @@ export class EntityMockFactory {
     when(mockedPiece.preRollDuration).thenReturn(pieceInterface.preRollDuration ?? 0)
     when(mockedPiece.postRollDuration).thenReturn(pieceInterface.postRollDuration ?? 0)
     when(mockedPiece.transitionType).thenReturn(pieceInterface.transitionType ?? TransitionType.NO_TRANSITION)
+    when(mockedPiece.tags).thenReturn(pieceInterface.tags ?? [])
+    when(mockedPiece.content).thenReturn(pieceInterface.content)
 
     when(mockedPiece.getExecutedAt()).thenReturn(misc.executedAt ?? 0)
 

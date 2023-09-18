@@ -1,4 +1,5 @@
 import { TimelineObject } from '../../../model/entities/timeline-object'
+import { DeviceType } from '../../../model/enums/device-type'
 
 export interface Tv2SisyfosPersistenceMetaData {
   /**
@@ -24,14 +25,17 @@ export interface Tv2SisyfosPersistenceMetaData {
 }
 
 export interface Tv2PieceMetaData {
-  // TODO: Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
-  sisyfosPersistMetaData?: Tv2SisyfosPersistenceMetaData
-  mediaPlayerSessions?: string[]
-  modifiedByAction?: boolean
+  sisyfosPersistMetaData?: Tv2SisyfosPersistenceMetaData // Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
+  mediaPlayerSessions?: string[] // Hardcoded in Blueprints for each Part.
 }
 
 export interface Tv2BlueprintTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType
+  }
   metaData?: Tv2TimelineObjectMetaData
+  isLookahead?: boolean
+  lookaheadForLayer?: string
 }
 
 export interface Tv2TimelineObjectMetaData {

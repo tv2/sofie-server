@@ -1,15 +1,10 @@
 import { TimelineBuilder } from './interfaces/timeline-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
-  ActivePartTimelineObjectGroup,
-  DeviceType,
-  LookAheadTimelineObject,
-  Timeline,
-  TimelineObjectControl,
+  ActivePartTimelineObjectGroup, LookAheadTimelineObject,
+  TimelineObject,
   TimelineObjectGroup,
-  TimelineObjectType,
-} from '../../model/entities/timeline'
-import { TimelineObject } from '../../model/entities/timeline-object'
+} from '../../model/entities/timeline-object'
 import { Part } from '../../model/entities/part'
 import { Piece } from '../../model/entities/piece'
 import { TimelineEnable } from '../../model/entities/timeline-enable'
@@ -24,6 +19,7 @@ import { StudioLayer } from '../../model/value-objects/studio-layer'
 import { LookAheadMode } from '../../model/enums/look-ahead-mode'
 import { Exception } from '../../model/exceptions/exception'
 import { ErrorCode } from '../../model/enums/error-code'
+import { Timeline } from '../../model/entities/timeline'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOK_AHEAD_GROUP_ID: string = 'look_ahead_group'
@@ -79,10 +75,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       },
       priority: BASELINE_PRIORITY,
       layer: '',
-      content: {
-        type: TimelineObjectType.GROUP,
-        deviceType: DeviceType.ABSTRACT,
-      },
+      content: {}
     }
 
     return {
@@ -112,10 +105,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       enable: currentPartEnable,
       layer: '',
       autoNextEpochTime,
-      content: {
-        type: TimelineObjectType.GROUP,
-        deviceType: DeviceType.ABSTRACT,
-      },
+      content: {}
     }
 
     activeGroup.children = activePart
@@ -144,7 +134,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       )
     }
 
-    const controlForPiece: TimelineObjectControl = this.createTimelineObjectControl(parentGroup, piece, pieceEnable)
+    const controlForPiece: TimelineObject = this.createTimelineObjectControl(parentGroup, piece, pieceEnable)
     timelineObjectsToReturn.push(controlForPiece)
 
     const childGroupForPiece: TimelineObjectGroup = this.createTimelineObjectGroupForPiece(
@@ -155,7 +145,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     timelineObjectsToReturn.push(childGroupForPiece)
 
     if (this.shouldPieceHavePreRollGroup(controlForPiece, piece)) {
-      const preRollControlForPiece: TimelineObjectControl = this.createPreRollGroupForControl(
+      const preRollControlForPiece: TimelineObject = this.createPreRollGroupForControl(
         controlForPiece,
         parentGroup
       )
@@ -254,32 +244,25 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     parentGroup: TimelineObjectGroup,
     piece: Piece,
     pieceEnable: TimelineEnable
-  ): TimelineObjectControl {
+  ): TimelineObject {
     return {
       id: `${parentGroup.id}${PIECE_CONTROL_INFIX}${piece.id}`,
       enable: pieceEnable,
       layer: piece.layer,
       priority: MEDIUM_PRIORITY,
-      content: {
-        type: TimelineObjectType.CONTROL,
-        deviceType: DeviceType.ABSTRACT,
-      },
       isGroup: false,
       inGroup: parentGroup.id,
+      content: {}
     }
   }
 
   private createTimelineObjectGroupForPiece(
     parentGroup: TimelineObjectGroup,
     piece: Piece,
-    controlForPiece: TimelineObjectControl
+    controlForPiece: TimelineObject
   ): TimelineObjectGroup {
     return {
       id: `${parentGroup.id}${PIECE_GROUP_INFIX}${piece.id}`,
-      content: {
-        type: TimelineObjectType.GROUP,
-        deviceType: DeviceType.ABSTRACT,
-      },
       isGroup: true,
       inGroup: parentGroup.id,
       children: [],
@@ -288,28 +271,26 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         end: `#${controlForPiece.id}.end${piece.postRollDuration ? ` - ${piece.postRollDuration}` : ''}`,
       },
       layer: '',
+      content: {}
     }
   }
 
-  private shouldPieceHavePreRollGroup(controlForPiece: TimelineObjectControl, piece: Piece): boolean {
+  private shouldPieceHavePreRollGroup(controlForPiece: TimelineObject, piece: Piece): boolean {
     // TODO: If we can't get rid of start="now" then we need to check for "now" here.
     return (controlForPiece.enable as TimelineEnable).start === 0 && piece.preRollDuration > 0
   }
 
   private createPreRollGroupForControl(
-    controlObject: TimelineObjectControl,
+    controlObject: TimelineObject,
     parentGroup: TimelineObjectGroup
-  ): TimelineObjectControl {
+  ): TimelineObject {
     return {
       id: `${PIECE_PRE_ROLL_PREFIX}${controlObject.id}`,
       enable: {
         start: `#${parentGroup.id}.start`,
       },
       layer: '',
-      content: {
-        type: TimelineObjectType.CONTROL,
-        deviceType: DeviceType.ABSTRACT,
-      },
+      content: {}
     }
   }
 
@@ -358,10 +339,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       },
       priority: LOOK_AHEAD_PRIORITY,
       layer: '',
-      content: {
-        type: TimelineObjectType.GROUP,
-        deviceType: DeviceType.ABSTRACT,
-      },
+      content: {}
     }
 
     timeline.timelineGroups.push(lookAheadTimelineObjectGroup)
@@ -486,10 +464,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         }`,
       },
       layer: '',
-      content: {
-        type: TimelineObjectType.GROUP,
-        deviceType: DeviceType.ABSTRACT,
-      },
+      content: {}
     }
 
     previousGroup.children = previousPart
@@ -527,10 +502,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
             start: piece.getExecutedAt(),
           },
           layer: piece.layer,
-          content: {
-            type: TimelineObjectType.GROUP,
-            deviceType: DeviceType.ABSTRACT,
-          },
+          content: {}
         }
 
         // TODO: Do infinite Pieces need a PreRoll group? In current implementation Piece.executedAt already includes PreRoll
@@ -590,10 +562,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         // TODO: Start should be enough. We call the "TakeNext" again when it's time to autoNext, and then duration will be set.
       },
       layer: '',
-      content: {
-        type: TimelineObjectType.GROUP,
-        deviceType: DeviceType.ABSTRACT,
-      },
+      content: {}
     }
 
     nextGroup.children = nextPart

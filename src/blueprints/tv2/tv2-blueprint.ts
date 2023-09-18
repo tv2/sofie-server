@@ -3,10 +3,9 @@ import { RundownPersistentState } from '../../model/value-objects/rundown-persis
 import { Part } from '../../model/entities/part'
 import { PartEndState } from '../../model/value-objects/part-end-state'
 import { Tv2EndStateForPartCalculator } from './tv2-end-state-for-part-calculator'
-import { ShowStyle } from '../../model/entities/show-style'
 import { Timeline } from '../../model/entities/timeline'
-import { Studio } from '../../model/entities/studio'
 import { Tv2OnTimelineGenerateCalculator } from './tv2-on-timeline-generate-calculator'
+import { Configuration } from '../../model/entities/configuration'
 
 export class Tv2Blueprint implements Blueprint {
   constructor(
@@ -24,8 +23,7 @@ export class Tv2Blueprint implements Blueprint {
   }
 
   public onTimelineGenerate(
-    studio: Studio,
-    showStyle: ShowStyle,
+    configuration: Configuration,
     previousRundownPersistentState: RundownPersistentState,
     currentPart: Part,
     previousPart: Part,
@@ -35,8 +33,7 @@ export class Tv2Blueprint implements Blueprint {
       rundownPersistentState: RundownPersistentState
     } {
     return this.onTimelineGenerateCalculator.onTimelineGenerate(
-      studio,
-      showStyle,
+      configuration,
       previousRundownPersistentState,
       currentPart,
       previousPart,
