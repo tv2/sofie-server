@@ -52,7 +52,6 @@ export class Segment {
   }
 
   public setAsNext(): void {
-    this.reset()
     this.isSegmentNext = true
   }
 
