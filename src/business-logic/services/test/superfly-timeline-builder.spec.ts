@@ -17,6 +17,7 @@ import { LastPartInRundownException } from '../../../model/exceptions/last-part-
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOK_AHEAD_GROUP_ID: string = 'look_ahead_group'
+const LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX: string = '_forActive'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
@@ -128,10 +129,7 @@ describe('superfly-timeline-builder', () => {
           expect(result).not.toBeUndefined()
         })
 
-        it('sets TimelineEnable.start set to now', () => {
-          const now: number = Date.now()
-          jest.useFakeTimers().setSystemTime(now)
-
+        it('sets TimelineEnable.start set to be when the active Part was "executed"', () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -141,7 +139,7 @@ describe('superfly-timeline-builder', () => {
             group.id.includes(ACTIVE_GROUP_PREFIX)
           )!
 
-          expect(result.enable.start).toBe(now)
+          expect(result.enable.start).toBe(rundown.getActivePart().getExecutedAt())
         })
 
         it('sets an empty layer', () => {
@@ -2426,10 +2424,7 @@ describe('superfly-timeline-builder', () => {
           })
         })
 
-        it('sets Timeline.autoNext.epochTimeToTakeNext to be now + active Part.expected duration + active Part.delayStartOffPiecesDuration - next Part.previousPartContinueIntoPartDuration', () => {
-          const now: number = Date.now()
-          jest.useFakeTimers().setSystemTime(now)
-
+        it('sets Timeline.autoNext.epochTimeToTakeNext to be active Part.executedAt + active Part.expected duration + active Part.delayStartOffPiecesDuration - next Part.previousPartContinueIntoPartDuration', () => {
           const delayStartOfPiecesDuration: number = 30
           const continueIntoPartDuration: number = 50
 
@@ -2450,7 +2445,7 @@ describe('superfly-timeline-builder', () => {
 
           expect(timeline.autoNext).not.toBeUndefined()
           const expectedEpochTimeToTakeNext: number =
-              now + activePart.expectedDuration + delayStartOfPiecesDuration - continueIntoPartDuration
+              activePart.getExecutedAt() + activePart.expectedDuration + delayStartOfPiecesDuration - continueIntoPartDuration
           expect(timeline.autoNext?.epochTimeToTakeNext).toBe(expectedEpochTimeToTakeNext)
         })
 
@@ -4528,7 +4523,7 @@ describe('superfly-timeline-builder', () => {
                 )!
                 const lookAheadTimelineObject: TimelineObject | undefined =
                     lookAheadGroup.children.find(
-                      (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                      (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                     )
                 expect(lookAheadTimelineObject).not.toBeUndefined()
               })
@@ -4560,7 +4555,7 @@ describe('superfly-timeline-builder', () => {
                   (group) => group.id === LOOK_AHEAD_GROUP_ID
                 )!
                 const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
                 expect(lookAheadTimelineObject.priority).toBe(LOOK_AHEAD_PRIORITY)
               })
@@ -4592,7 +4587,7 @@ describe('superfly-timeline-builder', () => {
                   (group) => group.id === LOOK_AHEAD_GROUP_ID
                 )!
                 const lookAheadTimelineObject: LookAheadTimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )! as LookAheadTimelineObject
                 expect(lookAheadTimelineObject.isLookahead).toBe(true)
               })
@@ -4624,7 +4619,7 @@ describe('superfly-timeline-builder', () => {
                   (group) => group.id === LOOK_AHEAD_GROUP_ID
                 )!
                 const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
                 expect(lookAheadTimelineObject.enable.start).toBe(0)
               })
@@ -4656,7 +4651,7 @@ describe('superfly-timeline-builder', () => {
                   (group) => group.id === LOOK_AHEAD_GROUP_ID
                 )!
                 const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
                 expect(lookAheadTimelineObject.enable.end).toBe(
                   `#${ACTIVE_GROUP_PREFIX}${activePart.id}.start`
@@ -4690,7 +4685,7 @@ describe('superfly-timeline-builder', () => {
                   (group) => group.id === LOOK_AHEAD_GROUP_ID
                 )!
                 const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
                 expect(lookAheadTimelineObject.inGroup).toBe(LOOK_AHEAD_GROUP_ID)
               })
@@ -4729,7 +4724,7 @@ describe('superfly-timeline-builder', () => {
                   (group) => group.id === LOOK_AHEAD_GROUP_ID
                 )!
                 const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
                 expect(lookAheadTimelineObject.content).toBe(content)
               })
@@ -4765,7 +4760,7 @@ describe('superfly-timeline-builder', () => {
                     (group) => group.id === LOOK_AHEAD_GROUP_ID
                   )!
                   const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                    (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                    (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                   )!
                   expect(lookAheadTimelineObject.layer).toBe(timelineObject.layer)
                 })
@@ -4803,7 +4798,7 @@ describe('superfly-timeline-builder', () => {
                   )!
                   const lookAheadTimelineObject: LookAheadTimelineObject =
                       lookAheadGroup.children.find(
-                        (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                        (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                       )! as LookAheadTimelineObject
                   expect(lookAheadTimelineObject.layer).toBe(`${timelineObject.layer}_lookahead`)
                 })
@@ -4839,7 +4834,7 @@ describe('superfly-timeline-builder', () => {
                   )!
                   const lookAheadTimelineObject: LookAheadTimelineObject =
                       lookAheadGroup.children.find(
-                        (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                        (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                       )! as LookAheadTimelineObject
                   expect(lookAheadTimelineObject.lookaheadForLayer).toBe(timelineObject.layer)
                 })
@@ -4883,8 +4878,8 @@ describe('superfly-timeline-builder', () => {
                 (group) => group.id === LOOK_AHEAD_GROUP_ID
               )!
               const childrenIds: string[] = lookAheadGroup.children.map((o) => o.id)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${timelineObjectOne.id}`)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${timelineObjectTwo.id}`)
+              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${timelineObjectOne.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
+              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${timelineObjectTwo.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
             })
           })
         })
@@ -5505,7 +5500,7 @@ describe('superfly-timeline-builder', () => {
               )!
               expect(lookAheadGroup.children).toHaveLength(2)
               const childrenIds: string[] = lookAheadGroup.children.map((child) => child.id)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${activePartTimelineObject.id}`)
+              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${activePartTimelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
               expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${lookAheadTimelineObject.id}`)
             })
           })

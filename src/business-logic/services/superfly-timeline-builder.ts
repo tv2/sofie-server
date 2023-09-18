@@ -27,6 +27,7 @@ import { ErrorCode } from '../../model/enums/error-code'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOK_AHEAD_GROUP_ID: string = 'look_ahead_group'
+const LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX: string = '_forActive'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
@@ -90,19 +91,17 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   }
 
   private createActivePartGroup(rundown: Rundown): ActivePartTimelineObjectGroup {
-    const now: number = Date.now()
-
     const activePart: Part = rundown.getActivePart()
 
     const currentPartEnable: TimelineEnable = {
-      start: now,
+      start: activePart.getExecutedAt()
     }
 
     let autoNextEpochTime: number = 0
     if (activePart.autoNext && !!activePart.expectedDuration) {
       currentPartEnable.duration =
           activePart.expectedDuration + activePart.getTimings().delayStartOfPiecesDuration
-      autoNextEpochTime = now + currentPartEnable.duration
+      autoNextEpochTime = activePart.getExecutedAt() + currentPartEnable.duration
     }
 
     const activeGroup: ActivePartTimelineObjectGroup = {
@@ -350,8 +349,6 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       return lookAheadObjects
     })
 
-    // TODO: Test server with in-transition to see if we need to do something about it with lookAhead
-
     const lookAheadTimelineObjectGroup: TimelineObjectGroup = {
       id: LOOK_AHEAD_GROUP_ID,
       isGroup: true,
@@ -405,14 +402,15 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   private createLookAheadTimelineObjectsForPart(
     part: Part,
     layer: StudioLayer,
-    enable: TimelineEnable
+    enable: TimelineEnable,
+    idPostFix?: string
   ): LookAheadTimelineObject[] {
     return part
       .getPieces()
       .filter((piece) => piece.pieceLifespan === PieceLifespan.WITHIN_PART)
       .flatMap((piece) => piece.timelineObjects)
       .filter((timelineObject) => timelineObject.layer === layer.name)
-      .map((timelineObject) => this.mapTimelineObjectToLookAheadTimelineObject(timelineObject, enable, layer))
+      .map((timelineObject) => this.mapTimelineObjectToLookAheadTimelineObject(timelineObject, enable, layer, idPostFix))
   }
 
   /*
@@ -433,18 +431,20 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return this.createLookAheadTimelineObjectsForPart(
       rundown.getActivePart(),
       layer,
-      activePartTimelineObjectEnable
+      activePartTimelineObjectEnable,
+      LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX
     )
   }
 
   private mapTimelineObjectToLookAheadTimelineObject(
     timelineObject: TimelineObject,
     enable: TimelineEnable,
-    studioLayer: StudioLayer
+    studioLayer: StudioLayer,
+    idPostFix: string = ''
   ): LookAheadTimelineObject {
     const lookAheadTimelineObject: LookAheadTimelineObject = {
       ...this.objectCloner.clone(timelineObject),
-      id: `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`,
+      id: `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${idPostFix}`,
       priority: LOOK_AHEAD_PRIORITY,
       isLookahead: true,
       enable,
