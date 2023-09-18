@@ -13,7 +13,7 @@ import { EntityMockFactory } from '../../../model/entities/test/entity-mock-fact
 import { Segment } from '../../../model/entities/segment'
 import { EntityFactory } from '../../../model/entities/test/entity-factory'
 
-const COLLECTION_NAME = 'rundowns'
+const COLLECTION_NAME: string = 'rundowns'
 describe(`${MongoRundownRepository.name}`, () => {
   const testDatabase: MongoTestDatabase = new MongoTestDatabase()
   beforeEach(async () => testDatabase.setupDatabase())
