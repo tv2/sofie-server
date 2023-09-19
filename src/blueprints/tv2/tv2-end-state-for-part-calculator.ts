@@ -72,8 +72,12 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
         previousPartEndState.sisyfosPersistenceMetaData
           ? previousPartEndState.sisyfosPersistenceMetaData.sisyfosLayers
           : []
+
+    const pieceMetaData: Tv2SisyfosPersistenceMetaData | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetaData(part, time)
     return {
-      sisyfosLayers: this.sisyfosPersistentLayerFinder.findLayersToPersist(part, time, layersWantingToPersist),
+      sisyfosLayers: pieceMetaData?.wantsToPersistAudio
+        ? this.sisyfosPersistentLayerFinder.findLayersToPersistForPieceMetaData(pieceMetaData, layersWantingToPersist)
+        : []
     }
   }
 }

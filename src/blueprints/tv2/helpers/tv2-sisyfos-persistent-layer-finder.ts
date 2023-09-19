@@ -8,6 +8,14 @@ export class Tv2SisyfosPersistentLayerFinder {
     time: number | undefined,
     layersWantingToPersistFromPreviousPart: string[] = []
   ): string[] {
+    const lastPlayingPieceMetaData: Tv2SisyfosPersistenceMetaData | undefined = this.findLastPlayingPieceMetaData(part, time)
+    if (!lastPlayingPieceMetaData) {
+      return []
+    }
+    return this.findLayersToPersistForPieceMetaData(lastPlayingPieceMetaData, layersWantingToPersistFromPreviousPart)
+  }
+
+  public findLastPlayingPieceMetaData(part: Part, time: number | undefined): Tv2SisyfosPersistenceMetaData | undefined {
     if (!time) {
       time = Date.now()
     }
@@ -19,31 +27,13 @@ export class Tv2SisyfosPersistentLayerFinder {
       time
     )
 
-    // TODO: Does this work? Test it
     if (!lastPlayingPiece) {
-      return []
+      return undefined
     }
 
     // .findPieceWithSisyfosMetaData() has already filtered all Pieces without SisyfosPersistenceMetaData away, so we know it's not undefined.
-    const lastPlayingPieceMetaData: Tv2SisyfosPersistenceMetaData = (lastPlayingPiece.metaData as Tv2PieceMetaData)
+    return (lastPlayingPiece.metaData as Tv2PieceMetaData)
       .sisyfosPersistMetaData!
-
-    if (!lastPlayingPieceMetaData.wantsToPersistAudio) {
-      return []
-    }
-
-    if (!lastPlayingPieceMetaData.acceptsPersistedAudio) {
-      return lastPlayingPieceMetaData.sisyfosLayers
-    }
-
-    const layersToPersist: string[] = [...lastPlayingPieceMetaData.sisyfosLayers]
-    if (!lastPlayingPieceMetaData.isModifiedOrInsertedByAction) {
-      layersToPersist.push(...layersWantingToPersistFromPreviousPart)
-    } else if (lastPlayingPieceMetaData.previousSisyfosLayers) {
-      layersToPersist.push(...lastPlayingPieceMetaData.previousSisyfosLayers)
-    }
-
-    return Array.from(new Set(layersToPersist))
   }
 
   private findPiecesWithSisyfosMetaData(part: Part): Piece[] {
@@ -58,7 +48,6 @@ export class Tv2SisyfosPersistentLayerFinder {
 
   private findLastPlayingPiece(pieces: Piece[], partExecutedAt: number, time: number): Piece | undefined {
     const playingPieces: Piece[] = pieces.filter((piece) => {
-      // TODO: Verify this condition - It's found in Blueprints in onTimelineGenerate.ts line 264
       const hasPieceStoppedPlaying: boolean =
 				piece.duration > 0 && piece.start + piece.duration + partExecutedAt <= time
       return !hasPieceStoppedPlaying
@@ -71,5 +60,20 @@ export class Tv2SisyfosPersistentLayerFinder {
     return playingPieces.reduce((previous, current) => {
       return previous.start > current.start ? previous : current
     })
+  }
+
+  public findLayersToPersistForPieceMetaData(lastPlayingPieceMetaData: Tv2SisyfosPersistenceMetaData, layersWantingToPersistFromPreviousPart: string[]): string[] {
+    if (!lastPlayingPieceMetaData.acceptsPersistedAudio) {
+      return lastPlayingPieceMetaData.sisyfosLayers
+    }
+
+    const layersToPersist: string[] = [...lastPlayingPieceMetaData.sisyfosLayers]
+    if (!lastPlayingPieceMetaData.isModifiedOrInsertedByAction) {
+      layersToPersist.push(...layersWantingToPersistFromPreviousPart)
+    } else if (lastPlayingPieceMetaData.previousSisyfosLayers) {
+      layersToPersist.push(...lastPlayingPieceMetaData.previousSisyfosLayers)
+    }
+
+    return Array.from(new Set(layersToPersist))
   }
 }
