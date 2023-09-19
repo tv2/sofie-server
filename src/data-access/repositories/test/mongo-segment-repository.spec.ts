@@ -2,7 +2,7 @@ import { MongoSegmentRepository } from '../mongo/mongo-segment-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
 import { MongoEntityConverter, MongoSegment } from '../mongo/mongo-entity-converter'
 import { Db } from 'mongodb'
-import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
+import { anyString, anything, capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { PartRepository } from '../interfaces/part-repository'
 import { SegmentRepository } from '../interfaces/segment-repository'
 import { Segment } from '../../../model/entities/segment'
@@ -156,22 +156,25 @@ describe(`${MongoSegmentRepository.name}`, () => {
   })
 
   describe(`${MongoSegmentRepository.prototype.getSegments.name}`, () => {
-    // TODO: See this test fail.
-    it('returns zero segments when no segments for given rundownId exist', async () => {
+    it('gets zero segments from database when no segments for given rundownId exist', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
-      const rundownId: string = 'someRundownId'
+      const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: 'someRundownId'})]
+      const nonExistingId: string = 'nonExistingId'
+      const db: Db = testDatabase.getDatabase()
+      await testDatabase.populateDatabaseWithSegments(mongoSegments)
 
       when(mongoConverter.convertSegments(anything())).thenReturn([])
       const testee: SegmentRepository = createTestee({
         mongoConverter: mongoConverter,
       })
 
-      const result: Segment[] = await testee.getSegments(rundownId)
+      await testee.getSegments(nonExistingId)
 
-      expect(result.length).toBe(0)
+      const [capturedMongoSegments] =  capture(mongoConverter.convertSegments).first()
+      expect(capturedMongoSegments.length).toBe(0)
+      expect((await db.collection(COLLECTION_NAME).find().toArray()).length).toBe(1)
     })
 
-    // TODO: See this test fail.
     it('returns one segment when rundownId is given', async () => {
       const rundownId: string = 'someRundownId'
       const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: rundownId})]
@@ -182,12 +185,9 @@ describe(`${MongoSegmentRepository.name}`, () => {
 
       const result: Segment[] = await testee.getSegments(rundownId)
 
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertSegments).toBeCalledWith(arrayContaining(segments.map((segment) => objectContaining(segment))))
-      expect(result.length).toBe(1)
+      expect(result.length).toBe(segments.length)
     })
 
-    // TODO: See this test fail.
     it('returns multiple segments when rundownId is given', async () => {
       const rundownId: string = 'someRundownId'
       const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: rundownId}), createMongoSegment({rundownId: rundownId})]
@@ -197,8 +197,6 @@ describe(`${MongoSegmentRepository.name}`, () => {
       }, {segments: segments, mongoSegments: mongoSegments})
 
       const result: Segment[] = await testee.getSegments(rundownId)
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertSegments).toBeCalledWith(arrayContaining(segments.map((segment) => objectContaining(segment))))
       expect(result.length).toBe(segments.length)
     })
 
@@ -217,12 +215,9 @@ describe(`${MongoSegmentRepository.name}`, () => {
 
       await testee.getSegments(rundownId)
 
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertSegments).toBeCalledWith(arrayContaining(segments.map((segment) => objectContaining(segment))))
       verify(partRepository.getParts(anyString())).times(segments.length)
     })
 
-    // TODO: See this test fail.
     it('converts from mongo segments to our segment entity, when rundownId is given', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const rundownId: string = 'someRundownId'
@@ -238,8 +233,11 @@ describe(`${MongoSegmentRepository.name}`, () => {
       await testee.getSegments(rundownId)
 
       verify(mongoConverter.convertSegments(anything())).once()
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertSegments).toBeCalledWith(arrayContaining(segments.map((segment) => objectContaining(segment))))
+      const [capturedMongoSegments] =  capture(mongoConverter.convertSegments).first()
+      expect(capturedMongoSegments.length).toBe(mongoSegments.length)
+      mongoSegments.forEach((mongoSegment) => {
+        expect(capturedMongoSegments).toEqual(expect.arrayContaining([expect.objectContaining(mongoSegment)]))
+      })
     })
   })
 
