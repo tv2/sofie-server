@@ -22,8 +22,9 @@ describe('Part', () => {
     afterEach(() => jest.useRealTimers())
 
     it('sets part to be on air', () => {
-      const testee: Part = new Part({} as PartInterface)
+      const testee: Part = new Part({ isOnAir: false } as PartInterface)
 
+      expect(testee.isOnAir()).toBe(false)
       testee.putOnAir()
 
       const result: boolean = testee.isOnAir()
