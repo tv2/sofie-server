@@ -1,7 +1,7 @@
 import { MongoPieceRepository } from '../mongo/mongo-piece-repository'
 import { MongoTestDatabase } from './mongo-test-database'
 import { MongoEntityConverter, MongoPiece } from '../mongo/mongo-entity-converter'
-import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Db } from 'mongodb'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
@@ -98,22 +98,25 @@ describe(`${MongoPieceRepository.name}`, () => {
   })
 
   describe(`${MongoPieceRepository.prototype.getPieces.name}`, () => {
-    // TODO: See this test fail.
-    it('returns zero pieces when no pieces for given partId exist', async () => {
+    it('gets zero pieces from database when no pieces for given partId exist', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
-      const partId: string = 'somePartId'
+      const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: 'somePartId'})]
+      const nonExistingId: string = 'nonExistingId'
+      const db: Db = testDatabase.getDatabase()
+      await testDatabase.populateDatabaseWithPieces(mongoPieces)
 
       when(mongoConverter.convertPieces(anything())).thenReturn([])
       const testee: PieceRepository = createTestee({
         mongoConverter: mongoConverter,
       })
 
-      const result: Piece[] = await testee.getPieces(partId)
+      await testee.getPieces(nonExistingId)
 
-      expect(result.length).toBe(0)
+      const [capturedMongoPieces] =  capture(mongoConverter.convertPieces).first()
+      expect(capturedMongoPieces.length).toBe(0)
+      expect((await db.collection(COLLECTION_NAME).find().toArray()).length).toBe(1)
     })
 
-    // TODO: See this test fail.
     it('returns one piece when partId is given', async () => {
       const partId: string = 'somePartId'
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId})]
@@ -123,12 +126,9 @@ describe(`${MongoPieceRepository.name}`, () => {
 
       const result: Piece[] = await testee.getPieces(partId)
 
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertPieces).toBeCalledWith(arrayContaining(pieces.map((piece) => objectContaining(piece))))
-      expect(result.length).toBe(1)
+      expect(result.length).toBe(pieces.length)
     })
 
-    // TODO: See this test fail.
     it('returns multiple pieces when partId is given', async () => {
       const partId: string = 'somePartId'
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId}), createMongoPiece({startPartId: partId})]
@@ -138,12 +138,9 @@ describe(`${MongoPieceRepository.name}`, () => {
 
       const result: Piece[] = await testee.getPieces(partId)
 
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertPieces).toBeCalledWith(arrayContaining(pieces.map((piece) => objectContaining(piece))))
       expect(result.length).toBe(pieces.length)
     })
 
-    // TODO: See this test fail.
     it('converts from mongo pieces to our piece entity, when partId is given', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
@@ -157,8 +154,11 @@ describe(`${MongoPieceRepository.name}`, () => {
       await testee.getPieces(partId)
 
       verify(mongoConverter.convertPieces(anything())).once()
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertPieces).toBeCalledWith(arrayContaining(pieces.map((piece) => objectContaining(piece))))
+      const [capturedMongoPieces] =  capture(mongoConverter.convertPieces).first()
+      expect(capturedMongoPieces.length).toBe(mongoPieces.length)
+      mongoPieces.forEach((mongoPiece) => {
+        expect(capturedMongoPieces).toEqual(expect.arrayContaining([expect.objectContaining(mongoPiece)]))
+      })
     })
   })
 

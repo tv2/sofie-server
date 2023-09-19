@@ -4,7 +4,7 @@ import { Db } from 'mongodb'
 import { MongoEntityConverter, MongoPart } from '../mongo/mongo-entity-converter'
 import { PartRepository } from '../interfaces/part-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
-import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
+import { anyString, anything, capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { MongoTestDatabase } from './mongo-test-database'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
@@ -264,22 +264,25 @@ describe(`${MongoPartRepository.name}`, () => {
   })
 
   describe(`${MongoPartRepository.prototype.getParts.name}`, () => {
-    // TODO: See this test fail.
-    it('returns zero pars when no parts for given segmentId exist', async () => {
+    it('gets zero parts from database when no parts for given segmentId exist', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
-      const segmentId: string = 'someSegmentId'
+      const mongoParts: MongoPart[] = [createMongoPart({segmentId: 'someSegmentId'})]
+      const nonExistingId: string = 'nonExistingId'
+      const db: Db = testDatabase.getDatabase()
+      await testDatabase.populateDatabaseWithParts(mongoParts)
 
       when(mongoConverter.convertParts(anything())).thenReturn([])
       const testee: PartRepository = createTestee({
         mongoConverter: mongoConverter,
       })
 
-      const result: Part[] = await testee.getParts(segmentId)
+      await testee.getParts(nonExistingId)
 
-      expect(result.length).toBe(0)
+      const [capturedMongoParts] =  capture(mongoConverter.convertParts).first()
+      expect(capturedMongoParts.length).toBe(0)
+      expect((await db.collection(COLLECTION_NAME).find().toArray()).length).toBe(1)
     })
 
-    // TODO: See this test fail.
     it('returns one part when segmentId is given', async () => {
       const segmentId: string = 'someSegmentId'
       const mongoParts: MongoPart[] = [createMongoPart({segmentId: segmentId})]
@@ -289,12 +292,9 @@ describe(`${MongoPartRepository.name}`, () => {
 
       const result: Part[] = await testee.getParts(segmentId)
 
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertParts).toBeCalledWith(arrayContaining(parts.map((part) => objectContaining(part))))
-      expect(result.length).toBe(1)
+      expect(result.length).toBe(parts.length)
     })
 
-    // TODO: See this test fail.
     it('returns multiple parts when segmentId is given', async () => {
       const segmentId: string = 'someSegmentId'
       const mongoParts: MongoPart[] = [createMongoPart({segmentId: segmentId}), createMongoPart({segmentId: segmentId})]
@@ -304,12 +304,9 @@ describe(`${MongoPartRepository.name}`, () => {
 
       const result: Part[] = await testee.getParts(segmentId)
 
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertParts).toBeCalledWith(arrayContaining(parts.map((part) => objectContaining(part))))
       expect(result.length).toBe(parts.length)
     })
 
-    // TODO: See this test fail.
     it('retrieves pieces equal times to amount of parts retrieved', async () => {
       const pieceRepository: PieceRepository = mock<PieceRepository>()
       const segmentId: string = 'someSegmentId'
@@ -323,12 +320,9 @@ describe(`${MongoPartRepository.name}`, () => {
 
       await testee.getParts(segmentId)
 
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertParts).toBeCalledWith(arrayContaining(parts.map((part) => objectContaining(part))))
       verify(pieceRepository.getPieces(anyString())).times(parts.length)
     })
 
-    // TODO: See this test fail.
     it('converts from mongo parts to our part entity, when segmentId is given', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const segmentId: string = 'someSegmentId'
@@ -343,8 +337,11 @@ describe(`${MongoPartRepository.name}`, () => {
       await testee.getParts(segmentId)
 
       verify(mongoConverter.convertParts(anything())).once()
-      // TODO: Fix 'jasmine' not being defined.
-      //expect(mongoConverter.convertParts).toBeCalledWith(arrayContaining(parts.map((part) => objectContaining(part))))
+      const [capturedMongoParts] =  capture(mongoConverter.convertParts).first()
+      expect(capturedMongoParts.length).toBe(mongoParts.length)
+      mongoParts.forEach((mongoPart) => {
+        expect(capturedMongoParts).toEqual(expect.arrayContaining([expect.objectContaining(mongoPart)]))
+      })
     })
   })
 
