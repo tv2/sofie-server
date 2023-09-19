@@ -11,7 +11,7 @@ import { RundownEventType } from '../../../model/enums/rundown-event-type'
 import { RundownTimelineService } from '../rundown-timeline-service'
 import { CallbackScheduler } from '../interfaces/callback-scheduler'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
-import { RundownDeletedEvent, RundownEvent } from '../../../model/value-objects/rundown-event'
+import { RundownDeletedEvent } from '../../../model/value-objects/rundown-event'
 
 describe(`${RundownTimelineService.name}`, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
