@@ -229,7 +229,7 @@ describe('Rundown', () => {
         const firstPart: Part = EntityMockFactory.createPart({
           id: 'firstPartId',
         })
-        const mockNextPart: Part = EntityMockFactory.createPartMockInstance({
+        const mockNextPart: Part = EntityMockFactory.createPartMock({
           id: 'nextPartId',
         })
         const nextPart: Part = instance(mockNextPart)
@@ -406,7 +406,7 @@ describe('Rundown', () => {
             pieces: [nextPiece],
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMockInstance(
+          const mockedSegment: Segment = EntityMockFactory.createSegmentMock(
             {},
             {
               firstPart,
@@ -443,7 +443,7 @@ describe('Rundown', () => {
         it('sets executedAt to zero for the Piece no longer being an infinite', () => {
           const layer: string = 'someLayer'
 
-          const mockFirstPiece: Piece = EntityMockFactory.createPieceMockInstance({
+          const mockFirstPiece: Piece = EntityMockFactory.createPieceMock({
             id: 'p1',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
@@ -872,7 +872,7 @@ describe('Rundown', () => {
             parts: [firstPart],
           })
 
-          const mockMiddlePiece: Piece = EntityMockFactory.createPieceMockInstance({
+          const mockMiddlePiece: Piece = EntityMockFactory.createPieceMock({
             id: 'middlePiece',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
@@ -1185,7 +1185,7 @@ describe('Rundown', () => {
             pieces: [nextPiece],
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMockInstance({
+          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
             id: 'segment',
             parts: [firstPart, nextPart],
           })
@@ -1237,7 +1237,7 @@ describe('Rundown', () => {
 
           const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMockInstance({
+          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
             id: 'segment',
             parts: [firstPart, middlePart, lastPart],
           })
@@ -1289,7 +1289,7 @@ describe('Rundown', () => {
             pieces: [lastPiece],
           })
 
-          const mockSegment: Segment = EntityMockFactory.createSegmentMockInstance({
+          const mockSegment: Segment = EntityMockFactory.createSegmentMock({
             id: 'segment',
             parts: [firstPart, middlePart, lastPart],
           })
@@ -1339,7 +1339,7 @@ describe('Rundown', () => {
             pieces: [nextPiece],
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMockInstance({
+          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
             id: 'segment',
             parts: [firstPart, nextPart],
           })
@@ -1389,7 +1389,7 @@ describe('Rundown', () => {
             pieces: [nextPiece],
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMockInstance({
+          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
             id: 'segment',
             parts: [firstPart, nextPart],
           })
@@ -1443,7 +1443,7 @@ describe('Rundown', () => {
             id: 'lastPart',
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMockInstance({
+          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
             id: 'segment',
             parts: [firstPart, middlePart, lastPart],
           })
@@ -1578,7 +1578,7 @@ describe('Rundown', () => {
             pieces: [firstPiece],
           })
 
-          const mockMiddlePiece: Piece = EntityMockFactory.createPieceMockInstance({
+          const mockMiddlePiece: Piece = EntityMockFactory.createPieceMock({
             id: 'middlePiece',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
@@ -2033,9 +2033,9 @@ describe('Rundown', () => {
   describe('activate', () => {
 
     it('resets all segments', () => {
-      const mockedSegment1: Segment = EntityMockFactory.createSegmentMockInstance()
-      const mockedSegment2: Segment = EntityMockFactory.createSegmentMockInstance()
-      const mockedSegment3: Segment = EntityMockFactory.createSegmentMockInstance()
+      const mockedSegment1: Segment = EntityMockFactory.createSegmentMock()
+      const mockedSegment2: Segment = EntityMockFactory.createSegmentMock()
+      const mockedSegment3: Segment = EntityMockFactory.createSegmentMock()
 
       const segments: Segment[] = [
         instance(mockedSegment1),
