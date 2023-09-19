@@ -4,9 +4,8 @@ import { Tv2TallyTags } from '../value-objects/tv2-tally-tags'
 import { Piece } from '../../../model/entities/piece'
 import { Part } from '../../../model/entities/part'
 import { Tv2SisyfosPersistentLayerFinder } from '../helpers/tv2-sisyfos-persistent-layer-finder'
-import { capture, instance, mock } from '@typestrong/ts-mockito'
+import { instance, mock } from '@typestrong/ts-mockito'
 import { Tv2PartEndState } from '../value-objects/tv2-part-end-state'
-import { Tv2RundownPersistentState } from '../value-objects/tv2-rundown-persistent-state'
 
 describe(`${Tv2EndStateForPartCalculator.name}`, () => {
   describe(`${Tv2EndStateForPartCalculator.prototype.getEndStateForPart.name}`, () => {
