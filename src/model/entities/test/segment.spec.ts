@@ -234,7 +234,7 @@ describe('Segment', () => {
 
       describe('it calls getPiecesWithLifespan on Part', () => {
         it('with PieceLifespan.SPANNING_UNTIL_RUNDOWN_END', () => {
-          const mockPart: Part = EntityMockFactory.createPartMockInstance()
+          const mockPart: Part = EntityMockFactory.createPartMock()
           const part: Part = instance(mockPart)
 
           const partToSearchBefore: Part = EntityMockFactory.createPart({ id: 'searchPart' })
@@ -248,7 +248,7 @@ describe('Segment', () => {
         })
 
         it('with PieceLifespan.SPANNING_UNTIL_SEGMENT_END', () => {
-          const mockPart: Part = EntityMockFactory.createPartMockInstance()
+          const mockPart: Part = EntityMockFactory.createPartMock()
           const part: Part = instance(mockPart)
 
           const partToSearchBefore: Part = EntityMockFactory.createPart({ id: 'searchPart' })
@@ -262,7 +262,7 @@ describe('Segment', () => {
         })
 
         it('with PieceLifespan.START_SPANNING_THEN_STICKY', () => {
-          const mockPart: Part = EntityMockFactory.createPartMockInstance()
+          const mockPart: Part = EntityMockFactory.createPartMock()
           const part: Part = instance(mockPart)
 
           const partToSearchBefore: Part = EntityMockFactory.createPart({ id: 'searchPart' })
@@ -276,7 +276,7 @@ describe('Segment', () => {
         })
 
         it('does not call with PieceLifespan.WITHIN_PART', () => {
-          const mockPart: Part = EntityMockFactory.createPartMockInstance()
+          const mockPart: Part = EntityMockFactory.createPartMock()
           const part: Part = instance(mockPart)
 
           const partToSearchBefore: Part = EntityMockFactory.createPart({ id: 'searchPart' })
@@ -290,7 +290,7 @@ describe('Segment', () => {
         })
 
         it('does not call with PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE', () => {
-          const mockPart: Part = EntityMockFactory.createPartMockInstance()
+          const mockPart: Part = EntityMockFactory.createPartMock()
           const part: Part = instance(mockPart)
 
           const partToSearchBefore: Part = EntityMockFactory.createPart({ id: 'searchPart' })
@@ -304,7 +304,7 @@ describe('Segment', () => {
         })
 
         it('does not call with PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE', () => {
-          const mockPart: Part = EntityMockFactory.createPartMockInstance()
+          const mockPart: Part = EntityMockFactory.createPartMock()
           const part: Part = instance(mockPart)
 
           const partToSearchBefore: Part = EntityMockFactory.createPart({ id: 'searchPart' })
@@ -388,7 +388,7 @@ describe('Segment', () => {
       describe('Part has one Piece', () => {
         describe('it calls getPiecesWithLifespan on Part', () => {
           it('with PieceLifespan.SPANNING_UNTIL_RUNDOWN_END', () => {
-            const mockPart: Part = EntityMockFactory.createPartMockInstance()
+            const mockPart: Part = EntityMockFactory.createPartMock()
             const part: Part = instance(mockPart)
 
             const testee: Segment = new Segment({ parts: [part] } as SegmentInterface)
@@ -400,7 +400,7 @@ describe('Segment', () => {
           })
 
           it('does not call with PieceLifespan.WITHIN_PART', () => {
-            const mockPart: Part = EntityMockFactory.createPartMockInstance()
+            const mockPart: Part = EntityMockFactory.createPartMock()
             const part: Part = instance(mockPart)
 
             const testee: Segment = new Segment({ parts: [part] } as SegmentInterface)
@@ -412,7 +412,7 @@ describe('Segment', () => {
           })
 
           it('does not call with PieceLifespan.SPANNING_UNTIL_SEGMENT_END', () => {
-            const mockPart: Part = EntityMockFactory.createPartMockInstance()
+            const mockPart: Part = EntityMockFactory.createPartMock()
             const part: Part = instance(mockPart)
 
             const testee: Segment = new Segment({ parts: [part] } as SegmentInterface)
@@ -424,7 +424,7 @@ describe('Segment', () => {
           })
 
           it('does not call with PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE', () => {
-            const mockPart: Part = EntityMockFactory.createPartMockInstance()
+            const mockPart: Part = EntityMockFactory.createPartMock()
             const part: Part = instance(mockPart)
 
             const testee: Segment = new Segment({ parts: [part] } as SegmentInterface)
@@ -436,7 +436,7 @@ describe('Segment', () => {
           })
 
           it('does not call with PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE', () => {
-            const mockPart: Part = EntityMockFactory.createPartMockInstance()
+            const mockPart: Part = EntityMockFactory.createPartMock()
             const part: Part = instance(mockPart)
 
             const testee: Segment = new Segment({ parts: [part] } as SegmentInterface)
@@ -448,7 +448,7 @@ describe('Segment', () => {
           })
 
           it('does not call with PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN', () => {
-            const mockPart: Part = EntityMockFactory.createPartMockInstance()
+            const mockPart: Part = EntityMockFactory.createPartMock()
             const part: Part = instance(mockPart)
 
             const testee: Segment = new Segment({ parts: [part] } as SegmentInterface)
@@ -489,9 +489,9 @@ describe('Segment', () => {
 
   describe('reset', () => {
     it('resets all parts', () => {
-      const mockedPart1: Part = EntityMockFactory.createPartMockInstance()
-      const mockedPart2: Part = EntityMockFactory.createPartMockInstance()
-      const mockedPart3: Part = EntityMockFactory.createPartMockInstance()
+      const mockedPart1: Part = EntityMockFactory.createPartMock()
+      const mockedPart2: Part = EntityMockFactory.createPartMock()
+      const mockedPart3: Part = EntityMockFactory.createPartMock()
       const parts: Part[] = [
         instance(mockedPart1),
         instance(mockedPart2),
