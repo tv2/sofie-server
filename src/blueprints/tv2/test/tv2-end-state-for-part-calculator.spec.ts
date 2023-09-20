@@ -15,7 +15,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
         const part: Part = EntityMockFactory.createPart({ pieces: [pieceWithJingleTag] })
 
         const testee: Tv2EndStateForPartCalculator = createTestee()
-        const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0) as Tv2PartEndState
+        const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.isJingle).toBeTruthy()
       })
@@ -27,7 +27,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
         const part: Part = EntityMockFactory.createPart({ pieces: [pieceWithoutJingleTag] })
 
         const testee: Tv2EndStateForPartCalculator = createTestee()
-        const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0) as Tv2PartEndState
+        const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.isJingle).toBeFalsy()
       })
@@ -40,7 +40,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
         const part: Part = EntityMockFactory.createPart({ pieces: [pieceWithFileName] })
 
         const testee: Tv2EndStateForPartCalculator = createTestee()
-        const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0) as Tv2PartEndState
+        const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.fullFileName).toBe(fileName)
       })
@@ -52,7 +52,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
         const part: Part = EntityMockFactory.createPart({ pieces: [pieceWithoutFileName] })
 
         const testee: Tv2EndStateForPartCalculator = createTestee()
-        const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0) as Tv2PartEndState
+        const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.fullFileName).toBeFalsy()
       })
