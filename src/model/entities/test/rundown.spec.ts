@@ -2084,7 +2084,7 @@ describe('Rundown', () => {
           it('returns the first Part of the following Segment', () => {
             const firstSegmentId: string = 'firstSegmentId'
             const part: Part = EntityMockFactory.createPart({ segmentId: firstSegmentId })
-            const firstSegmentMock: Segment = EntityMockFactory.createSegmentMockInstance({
+            const firstSegmentMock: Segment = EntityMockFactory.createSegmentMock({
               id: firstSegmentId,
               parts: [part],
             })

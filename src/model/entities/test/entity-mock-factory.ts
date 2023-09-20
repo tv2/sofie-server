@@ -44,11 +44,11 @@ export class EntityMockFactory {
     } = {},
     rundownInterface?: Partial<RundownInterface>
   ): Rundown {
-    const mockedRundown: Rundown = this.createActiveRundownMockInstance(activeRundownProperties, rundownInterface)
+    const mockedRundown: Rundown = this.createActiveRundownMock(activeRundownProperties, rundownInterface)
     return instance(mockedRundown)
   }
 
-  public static createActiveRundownMockInstance(// TODO
+  public static createActiveRundownMock(
     activeRundownProperties: {
       activePart?: Part
       nextPart?: Part
