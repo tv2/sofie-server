@@ -5326,7 +5326,7 @@ describe('superfly-timeline-builder', () => {
                 })
                 const secondPart: Part = EntityMockFactory.createPart({ pieces: [secondPiece] })
 
-                const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+                const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                   nextPart: firstPart,
                 })
                 when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
@@ -5375,7 +5375,7 @@ describe('superfly-timeline-builder', () => {
                 })
                 const lastPart: Part = EntityMockFactory.createPart({ pieces: [lastPiece] })
 
-                const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+                const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                   nextPart: firstPart,
                 })
                 when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
@@ -5428,7 +5428,7 @@ describe('superfly-timeline-builder', () => {
                   pieces: [pieceOutsideSearchDistance],
                 })
 
-                const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+                const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                   nextPart: firstPart,
                 })
                 when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
@@ -5475,7 +5475,7 @@ describe('superfly-timeline-builder', () => {
               })
               const lookAheadPart: Part = EntityMockFactory.createPart({ pieces: [lookAheadPiece] })
 
-              const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+              const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                 activePart,
                 nextPart: lookAheadPart,
               })
@@ -5525,7 +5525,7 @@ describe('superfly-timeline-builder', () => {
               })
               const secondPart: Part = EntityMockFactory.createPart({ pieces: [secondPiece] })
 
-              const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+              const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                 nextPart: firstPart,
               })
               when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
@@ -5562,7 +5562,7 @@ describe('superfly-timeline-builder', () => {
                 EntityMockFactory.createPart({ id: 'thirdPartId' }),
               ]
 
-              const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+              const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                 nextPart: parts[0],
               })
               when(rundown.getPartAfter(parts[0])).thenReturn(parts[1])
