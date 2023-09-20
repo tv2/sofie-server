@@ -15,29 +15,29 @@ export class Tv2Blueprint implements Blueprint {
 
   public getEndStateForPart(
     part: Part,
-    previousPart: Part,
+    previousPart: Part | undefined,
     time: number,
-    rundownPersistentState?: RundownPersistentState
+    rundownPersistentState: RundownPersistentState | undefined
   ): PartEndState {
     return this.endStateForPartCalculator.getEndStateForPart(part, previousPart, time, rundownPersistentState)
   }
 
   public onTimelineGenerate(
     configuration: Configuration,
-    previousRundownPersistentState: RundownPersistentState,
-    currentPart: Part,
-    previousPart: Part,
-    timeline: Timeline
+    timeline: Timeline,
+    activePart: Part,
+    previousRundownPersistentState: RundownPersistentState | undefined,
+    previousPart: Part | undefined,
   ): {
       timeline: Timeline
       rundownPersistentState: RundownPersistentState
     } {
     return this.onTimelineGenerateCalculator.onTimelineGenerate(
       configuration,
+      timeline,
+      activePart,
       previousRundownPersistentState,
-      currentPart,
-      previousPart,
-      timeline
+      previousPart
     )
   }
 }

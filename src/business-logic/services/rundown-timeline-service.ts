@@ -62,10 +62,10 @@ export class RundownTimelineService implements RundownService {
 
     return this.blueprint.onTimelineGenerate(
       configuration,
-      rundown.getPersistentState(),
+      timeline,
       rundown.getActivePart(),
-      rundown.getPreviousPart(),
-      timeline
+      rundown.getPersistentState(),
+      rundown.getPreviousPart()
     )
   }
 
@@ -128,7 +128,8 @@ export class RundownTimelineService implements RundownService {
     return this.blueprint.getEndStateForPart(
       rundown.getActivePart(),
       rundown.getPreviousPart(),
-      Date.now()
+      Date.now(),
+      undefined
     )
   }
 
