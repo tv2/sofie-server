@@ -33,7 +33,7 @@ export interface Tv2BlueprintTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType
   }
-  metadata?: Tv2TimelineObjectMetadata
+  metaData?: Tv2TimelineObjectMetadata
   isLookahead?: boolean
   lookaheadForLayer?: string
 }

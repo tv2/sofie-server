@@ -142,10 +142,10 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     const timelineObjects: TimelineObject[] = this.flatMapTimelineObjectChildren(previousGroup)
     timelineObjects.forEach(timelineObject => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-      if (!blueprintTimelineObject.metadata || !blueprintTimelineObject.metadata.mediaPlayerSession) {
+      if (!blueprintTimelineObject.metaData || !blueprintTimelineObject.metaData.mediaPlayerSession) {
         return
       }
-      const mediaPlayerSessionInUse: Tv2MediaPlayerSession | undefined = mediaPlayerSessionsInUse.find(session => session.sessionId === blueprintTimelineObject.metadata?.mediaPlayerSession)
+      const mediaPlayerSessionInUse: Tv2MediaPlayerSession | undefined = mediaPlayerSessionsInUse.find(session => session.sessionId === blueprintTimelineObject.metaData?.mediaPlayerSession)
       if (!mediaPlayerSessionInUse) {
         return
       }
@@ -157,10 +157,10 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     const timelineObjects: TimelineObject[] = this.flatMapTimelineObjectChildren(group)
     timelineObjects.forEach(timelineObject => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-      if (!blueprintTimelineObject.metadata || !blueprintTimelineObject.metadata.mediaPlayerSession) {
+      if (!blueprintTimelineObject.metaData || !blueprintTimelineObject.metaData.mediaPlayerSession) {
         return
       }
-      const mediaPlayerSessionInUse: Tv2MediaPlayerSession | undefined = mediaPlayerSessionsInUse.find(session => session.sessionId === blueprintTimelineObject.metadata?.mediaPlayerSession)
+      const mediaPlayerSessionInUse: Tv2MediaPlayerSession | undefined = mediaPlayerSessionsInUse.find(session => session.sessionId === blueprintTimelineObject.metaData?.mediaPlayerSession)
       if (mediaPlayerSessionInUse) {
         this.updateTimelineObjectWithMediaPlayer(blueprintTimelineObject, mediaPlayerSessionInUse.mediaPlayer)
         return
@@ -171,7 +171,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
       }
       mediaPlayerSessionsInUse.push({
         mediaPlayer,
-        sessionId: blueprintTimelineObject.metadata.mediaPlayerSession
+        sessionId: blueprintTimelineObject.metaData.mediaPlayerSession
       })
       this.updateTimelineObjectWithMediaPlayer(blueprintTimelineObject, mediaPlayer)
     })
@@ -188,7 +188,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
       timelineObject.children?.some((child: TimelineObject) => this.doesTimelineObjectHaveMediaPlayerSessionWithId(child, sessionId))
       ?? false
     const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-    const hasMediaPlayerSession: boolean = blueprintTimelineObject.metadata?.mediaPlayerSession === sessionId
+    const hasMediaPlayerSession: boolean = blueprintTimelineObject.metaData?.mediaPlayerSession === sessionId
 
     return hasMediaPlayerSession || doesChildrenHaveMediaPlayerSession
   }
