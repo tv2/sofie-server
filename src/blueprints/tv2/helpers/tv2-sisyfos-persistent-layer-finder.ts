@@ -24,7 +24,7 @@ export class Tv2SisyfosPersistentLayerFinder {
 
     // .findPieceWithSisyfosMetadata() has already filtered all Pieces without SisyfosPersistenceMetadata away, so we know it's not undefined.
     const lastPlayingPieceMetadata: Tv2SisyfosPersistenceMetadata = (lastPlayingPiece.metadata as Tv2PieceMetadata)
-      .sisyfosPersistMetadata!
+      .sisyfosPersistMetaData!
 
     if (!lastPlayingPieceMetadata.wantsToPersistAudio) {
       return []
@@ -50,7 +50,7 @@ export class Tv2SisyfosPersistentLayerFinder {
         return false
       }
       const metadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
-      return !!metadata.sisyfosPersistMetadata
+      return !!metadata.sisyfosPersistMetaData
     })
   }
 
