@@ -3,10 +3,8 @@ import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
 
 // TODO: Move to ENV variables
-// const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
-// const MONGO_DB_NAME: string = 'meteor'
-const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:27017?directConnection=true'
-const MONGO_DB_NAME: string = 'sofie'
+const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
+const MONGO_DB_NAME: string = 'meteor'
 
 export class MongoDatabase {
   private static instance: MongoDatabase
