@@ -183,14 +183,8 @@ export class Rundown extends BasicRundown {
   public getPartAfter(part: Part): Part {
     this.assertActive(this.getPartAfter.name)
     let nextPartAfterPart: Part
-    let segmentIndexForPart: number = 0
+    const segmentIndexForPart: number = this.getSegmentIndexForPart(part)
     try {
-      segmentIndexForPart = this.segments.findIndex((segment) => segment.id === part.segmentId)
-      if (segmentIndexForPart < 0) {
-        throw new NotFoundException(
-          `Part: "${part.id}" does not belong to any Segments on Rundown: "${this.id}"`
-        )
-      }
       nextPartAfterPart = this.segments[segmentIndexForPart].findNextPart(part)
     } catch (exception) {
       if ((exception as Exception).errorCode !== ErrorCode.LAST_PART_IN_SEGMENT) {
@@ -203,6 +197,16 @@ export class Rundown extends BasicRundown {
     }
 
     return nextPartAfterPart
+  }
+
+  private getSegmentIndexForPart(part: Part): number {
+    const segmentIndexForPart: number = this.segments.findIndex((segment) => segment.id === part.segmentId)
+    if (segmentIndexForPart < 0) {
+      throw new NotFoundException(
+        `Part: "${part.id}" does not belong to any Segments on Rundown: "${this.id}"`
+      )
+    }
+    return segmentIndexForPart
   }
 
   public getPreviousPart(): Part | undefined {
