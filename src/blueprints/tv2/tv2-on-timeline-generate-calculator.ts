@@ -7,7 +7,7 @@ import { TimelineObject, TimelineObjectGroup } from '../../model/entities/timeli
 import { Tv2PartEndState } from './value-objects/tv2-part-end-state'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
 import { UnsupportedOperation } from '../../model/exceptions/unsupported-operation'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetaData } from './value-objects/tv2-meta-data'
+import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from './value-objects/tv2-meta-data'
 import { Tv2MediaPlayer, Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../model/entities/timeline'
 import { DeviceType } from '../../model/enums/device-type'
@@ -44,7 +44,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
       isNewSegment: previousPart?.segmentId !== activePart.segmentId,
     }
 
-    this.assignSisyfosPersistMetaData(newRundownPersistentState, activePart, previousPart, timeline)
+    this.assignSisyfosPersistMetadata(newRundownPersistentState, activePart, previousPart, timeline)
 
     newRundownPersistentState.activeMediaPlayerSessions = this.assignMediaPlayerSessions(rundownPersistentState.activeMediaPlayerSessions, timeline, blueprintConfiguration)
 
@@ -61,7 +61,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     return rundownPersistentState
   }
 
-  private assignSisyfosPersistMetaData(newRundownPersistentState: Tv2RundownPersistentState, activePart: Part, previousPart: Part | undefined, timeline: Timeline): void {
+  private assignSisyfosPersistMetadata(newRundownPersistentState: Tv2RundownPersistentState, activePart: Part, previousPart: Part | undefined, timeline: Timeline): void {
     if (!newRundownPersistentState.isNewSegment || this.isAnySisyfosPieceInjectedIntoPart(activePart)) {
       const sisyfosPersistedLevelsTimelineObject: TimelineObject =
           this.createSisyfosPersistedLevelsTimelineObject(activePart, previousPart, newRundownPersistentState)
@@ -78,8 +78,8 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
   private isAnySisyfosPieceInjectedIntoPart(part: Part): boolean {
     // TODO: This is a hacky way to check if a Piece is an AdLib. It should not be hidden away in meta data for Sisyfos...
     return part.getPieces().some((piece) => {
-      const pieceMetaData: Tv2PieceMetaData = piece.metaData as Tv2PieceMetaData
-      return pieceMetaData && pieceMetaData.sisyfosPersistMetaData?.isModifiedOrInsertedByAction
+      const pieceMetadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
+      return pieceMetadata && pieceMetadata.sisyfosPersistMetadata?.isModifiedOrInsertedByAction
     })
   }
 
@@ -92,7 +92,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     const previousPartEndState: Tv2PartEndState = previousPart?.getEndState() as Tv2PartEndState
     const layersWantingToPersistFromPreviousPart: string[] =
         previousPartEndState && !rundownPersistentState.isNewSegment
-          ? previousPartEndState.sisyfosPersistenceMetaData.sisyfosLayers
+          ? previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
           : []
     const layersToPersist: string[] = this.sisyfosPersistentLayerFinder.findLayersToPersist(
       part,
@@ -145,10 +145,10 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     const timelineObjects: TimelineObject[] = this.flatMapTimelineObjectChildren(previousGroup)
     timelineObjects.forEach(timelineObject => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-      if (!blueprintTimelineObject.metaData || !blueprintTimelineObject.metaData.mediaPlayerSession) {
+      if (!blueprintTimelineObject.metadata || !blueprintTimelineObject.metadata.mediaPlayerSession) {
         return
       }
-      const mediaPlayerSessionInUse: Tv2MediaPlayerSession | undefined = mediaPlayerSessionsInUse.find(session => session.sessionId === blueprintTimelineObject.metaData?.mediaPlayerSession)
+      const mediaPlayerSessionInUse: Tv2MediaPlayerSession | undefined = mediaPlayerSessionsInUse.find(session => session.sessionId === blueprintTimelineObject.metadata?.mediaPlayerSession)
       if (!mediaPlayerSessionInUse) {
         return
       }
@@ -160,10 +160,10 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     const timelineObjects: TimelineObject[] = this.flatMapTimelineObjectChildren(group)
     timelineObjects.forEach(timelineObject => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-      if (!blueprintTimelineObject.metaData || !blueprintTimelineObject.metaData.mediaPlayerSession) {
+      if (!blueprintTimelineObject.metadata || !blueprintTimelineObject.metadata.mediaPlayerSession) {
         return
       }
-      const mediaPlayerSessionInUse: Tv2MediaPlayerSession | undefined = mediaPlayerSessionsInUse.find(session => session.sessionId === blueprintTimelineObject.metaData?.mediaPlayerSession)
+      const mediaPlayerSessionInUse: Tv2MediaPlayerSession | undefined = mediaPlayerSessionsInUse.find(session => session.sessionId === blueprintTimelineObject.metadata?.mediaPlayerSession)
       if (mediaPlayerSessionInUse) {
         this.updateTimelineObjectWithMediaPlayer(blueprintTimelineObject, mediaPlayerSessionInUse.mediaPlayer)
         return
@@ -174,7 +174,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
       }
       mediaPlayerSessionsInUse.push({
         mediaPlayer,
-        sessionId: blueprintTimelineObject.metaData.mediaPlayerSession
+        sessionId: blueprintTimelineObject.metadata.mediaPlayerSession
       })
       this.updateTimelineObjectWithMediaPlayer(blueprintTimelineObject, mediaPlayer)
     })
@@ -192,7 +192,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
       doesChildrenHaveMediaPlayerSession = timelineObject.children.some((child: TimelineObject) => this.doesTimelineObjectHaveMediaPlayerSessionWithId(child, sessionId))
     }
     const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-    const hasMediaPlayerSession: boolean = blueprintTimelineObject.metaData?.mediaPlayerSession === sessionId
+    const hasMediaPlayerSession: boolean = blueprintTimelineObject.metadata?.mediaPlayerSession === sessionId
 
     return hasMediaPlayerSession || doesChildrenHaveMediaPlayerSession
   }

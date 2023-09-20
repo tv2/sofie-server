@@ -64,7 +64,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
         it('calls sisyfosPersistentLayerFinder with an empty array', () =>  {
           const part: Part = EntityMockFactory.createPart({ id: 'active' })
           const previousPartEndState: Tv2PartEndState = {
-            sisyfosPersistenceMetaData: {
+            sisyfosPersistenceMetadata: {
               sisyfosLayers: ['someLayer']
             }
           }
@@ -129,7 +129,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart({ id: 'active' })
           const sisyfosLayers: string[] = ['someLayer']
           const previousPartEndState: Tv2PartEndState = {
-            sisyfosPersistenceMetaData: {
+            sisyfosPersistenceMetadata: {
               sisyfosLayers
             }
           }

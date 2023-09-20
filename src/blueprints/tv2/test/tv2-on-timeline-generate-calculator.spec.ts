@@ -9,7 +9,7 @@ import { Tv2MediaPlayerSession, Tv2RundownPersistentState } from '../value-objec
 import { Timeline } from '../../../model/entities/timeline'
 import { TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
 import { Tv2MediaPlayer, Tv2StudioBlueprintConfiguration } from '../value-objects/tv2-studio-blueprint-configuration'
-import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetaData } from '../value-objects/tv2-meta-data'
+import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../value-objects/tv2-meta-data'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const LOOK_AHEAD_GROUP_ID: string = 'look_ahead_group'
@@ -622,10 +622,10 @@ function createRundownPersistentState(activeMediaPlayerSessions?: Tv2MediaPlayer
   }
 }
 
-function createTimelineObject(id: string, metaData?: Tv2TimelineObjectMetaData): Tv2BlueprintTimelineObject {
+function createTimelineObject(id: string, metadata?: Tv2TimelineObjectMetadata): Tv2BlueprintTimelineObject {
   return {
     id,
-    metaData,
+    metadata,
     content: {}
   } as Tv2BlueprintTimelineObject
 }
