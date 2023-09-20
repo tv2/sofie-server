@@ -55,12 +55,7 @@ export class Tv2SisyfosPersistentLayerFinder {
   }
 
   private findLastPlayingPiece(pieces: Piece[], partExecutedAt: number, time: number): Piece | undefined {
-    const playingPieces: Piece[] = pieces.filter((piece) => {
-      // TODO: Verify this condition - It's found in Blueprints in onTimelineGenerate.ts line 264
-      const hasPieceStoppedPlaying: boolean =
-				piece.duration > 0 && piece.start + piece.duration + partExecutedAt <= time
-      return !hasPieceStoppedPlaying
-    })
+    const playingPieces: Piece[] = pieces.filter((piece) => this.isPiecePlaying(piece, partExecutedAt, time))
 
     if (playingPieces.length <= 1) {
       return playingPieces[0]
@@ -69,5 +64,12 @@ export class Tv2SisyfosPersistentLayerFinder {
     return playingPieces.reduce((previous, current) => {
       return previous.start > current.start ? previous : current
     })
+  }
+
+  private isPiecePlaying(piece: Piece, partExecutedAt: number, time: number): boolean {
+    // TODO: Verify this condition - It's found in Blueprints in onTimelineGenerate.ts line 264
+    const hasPieceStoppedPlaying: boolean =
+      piece.duration > 0 && piece.start + piece.duration + partExecutedAt <= time
+    return !hasPieceStoppedPlaying
   }
 }

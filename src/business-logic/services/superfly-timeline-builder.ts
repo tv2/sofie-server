@@ -1,7 +1,8 @@
 import { TimelineBuilder } from './interfaces/timeline-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
-  ActivePartTimelineObjectGroup, LookaheadTimelineObject,
+  ActivePartTimelineObjectGroup,
+  LookaheadTimelineObject,
   TimelineObject,
   TimelineObjectGroup,
 } from '../../model/entities/timeline-object'
@@ -316,24 +317,12 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       (layer) => layer.lookaheadMode !== LookaheadMode.NONE
     )
 
-    const futureLookaheadObjects: TimelineObject[] = lookaheadLayers.flatMap((layer) => {
-      const lookaheadObjects: LookaheadTimelineObject[] = this.findLookaheadTimelineObjectsForFutureParts(
-        rundown,
-        layer,
-        activeGroup
-      )
-
-      const activePartLookaheadObjects: LookaheadTimelineObject[] =
-          this.findLookaheadTimelineObjectsForActivePart(rundown, layer, activeGroup)
-      lookaheadObjects.push(...activePartLookaheadObjects)
-
-      return lookaheadObjects
-    })
+    const lookaheadObjects: TimelineObject[] = this.findLookaheadTimelineObjectsForLayers(lookaheadLayers, rundown, activeGroup)
 
     const lookaheadTimelineObjectGroup: TimelineObjectGroup = {
       id: LOOKAHEAD_GROUP_ID,
       isGroup: true,
-      children: futureLookaheadObjects,
+      children: lookaheadObjects,
       enable: {
         while: '1',
       },
@@ -344,6 +333,22 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
 
     timeline.timelineGroups.push(lookaheadTimelineObjectGroup)
     return timeline
+  }
+
+  private findLookaheadTimelineObjectsForLayers(lookaheadLayers: StudioLayer[], rundown: Rundown, activeGroup: TimelineObjectGroup): TimelineObject[] {
+    return lookaheadLayers.flatMap((layer) => {
+      const lookaheadObjects: LookaheadTimelineObject[] = this.findLookaheadTimelineObjectsForFutureParts(
+        rundown,
+        layer,
+        activeGroup
+      )
+
+      const activePartLookaheadObjects: LookaheadTimelineObject[] =
+        this.findLookaheadTimelineObjectsForActivePart(rundown, layer, activeGroup)
+      lookaheadObjects.push(...activePartLookaheadObjects)
+
+      return lookaheadObjects
+    })
   }
 
   private findLookaheadTimelineObjectsForFutureParts(

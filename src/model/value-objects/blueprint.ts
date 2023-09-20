@@ -10,10 +10,10 @@ export interface Blueprint extends BlueprintOnTimelineGenerate, BlueprintGetEndS
 export interface BlueprintOnTimelineGenerate {
   onTimelineGenerate(
     configuration: Configuration,
-    previousRundownPersistentState: RundownPersistentState,
+    timeline: Timeline,
     activePart: Part,
+    previousRundownPersistentState: RundownPersistentState | undefined,
     previousPart: Part | undefined,
-    timeline: Timeline
   ): OnTimelineGenerateResult
 }
 
@@ -22,6 +22,6 @@ export interface BlueprintGetEndStateForPart {
     part: Part,
     previousPart: Part | undefined,
     time: number,
-    rundownPersistentState?: RundownPersistentState
+    rundownPersistentState: RundownPersistentState | undefined
   ): PartEndState
 }

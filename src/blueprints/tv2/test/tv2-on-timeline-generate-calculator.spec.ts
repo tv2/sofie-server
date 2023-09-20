@@ -26,7 +26,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
         const previousPart: Part = EntityMockFactory.createPart({ segmentId })
 
         const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, activePart, previousPart, timeline)
+        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, activePart, rundownPersistentState, previousPart)
         const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
         expect(result.isNewSegment).toBeFalsy()
@@ -42,7 +42,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
         const previousPart: Part = EntityMockFactory.createPart({ segmentId: 'someOtherSegmentId' })
 
         const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, activePart, previousPart, timeline)
+        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, activePart, rundownPersistentState, previousPart)
         const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
         expect(result.isNewSegment).toBeTruthy()
@@ -60,7 +60,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(0)
@@ -82,7 +82,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -105,7 +105,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -130,7 +130,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -156,7 +156,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -185,7 +185,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -211,7 +211,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -238,7 +238,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(0)
@@ -267,7 +267,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -301,7 +301,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -341,7 +341,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -382,7 +382,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -427,7 +427,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -472,7 +472,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -514,7 +514,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -555,7 +555,7 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)

@@ -20,7 +20,7 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     part: Part,
     previousPart: Part | undefined,
     time: number,
-    rundownPersistentState?: RundownPersistentState
+    rundownPersistentState: RundownPersistentState | undefined
   ): PartEndState {
     const endState: Tv2PartEndState = {
       sisyfosPersistenceMetadata: {
@@ -34,7 +34,7 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     // so this basically evaluates to all Pieces always being "active"
     // which means we can just do Part.getPieces()
 
-    const previousPersistentState: Tv2RundownPersistentState = this.convertToTv2RundownPersistentState(rundownPersistentState)
+    const previousPersistentState: Tv2RundownPersistentState = (rundownPersistentState ?? this.getEmptyTv2RundownPersistentState()) as Tv2RundownPersistentState
     const previousPartEndState: Tv2PartEndState | undefined = previousPart?.getEndState() as
 			| Tv2PartEndState
 			| undefined
@@ -60,15 +60,11 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     return endState
   }
 
-  private convertToTv2RundownPersistentState(persistentState?: RundownPersistentState): Tv2RundownPersistentState {
-    let rundownPersistentState: Tv2RundownPersistentState = persistentState as Tv2RundownPersistentState
-    if (!rundownPersistentState) {
-      rundownPersistentState = {
-        activeMediaPlayerSessions: [],
-        isNewSegment: false
-      }
+  private getEmptyTv2RundownPersistentState(): Tv2RundownPersistentState {
+    return {
+      activeMediaPlayerSessions: [],
+      isNewSegment: false
     }
-    return rundownPersistentState
   }
 
   private calculateSisyfosPersistenceMetaData(
@@ -77,14 +73,17 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     time: number,
     rundownPersistentState: Tv2RundownPersistentState
   ): Tv2SisyfosPersistenceMetadata {
-    const layersWantingToPersist: string[] =
-        !rundownPersistentState.isNewSegment &&
-        previousPartEndState &&
-        previousPartEndState.sisyfosPersistenceMetadata
-          ? previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
-          : []
+    const layersWantingToPersist: string[] = this.findLayersWantingToPersist(rundownPersistentState, previousPartEndState)
     return {
       sisyfosLayers: this.sisyfosPersistentLayerFinder.findLayersToPersist(part, time, layersWantingToPersist),
     }
+  }
+
+  private findLayersWantingToPersist(rundownPersistentState: Tv2RundownPersistentState, previousPartEndState: Tv2PartEndState | undefined): string[] {
+    return !rundownPersistentState.isNewSegment &&
+    previousPartEndState &&
+    previousPartEndState.sisyfosPersistenceMetadata
+      ? previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
+      : []
   }
 }
