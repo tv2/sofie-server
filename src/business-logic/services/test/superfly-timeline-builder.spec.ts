@@ -5,19 +5,19 @@ import { Part } from '../../../model/entities/part'
 import { Rundown } from '../../../model/entities/rundown'
 import { Timeline } from '../../../model/entities/timeline'
 import { Piece } from '../../../model/entities/piece'
-import { LookAheadTimelineObject, TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
+import { LookaheadTimelineObject, TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { ObjectCloner } from '../interfaces/object-cloner'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Studio } from '../../../model/entities/studio'
 import { StudioLayer } from '../../../model/value-objects/studio-layer'
-import { LookAheadMode } from '../../../model/enums/look-ahead-mode'
+import { LookaheadMode } from '../../../model/enums/lookahead-mode'
 import { LastPartInRundownException } from '../../../model/exceptions/last-part-in-rundown-exception'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
-const LOOK_AHEAD_GROUP_ID: string = 'look_ahead_group'
-const LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX: string = '_forActive'
+const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
+const LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX: string = '_forActive'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
@@ -30,7 +30,7 @@ const PIECE_GROUP_INFIX: string = '_piece_group_'
 
 const HIGH_PRIORITY: number = 5
 const MEDIUM_PRIORITY: number = 1
-const LOOK_AHEAD_PRIORITY: number = 0.1
+const LOOKAHEAD_PRIORITY: number = 0.1
 const BASELINE_PRIORITY: number = 0
 const LOW_PRIORITY: number = -1
 
@@ -4346,10 +4346,10 @@ describe('superfly-timeline-builder', () => {
         const testee: TimelineBuilder = createTestee()
         const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
 
-        const lookAheadGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
-          (group) => group.id === LOOK_AHEAD_GROUP_ID
+        const lookaheadGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
+          (group) => group.id === LOOKAHEAD_GROUP_ID
         )
-        expect(lookAheadGroup).not.toBeUndefined()
+        expect(lookaheadGroup).not.toBeUndefined()
       })
 
       it('sets the enable to while="1"', () => {
@@ -4358,10 +4358,10 @@ describe('superfly-timeline-builder', () => {
         const testee: TimelineBuilder = createTestee()
         const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
 
-        const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-          (group) => group.id === LOOK_AHEAD_GROUP_ID
+        const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+          (group) => group.id === LOOKAHEAD_GROUP_ID
         )!
-        expect(lookAheadGroup.enable.while).toBe('1')
+        expect(lookaheadGroup.enable.while).toBe('1')
       })
 
       it('sets the layer to be empty', () => {
@@ -4370,26 +4370,26 @@ describe('superfly-timeline-builder', () => {
         const testee: TimelineBuilder = createTestee()
         const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
 
-        const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-          (group) => group.id === LOOK_AHEAD_GROUP_ID
+        const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+          (group) => group.id === LOOKAHEAD_GROUP_ID
         )!
-        expect(lookAheadGroup.layer).toBe('')
+        expect(lookaheadGroup.layer).toBe('')
       })
 
-      it('sets the priority to LookAhead priority', () => {
+      it('sets the priority to Lookahead priority', () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
         const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
 
-        const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-          (group) => group.id === LOOK_AHEAD_GROUP_ID
+        const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+          (group) => group.id === LOOKAHEAD_GROUP_ID
         )!
-        expect(lookAheadGroup.priority).toBe(LOOK_AHEAD_PRIORITY)
+        expect(lookaheadGroup.priority).toBe(LOOKAHEAD_PRIORITY)
       })
 
-      describe('there are no layers with LookAhead', () => {
-        it('does not add any children to the lookAhead group', () => {
+      describe('there are no layers with Lookahead', () => {
+        it('does not add any children to the lookahead group', () => {
           const timelineObject: TimelineObject = {
             id: 'timelineObject',
             layer: 'someLayer',
@@ -4403,14 +4403,14 @@ describe('superfly-timeline-builder', () => {
           const testee: TimelineBuilder = createTestee()
           const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock(studioLayers))
 
-          const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-            (group) => group.id === LOOK_AHEAD_GROUP_ID
+          const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+            (group) => group.id === LOOKAHEAD_GROUP_ID
           )!
-          expect(lookAheadGroup.children).toHaveLength(0)
+          expect(lookaheadGroup.children).toHaveLength(0)
         })
 
-        describe('there are layers without lookAhead', () => {
-          it('does not add any children to the lookAhead group', () => {
+        describe('there are layers without lookahead', () => {
+          it('does not add any children to the lookahead group', () => {
             const timelineObject: TimelineObject = {
               id: 'timelineObject',
               layer: 'someLayer',
@@ -4419,24 +4419,24 @@ describe('superfly-timeline-builder', () => {
             const nextPart: Part = EntityMockFactory.createPart({ pieces: [piece] })
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ nextPart })
             const studioLayers: StudioLayer[] = [
-              createStudioLayer({ name: timelineObject.layer, lookAheadMode: LookAheadMode.NONE }),
+              createStudioLayer({ name: timelineObject.layer, lookaheadMode: LookaheadMode.NONE }),
             ]
 
             const testee: TimelineBuilder = createTestee()
             const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock(studioLayers))
 
-            const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-              (group) => group.id === LOOK_AHEAD_GROUP_ID
+            const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+              (group) => group.id === LOOKAHEAD_GROUP_ID
             )!
-            expect(lookAheadGroup.children).toHaveLength(0)
+            expect(lookaheadGroup.children).toHaveLength(0)
           })
         })
       })
 
-      describe('there is one layer with LookAhead', () => {
+      describe('there is one layer with Lookahead', () => {
         describe('it gets the Pieces of the active Part', () => {
           describe('active Part only have infinite Pieces', () => {
-            it('does not add any children to the lookAhead group', () => {
+            it('does not add any children to the lookahead group', () => {
               const timelineObject: TimelineObject = {
                 id: 'timelineObject',
                 layer: 'someLayer',
@@ -4450,7 +4450,7 @@ describe('superfly-timeline-builder', () => {
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: timelineObject.layer,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
               ]
 
@@ -4460,15 +4460,15 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              expect(lookAheadGroup.children).toHaveLength(0)
+              expect(lookaheadGroup.children).toHaveLength(0)
             })
           })
 
-          describe('active Part does not have any Pieces with TimelineObjects on a LookAhead layer', () => {
-            it('does not add any children to the lookAhead group', () => {
+          describe('active Part does not have any Pieces with TimelineObjects on a Lookahead layer', () => {
+            it('does not add any children to the lookahead group', () => {
               const timelineObject: TimelineObject = {
                 id: 'timelineObject',
                 layer: 'completelyRandomLayer',
@@ -4477,7 +4477,7 @@ describe('superfly-timeline-builder', () => {
               const activePart: Part = EntityMockFactory.createPart({ pieces: [piece] })
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
               const studioLayers: StudioLayer[] = [
-                createStudioLayer({ lookAheadMode: LookAheadMode.WHEN_CLEAR }),
+                createStudioLayer({ lookaheadMode: LookaheadMode.WHEN_CLEAR }),
               ]
 
               const testee: TimelineBuilder = createTestee()
@@ -4486,16 +4486,16 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              expect(lookAheadGroup.children).toHaveLength(0)
+              expect(lookaheadGroup.children).toHaveLength(0)
             })
           })
 
-          describe('active Part has one TimelineObject for the lookAhead layer', () => {
-            describe('it adds the TimelineObject to the children of the lookAhead group', () => {
-              it('sets the id to be "lookAheadGroupId_timelineObject.id"', () => {
+          describe('active Part has one TimelineObject for the lookahead layer', () => {
+            describe('it adds the TimelineObject to the children of the lookahead group', () => {
+              it('sets the id to be "lookaheadGroupId_timelineObject.id"', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -4508,7 +4508,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -4518,17 +4518,17 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject | undefined =
-                    lookAheadGroup.children.find(
-                      (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                const lookaheadTimelineObject: TimelineObject | undefined =
+                    lookaheadGroup.children.find(
+                      (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                     )
-                expect(lookAheadTimelineObject).not.toBeUndefined()
+                expect(lookaheadTimelineObject).not.toBeUndefined()
               })
 
-              it('sets the priority to be the lookAhead priority', () => {
+              it('sets the priority to be the lookahead priority', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -4541,7 +4541,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -4551,16 +4551,16 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
-                expect(lookAheadTimelineObject.priority).toBe(LOOK_AHEAD_PRIORITY)
+                expect(lookaheadTimelineObject.priority).toBe(LOOKAHEAD_PRIORITY)
               })
 
-              it('sets lookAhead to be true', () => {
+              it('sets lookahead to be true', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -4573,7 +4573,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -4583,13 +4583,13 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: LookAheadTimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
-                )! as LookAheadTimelineObject
-                expect(lookAheadTimelineObject.isLookahead).toBe(true)
+                const lookaheadTimelineObject: LookaheadTimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                )! as LookaheadTimelineObject
+                expect(lookaheadTimelineObject.isLookahead).toBe(true)
               })
 
               it('sets the start to be 0', () => {
@@ -4605,7 +4605,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -4615,13 +4615,13 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
-                expect(lookAheadTimelineObject.enable.start).toBe(0)
+                expect(lookaheadTimelineObject.enable.start).toBe(0)
               })
 
               it('sets the end to be when the active group starts', () => {
@@ -4637,7 +4637,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -4647,18 +4647,18 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
-                expect(lookAheadTimelineObject.enable.end).toBe(
+                expect(lookaheadTimelineObject.enable.end).toBe(
                   `#${ACTIVE_GROUP_PREFIX}${activePart.id}.start`
                 )
               })
 
-              it('sets the group id to be the LookAhead group id', () => {
+              it('sets the group id to be the Lookahead group id', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -4671,7 +4671,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -4681,13 +4681,13 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
-                expect(lookAheadTimelineObject.inGroup).toBe(LOOK_AHEAD_GROUP_ID)
+                expect(lookaheadTimelineObject.inGroup).toBe(LOOKAHEAD_GROUP_ID)
               })
 
               it('sets the content to be the content of the TimelineObject', () => {
@@ -4707,7 +4707,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -4720,16 +4720,16 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
-                expect(lookAheadTimelineObject.content).toBe(content)
+                expect(lookaheadTimelineObject.content).toBe(content)
               })
 
-              describe('the layer is a WHEN_CLEAR lookAhead layer', () => {
+              describe('the layer is a WHEN_CLEAR lookahead layer', () => {
                 it('sets the layer to be the layer of the TimelineObject', () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
@@ -4743,7 +4743,7 @@ describe('superfly-timeline-builder', () => {
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
-                      lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                      lookaheadMode: LookaheadMode.WHEN_CLEAR,
                     }),
                   ]
 
@@ -4756,18 +4756,18 @@ describe('superfly-timeline-builder', () => {
                     createBasicStudioMock(studioLayers)
                   )
 
-                  const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                    (group) => group.id === LOOK_AHEAD_GROUP_ID
+                  const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                    (group) => group.id === LOOKAHEAD_GROUP_ID
                   )!
-                  const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                    (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                  const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                    (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                   )!
-                  expect(lookAheadTimelineObject.layer).toBe(timelineObject.layer)
+                  expect(lookaheadTimelineObject.layer).toBe(timelineObject.layer)
                 })
               })
 
-              describe('the layer is a PRELOAD lookAhead layer', () => {
-                it('sets the "lookAheadForLayer" to be the same as the layer of the timelineObject', () => {
+              describe('the layer is a PRELOAD lookahead layer', () => {
+                it('sets the "lookaheadForLayer" to be the same as the layer of the timelineObject', () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
                     layer: 'layerName',
@@ -4780,7 +4780,7 @@ describe('superfly-timeline-builder', () => {
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
-                      lookAheadMode: LookAheadMode.PRELOAD,
+                      lookaheadMode: LookaheadMode.PRELOAD,
                     }),
                   ]
 
@@ -4793,14 +4793,14 @@ describe('superfly-timeline-builder', () => {
                     createBasicStudioMock(studioLayers)
                   )
 
-                  const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                    (group) => group.id === LOOK_AHEAD_GROUP_ID
+                  const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                    (group) => group.id === LOOKAHEAD_GROUP_ID
                   )!
-                  const lookAheadTimelineObject: LookAheadTimelineObject =
-                      lookAheadGroup.children.find(
-                        (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
-                      )! as LookAheadTimelineObject
-                  expect(lookAheadTimelineObject.layer).toBe(`${timelineObject.layer}_lookahead`)
+                  const lookaheadTimelineObject: LookaheadTimelineObject =
+                      lookaheadGroup.children.find(
+                        (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                      )! as LookaheadTimelineObject
+                  expect(lookaheadTimelineObject.layer).toBe(`${timelineObject.layer}_lookahead`)
                 })
 
                 it('sets the "layer" to be the layer of the TimelineObject post-fixed with "_lookahead"', () => {
@@ -4816,7 +4816,7 @@ describe('superfly-timeline-builder', () => {
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
-                      lookAheadMode: LookAheadMode.PRELOAD,
+                      lookaheadMode: LookaheadMode.PRELOAD,
                     }),
                   ]
 
@@ -4829,21 +4829,21 @@ describe('superfly-timeline-builder', () => {
                     createBasicStudioMock(studioLayers)
                   )
 
-                  const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                    (group) => group.id === LOOK_AHEAD_GROUP_ID
+                  const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                    (group) => group.id === LOOKAHEAD_GROUP_ID
                   )!
-                  const lookAheadTimelineObject: LookAheadTimelineObject =
-                      lookAheadGroup.children.find(
-                        (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
-                      )! as LookAheadTimelineObject
-                  expect(lookAheadTimelineObject.lookaheadForLayer).toBe(timelineObject.layer)
+                  const lookaheadTimelineObject: LookaheadTimelineObject =
+                      lookaheadGroup.children.find(
+                        (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
+                      )! as LookaheadTimelineObject
+                  expect(lookaheadTimelineObject.lookaheadForLayer).toBe(timelineObject.layer)
                 })
               })
             })
           })
 
-          describe('active Part has two TimelineObjects for the lookAhead layer', () => {
-            it('adds them both to the children of the lookAhead group', () => {
+          describe('active Part has two TimelineObjects for the lookahead layer', () => {
+            it('adds them both to the children of the lookahead group', () => {
               const timelineObjectOne: TimelineObject = {
                 id: 'timelineObjectOne',
                 layer: 'layerName',
@@ -4860,11 +4860,11 @@ describe('superfly-timeline-builder', () => {
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: timelineObjectOne.layer,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
                 createStudioLayer({
                   name: timelineObjectTwo.layer,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
               ]
 
@@ -4874,19 +4874,19 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              const childrenIds: string[] = lookAheadGroup.children.map((o) => o.id)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${timelineObjectOne.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${timelineObjectTwo.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
+              const childrenIds: string[] = lookaheadGroup.children.map((o) => o.id)
+              expect(childrenIds).toContain(`${LOOKAHEAD_GROUP_ID}_${timelineObjectOne.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
+              expect(childrenIds).toContain(`${LOOKAHEAD_GROUP_ID}_${timelineObjectTwo.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
             })
           })
         })
 
         describe('it gets the Pieces from the next Part', () => {
           describe('next Part only have infinite Pieces', () => {
-            it('does not add any children to the lookAhead group', () => {
+            it('does not add any children to the lookahead group', () => {
               const timelineObject: TimelineObject = {
                 id: 'timelineObject',
                 layer: 'someLayer',
@@ -4900,7 +4900,7 @@ describe('superfly-timeline-builder', () => {
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: timelineObject.layer,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
               ]
 
@@ -4910,24 +4910,24 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              expect(lookAheadGroup.children).toHaveLength(0)
+              expect(lookaheadGroup.children).toHaveLength(0)
             })
           })
 
-          describe('next Part does not have any Pieces with TimelineObjects on a LookAhead layer', () => {
-            it('does not add any children to the lookAhead group', () => {
+          describe('next Part does not have any Pieces with TimelineObjects on a Lookahead layer', () => {
+            it('does not add any children to the lookahead group', () => {
               const timelineObject: TimelineObject = {
                 id: 'timelineObject',
-                layer: 'someLayerWithNoLookAhead',
+                layer: 'someLayerWithNoLookahead',
               } as TimelineObject
               const piece: Piece = EntityMockFactory.createPiece({ timelineObjects: [timelineObject] })
               const nextPart: Part = EntityMockFactory.createPart({ pieces: [piece] })
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ nextPart })
               const studioLayers: StudioLayer[] = [
-                createStudioLayer({ lookAheadMode: LookAheadMode.WHEN_CLEAR }),
+                createStudioLayer({ lookaheadMode: LookaheadMode.WHEN_CLEAR }),
               ]
 
               const testee: TimelineBuilder = createTestee()
@@ -4936,16 +4936,16 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              expect(lookAheadGroup.children).toHaveLength(0)
+              expect(lookaheadGroup.children).toHaveLength(0)
             })
           })
 
-          describe('next Part has one TimelineObject for the lookAhead layer', () => {
-            describe('it adds the TimelineObject to the children of the lookAhead group', () => {
-              it('sets the id to be "lookAheadGroupId_timelineObject.id"', () => {
+          describe('next Part has one TimelineObject for the lookahead layer', () => {
+            describe('it adds the TimelineObject to the children of the lookahead group', () => {
+              it('sets the id to be "lookaheadGroupId_timelineObject.id"', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -4958,7 +4958,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -4968,17 +4968,17 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject | undefined =
-                    lookAheadGroup.children.find(
-                      (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                const lookaheadTimelineObject: TimelineObject | undefined =
+                    lookaheadGroup.children.find(
+                      (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
                     )
-                expect(lookAheadTimelineObject).not.toBeUndefined()
+                expect(lookaheadTimelineObject).not.toBeUndefined()
               })
 
-              it('sets the priority to be the lookAhead priority', () => {
+              it('sets the priority to be the lookahead priority', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -4991,7 +4991,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -5001,16 +5001,16 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
                 )!
-                expect(lookAheadTimelineObject.priority).toBe(LOOK_AHEAD_PRIORITY)
+                expect(lookaheadTimelineObject.priority).toBe(LOOKAHEAD_PRIORITY)
               })
 
-              it('sets lookAhead to be true', () => {
+              it('sets lookahead to be true', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -5023,7 +5023,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -5033,13 +5033,13 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: LookAheadTimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
-                )! as LookAheadTimelineObject
-                expect(lookAheadTimelineObject.isLookahead).toBe(true)
+                const lookaheadTimelineObject: LookaheadTimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
+                )! as LookaheadTimelineObject
+                expect(lookaheadTimelineObject.isLookahead).toBe(true)
               })
 
               it('sets the enable to be while active group is present', () => {
@@ -5056,7 +5056,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -5066,18 +5066,18 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
                 )!
-                expect(lookAheadTimelineObject.enable.while).toBe(
+                expect(lookaheadTimelineObject.enable.while).toBe(
                   `#${ACTIVE_GROUP_PREFIX}${activePart.id}`
                 )
               })
 
-              it('sets the group id to be the LookAhead group id', () => {
+              it('sets the group id to be the Lookahead group id', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -5090,7 +5090,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -5100,13 +5100,13 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
                 )!
-                expect(lookAheadTimelineObject.inGroup).toBe(LOOK_AHEAD_GROUP_ID)
+                expect(lookaheadTimelineObject.inGroup).toBe(LOOKAHEAD_GROUP_ID)
               })
 
               it('sets the content to be the content of the TimelineObject', () => {
@@ -5126,7 +5126,7 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -5139,16 +5139,16 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                  (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                  (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
                 )!
-                expect(lookAheadTimelineObject.content).toBe(content)
+                expect(lookaheadTimelineObject.content).toBe(content)
               })
 
-              describe('the layer is a WHEN_CLEAR lookAhead layer', () => {
+              describe('the layer is a WHEN_CLEAR lookahead layer', () => {
                 it('sets the layer to be the layer of the TimelineObject', () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
@@ -5162,7 +5162,7 @@ describe('superfly-timeline-builder', () => {
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
-                      lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                      lookaheadMode: LookaheadMode.WHEN_CLEAR,
                     }),
                   ]
 
@@ -5175,18 +5175,18 @@ describe('superfly-timeline-builder', () => {
                     createBasicStudioMock(studioLayers)
                   )
 
-                  const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                    (group) => group.id === LOOK_AHEAD_GROUP_ID
+                  const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                    (group) => group.id === LOOKAHEAD_GROUP_ID
                   )!
-                  const lookAheadTimelineObject: TimelineObject = lookAheadGroup.children.find(
-                    (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                  const lookaheadTimelineObject: TimelineObject = lookaheadGroup.children.find(
+                    (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
                   )!
-                  expect(lookAheadTimelineObject.layer).toBe(timelineObject.layer)
+                  expect(lookaheadTimelineObject.layer).toBe(timelineObject.layer)
                 })
               })
 
-              describe('the layer is a PRELOAD lookAhead layer', () => {
-                it('sets the "lookAheadForLayer" to be the same as the layer of the timelineObject', () => {
+              describe('the layer is a PRELOAD lookahead layer', () => {
+                it('sets the "lookaheadForLayer" to be the same as the layer of the timelineObject', () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
                     layer: 'someLayer',
@@ -5199,7 +5199,7 @@ describe('superfly-timeline-builder', () => {
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
-                      lookAheadMode: LookAheadMode.PRELOAD,
+                      lookaheadMode: LookaheadMode.PRELOAD,
                     }),
                   ]
 
@@ -5212,14 +5212,14 @@ describe('superfly-timeline-builder', () => {
                     createBasicStudioMock(studioLayers)
                   )
 
-                  const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                    (group) => group.id === LOOK_AHEAD_GROUP_ID
+                  const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                    (group) => group.id === LOOKAHEAD_GROUP_ID
                   )!
-                  const lookAheadTimelineObject: LookAheadTimelineObject =
-                      lookAheadGroup.children.find(
-                        (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
-                      )! as LookAheadTimelineObject
-                  expect(lookAheadTimelineObject.lookaheadForLayer).toBe(timelineObject.layer)
+                  const lookaheadTimelineObject: LookaheadTimelineObject =
+                      lookaheadGroup.children.find(
+                        (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
+                      )! as LookaheadTimelineObject
+                  expect(lookaheadTimelineObject.lookaheadForLayer).toBe(timelineObject.layer)
                 })
 
                 it('sets the "layer" to be the layer of the TimelineObject post-fixed with "_lookahead"', () => {
@@ -5235,7 +5235,7 @@ describe('superfly-timeline-builder', () => {
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
-                      lookAheadMode: LookAheadMode.PRELOAD,
+                      lookaheadMode: LookaheadMode.PRELOAD,
                     }),
                   ]
 
@@ -5248,21 +5248,21 @@ describe('superfly-timeline-builder', () => {
                     createBasicStudioMock(studioLayers)
                   )
 
-                  const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                    (group) => group.id === LOOK_AHEAD_GROUP_ID
+                  const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                    (group) => group.id === LOOKAHEAD_GROUP_ID
                   )!
-                  const lookAheadTimelineObject: LookAheadTimelineObject =
-                      lookAheadGroup.children.find(
-                        (o) => o.id === `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
-                      )! as LookAheadTimelineObject
-                  expect(lookAheadTimelineObject.layer).toBe(`${timelineObject.layer}_lookahead`)
+                  const lookaheadTimelineObject: LookaheadTimelineObject =
+                      lookaheadGroup.children.find(
+                        (o) => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
+                      )! as LookaheadTimelineObject
+                  expect(lookaheadTimelineObject.layer).toBe(`${timelineObject.layer}_lookahead`)
                 })
               })
             })
           })
 
-          describe('next Part has two TimelineObjects with lookAhead layer', () => {
-            it('adds them both to the children of the lookAhead group', () => {
+          describe('next Part has two TimelineObjects with lookahead layer', () => {
+            it('adds them both to the children of the lookahead group', () => {
               const timelineObjectOne: TimelineObject = {
                 id: 'timelineObjectOne',
                 layer: 'someLayer',
@@ -5279,11 +5279,11 @@ describe('superfly-timeline-builder', () => {
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: timelineObjectOne.layer,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
                 createStudioLayer({
                   name: timelineObjectTwo.layer,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
               ]
 
@@ -5296,18 +5296,18 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              const childrenIds: string[] = lookAheadGroup.children.map((o) => o.id)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${timelineObjectOne.id}`)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${timelineObjectTwo.id}`)
+              const childrenIds: string[] = lookaheadGroup.children.map((o) => o.id)
+              expect(childrenIds).toContain(`${LOOKAHEAD_GROUP_ID}_${timelineObjectOne.id}`)
+              expect(childrenIds).toContain(`${LOOKAHEAD_GROUP_ID}_${timelineObjectTwo.id}`)
             })
           })
 
-          describe('layer has a minimumLookAhead set to one', () => {
+          describe('layer has a minimumLookahead set to one', () => {
             describe('it has two TimelineObjects for layer', () => {
-              it('only adds the first TimelineObject to the children of the lookAhead group', () => {
+              it('only adds the first TimelineObject to the children of the lookahead group', () => {
                 const firstTimelineObject: TimelineObject = {
                   id: 'firstTimelineObject',
                   layer: 'someLayer',
@@ -5334,8 +5334,8 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: firstTimelineObject.layer,
-                    amountOfLookAheadObjectsToFind: 1,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    amountOfLookaheadObjectsToFind: 1,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -5345,18 +5345,18 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                expect(lookAheadGroup.children).toHaveLength(1)
-                expect(lookAheadGroup.children[0].id).toBe(
-                  `${LOOK_AHEAD_GROUP_ID}_${firstTimelineObject.id}`
+                expect(lookaheadGroup.children).toHaveLength(1)
+                expect(lookaheadGroup.children[0].id).toBe(
+                  `${LOOKAHEAD_GROUP_ID}_${firstTimelineObject.id}`
                 )
               })
             })
 
             describe('it has the first TimelineObject for the layer on just before the maximumSearchDistance', () => {
-              it('adds the TimelineObject to the children of the lookAhead group', () => {
+              it('adds the TimelineObject to the children of the lookahead group', () => {
                 const firstPiece: Piece = EntityMockFactory.createPiece()
                 const firstPart: Part = EntityMockFactory.createPart({ pieces: [firstPiece] })
 
@@ -5385,8 +5385,8 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
-                    maximumLookAheadSearchDistance: 4,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    maximumLookaheadSearchDistance: 4,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -5396,18 +5396,18 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                expect(lookAheadGroup.children).toHaveLength(1)
-                expect(lookAheadGroup.children[0].id).toBe(
-                  `${LOOK_AHEAD_GROUP_ID}_${timelineObject.id}`
+                expect(lookaheadGroup.children).toHaveLength(1)
+                expect(lookaheadGroup.children[0].id).toBe(
+                  `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}`
                 )
               })
             })
 
             describe('it has no TimelineObject for layer within the maximumSearchDistance', () => {
-              it('does not add any children to the lookAhead group', () => {
+              it('does not add any children to the lookahead group', () => {
                 const firstPiece: Piece = EntityMockFactory.createPiece()
                 const firstPart: Part = EntityMockFactory.createPart({ pieces: [firstPiece] })
 
@@ -5438,8 +5438,8 @@ describe('superfly-timeline-builder', () => {
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObjectOutsideSearchDistance.layer,
-                    maximumLookAheadSearchDistance: 1,
-                    lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                    maximumLookaheadSearchDistance: 1,
+                    lookaheadMode: LookaheadMode.WHEN_CLEAR,
                   }),
                 ]
 
@@ -5449,14 +5449,14 @@ describe('superfly-timeline-builder', () => {
                   createBasicStudioMock(studioLayers)
                 )
 
-                const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                  (group) => group.id === LOOK_AHEAD_GROUP_ID
+                const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                  (group) => group.id === LOOKAHEAD_GROUP_ID
                 )!
-                expect(lookAheadGroup.children).toHaveLength(0)
+                expect(lookaheadGroup.children).toHaveLength(0)
               })
             })
 
-            it('does not count TimelineObjects from the active Part among mimimumLookAheadObjects', () => {
+            it('does not count TimelineObjects from the active Part among minimumLookaheadObjects', () => {
               const activePartTimelineObject: TimelineObject = {
                 id: 'activePartTimelineObject',
                 layer: 'someLayer',
@@ -5466,12 +5466,12 @@ describe('superfly-timeline-builder', () => {
               })
               const activePart: Part = EntityMockFactory.createPart({ pieces: [activePiece] })
 
-              const lookAheadTimelineObject: TimelineObject = {
-                id: 'lookAheadTimelineObject',
+              const lookaheadTimelineObject: TimelineObject = {
+                id: 'lookaheadTimelineObject',
                 layer: activePartTimelineObject.layer,
               } as TimelineObject
               const lookAheadPiece: Piece = EntityMockFactory.createPiece({
-                timelineObjects: [lookAheadTimelineObject],
+                timelineObjects: [lookaheadTimelineObject],
               })
               const lookAheadPart: Part = EntityMockFactory.createPart({ pieces: [lookAheadPiece] })
 
@@ -5484,8 +5484,8 @@ describe('superfly-timeline-builder', () => {
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: activePartTimelineObject.layer,
-                  amountOfLookAheadObjectsToFind: 1,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  amountOfLookaheadObjectsToFind: 1,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
               ]
 
@@ -5495,17 +5495,17 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              expect(lookAheadGroup.children).toHaveLength(2)
-              const childrenIds: string[] = lookAheadGroup.children.map((child) => child.id)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${activePartTimelineObject.id}${LOOK_AHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${lookAheadTimelineObject.id}`)
+              expect(lookaheadGroup.children).toHaveLength(2)
+              const childrenIds: string[] = lookaheadGroup.children.map((child) => child.id)
+              expect(childrenIds).toContain(`${LOOKAHEAD_GROUP_ID}_${activePartTimelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`)
+              expect(childrenIds).toContain(`${LOOKAHEAD_GROUP_ID}_${lookaheadTimelineObject.id}`)
             })
           })
 
-          describe('layer has a minimumLookAhead set to two', () => {
+          describe('layer has a minimumLookahead set to two', () => {
             it('returns both TimelineObjects', () => {
               const firstTimelineObject: TimelineObject = {
                 id: 'firstTimelineObject',
@@ -5533,8 +5533,8 @@ describe('superfly-timeline-builder', () => {
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: firstTimelineObject.layer,
-                  amountOfLookAheadObjectsToFind: 2,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  amountOfLookaheadObjectsToFind: 2,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
               ]
 
@@ -5544,18 +5544,18 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              expect(lookAheadGroup.children).toHaveLength(2)
-              const childrenIds: string[] = lookAheadGroup.children.map((child) => child.id)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${firstTimelineObject.id}`)
-              expect(childrenIds).toContain(`${LOOK_AHEAD_GROUP_ID}_${secondTimelineObject.id}`)
+              expect(lookaheadGroup.children).toHaveLength(2)
+              const childrenIds: string[] = lookaheadGroup.children.map((child) => child.id)
+              expect(childrenIds).toContain(`${LOOKAHEAD_GROUP_ID}_${firstTimelineObject.id}`)
+              expect(childrenIds).toContain(`${LOOKAHEAD_GROUP_ID}_${secondTimelineObject.id}`)
             })
           })
 
           describe('Rundown runs out of Parts before maximum search distance is reached', () => {
-            it('does not add any children to the lookAhead group', () => {
+            it('does not add any children to the lookahead group', () => {
               const parts: Part[] = [
                 EntityMockFactory.createPart({ id: 'firstPartId' }),
                 EntityMockFactory.createPart({ id: 'secondPartId' }),
@@ -5572,8 +5572,8 @@ describe('superfly-timeline-builder', () => {
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: 'someLayer',
-                  maximumLookAheadSearchDistance: 10,
-                  lookAheadMode: LookAheadMode.WHEN_CLEAR,
+                  maximumLookaheadSearchDistance: 10,
+                  lookaheadMode: LookaheadMode.WHEN_CLEAR,
                 }),
               ]
 
@@ -5583,10 +5583,10 @@ describe('superfly-timeline-builder', () => {
                 createBasicStudioMock(studioLayers)
               )
 
-              const lookAheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
-                (group) => group.id === LOOK_AHEAD_GROUP_ID
+              const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+                (group) => group.id === LOOKAHEAD_GROUP_ID
               )!
-              expect(lookAheadGroup.children).toHaveLength(0)
+              expect(lookaheadGroup.children).toHaveLength(0)
             })
           })
         })
@@ -5614,8 +5614,8 @@ function createBasicStudioMock(layers?: StudioLayer[]): Studio {
 function createStudioLayer(layer: Partial<StudioLayer>): StudioLayer {
   return {
     name: layer?.name ?? 'layerName',
-    amountOfLookAheadObjectsToFind: layer?.amountOfLookAheadObjectsToFind ?? 1,
-    maximumLookAheadSearchDistance: layer?.maximumLookAheadSearchDistance ?? 10,
-    lookAheadMode: layer?.lookAheadMode ?? LookAheadMode.NONE,
+    amountOfLookaheadObjectsToFind: layer?.amountOfLookaheadObjectsToFind ?? 1,
+    maximumLookaheadSearchDistance: layer?.maximumLookaheadSearchDistance ?? 10,
+    lookaheadMode: layer?.lookaheadMode ?? LookaheadMode.NONE,
   }
 }

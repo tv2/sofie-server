@@ -9,7 +9,7 @@ export type TimelineObject = SuperFlyTimelineObject & {
   content: unknown
 }
 
-export interface LookAheadTimelineObject extends TimelineObject {
+export interface LookaheadTimelineObject extends TimelineObject {
   isLookahead: boolean
   lookaheadForLayer?: string
 }

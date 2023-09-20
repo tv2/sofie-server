@@ -20,7 +20,7 @@ import { SisyfosChannelsTimelineObject, SisyfosType } from '../timeline-state-re
 import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
-const LOOK_AHEAD_GROUP_ID: string = 'look_ahead_group'
+const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
 
 export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGenerate {
@@ -51,11 +51,12 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     return { rundownPersistentState: newRundownPersistentState, timeline }
   }
 
-  private convertToTv2RundownPersistentState(persistentState: RundownPersistentState): Tv2RundownPersistentState {
+  private convertToTv2RundownPersistentState(persistentState?: RundownPersistentState): Tv2RundownPersistentState {
     let rundownPersistentState: Tv2RundownPersistentState = persistentState as Tv2RundownPersistentState
     if (!rundownPersistentState) {
       rundownPersistentState = {
-        activeMediaPlayerSessions: []
+        activeMediaPlayerSessions: [],
+        isNewSegment: false
       }
     }
     return rundownPersistentState
@@ -127,16 +128,16 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     }
 
     const activeGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(ACTIVE_GROUP_PREFIX))
-    const lookAheadGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(LOOK_AHEAD_GROUP_ID))
-    if (!activeGroup || !lookAheadGroup) {
-      throw new UnsupportedOperation('No Active or LookAhead Group found. This shouldn\'t be possible!')
+    const lookaheadGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(LOOKAHEAD_GROUP_ID))
+    if (!activeGroup || !lookaheadGroup) {
+      throw new UnsupportedOperation('No Active or Lookahead Group found. This shouldn\'t be possible!')
     }
 
     const mediaPlayerSessionsInUse: Tv2MediaPlayerSession[] = this.findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions, activeGroup)
     const availableMediaPlayers: Tv2MediaPlayer[] = configuration.studio.ABMediaPlayers.filter(mediaPlayer => !mediaPlayerSessionsInUse.some(session => session.mediaPlayer._id === mediaPlayer._id))
 
     this.assignMediaPlayersForGroup(activeGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
-    this.assignMediaPlayersForGroup(lookAheadGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
+    this.assignMediaPlayersForGroup(lookaheadGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
 
     return mediaPlayerSessionsInUse
   }
@@ -208,12 +209,12 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     switch (timelineObject.content.deviceType) {
       case DeviceType.CASPAR_CG: {
         this.updateCasparCgProgramWithMediaPlayer(timelineObject, mediaPlayer)
-        this.updateCasparCgLookAheadWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateCasparCgLookaheadWithMediaPlayer(timelineObject, mediaPlayer)
         break
       }
       case DeviceType.ATEM: { // TODO: Fully implement VideoSwitcher composition strategy
         this.updateAtemProgramWithMediaPlayer(timelineObject, mediaPlayer)
-        this.updateAtemLookAheadWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateAtemLookaheadWithMediaPlayer(timelineObject, mediaPlayer)
         // TODO: Implement for DVEs
         break
       }
@@ -239,7 +240,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     timelineObject.layer = this.getCasparCgPlayerClipLayer(mediaPlayer)
   }
 
-  private updateCasparCgLookAheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+  private updateCasparCgLookaheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
     if (timelineObject.content.deviceType !== DeviceType.CASPAR_CG) {
       return
     }
@@ -261,7 +262,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     atemContent.me!.input = mediaPlayer.SwitcherSource
   }
 
-  private updateAtemLookAheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+  private updateAtemLookaheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
     if (timelineObject.content.deviceType !== DeviceType.ATEM) {
       return
     }
