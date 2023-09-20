@@ -1,8 +1,8 @@
-import { LookAheadMode } from '../enums/look-ahead-mode'
+import { LookaheadMode } from '../enums/lookahead-mode'
 
 export interface StudioLayer {
   name: string
-  lookAheadMode: LookAheadMode
-  amountOfLookAheadObjectsToFind: number
-  maximumLookAheadSearchDistance: number
+  lookaheadMode: LookaheadMode
+  amountOfLookaheadObjectsToFind: number
+  maximumLookaheadSearchDistance: number
 }
