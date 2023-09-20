@@ -626,7 +626,7 @@ function createRundownPersistentState(activeMediaPlayerSessions?: Tv2MediaPlayer
 function createTimelineObject(id: string, metadata?: Tv2TimelineObjectMetadata): Tv2BlueprintTimelineObject {
   return {
     id,
-    metadata,
+    metaData: metadata,
     content: {}
   } as Tv2BlueprintTimelineObject
 }
