@@ -205,7 +205,7 @@ export class Rundown extends BasicRundown {
   }
 
   private getSegmentIndexForPart(part: Part): number {
-    const segmentIndexForPart: number = this.segments.findIndex((segment) => segment.id === part.segmentId)
+    const segmentIndexForPart: number = this.segments.findIndex((segment) => segment.id === part.getSegmentId())
     if (segmentIndexForPart < 0) {
       throw new NotFoundException(
         `Part: "${part.id}" does not belong to any Segments on Rundown: "${this.id}"`
@@ -416,5 +416,11 @@ export class Rundown extends BasicRundown {
 
   public setPersistentState(rundownPersistentState: RundownPersistentState): void {
     this.persistentState = rundownPersistentState
+  }
+
+  public insertPart(part: Part): void {
+    this.assertActive(this.insertPart.name)
+    this.activeSegment.insertPartAfterActivePart(part)
+    this.setNext(this.activeSegment.id, part.id)
   }
 }

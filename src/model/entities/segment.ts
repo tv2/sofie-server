@@ -134,6 +134,34 @@ export class Segment {
   }
 
   public reset(): void {
+    this.removeAdLibbedParts()
     this.parts.forEach(part => part.reset())
+  }
+
+  private removeAdLibbedParts(): void {
+    this.parts = this.parts.filter(part => !part.isAdLib)
+  }
+
+  public insertPartAfterActivePart(part: Part): void {
+    const activePartIndex: number = this.parts.findIndex(p => p.isOnAir())
+    if (activePartIndex < 0) {
+      throw new NotFoundException(`Not allowed to insert Part: ${part.id} into Segment: ${this.id} because Segment does not have the active Part.`)
+    }
+
+    part.setSegmentId(this.id)
+
+    const isActivePartLastPartInSegment: boolean = activePartIndex + 1 === this.parts.length
+    if (isActivePartLastPartInSegment) {
+      this.parts.push(part)
+      return
+    }
+
+    const isPartAfterActivePartAnAdLib: boolean = this.parts[activePartIndex + 1].isAdLib
+    if (isPartAfterActivePartAnAdLib) {
+      this.parts[activePartIndex + 1] = part
+      return
+    }
+
+    this.parts.splice(activePartIndex + 1, 0, part)
   }
 }

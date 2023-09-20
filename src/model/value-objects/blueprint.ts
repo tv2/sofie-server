@@ -4,8 +4,9 @@ import { RundownPersistentState } from './rundown-persistent-state'
 import { Timeline } from '../entities/timeline'
 import { Configuration } from '../entities/configuration'
 import { OnTimelineGenerateResult } from './on-timeline-generate-result'
+import { Action } from '../entities/action'
 
-export interface Blueprint extends BlueprintOnTimelineGenerate, BlueprintGetEndStateForPart {}
+export interface Blueprint extends BlueprintOnTimelineGenerate, BlueprintGetEndStateForPart, BlueprintGenerateActions {}
 
 export interface BlueprintOnTimelineGenerate {
   onTimelineGenerate(
@@ -24,4 +25,8 @@ export interface BlueprintGetEndStateForPart {
     time: number,
     rundownPersistentState: RundownPersistentState | undefined
   ): PartEndState
+}
+
+export interface BlueprintGenerateActions {
+  generateActions(configuration: Configuration): Action[]
 }

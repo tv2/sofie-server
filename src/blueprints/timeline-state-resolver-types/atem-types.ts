@@ -1,15 +1,25 @@
 import { DeviceType } from '../../model/enums/device-type'
+import { TimelineObject } from '../../model/entities/timeline-object'
 
 // These values are taken from TSR TODO: Find a better way for types.
-export interface AtemTimelineObjectContent {
-  deviceType: DeviceType.ATEM,
-  type: AtemType,
-  me?: {
-    input?: number,
-    previewInput?: number
-  },
-  aux?: {
-    input: number
+export interface AtemMeTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.ATEM,
+    type: AtemType.ME
+    me: {
+      input: number
+      transition: AtemTransition
+    }
+  }
+}
+
+export interface AtemAuxTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.ATEM,
+    type: AtemType.AUX,
+    aux: {
+      input: number
+    }
   }
 }
 
@@ -23,4 +33,14 @@ export enum AtemType {
   MEDIA_PLAYER = 'mp',
   AUDIO_CHANNEL = 'audioChan',
   MACRO_PLAYER = 'macroPlayer',
+}
+
+export enum AtemTransition {
+  MIX = 0,
+  DIP = 1,
+  WIPE = 2,
+  DVE = 3,
+  STING = 4,
+  CUT = 5,
+  DUMMY = 6
 }

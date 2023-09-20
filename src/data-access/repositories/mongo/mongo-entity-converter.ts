@@ -39,6 +39,7 @@ export interface MongoPart {
   segmentId: string
   title: string
   _rank: number
+  isAdLib: boolean
   expectedDuration: number
   isOnAir: boolean
   isNext: boolean
@@ -183,6 +184,7 @@ export class MongoEntityConverter {
       segmentId: mongoPart.segmentId,
       name: mongoPart.title,
       rank: mongoPart._rank,
+      isAdLib: mongoPart.isAdLib ?? false,
       expectedDuration: mongoPart.expectedDuration,
       isOnAir: false,
       isNext: false,
@@ -209,7 +211,7 @@ export class MongoEntityConverter {
       _id: part.id,
       expectedDuration: part.expectedDuration,
       title: part.name,
-      segmentId: part.segmentId,
+      segmentId: part.getSegmentId(),
       _rank: part.rank,
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
