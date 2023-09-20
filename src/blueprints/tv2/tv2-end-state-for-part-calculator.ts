@@ -7,7 +7,7 @@ import { Tv2RundownPersistentState } from './value-objects/tv2-rundown-persisten
 import { Tv2TallyTags } from './value-objects/tv2-tally-tags'
 import { Tv2GraphicsContent } from './value-objects/tv2-content'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
-import { Tv2SisyfosPersistenceMetaData } from './value-objects/tv2-meta-data'
+import { Tv2SisyfosPersistenceMetadata } from './value-objects/tv2-meta-data'
 
 /*
  Disclaimer: The code in this file is almost a 1 to 1 copy of the code of the corresponding implementations in Blueprints.
@@ -23,7 +23,7 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     rundownPersistentState?: RundownPersistentState
   ): PartEndState {
     const endState: Tv2PartEndState = {
-      sisyfosPersistenceMetaData: {
+      sisyfosPersistenceMetadata: {
         sisyfosLayers: [],
       }
     }
@@ -39,7 +39,7 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
 			| Tv2PartEndState
 			| undefined
 
-    endState.sisyfosPersistenceMetaData = this.calculateSisyfosPersistenceMetaData(
+    endState.sisyfosPersistenceMetadata = this.calculateSisyfosPersistenceMetaData(
       part,
       previousPartEndState,
       time,
@@ -65,12 +65,12 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     previousPartEndState: Tv2PartEndState | undefined,
     time: number,
     rundownPersistentState: Tv2RundownPersistentState
-  ): Tv2SisyfosPersistenceMetaData {
+  ): Tv2SisyfosPersistenceMetadata {
     const layersWantingToPersist: string[] =
         !rundownPersistentState?.isNewSegment &&
         previousPartEndState &&
-        previousPartEndState.sisyfosPersistenceMetaData
-          ? previousPartEndState.sisyfosPersistenceMetaData.sisyfosLayers
+        previousPartEndState.sisyfosPersistenceMetadata
+          ? previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
           : []
     return {
       sisyfosLayers: this.sisyfosPersistentLayerFinder.findLayersToPersist(part, time, layersWantingToPersist),

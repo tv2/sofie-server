@@ -69,7 +69,7 @@ export interface MongoPiece {
   timelineObjectsString: string
   lifespan: string
   pieceType: string
-  metaData?: unknown
+  metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
   content?: unknown
   tags?: string[]
 }
@@ -235,7 +235,7 @@ export class MongoEntityConverter {
       postRollDuration: mongoPiece.prerollDuration,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
-      metaData: mongoPiece.metaData,
+      metadata: mongoPiece.metaData,
       content: mongoPiece.content,
       tags: mongoPiece.tags ?? [],
     })

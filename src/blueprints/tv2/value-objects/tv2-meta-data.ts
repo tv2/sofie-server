@@ -1,7 +1,7 @@
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { DeviceType } from '../../../model/enums/device-type'
 
-export interface Tv2SisyfosPersistenceMetaData {
+export interface Tv2SisyfosPersistenceMetadata {
   /**
 	 * The layers this piece wants to persist into the next part
 	 */
@@ -24,8 +24,8 @@ export interface Tv2SisyfosPersistenceMetaData {
   isModifiedOrInsertedByAction?: boolean
 }
 
-export interface Tv2PieceMetaData {
-  sisyfosPersistMetaData?: Tv2SisyfosPersistenceMetaData // Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
+export interface Tv2PieceMetadata {
+  sisyfosPersistMetadata?: Tv2SisyfosPersistenceMetadata // Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
   mediaPlayerSessions?: string[] // Hardcoded in Blueprints for each Part.
 }
 
@@ -33,12 +33,12 @@ export interface Tv2BlueprintTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType
   }
-  metaData?: Tv2TimelineObjectMetaData
+  metadata?: Tv2TimelineObjectMetadata
   isLookahead?: boolean
   lookaheadForLayer?: string
 }
 
-export interface Tv2TimelineObjectMetaData {
+export interface Tv2TimelineObjectMetadata {
   context?: string
   mediaPlayerSession?: string
   templateData?: unknown
