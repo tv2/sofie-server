@@ -11,7 +11,7 @@ import { RundownEventType } from '../../../model/enums/rundown-event-type'
 import { RundownTimelineService } from '../rundown-timeline-service'
 import { CallbackScheduler } from '../interfaces/callback-scheduler'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
-import { RundownEvent } from '../../../model/value-objects/rundown-event'
+import { RundownDeletedEvent } from '../../../model/value-objects/rundown-event'
 import { Blueprint } from '../../../model/value-objects/blueprint'
 import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
 
@@ -87,11 +87,12 @@ describe(`${RundownTimelineService.name}`, () => {
   })
 })
 
-function createDeletedRundownEvent(rundownId: string): RundownEvent {
+function createDeletedRundownEvent(rundownId: string): RundownDeletedEvent {
   return {
     type: RundownEventType.DELETED,
+    timestamp: Date.now(),
     rundownId: rundownId,
-  } as RundownEvent
+  }
 }
 
 function createTestee(params: {
