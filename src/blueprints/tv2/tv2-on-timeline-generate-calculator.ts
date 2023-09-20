@@ -78,7 +78,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     // TODO: This is a hacky way to check if a Piece is an AdLib. It should not be hidden away in meta data for Sisyfos...
     return part.getPieces().some((piece) => {
       const pieceMetadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
-      return pieceMetadata && pieceMetadata.sisyfosPersistMetadata?.isModifiedOrInsertedByAction
+      return pieceMetadata && pieceMetadata.sisyfosPersistMetaData?.isModifiedOrInsertedByAction
     })
   }
 
