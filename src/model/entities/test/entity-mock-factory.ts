@@ -159,7 +159,7 @@ export class EntityMockFactory {
     when(mockedPart.id).thenReturn(
       partInterface.id ?? (partInterface.rank ? `part${partInterface.rank}` : 'partId')
     )
-    when(mockedPart.segmentId).thenReturn(partInterface.segmentId ?? 'segmentId')
+    when(mockedPart.getSegmentId()).thenReturn(partInterface.segmentId ?? 'segmentId')
     when(mockedPart.rank).thenReturn(partInterface.rank ?? 1)
     when(mockedPart.name).thenReturn(partInterface.name ?? 'partName')
     when(mockedPart.isNext()).thenReturn(partInterface.isNext ?? false)

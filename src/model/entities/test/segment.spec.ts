@@ -1,12 +1,12 @@
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { Piece } from '../piece'
-import { Part } from '../part'
+import { Part, PartInterface } from '../part'
 import { Segment, SegmentInterface } from '../segment'
 import { EntityMockFactory } from './entity-mock-factory'
 import { capture, instance, verify } from '@typestrong/ts-mockito'
 
-describe('Segment', () => {
-  describe('getFirstSpanningPieceForEachLayerBeforePart', () => {
+describe(`${Segment.name}`, () => {
+  describe(`${Segment.prototype.getFirstSpanningPieceForEachLayerBeforePart.name}`, () => {
     describe('Segment has two Parts', () => {
       describe('One Part is "after" the search point', () => {
         it('does not include the Piece from the last Part', () => {
@@ -320,7 +320,7 @@ describe('Segment', () => {
     })
   })
 
-  describe('getFirstSpanningRundownPieceForEachLayerForAllParts', () => {
+  describe(`${Segment.prototype.getFirstSpanningRundownPieceForEachLayerForAllParts.name}`, () => {
     describe('it has one Part', () => {
       describe('Part has two Pieces', () => {
         describe('Pieces are on different layers', () => {
@@ -487,7 +487,7 @@ describe('Segment', () => {
     })
   })
 
-  describe('reset', () => {
+  describe(`${Segment.prototype.reset.name}`, () => {
     it('resets all parts', () => {
       const mockedPart1: Part = EntityMockFactory.createPartMock()
       const mockedPart2: Part = EntityMockFactory.createPartMock()
@@ -504,6 +504,80 @@ describe('Segment', () => {
       verify(mockedPart1.reset()).once()
       verify(mockedPart2.reset()).once()
       verify(mockedPart3.reset()).once()
+    })
+  })
+
+  describe(`${Segment.prototype.insertPartAfterActivePart.name}`, () => {
+    it('is not the Segment with the active Part - throws exception', () => {
+      const randomNotActivePart: Part = new Part({ isOnAir: false } as PartInterface)
+      const adLibPart: Part = new Part({ id: 'adLibPartId', isAdLib: true } as PartInterface)
+
+      const testee: Segment = new Segment({ parts: [randomNotActivePart] } as SegmentInterface)
+
+      expect(() => testee.insertPartAfterActivePart(adLibPart)).toThrow()
+    })
+
+    it('updates the SegmentId of the Part', () => {
+      const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
+      const adLibPart: Part = new Part({ id: 'adLibPartId', isAdLib: true, segmentId: '' } as PartInterface)
+
+      const testee: Segment = new Segment({ id: 'segmentId', parts: [randomActivePart] } as SegmentInterface)
+
+      testee.insertPartAfterActivePart(adLibPart)
+
+      expect(adLibPart.getSegmentId()).toBe(testee.id)
+    })
+
+    describe('the active Part is the last Part of the Segment', () => {
+      it('inserts the Part as the last entry of the Parts array', () => {
+        const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
+        const adLibPart: Part = new Part({ id: 'adLibPartId', isAdLib: true, segmentId: '' } as PartInterface)
+
+        const testee: Segment = new Segment({ parts: [randomActivePart] } as SegmentInterface)
+
+        testee.insertPartAfterActivePart(adLibPart)
+
+        const lastPartOfSegment: Part = testee.getParts()[testee.getParts().length - 1]
+        expect(lastPartOfSegment).toBe(adLibPart)
+      })
+    })
+
+    describe('the active Part is not the last Part of the Segment', () => {
+      describe('the Part after the active Part is an AdLib Part', () => {
+        it('replaces the "old" AdLib Part', () => {
+          const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
+          const adLibPartAfterActivePart: Part = new Part({ id: 'oldAdLibPartId', isOnAir: false, isAdLib: true } as PartInterface)
+          const adLibPartToBeInserted: Part = new Part({ id: 'adLibPartId', isAdLib: true, segmentId: '' } as PartInterface)
+
+          const testee: Segment = new Segment({ parts: [randomActivePart, adLibPartAfterActivePart] } as SegmentInterface)
+
+          const indexOfOldAdLibPart: number = testee.getParts().findIndex(part => part.id === adLibPartAfterActivePart.id)
+
+          testee.insertPartAfterActivePart(adLibPartToBeInserted)
+
+          expect(testee.getParts()).not.toContain(adLibPartAfterActivePart)
+          expect(testee.getParts()).toContain(adLibPartToBeInserted)
+          expect(testee.getParts()[indexOfOldAdLibPart]).toBe(adLibPartToBeInserted)
+        })
+      })
+
+      describe('the Part after the active Part is a planned Part', () => {
+        it('inserts the AdLib Part after the active Part and before the planned Part', () => {
+          const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
+          const plannedPartAfterActivePart: Part = new Part({ id: 'plannedPartId', isOnAir: false, isAdLib: false } as PartInterface)
+          const adLibPartToBeInserted: Part = new Part({ id: 'adLibPartId', isAdLib: true, segmentId: '' } as PartInterface)
+
+          const testee: Segment = new Segment({ parts: [randomActivePart, plannedPartAfterActivePart] } as SegmentInterface)
+
+          const indexOfPlannedPart: number = testee.getParts().findIndex(part => part.id === plannedPartAfterActivePart.id)
+
+          testee.insertPartAfterActivePart(adLibPartToBeInserted)
+
+          expect(testee.getParts()).toContain(plannedPartAfterActivePart)
+          expect(testee.getParts()).toContain(adLibPartToBeInserted)
+          expect(testee.getParts()[indexOfPlannedPart]).toBe(adLibPartToBeInserted)
+        })
+      })
     })
   })
 })

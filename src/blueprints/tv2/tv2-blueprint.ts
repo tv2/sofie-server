@@ -6,11 +6,14 @@ import { Tv2EndStateForPartCalculator } from './tv2-end-state-for-part-calculato
 import { Timeline } from '../../model/entities/timeline'
 import { Tv2OnTimelineGenerateCalculator } from './tv2-on-timeline-generate-calculator'
 import { Configuration } from '../../model/entities/configuration'
+import { Action } from '../../model/entities/action'
+import { Tv2ActionsService } from './tv2-actions-service'
 
 export class Tv2Blueprint implements Blueprint {
   constructor(
     private readonly endStateForPartCalculator: Tv2EndStateForPartCalculator,
-    private readonly onTimelineGenerateCalculator: Tv2OnTimelineGenerateCalculator
+    private readonly onTimelineGenerateCalculator: Tv2OnTimelineGenerateCalculator,
+    private readonly actionsService: Tv2ActionsService
   ) {}
 
   public getEndStateForPart(
@@ -39,5 +42,9 @@ export class Tv2Blueprint implements Blueprint {
       previousRundownPersistentState,
       previousPart
     )
+  }
+
+  public generateActions(configuration: Configuration): Action[] {
+    return this.actionsService.generateActions(configuration)
   }
 }

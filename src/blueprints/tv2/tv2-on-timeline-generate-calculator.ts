@@ -11,7 +11,7 @@ import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from './value-objects/tv
 import { Tv2MediaPlayer, Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../model/entities/timeline'
 import { DeviceType } from '../../model/enums/device-type'
-import { AtemTimelineObjectContent, AtemType } from '../timeline-state-resolver-types/atem-types'
+import { AtemAuxTimelineObject, AtemMeTimelineObject, AtemType } from '../timeline-state-resolver-types/atem-types'
 import { A_B_SOURCE_LAYERS } from './value-objects/tv2-a-b-source-layers'
 import { Configuration } from '../../model/entities/configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
@@ -41,7 +41,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     const rundownPersistentState: Tv2RundownPersistentState = (previousRundownPersistentState ?? this.getEmptyTv2RundownPersistentState()) as Tv2RundownPersistentState
     const newRundownPersistentState: Tv2RundownPersistentState = {
       activeMediaPlayerSessions: [],
-      isNewSegment: previousPart?.segmentId !== activePart.segmentId,
+      isNewSegment: previousPart?.getSegmentId() !== activePart.getSegmentId(),
     }
 
     this.assignSisyfosPersistMetadata(newRundownPersistentState, activePart, previousPart, timeline)
@@ -103,7 +103,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
       enable: {
         start: 0,
       },
-      layer: Tv2SisyfosLayer.SisyfosPersistedLevels,
+      layer: Tv2SisyfosLayer.SISYFOS_PERSISTED_LEVELS,
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNELS,
@@ -247,25 +247,19 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
   }
 
   private updateAtemProgramWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
-    if (timelineObject.content.deviceType !== DeviceType.ATEM) {
+    if (timelineObject.content.deviceType !== DeviceType.ATEM || timelineObject.content.type !== AtemType.ME) {
       return
     }
-    const atemContent: AtemTimelineObjectContent = timelineObject.content as AtemTimelineObjectContent
-    if (atemContent.type !== AtemType.ME) {
-      return
-    }
-    atemContent.me!.input = mediaPlayer.SwitcherSource
+    const atemMeTimelineObject: AtemMeTimelineObject = timelineObject as AtemMeTimelineObject
+    atemMeTimelineObject.content.me.input = mediaPlayer.SwitcherSource
   }
 
   private updateAtemLookaheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
-    if (timelineObject.content.deviceType !== DeviceType.ATEM) {
+    if (timelineObject.content.deviceType !== DeviceType.ATEM || timelineObject.content.type !== AtemType.AUX) {
       return
     }
-    const atemContent: AtemTimelineObjectContent = timelineObject.content as AtemTimelineObjectContent
-    if (atemContent.type !== AtemType.AUX) {
-      return
-    }
-    atemContent.aux!.input = mediaPlayer.SwitcherSource
+    const atemAuxTimelineObject: AtemAuxTimelineObject = timelineObject as AtemAuxTimelineObject
+    atemAuxTimelineObject.content.aux.input = mediaPlayer.SwitcherSource
   }
 
   private updateSisyfosTimelineObjectWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {

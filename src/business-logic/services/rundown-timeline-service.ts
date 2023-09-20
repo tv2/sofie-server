@@ -21,6 +21,7 @@ import { PartEndState } from '../../model/value-objects/part-end-state'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
 import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
+import { Part } from '../../model/entities/part'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -215,5 +216,18 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.deleteRundown(rundownId)
 
     this.sendEvents(rundown, [this.rundownEventBuilder.buildDeletedEvent])
+  }
+
+  public async insertPart(rundownId: string, part: Part): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.insertPart(part)
+
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+
+    // TODO: Emit events
+
+    await this.rundownRepository.saveRundown(rundown)
   }
 }

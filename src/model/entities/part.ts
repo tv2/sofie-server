@@ -13,6 +13,7 @@ export interface PartInterface {
   segmentId: string
   name: string
   rank: number
+  isAdLib: boolean
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
@@ -31,9 +32,9 @@ export interface PartInterface {
 
 export class Part {
   public readonly id: string
-  public readonly segmentId: string
   public readonly name: string
   public readonly rank: number
+  public readonly isAdLib: boolean
 
   public readonly expectedDuration: number
 
@@ -42,6 +43,8 @@ export class Part {
 
   public readonly autoNext?: AutoNext
   public readonly disableNextInTransition: boolean
+
+  private segmentId: string
 
   private pieces: Piece[]
 
@@ -66,6 +69,7 @@ export class Part {
     this.segmentId = part.segmentId
     this.name = part.name
     this.rank = part.rank
+    this.isAdLib = part.isAdLib
     this.pieces = part.pieces ?? []
     this.isPartOnAir = part.isOnAir
     this.isPartNext = part.isNext
@@ -136,6 +140,17 @@ export class Part {
 
   public getPlayedDuration(): number {
     return this.playedDuration
+  }
+
+  public getSegmentId(): string {
+    return this.segmentId
+  }
+
+  public setSegmentId(segmentId: string): void {
+    if (!this.isAdLib) {
+      throw new UnsupportedOperation(`Can't update SegmentId for Part: ${this.id}. Only AdLibbed Parts are allowed to have their Segment id updated!`)
+    }
+    this.segmentId = segmentId
   }
 
   // TODO: This implementation currently reflects how Core implemented it. It's in dire need of a refactor.
