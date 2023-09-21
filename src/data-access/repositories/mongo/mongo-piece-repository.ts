@@ -20,8 +20,8 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
   public async getPieces(partId: string): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPieces.name)
     const mongoPieces: MongoPiece[] = (await this.getCollection()
-      .find({ startPartId: partId })
-      .toArray()) as unknown as MongoPiece[]
+      .find<MongoPiece>({ startPartId: partId })
+      .toArray())
     return this.mongoEntityConverter.convertPieces(mongoPieces)
   }
 

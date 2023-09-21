@@ -3,6 +3,7 @@ import { ShowStyleRepository } from '../interfaces/show-style-repository'
 import { ShowStyle } from '../../../model/entities/show-style'
 import { MongoDatabase } from './mongo-database'
 import { MongoEntityConverter, MongoShowStyle } from './mongo-entity-converter'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const COLLECTION_NAME: string = 'showStyleBases'
 
@@ -17,9 +18,12 @@ export class MongoShowStyleRepository extends BaseMongoRepository implements Sho
 
   public async getShowStyle(showStyleId: string): Promise<ShowStyle> {
     this.assertDatabaseConnection(this.getShowStyle.name)
-    const mongoShowStyle: MongoShowStyle = (await this.getCollection().findOne({
+    const mongoShowStyle: MongoShowStyle | null = (await this.getCollection().findOne<MongoShowStyle>({
       _id: showStyleId,
-    })) as unknown as MongoShowStyle
+    }))
+    if (!mongoShowStyle) {
+      throw new NotFoundException(`No ShowStyle found for showStyleId: ${showStyleId}`)
+    }
     return this.mongoEntityConverter.convertShowStyle(mongoShowStyle)
   }
 }
