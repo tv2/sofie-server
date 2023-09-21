@@ -82,7 +82,7 @@ describe(`${RundownTimelineService.name}`, () => {
 
       const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
 
-      await expect(async () => testee.deleteRundown(rundown.id)).rejects.toThrow(ActiveRundownException)
+      await expect(() => testee.deleteRundown(rundown.id)).rejects.toThrow(ActiveRundownException)
     })
   })
 })

@@ -17,7 +17,7 @@ export interface PieceInterface {
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
 
-  metaData?: unknown
+  metadata?: unknown
   content?: unknown
   tags: string[]
 }
@@ -36,7 +36,7 @@ export class Piece {
   public transitionType: TransitionType
   public timelineObjects: TimelineObject[]
 
-  public readonly metaData?: unknown
+  public readonly metadata?: unknown
   public content?: unknown
   public tags: string[]
 
@@ -56,7 +56,7 @@ export class Piece {
     this.transitionType = piece.transitionType
     this.timelineObjects = piece.timelineObjects
 
-    this.metaData = piece.metaData
+    this.metadata = piece.metadata
     this.content = piece.content
     this.tags = piece.tags
   }

@@ -1,4 +1,4 @@
-import { Tv2OnTimelineGenerateCalculator } from '../tv2-on-timeline-generate-calculator'
+import { Tv2OnTimelineGenerateService } from '../tv2-on-timeline-generate-service'
 import { Tv2SisyfosPersistentLayerFinder } from '../helpers/tv2-sisyfos-persistent-layer-finder'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Configuration } from '../../../model/entities/configuration'
@@ -9,13 +9,13 @@ import { Tv2MediaPlayerSession, Tv2RundownPersistentState } from '../value-objec
 import { Timeline } from '../../../model/entities/timeline'
 import { TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
 import { Tv2MediaPlayer, Tv2StudioBlueprintConfiguration } from '../value-objects/tv2-studio-blueprint-configuration'
-import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetaData } from '../value-objects/tv2-meta-data'
+import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../value-objects/tv2-meta-data'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
-const LOOK_AHEAD_GROUP_ID: string = 'look_ahead_group'
+const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 
-describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
-  describe(`${Tv2OnTimelineGenerateCalculator.prototype.onTimelineGenerate.name}`, () => {
+describe(`${Tv2OnTimelineGenerateService.name}`, () => {
+  describe(`${Tv2OnTimelineGenerateService.prototype.onTimelineGenerate.name}`, () => {
     describe('the active Part is from the same Segment as the previous Part', () => {
       it('sets isNewSegment to false', () => {
         const configuration: Configuration = createConfiguration()
@@ -25,8 +25,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
         const activePart: Part = EntityMockFactory.createPart({ segmentId })
         const previousPart: Part = EntityMockFactory.createPart({ segmentId })
 
-        const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, activePart, previousPart, timeline)
+        const testee: Tv2OnTimelineGenerateService = createTestee()
+        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, activePart, rundownPersistentState, previousPart)
         const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
         expect(result.isNewSegment).toBeFalsy()
@@ -41,8 +41,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
         const activePart: Part = EntityMockFactory.createPart({ segmentId: 'someSegmentId' })
         const previousPart: Part = EntityMockFactory.createPart({ segmentId: 'someOtherSegmentId' })
 
-        const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, activePart, previousPart, timeline)
+        const testee: Tv2OnTimelineGenerateService = createTestee()
+        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, activePart, rundownPersistentState, previousPart)
         const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
         expect(result.isNewSegment).toBeTruthy()
@@ -59,8 +59,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(0)
@@ -81,8 +81,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -90,13 +90,13 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
         })
       })
 
-      describe('there is a LookAhead who wants a MediaPlayer', () => {
-        it('assigns a MediaPlayer to the LookAhead TimelineObject', () => {
+      describe('there is a Lookahead who wants a MediaPlayer', () => {
+        it('assigns a MediaPlayer to the Lookahead TimelineObject', () => {
           const mediaPlayerIds: string[] = ['1', '2']
           const configuration: Configuration = createConfiguration(mediaPlayerIds)
           const sessionId: string = 'someSession'
           const timeline: Timeline = createTimeline({
-            lookAheadGroupTimelineObjects: [
+            lookaheadGroupTimelineObjects: [
               createTimelineObject('someId', { mediaPlayerSession: sessionId })
             ]
           })
@@ -104,8 +104,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -113,14 +113,14 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
         })
       })
 
-      describe('there are two LookAhead TimelineObjects who wants their own MediaPlayer', () => {
-        it('assigns a MediaPlayer to each LookAhead TimelineObject', () => {
+      describe('there are two Lookahead TimelineObjects who wants their own MediaPlayer', () => {
+        it('assigns a MediaPlayer to each Lookahead TimelineObject', () => {
           const mediaPlayerIds: string[] = ['1', '2']
           const configuration: Configuration = createConfiguration(mediaPlayerIds)
           const firstSessionId: string = 'firstSessionId'
           const secondSessionId: string = 'secondSessionId'
           const timeline: Timeline = createTimeline({
-            lookAheadGroupTimelineObjects: [
+            lookaheadGroupTimelineObjects: [
               createTimelineObject('someId', { mediaPlayerSession: firstSessionId }),
               createTimelineObject('someOtherId', { mediaPlayerSession: secondSessionId })
             ]
@@ -129,8 +129,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -155,8 +155,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -164,28 +164,28 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           expect(result.activeMediaPlayerSessions[1].sessionId).toBe(secondSessionId)
         })
 
-        describe('there is also a LookAhead who wants a MediaPlayer', () => {
-          it('does not assign a MediaPlayer to the LookAhead TimelineObject', () => {
+        describe('there is also a Lookahead who wants a MediaPlayer', () => {
+          it('does not assign a MediaPlayer to the Lookahead TimelineObject', () => {
             const mediaPlayerIds: string[] = ['1', '2']
             const configuration: Configuration = createConfiguration(mediaPlayerIds)
             const firstSessionId: string = 'firstSessionId'
             const secondSessionId: string = 'secondSessionId'
-            const lookAheadSessionId: string = 'lookAheadSessionId'
+            const lookaheadSessionId: string = 'lookaheadSessionId'
             const timeline: Timeline = createTimeline({
               activeGroupTimelineObjects: [
                 createTimelineObject('someId', { mediaPlayerSession: firstSessionId }),
                 createTimelineObject('someOtherId', { mediaPlayerSession: secondSessionId })
               ],
-              lookAheadGroupTimelineObjects: [
-                createTimelineObject('lookAheadId', { mediaPlayerSession: lookAheadSessionId })
+              lookaheadGroupTimelineObjects: [
+                createTimelineObject('lookaheadId', { mediaPlayerSession: lookaheadSessionId })
               ]
             })
             const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = []
             const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
             const part: Part = EntityMockFactory.createPart()
 
-            const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const testee: Tv2OnTimelineGenerateService = createTestee()
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -210,8 +210,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -237,8 +237,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(0)
@@ -266,8 +266,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -275,18 +275,18 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           expect(result.activeMediaPlayerSessions[0].mediaPlayer._id).toBe('1')
         })
 
-        describe('there is a LookAhead TimelineObject who wants a MediaPlayer', () => {
+        describe('there is a Lookahead TimelineObject who wants a MediaPlayer', () => {
           it('it gets a different Media Player assigned', () => {
             const mediaPlayerIds: string[] = ['1', '2']
             const configuration: Configuration = createConfiguration(mediaPlayerIds)
             const sessionId: string = 'sessionId'
-            const lookAheadSessionId: string = 'lookAheadSessionId'
+            const lookaheadSessionId: string = 'lookaheadSessionId'
             const timeline: Timeline = createTimeline({
               activeGroupTimelineObjects: [
                 createTimelineObject('someId', { mediaPlayerSession: sessionId })
               ],
-              lookAheadGroupTimelineObjects: [
-                createTimelineObject('lookAheadId', { mediaPlayerSession: lookAheadSessionId })
+              lookaheadGroupTimelineObjects: [
+                createTimelineObject('lookaheadId', { mediaPlayerSession: lookaheadSessionId })
               ]
             })
             const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = [
@@ -300,33 +300,33 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
             const part: Part = EntityMockFactory.createPart()
 
-            const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const testee: Tv2OnTimelineGenerateService = createTestee()
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
             expect(result.activeMediaPlayerSessions[0].sessionId).toBe(sessionId)
             expect(result.activeMediaPlayerSessions[0].mediaPlayer._id).toBe('1')
 
-            expect(result.activeMediaPlayerSessions[1].sessionId).toBe(lookAheadSessionId)
+            expect(result.activeMediaPlayerSessions[1].sessionId).toBe(lookaheadSessionId)
             expect(result.activeMediaPlayerSessions[1].mediaPlayer._id).toBe('2')
           })
         })
 
-        describe('there are two more LookAhead who wants a MediaPlayer, but only one MediaPlayer available', () => {
-          it('assigns the MediaPlayer to the first LookAhead TimelineObject', () => {
+        describe('there are two more Lookahead who wants a MediaPlayer, but only one MediaPlayer available', () => {
+          it('assigns the MediaPlayer to the first Lookahead TimelineObject', () => {
             const mediaPlayerIds: string[] = ['1', '2']
             const configuration: Configuration = createConfiguration(mediaPlayerIds)
             const sessionId: string = 'sessionId'
-            const lookAheadSessionId: string = 'lookAheadSessionId'
-            const secondLookAheadSessionId: string = 'secondLookAheadSessionId'
+            const lookaheadSessionId: string = 'lookaheadSessionId'
+            const secondLookaheadSessionId: string = 'secondLookaheadSessionId'
             const timeline: Timeline = createTimeline({
               activeGroupTimelineObjects: [
                 createTimelineObject('someId', { mediaPlayerSession: sessionId })
               ],
-              lookAheadGroupTimelineObjects: [
-                createTimelineObject('lookAheadId', { mediaPlayerSession: lookAheadSessionId }),
-                createTimelineObject('secondLookAheadId', { mediaPlayerSession: secondLookAheadSessionId })
+              lookaheadGroupTimelineObjects: [
+                createTimelineObject('lookaheadId', { mediaPlayerSession: lookaheadSessionId }),
+                createTimelineObject('secondLookaheadId', { mediaPlayerSession: secondLookaheadSessionId })
               ]
             })
             const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = [
@@ -340,34 +340,34 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
             const part: Part = EntityMockFactory.createPart()
 
-            const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const testee: Tv2OnTimelineGenerateService = createTestee()
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
             expect(result.activeMediaPlayerSessions[0].sessionId).toBe(sessionId)
             expect(result.activeMediaPlayerSessions[0].mediaPlayer._id).toBe('1')
 
-            expect(result.activeMediaPlayerSessions[1].sessionId).toBe(lookAheadSessionId)
+            expect(result.activeMediaPlayerSessions[1].sessionId).toBe(lookaheadSessionId)
             expect(result.activeMediaPlayerSessions[1].mediaPlayer._id).toBe('2')
           })
         })
       })
 
       describe('there is no active Part that wants to continue using the MediaPlayer', () => {
-        describe('there is as many LookAhead TimelineObjects as there is MediaPlayers that wants a MediaPlayer', () => {
+        describe('there is as many Lookahead TimelineObjects as there is MediaPlayers that wants a MediaPlayer', () => {
           it('assigns all the MediaPlayers', () => {
             const mediaPlayerIds: string[] = ['1', '2']
             const configuration: Configuration = createConfiguration(mediaPlayerIds)
             const sessionId: string = 'sessionId'
-            const lookAheadSessionId: string = 'lookAheadSessionId'
-            const secondLookAheadSessionId: string = 'secondLookAheadSessionId'
+            const lookaheadSessionId: string = 'lookaheadSessionId'
+            const secondLookaheadSessionId: string = 'secondLookaheadSessionId'
             const timeline: Timeline = createTimeline({
               activeGroupTimelineObjects: [
               ],
-              lookAheadGroupTimelineObjects: [
-                createTimelineObject('lookAheadId', { mediaPlayerSession: lookAheadSessionId }),
-                createTimelineObject('secondLookAheadId', { mediaPlayerSession: secondLookAheadSessionId })
+              lookaheadGroupTimelineObjects: [
+                createTimelineObject('lookaheadId', { mediaPlayerSession: lookaheadSessionId }),
+                createTimelineObject('secondLookaheadId', { mediaPlayerSession: secondLookaheadSessionId })
               ]
             })
             const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = [
@@ -381,15 +381,15 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
             const part: Part = EntityMockFactory.createPart()
 
-            const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const testee: Tv2OnTimelineGenerateService = createTestee()
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
-            expect(result.activeMediaPlayerSessions[0].sessionId).toBe(lookAheadSessionId)
+            expect(result.activeMediaPlayerSessions[0].sessionId).toBe(lookaheadSessionId)
             expect(result.activeMediaPlayerSessions[0].mediaPlayer._id).toBe('2')
 
-            expect(result.activeMediaPlayerSessions[1].sessionId).toBe(secondLookAheadSessionId)
+            expect(result.activeMediaPlayerSessions[1].sessionId).toBe(secondLookaheadSessionId)
             expect(result.activeMediaPlayerSessions[1].mediaPlayer._id).toBe('1')
           })
         })
@@ -426,8 +426,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -438,20 +438,20 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           expect(result.activeMediaPlayerSessions[1].mediaPlayer._id).toBe('2')
         })
 
-        describe('there are LookAhead TimelineObjects that wants to use the MediaPlayers', () => {
+        describe('there are Lookahead TimelineObjects that wants to use the MediaPlayers', () => {
           it('does not reassign the MediaPlayers', () => {
             const mediaPlayerIds: string[] = ['1', '2']
             const configuration: Configuration = createConfiguration(mediaPlayerIds)
             const firstSessionId: string = 'firstSessionId'
             const secondSessionId: string = 'secondSessionId'
-            const lookAheadSessionId: string = 'lookAheadSessionId'
+            const lookaheadSessionId: string = 'lookaheadSessionId'
             const timeline: Timeline = createTimeline({
               activeGroupTimelineObjects: [
                 createTimelineObject('someId', { mediaPlayerSession: firstSessionId }),
                 createTimelineObject('someOtherId', { mediaPlayerSession: secondSessionId })
               ],
-              lookAheadGroupTimelineObjects: [
-                createTimelineObject('lookAheadId', { mediaPlayerSession: lookAheadSessionId })
+              lookaheadGroupTimelineObjects: [
+                createTimelineObject('lookaheadId', { mediaPlayerSession: lookaheadSessionId })
               ]
             })
             const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = [
@@ -471,8 +471,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
             const part: Part = EntityMockFactory.createPart()
 
-            const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const testee: Tv2OnTimelineGenerateService = createTestee()
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -513,8 +513,8 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
           const part: Part = EntityMockFactory.createPart()
 
-          const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+          const testee: Tv2OnTimelineGenerateService = createTestee()
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -522,19 +522,19 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
           expect(result.activeMediaPlayerSessions[0].mediaPlayer._id).toBe('1')
         })
 
-        describe('there is a LookAhead TimelineObject that wants to use the MediaPlayer', () => {
+        describe('there is a Lookahead TimelineObject that wants to use the MediaPlayer', () => {
           it('assigns the MediaPlayer no longer used by active Part to the LookAhead TimelineObject', () => {
             const mediaPlayerIds: string[] = ['1', '2']
             const configuration: Configuration = createConfiguration(mediaPlayerIds)
             const firstSessionId: string = 'firstSessionId'
             const secondSessionId: string = 'secondSessionId'
-            const lookAheadSessionId: string = 'lookAheadSessionId'
+            const lookaheadSessionId: string = 'lookaheadSessionId'
             const timeline: Timeline = createTimeline({
               activeGroupTimelineObjects: [
                 createTimelineObject('someId', { mediaPlayerSession: firstSessionId })
               ],
-              lookAheadGroupTimelineObjects: [
-                createTimelineObject('lookAheadId', { mediaPlayerSession: lookAheadSessionId })
+              lookaheadGroupTimelineObjects: [
+                createTimelineObject('lookaheadId', { mediaPlayerSession: lookaheadSessionId })
               ]
             })
             const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = [
@@ -554,15 +554,15 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
             const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
             const part: Part = EntityMockFactory.createPart()
 
-            const testee: Tv2OnTimelineGenerateCalculator = createTestee()
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, rundownPersistentState, part, undefined, timeline)
+            const testee: Tv2OnTimelineGenerateService = createTestee()
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, timeline, part,  rundownPersistentState, undefined)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
             expect(result.activeMediaPlayerSessions[0].sessionId).toBe(firstSessionId)
             expect(result.activeMediaPlayerSessions[0].mediaPlayer._id).toBe('1')
 
-            expect(result.activeMediaPlayerSessions[1].sessionId).toBe(lookAheadSessionId)
+            expect(result.activeMediaPlayerSessions[1].sessionId).toBe(lookaheadSessionId)
             expect(result.activeMediaPlayerSessions[1].mediaPlayer._id).toBe('2')
           })
         })
@@ -573,14 +573,14 @@ describe(`${Tv2OnTimelineGenerateCalculator.name}`, () => {
 
 function createTestee(params?: {
   sisyfosPersistentLayerFinder?: Tv2SisyfosPersistentLayerFinder
-}): Tv2OnTimelineGenerateCalculator {
+}): Tv2OnTimelineGenerateService {
   let sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder | undefined = params?.sisyfosPersistentLayerFinder
   if (!params?.sisyfosPersistentLayerFinder) {
     const sisyfosPersistentLayerFinderMock = mock(Tv2SisyfosPersistentLayerFinder)
     when(sisyfosPersistentLayerFinderMock.findLayersToPersist(anything(), anything(), anything())).thenReturn([])
     sisyfosPersistentLayerFinder = instance(sisyfosPersistentLayerFinderMock)
   }
-  return new Tv2OnTimelineGenerateCalculator(sisyfosPersistentLayerFinder!)
+  return new Tv2OnTimelineGenerateService(sisyfosPersistentLayerFinder!)
 }
 
 function createConfiguration(abMediaPlayerIds?: string[]): Configuration {
@@ -601,7 +601,7 @@ function createConfiguration(abMediaPlayerIds?: string[]): Configuration {
   }
 }
 
-function createTimeline(params?: { activeGroupTimelineObjects?: TimelineObject[], lookAheadGroupTimelineObjects?: TimelineObject[] }): Timeline {
+function createTimeline(params?: { activeGroupTimelineObjects?: TimelineObject[], lookaheadGroupTimelineObjects?: TimelineObject[] }): Timeline {
   return {
     timelineGroups: [
       {
@@ -609,8 +609,8 @@ function createTimeline(params?: { activeGroupTimelineObjects?: TimelineObject[]
         children: params?.activeGroupTimelineObjects ?? [] as TimelineObject[]
       } as TimelineObjectGroup,
       {
-        id: LOOK_AHEAD_GROUP_ID,
-        children: params?.lookAheadGroupTimelineObjects ?? [] as TimelineObject[]
+        id: LOOKAHEAD_GROUP_ID,
+        children: params?.lookaheadGroupTimelineObjects ?? [] as TimelineObject[]
       } as TimelineObjectGroup
     ]
   }
@@ -618,14 +618,15 @@ function createTimeline(params?: { activeGroupTimelineObjects?: TimelineObject[]
 
 function createRundownPersistentState(activeMediaPlayerSessions?: Tv2MediaPlayerSession[]): Tv2RundownPersistentState {
   return {
-    activeMediaPlayerSessions: activeMediaPlayerSessions ?? []
+    activeMediaPlayerSessions: activeMediaPlayerSessions ?? [],
+    isNewSegment: false
   }
 }
 
-function createTimelineObject(id: string, metaData?: Tv2TimelineObjectMetaData): Tv2BlueprintTimelineObject {
+function createTimelineObject(id: string, metadata?: Tv2TimelineObjectMetadata): Tv2BlueprintTimelineObject {
   return {
     id,
-    metaData,
+    metaData: metadata,
     content: {}
   } as Tv2BlueprintTimelineObject
 }
