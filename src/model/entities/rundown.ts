@@ -182,21 +182,18 @@ export class Rundown extends BasicRundown {
 
   public getPartAfter(part: Part): Part {
     this.assertActive(this.getPartAfter.name)
-    let nextPartAfterPart: Part
     const segmentIndexForPart: number = this.getSegmentIndexForPart(part)
     try {
-      nextPartAfterPart = this.segments[segmentIndexForPart].findNextPart(part)
+      return  this.segments[segmentIndexForPart].findNextPart(part)
     } catch (exception) {
-      if ((exception as Exception).errorCode !== ErrorCode.LAST_PART_IN_SEGMENT) {
+      if (!(exception instanceof LastPartInSegmentException)) {
         throw exception
       }
       if (segmentIndexForPart + 1 === this.segments.length) {
         throw new LastPartInRundownException()
       }
-      nextPartAfterPart = this.segments[segmentIndexForPart + 1].findFirstPart()
+      return this.segments[segmentIndexForPart + 1].findFirstPart()
     }
-
-    return nextPartAfterPart
   }
 
   private getSegmentIndexForPart(part: Part): number {
