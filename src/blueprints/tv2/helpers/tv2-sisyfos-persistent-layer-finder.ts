@@ -8,14 +8,14 @@ export class Tv2SisyfosPersistentLayerFinder {
     time: number | undefined,
     layersWantingToPersistFromPreviousPart: string[] = []
   ): string[] {
-    const lastPlayingPieceMetaData: Tv2SisyfosPersistenceMetadata | undefined = this.findLastPlayingPieceMetaData(part, time)
-    if (!lastPlayingPieceMetaData) {
+    const lastPlayingPieceMetadata: Tv2SisyfosPersistenceMetadata | undefined = this.findLastPlayingPieceMetadata(part, time)
+    if (!lastPlayingPieceMetadata) {
       return []
     }
-    return this.findLayersToPersistForPieceMetaData(lastPlayingPieceMetaData, layersWantingToPersistFromPreviousPart)
+    return this.findLayersToPersistForPieceMetadata(lastPlayingPieceMetadata, layersWantingToPersistFromPreviousPart)
   }
 
-  public findLastPlayingPieceMetaData(part: Part, time: number | undefined): Tv2SisyfosPersistenceMetadata | undefined {
+  public findLastPlayingPieceMetadata(part: Part, time: number | undefined): Tv2SisyfosPersistenceMetadata | undefined {
     time ??= Date.now()
 
     const piecesWithSisyfosMetadata: Piece[] = this.findPiecesWithSisyfosMetadata(part)
@@ -46,33 +46,29 @@ export class Tv2SisyfosPersistentLayerFinder {
 
   private findLastPlayingPiece(pieces: Piece[], partExecutedAt: number, time: number): Piece | undefined {
     const playingPieces: Piece[] = pieces.filter((piece) => this.isPiecePlaying(piece, partExecutedAt, time))
-
-    if (playingPieces.length <= 1) {
-      return playingPieces[0]
-    }
-
-    return playingPieces.reduce((previous, current) => {
-      return previous.start > current.start ? previous : current
-    })
+    return playingPieces.reduce(
+      (previous: Piece | undefined, current: Piece) => !previous || previous.start <= current.start ? current : previous,
+      undefined
+    )
   }
 
-  private isPiecePlaying(piece: Piece, partExecutedAt: number, time: number): boolean {
-    // TODO: Verify this condition - It's found in Blueprints in onTimelineGenerate.ts line 264
+  private isPiecePlaying(piece: Piece, partExecutedAt: number, time: number): boolean{
     const hasPieceStoppedPlaying: boolean =
-      piece.duration > 0 && piece.start + piece.duration + partExecutedAt <= time
+				piece.duration > 0 && piece.start + piece.duration + partExecutedAt <= time
     return !hasPieceStoppedPlaying
+
   }
 
-  public findLayersToPersistForPieceMetaData(lastPlayingPieceMetaData: Tv2SisyfosPersistenceMetadata, layersWantingToPersistFromPreviousPart: string[]): string[] {
-    if (!lastPlayingPieceMetaData.acceptsPersistedAudio) {
-      return lastPlayingPieceMetaData.sisyfosLayers
+  public findLayersToPersistForPieceMetadata(lastPlayingPieceMetadata: Tv2SisyfosPersistenceMetadata, layersWantingToPersistFromPreviousPart: string[]): string[] {
+    if (!lastPlayingPieceMetadata.acceptsPersistedAudio) {
+      return lastPlayingPieceMetadata.sisyfosLayers
     }
 
-    const layersToPersist: string[] = [...lastPlayingPieceMetaData.sisyfosLayers]
-    if (!lastPlayingPieceMetaData.isModifiedOrInsertedByAction) {
+    const layersToPersist: string[] = [...lastPlayingPieceMetadata.sisyfosLayers]
+    if (!lastPlayingPieceMetadata.isModifiedOrInsertedByAction) {
       layersToPersist.push(...layersWantingToPersistFromPreviousPart)
-    } else if (lastPlayingPieceMetaData.previousSisyfosLayers) {
-      layersToPersist.push(...lastPlayingPieceMetaData.previousSisyfosLayers)
+    } else if (lastPlayingPieceMetadata.previousSisyfosLayers) {
+      layersToPersist.push(...lastPlayingPieceMetadata.previousSisyfosLayers)
     }
 
     return Array.from(new Set(layersToPersist))
