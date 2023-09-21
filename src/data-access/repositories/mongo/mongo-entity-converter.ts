@@ -9,7 +9,7 @@ import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Studio } from '../../../model/entities/studio'
 import { StudioLayer } from '../../../model/value-objects/studio-layer'
-import { LookAheadMode } from '../../../model/enums/look-ahead-mode'
+import { LookaheadMode } from '../../../model/enums/lookahead-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Identifier } from '../../../model/value-objects/identifier'
@@ -69,7 +69,7 @@ export interface MongoPiece {
   timelineObjectsString: string
   lifespan: string
   pieceType: string
-  metaData?: unknown
+  metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
   content?: unknown
   tags?: string[]
 }
@@ -103,11 +103,11 @@ export interface MongoShowStyle {
 }
 
 interface MongoLayerMapping {
-  // Which LookAhead "mode" we are in.
+  // Which Lookahead "mode" we are in.
   lookahead: number
-  // The minimum number of lookAhead objects to find.
+  // The minimum number of lookahead objects to find.
   lookaheadDepth: number
-  // The maximum distance to search for lookAhead
+  // The maximum distance to search for lookahead
   lookaheadMaxSearchDistance: number
 }
 
@@ -213,7 +213,7 @@ export class MongoEntityConverter {
       _rank: part.rank,
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
-      endState: part.getEndState() ?? undefined,
+      endState: part.getEndState(),
     } as MongoPart
   }
 
@@ -235,7 +235,7 @@ export class MongoEntityConverter {
       postRollDuration: mongoPiece.prerollDuration,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
-      metaData: mongoPiece.metaData,
+      metadata: mongoPiece.metaData,
       content: mongoPiece.content,
       tags: mongoPiece.tags ?? [],
     })
@@ -339,37 +339,37 @@ export class MongoEntityConverter {
 
   public convertStudio(mongoStudio: MongoStudio): Studio {
     const defaultNumberOfObjects: number = 1
-    const defaultLookAheadDistance: number = 10
+    const defaultLookaheadDistance: number = 10
     const layers: StudioLayer[] = []
     for (const mapping in mongoStudio.mappings) {
       layers.push({
         name: mapping,
-        lookAheadMode: this.mapLookAheadNumberToEnum(mongoStudio.mappings[mapping].lookahead),
-        amountOfLookAheadObjectsToFind: mongoStudio.mappings[mapping].lookaheadDepth ?? defaultNumberOfObjects,
-        maximumLookAheadSearchDistance:
-            mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookAheadDistance,
+        lookaheadMode: this.mapLookaheadNumberToEnum(mongoStudio.mappings[mapping].lookahead),
+        amountOfLookaheadObjectsToFind: mongoStudio.mappings[mapping].lookaheadDepth ?? defaultNumberOfObjects,
+        maximumLookaheadSearchDistance:
+            mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookaheadDistance,
       })
     }
     return { layers, blueprintConfiguration: mongoStudio.blueprintConfig }
   }
 
-  private mapLookAheadNumberToEnum(lookAheadNumber: number): LookAheadMode {
+  private mapLookaheadNumberToEnum(lookAheadNumber: number): LookaheadMode {
     // These numbers are based on the "LookaheadMode" enum from BlueprintsIntegration
     switch (lookAheadNumber) {
       case 0: {
-        return LookAheadMode.NONE
+        return LookaheadMode.NONE
       }
       case 1: {
-        return LookAheadMode.PRELOAD
+        return LookaheadMode.PRELOAD
       }
       case 3: {
-        return LookAheadMode.WHEN_CLEAR
+        return LookaheadMode.WHEN_CLEAR
       }
       default: {
         console.log(`### Warning: Found unknown number for LookAhead: ${lookAheadNumber}`)
         // TODO: Throw error. Currently we have some misconfiguration that uses an outdated lookAhead mode
         // throw new UnsupportedOperation(`Found unknown number for LookAhead: ${lookAheadNumber}`)
-        return LookAheadMode.NONE
+        return LookaheadMode.NONE
       }
     }
   }

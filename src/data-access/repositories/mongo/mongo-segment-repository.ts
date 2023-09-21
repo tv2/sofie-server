@@ -25,8 +25,8 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
   public async getSegments(rundownId: string): Promise<Segment[]> {
     this.assertDatabaseConnection(this.getSegments.name)
     const mongoSegments: MongoSegment[] = (await this.getCollection()
-      .find({ rundownId: rundownId })
-      .toArray()) as unknown as MongoSegment[]
+      .find<MongoSegment>({ rundownId: rundownId })
+      .toArray())
     const segments: Segment[] = this.mongoEntityConverter.convertSegments(mongoSegments)
     return Promise.all(
       segments.map(async (segment) => {
