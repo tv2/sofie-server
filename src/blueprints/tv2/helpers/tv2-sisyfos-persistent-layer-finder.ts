@@ -56,14 +56,10 @@ export class Tv2SisyfosPersistentLayerFinder {
 
   private findLastPlayingPiece(pieces: Piece[], partExecutedAt: number, time: number): Piece | undefined {
     const playingPieces: Piece[] = pieces.filter((piece) => this.isPiecePlaying(piece, partExecutedAt, time))
-
-    if (playingPieces.length <= 1) {
-      return playingPieces[0]
-    }
-
-    return playingPieces.reduce((previous, current) => {
-      return previous.start > current.start ? previous : current
-    })
+    return playingPieces.reduce(
+      (previous: Piece | undefined, current: Piece) => !previous || previous.start <= current.start ? current : previous,
+      undefined
+    )
   }
 
   private isPiecePlaying(piece: Piece, partExecutedAt: number, time: number): boolean {
