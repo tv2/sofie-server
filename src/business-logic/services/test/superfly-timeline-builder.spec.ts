@@ -547,7 +547,7 @@ describe('superfly-timeline-builder', () => {
               })
 
               describe('active Part does not have PostRoll', () => {
-                it('sets TimelineEnable.duration to be zero', () => {
+                it('sets TimelineEnable.duration to be undefined', () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     transitionType: TransitionType.NO_TRANSITION,
                   })
@@ -566,7 +566,7 @@ describe('superfly-timeline-builder', () => {
                     child.id.includes(PIECE_CONTROL_INFIX)
                   )!
 
-                  expect(controlObject.enable.duration).toBe(0)
+                  expect(controlObject.enable.duration).toBe(undefined)
                 })
               })
             })
@@ -1691,7 +1691,7 @@ describe('superfly-timeline-builder', () => {
                 })
 
                 describe('previous Part does not have PostRoll', () => {
-                  it('sets TimelineEnable.duration to zero', () => {
+                  it('sets TimelineEnable.duration to undefined', () => {
                     const piece: Piece = EntityMockFactory.createPiece({
                       transitionType: TransitionType.NO_TRANSITION,
                     })
@@ -1720,7 +1720,7 @@ describe('superfly-timeline-builder', () => {
                       child.id.includes(PIECE_CONTROL_INFIX)
                     )!
 
-                    expect(controlObject.enable.duration).toBe(0)
+                    expect(controlObject.enable.duration).toBe(undefined)
                   })
                 })
               })
@@ -3051,7 +3051,7 @@ describe('superfly-timeline-builder', () => {
                   })
 
                   describe('next Part does not have PostRoll', () => {
-                    it('sets TimelineEnable.duration to zero', () => {
+                    it('sets TimelineEnable.duration to undefined', () => {
                       const piece: Piece = EntityMockFactory.createPiece({
                         transitionType: TransitionType.NO_TRANSITION,
                       })
@@ -3082,7 +3082,7 @@ describe('superfly-timeline-builder', () => {
                         child.id.includes(PIECE_CONTROL_INFIX)
                       )!
 
-                      expect(controlGroup.enable.duration).toBe(0)
+                      expect(controlGroup.enable.duration).toBe(undefined)
                     })
                   })
                 })

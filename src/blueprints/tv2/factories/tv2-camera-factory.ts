@@ -80,7 +80,7 @@ export class Tv2CameraFactory {
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       start: 0,
-      duration: 0, // TODO: Is this right?
+      duration: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       metadata,

@@ -45,6 +45,7 @@ export class BlueprintActionService implements ActionService {
     const pieces: Piece[] = insertPartAction.data.pieceInterfaces.map(pieceInterface => new Piece(pieceInterface))
 
     const partInterface: PartInterface = insertPartAction.data.partInterface
+    partInterface.id = `${partInterface.id}_${Date.now()}`
     partInterface.pieces = pieces
 
     const part: Part = new Part(partInterface)

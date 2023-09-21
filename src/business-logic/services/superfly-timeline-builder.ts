@@ -237,7 +237,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       // TODO: Since handling AdLibs is no longer Part of building the Timeline, we should be safe to always add this? It should evaluate to zero in most cases.
       // TODO: Verify when we implement adLibs.
       start: piece.start + partCalculatedTimings.delayStartOfPiecesDuration,
-      duration: duration,
+      duration: duration === 0 ? undefined : duration,
     }
   }
 
