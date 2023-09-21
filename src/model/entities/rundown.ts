@@ -100,7 +100,7 @@ export class Rundown extends BasicRundown {
   }
 
   private setNextFromActive(): void {
-    this.unmarkNextSegmentAndPart()
+    this.unmarkNextPart()
 
     try {
       this.nextPart = this.activeSegment.findNextPart(this.activePart)
@@ -108,30 +108,38 @@ export class Rundown extends BasicRundown {
       if ((exception as Exception).errorCode !== ErrorCode.LAST_PART_IN_SEGMENT) {
         throw exception
       }
+      this.unmarkNextSegment()
       const segment: Segment = this.findNextSegment()
       // TODO: Handle that we might be on the last Segment
       if (segment) {
         this.nextSegment = segment
+        this.markNextSegment()
         this.nextPart = this.nextSegment.findFirstPart()
       }
     }
 
-    this.markNextSegmentAndPart()
+    this.markNextPart()
   }
 
-  private unmarkNextSegmentAndPart(): void {
+  private unmarkNextSegment(): void {
     if (this.nextSegment) {
       this.nextSegment.removeAsNext()
     }
+  }
+
+  private unmarkNextPart(): void {
     if (this.nextPart) {
       this.nextPart.removeAsNext()
     }
   }
 
-  private markNextSegmentAndPart(): void {
+  private markNextSegment(): void {
     if (this.nextSegment) {
       this.nextSegment.setAsNext()
     }
+  }
+
+  private markNextPart(): void {
     if (this.nextPart) {
       this.nextPart.setAsNext()
     }
@@ -152,7 +160,8 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.deactivate.name)
     this.activeSegment.takeOffAir()
     this.activePart.takeOffAir()
-    this.unmarkNextSegmentAndPart()
+    this.unmarkNextSegment()
+    this.unmarkNextPart()
     this.infinitePieces = new Map()
     this.isRundownActive = false
     this.previousPart = undefined
@@ -238,7 +247,7 @@ export class Rundown extends BasicRundown {
       // Strongly consider refactor into something less implicit.
       return
     }
-    this.previousPart = this.activePart
+    this.previousPart = this.activePart.clone()
   }
 
   private takeNextPart(): void {
@@ -371,13 +380,15 @@ export class Rundown extends BasicRundown {
 
   public setNext(segmentId: string, partId: string): void {
     this.assertActive(this.setNext.name)
+    if (!this.nextSegment || this.nextSegment.id !== segmentId) {
+      this.unmarkNextSegment()
+      this.nextSegment = this.findSegment(segmentId)
+      this.markNextSegment()
+    }
 
-    this.unmarkNextSegmentAndPart()
-
-    this.nextSegment = this.findSegment(segmentId)
+    this.unmarkNextPart()
     this.nextPart = this.nextSegment.findPart(partId)
-
-    this.markNextSegmentAndPart()
+    this.markNextPart()
   }
 
   private findSegment(segmentId: string): Segment {
