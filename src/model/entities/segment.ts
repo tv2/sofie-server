@@ -53,6 +53,9 @@ export class Segment {
 
   public setAsNext(): void {
     this.isSegmentNext = true
+    if (!this.isSegmentOnAir) {
+      this.reset()
+    }
   }
 
   public removeAsNext(): void {

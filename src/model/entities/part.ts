@@ -241,4 +241,24 @@ export class Part {
     this.executedAt = 0
     this.playedDuration = 0
   }
+
+  public clone(): Part {
+    const clonedPart: Part = new Part({
+      id: this.id,
+      executedAt: this.executedAt,
+      pieces: this.pieces,
+      segmentId: this.segmentId,
+      isAdLib: this.isAdLib,
+      isOnAir: this.isPartOnAir,
+      isNext: this.isPartNext,
+      name: this.name,
+      rank: this.rank,
+      disableNextInTransition: this.disableNextInTransition,
+      expectedDuration: this.expectedDuration,
+      outTransition: this.outTransition,
+      inTransition: this.inTransition,
+    })
+    clonedPart.timings = this.timings
+    return clonedPart
+  }
 }
