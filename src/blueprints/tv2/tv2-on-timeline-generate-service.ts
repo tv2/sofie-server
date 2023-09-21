@@ -23,7 +23,7 @@ const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
 
-export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGenerate {
+export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate {
   constructor(private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder) {}
 
   public onTimelineGenerate(
@@ -139,7 +139,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
   }
 
   private assignMediaPlayersForPreviousGroup(previousGroup: TimelineObjectGroup, mediaPlayerSessionsInUse: Tv2MediaPlayerSession[]): void {
-    const timelineObjects: TimelineObject[] = this.flatMapTimelineObjectChildren(previousGroup)
+    const timelineObjects: TimelineObject[] = this.flattenNestedTimelineObjectChildren(previousGroup)
     timelineObjects.forEach(timelineObject => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
       if (!blueprintTimelineObject.metaData || !blueprintTimelineObject.metaData.mediaPlayerSession) {
@@ -154,7 +154,7 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
   }
 
   private assignMediaPlayersForGroup(group: TimelineObjectGroup, mediaPlayerSessionsInUse: Tv2MediaPlayerSession[], availableMediaPlayers: Tv2MediaPlayer[]): void {
-    const timelineObjects: TimelineObject[] = this.flatMapTimelineObjectChildren(group)
+    const timelineObjects: TimelineObject[] = this.flattenNestedTimelineObjectChildren(group)
     timelineObjects.forEach(timelineObject => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
       if (!blueprintTimelineObject.metaData || !blueprintTimelineObject.metaData.mediaPlayerSession) {
@@ -193,9 +193,9 @@ export class Tv2OnTimelineGenerateCalculator implements BlueprintOnTimelineGener
     return hasMediaPlayerSession || doesChildrenHaveMediaPlayerSession
   }
 
-  private flatMapTimelineObjectChildren(timelineObject: TimelineObject): TimelineObject[] {
+  private flattenNestedTimelineObjectChildren(timelineObject: TimelineObject): TimelineObject[] {
     if (timelineObject.children) {
-      return timelineObject.children.flatMap((child: TimelineObject) => this.flatMapTimelineObjectChildren(child))
+      return timelineObject.children.flatMap((child: TimelineObject) => this.flattenNestedTimelineObjectChildren(child))
     }
     return [timelineObject]
   }

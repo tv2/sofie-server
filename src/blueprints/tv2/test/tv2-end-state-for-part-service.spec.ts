@@ -1,4 +1,4 @@
-import { Tv2EndStateForPartCalculator } from '../tv2-end-state-for-part-calculator'
+import { Tv2EndStateForPartService } from '../tv2-end-state-for-part-service'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Tv2TallyTags } from '../value-objects/tv2-tally-tags'
 import { Piece } from '../../../model/entities/piece'
@@ -7,14 +7,14 @@ import { Tv2SisyfosPersistentLayerFinder } from '../helpers/tv2-sisyfos-persiste
 import { instance, mock } from '@typestrong/ts-mockito'
 import { Tv2PartEndState } from '../value-objects/tv2-part-end-state'
 
-describe(`${Tv2EndStateForPartCalculator.name}`, () => {
-  describe(`${Tv2EndStateForPartCalculator.prototype.getEndStateForPart.name}`, () => {
+describe(`${Tv2EndStateForPartService.name}`, () => {
+  describe(`${Tv2EndStateForPartService.prototype.getEndStateForPart.name}`, () => {
     describe('Part has Piece with JingleIsLive tag', () => {
       it('sets isJingle to true', () => {
         const pieceWithJingleTag: Piece = EntityMockFactory.createPiece({ tags: [Tv2TallyTags.JINGLE_IS_LIVE] })
         const part: Part = EntityMockFactory.createPart({ pieces: [pieceWithJingleTag] })
 
-        const testee: Tv2EndStateForPartCalculator = createTestee()
+        const testee: Tv2EndStateForPartService = createTestee()
         const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.isJingle).toBeTruthy()
@@ -26,7 +26,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
         const pieceWithoutJingleTag: Piece = EntityMockFactory.createPiece()
         const part: Part = EntityMockFactory.createPart({ pieces: [pieceWithoutJingleTag] })
 
-        const testee: Tv2EndStateForPartCalculator = createTestee()
+        const testee: Tv2EndStateForPartService = createTestee()
         const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.isJingle).toBeFalsy()
@@ -39,7 +39,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
         const pieceWithFileName: Piece = EntityMockFactory.createPiece({ tags: [Tv2TallyTags.FULL_IS_LIVE], content: { fileName } })
         const part: Part = EntityMockFactory.createPart({ pieces: [pieceWithFileName] })
 
-        const testee: Tv2EndStateForPartCalculator = createTestee()
+        const testee: Tv2EndStateForPartService = createTestee()
         const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.fullFileName).toBe(fileName)
@@ -51,7 +51,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
         const pieceWithoutFileName: Piece = EntityMockFactory.createPiece()
         const part: Part = EntityMockFactory.createPart({ pieces: [pieceWithoutFileName] })
 
-        const testee: Tv2EndStateForPartCalculator = createTestee()
+        const testee: Tv2EndStateForPartService = createTestee()
         const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.fullFileName).toBeFalsy()
@@ -62,7 +62,7 @@ describe(`${Tv2EndStateForPartCalculator.name}`, () => {
 
 function createTestee(params?: {
   sisyfosPersistentLayerFinder?: Tv2SisyfosPersistentLayerFinder
-}): Tv2EndStateForPartCalculator {
+}): Tv2EndStateForPartService {
   const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = params?.sisyfosPersistentLayerFinder ?? instance(mock(Tv2SisyfosPersistentLayerFinder))
-  return  new Tv2EndStateForPartCalculator(sisyfosPersistentLayerFinder)
+  return  new Tv2EndStateForPartService(sisyfosPersistentLayerFinder)
 }

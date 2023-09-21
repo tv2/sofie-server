@@ -547,7 +547,8 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     activeGroup: ActivePartTimelineObjectGroup,
     timeline: Timeline
   ): Timeline {
-    if (activeGroup.autoNextEpochTime === 0) {
+    const hasNoAutoNext: boolean = activeGroup.autoNextEpochTime === 0
+    if (hasNoAutoNext) {
       return timeline
     }
 

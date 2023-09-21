@@ -3,6 +3,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { Timeline } from '../../../model/entities/timeline'
 import { MongoDatabase } from './mongo-database'
 import { MongoEntityConverter, MongoTimeline } from './mongo-entity-converter'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const TIMELINE_COLLECTION_NAME: string = 'timeline'
 
@@ -16,7 +17,10 @@ export class MongoTimelineRepository extends BaseMongoRepository implements Time
   }
 
   public async getTimeline(): Promise<Timeline> {
-    const mongoTimeline: MongoTimeline = (await this.getCollection().findOne()) as unknown as MongoTimeline
+    const mongoTimeline: MongoTimeline | null = (await this.getCollection().findOne<MongoTimeline>())
+    if (!mongoTimeline) {
+      throw new NotFoundException('No Timeline was found')
+    }
     return this.mongoEntityConverter.convertToTimeline(mongoTimeline)
   }
 

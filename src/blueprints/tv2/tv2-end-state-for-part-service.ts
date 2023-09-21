@@ -13,7 +13,7 @@ import { Tv2SisyfosPersistenceMetadata } from './value-objects/tv2-meta-data'
  Disclaimer: The code in this file is almost a 1 to 1 copy of the code of the corresponding implementations in Blueprints.
  Minimal effort has been put into refactoring it - only to the extent that it works with the new data model of SofieServer.
  */
-export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart {
+export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
   constructor(private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder) {}
 
   public getEndStateForPart(
@@ -74,19 +74,18 @@ export class Tv2EndStateForPartCalculator implements BlueprintGetEndStateForPart
     rundownPersistentState: Tv2RundownPersistentState
   ): Tv2SisyfosPersistenceMetadata {
     const layersWantingToPersist: string[] = this.findLayersWantingToPersist(rundownPersistentState, previousPartEndState)
-    const pieceMetaData: Tv2SisyfosPersistenceMetadata | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetaData(part, time)
+    const pieceMetadata: Tv2SisyfosPersistenceMetadata | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetadata(part, time)
     return {
-      sisyfosLayers: pieceMetaData?.wantsToPersistAudio
-        ? this.sisyfosPersistentLayerFinder.findLayersToPersistForPieceMetaData(pieceMetaData, layersWantingToPersist)
+      sisyfosLayers: pieceMetadata?.wantsToPersistAudio
+        ? this.sisyfosPersistentLayerFinder.findLayersToPersistForPieceMetadata(pieceMetadata, layersWantingToPersist)
         : []
     }
   }
 
   private findLayersWantingToPersist(rundownPersistentState: Tv2RundownPersistentState, previousPartEndState: Tv2PartEndState | undefined): string[] {
-    return !rundownPersistentState.isNewSegment &&
-    previousPartEndState &&
-    previousPartEndState.sisyfosPersistenceMetadata
-      ? previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
-      : []
+    if (rundownPersistentState.isNewSegment || !previousPartEndState?.sisyfosPersistenceMetadata) {
+      return []
+    }
+    return previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
   }
 }
