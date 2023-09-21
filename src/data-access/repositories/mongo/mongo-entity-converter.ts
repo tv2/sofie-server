@@ -213,7 +213,7 @@ export class MongoEntityConverter {
       _rank: part.rank,
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
-      endState: part.getEndState() ?? undefined,
+      endState: part.getEndState(),
     } as MongoPart
   }
 
