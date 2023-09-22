@@ -13,6 +13,8 @@ import { PieceLifespan } from '../enums/piece-lifespan'
 import { MisconfigurationException } from '../exceptions/misconfiguration-exception'
 import { ExhaustiveCaseChecker } from '../../business-logic/exhaustive-case-checker'
 import { TimelineObject } from './timeline-object'
+import { LastPartInRundownException } from '../exceptions/last-part-in-rundown-exception'
+import { RundownPersistentState } from '../value-objects/rundown-persistent-state'
 
 export interface RundownInterface {
   id: string
@@ -21,6 +23,7 @@ export interface RundownInterface {
   baselineTimelineObjects: TimelineObject[]
   isRundownActive: boolean
   modifiedAt: number
+  persistentState?: RundownPersistentState
 
   alreadyActiveProperties?: {
     activePart: Part
@@ -45,6 +48,8 @@ export class Rundown extends BasicRundown {
 
   private infinitePieces: Map<string, Piece> = new Map()
 
+  private persistentState?: RundownPersistentState
+
   constructor(rundown: RundownInterface) {
     super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt)
     this.segments = rundown.segments ?? []
@@ -53,11 +58,11 @@ export class Rundown extends BasicRundown {
     if (rundown.alreadyActiveProperties) {
       if (
         !rundown.isRundownActive ||
-				// TODO: Should it be possible to instantiate the Rundown without active Part and active Segment?
-				!rundown.alreadyActiveProperties.activePart ||
-				!rundown.alreadyActiveProperties.nextPart ||
-				!rundown.alreadyActiveProperties.activeSegment ||
-				!rundown.alreadyActiveProperties.nextSegment
+          // TODO: Should it be possible to instantiate the Rundown without active Part and active Segment?
+          !rundown.alreadyActiveProperties.activePart ||
+          !rundown.alreadyActiveProperties.nextPart ||
+          !rundown.alreadyActiveProperties.activeSegment ||
+          !rundown.alreadyActiveProperties.nextSegment
       ) {
         throw new MisconfigurationException(
           'Rundown is missing required values in order to be instantiated as an active Rundown'
@@ -146,6 +151,7 @@ export class Rundown extends BasicRundown {
     this.infinitePieces = new Map()
     this.isRundownActive = false
     this.previousPart = undefined
+    this.persistentState = undefined
   }
 
   private assertActive(operationName: string): void {
@@ -172,6 +178,32 @@ export class Rundown extends BasicRundown {
   public getNextPart(): Part {
     this.assertActive(this.getNextPart.name)
     return this.nextPart
+  }
+
+  public getPartAfter(part: Part): Part {
+    this.assertActive(this.getPartAfter.name)
+    const segmentIndexForPart: number = this.getSegmentIndexForPart(part)
+    try {
+      return  this.segments[segmentIndexForPart].findNextPart(part)
+    } catch (exception) {
+      if (!(exception instanceof LastPartInSegmentException)) {
+        throw exception
+      }
+      if (segmentIndexForPart + 1 === this.segments.length) {
+        throw new LastPartInRundownException()
+      }
+      return this.segments[segmentIndexForPart + 1].findFirstPart()
+    }
+  }
+
+  private getSegmentIndexForPart(part: Part): number {
+    const segmentIndexForPart: number = this.segments.findIndex((segment) => segment.id === part.segmentId)
+    if (segmentIndexForPart < 0) {
+      throw new NotFoundException(
+        `Part: "${part.id}" does not belong to any Segments on Rundown: "${this.id}"`
+      )
+    }
+    return segmentIndexForPart
   }
 
   public getPreviousPart(): Part | undefined {
@@ -211,8 +243,8 @@ export class Rundown extends BasicRundown {
   }
 
   /**
-	 * This needs information from the current active Part, so this must be called after the active Part has been updated.
-	 */
+   * This needs information from the current active Part, so this must be called after the active Part has been updated.
+   */
   private takeNextSegment(): void {
     if (this.activeSegment) {
       this.activeSegment.takeOffAir()
@@ -368,5 +400,13 @@ export class Rundown extends BasicRundown {
   public reset(): void {
     this.deactivate()
     this.activate()
+  }
+
+  public getPersistentState(): RundownPersistentState {
+    return this.persistentState
+  }
+
+  public setPersistentState(rundownPersistentState: RundownPersistentState): void {
+    this.persistentState = rundownPersistentState
   }
 }
