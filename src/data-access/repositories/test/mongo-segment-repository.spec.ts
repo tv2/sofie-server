@@ -94,15 +94,11 @@ describe(`${MongoSegmentRepository.name}`, () => {
 
     it('does not deletes any segments, when nonexistent rundownId is given', async () => {
       const db: Db = testDatabase.getDatabase()
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const mongoSegment: MongoSegment = createMongoSegment({})
       await testDatabase.populateDatabaseWithSegments([mongoSegment])
 
-      when(mongoConverter.convertSegments(anything())).thenReturn([])
-      const testee: SegmentRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: SegmentRepository = createTestee({ })
       const action: () => Promise<void> = async () => testee.deleteSegmentsForRundown(nonExistingId)
 
       await expect(action).rejects.toThrow(DeletionFailedException)
@@ -111,15 +107,11 @@ describe(`${MongoSegmentRepository.name}`, () => {
 
     it('throws exception, when nonexistent rundownId is given', async () => {
       const expectedErrorMessageFragment: string = 'Expected to delete one or more segments'
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const mongoSegment: MongoSegment = createMongoSegment({})
       await testDatabase.populateDatabaseWithSegments([mongoSegment])
 
-      when(mongoConverter.convertSegments(anything())).thenReturn([])
-      const testee: SegmentRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: SegmentRepository = createTestee({ })
       const action: () => Promise<void> = async () => testee.deleteSegmentsForRundown(nonExistingId)
 
       await expect(action).rejects.toThrow(DeletionFailedException)
@@ -370,8 +362,6 @@ describe(`${MongoSegmentRepository.name}`, () => {
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
   }): MongoSegmentRepository {
-    const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
-
     if (!params.mongoDb) {
       params.mongoDb = mock(MongoDatabase)
       when(params.mongoDb.getCollection(COLLECTION_NAME)).thenReturn(
@@ -384,6 +374,11 @@ describe(`${MongoSegmentRepository.name}`, () => {
       when(params.partRepository.getParts(anyString())).thenResolve([])
     }
 
-    return new MongoSegmentRepository(instance(params.mongoDb), instance(mongoConverter), instance(params.partRepository))
+    if (!params.mongoConverter) {
+      params.mongoConverter = mock(MongoEntityConverter)
+      when(params.mongoConverter.convertSegments(anything())).thenReturn([])
+    }
+
+    return new MongoSegmentRepository(instance(params.mongoDb), instance(params.mongoConverter), instance(params.partRepository))
   }
 })
