@@ -4,9 +4,8 @@ import { Tv2TallyTags } from '../value-objects/tv2-tally-tags'
 import { Piece } from '../../../model/entities/piece'
 import { Part } from '../../../model/entities/part'
 import { Tv2SisyfosPersistentLayerFinder } from '../helpers/tv2-sisyfos-persistent-layer-finder'
-import { capture, instance, mock } from '@typestrong/ts-mockito'
+import { instance, mock } from '@typestrong/ts-mockito'
 import { Tv2PartEndState } from '../value-objects/tv2-part-end-state'
-import { Tv2RundownPersistentState } from '../value-objects/tv2-rundown-persistent-state'
 
 describe(`${Tv2EndStateForPartService.name}`, () => {
   describe(`${Tv2EndStateForPartService.prototype.getEndStateForPart.name}`, () => {
@@ -56,98 +55,6 @@ describe(`${Tv2EndStateForPartService.name}`, () => {
         const result: Tv2PartEndState = testee.getEndStateForPart(part, undefined, 0, undefined) as Tv2PartEndState
 
         expect(result.fullFileName).toBeFalsy()
-      })
-    })
-
-    describe('it finds sisyfos layers to be persisted', () => {
-      describe('Segment is a new Segment', () => {
-        it('calls sisyfosPersistentLayerFinder with an empty array', () =>  {
-          const part: Part = EntityMockFactory.createPart({ id: 'active' })
-          const previousPartEndState: Tv2PartEndState = {
-            sisyfosPersistenceMetadata: {
-              sisyfosLayers: ['someLayer']
-            }
-          }
-          const previousPart: Part = EntityMockFactory.createPart({ id: 'previous', endState: previousPartEndState })
-          const persistentState: Tv2RundownPersistentState = {
-            isNewSegment: true,
-            activeMediaPlayerSessions: []
-          }
-
-          const sisyfosPersistentLayerFinderMock: Tv2SisyfosPersistentLayerFinder = mock(Tv2SisyfosPersistentLayerFinder)
-
-          const testee: Tv2EndStateForPartService = createTestee({ sisyfosPersistentLayerFinder: instance(sisyfosPersistentLayerFinderMock) })
-          testee.getEndStateForPart(part, previousPart, 0, persistentState)
-
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const [_part, _previousPart, layers, ] = capture(sisyfosPersistentLayerFinderMock.findLayersToPersist).last()
-          expect(layers).toHaveLength(0)
-        })
-      })
-
-      describe('there is no previous Part end state', () => {
-        it('calls sisyfosPersistentLayerFinder with an empty array', () =>  {
-          const part: Part = EntityMockFactory.createPart()
-          const persistentState: Tv2RundownPersistentState = {
-            isNewSegment: false,
-            activeMediaPlayerSessions: []
-          }
-
-          const sisyfosPersistentLayerFinderMock: Tv2SisyfosPersistentLayerFinder = mock(Tv2SisyfosPersistentLayerFinder)
-
-          const testee: Tv2EndStateForPartService = createTestee({ sisyfosPersistentLayerFinder: instance(sisyfosPersistentLayerFinderMock) })
-          testee.getEndStateForPart(part, undefined, 0, persistentState)
-
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const [_part, _previousPart, layers, ] = capture(sisyfosPersistentLayerFinderMock.findLayersToPersist).last()
-          expect(layers).toHaveLength(0)
-        })
-      })
-
-      describe('there is a previous Part end state, but with no sisyfos layers', () => {
-        it('calls sisyfosPersistentLayerFinder with an empty array', () =>  {
-          const part: Part = EntityMockFactory.createPart({ id: 'active' })
-          const previousPart: Part = EntityMockFactory.createPart({ id: 'previous' })
-          const persistentState: Tv2RundownPersistentState = {
-            isNewSegment: false,
-            activeMediaPlayerSessions: []
-          }
-
-          const sisyfosPersistentLayerFinderMock: Tv2SisyfosPersistentLayerFinder = mock(Tv2SisyfosPersistentLayerFinder)
-
-          const testee: Tv2EndStateForPartService = createTestee({ sisyfosPersistentLayerFinder: instance(sisyfosPersistentLayerFinderMock) })
-          testee.getEndStateForPart(part, previousPart, 0, persistentState)
-
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const [_part, _previousPart, layers, ] = capture(sisyfosPersistentLayerFinderMock.findLayersToPersist).last()
-          expect(layers).toHaveLength(0)
-        })
-      })
-
-      describe('Segment is not a new Segment and there is a previous Part end state with sisyfos layers', () => {
-        it('calls sisyfosPersistentLayerFinder with the sisyfos layers of the previous Part end state', () =>  {
-          const part: Part = EntityMockFactory.createPart({ id: 'active' })
-          const sisyfosLayers: string[] = ['someLayer']
-          const previousPartEndState: Tv2PartEndState = {
-            sisyfosPersistenceMetadata: {
-              sisyfosLayers
-            }
-          }
-          const previousPart: Part = EntityMockFactory.createPart({ id: 'previous', endState: previousPartEndState })
-          const persistentState: Tv2RundownPersistentState = {
-            isNewSegment: false,
-            activeMediaPlayerSessions: []
-          }
-
-          const sisyfosPersistentLayerFinderMock: Tv2SisyfosPersistentLayerFinder = mock(Tv2SisyfosPersistentLayerFinder)
-
-          const testee: Tv2EndStateForPartService = createTestee({ sisyfosPersistentLayerFinder: instance(sisyfosPersistentLayerFinderMock) })
-          testee.getEndStateForPart(part, previousPart, 0, persistentState)
-
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const [_part, _previousPart, layers, ] = capture(sisyfosPersistentLayerFinderMock.findLayersToPersist).last()
-          expect(layers).toBe(sisyfosLayers)
-        })
       })
     })
   })

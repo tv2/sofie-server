@@ -74,8 +74,11 @@ export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
     rundownPersistentState: Tv2RundownPersistentState
   ): Tv2SisyfosPersistenceMetadata {
     const layersWantingToPersist: string[] = this.findLayersWantingToPersist(rundownPersistentState, previousPartEndState)
+    const pieceMetadata: Tv2SisyfosPersistenceMetadata | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetadata(part, time)
     return {
-      sisyfosLayers: this.sisyfosPersistentLayerFinder.findLayersToPersist(part, time, layersWantingToPersist),
+      sisyfosLayers: pieceMetadata?.wantsToPersistAudio
+        ? this.sisyfosPersistentLayerFinder.findLayersToPersistForPieceMetadata(pieceMetadata, layersWantingToPersist)
+        : []
     }
   }
 
