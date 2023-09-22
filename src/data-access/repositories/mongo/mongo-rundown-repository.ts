@@ -38,9 +38,9 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
 
   public async getRundown(rundownId: string): Promise<Rundown> {
     this.assertDatabaseConnection(this.getRundown.name)
-    const mongoRundown: MongoRundown | null = (await this.getCollection().findOne<MongoRundown>({
+    const mongoRundown: MongoRundown | null = await this.getCollection().findOne<MongoRundown>({
       _id: rundownId,
-    }))
+    })
     if (!mongoRundown) {
       throw new NotFoundException(`No Rundown found for rundownId: ${rundownId}`)
     }
