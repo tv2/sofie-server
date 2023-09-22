@@ -89,15 +89,11 @@ describe(`${MongoPartRepository.name}`, () => {
 
     it('throws exception, when nonexistent segmentId is given', async () => {
       const expectedErrorMessageFragment: string = 'Expected to delete one or more parts'
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const mongoPart: MongoPart = createMongoPart({})
       await testDatabase.populateDatabaseWithParts([mongoPart])
 
-      when(mongoConverter.convertParts(anything())).thenReturn([])
-      const testee: PartRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: PartRepository = createTestee({ })
 
       const action: () => Promise<void> = async () => testee.deletePartsForSegment(nonExistingId)
 
@@ -106,16 +102,12 @@ describe(`${MongoPartRepository.name}`, () => {
     })
 
     it('does not deletes any pieces, when nonexistent segmentId is given', async () => {
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const mongoPart: MongoPart = createMongoPart({})
       await testDatabase.populateDatabaseWithParts([mongoPart])
       const db = testDatabase.getDatabase()
 
-      when(mongoConverter.convertParts(anything())).thenReturn([])
-      const testee = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee = createTestee({ })
       const action: () => Promise<void> = async () => testee.deletePartsForSegment(nonExistingId)
 
       await expect(action).rejects.toThrow(DeletionFailedException)
@@ -351,7 +343,6 @@ describe(`${MongoPartRepository.name}`, () => {
     mongoConverter?: MongoEntityConverter
   }): MongoPartRepository {
     const pieceRepository: PieceRepository = params.pieceRepository ?? mock<PieceRepository>()
-    const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
 
     if (!params.mongoDb) {
       params.mongoDb = mock(MongoDatabase)
@@ -360,6 +351,11 @@ describe(`${MongoPartRepository.name}`, () => {
       )
     }
 
-    return new MongoPartRepository(instance(params.mongoDb), instance(mongoConverter), instance(pieceRepository))
+    if (!params.mongoConverter) {
+      params.mongoConverter = mock(MongoEntityConverter)
+      when(params.mongoConverter.convertParts(anything())).thenReturn([])
+    }
+
+    return new MongoPartRepository(instance(params.mongoDb), instance(params.mongoConverter), instance(pieceRepository))
   }
 })

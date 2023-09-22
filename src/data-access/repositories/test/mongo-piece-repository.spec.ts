@@ -62,16 +62,12 @@ describe(`${MongoPieceRepository.name}`, () => {
 
     it('throws exception, when nonexistent partId is given', async () => {
       const expectedErrorMessageFragment: string = 'Expected to delete one or more pieces'
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const partId: string = 'somePartId'
       const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
       await testDatabase.populateDatabaseWithPieces([mongoPiece])
 
-      when(mongoConverter.convertPieces(anything())).thenReturn([])
-      const testee: PieceRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: PieceRepository = createTestee({ })
       const action: () => Promise<void> = async () => testee.deletePiecesForPart(nonExistingId)
 
       await expect(action).rejects.toThrow(DeletionFailedException)
@@ -79,17 +75,13 @@ describe(`${MongoPieceRepository.name}`, () => {
     })
 
     it('does not deletes any pieces, when nonexistent partId is given', async () => {
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const partId: string = 'somePartId'
       const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
       await testDatabase.populateDatabaseWithPieces([mongoPiece])
       const db: Db = testDatabase.getDatabase()
 
-      when(mongoConverter.convertPieces(anything())).thenReturn([])
-      const testee: PieceRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: PieceRepository = createTestee({ })
       const action: () => Promise<void> = async () => testee.deletePiecesForPart(nonExistingId)
 
       await expect(action).rejects.toThrow(DeletionFailedException)
@@ -170,10 +162,14 @@ describe(`${MongoPieceRepository.name}`, () => {
     mongoConverter?: MongoEntityConverter
   }): MongoPieceRepository {
     const mongoDb: MongoDatabase = params.mongoDb ?? mock(MongoDatabase)
-    const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
 
     when(mongoDb.getCollection(COLLECTION_NAME)).thenReturn(testDatabase.getDatabase().collection(COLLECTION_NAME))
 
-    return new MongoPieceRepository(instance(mongoDb), instance(mongoConverter))
+    if (!params.mongoConverter) {
+      params.mongoConverter = mock(MongoEntityConverter)
+      when(params.mongoConverter.convertPieces(anything())).thenReturn([])
+    }
+
+    return new MongoPieceRepository(instance(mongoDb), instance(params.mongoConverter))
   }
 })
