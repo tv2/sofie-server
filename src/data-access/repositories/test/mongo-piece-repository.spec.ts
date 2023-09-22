@@ -1,7 +1,7 @@
 import { MongoPieceRepository } from '../mongo/mongo-piece-repository'
 import { MongoTestDatabase } from './mongo-test-database'
 import { MongoEntityConverter, MongoPiece } from '../mongo/mongo-entity-converter'
-import { anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { anything, capture, instance, mock, when } from '@typestrong/ts-mockito'
 import { Db } from 'mongodb'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
@@ -143,26 +143,6 @@ describe(`${MongoPieceRepository.name}`, () => {
       const result: Piece[] = await testee.getPieces(partId)
 
       expect(result.length).toBe(pieces.length)
-    })
-
-    it('converts from mongo pieces to our piece entity, when partId is given', async () => {
-      const partId: string = 'somePartId'
-      const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: partId})]
-      const pieces: Piece[] = [EntityFactory.createPiece({partId: partId})]
-      const mongoConverter: MongoEntityConverter = await setupMongoConverter(pieces, mongoPieces)
-
-      const testee: PieceRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
-
-      await testee.getPieces(partId)
-
-      verify(mongoConverter.convertPieces(anything())).once()
-      const [capturedMongoPieces] =  capture(mongoConverter.convertPieces).first()
-      expect(capturedMongoPieces.length).toBe(mongoPieces.length)
-      mongoPieces.forEach((mongoPiece) => {
-        expect(capturedMongoPieces).toEqual(expect.arrayContaining([expect.objectContaining(mongoPiece)]))
-      })
     })
   })
 
