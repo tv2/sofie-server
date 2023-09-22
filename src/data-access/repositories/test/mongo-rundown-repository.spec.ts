@@ -200,11 +200,13 @@ describe(`${MongoRundownRepository.name}`, () => {
     it('retrieves segments from the segment repository, when existing rundownId is given', async () => {
       const segmentRepository: SegmentRepository = mock<SegmentRepository>()
       const rundown: Rundown = EntityFactory.createRundown()
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
 
       when(segmentRepository.getSegments(anyString())).thenResolve([])
-      const testee: RundownRepository = await populateAndCreateTestee({
+      const testee: RundownRepository = createTestee({
         segmentRepository: segmentRepository,
-      }, {rundown: rundown})
+        mongoConverter: mongoConverter
+      })
 
       await testee.getRundown(rundown.id)
 
@@ -215,11 +217,13 @@ describe(`${MongoRundownRepository.name}`, () => {
       const segmentRepository: SegmentRepository = mock<SegmentRepository>()
       const rundown: Rundown = EntityFactory.createRundown()
       const segments: Segment[] = [EntityFactory.createSegment({ rundownId: rundown.id }), EntityFactory.createSegment({ rundownId: rundown.id })]
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
 
       when(segmentRepository.getSegments(rundown.id)).thenResolve(segments)
-      const testee: RundownRepository = await populateAndCreateTestee({
+      const testee: RundownRepository = createTestee({
         segmentRepository: segmentRepository,
-      }, {rundown: rundown})
+        mongoConverter: mongoConverter
+      })
 
       await testee.getRundown(rundown.id)
 
@@ -228,7 +232,8 @@ describe(`${MongoRundownRepository.name}`, () => {
 
     it('returns rundown, when existing rundownId is given', async () => {
       const rundown: Rundown = EntityFactory.createRundown()
-      const testee: RundownRepository = await populateAndCreateTestee({}, {rundown: rundown})
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
+      const testee: RundownRepository = createTestee({mongoConverter: mongoConverter})
 
       const result: Rundown = await testee.getRundown(rundown.id)
 
@@ -236,12 +241,12 @@ describe(`${MongoRundownRepository.name}`, () => {
     })
 
     it('converts from mongo rundown to our rundown entity, when existing rundownId is given', async () => {
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const rundown: Rundown = EntityFactory.createRundown()
       const mongoRundown: MongoRundown = createMongoRundown({
         _id: rundown.id,
       })
-      const testee: RundownRepository = await populateAndCreateTestee({mongoConverter: mongoConverter}, {rundown: rundown, mongoRundown: mongoRundown})
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown, mongoRundown)
+      const testee: RundownRepository = createTestee({mongoConverter: mongoConverter})
 
       await testee.getRundown(rundown.id)
 
@@ -256,29 +261,25 @@ describe(`${MongoRundownRepository.name}`, () => {
     } as MongoRundown
   }
 
-  interface TesteeParams {
+  async function setupMongoConverter(rundown: Rundown, mongoRundown?: MongoRundown): Promise<MongoEntityConverter> {
+    const mongoEntityConverter: MongoEntityConverter = mock(MongoEntityConverter)
+    if (!mongoRundown) {
+      mongoRundown = createMongoRundown({
+        _id: rundown.id,
+      })
+    }
+
+    when(mongoEntityConverter.convertRundown(objectContaining(mongoRundown), anything())).thenReturn(rundown)
+    await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
+    return mongoEntityConverter
+  }
+
+  function createTestee(params: {
     segmentRepository?: SegmentRepository
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
     baselineRepository?: RundownBaselineRepository
-  }
-
-  async function populateAndCreateTestee(params: TesteeParams, misc: {rundown: Rundown, mongoRundown?: MongoRundown}): Promise<MongoRundownRepository> {
-    if (!params.mongoConverter) {
-      params.mongoConverter = mock(MongoEntityConverter)
-    }
-    if (!misc.mongoRundown) {
-      misc.mongoRundown = createMongoRundown({
-        _id: misc.rundown.id,
-      })
-    }
-    await testDatabase.populateDatabaseWithInactiveRundowns([misc.mongoRundown])
-    when(params.mongoConverter.convertRundown(objectContaining(misc.mongoRundown), anything())).thenReturn(misc.rundown)
-
-    return createTestee(params)
-  }
-
-  function createTestee(params: TesteeParams): MongoRundownRepository {
+  }): MongoRundownRepository {
     const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
 
     if (!params.mongoDb) {
