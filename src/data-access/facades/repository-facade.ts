@@ -15,6 +15,13 @@ import { MongoAdLibPieceRepository } from '../repositories/mongo/mongo-ad-lib-pi
 import { CachedRundownRepository } from '../repositories/cache/cached-rundown-repository'
 import { RundownBaselineRepository } from '../repositories/interfaces/rundown-baseline-repository'
 import { MongoRundownBaselineRepository } from '../repositories/mongo/mongo-rundown-baseline-repository'
+import { StudioRepository } from '../repositories/interfaces/studio-repository'
+import { MongoStudioRepository } from '../repositories/mongo/mongo-studio-repository'
+import { ShowStyleRepository } from '../repositories/interfaces/show-style-repository'
+import { CachedConfigurationRepository } from '../repositories/cache/cached-configuration-repository'
+import { MongoShowStyleRepository } from '../repositories/mongo/mongo-show-style-repository'
+import { ConfigurationRepository } from '../repositories/interfaces/configuration-repository'
+import { MongoConfigurationRepository } from '../repositories/mongo/mongo-configuration-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -58,5 +65,21 @@ export class RepositoryFacade {
 
   public static createAdLibRepository(): AdLibPieceRepository {
     return new MongoAdLibPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  public static createConfigurationRepository(): ConfigurationRepository {
+    const configurationRepository: ConfigurationRepository = new MongoConfigurationRepository(
+      this.createStudioRepository(),
+      this.createShowStyleRepository()
+    )
+    return CachedConfigurationRepository.getInstance(configurationRepository)
+  }
+
+  private static createStudioRepository(): StudioRepository {
+    return new MongoStudioRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  private static createShowStyleRepository(): ShowStyleRepository {
+    return new MongoShowStyleRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 }

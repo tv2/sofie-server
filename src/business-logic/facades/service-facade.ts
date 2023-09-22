@@ -8,6 +8,7 @@ import { RundownEventBuilderImplementation } from '../services/rundown-event-bui
 import { RundownEventBuilder } from '../services/interfaces/rundown-event-builder'
 import { TimeoutCallbackScheduler } from '../services/timeout-callback-scheduler'
 import { JsonObjectCloner } from '../services/json-object-cloner'
+import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -16,9 +17,11 @@ export class ServiceFacade {
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createTimelineRepository(),
       RepositoryFacade.createAdLibRepository(),
+      RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createRundownEventBuilder(),
-      TimeoutCallbackScheduler.getInstance()
+      TimeoutCallbackScheduler.getInstance(),
+      BlueprintsFacade.createBlueprint()
     )
   }
 
