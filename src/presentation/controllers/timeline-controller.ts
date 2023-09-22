@@ -12,7 +12,7 @@ export class TimelineController extends BaseController {
   }
 
   @GetRequest()
-  public async getTimeline(_reg: Request, res: Response): Promise<void> {
+  public async getTimeline(_req: Request, res: Response): Promise<void> {
     try {
       const timeline: Timeline = await this.timelineRepository.getTimeline()
       res.send(timeline)
