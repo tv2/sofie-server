@@ -6,6 +6,7 @@ import { UnsupportedOperation } from '../exceptions/unsupported-operation'
 import { InTransition } from '../value-objects/in-transition'
 import { OutTransition } from '../value-objects/out-transition'
 import { AutoNext } from '../value-objects/auto-next'
+import { PartEndState } from '../value-objects/part-end-state'
 
 export interface PartInterface {
   id: string
@@ -24,6 +25,8 @@ export interface PartInterface {
 
   autoNext?: AutoNext
   disableNextInTransition: boolean
+
+  endState?: PartEndState
 }
 
 export class Part {
@@ -51,6 +54,13 @@ export class Part {
   private playedDuration: number
   private timings?: PartTimings
 
+  /*
+   * The EndState of the Part
+   * This should be set when the Part becomes the Previous Part.
+   * // TODO: Should we reset it when it becomes the active?
+   */
+  private endState?: PartEndState
+
   constructor(part: PartInterface) {
     this.id = part.id
     this.segmentId = part.segmentId
@@ -69,6 +79,8 @@ export class Part {
 
     this.executedAt = part.executedAt ?? 0
     this.playedDuration = part.playedDuration ?? 0
+
+    this.endState = part.endState
   }
 
   public putOnAir(): void {
@@ -168,7 +180,7 @@ export class Part {
         delayStartOfPiecesDuration,
         postRollDuration: maxPostRollDurationForPieces,
         previousPartContinueIntoPartDuration:
-					delayStartOfPiecesDuration + (previousPart?.getTimings().postRollDuration ?? 0),
+            delayStartOfPiecesDuration + (previousPart?.getTimings().postRollDuration ?? 0),
       }
       return
     }
@@ -189,9 +201,9 @@ export class Part {
       delayStartOfPiecesDuration: delayStartOfPiecesDuration + inTransition.delayPiecesDuration,
       postRollDuration: maxPostRollDurationForPieces,
       previousPartContinueIntoPartDuration:
-				delayStartOfPiecesDuration +
-				inTransition.keepPreviousPartAliveDuration +
-				previousPart.getTimings().postRollDuration,
+          delayStartOfPiecesDuration +
+          inTransition.keepPreviousPartAliveDuration +
+          previousPart.getTimings().postRollDuration,
     }
   }
 
@@ -200,6 +212,14 @@ export class Part {
       throw new UnsupportedOperation(`No Timings has been calculated for Part: ${this.id}`)
     }
     return this.timings
+  }
+
+  public getEndState(): PartEndState | undefined {
+    return this.endState
+  }
+
+  public setEndState(endState: PartEndState): void {
+    this.endState = endState
   }
 
   public reset(): void {
