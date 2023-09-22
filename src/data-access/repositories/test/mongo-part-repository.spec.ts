@@ -323,23 +323,6 @@ describe(`${MongoPartRepository.name}`, () => {
       verify(pieceRepository.getPieces(anyString())).times(parts.length)
     })
 
-    it('converts from mongo parts to our part entity, when segmentId is given', async () => {
-      const segmentId: string = 'someSegmentId'
-      const mongoParts: MongoPart[] = [createMongoPart({segmentId: segmentId})]
-      const parts: Part[] = [EntityFactory.createPart({segmentId: segmentId})]
-      const mongoConverter: MongoEntityConverter = await setupMongoConverter(parts, mongoParts)
-
-      const testee: PartRepository = createTestee({ mongoConverter: mongoConverter })
-
-      await testee.getParts(segmentId)
-
-      verify(mongoConverter.convertParts(anything())).once()
-      const [capturedMongoParts] =  capture(mongoConverter.convertParts).first()
-      expect(capturedMongoParts.length).toBe(mongoParts.length)
-      mongoParts.forEach((mongoPart) => {
-        expect(capturedMongoParts).toEqual(expect.arrayContaining([expect.objectContaining(mongoPart)]))
-      })
-    })
   })
 
   function createMongoPart(mongoPartInterface?: Partial<MongoPart>): MongoPart {

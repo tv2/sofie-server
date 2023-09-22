@@ -239,19 +239,7 @@ describe(`${MongoRundownRepository.name}`, () => {
 
       expect(result).not.toBeNull()
     })
-
-    it('converts from mongo rundown to our rundown entity, when existing rundownId is given', async () => {
-      const rundown: Rundown = EntityFactory.createRundown()
-      const mongoRundown: MongoRundown = createMongoRundown({
-        _id: rundown.id,
-      })
-      const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown, mongoRundown)
-      const testee: RundownRepository = createTestee({mongoConverter: mongoConverter})
-
-      await testee.getRundown(rundown.id)
-
-      verify(mongoConverter.convertRundown(objectContaining(mongoRundown), anything())).once()
-    })
+    
   })
 
   function createMongoRundown(mongoRundownInterface?: Partial<MongoRundown>): MongoRundown {

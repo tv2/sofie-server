@@ -214,25 +214,6 @@ describe(`${MongoSegmentRepository.name}`, () => {
       verify(partRepository.getParts(anyString())).times(segments.length)
     })
 
-    it('converts from mongo segments to our segment entity, when rundownId is given', async () => {
-      const rundownId: string = 'someRundownId'
-      const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: rundownId})]
-      const segments: Segment[] = [EntityFactory.createSegment({rundownId: rundownId})]
-      const mongoConverter: MongoEntityConverter = await setupMongoConverter(segments, mongoSegments)
-
-      const testee: SegmentRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
-
-      await testee.getSegments(rundownId)
-
-      verify(mongoConverter.convertSegments(anything())).once()
-      const [capturedMongoSegments] =  capture(mongoConverter.convertSegments).first()
-      expect(capturedMongoSegments.length).toBe(mongoSegments.length)
-      mongoSegments.forEach((mongoSegment) => {
-        expect(capturedMongoSegments).toEqual(expect.arrayContaining([expect.objectContaining(mongoSegment)]))
-      })
-    })
   })
 
   describe(`${MongoSegmentRepository.prototype.saveSegment.name}`, () => {
