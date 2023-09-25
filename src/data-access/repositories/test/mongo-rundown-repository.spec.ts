@@ -72,9 +72,8 @@ describe(`${MongoRundownRepository.name}`, () => {
       const db: Db = testDatabase.getDatabase()
 
       const testee: MongoRundownRepository = createTestee({})
-      const action: () => Promise<void> = async () => testee.deleteRundown(nonExistingId)
 
-      await expect(action).rejects.toThrow(NotFoundException)
+      await expect(() => testee.deleteRundown(nonExistingId)).rejects.toThrow(NotFoundException)
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
       await expect(db.collection(COLLECTION_NAME).findOne({ name: rundownName })).resolves.not.toBeNull()
     })
@@ -87,9 +86,8 @@ describe(`${MongoRundownRepository.name}`, () => {
       const db: Db = testDatabase.getDatabase()
 
       const testee: MongoRundownRepository = createTestee({})
-      const action: () => Promise<void> = async () => testee.deleteRundown(nonExistingId)
 
-      await expect(action).rejects.toThrow(NotFoundException)
+      await expect(() => testee.deleteRundown(nonExistingId)).rejects.toThrow(NotFoundException)
       await expect(db.collection(COLLECTION_NAME).findOne({ name: rundownName })).resolves.not.toBeNull()
     })
 
@@ -192,9 +190,8 @@ describe(`${MongoRundownRepository.name}`, () => {
       await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
 
       const testee: MongoRundownRepository = createTestee({})
-      const action: () => Promise<Rundown> = async () => testee.getRundown(nonExistingId)
 
-      await expect(action).rejects.toThrow(NotFoundException)
+      await expect(() => testee.getRundown(nonExistingId)).rejects.toThrow(NotFoundException)
     })
 
     it('retrieves segments from the segment repository, when existing rundownId is given', async () => {
