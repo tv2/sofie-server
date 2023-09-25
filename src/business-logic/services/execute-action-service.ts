@@ -1,5 +1,5 @@
 import { ActionService } from './interfaces/action-service'
-import { Action, InsertPartAction } from '../../model/entities/action'
+import { Action, PartAction } from '../../model/entities/action'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
@@ -10,7 +10,7 @@ import { RundownService } from './interfaces/rundown-service'
 import { Part, PartInterface } from '../../model/entities/part'
 import { Piece } from '../../model/entities/piece'
 
-export class BlueprintActionService implements ActionService {
+export class ExecuteActionService implements ActionService {
   constructor(
     private readonly configurationRepository: ConfigurationRepository,
     private readonly actionRepository: ActionRepository,
@@ -30,8 +30,13 @@ export class BlueprintActionService implements ActionService {
     const action: Action = await this.actionRepository.getAction(actionId)
     switch (action.type) {
       case ActionType.INSERT_PART: {
-        const insertPartAction: InsertPartAction = action as InsertPartAction
-        await this.executeInsertPartAction(insertPartAction, rundownId)
+        const partAction: PartAction = action as PartAction
+        await this.executeInsertPartAction(partAction, rundownId)
+        break
+      }
+      case ActionType.INSERT_AND_TAKE_PART: {
+        const partAction: PartAction = action as PartAction
+        await this.executeInsertAndTakePartAction(partAction, rundownId)
         break
       }
       case ActionType.INSERT_PIECE:
@@ -41,14 +46,23 @@ export class BlueprintActionService implements ActionService {
     }
   }
 
-  private async executeInsertPartAction(insertPartAction: InsertPartAction, rundownId: string): Promise<void> {
-    const pieces: Piece[] = insertPartAction.data.pieceInterfaces.map(pieceInterface => new Piece(pieceInterface))
+  private async executeInsertPartAction(partAction: PartAction, rundownId: string): Promise<void> {
+    const part: Part = this.createPartFromAction(partAction)
+    await this.rundownService.insertPart(rundownId, part)
+  }
 
-    const partInterface: PartInterface = insertPartAction.data.partInterface
+  private createPartFromAction(partAction: PartAction): Part {
+    const pieces: Piece[] = partAction.data.pieceInterfaces.map(pieceInterface => new Piece(pieceInterface))
+
+    const partInterface: PartInterface = partAction.data.partInterface
     partInterface.id = `${partInterface.id}_${Date.now()}`
     partInterface.pieces = pieces
 
-    const part: Part = new Part(partInterface)
-    await this.rundownService.insertPart(rundownId, part)
+    return new Part(partInterface)
+  }
+
+  private async executeInsertAndTakePartAction(partAction: PartAction, rundownId: string): Promise<void> {
+    const part: Part = this.createPartFromAction(partAction)
+    await this.rundownService.insertAndTakePart(rundownId, part)
   }
 }

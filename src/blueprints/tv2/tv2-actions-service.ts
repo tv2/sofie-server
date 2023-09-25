@@ -18,7 +18,10 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
 
     const cameraActions: Action[] = blueprintConfiguration.studio.SourcesCam
       .slice(0, 5)
-      .map(source => this.cameraFactory.createInsertCameraAction(blueprintConfiguration, source))
+      .flatMap(source => [
+        this.cameraFactory.createInsertCameraAction(blueprintConfiguration, source),
+        this.cameraFactory.createInsertAndTakeCameraAction(blueprintConfiguration, source)
+      ])
 
     return [
       ...cameraActions

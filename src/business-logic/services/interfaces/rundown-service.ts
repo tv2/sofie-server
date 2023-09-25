@@ -8,5 +8,6 @@ export interface RundownService {
   setNext(rundownId: string, segmentId: string, partId: string): Promise<void>
   resetRundown(rundownId: string): Promise<void>
   insertPart(rundownId: string, part: Part): Promise<void>
+  insertAndTakePart(rundownId: string, part: Part): Promise<void>
   executeAdLibPiece(rundownId: string, adLibPieceId: string): Promise<void>
 }

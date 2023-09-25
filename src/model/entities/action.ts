@@ -9,8 +9,8 @@ export interface Action {
   data: unknown
 }
 
-export interface InsertPartAction extends Action {
-  type: ActionType.INSERT_PART
+export interface PartAction extends Action {
+  type: ActionType.INSERT_PART | ActionType.INSERT_AND_TAKE_PART
   data: {
     partInterface: PartInterface,
     pieceInterfaces: PieceInterface[]

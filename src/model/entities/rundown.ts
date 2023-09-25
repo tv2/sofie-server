@@ -426,8 +426,8 @@ export class Rundown extends BasicRundown {
     this.persistentState = rundownPersistentState
   }
 
-  public insertPart(part: Part): void {
-    this.assertActive(this.insertPart.name)
+  public insertPartAsNext(part: Part): void {
+    this.assertActive(this.insertPartAsNext.name)
     this.activeSegment.insertPartAfterActivePart(part)
     this.setNext(this.activeSegment.id, part.id)
   }

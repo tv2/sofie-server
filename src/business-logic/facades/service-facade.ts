@@ -10,7 +10,7 @@ import { TimeoutCallbackScheduler } from '../services/timeout-callback-scheduler
 import { JsonObjectCloner } from '../services/json-object-cloner'
 import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
-import { BlueprintActionService } from '../services/blueprint-action-service'
+import { ExecuteActionService } from '../services/execute-action-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -36,7 +36,7 @@ export class ServiceFacade {
   }
 
   public static createActionService(): ActionService {
-    return new BlueprintActionService(
+    return new ExecuteActionService(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionRepository(),
       this.createRundownService(),
