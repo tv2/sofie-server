@@ -220,7 +220,21 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPart(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.insertPart(part)
+    rundown.insertPartAsNext(part)
+
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+
+    // TODO: Emit events
+
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  public async insertAndTakePart(rundownId: string, part: Part): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.insertPartAsNext(part)
+    rundown.takeNext()
 
     const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
     rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
