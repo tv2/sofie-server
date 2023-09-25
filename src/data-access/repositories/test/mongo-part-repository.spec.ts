@@ -8,7 +8,7 @@ import { anyString, anything, capture, instance, mock, spy, verify, when } from 
 import { MongoTestDatabase } from './mongo-test-database'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
-import { EntityFactory } from '../../../model/entities/test/entity-factory'
+import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
 
 const COLLECTION_NAME = 'parts'
 
@@ -261,7 +261,7 @@ describe(`${MongoPartRepository.name}`, () => {
 
     it('returns one part when segmentId is given', async () => {
       const segmentId: string = 'someSegmentId'
-      const parts: Part[] = [EntityFactory.createPart({segmentId: segmentId})]
+      const parts: Part[] = [TestEntityFactory.createPart({segmentId: segmentId})]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(parts)
 
       const testee: PartRepository = createTestee({mongoConverter: mongoConverter})
@@ -273,7 +273,7 @@ describe(`${MongoPartRepository.name}`, () => {
 
     it('returns multiple parts when segmentId is given', async () => {
       const segmentId: string = 'someSegmentId'
-      const parts: Part[] = [EntityFactory.createPart({segmentId: segmentId}), EntityFactory.createPart({segmentId: segmentId})]
+      const parts: Part[] = [TestEntityFactory.createPart({segmentId: segmentId}), TestEntityFactory.createPart({segmentId: segmentId})]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(parts)
 
       const testee: PartRepository = createTestee({mongoConverter: mongoConverter})
@@ -286,7 +286,7 @@ describe(`${MongoPartRepository.name}`, () => {
     it('retrieves pieces equal times to amount of parts retrieved', async () => {
       const pieceRepository: PieceRepository = mock<PieceRepository>()
       const segmentId: string = 'someSegmentId'
-      const parts: Part[] = [EntityFactory.createPart({segmentId: segmentId}), EntityFactory.createPart({segmentId: segmentId})]
+      const parts: Part[] = [TestEntityFactory.createPart({segmentId: segmentId}), TestEntityFactory.createPart({segmentId: segmentId})]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(parts)
 
       when(pieceRepository.getPieces(anyString())).thenResolve([])

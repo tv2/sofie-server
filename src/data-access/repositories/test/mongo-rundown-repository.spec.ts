@@ -11,7 +11,7 @@ import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Segment } from '../../../model/entities/segment'
-import { EntityFactory } from '../../../model/entities/test/entity-factory'
+import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
 
 const COLLECTION_NAME: string = 'rundowns'
 describe(`${MongoRundownRepository.name}`, () => {
@@ -196,7 +196,7 @@ describe(`${MongoRundownRepository.name}`, () => {
 
     it('retrieves segments from the segment repository, when existing rundownId is given', async () => {
       const segmentRepository: SegmentRepository = mock<SegmentRepository>()
-      const rundown: Rundown = EntityFactory.createRundown()
+      const rundown: Rundown = TestEntityFactory.createRundown()
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
 
       when(segmentRepository.getSegments(anyString())).thenResolve([])
@@ -212,8 +212,8 @@ describe(`${MongoRundownRepository.name}`, () => {
 
     it('sets the rundown segments, when existing rundownId is given', async () => {
       const segmentRepository: SegmentRepository = mock<SegmentRepository>()
-      const rundown: Rundown = EntityFactory.createRundown()
-      const segments: Segment[] = [EntityFactory.createSegment({ rundownId: rundown.id }), EntityFactory.createSegment({ rundownId: rundown.id })]
+      const rundown: Rundown = TestEntityFactory.createRundown()
+      const segments: Segment[] = [TestEntityFactory.createSegment({ rundownId: rundown.id }), TestEntityFactory.createSegment({ rundownId: rundown.id })]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
 
       when(segmentRepository.getSegments(rundown.id)).thenResolve(segments)
@@ -228,7 +228,7 @@ describe(`${MongoRundownRepository.name}`, () => {
     })
 
     it('returns rundown, when existing rundownId is given', async () => {
-      const rundown: Rundown = EntityFactory.createRundown()
+      const rundown: Rundown = TestEntityFactory.createRundown()
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
       const testee: RundownRepository = createTestee({mongoConverter: mongoConverter})
 
