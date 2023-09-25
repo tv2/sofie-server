@@ -10,14 +10,14 @@ export interface Action {
 }
 
 export interface PartAction extends Action {
-  type: ActionType.INSERT_PART | ActionType.INSERT_AND_TAKE_PART
+  type: ActionType.INSERT_PART_AS_NEXT | ActionType.INSERT_PART_AS_ON_AIR
   data: {
     partInterface: PartInterface,
     pieceInterfaces: PieceInterface[]
   }
 }
 
-export interface InsertPieceAction extends Action {
-  type: ActionType.INSERT_PIECE
+export interface PieceAction extends Action {
+  type: ActionType.INSERT_PIECE_AS_ON_AIR
   data: PieceInterface
 }

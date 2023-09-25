@@ -1,5 +1,4 @@
 import { Piece } from './piece'
-import { AdLibPiece } from './ad-lib-piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { PartTimings } from '../value-objects/part-timings'
 import { UnsupportedOperation } from '../exceptions/unsupported-operation'
@@ -13,7 +12,7 @@ export interface PartInterface {
   segmentId: string
   name: string
   rank: number
-  isAdLib: boolean
+  isPlanned: boolean
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
@@ -34,7 +33,7 @@ export class Part {
   public readonly id: string
   public readonly name: string
   public readonly rank: number
-  public readonly isAdLib: boolean
+  public readonly isPlanned: boolean
 
   public readonly expectedDuration: number
 
@@ -50,8 +49,6 @@ export class Part {
 
   private isPartOnAir: boolean
   private isPartNext: boolean
-
-  private readonly adLibPieces: AdLibPiece[] = []
 
   private executedAt: number
   private playedDuration: number
@@ -69,7 +66,7 @@ export class Part {
     this.segmentId = part.segmentId
     this.name = part.name
     this.rank = part.rank
-    this.isAdLib = part.isAdLib
+    this.isPlanned = part.isPlanned
     this.pieces = part.pieces ?? []
     this.isPartOnAir = part.isOnAir
     this.isPartNext = part.isNext
@@ -126,8 +123,16 @@ export class Part {
     this.pieces = pieces
   }
 
-  public addAdLibPiece(adLibPiece: AdLibPiece): void {
-    this.adLibPieces.push(adLibPiece)
+  public insertPiece(nonPlannedPiece: Piece): void {
+    if (!nonPlannedPiece.isPlanned) {
+      throw new UnsupportedOperation(`Trying to insert a unplanned Piece ${nonPlannedPiece.id} to Part ${this.id}.`)
+    }
+    nonPlannedPiece.setPartId(this.id)
+    if (this.isPartOnAir) {
+      const timeSincePutOnAir: number = Date.now() - this.executedAt
+      nonPlannedPiece.setStart(timeSincePutOnAir)
+    }
+    this.pieces.push(nonPlannedPiece)
   }
 
   public getPiecesWithLifespan(lifespanFilters: PieceLifespan[]): Piece[] {
@@ -147,8 +152,8 @@ export class Part {
   }
 
   public setSegmentId(segmentId: string): void {
-    if (!this.isAdLib) {
-      throw new UnsupportedOperation(`Can't update SegmentId for Part: ${this.id}. Only AdLibbed Parts are allowed to have their Segment id updated!`)
+    if (!this.isPlanned) {
+      throw new UnsupportedOperation(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
     }
     this.segmentId = segmentId
   }
@@ -240,6 +245,7 @@ export class Part {
   public reset(): void {
     this.executedAt = 0
     this.playedDuration = 0
+    this.pieces = this.pieces.filter(piece => !piece.isPlanned)
   }
 
   public clone(): Part {

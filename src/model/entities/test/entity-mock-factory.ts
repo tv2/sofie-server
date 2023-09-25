@@ -210,10 +210,10 @@ export class EntityMockFactory {
 
     when(mockedPiece.id).thenReturn(pieceInterface.id ?? 'pieceId')
     when(mockedPiece.name).thenReturn(pieceInterface.name ?? 'pieceName')
-    when(mockedPiece.partId).thenReturn(pieceInterface.partId ?? 'partId')
+    when(mockedPiece.getPartId()).thenReturn(pieceInterface.partId ?? 'partId')
     when(mockedPiece.type).thenReturn(pieceInterface.type ?? PieceType.UNKNOWN)
     when(mockedPiece.layer).thenReturn(pieceInterface.layer ?? 'layer')
-    when(mockedPiece.start).thenReturn(pieceInterface.start ?? 0)
+    when(mockedPiece.getStart()).thenReturn(pieceInterface.start ?? 0)
     when(mockedPiece.duration).thenReturn(pieceInterface.duration ?? 0)
     when(mockedPiece.pieceLifespan).thenReturn(pieceInterface.pieceLifespan ?? PieceLifespan.WITHIN_PART)
     when(mockedPiece.timelineObjects).thenReturn(pieceInterface.timelineObjects ?? [])

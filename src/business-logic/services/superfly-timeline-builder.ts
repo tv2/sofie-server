@@ -198,7 +198,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       return
     }
 
-    const startOffset: number = piece.start
+    const startOffset: number = piece.getStart()
     return {
       start: partCalculatedTimings.inTransitionStart + startOffset,
       duration: piece.duration,
@@ -236,7 +236,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       // TODO: Core only adds "delayStartOfPiecesDuration" if it's not an adLib or if it is an adLib then only if it has been adLibbed into next Part
       // TODO: Since handling AdLibs is no longer Part of building the Timeline, we should be safe to always add this? It should evaluate to zero in most cases.
       // TODO: Verify when we implement adLibs.
-      start: piece.start + partCalculatedTimings.delayStartOfPiecesDuration,
+      start: piece.getStart() + (piece.isPlanned ? 0 : partCalculatedTimings.delayStartOfPiecesDuration),
       duration: duration === 0 ? undefined : duration,
     }
   }
@@ -490,7 +490,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           piece.transitionType ===
                 TransitionType.NO_TRANSITION /* TODO: && filter for not disabled - if that becomes a thing */
       )
-      .filter((piece) => piece.partId !== activePart.id)
+      .filter((piece) => piece.getPartId() !== activePart.id)
       .forEach((piece) => {
         if (!piece.getExecutedAt()) {
           throw new UnsupportedOperation(

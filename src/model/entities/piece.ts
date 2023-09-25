@@ -2,6 +2,7 @@ import { PieceType } from '../enums/piece-type'
 import { TimelineObject } from './timeline-object'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { TransitionType } from '../enums/transition-type'
+import { UnsupportedOperation } from '../exceptions/unsupported-operation'
 
 export interface PieceInterface {
   id: string
@@ -10,6 +11,7 @@ export interface PieceInterface {
   layer: string
   type: PieceType
   pieceLifespan: PieceLifespan
+  isPlanned: boolean
   start: number
   duration: number
   preRollDuration: number
@@ -24,12 +26,11 @@ export interface PieceInterface {
 
 export class Piece {
   public readonly id: string
-  public readonly partId: string
   public name: string
   public layer: string
   public type: PieceType
   public pieceLifespan: PieceLifespan
-  public start: number
+  public isPlanned: boolean
   public duration: number
   public preRollDuration: number
   public postRollDuration: number
@@ -40,6 +41,8 @@ export class Piece {
   public content?: unknown
   public tags: string[]
 
+  private partId: string
+  private start: number
   private executedAt: number
 
   constructor(piece: PieceInterface) {
@@ -49,6 +52,7 @@ export class Piece {
     this.layer = piece.layer
     this.type = piece.type
     this.pieceLifespan = piece.pieceLifespan
+    this.isPlanned = piece.isPlanned
     this.start = piece.start
     this.duration = piece.duration
     this.preRollDuration = piece.preRollDuration
@@ -76,5 +80,27 @@ export class Piece {
 
   public getExecutedAt(): number {
     return this.executedAt
+  }
+
+  public getPartId(): string {
+    return this.partId
+  }
+
+  public setPartId(partId: string): void {
+    if (!this.isPlanned) {
+      throw new UnsupportedOperation(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
+    }
+    this.partId = partId
+  }
+
+  public setStart(startTimestamp: number): void {
+    if (!this.isPlanned) {
+      throw new UnsupportedOperation(`Trying to set start of a non-adLib Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
+    }
+    this.start = startTimestamp
+  }
+
+  public getStart(): number {
+    return this.start
   }
 }

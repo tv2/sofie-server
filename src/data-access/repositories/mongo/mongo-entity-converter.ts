@@ -39,7 +39,7 @@ export interface MongoPart {
   segmentId: string
   title: string
   _rank: number
-  isAdLib: boolean
+  isPlanned: boolean
   expectedDuration: number
   isOnAir: boolean
   isNext: boolean
@@ -70,6 +70,7 @@ export interface MongoPiece {
   timelineObjectsString: string
   lifespan: string
   pieceType: string
+  isPlanned?: boolean
   metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
   content?: unknown
   tags?: string[]
@@ -184,7 +185,7 @@ export class MongoEntityConverter {
       segmentId: mongoPart.segmentId,
       name: mongoPart.title,
       rank: mongoPart._rank,
-      isAdLib: mongoPart.isAdLib ?? false,
+      isPlanned: mongoPart.isPlanned ?? false,
       expectedDuration: mongoPart.expectedDuration,
       isOnAir: false,
       isNext: false,
@@ -209,18 +210,15 @@ export class MongoEntityConverter {
   public convertToMongoPart(part: Part): MongoPart {
     return {
       _id: part.id,
+      isPlanned: part.isPlanned,
       expectedDuration: part.expectedDuration,
       title: part.name,
       segmentId: part.getSegmentId(),
       _rank: part.rank,
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
-      endState: part.getEndState(),
+      endState: part.getEndState()
     } as MongoPart
-  }
-
-  public convertToMongoParts(parts: Part[]): MongoPart[] {
-    return parts.map(this.convertToMongoPart.bind(this))
   }
 
   public convertPiece(mongoPiece: MongoPiece): Piece {
@@ -231,6 +229,7 @@ export class MongoEntityConverter {
       layer: mongoPiece.sourceLayerId,
       type: PieceType.UNKNOWN,
       pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
+      isPlanned: mongoPiece.isPlanned ?? false,
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
       duration: mongoPiece.enable.duration,
       preRollDuration: mongoPiece.prerollDuration,
@@ -286,11 +285,11 @@ export class MongoEntityConverter {
 
   public convertToMongoPiece(piece: Piece): MongoPiece {
     return {
-      enable: { duration: piece.duration, start: piece.start },
+      enable: { duration: piece.duration, start: piece.getStart() },
       lifespan: piece.pieceLifespan,
       sourceLayerId: piece.layer,
       _id: piece.id,
-      startPartId: piece.partId,
+      startPartId: piece.getPartId(),
       name: piece.name,
     } as MongoPiece
   }
