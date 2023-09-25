@@ -10,11 +10,11 @@ import { PartTimings } from '../../value-objects/part-timings'
 
 export class EntityMockFactory {
   public static createRundown(rundownInterface?: Partial<RundownInterface>): Rundown {
-    const mockedRundown: Rundown = this.createRundownMockInstance(rundownInterface)
+    const mockedRundown: Rundown = this.createRundownMock(rundownInterface)
     return instance(mockedRundown)
   }
 
-  public static createRundownMockInstance(rundownInterface?: Partial<RundownInterface>): Rundown {
+  public static createRundownMock(rundownInterface?: Partial<RundownInterface>): Rundown {
     if (!rundownInterface) {
       rundownInterface = {} as RundownInterface
     }
@@ -28,6 +28,7 @@ export class EntityMockFactory {
     when(mockedRundown.getSegments()).thenReturn(rundownInterface.segments ?? [])
 
     when(mockedRundown.getBaseline()).thenReturn(rundownInterface.baselineTimelineObjects ?? [])
+    when(mockedRundown.getPartAfter(anything())).thenReturn(this.createPart())
 
     return mockedRundown
   }
@@ -43,7 +44,22 @@ export class EntityMockFactory {
     } = {},
     rundownInterface?: Partial<RundownInterface>
   ): Rundown {
-    const mockedRundown: Rundown = this.createRundownMockInstance({ ...rundownInterface, isRundownActive: true })
+    const mockedRundown: Rundown = this.createActiveRundownMockInstance(activeRundownProperties, rundownInterface)
+    return instance(mockedRundown)
+  }
+
+  public static createActiveRundownMockInstance(
+    activeRundownProperties: {
+      activePart?: Part
+      nextPart?: Part
+      previousPart?: Part
+      activeSegment?: Segment
+      nextSegment?: Segment
+      infinitePieces?: Piece[]
+    } = {},
+    rundownInterface?: Partial<RundownInterface>
+  ): Rundown {
+    const mockedRundown: Rundown = this.createRundownMock({ ...rundownInterface, isRundownActive: true })
     when(mockedRundown.getActivePart()).thenReturn(activeRundownProperties.activePart ?? this.createPart())
     when(mockedRundown.getNextPart()).thenReturn(activeRundownProperties.nextPart ?? this.createPart())
     when(mockedRundown.getPreviousPart()).thenReturn(activeRundownProperties.previousPart ?? undefined)
@@ -51,7 +67,7 @@ export class EntityMockFactory {
     when(mockedRundown.getNextSegment()).thenReturn(activeRundownProperties.nextSegment ?? this.createSegment())
     when(mockedRundown.getInfinitePieces()).thenReturn(activeRundownProperties.infinitePieces ?? [])
 
-    return instance(mockedRundown)
+    return mockedRundown
   }
 
   public static createSegment(
@@ -63,11 +79,11 @@ export class EntityMockFactory {
       firstSpanningRundownPieceForEachLayerForAllParts?: Piece[]
     }
   ): Segment {
-    const mockedSegment: Segment = this.createSegmentMockInstance(segmentInterface, misc)
+    const mockedSegment: Segment = this.createSegmentMock(segmentInterface, misc)
     return instance(mockedSegment)
   }
 
-  public static createSegmentMockInstance(
+  public static createSegmentMock(
     segmentInterface?: Partial<SegmentInterface>,
     misc?: Partial<{
       firstPart?: Part
@@ -118,11 +134,11 @@ export class EntityMockFactory {
       piecesWithLifespanFilters?: Piece[]
     }
   ): Part {
-    const mockedPart: Part = this.createPartMockInstance(partInterface, misc)
+    const mockedPart: Part = this.createPartMock(partInterface, misc)
     return instance(mockedPart)
   }
 
-  public static createPartMockInstance(
+  public static createPartMock(
     partInterface?: Partial<PartInterface>,
     misc?: {
       partTimings?: Partial<PartTimings>
@@ -168,15 +184,17 @@ export class EntityMockFactory {
       previousPartContinueIntoPartDuration: misc.partTimings?.previousPartContinueIntoPartDuration ?? 0,
     })
 
+    when(mockedPart.getEndState()).thenReturn(partInterface.endState)
+
     return mockedPart
   }
 
   public static createPiece(pieceInterface?: Partial<PieceInterface>, misc?: { executedAt?: number }): Piece {
-    const mockedPiece: Piece = this.createPieceMockInstance(pieceInterface, misc)
+    const mockedPiece: Piece = this.createPieceMock(pieceInterface, misc)
     return instance(mockedPiece)
   }
 
-  public static createPieceMockInstance(
+  public static createPieceMock(
     pieceInterface?: Partial<PieceInterface>,
     misc?: { executedAt?: number }
   ): Piece {
@@ -202,6 +220,8 @@ export class EntityMockFactory {
     when(mockedPiece.preRollDuration).thenReturn(pieceInterface.preRollDuration ?? 0)
     when(mockedPiece.postRollDuration).thenReturn(pieceInterface.postRollDuration ?? 0)
     when(mockedPiece.transitionType).thenReturn(pieceInterface.transitionType ?? TransitionType.NO_TRANSITION)
+    when(mockedPiece.tags).thenReturn(pieceInterface.tags ?? [])
+    when(mockedPiece.content).thenReturn(pieceInterface.content)
 
     when(mockedPiece.getExecutedAt()).thenReturn(misc.executedAt ?? 0)
 

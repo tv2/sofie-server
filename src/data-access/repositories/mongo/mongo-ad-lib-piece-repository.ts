@@ -20,18 +20,18 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ad
   public async getAdLibPieceIdentifiers(rundownId: string): Promise<Identifier[]> {
     this.assertDatabaseConnection(this.getAdLibPieceIdentifiers.name)
     const mongoAdLibPieces: MongoAdLibPiece[] = (await this.getCollection()
-      .find({ rundownId: rundownId })
-      .toArray()) as unknown as MongoAdLibPiece[]
+      .find<MongoAdLibPiece>({ rundownId: rundownId })
+      .toArray())
     return this.mongoEntityConverter.convertMongoAdLibPiecesToIdentifiers(mongoAdLibPieces)
   }
 
   public async getAdLibPiece(adLibPieceId: string): Promise<AdLibPiece> {
     this.assertDatabaseConnection(this.getAdLibPiece.name)
-    const mongoAdLibPiece: MongoAdLibPiece = (await this.getCollection().findOne({
+    const mongoAdLibPiece: MongoAdLibPiece | null = (await this.getCollection().findOne<MongoAdLibPiece>({
       _id: adLibPieceId,
-    })) as unknown as MongoAdLibPiece
+    }))
     if (!mongoAdLibPiece) {
-      throw new NotFoundException(`Could not find an AdLibPiece for "${adLibPieceId}"`)
+      throw new NotFoundException(`No AdLibPiece found for AdLibPieceId: "${adLibPieceId}"`)
     }
     return this.mongoEntityConverter.convertAdLib(mongoAdLibPiece)
   }
