@@ -294,7 +294,7 @@ describe('superfly-timeline-builder', () => {
                   child.id.includes(PIECE_CONTROL_INFIX)
                 )!
 
-                expect(controlObject.enable.start).toBe(inTransitionStart + piece.start)
+                expect(controlObject.enable.start).toBe(inTransitionStart + piece.getStart())
               })
 
               it('sets TimelineEnable.duration to Piece.duration', () => {
@@ -459,7 +459,7 @@ describe('superfly-timeline-builder', () => {
                 child.id.includes(PIECE_CONTROL_INFIX)
               )!
 
-              expect(controlObject.enable.start).toBe(piece.start)
+              expect(controlObject.enable.start).toBe(piece.getStart())
             })
 
             describe('active Part has a delayStartOfPiecesDuration', () => {
@@ -485,7 +485,7 @@ describe('superfly-timeline-builder', () => {
                 )!
 
                 expect(controlObject.enable.start).toBe(
-                  piece.start + activePart.getTimings().delayStartOfPiecesDuration
+                  piece.getStart() + activePart.getTimings().delayStartOfPiecesDuration
                 )
               })
             })
@@ -1389,7 +1389,7 @@ describe('superfly-timeline-builder', () => {
                     child.id.includes(PIECE_CONTROL_INFIX)
                   )!
 
-                  expect(controlGroup.enable.start).toBe(inTransitionStart + piece.start)
+                  expect(controlGroup.enable.start).toBe(inTransitionStart + piece.getStart())
                 })
 
                 it('sets TimelineEnable.duration to Piece.duration', () => {
@@ -1612,7 +1612,7 @@ describe('superfly-timeline-builder', () => {
                   child.id.includes(PIECE_CONTROL_INFIX)
                 )!
 
-                expect(controlObject.enable.start).toBe(piece.start)
+                expect(controlObject.enable.start).toBe(piece.getStart())
               })
 
               describe('Piece has a duration', () => {
@@ -2721,7 +2721,7 @@ describe('superfly-timeline-builder', () => {
                       child.id.includes(PIECE_CONTROL_INFIX)
                     )!
 
-                    expect(controlGroup.enable.start).toBe(inTransitionStart + piece.start)
+                    expect(controlGroup.enable.start).toBe(inTransitionStart + piece.getStart())
                   })
 
                   it('sets TimelineEnable.duration to Piece.duration', () => {
@@ -2966,7 +2966,7 @@ describe('superfly-timeline-builder', () => {
                     child.id.includes(PIECE_CONTROL_INFIX)
                   )!
 
-                  expect(controlGroup.enable.start).toBe(piece.start)
+                  expect(controlGroup.enable.start).toBe(piece.getStart())
                 })
 
                 describe('Piece has a duration', () => {

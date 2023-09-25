@@ -6,7 +6,6 @@ import { LastPartInSegmentException } from '../exceptions/last-part-in-segment-e
 import { NotFoundException } from '../exceptions/not-found-exception'
 import { NotActivatedException } from '../exceptions/not-activated-exception'
 import { AlreadyActivatedException } from '../exceptions/already-activated-exception'
-import { AdLibPiece } from './ad-lib-piece'
 import { Piece } from './piece'
 import { BasicRundown } from './basic-rundown'
 import { PieceLifespan } from '../enums/piece-lifespan'
@@ -404,11 +403,6 @@ export class Rundown extends BasicRundown {
     return this.segments
   }
 
-  public adAdLibPiece(adLibPiece: AdLibPiece): void {
-    this.assertActive(this.adAdLibPiece.name)
-    this.activePart.addAdLibPiece(adLibPiece)
-  }
-
   public getInfinitePieces(): Piece[] {
     return Array.from(this.infinitePieces.values())
   }
@@ -430,5 +424,11 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.insertPartAsNext.name)
     this.activeSegment.insertPartAfterActivePart(part)
     this.setNext(this.activeSegment.id, part.id)
+  }
+
+  public insertPieceIntoActivePart(piece: Piece): void {
+    this.assertActive(this.insertPieceIntoActivePart.name)
+    this.activePart.insertPiece(piece)
+    this.updateInfinitePieces()
   }
 }

@@ -4,6 +4,7 @@ import { ActionService } from '../../business-logic/services/interfaces/action-s
 import { Action } from '../../model/entities/action'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
+import { ActionDto } from '../dtos/action-dto'
 
 @RestController('/actions')
 export class ActionController extends BaseController {
@@ -16,7 +17,7 @@ export class ActionController extends BaseController {
   public async getActions(_reg: Request, res: Response): Promise<void> {
     try {
       const actions: Action[] = await this.actionService.getActions()
-      res.send(actions)
+      res.send(actions.map(action => new ActionDto(action)))
     } catch (error) {
       this.httpErrorHandler.handleError(res, error as Exception)
     }

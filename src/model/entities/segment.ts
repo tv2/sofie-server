@@ -133,7 +133,7 @@ export class Segment {
   }
 
   public doesPieceBelongToSegment(piece: Piece): boolean {
-    return this.parts.some((part) => part.id === piece.partId)
+    return this.parts.some((part) => part.id === piece.getPartId())
   }
 
   public reset(): void {
@@ -142,7 +142,7 @@ export class Segment {
   }
 
   private removeAdLibbedParts(): void {
-    this.parts = this.parts.filter(part => !part.isAdLib)
+    this.parts = this.parts.filter(part => !part.isPlanned)
   }
 
   public insertPartAfterActivePart(part: Part): void {
@@ -159,7 +159,7 @@ export class Segment {
       return
     }
 
-    const isPartAfterActivePartAnAdLib: boolean = this.parts[activePartIndex + 1].isAdLib
+    const isPartAfterActivePartAnAdLib: boolean = this.parts[activePartIndex + 1].isPlanned
     if (isPartAfterActivePartAnAdLib) {
       this.parts[activePartIndex + 1] = part
       return

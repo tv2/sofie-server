@@ -103,7 +103,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       enable: {
         start: 0,
       },
-      layer: Tv2SisyfosLayer.SISYFOS_PERSISTED_LEVELS,
+      layer: Tv2SisyfosLayer.PERSISTED_LEVELS,
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNELS,

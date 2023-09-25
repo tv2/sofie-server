@@ -510,72 +510,72 @@ describe(`${Segment.name}`, () => {
   describe(`${Segment.prototype.insertPartAfterActivePart.name}`, () => {
     it('is not the Segment with the active Part - throws exception', () => {
       const randomNotActivePart: Part = new Part({ isOnAir: false } as PartInterface)
-      const adLibPart: Part = new Part({ id: 'adLibPartId', isAdLib: true } as PartInterface)
+      const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: true } as PartInterface)
 
       const testee: Segment = new Segment({ parts: [randomNotActivePart] } as SegmentInterface)
 
-      expect(() => testee.insertPartAfterActivePart(adLibPart)).toThrow()
+      expect(() => testee.insertPartAfterActivePart(unplannedPart)).toThrow()
     })
 
     it('updates the SegmentId of the Part', () => {
       const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-      const adLibPart: Part = new Part({ id: 'adLibPartId', isAdLib: true, segmentId: '' } as PartInterface)
+      const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: true, segmentId: '' } as PartInterface)
 
       const testee: Segment = new Segment({ id: 'segmentId', parts: [randomActivePart] } as SegmentInterface)
 
-      testee.insertPartAfterActivePart(adLibPart)
+      testee.insertPartAfterActivePart(unplannedPart)
 
-      expect(adLibPart.getSegmentId()).toBe(testee.id)
+      expect(unplannedPart.getSegmentId()).toBe(testee.id)
     })
 
     describe('the active Part is the last Part of the Segment', () => {
       it('inserts the Part as the last entry of the Parts array', () => {
         const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-        const adLibPart: Part = new Part({ id: 'adLibPartId', isAdLib: true, segmentId: '' } as PartInterface)
+        const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: true, segmentId: '' } as PartInterface)
 
         const testee: Segment = new Segment({ parts: [randomActivePart] } as SegmentInterface)
 
-        testee.insertPartAfterActivePart(adLibPart)
+        testee.insertPartAfterActivePart(unplannedPart)
 
         const lastPartOfSegment: Part = testee.getParts()[testee.getParts().length - 1]
-        expect(lastPartOfSegment).toBe(adLibPart)
+        expect(lastPartOfSegment).toBe(unplannedPart)
       })
     })
 
     describe('the active Part is not the last Part of the Segment', () => {
-      describe('the Part after the active Part is an AdLib Part', () => {
-        it('replaces the "old" AdLib Part', () => {
+      describe('the Part after the active Part is an unplanned Part', () => {
+        it('replaces the "old" unplanned Part', () => {
           const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-          const adLibPartAfterActivePart: Part = new Part({ id: 'oldAdLibPartId', isOnAir: false, isAdLib: true } as PartInterface)
-          const adLibPartToBeInserted: Part = new Part({ id: 'adLibPartId', isAdLib: true, segmentId: '' } as PartInterface)
+          const unplannedPartAfterActivePart: Part = new Part({ id: 'oldUnplannedPartId', isOnAir: false, isPlanned: true } as PartInterface)
+          const unplannedPartToBeInserted: Part = new Part({ id: 'unplannedPartId', isPlanned: true, segmentId: '' } as PartInterface)
 
-          const testee: Segment = new Segment({ parts: [randomActivePart, adLibPartAfterActivePart] } as SegmentInterface)
+          const testee: Segment = new Segment({ parts: [randomActivePart, unplannedPartAfterActivePart] } as SegmentInterface)
 
-          const indexOfOldAdLibPart: number = testee.getParts().findIndex(part => part.id === adLibPartAfterActivePart.id)
+          const indexOfOldUnplannedPart: number = testee.getParts().findIndex(part => part.id === unplannedPartAfterActivePart.id)
 
-          testee.insertPartAfterActivePart(adLibPartToBeInserted)
+          testee.insertPartAfterActivePart(unplannedPartToBeInserted)
 
-          expect(testee.getParts()).not.toContain(adLibPartAfterActivePart)
-          expect(testee.getParts()).toContain(adLibPartToBeInserted)
-          expect(testee.getParts()[indexOfOldAdLibPart]).toBe(adLibPartToBeInserted)
+          expect(testee.getParts()).not.toContain(unplannedPartAfterActivePart)
+          expect(testee.getParts()).toContain(unplannedPartToBeInserted)
+          expect(testee.getParts()[indexOfOldUnplannedPart]).toBe(unplannedPartToBeInserted)
         })
       })
 
       describe('the Part after the active Part is a planned Part', () => {
-        it('inserts the AdLib Part after the active Part and before the planned Part', () => {
+        it('inserts the unplanned Part after the active Part and before the planned Part', () => {
           const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-          const plannedPartAfterActivePart: Part = new Part({ id: 'plannedPartId', isOnAir: false, isAdLib: false } as PartInterface)
-          const adLibPartToBeInserted: Part = new Part({ id: 'adLibPartId', isAdLib: true, segmentId: '' } as PartInterface)
+          const plannedPartAfterActivePart: Part = new Part({ id: 'plannedPartId', isOnAir: false, isPlanned: false } as PartInterface)
+          const partToBeInserted: Part = new Part({ id: 'unplannedPartId', isPlanned: true, segmentId: '' } as PartInterface)
 
           const testee: Segment = new Segment({ parts: [randomActivePart, plannedPartAfterActivePart] } as SegmentInterface)
 
           const indexOfPlannedPart: number = testee.getParts().findIndex(part => part.id === plannedPartAfterActivePart.id)
 
-          testee.insertPartAfterActivePart(adLibPartToBeInserted)
+          testee.insertPartAfterActivePart(partToBeInserted)
 
           expect(testee.getParts()).toContain(plannedPartAfterActivePart)
-          expect(testee.getParts()).toContain(adLibPartToBeInserted)
-          expect(testee.getParts()[indexOfPlannedPart]).toBe(adLibPartToBeInserted)
+          expect(testee.getParts()).toContain(partToBeInserted)
+          expect(testee.getParts()[indexOfPlannedPart]).toBe(partToBeInserted)
         })
       })
     })

@@ -180,6 +180,7 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
+  // TODO: This is deprecated
   public async executeAdLibPiece(rundownId: string, adLibPieceId: string): Promise<void> {
     // TODO: We don't need to recalculate the entire Rundown when an AdLib is added.
     // TODO: E.g. it should be enough just to add an AdLibPiece to the "ActivePartGroup"
@@ -189,7 +190,7 @@ export class RundownTimelineService implements RundownService {
     const adLibPiece: AdLibPiece = await this.adLibPieceRepository.getAdLibPiece(adLibPieceId)
 
     adLibPiece.setExecutedAt(new Date().getTime())
-    rundown.adAdLibPiece(adLibPiece)
+    // rundown.adAdLibPiece(adLibPiece)
 
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
 
@@ -218,7 +219,7 @@ export class RundownTimelineService implements RundownService {
     this.sendEvents(rundown, [this.rundownEventBuilder.buildDeletedEvent])
   }
 
-  public async insertPart(rundownId: string, part: Part): Promise<void> {
+  public async insertPartAsNext(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.insertPartAsNext(part)
 
@@ -231,10 +232,23 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  public async insertAndTakePart(rundownId: string, part: Part): Promise<void> {
+  public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.insertPartAsNext(part)
     rundown.takeNext()
+
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+
+    // TODO: Emit events
+
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  public async insertPieceAsOnAir(rundownId: string, piece: Piece): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.insertPieceIntoActivePart(piece)
 
     const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
     rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)

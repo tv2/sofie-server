@@ -13,11 +13,11 @@ interface Tv2ABSourceLayers {
 
 export const A_B_SOURCE_LAYERS: Tv2ABSourceLayers = {
   caspar: {
-    clipPending: Tv2CasparCgLayer.CASPAR_CG_PLAYER_CLIP_PENDING,
+    clipPending: Tv2CasparCgLayer.PLAYER_CLIP_PENDING,
   },
   sisyfos: {
-    clipPending: Tv2SisyfosLayer.SISYFOS_SOURCE_CLIP_PENDING,
-    playerA: Tv2SisyfosLayer.SISYFOS_SOURCE_SERVER_A,
-    playerB: Tv2SisyfosLayer.SISYFOS_SOURCE_SERVER_B,
+    clipPending: Tv2SisyfosLayer.SOURCE_CLIP_PENDING,
+    playerA: Tv2SisyfosLayer.SOURCE_SERVER_A,
+    playerB: Tv2SisyfosLayer.SOURCE_SERVER_B,
   },
 }
