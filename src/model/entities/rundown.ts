@@ -80,12 +80,17 @@ export class Rundown extends BasicRundown {
     if (this.isActive()) {
       throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated')
     }
+    this.resetSegments()
     this.isRundownActive = true
 
     this.nextSegment = this.findFirstSegment()
     this.nextPart = this.nextSegment.findFirstPart()
 
     this.takeNext()
+  }
+
+  private resetSegments(): void {
+    this.segments.forEach(segment => segment.reset())
   }
 
   private findFirstSegment(): Segment {
@@ -246,7 +251,7 @@ export class Rundown extends BasicRundown {
    * This needs information from the current active Part, so this must be called after the active Part has been updated.
    */
   private takeNextSegment(): void {
-    if (this.activeSegment) {
+    if (this.activeSegment && this.activeSegment.id !== this.nextSegment.id) {
       this.activeSegment.takeOffAir()
     }
     this.activeSegment = this.nextSegment

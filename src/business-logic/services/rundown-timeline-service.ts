@@ -11,8 +11,8 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 import { RundownService } from './interfaces/rundown-service'
 import {
-  AdLibPieceInsertedEvent,
-  InfiniteRundownPieceAddedEvent,
+  RundownAdLibPieceInsertedEvent,
+  RundownInfinitePieceAddedEvent,
   RundownEvent,
 } from '../../model/value-objects/rundown-event'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
@@ -145,7 +145,7 @@ export class RundownTimelineService implements RundownService {
     infinitePiecesAfter
       .filter((piece) => !infinitePiecesBefore.includes(piece))
       .forEach((piece) => {
-        const infinitePieceAddedEvent: InfiniteRundownPieceAddedEvent =
+        const infinitePieceAddedEvent: RundownInfinitePieceAddedEvent =
               this.rundownEventBuilder.buildInfiniteRundownPieceAddedEvent(rundown, piece)
         this.rundownEventEmitter.emitRundownEvent(infinitePieceAddedEvent)
       })
@@ -196,7 +196,7 @@ export class RundownTimelineService implements RundownService {
 
     this.timelineRepository.saveTimeline(timeline)
 
-    const adLibPieceInsertedEvent: AdLibPieceInsertedEvent = this.rundownEventBuilder.buildAdLibPieceInsertedEvent(
+    const adLibPieceInsertedEvent: RundownAdLibPieceInsertedEvent = this.rundownEventBuilder.buildAdLibPieceInsertedEvent(
       rundown,
       adLibPiece
     )

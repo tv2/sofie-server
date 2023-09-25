@@ -18,6 +18,77 @@ describe('Part', () => {
     })
   })
 
+  describe('putOnAir', () => {
+    afterEach(() => jest.useRealTimers())
+
+    it('sets part to be on air', () => {
+      const testee: Part = new Part({ isOnAir: false } as PartInterface)
+
+      expect(testee.isOnAir()).toBe(false)
+      testee.putOnAir()
+
+      const result: boolean = testee.isOnAir()
+      expect(result).toBe(true)
+    })
+
+    it('sets when it was executed to now', () => {
+      const testee: Part = new Part({} as PartInterface)
+      const now: number = 123456789
+
+      jest.useFakeTimers({ now })
+      testee.putOnAir()
+
+      const result: number = testee.getExecutedAt()
+      expect(result).toBe(now)
+    })
+  })
+
+  describe('takeOffAir', () => {
+    afterEach(() => jest.useRealTimers())
+
+    it('sets part to be off air', () => {
+      const testee: Part = new Part({ isOnAir: true } as PartInterface)
+
+      testee.takeOffAir()
+
+      const result: boolean = testee.isOnAir()
+      expect(result).toBe(false)
+    })
+
+    it('sets played duration', () => {
+      const executedAt: number = 123450000
+      const testee: Part = new Part({ isOnAir: true, executedAt } as PartInterface)
+      const duration: number = 6789
+      const now: number = executedAt + duration
+
+      jest.useFakeTimers({ now })
+      testee.takeOffAir()
+
+      const result: number = testee.getPlayedDuration()
+      expect(result).toBe(duration)
+    })
+  })
+
+  describe('reset', () => {
+    it('has an executedAt value of 0 after being reset', () => {
+      const testee: Part = new Part({ executedAt: 123456789 } as PartInterface)
+
+      testee.reset()
+
+      const result: number = testee.getExecutedAt()
+      expect(result).toBe(0)
+    })
+
+    it('has a playedDuration value of 0 after being reset', () => {
+      const testee: Part = new Part({ playedDuration: 5023 } as PartInterface)
+
+      testee.reset()
+
+      const result: number = testee.getPlayedDuration()
+      expect(result).toBe(0)
+    })
+  })
+
   describe('calculateTimings', () => {
     describe('there is no previous Part', () => {
       it('has no inTransitionStart', () => {
