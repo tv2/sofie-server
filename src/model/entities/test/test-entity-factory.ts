@@ -3,7 +3,7 @@ import { Segment, SegmentInterface } from '../segment'
 import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 
-export class EntityFactory {
+export class TestEntityFactory {
   public static createRundown(rundownInterface?: Partial<RundownInterface>): Rundown {
     if (!rundownInterface) {
       rundownInterface = {} as RundownInterface

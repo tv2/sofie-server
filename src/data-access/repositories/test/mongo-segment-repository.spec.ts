@@ -8,7 +8,7 @@ import { SegmentRepository } from '../interfaces/segment-repository'
 import { Segment } from '../../../model/entities/segment'
 import { MongoTestDatabase } from './mongo-test-database'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
-import { EntityFactory } from '../../../model/entities/test/entity-factory'
+import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
 
 const COLLECTION_NAME: string = 'segments'
 
@@ -154,7 +154,7 @@ describe(`${MongoSegmentRepository.name}`, () => {
 
     it('returns one segment when rundownId is given', async () => {
       const rundownId: string = 'someRundownId'
-      const segments: Segment[] = [EntityFactory.createSegment({rundownId: rundownId})]
+      const segments: Segment[] = [TestEntityFactory.createSegment({rundownId: rundownId})]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(segments)
 
       const testee: SegmentRepository = createTestee({ mongoConverter: mongoConverter })
@@ -166,7 +166,7 @@ describe(`${MongoSegmentRepository.name}`, () => {
 
     it('returns multiple segments when rundownId is given', async () => {
       const rundownId: string = 'someRundownId'
-      const segments: Segment[] = [EntityFactory.createSegment({rundownId: rundownId}), EntityFactory.createSegment({rundownId: rundownId})]
+      const segments: Segment[] = [TestEntityFactory.createSegment({rundownId: rundownId}), TestEntityFactory.createSegment({rundownId: rundownId})]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(segments)
 
       const testee: SegmentRepository = createTestee({ mongoConverter: mongoConverter })
@@ -178,7 +178,7 @@ describe(`${MongoSegmentRepository.name}`, () => {
     it('retrieves parts equal times to amount of segments retrieved', async () => {
       const partRepository: PartRepository = mock<PartRepository>()
       const rundownId: string = 'someRundownId'
-      const segments: Segment[] = [EntityFactory.createSegment({rundownId: rundownId}), EntityFactory.createSegment({rundownId: rundownId})]
+      const segments: Segment[] = [TestEntityFactory.createSegment({rundownId: rundownId}), TestEntityFactory.createSegment({rundownId: rundownId})]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(segments)
 
       when(partRepository.getParts(anyString())).thenResolve([])
