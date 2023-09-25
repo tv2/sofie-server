@@ -25,8 +25,8 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
   public async getSegments(rundownId: string): Promise<Segment[]> {
     this.assertDatabaseConnection(this.getSegments.name)
     const mongoSegments: MongoSegment[] = (await this.getCollection()
-      .find({ rundownId: rundownId })
-      .toArray()) as unknown as MongoSegment[]
+      .find<MongoSegment>({ rundownId: rundownId })
+      .toArray())
     const segments: Segment[] = this.mongoEntityConverter.convertSegments(mongoSegments)
     return Promise.all(
       segments.map(async (segment) => {
@@ -54,11 +54,6 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
 
     if (!segmentDeleteResult.acknowledged) {
       throw new DeletionFailedException(`Deletion of segments was not acknowledged, for rundownId: ${rundownId}`)
-    }
-    if (segmentDeleteResult.deletedCount === 0) {
-      throw new DeletionFailedException(
-        `Expected to delete one or more segments, but none was deleted, for rundownId: ${rundownId}`
-      )
     }
   }
 }
