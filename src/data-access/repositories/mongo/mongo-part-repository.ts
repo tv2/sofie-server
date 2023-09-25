@@ -25,8 +25,8 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
   public async getParts(segmentId: string): Promise<Part[]> {
     this.assertDatabaseConnection(this.getParts.name)
     const mongoParts: MongoPart[] = (await this.getCollection()
-      .find({ segmentId: segmentId })
-      .toArray()) as unknown as MongoPart[]
+      .find<MongoPart>({ segmentId: segmentId })
+      .toArray())
     const parts: Part[] = this.mongoEntityConverter.convertParts(mongoParts)
     return Promise.all(
       parts.map(async (part) => {
@@ -51,11 +51,6 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
 
     if (!partsDeletedResult.acknowledged) {
       throw new DeletionFailedException(`Deletion of parts was not acknowledged, for segmentId: ${segmentId}`)
-    }
-    if (partsDeletedResult.deletedCount === 0) {
-      throw new DeletionFailedException(
-        `Expected to delete one or more parts, but none was deleted, for segmentId: ${segmentId}`
-      )
     }
   }
 }

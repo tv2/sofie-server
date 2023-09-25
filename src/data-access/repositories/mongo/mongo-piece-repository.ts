@@ -20,8 +20,8 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
   public async getPieces(partId: string): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPieces.name)
     const mongoPieces: MongoPiece[] = (await this.getCollection()
-      .find({ startPartId: partId })
-      .toArray()) as unknown as MongoPiece[]
+      .find<MongoPiece>({ startPartId: partId })
+      .toArray())
     return this.mongoEntityConverter.convertPieces(mongoPieces)
   }
 
@@ -31,11 +31,6 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
 
     if (!piecesDeletionResult.acknowledged) {
       throw new DeletionFailedException(`Deletion of pieces was not acknowledged, for partId: ${partId}`)
-    }
-    if (piecesDeletionResult.deletedCount === 0) {
-      throw new DeletionFailedException(
-        `Expected to delete one or more pieces, but none was deleted, for partId: ${partId}`
-      )
     }
   }
 }

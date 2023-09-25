@@ -38,10 +38,13 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
 
   public async getRundown(rundownId: string): Promise<Rundown> {
     this.assertDatabaseConnection(this.getRundown.name)
-    await this.assertRundownExist(rundownId)
-    const mongoRundown: MongoRundown = (await this.getCollection().findOne({
+    const mongoRundown: MongoRundown | null = await this.getCollection().findOne<MongoRundown>({
       _id: rundownId,
-    })) as unknown as MongoRundown
+    })
+    if (!mongoRundown) {
+      throw new NotFoundException(`No Rundown found for rundownId: ${rundownId}`)
+    }
+
     const baselineTimelineObjects: TimelineObject[] = await this.rundownBaselineRepository.getRundownBaseline(
       rundownId
     )
@@ -69,12 +72,8 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     if (!rundownDeletionResult.acknowledged) {
       throw new DeletionFailedException(`Deletion of rundown was not acknowledged, for rundownId: ${rundownId}`)
     }
-    if (rundownDeletionResult.deletedCount === 0) {
-      throw new DeletionFailedException(
-        `Expected to delete one rundown, but none was deleted, for rundownId: ${rundownId}`
-      )
-    }
   }
+
   private async assertRundownExist(rundownId: string): Promise<void> {
     const doesRundownExist: boolean = (await this.getCollection().countDocuments({ _id: rundownId })) === 1
     if (!doesRundownExist) {
