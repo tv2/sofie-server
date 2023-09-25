@@ -7,7 +7,6 @@ import { PartRepository } from '../interfaces/part-repository'
 import { SegmentRepository } from '../interfaces/segment-repository'
 import { Segment } from '../../../model/entities/segment'
 import { MongoTestDatabase } from './mongo-test-database'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { EntityFactory } from '../../../model/entities/test/entity-factory'
 
@@ -99,23 +98,9 @@ describe(`${MongoSegmentRepository.name}`, () => {
       await testDatabase.populateDatabaseWithSegments([mongoSegment])
 
       const testee: SegmentRepository = createTestee({ })
-      const action: () => Promise<void> = async () => testee.deleteSegmentsForRundown(nonExistingId)
+      await testee.deleteSegmentsForRundown(nonExistingId)
 
-      await expect(action).rejects.toThrow(DeletionFailedException)
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
-    })
-
-    it('throws exception, when nonexistent rundownId is given', async () => {
-      const expectedErrorMessageFragment: string = 'Expected to delete one or more segments'
-      const nonExistingId: string = 'nonExistingId'
-      const mongoSegment: MongoSegment = createMongoSegment({})
-      await testDatabase.populateDatabaseWithSegments([mongoSegment])
-
-      const testee: SegmentRepository = createTestee({ })
-      const action: () => Promise<void> = async () => testee.deleteSegmentsForRundown(nonExistingId)
-
-      await expect(action).rejects.toThrow(DeletionFailedException)
-      await expect(action).rejects.toThrow(expectedErrorMessageFragment)
     })
 
     it('deletes parts before segments', async () => {

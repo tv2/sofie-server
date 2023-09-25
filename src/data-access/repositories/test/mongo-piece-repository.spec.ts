@@ -5,7 +5,6 @@ import { anything, capture, instance, mock, when } from '@typestrong/ts-mockito'
 import { Db } from 'mongodb'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Piece } from '../../../model/entities/piece'
 import { EntityFactory } from '../../../model/entities/test/entity-factory'
@@ -60,20 +59,6 @@ describe(`${MongoPieceRepository.name}`, () => {
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(0)
     })
 
-    it('throws exception, when nonexistent partId is given', async () => {
-      const expectedErrorMessageFragment: string = 'Expected to delete one or more pieces'
-      const nonExistingId: string = 'nonExistingId'
-      const partId: string = 'somePartId'
-      const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
-      await testDatabase.populateDatabaseWithPieces([mongoPiece])
-
-      const testee: PieceRepository = createTestee({ })
-      const action: () => Promise<void> = async () => testee.deletePiecesForPart(nonExistingId)
-
-      await expect(action).rejects.toThrow(DeletionFailedException)
-      await expect(action).rejects.toThrow(expectedErrorMessageFragment)
-    })
-
     it('does not deletes any pieces, when nonexistent partId is given', async () => {
       const nonExistingId: string = 'nonExistingId'
       const partId: string = 'somePartId'
@@ -82,9 +67,8 @@ describe(`${MongoPieceRepository.name}`, () => {
       const db: Db = testDatabase.getDatabase()
 
       const testee: PieceRepository = createTestee({ })
-      const action: () => Promise<void> = async () => testee.deletePiecesForPart(nonExistingId)
+      await testee.deletePiecesForPart(nonExistingId)
 
-      await expect(action).rejects.toThrow(DeletionFailedException)
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
     })
   })

@@ -7,7 +7,6 @@ import { MongoDatabase } from '../mongo/mongo-database'
 import { anyString, anything, capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { MongoTestDatabase } from './mongo-test-database'
 import { PieceRepository } from '../interfaces/piece-repository'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { EntityFactory } from '../../../model/entities/test/entity-factory'
 
@@ -87,20 +86,6 @@ describe(`${MongoPartRepository.name}`, () => {
       verify(pieceRepository.deletePiecesForPart(anyString())).times(mongoParts.length)
     })
 
-    it('throws exception, when nonexistent segmentId is given', async () => {
-      const expectedErrorMessageFragment: string = 'Expected to delete one or more parts'
-      const nonExistingId: string = 'nonExistingId'
-      const mongoPart: MongoPart = createMongoPart({})
-      await testDatabase.populateDatabaseWithParts([mongoPart])
-
-      const testee: PartRepository = createTestee({ })
-
-      const action: () => Promise<void> = async () => testee.deletePartsForSegment(nonExistingId)
-
-      await expect(action).rejects.toThrow(DeletionFailedException)
-      await expect(action).rejects.toThrow(expectedErrorMessageFragment)
-    })
-
     it('does not deletes any pieces, when nonexistent segmentId is given', async () => {
       const nonExistingId: string = 'nonExistingId'
       const mongoPart: MongoPart = createMongoPart({})
@@ -108,9 +93,8 @@ describe(`${MongoPartRepository.name}`, () => {
       const db = testDatabase.getDatabase()
 
       const testee = createTestee({ })
-      const action: () => Promise<void> = async () => testee.deletePartsForSegment(nonExistingId)
+      await testee.deletePartsForSegment(nonExistingId)
 
-      await expect(action).rejects.toThrow(DeletionFailedException)
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
     })
 

@@ -11,11 +11,16 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 import { RundownService } from './interfaces/rundown-service'
 import {
-  AdLibPieceInsertedEvent,
-  InfiniteRundownPieceAddedEvent,
+  RundownAdLibPieceInsertedEvent,
+  RundownInfinitePieceAddedEvent,
   RundownEvent,
 } from '../../model/value-objects/rundown-event'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
+import { Blueprint } from '../../model/value-objects/blueprint'
+import { PartEndState } from '../../model/value-objects/part-end-state'
+import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
+import { Configuration } from '../../model/entities/configuration'
+import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -23,9 +28,11 @@ export class RundownTimelineService implements RundownService {
     private readonly rundownRepository: RundownRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly adLibPieceRepository: AdLibPieceRepository,
+    private readonly configurationRepository: ConfigurationRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly rundownEventBuilder: RundownEventBuilder,
-    private readonly callbackScheduler: CallbackScheduler
+    private readonly callbackScheduler: CallbackScheduler,
+    private readonly blueprint: Blueprint
   ) {}
 
   public async activateRundown(rundownId: string): Promise<void> {
@@ -33,22 +40,37 @@ export class RundownTimelineService implements RundownService {
 
     rundown.activate()
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
-    this.timelineRepository.saveTimeline(timeline)
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
     this.emitAddInfinitePieces(rundown, [])
-
-    await this.rundownRepository.saveRundown(rundown)
 
     const activateEvent: RundownEvent = this.rundownEventBuilder.buildActivateEvent(rundown)
     this.rundownEventEmitter.emitRundownEvent(activateEvent)
 
     const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
     this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private async buildTimelineAndCallOnGenerate(rundown: Rundown): Promise<OnTimelineGenerateResult> {
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
+
+    return this.blueprint.onTimelineGenerate(
+      configuration,
+      timeline,
+      rundown.getActivePart(),
+      rundown.getPersistentState(),
+      rundown.getPreviousPart()
+    )
   }
 
   public async deactivateRundown(rundownId: string): Promise<void> {
-    this.callbackScheduler.stop()
+    this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
@@ -56,41 +78,66 @@ export class RundownTimelineService implements RundownService {
     const timeline: Timeline = this.timelineBuilder.getBaseTimeline()
 
     this.timelineRepository.saveTimeline(timeline)
-    await this.rundownRepository.saveRundown(rundown)
 
-    const deactivateEvent: RundownEvent = this.rundownEventBuilder.buildDeactivateEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(deactivateEvent)
+    this.sendEvents(rundown, [this.rundownEventBuilder.buildDeactivateEvent])
+
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private sendEvents(rundown: Rundown, buildEventCallbacks: ((rundown: Rundown) => RundownEvent)[]): void {
+    buildEventCallbacks.forEach(buildEventCallback => {
+      const event: RundownEvent = buildEventCallback(rundown)
+      this.rundownEventEmitter.emitRundownEvent(event)
+    })
+  }
+
+  private stopAutoNext(): void {
+    this.callbackScheduler.stop()
   }
 
   public async takeNext(rundownId: string): Promise<void> {
-    this.callbackScheduler.stop()
+    this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBefore: Piece[] = rundown.getInfinitePieces()
 
     rundown.takeNext()
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
-    if (timeline.autoNext) {
-      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, () => {
-        this.takeNext(rundownId).catch(error => console.error('Failed doing auto next:', error))
-      })
-    }
+    this.startAutoNext(onTimelineGenerateResult.timeline, rundownId)
 
-    this.timelineRepository.saveTimeline(timeline)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
     this.emitAddInfinitePieces(rundown, infinitePiecesBefore)
     // TODO: Emit if any infinite Pieces no longer exist e.g. we had a Segment infinite Piece and we changed Segment
     // TODO: Should we just emit a list of current infinite Pieces? That would be easy, but it then we would potentially emit the same pieces over and over again.
 
+    this.sendEvents(rundown, [
+      this.rundownEventBuilder.buildTakeEvent,
+      this.rundownEventBuilder.buildSetNextEvent
+    ])
+
     await this.rundownRepository.saveRundown(rundown)
+  }
 
-    const takeEvent: RundownEvent = this.rundownEventBuilder.buildTakeEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(takeEvent)
+  private getEndStateForActivePart(rundown: Rundown): PartEndState {
+    return this.blueprint.getEndStateForPart(
+      rundown.getActivePart(),
+      rundown.getPreviousPart(),
+      Date.now(),
+      undefined
+    )
+  }
 
-    const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+  private startAutoNext(timeline: Timeline, rundownId: string): void {
+    if (timeline.autoNext) {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
+    }
   }
 
   private emitAddInfinitePieces(rundown: Rundown, infinitePiecesBefore: Piece[]): void {
@@ -98,8 +145,8 @@ export class RundownTimelineService implements RundownService {
     infinitePiecesAfter
       .filter((piece) => !infinitePiecesBefore.includes(piece))
       .forEach((piece) => {
-        const infinitePieceAddedEvent: InfiniteRundownPieceAddedEvent =
-					this.rundownEventBuilder.buildInfiniteRundownPieceAddedEvent(rundown, piece)
+        const infinitePieceAddedEvent: RundownInfinitePieceAddedEvent =
+              this.rundownEventBuilder.buildInfiniteRundownPieceAddedEvent(rundown, piece)
         this.rundownEventEmitter.emitRundownEvent(infinitePieceAddedEvent)
       })
   }
@@ -107,25 +154,29 @@ export class RundownTimelineService implements RundownService {
   public async setNext(rundownId: string, segmentId: string, partId: string): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.setNext(segmentId, partId)
-    await this.rundownRepository.saveRundown(rundown)
 
-    const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+
+    this.sendEvents(rundown, [this.rundownEventBuilder.buildSetNextEvent])
+
+    await this.rundownRepository.saveRundown(rundown)
   }
 
   public async resetRundown(rundownId: string): Promise<void> {
-    this.callbackScheduler.stop()
+    this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.reset()
 
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
 
-    this.timelineRepository.saveTimeline(timeline)
+    this.sendEvents(rundown, [this.rundownEventBuilder.buildResetEvent])
+
     await this.rundownRepository.saveRundown(rundown)
-
-    const resetEvent: RundownEvent = this.rundownEventBuilder.buildResetEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(resetEvent)
   }
 
   public async executeAdLibPiece(rundownId: string, adLibPieceId: string): Promise<void> {
@@ -138,16 +189,20 @@ export class RundownTimelineService implements RundownService {
 
     adLibPiece.setExecutedAt(new Date().getTime())
     rundown.adAdLibPiece(adLibPiece)
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown)
+
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
 
     this.timelineRepository.saveTimeline(timeline)
-    await this.rundownRepository.saveRundown(rundown)
 
-    const adLibPieceInsertedEvent: AdLibPieceInsertedEvent = this.rundownEventBuilder.buildAdLibPieceInsertedEvent(
+    const adLibPieceInsertedEvent: RundownAdLibPieceInsertedEvent = this.rundownEventBuilder.buildAdLibPieceInsertedEvent(
       rundown,
       adLibPiece
     )
     this.rundownEventEmitter.emitRundownEvent(adLibPieceInsertedEvent)
+
+    await this.rundownRepository.saveRundown(rundown)
   }
 
   public async deleteRundown(rundownId: string): Promise<void> {
@@ -159,7 +214,6 @@ export class RundownTimelineService implements RundownService {
 
     await this.rundownRepository.deleteRundown(rundownId)
 
-    const deletedEvent: RundownEvent = this.rundownEventBuilder.buildDeletedEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(deletedEvent)
+    this.sendEvents(rundown, [this.rundownEventBuilder.buildDeletedEvent])
   }
 }
