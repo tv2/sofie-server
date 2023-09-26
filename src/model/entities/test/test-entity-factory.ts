@@ -4,11 +4,7 @@ import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 
 export class TestEntityFactory {
-  public static createRundown(rundownInterface?: Partial<RundownInterface>): Rundown {
-    if (!rundownInterface) {
-      rundownInterface = {} as RundownInterface
-    }
-
+  public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
     return new Rundown({
       id: rundownInterface.id ?? 'rundownId' + Math.floor(Math.random()*1000),
       name: rundownInterface.name ?? 'rundownName',
@@ -16,11 +12,7 @@ export class TestEntityFactory {
     } as RundownInterface)
   }
 
-  public static createSegment(segmentInterface?: Partial<SegmentInterface>): Segment {
-    if (!segmentInterface) {
-      segmentInterface = {} as SegmentInterface
-    }
-
+  public static createSegment(segmentInterface: Partial<SegmentInterface> = {}): Segment {
     return new Segment(
       {
         id: segmentInterface.id ?? 'segmentId' + Math.floor(Math.random()*1000),
@@ -28,22 +20,14 @@ export class TestEntityFactory {
       } as SegmentInterface)
   }
 
-  public static createPart(partInterface?: Partial<PartInterface>): Part {
-    if (!partInterface) {
-      partInterface = {} as PartInterface
-    }
-
+  public static createPart(partInterface: Partial<PartInterface> = {}): Part {
     return new Part({
       id: partInterface.id ?? 'partId' + Math.floor(Math.random()*1000),
       segmentId: partInterface.segmentId ?? 'segmentId'
     } as PartInterface)
   }
 
-  public static createPiece(pieceInterface?: Partial<PieceInterface>): Piece {
-    if (!pieceInterface) {
-      pieceInterface = {} as PieceInterface
-    }
-
+  public static createPiece(pieceInterface: Partial<PieceInterface> = {}): Piece {
     return new Piece({
       id: pieceInterface.id ?? 'pieceId' + Math.floor(Math.random()*1000),
       partId: pieceInterface.partId ?? 'partId'
