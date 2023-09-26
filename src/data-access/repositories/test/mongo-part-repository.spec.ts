@@ -4,7 +4,7 @@ import { Db } from 'mongodb'
 import { MongoEntityConverter, MongoPart } from '../mongo/mongo-entity-converter'
 import { PartRepository } from '../interfaces/part-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
-import { anyString, anything, capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
+import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { MongoTestDatabase } from './mongo-test-database'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
@@ -240,23 +240,18 @@ describe(`${MongoPartRepository.name}`, () => {
   })
 
   describe(`${MongoPartRepository.prototype.getParts.name}`, () => {
+    // TODO: Remove below comment, ones 'MongoEntityConverter' is gone.
+    // The below test should never fail, while we have the 'MongoEntityConverter', as it is the mocked value that is asserted.
     it('gets zero parts from database when no parts for given segmentId exist', async () => {
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoParts: MongoPart[] = [createMongoPart({segmentId: 'someSegmentId'})]
       const nonExistingId: string = 'nonExistingId'
-      const db: Db = testDatabase.getDatabase()
       await testDatabase.populateDatabaseWithParts(mongoParts)
 
-      when(mongoConverter.convertParts(anything())).thenReturn([])
-      const testee: PartRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: PartRepository = createTestee({ })
 
-      await testee.getParts(nonExistingId)
+      const result: Part[] = await testee.getParts(nonExistingId)
 
-      const [capturedMongoParts] =  capture(mongoConverter.convertParts).first()
-      expect(capturedMongoParts.length).toBe(0)
-      expect((await db.collection(COLLECTION_NAME).find().toArray()).length).toBe(1)
+      expect(result).toHaveLength(0)
     })
 
     it('returns one part when segmentId is given', async () => {

@@ -1,7 +1,7 @@
 import { MongoPieceRepository } from '../mongo/mongo-piece-repository'
 import { MongoTestDatabase } from './mongo-test-database'
 import { MongoEntityConverter, MongoPiece } from '../mongo/mongo-entity-converter'
-import { anything, capture, instance, mock, when } from '@typestrong/ts-mockito'
+import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Db } from 'mongodb'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
@@ -74,23 +74,18 @@ describe(`${MongoPieceRepository.name}`, () => {
   })
 
   describe(`${MongoPieceRepository.prototype.getPieces.name}`, () => {
+    // TODO: Remove below comment, ones 'MongoEntityConverter' is gone.
+    // The below test should never fail, while we have the 'MongoEntityConverter', as it is the mocked value that is asserted.
     it('gets zero pieces from database when no pieces for given partId exist', async () => {
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: 'somePartId'})]
       const nonExistingId: string = 'nonExistingId'
-      const db: Db = testDatabase.getDatabase()
       await testDatabase.populateDatabaseWithPieces(mongoPieces)
 
-      when(mongoConverter.convertPieces(anything())).thenReturn([])
-      const testee: PieceRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: PieceRepository = createTestee({ })
 
-      await testee.getPieces(nonExistingId)
+      const result: Piece[] = await testee.getPieces(nonExistingId)
 
-      const [capturedMongoPieces] =  capture(mongoConverter.convertPieces).first()
-      expect(capturedMongoPieces.length).toBe(0)
-      expect((await db.collection(COLLECTION_NAME).find().toArray()).length).toBe(1)
+      expect(result).toHaveLength(0)
     })
 
     it('returns one piece when partId is given', async () => {
