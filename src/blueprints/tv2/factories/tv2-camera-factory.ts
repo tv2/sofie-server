@@ -61,7 +61,7 @@ export class Tv2CameraFactory {
       layer: Tv2SourceLayer.CAMERA,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
-      isPlanned: true,
+      isPlanned: false,
       start: 0,
       duration: 0,
       preRollDuration: 0,
@@ -169,7 +169,7 @@ export class Tv2CameraFactory {
       segmentId: '',
       pieces: [],
       rank: -1,
-      isPlanned: true,
+      isPlanned: false,
       isOnAir: false,
       isNext: false,
       inTransition: {

@@ -431,4 +431,9 @@ export class Rundown extends BasicRundown {
     this.activePart.insertPiece(piece)
     this.updateInfinitePieces()
   }
+
+  public insertPieceIntoNextPart(piece: Piece): void {
+    this.assertActive(this.insertPieceIntoNextPart.name)
+    this.nextPart.insertPiece(piece)
+  }
 }

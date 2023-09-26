@@ -33,7 +33,7 @@ export class Part {
   public readonly id: string
   public readonly name: string
   public readonly rank: number
-  public readonly isPlanned: boolean
+  public readonly isPlanned: boolean = true
 
   public readonly expectedDuration: number
 
@@ -123,16 +123,16 @@ export class Part {
     this.pieces = pieces
   }
 
-  public insertPiece(nonPlannedPiece: Piece): void {
-    if (!nonPlannedPiece.isPlanned) {
-      throw new UnsupportedOperation(`Trying to insert a unplanned Piece ${nonPlannedPiece.id} to Part ${this.id}.`)
+  public insertPiece(unPlannedPiece: Piece): void {
+    if (unPlannedPiece.isPlanned) {
+      throw new UnsupportedOperation(`Trying to insert a planned Piece ${unPlannedPiece.id} to Part ${this.id}.`)
     }
-    nonPlannedPiece.setPartId(this.id)
+    unPlannedPiece.setPartId(this.id)
     if (this.isPartOnAir) {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
-      nonPlannedPiece.setStart(timeSincePutOnAir)
+      unPlannedPiece.setStart(timeSincePutOnAir)
     }
-    this.pieces.push(nonPlannedPiece)
+    this.pieces.push(unPlannedPiece)
   }
 
   public getPiecesWithLifespan(lifespanFilters: PieceLifespan[]): Piece[] {
@@ -152,7 +152,7 @@ export class Part {
   }
 
   public setSegmentId(segmentId: string): void {
-    if (!this.isPlanned) {
+    if (this.isPlanned) {
       throw new UnsupportedOperation(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
     }
     this.segmentId = segmentId
@@ -245,7 +245,7 @@ export class Part {
   public reset(): void {
     this.executedAt = 0
     this.playedDuration = 0
-    this.pieces = this.pieces.filter(piece => !piece.isPlanned)
+    this.pieces = this.pieces.filter(piece => piece.isPlanned)
   }
 
   public clone(): Part {

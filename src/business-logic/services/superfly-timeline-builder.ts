@@ -233,10 +233,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           : piece.duration
 
     return {
-      // TODO: Core only adds "delayStartOfPiecesDuration" if it's not an adLib or if it is an adLib then only if it has been adLibbed into next Part
-      // TODO: Since handling AdLibs is no longer Part of building the Timeline, we should be safe to always add this? It should evaluate to zero in most cases.
-      // TODO: Verify when we implement adLibs.
-      start: piece.getStart() + (piece.isPlanned ? 0 : partCalculatedTimings.delayStartOfPiecesDuration),
+      start: piece.getStart() + partCalculatedTimings.delayStartOfPiecesDuration,
       duration: duration === 0 ? undefined : duration,
     }
   }

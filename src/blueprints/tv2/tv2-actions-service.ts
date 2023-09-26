@@ -1,6 +1,6 @@
 import { BlueprintGenerateActions } from '../../model/value-objects/blueprint'
 import { Configuration } from '../../model/entities/configuration'
-import { Action, PieceAction } from '../../model/entities/action'
+import { Action, MutateActionMethods, PieceAction } from '../../model/entities/action'
 import { Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2ShowStyleBlueprintConfiguration } from './value-objects/tv2-show-style-blueprint-configuration'
@@ -12,10 +12,21 @@ import { PieceLifespan } from '../../model/enums/piece-lifespan'
 import { Tv2SisyfosLayer, Tv2SourceLayer } from './value-objects/tv2-layers'
 import { TransitionType } from '../../model/enums/transition-type'
 import { DeviceType } from '../../model/enums/device-type'
+import { Tv2TransitionFactory } from './factories/tv2-transition-factory'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
 
-  constructor(private readonly cameraFactory: Tv2CameraFactory) {}
+  constructor(
+    private readonly cameraFactory: Tv2CameraFactory,
+    private readonly transitionFactory: Tv2TransitionFactory
+  ) {
+  }
+
+  public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
+    if (this.transitionFactory.isTransitionAction(action)) {
+      return this.transitionFactory.getMutateActionMethods(action)
+    }
+  }
 
   public generateActions(configuration: Configuration): Action[] {
     const blueprintConfiguration: Tv2BlueprintConfiguration = {
@@ -34,9 +45,14 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       this.createStopAudioBedAction()
     ]
 
+    const transitionActions: Action[] = [
+      this.transitionFactory.createMixTransitionAction()
+    ]
+
     return [
       ...cameraActions,
-      ...audioActions
+      ...audioActions,
+      ...transitionActions
     ]
   }
 
@@ -50,7 +66,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       layer: Tv2SourceLayer.AUDIO_BED,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
-      isPlanned: true,
+      isPlanned: false,
       start: 0,
       duration,
       preRollDuration: 0,

@@ -40,6 +40,7 @@ export class ServiceFacade {
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionRepository(),
       this.createRundownService(),
+      RepositoryFacade.createRundownRepository(),
       BlueprintsFacade.createBlueprint()
     )
   }

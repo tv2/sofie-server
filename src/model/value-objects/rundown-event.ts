@@ -1,5 +1,6 @@
 import { RundownEventType } from '../enums/rundown-event-type'
 import { TypedEvent } from './typed-event'
+import { AutoNext } from './auto-next'
 
 export interface RundownEvent extends TypedEvent {
   type: RundownEventType
@@ -35,6 +36,73 @@ export interface PartTakenEvent extends PartEvent {
 
 export interface PartSetAsNextEvent extends PartEvent {
   type: RundownEventType.SET_NEXT
+}
+
+// TODO: Find a better way to type Parts and Piece for Inserted events.
+export interface PartInsertedAsOnAirEvent extends RundownEvent {
+  type: RundownEventType.PART_INSERTED_AS_ON_AIR,
+  part: {
+    id: string,
+    segmentId: string
+    name: string,
+    isPlanned: false,
+    expectedDuration: number
+    isPartNext: false,
+    isPartOnAir: true,
+    executedAt: number
+    playedDuration: number
+    autoNext?: AutoNext
+    pieces: {
+      id: string,
+      partId: string,
+      isPlanned: false,
+      name: string,
+      start: number
+      duration: number,
+      layer: string,
+      type: string
+    }[]
+  }
+}
+
+export interface PartInsertedAsNextEvent extends RundownEvent {
+  type: RundownEventType.PART_INSERTED_AS_NEXT,
+  part: {
+    id: string,
+    segmentId: string
+    name: string,
+    isPlanned: false,
+    expectedDuration: number
+    isPartNext: true,
+    isPartOnAir: false,
+    executedAt: number
+    playedDuration: number
+    autoNext?: AutoNext
+    pieces: {
+      id: string,
+      partId: string,
+      isPlanned: false,
+      name: string,
+      start: number
+      duration: number,
+      layer: string,
+      type: string
+    }[]
+  }
+}
+
+export interface PieceInsertedEvent extends RundownEvent {
+  type: RundownEventType.PIECE_INSERTED,
+  piece: {
+    id: string,
+    partId: string,
+    isPlanned: false,
+    name: string,
+    start: number
+    duration: number,
+    layer: string,
+    type: string
+  }
 }
 
 export interface RundownAdLibPieceInsertedEvent extends RundownEvent {
