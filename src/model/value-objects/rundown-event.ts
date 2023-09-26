@@ -105,19 +105,6 @@ export interface PieceInsertedEvent extends RundownEvent {
   }
 }
 
-export interface RundownAdLibPieceInsertedEvent extends RundownEvent {
-  type: RundownEventType.AD_LIB_PIECE_INSERTED,
-  segmentId: string
-  partId: string
-  adLibPiece: {
-    id: string
-    name: string
-    layer: string
-    start: number
-    duration: number
-  }
-}
-
 export interface RundownInfinitePieceAddedEvent extends RundownEvent {
   type: RundownEventType.INFINITE_PIECE_ADDED,
   infinitePiece: {
