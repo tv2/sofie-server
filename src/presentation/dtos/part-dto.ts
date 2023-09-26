@@ -1,5 +1,6 @@
 import { Part } from '../../model/entities/part'
 import { PieceDto } from './piece-dto'
+import { AutoNext } from '../../model/value-objects/auto-next'
 
 export class PartDto {
   public readonly id: string
@@ -11,6 +12,7 @@ export class PartDto {
   public readonly expectedDuration: number
   public readonly executedAt: number
   public readonly playedDuration: number
+  public readonly autoNext?: AutoNext
 
   constructor(part: Part) {
     this.id = part.id
@@ -22,5 +24,6 @@ export class PartDto {
     this.expectedDuration = part.expectedDuration
     this.executedAt = part.getExecutedAt()
     this.playedDuration = part.getPlayedDuration()
+    this.autoNext = part.autoNext
   }
 }
