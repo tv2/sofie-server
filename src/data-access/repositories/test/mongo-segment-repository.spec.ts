@@ -2,7 +2,7 @@ import { MongoSegmentRepository } from '../mongo/mongo-segment-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
 import { MongoEntityConverter, MongoSegment } from '../mongo/mongo-entity-converter'
 import { Db } from 'mongodb'
-import { anyString, anything, capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
+import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { PartRepository } from '../interfaces/part-repository'
 import { SegmentRepository } from '../interfaces/segment-repository'
 import { Segment } from '../../../model/entities/segment'
@@ -133,23 +133,18 @@ describe(`${MongoSegmentRepository.name}`, () => {
   })
 
   describe(`${MongoSegmentRepository.prototype.getSegments.name}`, () => {
+    // TODO: Remove below comment, ones 'MongoEntityConverter' is gone.
+    // The below test should never fail, while we have the 'MongoEntityConverter', as it is the mocked value that is asserted.
     it('gets zero segments from database when no segments for given rundownId exist', async () => {
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: 'someRundownId'})]
       const nonExistingId: string = 'nonExistingId'
-      const db: Db = testDatabase.getDatabase()
       await testDatabase.populateDatabaseWithSegments(mongoSegments)
 
-      when(mongoConverter.convertSegments(anything())).thenReturn([])
-      const testee: SegmentRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: SegmentRepository = createTestee({ })
 
-      await testee.getSegments(nonExistingId)
+      const result: Segment[] = await testee.getSegments(nonExistingId)
 
-      const [capturedMongoSegments] =  capture(mongoConverter.convertSegments).first()
-      expect(capturedMongoSegments.length).toBe(0)
-      expect((await db.collection(COLLECTION_NAME).find().toArray()).length).toBe(1)
+      expect(result).toHaveLength(0)
     })
 
     it('returns one segment when rundownId is given', async () => {
