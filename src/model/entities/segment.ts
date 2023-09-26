@@ -137,12 +137,12 @@ export class Segment {
   }
 
   public reset(): void {
-    this.removeAdLibbedParts()
+    this.removeUnplannedParts()
     this.parts.forEach(part => part.reset())
   }
 
-  private removeAdLibbedParts(): void {
-    this.parts = this.parts.filter(part => !part.isPlanned)
+  private removeUnplannedParts(): void {
+    this.parts = this.parts.filter(part => part.isPlanned)
   }
 
   public insertPartAfterActivePart(part: Part): void {
@@ -159,8 +159,8 @@ export class Segment {
       return
     }
 
-    const isPartAfterActivePartAnAdLib: boolean = this.parts[activePartIndex + 1].isPlanned
-    if (isPartAfterActivePartAnAdLib) {
+    const isPartAfterActivePartAnUnplannedPart: boolean = !this.parts[activePartIndex + 1].isPlanned
+    if (isPartAfterActivePartAnUnplannedPart) {
       this.parts[activePartIndex + 1] = part
       return
     }

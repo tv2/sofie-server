@@ -1,6 +1,6 @@
 import { ActionType } from '../enums/action-type'
 import { PartInterface } from './part'
-import { PieceInterface } from './piece'
+import { Piece, PieceInterface } from './piece'
 
 export interface Action {
   id: string
@@ -10,7 +10,7 @@ export interface Action {
 }
 
 export interface PartAction extends Action {
-  type: ActionType.INSERT_PART_AS_NEXT | ActionType.INSERT_PART_AS_ON_AIR
+  type: ActionType.INSERT_PART_AS_ON_AIR | ActionType.INSERT_PART_AS_NEXT
   data: {
     partInterface: PartInterface,
     pieceInterfaces: PieceInterface[]
@@ -18,6 +18,11 @@ export interface PartAction extends Action {
 }
 
 export interface PieceAction extends Action {
-  type: ActionType.INSERT_PIECE_AS_ON_AIR
+  type: ActionType.INSERT_PIECE_AS_ON_AIR | ActionType.INSERT_PIECE_AS_NEXT
   data: PieceInterface
+}
+
+export interface MutateActionMethods {
+  updateActionWithPlannedPieceData: (action: Action, plannedPiece: Piece) => Action
+  plannedPiecePredicate: (piece: Piece) => boolean
 }

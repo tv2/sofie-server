@@ -8,7 +8,8 @@ export interface AtemMeTimelineObject extends TimelineObject {
     type: AtemType.ME
     me: {
       input: number
-      transition: AtemTransition
+      transition: AtemTransition,
+      transitionSettings?: AtemTransitionSettings
     }
   }
 }
@@ -43,4 +44,17 @@ export enum AtemTransition {
   STING = 4,
   CUT = 5,
   DUMMY = 6
+}
+
+export interface AtemTransitionSettings {
+  mix?: {
+    rate: number
+  }
+  dip?: {
+    rate: number,
+    input: number
+  },
+  wipe?: {
+    //...
+  }
 }

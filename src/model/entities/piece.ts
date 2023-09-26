@@ -30,7 +30,7 @@ export class Piece {
   public layer: string
   public type: PieceType
   public pieceLifespan: PieceLifespan
-  public isPlanned: boolean
+  public isPlanned: boolean = true
   public duration: number
   public preRollDuration: number
   public postRollDuration: number
@@ -87,15 +87,15 @@ export class Piece {
   }
 
   public setPartId(partId: string): void {
-    if (!this.isPlanned) {
+    if (this.isPlanned) {
       throw new UnsupportedOperation(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
     }
     this.partId = partId
   }
 
   public setStart(startTimestamp: number): void {
-    if (!this.isPlanned) {
-      throw new UnsupportedOperation(`Trying to set start of a non-adLib Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
+    if (this.isPlanned) {
+      throw new UnsupportedOperation(`Trying to set the start of a planned Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
     }
     this.start = startTimestamp
   }

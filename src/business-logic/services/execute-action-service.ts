@@ -1,5 +1,5 @@
 import { ActionService } from './interfaces/action-service'
-import { Action, PartAction, PieceAction } from '../../model/entities/action'
+import { Action, MutateActionMethods, PartAction, PieceAction } from '../../model/entities/action'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
@@ -9,12 +9,15 @@ import { UnsupportedOperation } from '../../model/exceptions/unsupported-operati
 import { RundownService } from './interfaces/rundown-service'
 import { Part, PartInterface } from '../../model/entities/part'
 import { Piece, PieceInterface } from '../../model/entities/piece'
+import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
+import { Rundown } from '../../model/entities/rundown'
 
 export class ExecuteActionService implements ActionService {
   constructor(
     private readonly configurationRepository: ConfigurationRepository,
     private readonly actionRepository: ActionRepository,
     private readonly rundownService: RundownService,
+    private readonly rundownRepository: RundownRepository,
     private readonly blueprint: Blueprint
   ) {}
 
@@ -30,24 +33,42 @@ export class ExecuteActionService implements ActionService {
     const action: Action = await this.actionRepository.getAction(actionId)
     switch (action.type) {
       case ActionType.INSERT_PART_AS_NEXT: {
-        const partAction: PartAction = action as PartAction
+        const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
         await this.insertPartAsNext(partAction, rundownId)
         break
       }
       case ActionType.INSERT_PART_AS_ON_AIR: {
-        const partAction: PartAction = action as PartAction
+        const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
         await this.insertPartAsOnAir(partAction, rundownId)
         break
       }
       case ActionType.INSERT_PIECE_AS_ON_AIR: {
-        const pieceAction: PieceAction = action as PieceAction
+        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId)) as PieceAction
         await this.insertPieceAsOnAir(pieceAction, rundownId)
+        break
+      }
+      case ActionType.INSERT_PIECE_AS_NEXT: {
+        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId)) as PieceAction
+        await this.insertPieceAsNext(pieceAction, rundownId)
         break
       }
       default: {
         throw new UnsupportedOperation(`ActionType ${action.type} is not yet supported/implemented`)
       }
     }
+  }
+
+  private async mutateAction(action: Action, rundownId: string): Promise<Action> {
+    const mutateActionMethods: MutateActionMethods | undefined = this.blueprint.getMutateActionMethods(action)
+    if (!mutateActionMethods) {
+      return action
+    }
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const plannedPiece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.plannedPiecePredicate)
+    if (plannedPiece) {
+      action = mutateActionMethods.updateActionWithPlannedPieceData(action, plannedPiece)
+    }
+    return action
   }
 
   private async insertPartAsNext(partAction: PartAction, rundownId: string): Promise<void> {
@@ -71,9 +92,18 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async insertPieceAsOnAir(pieceAction: PieceAction, rundownId: string): Promise<void> {
+    const piece: Piece = this.createPieceFromAction(pieceAction)
+    await this.rundownService.insertPieceAsOnAir(rundownId, piece)
+  }
+
+  private createPieceFromAction(pieceAction: PieceAction): Piece {
     const pieceInterface: PieceInterface = pieceAction.data
     pieceInterface.id = `${pieceInterface.id}_${Date.now()}`
-    const piece: Piece = new Piece(pieceAction.data)
-    await this.rundownService.insertPieceAsOnAir(rundownId, piece)
+    return new Piece(pieceInterface)
+  }
+
+  private async insertPieceAsNext(pieceAction: PieceAction, rundownId: string): Promise<void> {
+    const piece: Piece = this.createPieceFromAction(pieceAction)
+    await this.rundownService.insertPieceAsNext(rundownId, piece)
   }
 }

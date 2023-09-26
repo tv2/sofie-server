@@ -11,6 +11,7 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 import { RundownService } from './interfaces/rundown-service'
 import {
+  PartInsertedAsNextEvent, PartInsertedAsOnAirEvent, PieceInsertedEvent,
   RundownAdLibPieceInsertedEvent,
   RundownEvent,
   RundownInfinitePieceAddedEvent,
@@ -41,19 +42,23 @@ export class RundownTimelineService implements RundownService {
 
     rundown.activate()
 
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+    await this.buildAndPersistTimeline(rundown)
 
     this.emitAddInfinitePieces(rundown, [])
 
-    const activateEvent: RundownEvent = this.rundownEventBuilder.buildActivateEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(activateEvent)
-
-    const setNextEvent: RundownEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-    this.rundownEventEmitter.emitRundownEvent(setNextEvent)
+    this.sendEvents(rundown, [
+      this.rundownEventBuilder.buildActivateEvent,
+      this.rundownEventBuilder.buildSetNextEvent]
+    )
 
     await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private async buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
+    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
+    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
+    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+    return onTimelineGenerateResult.timeline
   }
 
   private async buildTimelineAndCallOnGenerate(rundown: Rundown): Promise<OnTimelineGenerateResult> {
@@ -105,13 +110,9 @@ export class RundownTimelineService implements RundownService {
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+    const timeline: Timeline = await this.buildAndPersistTimeline(rundown)
 
-    this.startAutoNext(onTimelineGenerateResult.timeline, rundownId)
-
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+    this.startAutoNext(timeline, rundownId)
 
     this.emitAddInfinitePieces(rundown, infinitePiecesBefore)
     // TODO: Emit if any infinite Pieces no longer exist e.g. we had a Segment infinite Piece and we changed Segment
@@ -156,9 +157,7 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.setNext(segmentId, partId)
 
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+    await this.buildAndPersistTimeline(rundown)
 
     this.sendEvents(rundown, [this.rundownEventBuilder.buildSetNextEvent])
 
@@ -171,9 +170,7 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.reset()
 
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+    await this.buildAndPersistTimeline(rundown)
 
     this.sendEvents(rundown, [this.rundownEventBuilder.buildResetEvent])
 
@@ -219,29 +216,27 @@ export class RundownTimelineService implements RundownService {
     this.sendEvents(rundown, [this.rundownEventBuilder.buildDeletedEvent])
   }
 
-  public async insertPartAsNext(rundownId: string, part: Part): Promise<void> {
-    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.insertPartAsNext(part)
-
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
-
-    // TODO: Emit events
-
-    await this.rundownRepository.saveRundown(rundown)
-  }
-
   public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.insertPartAsNext(part)
     rundown.takeNext()
 
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+    await this.buildAndPersistTimeline(rundown)
 
-    // TODO: Emit events
+    const partInsertedEvent: PartInsertedAsOnAirEvent = this.rundownEventBuilder.buildPartInsertedAsOnAirEvent(rundown, part)
+    this.rundownEventEmitter.emitRundownEvent(partInsertedEvent)
+
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  public async insertPartAsNext(rundownId: string, part: Part): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.insertPartAsNext(part)
+
+    await this.buildAndPersistTimeline(rundown)
+
+    const partInsertedEvent: PartInsertedAsNextEvent = this.rundownEventBuilder.buildPartInsertedAsNextEvent(rundown, part)
+    this.rundownEventEmitter.emitRundownEvent(partInsertedEvent)
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -250,11 +245,22 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.insertPieceIntoActivePart(piece)
 
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
+    await this.buildAndPersistTimeline(rundown)
 
-    // TODO: Emit events
+    const pieceInsertedEvent: PieceInsertedEvent = this.rundownEventBuilder.buildPieceInsertedEvent(rundown, piece)
+    this.rundownEventEmitter.emitRundownEvent(pieceInsertedEvent)
+
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  public async insertPieceAsNext(rundownId: string, piece: Piece): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.insertPieceIntoNextPart(piece)
+
+    await this.buildAndPersistTimeline(rundown)
+
+    const pieceInsertedEvent: PieceInsertedEvent = this.rundownEventBuilder.buildPieceInsertedEvent(rundown, piece)
+    this.rundownEventEmitter.emitRundownEvent(pieceInsertedEvent)
 
     await this.rundownRepository.saveRundown(rundown)
   }

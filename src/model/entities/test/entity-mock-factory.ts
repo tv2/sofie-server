@@ -173,6 +173,7 @@ export class EntityMockFactory {
     when(mockedPart.disableNextInTransition).thenReturn(partInterface.disableNextInTransition ?? false)
 
     when(mockedPart.getExecutedAt()).thenReturn(misc.executedAt ?? 0)
+    when(mockedPart.isPlanned).thenReturn(partInterface.isPlanned ?? true)
 
     when(mockedPart.getPieces()).thenReturn(partInterface.pieces ?? [])
     when(mockedPart.getPiecesWithLifespan(anything())).thenReturn(misc.piecesWithLifespanFilters ?? [])
