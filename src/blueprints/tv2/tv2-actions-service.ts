@@ -1,24 +1,19 @@
 import { BlueprintGenerateActions } from '../../model/value-objects/blueprint'
 import { Configuration } from '../../model/entities/configuration'
-import { Action, MutateActionMethods, PieceAction } from '../../model/entities/action'
+import { Action, MutateActionMethods } from '../../model/entities/action'
 import { Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2ShowStyleBlueprintConfiguration } from './value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2CameraFactory } from './factories/tv2-camera-factory'
-import { ActionType } from '../../model/enums/action-type'
-import { PieceInterface } from '../../model/entities/piece'
-import { PieceType } from '../../model/enums/piece-type'
-import { PieceLifespan } from '../../model/enums/piece-lifespan'
-import { Tv2SisyfosLayer, Tv2SourceLayer } from './value-objects/tv2-layers'
-import { TransitionType } from '../../model/enums/transition-type'
-import { DeviceType } from '../../model/enums/device-type'
 import { Tv2TransitionFactory } from './factories/tv2-transition-factory'
+import { Tv2AudioFactory } from './factories/tv2-audio-factory'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
 
   constructor(
     private readonly cameraFactory: Tv2CameraFactory,
-    private readonly transitionFactory: Tv2TransitionFactory
+    private readonly transitionFactory: Tv2TransitionFactory,
+    private readonly audioFactory: Tv2AudioFactory
   ) {
   }
 
@@ -42,7 +37,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       ])
 
     const audioActions: Action[] = [
-      this.createStopAudioBedAction()
+      this.audioFactory.createStopAudioBedAction()
     ]
 
     const transitionActions: Action[] = [
@@ -54,45 +49,5 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       ...audioActions,
       ...transitionActions
     ]
-  }
-
-  private createStopAudioBedAction(): PieceAction {
-    const duration: number = 1000
-    const pieceInterface: PieceInterface = {
-      id: 'stopAudioBedPiece',
-      name: 'Stop audio bed',
-      partId: '',
-      type: PieceType.AUDIO,
-      layer: Tv2SourceLayer.AUDIO_BED,
-      pieceLifespan: PieceLifespan.WITHIN_PART,
-      transitionType: TransitionType.NO_TRANSITION,
-      isPlanned: false,
-      start: 0,
-      duration,
-      preRollDuration: 0,
-      postRollDuration: 0,
-      tags: [],
-      timelineObjects: [
-        {
-          id: '',
-          enable: {
-            start: 0,
-            duration
-          },
-          priority: 1,
-          layer: Tv2SisyfosLayer.AUDIO_BED,
-          content: {
-            deviceType: DeviceType.ABSTRACT,
-            type: 'empty'
-          }
-        }
-      ]
-    }
-    return {
-      id: 'stopAudioBedAction',
-      name: 'Stop audio bed',
-      type: ActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
-    }
   }
 }
