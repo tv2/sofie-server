@@ -3,7 +3,6 @@ import { Rundown } from '../../../model/entities/rundown'
 import { RundownEventEmitter } from '../interfaces/rundown-event-emitter'
 import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
 import { TimelineRepository } from '../../../data-access/repositories/interfaces/timeline-repository'
-import { AdLibPieceRepository } from '../../../data-access/repositories/interfaces/ad-lib-piece-repository'
 import { TimelineBuilder } from '../interfaces/timeline-builder'
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { ActiveRundownException } from '../../../model/exceptions/active-rundown-exception'
@@ -99,7 +98,6 @@ function createTestee(params: {
   rundownEventEmitter?: RundownEventEmitter
   rundownRepository?: RundownRepository
   timelineRepository?: TimelineRepository
-  adLibPieceRepository?: AdLibPieceRepository
   configurationRepository?: ConfigurationRepository
   timelineBuilder?: TimelineBuilder
   rundownEventBuilder?: RundownEventBuilder
@@ -110,7 +108,6 @@ function createTestee(params: {
     params.rundownEventEmitter ?? instance(mock<RundownEventEmitter>()),
     params.rundownRepository ?? instance(mock<RundownRepository>()),
     params.timelineRepository ?? instance(mock<TimelineRepository>()),
-    params.adLibPieceRepository ?? instance(mock<AdLibPieceRepository>()),
     params.configurationRepository ?? instance(mock<ConfigurationRepository>()),
     params.timelineBuilder ?? instance(mock<TimelineBuilder>()),
     params.rundownEventBuilder ?? instance(mock<RundownEventBuilder>()),

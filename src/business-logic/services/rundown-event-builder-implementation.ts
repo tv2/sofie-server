@@ -7,14 +7,12 @@ import {
   PartTakenEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
-  RundownAdLibPieceInsertedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
 } from '../../model/value-objects/rundown-event'
 import { RundownEventType } from '../../model/enums/rundown-event-type'
-import { AdLibPiece } from '../../model/entities/ad-lib-piece'
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 
@@ -70,23 +68,6 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       rundownId: rundown.id,
       segmentId: rundown.getNextSegment().id,
       partId: rundown.getNextPart().id,
-    }
-  }
-
-  public buildAdLibPieceInsertedEvent(rundown: Rundown, adLibPiece: AdLibPiece): RundownAdLibPieceInsertedEvent {
-    return {
-      type: RundownEventType.AD_LIB_PIECE_INSERTED,
-      timestamp: Date.now(),
-      rundownId: rundown.id,
-      segmentId: rundown.getActiveSegment().id,
-      partId: rundown.getActivePart().id,
-      adLibPiece: {
-        id: adLibPiece.id,
-        name: adLibPiece.name,
-        layer: '', // TODO: Properly fill out
-        start: Math.min(0, adLibPiece.getExecutedAt() - rundown.getActivePart().getExecutedAt()), // TODO: Properly fill out
-        duration: adLibPiece.duration,
-      },
     }
   }
 

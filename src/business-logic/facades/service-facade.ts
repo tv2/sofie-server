@@ -18,7 +18,6 @@ export class ServiceFacade {
       RundownEventService.getInstance(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createTimelineRepository(),
-      RepositoryFacade.createAdLibRepository(),
       RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createRundownEventBuilder(),
