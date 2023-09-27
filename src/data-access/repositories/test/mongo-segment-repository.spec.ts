@@ -133,8 +133,6 @@ describe(`${MongoSegmentRepository.name}`, () => {
   })
 
   describe(`${MongoSegmentRepository.prototype.getSegments.name}`, () => {
-    // TODO: Remove below comment, ones 'MongoEntityConverter' is gone.
-    // The below test should never fail, while we have the 'MongoEntityConverter', as it is the mocked value that is asserted.
     it('gets zero segments from database when no segments for given rundownId exist', async () => {
       const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: 'someRundownId'})]
       const nonExistingId: string = 'nonExistingId'
