@@ -74,8 +74,6 @@ describe(`${MongoPieceRepository.name}`, () => {
   })
 
   describe(`${MongoPieceRepository.prototype.getPieces.name}`, () => {
-    // TODO: Remove below comment, ones 'MongoEntityConverter' is gone.
-    // The below test should never fail, while we have the 'MongoEntityConverter', as it is the mocked value that is asserted.
     it('gets zero pieces from database when no pieces for given partId exist', async () => {
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: 'somePartId'})]
       const nonExistingId: string = 'nonExistingId'
