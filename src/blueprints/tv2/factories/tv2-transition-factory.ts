@@ -7,7 +7,7 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { AtemMeTimelineObject, AtemTransition, AtemType } from '../../timeline-state-resolver-types/atem-types'
 import { DeviceType } from '../../../model/enums/device-type'
-import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-meta-data'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 
 const FRAME_RATE: number = 25

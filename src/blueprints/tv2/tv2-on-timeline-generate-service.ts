@@ -7,7 +7,7 @@ import { TimelineObject, TimelineObjectGroup } from '../../model/entities/timeli
 import { Tv2PartEndState } from './value-objects/tv2-part-end-state'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
 import { UnsupportedOperation } from '../../model/exceptions/unsupported-operation'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from './value-objects/tv2-meta-data'
+import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from './value-objects/tv2-metadata'
 import { Tv2MediaPlayer, Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../model/entities/timeline'
 import { DeviceType } from '../../model/enums/device-type'

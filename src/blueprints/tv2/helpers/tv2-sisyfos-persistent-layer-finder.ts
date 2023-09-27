@@ -1,6 +1,6 @@
 import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
-import { Tv2PieceMetadata, Tv2SisyfosPersistenceMetadata } from '../value-objects/tv2-meta-data'
+import { Tv2PieceMetadata, Tv2SisyfosPersistenceMetadata } from '../value-objects/tv2-metadata'
 
 export class Tv2SisyfosPersistentLayerFinder {
   public findLayersToPersist(
