@@ -214,6 +214,7 @@ export class EntityMockFactory {
     when(mockedPiece.getPartId()).thenReturn(pieceInterface.partId ?? 'partId')
     when(mockedPiece.type).thenReturn(pieceInterface.type ?? PieceType.UNKNOWN)
     when(mockedPiece.layer).thenReturn(pieceInterface.layer ?? 'layer')
+    when(mockedPiece.isPlanned).thenReturn(pieceInterface.isPlanned ?? true)
     when(mockedPiece.getStart()).thenReturn(pieceInterface.start ?? 0)
     when(mockedPiece.duration).thenReturn(pieceInterface.duration ?? 0)
     when(mockedPiece.pieceLifespan).thenReturn(pieceInterface.pieceLifespan ?? PieceLifespan.WITHIN_PART)
