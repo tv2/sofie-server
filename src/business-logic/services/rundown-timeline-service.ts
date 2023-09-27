@@ -189,6 +189,7 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.insertPartAsNext(part)
     rundown.takeNext()
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
     await this.buildAndPersistTimeline(rundown)
 
