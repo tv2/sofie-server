@@ -1,4 +1,4 @@
-// The enum values in this file is taking from Blueprints and still has to match those values until we control ingest.
+// The enum values in this file is taken from Blueprints and still has to match those values until we control ingest.
 export enum Tv2SourceLayer {
   CAMERA = 'studio0_camera',
   JINGLE = 'studio0_jingle',
