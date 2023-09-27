@@ -57,7 +57,6 @@ export class Rundown extends BasicRundown {
     if (rundown.alreadyActiveProperties) {
       if (
         !rundown.isRundownActive ||
-          // TODO: Should it be possible to instantiate the Rundown without active Part and active Segment?
           !rundown.alreadyActiveProperties.activePart ||
           !rundown.alreadyActiveProperties.nextPart ||
           !rundown.alreadyActiveProperties.activeSegment ||

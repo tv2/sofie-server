@@ -263,10 +263,6 @@ describe('Rundown', () => {
       })
     })
 
-    describe('it does not have a next Part', () => {
-      // TODO: Write tests
-    })
-
     describe('next Part has no infinite Pieces', () => {
       it('does not add any infinite Pieces', () => {
         const partWithoutPieces: Part = EntityMockFactory.createPart()

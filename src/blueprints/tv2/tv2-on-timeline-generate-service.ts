@@ -87,7 +87,6 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     previousPart: Part | undefined,
     rundownPersistentState: Tv2RundownPersistentState
   ): SisyfosChannelsTimelineObject {
-    // TODO: Camera is not accepting persisted Audio?
     const previousPartEndState: Tv2PartEndState = previousPart?.getEndState() as Tv2PartEndState
     const layersWantingToPersistFromPreviousPart: string[] =
         previousPartEndState && !rundownPersistentState.isNewSegment

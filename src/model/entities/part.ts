@@ -57,7 +57,6 @@ export class Part {
   /*
    * The EndState of the Part
    * This should be set when the Part becomes the Previous Part.
-   * // TODO: Should we reset it when it becomes the active?
    */
   private endState?: PartEndState
 

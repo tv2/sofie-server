@@ -20,7 +20,6 @@ export class MongoRundownBaselineRepository extends BaseMongoRepository implemen
     return COLLECTION_NAME
   }
 
-  // TODO: Test this when receiving the setup for in-memory-mongo-database for test
   public async getRundownBaseline(rundownId: string): Promise<TimelineObject[]> {
     this.assertDatabaseConnection(this.getRundownBaseline.name)
     const rundownBaseline: TimelineObjectsString | null = (await this.getCollection().findOne<TimelineObjectsString>({
