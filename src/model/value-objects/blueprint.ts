@@ -40,7 +40,7 @@ export interface BlueprintGenerateActions {
    * A callback to do the actual mutating of the action.
    * A callback/predicate to help find which planned Piece the Action need data from.
    *
-   * Any Action not interested mutating its data at execution time can simply ignore this method.
+   * Any Action not interested in mutating its data at execution time can simply ignore this method.
    */
-  getMutateActionMethods(action: Action): MutateActionMethods | undefined
+  getMutateActionMethods?(action: Action): MutateActionMethods | undefined
 }

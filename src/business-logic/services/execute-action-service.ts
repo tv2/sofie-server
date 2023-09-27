@@ -32,14 +32,14 @@ export class ExecuteActionService implements ActionService {
   public async executeAction(actionId: string, rundownId: string): Promise<void> {
     const action: Action = await this.actionRepository.getAction(actionId)
     switch (action.type) {
-      case ActionType.INSERT_PART_AS_NEXT: {
-        const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
-        await this.insertPartAsNext(partAction, rundownId)
-        break
-      }
       case ActionType.INSERT_PART_AS_ON_AIR: {
         const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
         await this.insertPartAsOnAir(partAction, rundownId)
+        break
+      }
+      case ActionType.INSERT_PART_AS_NEXT: {
+        const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
+        await this.insertPartAsNext(partAction, rundownId)
         break
       }
       case ActionType.INSERT_PIECE_AS_ON_AIR: {
@@ -59,6 +59,9 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async mutateAction(action: Action, rundownId: string): Promise<Action> {
+    if (!this.blueprint.getMutateActionMethods) {
+      return action
+    }
     const mutateActionMethods: MutateActionMethods | undefined = this.blueprint.getMutateActionMethods(action)
     if (!mutateActionMethods) {
       return action
@@ -71,9 +74,9 @@ export class ExecuteActionService implements ActionService {
     return action
   }
 
-  private async insertPartAsNext(partAction: PartAction, rundownId: string): Promise<void> {
+  private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
     const part: Part = this.createPartFromAction(partAction)
-    await this.rundownService.insertPartAsNext(rundownId, part)
+    await this.rundownService.insertPartAsOnAir(rundownId, part)
   }
 
   private createPartFromAction(partAction: PartAction): Part {
@@ -86,9 +89,9 @@ export class ExecuteActionService implements ActionService {
     return new Part(partInterface)
   }
 
-  private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
+  private async insertPartAsNext(partAction: PartAction, rundownId: string): Promise<void> {
     const part: Part = this.createPartFromAction(partAction)
-    await this.rundownService.insertPartAsOnAir(rundownId, part)
+    await this.rundownService.insertPartAsNext(rundownId, part)
   }
 
   private async insertPieceAsOnAir(pieceAction: PieceAction, rundownId: string): Promise<void> {
