@@ -12,12 +12,12 @@ import { TestEntityFactory } from '../../../model/entities/test/test-entity-fact
 
 const COLLECTION_NAME = 'parts'
 
-describe(`${MongoPartRepository.name}`, () => {
+describe(MongoPartRepository.name, () => {
   const testDatabase: MongoTestDatabase = new MongoTestDatabase()
   beforeEach(async () => testDatabase.setupDatabase())
   afterEach(async () => testDatabase.teardownDatabase())
 
-  describe(`${MongoPartRepository.prototype.deletePartsForSegment.name}`, () => {
+  describe(MongoPartRepository.prototype.deletePartsForSegment.name, () => {
     it('deletes one part successfully', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const segmentId: string = 'someSegmentId'
@@ -125,7 +125,7 @@ describe(`${MongoPartRepository.name}`, () => {
     })
   })
 
-  describe(`${MongoPartRepository.prototype.savePart.name}`, () => {
+  describe(MongoPartRepository.prototype.savePart.name, () => {
     it('has part as not on air and saves the part as on air', async () => {
       const inactiveMongoPart: MongoPart = createMongoPart({ _id: 'randomId', isOnAir: false })
       const onAirPart: Part = EntityMockFactory.createPart({ id: inactiveMongoPart._id, isOnAir: true })
@@ -239,7 +239,7 @@ describe(`${MongoPartRepository.name}`, () => {
     })
   })
 
-  describe(`${MongoPartRepository.prototype.getParts.name}`, () => {
+  describe(MongoPartRepository.prototype.getParts.name, () => {
     it('gets zero parts from database when no parts for given segmentId exist', async () => {
       const mongoParts: MongoPart[] = [createMongoPart({segmentId: 'someSegmentId'})]
       const nonExistingId: string = 'nonExistingId'

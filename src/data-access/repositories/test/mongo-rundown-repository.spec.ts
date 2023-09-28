@@ -14,12 +14,12 @@ import { Segment } from '../../../model/entities/segment'
 import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
 
 const COLLECTION_NAME: string = 'rundowns'
-describe(`${MongoRundownRepository.name}`, () => {
+describe(MongoRundownRepository.name, () => {
   const testDatabase: MongoTestDatabase = new MongoTestDatabase()
   beforeEach(async () => testDatabase.setupDatabase())
   afterEach(async () => testDatabase.teardownDatabase())
 
-  describe(`${MongoRundownRepository.prototype.deleteRundown.name}`, () => {
+  describe(MongoRundownRepository.prototype.deleteRundown.name, () => {
     it('deletes active rundown successfully', async () => {
       const db: Db = testDatabase.getDatabase()
       const rundownId: string = 'someRundownId'
@@ -117,7 +117,7 @@ describe(`${MongoRundownRepository.name}`, () => {
     })
   })
 
-  describe(`${MongoRundownRepository.prototype.saveRundown.name}`, () => {
+  describe(MongoRundownRepository.prototype.saveRundown.name, () => {
     it('has rundown as not on air and saves the rundown as on air', async () => {
       const inactiveMongoRundown: MongoRundown = createMongoRundown({
         _id: 'rundownId',
@@ -183,7 +183,7 @@ describe(`${MongoRundownRepository.name}`, () => {
     })
   })
 
-  describe(`${MongoRundownRepository.prototype.getRundown.name}`, () => {
+  describe(MongoRundownRepository.prototype.getRundown.name, () => {
     it('throws exception, when nonexistent rundownId is given', async () => {
       const nonExistingId: string = 'nonExistingId'
       const mongoRundown: MongoRundown = createMongoRundown()
