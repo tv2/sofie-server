@@ -97,7 +97,7 @@ describe(`${MongoSegmentRepository.name}`, () => {
       const mongoSegment: MongoSegment = createMongoSegment({})
       await testDatabase.populateDatabaseWithSegments([mongoSegment])
 
-      const testee: SegmentRepository = createTestee({ })
+      const testee: SegmentRepository = createTestee()
       await testee.deleteSegmentsForRundown(nonExistingId)
 
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
@@ -138,7 +138,7 @@ describe(`${MongoSegmentRepository.name}`, () => {
       const nonExistingId: string = 'nonExistingId'
       await testDatabase.populateDatabaseWithSegments(mongoSegments)
 
-      const testee: SegmentRepository = createTestee({ })
+      const testee: SegmentRepository = createTestee()
 
       const result: Segment[] = await testee.getSegments(nonExistingId)
 
@@ -339,7 +339,7 @@ describe(`${MongoSegmentRepository.name}`, () => {
     partRepository?: PartRepository
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
-  }): MongoSegmentRepository {
+  } = {}): MongoSegmentRepository {
     if (!params.mongoDb) {
       params.mongoDb = mock(MongoDatabase)
       when(params.mongoDb.getCollection(COLLECTION_NAME)).thenReturn(

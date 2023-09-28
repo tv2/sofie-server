@@ -66,7 +66,7 @@ describe(`${MongoPieceRepository.name}`, () => {
       await testDatabase.populateDatabaseWithPieces([mongoPiece])
       const db: Db = testDatabase.getDatabase()
 
-      const testee: PieceRepository = createTestee({ })
+      const testee: PieceRepository = createTestee()
       await testee.deletePiecesForPart(nonExistingId)
 
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
@@ -79,7 +79,7 @@ describe(`${MongoPieceRepository.name}`, () => {
       const nonExistingId: string = 'nonExistingId'
       await testDatabase.populateDatabaseWithPieces(mongoPieces)
 
-      const testee: PieceRepository = createTestee({ })
+      const testee: PieceRepository = createTestee()
 
       const result: Piece[] = await testee.getPieces(nonExistingId)
 
@@ -137,7 +137,7 @@ describe(`${MongoPieceRepository.name}`, () => {
   function createTestee(params: {
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
-  }): MongoPieceRepository {
+  } = {}): MongoPieceRepository {
     const mongoDb: MongoDatabase = params.mongoDb ?? mock(MongoDatabase)
 
     when(mongoDb.getCollection(COLLECTION_NAME)).thenReturn(testDatabase.getDatabase().collection(COLLECTION_NAME))
