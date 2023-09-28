@@ -14,8 +14,6 @@ export interface PartEvent extends RundownEvent {
 
 export interface RundownActivatedEvent extends RundownEvent {
   type: RundownEventType.ACTIVATED
-  segmentId: string
-  partId: string
 }
 
 export interface RundownDeactivatedEvent extends RundownEvent {
