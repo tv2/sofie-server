@@ -23,7 +23,7 @@ export class ExecuteActionService implements ActionService {
 
   public async getActions(): Promise<Action[]> {
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    // TODO: These should be generated on ingest. Move them once we control ingest.
+    // TODO: The Actions should be generated on ingest. Move them once we control ingest.
     const actions: Action[] = this.blueprint.generateActions(configuration)
     await this.actionRepository.saveActions(actions)
     return actions
@@ -68,10 +68,10 @@ export class ExecuteActionService implements ActionService {
     }
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const plannedPiece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.plannedPiecePredicate)
-    if (plannedPiece) {
-      action = mutateActionMethods.updateActionWithPlannedPieceData(action, plannedPiece)
+    if (!plannedPiece) {
+      return action
     }
-    return action
+    return mutateActionMethods.updateActionWithPlannedPieceData(action, plannedPiece)
   }
 
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
@@ -83,10 +83,14 @@ export class ExecuteActionService implements ActionService {
     const pieces: Piece[] = partAction.data.pieceInterfaces.map(pieceInterface => new Piece(pieceInterface))
 
     const partInterface: PartInterface = partAction.data.partInterface
-    partInterface.id = `${partInterface.id}_${Date.now()}`
+    partInterface.id = this.makeUnique(partInterface.id)
     partInterface.pieces = pieces
 
     return new Part(partInterface)
+  }
+
+  private makeUnique(value: string): string {
+    return `${value}_${Date.now()}`
   }
 
   private async insertPartAsNext(partAction: PartAction, rundownId: string): Promise<void> {
@@ -101,7 +105,7 @@ export class ExecuteActionService implements ActionService {
 
   private createPieceFromAction(pieceAction: PieceAction): Piece {
     const pieceInterface: PieceInterface = pieceAction.data
-    pieceInterface.id = `${pieceInterface.id}_${Date.now()}`
+    pieceInterface.id = this.makeUnique(pieceInterface.id)
     return new Piece(pieceInterface)
   }
 

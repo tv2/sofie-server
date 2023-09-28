@@ -10,7 +10,7 @@ import { Blueprint } from '../../../model/value-objects/blueprint'
 import { anyOfClass, anyString, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 
-describe(`${ExecuteActionService.name}`, () => {
+describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
     describe('it receives an InsertPartAsOnAirAction', () => {
       it('calls RundownService.insertPartAsOnAir', async () => {

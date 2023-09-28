@@ -44,8 +44,8 @@ export class RundownTimelineService implements RundownService {
 
     this.sendEvents(rundown, [
       this.rundownEventBuilder.buildActivateEvent,
-      this.rundownEventBuilder.buildSetNextEvent]
-    )
+      this.rundownEventBuilder.buildSetNextEvent
+    ])
 
     await this.rundownRepository.saveRundown(rundown)
   }

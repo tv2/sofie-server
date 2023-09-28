@@ -1,7 +1,7 @@
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { Piece, PieceInterface } from '../piece'
 
-describe(`${Piece.name}`, () => {
+describe(Piece.name, () => {
   describe(`${Piece.prototype.setExecutedAt.name}`, () => {
     describe('piece is not an infinite Piece', () => {
       it('does not set executedAt', () => {

@@ -3,7 +3,7 @@ import { EntityMockFactory } from './entity-mock-factory'
 import { PartTimings } from '../../value-objects/part-timings'
 import { Piece, PieceInterface } from '../piece'
 
-describe(`${Part.name}`, () => {
+describe(Part.name, () => {
   describe(`${Part.prototype.getTimings.name}`, () => {
     it('has not had its timings calculated yet - throws error', () => {
       const testee: Part = new Part({} as PartInterface)
