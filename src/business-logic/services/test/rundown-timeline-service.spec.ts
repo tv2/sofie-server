@@ -14,7 +14,7 @@ import { RundownDeletedEvent } from '../../../model/value-objects/rundown-event'
 import { Blueprint } from '../../../model/value-objects/blueprint'
 import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
 
-describe(`${RundownTimelineService.name}`, () => {
+describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
     it('deletes a rundown, when it receives a valid RundownId', async () => {
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()

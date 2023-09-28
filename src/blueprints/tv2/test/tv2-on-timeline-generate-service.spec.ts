@@ -14,7 +14,7 @@ import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../value-
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 
-describe(`${Tv2OnTimelineGenerateService.name}`, () => {
+describe(Tv2OnTimelineGenerateService.name, () => {
   describe(`${Tv2OnTimelineGenerateService.prototype.onTimelineGenerate.name}`, () => {
     describe('the active Part is from the same Segment as the previous Part', () => {
       it('sets isNewSegment to false', () => {
