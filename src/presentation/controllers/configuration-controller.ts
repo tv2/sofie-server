@@ -15,7 +15,7 @@ export class ConfigurationController extends BaseController {
   }
 
   @GetRequest()
-  public async getConfigurations(_reg: Request, res: Response): Promise<void> {
+  public async getConfigurations(_req: Request, res: Response): Promise<void> {
     try {
       const configuration: Configuration = await this.configurationRepository.getConfiguration()
       res.send({
