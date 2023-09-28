@@ -12,12 +12,12 @@ import { TestEntityFactory } from '../../../model/entities/test/test-entity-fact
 
 const COLLECTION_NAME: string = 'segments'
 
-describe(`${MongoSegmentRepository.name}`, () => {
+describe(MongoSegmentRepository.name, () => {
   const testDatabase: MongoTestDatabase = new MongoTestDatabase()
   beforeEach(async () => testDatabase.setupDatabase())
   afterEach(async () => testDatabase.teardownDatabase())
 
-  describe(`${MongoSegmentRepository.prototype.deleteSegmentsForRundown.name}`, () => {
+  describe(MongoSegmentRepository.prototype.deleteSegmentsForRundown.name, () => {
     it('deletes one segment successfully', async () => {
       const db: Db = testDatabase.getDatabase()
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
@@ -132,7 +132,7 @@ describe(`${MongoSegmentRepository.name}`, () => {
     })
   })
 
-  describe(`${MongoSegmentRepository.prototype.getSegments.name}`, () => {
+  describe(MongoSegmentRepository.prototype.getSegments.name, () => {
     it('gets zero segments from database when no segments for given rundownId exist', async () => {
       const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: 'someRundownId'})]
       const nonExistingId: string = 'nonExistingId'
@@ -186,7 +186,7 @@ describe(`${MongoSegmentRepository.name}`, () => {
 
   })
 
-  describe(`${MongoSegmentRepository.prototype.saveSegment.name}`, () => {
+  describe(MongoSegmentRepository.prototype.saveSegment.name, () => {
     it('has segment as not on air and saves the segment as on air', async () => {
       const inactiveMongoSegment: MongoSegment = createMongoSegment({ _id: 'randomId', isOnAir: false })
       const onAirSegment: Segment = EntityMockFactory.createSegment({

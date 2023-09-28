@@ -11,12 +11,12 @@ import { TestEntityFactory } from '../../../model/entities/test/test-entity-fact
 
 const COLLECTION_NAME = 'pieces'
 
-describe(`${MongoPieceRepository.name}`, () => {
+describe(MongoPieceRepository.name, () => {
   const testDatabase: MongoTestDatabase = new MongoTestDatabase()
   beforeEach(async () => testDatabase.setupDatabase())
   afterEach(async () => testDatabase.teardownDatabase())
 
-  describe(`${MongoPieceRepository.prototype.deletePiecesForPart.name}`, () => {
+  describe(MongoPieceRepository.prototype.deletePiecesForPart.name, () => {
     it('deletes one pieces successfully', async () => {
       const db: Db = testDatabase.getDatabase()
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
@@ -73,7 +73,7 @@ describe(`${MongoPieceRepository.name}`, () => {
     })
   })
 
-  describe(`${MongoPieceRepository.prototype.getPieces.name}`, () => {
+  describe(MongoPieceRepository.prototype.getPieces.name, () => {
     it('gets zero pieces from database when no pieces for given partId exist', async () => {
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: 'somePartId'})]
       const nonExistingId: string = 'nonExistingId'
