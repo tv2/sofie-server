@@ -5,10 +5,16 @@ import { ExpressErrorHandler } from '../express-error-handler'
 import { AdLibPieceController } from '../controllers/ad-lib-piece-controller'
 import { BaseController } from '../controllers/base-controller'
 import { TimelineController } from '../controllers/timeline-controller'
+import { ConfigurationController } from '../controllers/configuration-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
-    return [this.createRundownController(), this.createAdLibPieceController(), this.createTimelineController()]
+    return [
+      this.createRundownController(),
+      this.createAdLibPieceController(),
+      this.createTimelineController(),
+      this.createConfigurationController()
+    ]
   }
 
   private static createRundownController(): RundownController {
@@ -29,5 +35,9 @@ export class ControllerFacade {
 
   private static createTimelineController(): TimelineController {
     return new TimelineController(RepositoryFacade.createTimelineRepository(), new ExpressErrorHandler())
+  }
+
+  private static createConfigurationController(): ConfigurationController {
+    return new ConfigurationController(RepositoryFacade.createConfigurationRepository(), new ExpressErrorHandler())
   }
 }
