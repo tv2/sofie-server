@@ -27,7 +27,7 @@ describe(`${MongoRundownRepository.name}`, () => {
         _id: rundownId,
       })
       await testDatabase.populateDatabaseWithActiveRundowns([mongoRundown])
-      const testee: RundownRepository = createTestee({})
+      const testee: RundownRepository = createTestee()
 
       await expect(db.collection(COLLECTION_NAME).findOne({ _id: rundownId })).resolves.not.toBeNull()
       await testee.deleteRundown(rundownId)
@@ -41,7 +41,7 @@ describe(`${MongoRundownRepository.name}`, () => {
         _id: rundownId,
       })
       await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
-      const testee: MongoRundownRepository = createTestee({})
+      const testee: MongoRundownRepository = createTestee()
 
       await expect(db.collection(COLLECTION_NAME).findOne({ _id: rundownId })).resolves.not.toBeNull()
       await testee.deleteRundown(rundownId)
@@ -71,7 +71,7 @@ describe(`${MongoRundownRepository.name}`, () => {
       await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
       const db: Db = testDatabase.getDatabase()
 
-      const testee: MongoRundownRepository = createTestee({})
+      const testee: MongoRundownRepository = createTestee()
 
       await expect(testee.deleteRundown(nonExistingId)).rejects.toThrow(NotFoundException)
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
@@ -85,7 +85,7 @@ describe(`${MongoRundownRepository.name}`, () => {
       await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
       const db: Db = testDatabase.getDatabase()
 
-      const testee: MongoRundownRepository = createTestee({})
+      const testee: MongoRundownRepository = createTestee()
 
       await expect(testee.deleteRundown(nonExistingId)).rejects.toThrow(NotFoundException)
       await expect(db.collection(COLLECTION_NAME).findOne({ name: rundownName })).resolves.not.toBeNull()
@@ -189,7 +189,7 @@ describe(`${MongoRundownRepository.name}`, () => {
       const mongoRundown: MongoRundown = createMongoRundown()
       await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
 
-      const testee: MongoRundownRepository = createTestee({})
+      const testee: MongoRundownRepository = createTestee()
 
       await expect(testee.getRundown(nonExistingId)).rejects.toThrow(NotFoundException)
     })
@@ -264,7 +264,7 @@ describe(`${MongoRundownRepository.name}`, () => {
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
     baselineRepository?: RundownBaselineRepository
-  }): MongoRundownRepository {
+  } = {}): MongoRundownRepository {
     const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
 
     if (!params.mongoDb) {

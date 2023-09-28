@@ -92,7 +92,7 @@ describe(`${MongoPartRepository.name}`, () => {
       await testDatabase.populateDatabaseWithParts([mongoPart])
       const db = testDatabase.getDatabase()
 
-      const testee = createTestee({ })
+      const testee = createTestee()
       await testee.deletePartsForSegment(nonExistingId)
 
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
@@ -245,7 +245,7 @@ describe(`${MongoPartRepository.name}`, () => {
       const nonExistingId: string = 'nonExistingId'
       await testDatabase.populateDatabaseWithParts(mongoParts)
 
-      const testee: PartRepository = createTestee({ })
+      const testee: PartRepository = createTestee()
 
       const result: Part[] = await testee.getParts(nonExistingId)
 
@@ -318,7 +318,7 @@ describe(`${MongoPartRepository.name}`, () => {
     pieceRepository?: PieceRepository
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
-  }): MongoPartRepository {
+  } = {}): MongoPartRepository {
     const pieceRepository: PieceRepository = params.pieceRepository ?? mock<PieceRepository>()
 
     if (!params.mongoDb) {
