@@ -50,7 +50,20 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private async buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
+  private buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
+    return rundown.isActivePartSet()
+      ? this.buildAndPersistTimelineWithBlueprint(rundown)
+      : this.buildAndPersistTimelineWithoutBlueprint(rundown)
+  }
+
+  private async buildAndPersistTimelineWithoutBlueprint(rundown: Rundown): Promise<Timeline> {
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
+    this.timelineRepository.saveTimeline(timeline)
+    return timeline
+  }
+
+  private async buildAndPersistTimelineWithBlueprint(rundown: Rundown): Promise<Timeline> {
     const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
     rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
     this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)

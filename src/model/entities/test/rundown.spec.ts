@@ -1,4 +1,4 @@
-import { Segment } from '../segment'
+import { Segment, SegmentInterface } from '../segment'
 import { Rundown, RundownInterface } from '../rundown'
 import { Part } from '../part'
 import { Piece } from '../piece'
@@ -9,8 +9,9 @@ import { NotActivatedException } from '../../exceptions/not-activated-exception'
 import { NotFoundException } from '../../exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
 import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
+import { AlreadyActivatedException } from '../../exceptions/already-activated-exception'
 
-describe('Rundown', () => {
+describe(`${Rundown.name}`, () => {
   describe('instantiate already active Rundown', () => {
     describe('"alreadyActiveProperties" is provided', () => {
       describe('active status is provided as false', () => {
@@ -191,7 +192,7 @@ describe('Rundown', () => {
     })
   })
 
-  describe('takeNext', () => {
+  describe(`${Rundown.prototype.takeNext.name}`, () => {
     describe('it has a next Part', () => {
       it('sets the next Part as the active Part', () => {
         const firstPart: Part = EntityMockFactory.createPart({
@@ -2030,7 +2031,7 @@ describe('Rundown', () => {
     })
   })
 
-  describe('getPartAfter', () => {
+  describe(`${Rundown.prototype.getPartAfter.name}`, () => {
     describe('rundown is not active', () => {
       it('throws NotActivatedException', () => {
         const testee: Rundown = new Rundown({ isRundownActive: false } as RundownInterface)
@@ -2129,7 +2130,61 @@ describe('Rundown', () => {
     })
   })
 
-  describe('activate', () => {
+  describe(`${Rundown.prototype.activate.name}`, () => {
+    describe('Rundown is already active', () => {
+      it('throws AlreadyActivatedException', () => {
+        const testee: Rundown = new Rundown({ isRundownActive: true } as RundownInterface)
+        expect(() => testee.activate()).toThrow(AlreadyActivatedException)
+      })
+    })
+
+    it('sets the Rundown to be active', () => {
+      const segment: Segment = EntityMockFactory.createSegment()
+      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
+
+      expect(testee.isActive()).toBeFalsy()
+      testee.activate()
+      expect(testee.isActive()).toBeTruthy()
+    })
+
+    it('sets the next Segment to be the first Segment of the Rundown', () => {
+      const firstSegment: Segment = EntityMockFactory.createSegment({ id: 'first', rank: 1 })
+      const middleSegment: Segment = EntityMockFactory.createSegment({ id: 'middle', rank: 2 })
+      const lastSegment: Segment = EntityMockFactory.createSegment({ id: 'last', rank: 3 })
+
+      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [firstSegment, middleSegment, lastSegment] } as RundownInterface)
+      testee.activate()
+      expect(testee.getNextSegment()).toEqual(firstSegment)
+    })
+
+    it('sets the next Part to be the first Part of the first Segment', () => {
+      const firstPart: Part = EntityMockFactory.createPart({ id: 'first' })
+      const lastPart: Part = EntityMockFactory.createPart({ id: 'last' })
+      const segment: Segment = new Segment({ parts: [firstPart, lastPart] } as SegmentInterface)
+
+      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
+      testee.activate()
+      expect(testee.getNextPart()).toEqual(firstPart)
+    })
+
+    it('does not set active Part', () => {
+      const part: Part = EntityMockFactory.createPart()
+      const segment: Segment = new Segment({ parts: [part] } as SegmentInterface)
+      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
+
+      testee.activate()
+
+      expect(() => testee.getActivePart()).toThrow()
+    })
+
+    it('does not set active Segment', () => {
+      const segment: Segment = new Segment({} as SegmentInterface)
+      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
+
+      testee.activate()
+
+      expect(() => testee.getActiveSegment()).toThrow()
+    })
 
     it('resets all segments', () => {
       const mockedSegment1: Segment = EntityMockFactory.createSegmentMock()

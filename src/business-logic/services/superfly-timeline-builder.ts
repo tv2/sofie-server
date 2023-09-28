@@ -52,7 +52,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   public buildTimeline(rundown: Rundown, studio: Studio): Timeline {
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)
 
-    // TODO: Support that there might not be an active Part.
+    if (!rundown.isActivePartSet()) {
+      return this.createTimelineWithLookaheadGroup(rundown, studio, undefined, timeline)
+    }
+
     const activePartTimelineGroup: ActivePartTimelineObjectGroup = this.createActivePartGroup(rundown)
     timeline.timelineGroups.push(activePartTimelineGroup)
 
@@ -295,7 +298,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   private createTimelineWithLookaheadGroup(
     rundown: Rundown,
     studio: Studio,
-    activeGroup: TimelineObjectGroup,
+    activeGroup: TimelineObjectGroup | undefined,
     timeline: Timeline
   ): Timeline {
     const lookaheadLayers: StudioLayer[] = studio.layers.filter(
@@ -320,7 +323,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return timeline
   }
 
-  private findLookaheadTimelineObjectsForLayers(lookaheadLayers: StudioLayer[], rundown: Rundown, activeGroup: TimelineObjectGroup): TimelineObject[] {
+  private findLookaheadTimelineObjectsForLayers(lookaheadLayers: StudioLayer[], rundown: Rundown, activeGroup: TimelineObjectGroup | undefined): TimelineObject[] {
     return lookaheadLayers.flatMap((layer) => {
       const lookaheadObjects: LookaheadTimelineObject[] = this.findLookaheadTimelineObjectsForFutureParts(
         rundown,
@@ -339,10 +342,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   private findLookaheadTimelineObjectsForFutureParts(
     rundown: Rundown,
     layer: StudioLayer,
-    activeGroup: TimelineObjectGroup
+    activeGroup: TimelineObjectGroup | undefined
   ): LookaheadTimelineObject[] {
     const lookAheadEnable: TimelineEnable = {
-      while: `#${activeGroup.id}`,
+      while: activeGroup ? `#${activeGroup.id}` : '1',
     }
     const lookAheadObjects: LookaheadTimelineObject[] = []
     let partToGetLookAheadObjectsFrom: Part = rundown.getNextPart()
@@ -390,8 +393,11 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   private findLookaheadTimelineObjectsForActivePart(
     rundown: Rundown,
     layer: StudioLayer,
-    activeGroup: TimelineObjectGroup
+    activeGroup: TimelineObjectGroup | undefined
   ): LookaheadTimelineObject[] {
+    if (!rundown.isActivePartSet() || !activeGroup) {
+      return []
+    }
     const activePartTimelineObjectEnable: TimelineEnable = {
       start: 0,
       end: `#${activeGroup.id}.start`,
