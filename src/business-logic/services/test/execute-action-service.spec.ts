@@ -1,6 +1,6 @@
 import { ExecuteActionService } from '../execute-action-service'
 import { Action, PartAction, PieceAction } from '../../../model/entities/action'
-import { ActionType } from '../../../model/enums/action-type'
+import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { Part, PartInterface } from '../../../model/entities/part'
 import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
 import { ActionRepository } from '../../../data-access/repositories/interfaces/action-repository'
@@ -10,11 +10,11 @@ import { Blueprint } from '../../../model/value-objects/blueprint'
 import { anyOfClass, anyString, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 
-describe(`${ExecuteActionService.name}`, () => {
+describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
     describe('it receives an InsertPartAsOnAirAction', () => {
       it('calls RundownService.insertPartAsOnAir', async () => {
-        const action: PartAction = createPartAction(ActionType.INSERT_PART_AS_ON_AIR)
+        const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
@@ -24,7 +24,7 @@ describe(`${ExecuteActionService.name}`, () => {
       })
 
       it('updates Part id to be unique', async () => {
-        const action: PartAction = createPartAction(ActionType.INSERT_PART_AS_ON_AIR)
+        const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
         const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, {action})
@@ -41,7 +41,7 @@ describe(`${ExecuteActionService.name}`, () => {
 
     describe('it receives an InsertPartAsNextAction', () => {
       it('calls RundownService.insertPartAsNext', async () => {
-        const action: PartAction = createPartAction(ActionType.INSERT_PART_AS_NEXT)
+        const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_NEXT)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
@@ -51,7 +51,7 @@ describe(`${ExecuteActionService.name}`, () => {
       })
 
       it('updates Part id to be unique', async () => {
-        const action: PartAction = createPartAction(ActionType.INSERT_PART_AS_NEXT)
+        const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_NEXT)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
@@ -68,7 +68,7 @@ describe(`${ExecuteActionService.name}`, () => {
 
     describe('it receives an InsertPieceAsOnAirAction', () => {
       it('calls RundownService.insertPieceAsOnAir', async () => {
-        const action: PieceAction = createPieceAction(ActionType.INSERT_PIECE_AS_ON_AIR)
+        const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
@@ -78,7 +78,7 @@ describe(`${ExecuteActionService.name}`, () => {
       })
 
       it('updates Piece id to be unique', async () => {
-        const action: PieceAction = createPieceAction(ActionType.INSERT_PIECE_AS_ON_AIR)
+        const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
@@ -95,7 +95,7 @@ describe(`${ExecuteActionService.name}`, () => {
 
     describe('it receives an InsertPieceAsNextAction', () => {
       it('calls RundownService.insertPieceAsNext', async () => {
-        const action: PieceAction = createPieceAction(ActionType.INSERT_PIECE_AS_NEXT)
+        const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_NEXT)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
@@ -105,7 +105,7 @@ describe(`${ExecuteActionService.name}`, () => {
       })
 
       it('updates Piece id to be unique', async () => {
-        const action: PieceAction = createPieceAction(ActionType.INSERT_PIECE_AS_NEXT)
+        const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_NEXT)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
@@ -122,7 +122,7 @@ describe(`${ExecuteActionService.name}`, () => {
   })
 })
 
-function createPartAction(actionType: ActionType.INSERT_PART_AS_ON_AIR | ActionType.INSERT_PART_AS_NEXT): PartAction {
+function createPartAction(actionType: PartActionType): PartAction {
   return {
     id: 'actionId',
     name: 'someAction',
@@ -136,7 +136,7 @@ function createPartAction(actionType: ActionType.INSERT_PART_AS_ON_AIR | ActionT
   }
 }
 
-function createPieceAction(actionType: ActionType.INSERT_PIECE_AS_ON_AIR | ActionType.INSERT_PIECE_AS_NEXT): PieceAction {
+function createPieceAction(actionType: PieceActionType): PieceAction {
   return {
     id: 'actionId',
     name: 'someAction',
