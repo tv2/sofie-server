@@ -1,6 +1,6 @@
 import { PieceInterface } from '../../../model/entities/piece'
 import { PartInterface } from '../../../model/entities/part'
-import { ActionType } from '../../../model/enums/action-type'
+import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { TimelineObject } from '../../../model/entities/timeline-object'
@@ -32,7 +32,7 @@ export class Tv2CameraActionFactory {
     return {
       id: `cameraAsNextAction_${cameraSource._id}`,
       name: `Insert Camera ${cameraSource.SourceName}`,
-      type: ActionType.INSERT_PART_AS_NEXT,
+      type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
@@ -191,7 +191,7 @@ export class Tv2CameraActionFactory {
     return {
       id: `cameraAsOnAirAction_${cameraSource._id}`,
       name: `Insert and Take Camera ${cameraSource.SourceName}`,
-      type: ActionType.INSERT_PART_AS_ON_AIR,
+      type: PartActionType.INSERT_PART_AS_ON_AIR,
       data: {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
