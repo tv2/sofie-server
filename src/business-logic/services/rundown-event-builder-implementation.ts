@@ -29,9 +29,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
     return {
       type: RundownEventType.ACTIVATED,
       timestamp: Date.now(),
-      rundownId: rundown.id,
-      segmentId: rundown.getActiveSegment().id,
-      partId: rundown.getActivePart().id,
+      rundownId: rundown.id
     }
   }
 

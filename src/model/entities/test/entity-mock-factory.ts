@@ -66,6 +66,7 @@ export class EntityMockFactory {
     when(mockedRundown.getActiveSegment()).thenReturn(activeRundownProperties.activeSegment ?? this.createSegment())
     when(mockedRundown.getNextSegment()).thenReturn(activeRundownProperties.nextSegment ?? this.createSegment())
     when(mockedRundown.getInfinitePieces()).thenReturn(activeRundownProperties.infinitePieces ?? [])
+    when(mockedRundown.isActivePartSet()).thenReturn(true)
 
     return mockedRundown
   }
