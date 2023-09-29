@@ -16,7 +16,7 @@ const FRAMES_FOR_MIX_TRANSITION: number = 25 // TODO: Get from configuration.
 
 const MIX_TRANSITION_ID: string = 'nextTakeHasMixTransitionAction'
 
-export class Tv2TransitionFactory {
+export class Tv2TransitionActionFactory {
 
   public isTransitionAction(action: Action): boolean {
     return [MIX_TRANSITION_ID].includes(action.id)
