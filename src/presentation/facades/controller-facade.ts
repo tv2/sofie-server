@@ -38,6 +38,10 @@ export class ControllerFacade {
   }
 
   private static createConfigurationController(): ConfigurationController {
-    return new ConfigurationController(RepositoryFacade.createConfigurationRepository(), new ExpressErrorHandler())
+    return new ConfigurationController(
+      RepositoryFacade.createConfigurationRepository(),
+      RepositoryFacade.createShowStyleVariantRepository(),
+      new ExpressErrorHandler()
+    )
   }
 }

@@ -4,11 +4,14 @@ import { Request, Response } from 'express'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Exception } from '../../model/exceptions/exception'
 import { Configuration } from '../../model/entities/configuration'
+import { ShowStyleVariantRepository } from '../../data-access/repositories/interfaces/show-style-variant-repository'
+import { ShowStyleVariant } from '../../model/entities/show-style-variant'
 
 @RestController('/configurations')
 export class ConfigurationController extends BaseController {
   constructor(
     private readonly configurationRepository: ConfigurationRepository,
+    private readonly showStyleVariantRepository: ShowStyleVariantRepository,
     private readonly httpErrorHandler: HttpErrorHandler
   ) {
     super()
@@ -26,4 +29,16 @@ export class ConfigurationController extends BaseController {
       this.httpErrorHandler.handleError(res, error as Exception)
     }
   }
+
+  @GetRequest('/:rundownId')
+  public async getShowStyleVariant(req: Request, res: Response): Promise<void> {
+    try {
+      const rundownId: string = req.params.rundownId
+      const showStyleVariant: ShowStyleVariant = await this.showStyleVariantRepository.getShowStyleVariant(rundownId)
+      res.send(showStyleVariant)
+    } catch (error) {
+      this.httpErrorHandler.handleError(res, error as Exception)
+    }
+  }
+
 }
