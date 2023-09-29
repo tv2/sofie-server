@@ -1,3 +1,5 @@
+export type EventType = RundownEventType | IngestEventType
+
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
   DEACTIVATED = 'DEACTIVATED',
@@ -10,4 +12,9 @@ export enum RundownEventType {
   PIECE_INSERTED = 'PIECE_INSERTED',
   AD_LIB_PIECE_INSERTED = 'AD_LIB_PIECE_INSERTED',
   INFINITE_PIECE_ADDED = 'INFINITE_PIECE_ADDED'
+}
+
+export enum IngestEventType {
+  SEGMENT_CREATED = 'SEGMENT_CREATED',
+  SEGMENT_DELETED = 'SEGMENT_DELETED'
 }

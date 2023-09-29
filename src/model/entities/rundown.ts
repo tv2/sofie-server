@@ -259,6 +259,8 @@ export class Rundown extends BasicRundown {
     this.takeNextSegment()
     this.setNextFromActive()
     this.updateInfinitePieces()
+
+    // TODO: If we changed Segments and if the Segment we came from is removed by ingest, we should remove it from the Rundown
   }
 
   private setPreviousPart(): void {
@@ -425,7 +427,25 @@ export class Rundown extends BasicRundown {
   }
 
   public setSegments(segments: Segment[]): void {
-    this.segments = segments.sort((segmentOne: Segment, segmentTwo: Segment) => segmentOne.rank - segmentTwo.rank)
+    this.segments = segments.sort(this.compareSegments)
+  }
+
+  private compareSegments(segmentOne: Segment, segmentTwo: Segment): number {
+    return segmentOne.rank - segmentTwo.rank
+  }
+
+  public addSegment(segment: Segment): void {
+    this.segments.push(segment)
+    this.segments.sort(this.compareSegments)
+  }
+
+  public removeSegment(segmentId: string): void {
+    const segmentIndex: number = this.segments.findIndex(s => s.id === segmentId)
+    if (segmentIndex < 0) {
+      return
+    }
+    // TODO: Account for the Segment being on Air
+    this.segments.splice(segmentIndex, 1)
   }
 
   public getSegments(): Segment[] {

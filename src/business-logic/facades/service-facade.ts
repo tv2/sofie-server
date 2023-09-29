@@ -11,6 +11,8 @@ import { JsonObjectCloner } from '../services/json-object-cloner'
 import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
+import { IngestService } from '../services/interfaces/ingest-service'
+import { DatabaseChangeIngestService } from '../services/database-change-ingest-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -41,6 +43,16 @@ export class ServiceFacade {
       this.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       BlueprintsFacade.createBlueprint()
+    )
+  }
+
+  public static createIngestService(): IngestService {
+    return new DatabaseChangeIngestService(
+      RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createSegmentRepository(),
+      RundownEventService.getInstance(),
+      ServiceFacade.createRundownEventBuilder(),
+      RepositoryFacade.createSegmentChangedListener()
     )
   }
 }
