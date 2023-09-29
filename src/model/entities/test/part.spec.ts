@@ -1,10 +1,10 @@
 import { Part, PartInterface } from '../part'
 import { EntityMockFactory } from './entity-mock-factory'
 import { PartTimings } from '../../value-objects/part-timings'
-import { Piece } from '../piece'
+import { Piece, PieceInterface } from '../piece'
 
-describe('Part', () => {
-  describe('getTimings', () => {
+describe(Part.name, () => {
+  describe(`${Part.prototype.getTimings.name}`, () => {
     it('has not had its timings calculated yet - throws error', () => {
       const testee: Part = new Part({} as PartInterface)
       expect(() => testee.getTimings()).toThrow()
@@ -18,7 +18,7 @@ describe('Part', () => {
     })
   })
 
-  describe('putOnAir', () => {
+  describe(`${Part.prototype.putOnAir.name}`, () => {
     afterEach(() => jest.useRealTimers())
 
     it('sets part to be on air', () => {
@@ -43,7 +43,7 @@ describe('Part', () => {
     })
   })
 
-  describe('takeOffAir', () => {
+  describe(`${Part.prototype.takeOffAir.name}`, () => {
     afterEach(() => jest.useRealTimers())
 
     it('sets part to be off air', () => {
@@ -69,7 +69,7 @@ describe('Part', () => {
     })
   })
 
-  describe('reset', () => {
+  describe(`${Part.prototype.reset.name}`, () => {
     it('has an executedAt value of 0 after being reset', () => {
       const testee: Part = new Part({ executedAt: 123456789 } as PartInterface)
 
@@ -87,9 +87,95 @@ describe('Part', () => {
       const result: number = testee.getPlayedDuration()
       expect(result).toBe(0)
     })
+
+    it('removes all unplanned Pieces from its Pieces array', () => {
+      const plannedPieceOne: Piece = EntityMockFactory.createPiece({ id: 'plannedOne', isPlanned: true })
+      const plannedPieceTwo: Piece = EntityMockFactory.createPiece({ id: 'plannedTwo', isPlanned: true })
+      const unPlannedPieceOne: Piece = EntityMockFactory.createPiece({ id: 'unPlannedOne', isPlanned: false })
+      const unPlannedPieceTwo: Piece = EntityMockFactory.createPiece({ id: 'unPlannedTwo', isPlanned: false })
+
+      const testee: Part = new Part({ pieces: [
+        plannedPieceOne, plannedPieceTwo, unPlannedPieceOne, unPlannedPieceTwo
+      ] } as PartInterface)
+
+      expect(testee.getPieces()).toContain(unPlannedPieceOne)
+      expect(testee.getPieces()).toContain(unPlannedPieceTwo)
+
+      testee.reset()
+
+      expect(testee.getPieces()).toContain(plannedPieceOne)
+      expect(testee.getPieces()).toContain(plannedPieceTwo)
+      expect(testee.getPieces()).not.toContain(unPlannedPieceOne)
+      expect(testee.getPieces()).not.toContain(unPlannedPieceTwo)
+    })
   })
 
-  describe('calculateTimings', () => {
+  describe(`${Part.prototype.setSegmentId.name}`, () => {
+    describe('Part is planned', () => {
+      it('throws an error', () => {
+        const testee: Part = new Part({ isPlanned: true } as PartInterface)
+        expect(() => testee.setSegmentId('someSegmentId')).toThrow()
+      })
+    })
+
+    describe('Part is unplanned', () => {
+      it('updates the Segment id', () => {
+        const segmentId: string = 'segmentId'
+        const testee: Part = new Part({ segmentId: '', isPlanned: false } as PartInterface)
+
+        expect(testee.getSegmentId()).not.toBe(segmentId)
+        testee.setSegmentId(segmentId)
+        expect(testee.getSegmentId()).toBe(segmentId)
+      })
+    })
+  })
+
+  describe(`${Part.prototype.insertPiece.name}`, () => {
+    describe('Piece is a planned Piece', () => {
+      it('throws an error', () => {
+        const plannedPiece: Piece = EntityMockFactory.createPiece({ isPlanned: true })
+        const testee: Part = new Part({ } as PartInterface)
+
+        expect(() => testee.insertPiece(plannedPiece)).toThrow()
+      })
+    })
+
+    describe('Piece is an unplanned Piece', () => {
+      it('updates the Part id of the Piece to the id of the Part', () => {
+        const unplannedPiece: Piece = new Piece({ partId: '', isPlanned: false } as PieceInterface)
+        const testee: Part = new Part({ id: 'partId' } as PartInterface)
+
+        testee.insertPiece(unplannedPiece)
+        expect(unplannedPiece.getPartId()).toBe(testee.id)
+      })
+
+      it('adds the Piece to the array of Pieces for the Part', () => {
+        const unplannedPiece: Piece = new Piece({ partId: '', isPlanned: false } as PieceInterface)
+        const testee: Part = new Part({ id: 'partId' } as PartInterface)
+
+        expect(testee.getPieces()).not.toContain(unplannedPiece)
+        testee.insertPiece(unplannedPiece)
+        expect(testee.getPieces()).toContain(unplannedPiece)
+      })
+
+      describe('the Part is On Air', () => {
+        it('sets the start of the Piece to the amount of time since the Part was started', () => {
+          const now: number = 1000
+          jest.useFakeTimers({ now })
+          const partStartedAt: number = 20
+          const timeSincePartStartAndPieceInserted: number = now - partStartedAt
+
+          const unplannedPiece: Piece = new Piece({ partId: '', isPlanned: false } as PieceInterface)
+          const testee: Part = new Part({ id: 'partId', isOnAir: true, executedAt: partStartedAt } as PartInterface)
+
+          testee.insertPiece(unplannedPiece)
+          expect(unplannedPiece.getStart()).toBe(timeSincePartStartAndPieceInserted)
+        })
+      })
+    })
+  })
+
+  describe(`${Part.prototype.calculateTimings.name}`, () => {
     describe('there is no previous Part', () => {
       it('has no inTransitionStart', () => {
         const testee: Part = new Part({} as PartInterface)

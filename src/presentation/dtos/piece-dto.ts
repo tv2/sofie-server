@@ -11,9 +11,9 @@ export class PieceDto {
 
   constructor(piece: Piece) {
     this.id = piece.id
-    this.partId = piece.partId
+    this.partId = piece.getPartId()
     this.name = piece.name
-    this.start = piece.start
+    this.start = piece.getStart()
     this.duration = piece.duration
     this.layer = piece.layer
     this.type = piece.type

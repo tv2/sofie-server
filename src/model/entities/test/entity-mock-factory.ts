@@ -44,11 +44,11 @@ export class EntityMockFactory {
     } = {},
     rundownInterface?: Partial<RundownInterface>
   ): Rundown {
-    const mockedRundown: Rundown = this.createActiveRundownMockInstance(activeRundownProperties, rundownInterface)
+    const mockedRundown: Rundown = this.createActiveRundownMock(activeRundownProperties, rundownInterface)
     return instance(mockedRundown)
   }
 
-  public static createActiveRundownMockInstance(
+  public static createActiveRundownMock(
     activeRundownProperties: {
       activePart?: Part
       nextPart?: Part
@@ -159,7 +159,7 @@ export class EntityMockFactory {
     when(mockedPart.id).thenReturn(
       partInterface.id ?? (partInterface.rank ? `part${partInterface.rank}` : 'partId')
     )
-    when(mockedPart.segmentId).thenReturn(partInterface.segmentId ?? 'segmentId')
+    when(mockedPart.getSegmentId()).thenReturn(partInterface.segmentId ?? 'segmentId')
     when(mockedPart.rank).thenReturn(partInterface.rank ?? 1)
     when(mockedPart.name).thenReturn(partInterface.name ?? 'partName')
     when(mockedPart.isNext()).thenReturn(partInterface.isNext ?? false)
@@ -173,6 +173,7 @@ export class EntityMockFactory {
     when(mockedPart.disableNextInTransition).thenReturn(partInterface.disableNextInTransition ?? false)
 
     when(mockedPart.getExecutedAt()).thenReturn(misc.executedAt ?? 0)
+    when(mockedPart.isPlanned).thenReturn(partInterface.isPlanned ?? true)
 
     when(mockedPart.getPieces()).thenReturn(partInterface.pieces ?? [])
     when(mockedPart.getPiecesWithLifespan(anything())).thenReturn(misc.piecesWithLifespanFilters ?? [])
@@ -210,10 +211,11 @@ export class EntityMockFactory {
 
     when(mockedPiece.id).thenReturn(pieceInterface.id ?? 'pieceId')
     when(mockedPiece.name).thenReturn(pieceInterface.name ?? 'pieceName')
-    when(mockedPiece.partId).thenReturn(pieceInterface.partId ?? 'partId')
+    when(mockedPiece.getPartId()).thenReturn(pieceInterface.partId ?? 'partId')
     when(mockedPiece.type).thenReturn(pieceInterface.type ?? PieceType.UNKNOWN)
     when(mockedPiece.layer).thenReturn(pieceInterface.layer ?? 'layer')
-    when(mockedPiece.start).thenReturn(pieceInterface.start ?? 0)
+    when(mockedPiece.isPlanned).thenReturn(pieceInterface.isPlanned ?? true)
+    when(mockedPiece.getStart()).thenReturn(pieceInterface.start ?? 0)
     when(mockedPiece.duration).thenReturn(pieceInterface.duration ?? 0)
     when(mockedPiece.pieceLifespan).thenReturn(pieceInterface.pieceLifespan ?? PieceLifespan.WITHIN_PART)
     when(mockedPiece.timelineObjects).thenReturn(pieceInterface.timelineObjects ?? [])

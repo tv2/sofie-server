@@ -10,8 +10,6 @@ import { MongoPieceRepository } from '../repositories/mongo/mongo-piece-reposito
 import { MongoPartRepository } from '../repositories/mongo/mongo-part-repository'
 import { TimelineRepository } from '../repositories/interfaces/timeline-repository'
 import { MongoTimelineRepository } from '../repositories/mongo/mongo-timeline-repository'
-import { AdLibPieceRepository } from '../repositories/interfaces/ad-lib-piece-repository'
-import { MongoAdLibPieceRepository } from '../repositories/mongo/mongo-ad-lib-piece-repository'
 import { CachedRundownRepository } from '../repositories/cache/cached-rundown-repository'
 import { RundownBaselineRepository } from '../repositories/interfaces/rundown-baseline-repository'
 import { MongoRundownBaselineRepository } from '../repositories/mongo/mongo-rundown-baseline-repository'
@@ -22,6 +20,8 @@ import { CachedConfigurationRepository } from '../repositories/cache/cached-conf
 import { MongoShowStyleRepository } from '../repositories/mongo/mongo-show-style-repository'
 import { ConfigurationRepository } from '../repositories/interfaces/configuration-repository'
 import { MongoConfigurationRepository } from '../repositories/mongo/mongo-configuration-repository'
+import { ActionRepository } from '../repositories/interfaces/action-repository'
+import { MongoActionRepository } from '../repositories/mongo/mongo-action-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -63,10 +63,6 @@ export class RepositoryFacade {
     return new MongoTimelineRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 
-  public static createAdLibRepository(): AdLibPieceRepository {
-    return new MongoAdLibPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
-  }
-
   public static createConfigurationRepository(): ConfigurationRepository {
     const configurationRepository: ConfigurationRepository = new MongoConfigurationRepository(
       this.createStudioRepository(),
@@ -81,5 +77,9 @@ export class RepositoryFacade {
 
   private static createShowStyleRepository(): ShowStyleRepository {
     return new MongoShowStyleRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  public static createActionRepository(): ActionRepository {
+    return new MongoActionRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 }

@@ -4,7 +4,6 @@ import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Timeline } from '../../../model/entities/timeline'
-import { AdLibPiece } from '../../../model/entities/ad-lib-piece'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Studio } from '../../../model/entities/studio'
@@ -12,7 +11,6 @@ import { StudioLayer } from '../../../model/value-objects/studio-layer'
 import { LookaheadMode } from '../../../model/enums/lookahead-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Identifier } from '../../../model/value-objects/identifier'
 import { ShowStyle } from '../../../model/entities/show-style'
 
 export interface MongoRundown {
@@ -40,6 +38,7 @@ export interface MongoPart {
   segmentId: string
   title: string
   _rank: number
+  isPlanned: boolean
   expectedDuration: number
   isOnAir: boolean
   isNext: boolean
@@ -70,6 +69,7 @@ export interface MongoPiece {
   timelineObjectsString: string
   lifespan: string
   pieceType: string
+  isPlanned?: boolean
   metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
   content?: unknown
   tags?: string[]
@@ -80,14 +80,6 @@ export interface MongoTimeline {
   timelineHash: string
   generated: number
   timelineBlob: string
-}
-
-export interface MongoAdLibPiece {
-  _id: string
-  rundownId: string
-  name: string
-  expectedDuration: number
-  timelineObjectsString: string
 }
 
 export interface MongoStudio {
@@ -176,16 +168,13 @@ export class MongoEntityConverter {
     } as MongoSegment
   }
 
-  public convertToMongoSegments(segments: Segment[]): MongoSegment[] {
-    return segments.map(this.convertToMongoSegment.bind(this))
-  }
-
   public convertPart(mongoPart: MongoPart): Part {
     return new Part({
       id: mongoPart._id,
       segmentId: mongoPart.segmentId,
       name: mongoPart.title,
       rank: mongoPart._rank,
+      isPlanned: mongoPart.isPlanned ?? true,
       expectedDuration: mongoPart.expectedDuration,
       isOnAir: false,
       isNext: false,
@@ -210,18 +199,15 @@ export class MongoEntityConverter {
   public convertToMongoPart(part: Part): MongoPart {
     return {
       _id: part.id,
+      isPlanned: part.isPlanned,
       expectedDuration: part.expectedDuration,
       title: part.name,
-      segmentId: part.segmentId,
+      segmentId: part.getSegmentId(),
       _rank: part.rank,
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
-      endState: part.getEndState(),
+      endState: part.getEndState()
     } as MongoPart
-  }
-
-  public convertToMongoParts(parts: Part[]): MongoPart[] {
-    return parts.map(this.convertToMongoPart.bind(this))
   }
 
   public convertPiece(mongoPiece: MongoPiece): Piece {
@@ -232,6 +218,7 @@ export class MongoEntityConverter {
       layer: mongoPiece.sourceLayerId,
       type: PieceType.UNKNOWN,
       pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
+      isPlanned: mongoPiece.isPlanned ?? true,
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
       duration: mongoPiece.enable.duration,
       preRollDuration: mongoPiece.prerollDuration,
@@ -285,21 +272,6 @@ export class MongoEntityConverter {
     return mongoPieces.map((mongoPiece) => this.convertPiece(mongoPiece))
   }
 
-  public convertToMongoPiece(piece: Piece): MongoPiece {
-    return {
-      enable: { duration: piece.duration, start: piece.start },
-      lifespan: piece.pieceLifespan,
-      sourceLayerId: piece.layer,
-      _id: piece.id,
-      startPartId: piece.partId,
-      name: piece.name,
-    } as MongoPiece
-  }
-
-  public convertToMongoPieces(pieces: Piece[]): MongoPiece[] {
-    return pieces.map(this.convertToMongoPiece.bind(this))
-  }
-
   public convertToMongoTimeline(timeline: Timeline): MongoTimeline {
     return {
       _id: 'studio0',
@@ -313,31 +285,6 @@ export class MongoEntityConverter {
     return {
       timelineGroups: JSON.parse(mongoTimeline.timelineBlob),
     }
-  }
-
-  public convertMongoAdLibPieceToIdentifier(mongoAdLibPiece: MongoAdLibPiece): Identifier {
-    return {
-      id: mongoAdLibPiece._id,
-      name: mongoAdLibPiece.name,
-    }
-  }
-
-  public convertMongoAdLibPiecesToIdentifiers(mongoAdLibPieces: MongoAdLibPiece[]): Identifier[] {
-    return mongoAdLibPieces.map((piece) => this.convertMongoAdLibPieceToIdentifier(piece))
-  }
-
-  public convertAdLib(mongoAdLibPiece: MongoAdLibPiece): AdLibPiece {
-    return new AdLibPiece({
-      id: mongoAdLibPiece._id,
-      rundownId: mongoAdLibPiece.rundownId,
-      name: mongoAdLibPiece.name,
-      duration: mongoAdLibPiece.expectedDuration,
-      timelineObjects: JSON.parse(mongoAdLibPiece.timelineObjectsString),
-    })
-  }
-
-  public convertAdLibs(mongoAdLibPieces: MongoAdLibPiece[]): AdLibPiece[] {
-    return mongoAdLibPieces.map((piece) => this.convertAdLib(piece))
   }
 
   public convertStudio(mongoStudio: MongoStudio): Studio {
