@@ -8,29 +8,27 @@ import { SegmentRepository } from '../interfaces/segment-repository'
 import { Segment } from '../../../model/entities/segment'
 import { MongoTestDatabase } from './mongo-test-database'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
+import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
 
-const COLLECTION_NAME = 'segments'
+const COLLECTION_NAME: string = 'segments'
 
-describe(`${MongoSegmentRepository.name}`, () => {
+describe(MongoSegmentRepository.name, () => {
   const testDatabase: MongoTestDatabase = new MongoTestDatabase()
   beforeEach(async () => testDatabase.setupDatabase())
   afterEach(async () => testDatabase.teardownDatabase())
 
-  describe(`${MongoSegmentRepository.prototype.deleteSegmentsForRundown.name}`, () => {
+  describe(MongoSegmentRepository.prototype.deleteSegmentsForRundown.name, () => {
     it('deletes one segment successfully', async () => {
       const db: Db = testDatabase.getDatabase()
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
-      const partRepository: PartRepository = mock<PartRepository>()
       const rundownId: string = 'someRundownId'
       const mongoSegment: MongoSegment = createMongoSegment({ rundownId: rundownId })
       const segment: Segment = EntityMockFactory.createSegment({ rundownId: rundownId })
       await testDatabase.populateDatabaseWithSegments([mongoSegment])
 
       when(mongoConverter.convertSegments(anything())).thenReturn([segment])
-      when(partRepository.getParts(anything())).thenResolve([])
       const testee: SegmentRepository = createTestee({
         mongoConverter: mongoConverter,
-        partRepository: partRepository,
       })
 
       await testee.deleteSegmentsForRundown(rundownId)
@@ -95,15 +93,11 @@ describe(`${MongoSegmentRepository.name}`, () => {
 
     it('does not deletes any segments, when nonexistent rundownId is given', async () => {
       const db: Db = testDatabase.getDatabase()
-      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const nonExistingId: string = 'nonExistingId'
       const mongoSegment: MongoSegment = createMongoSegment({})
       await testDatabase.populateDatabaseWithSegments([mongoSegment])
 
-      when(mongoConverter.convertSegments(anything())).thenReturn([])
-      const testee: SegmentRepository = createTestee({
-        mongoConverter: mongoConverter,
-      })
+      const testee: SegmentRepository = createTestee()
       await testee.deleteSegmentsForRundown(nonExistingId)
 
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
@@ -138,7 +132,61 @@ describe(`${MongoSegmentRepository.name}`, () => {
     })
   })
 
-  describe(`${MongoSegmentRepository.prototype.saveSegment.name}`, () => {
+  describe(MongoSegmentRepository.prototype.getSegments.name, () => {
+    it('gets zero segments from database when no segments for given rundownId exist', async () => {
+      const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: 'someRundownId'})]
+      const nonExistingId: string = 'nonExistingId'
+      await testDatabase.populateDatabaseWithSegments(mongoSegments)
+
+      const testee: SegmentRepository = createTestee()
+
+      const result: Segment[] = await testee.getSegments(nonExistingId)
+
+      expect(result).toHaveLength(0)
+    })
+
+    it('returns one segment when rundownId is given', async () => {
+      const rundownId: string = 'someRundownId'
+      const segments: Segment[] = [TestEntityFactory.createSegment({rundownId: rundownId})]
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(segments)
+
+      const testee: SegmentRepository = createTestee({ mongoConverter: mongoConverter })
+
+      const result: Segment[] = await testee.getSegments(rundownId)
+
+      expect(result.length).toBe(segments.length)
+    })
+
+    it('returns multiple segments when rundownId is given', async () => {
+      const rundownId: string = 'someRundownId'
+      const segments: Segment[] = [TestEntityFactory.createSegment({rundownId: rundownId}), TestEntityFactory.createSegment({rundownId: rundownId})]
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(segments)
+
+      const testee: SegmentRepository = createTestee({ mongoConverter: mongoConverter })
+
+      const result: Segment[] = await testee.getSegments(rundownId)
+      expect(result.length).toBe(segments.length)
+    })
+
+    it('retrieves parts equal times to amount of segments retrieved', async () => {
+      const partRepository: PartRepository = mock<PartRepository>()
+      const rundownId: string = 'someRundownId'
+      const segments: Segment[] = [TestEntityFactory.createSegment({rundownId: rundownId}), TestEntityFactory.createSegment({rundownId: rundownId})]
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(segments)
+
+      when(partRepository.getParts(anyString())).thenResolve([])
+      const testee: SegmentRepository = createTestee({
+        partRepository: partRepository, mongoConverter: mongoConverter
+      })
+
+      await testee.getSegments(rundownId)
+
+      verify(partRepository.getParts(anyString())).times(segments.length)
+    })
+
+  })
+
+  describe(MongoSegmentRepository.prototype.saveSegment.name, () => {
     it('has segment as not on air and saves the segment as on air', async () => {
       const inactiveMongoSegment: MongoSegment = createMongoSegment({ _id: 'randomId', isOnAir: false })
       const onAirSegment: Segment = EntityMockFactory.createSegment({
@@ -272,18 +320,26 @@ describe(`${MongoSegmentRepository.name}`, () => {
     return {
       _id: mongoSegmentInterface?._id ?? 'id' + Math.random(),
       name: mongoSegmentInterface?.name ?? 'segmentName',
-      rundownId: mongoSegmentInterface?.rundownId ?? 'rundownId' + Math.random() * 10,
+      rundownId: mongoSegmentInterface?.rundownId ?? 'rundownId' + Math.floor(Math.random() * 10),
     } as MongoSegment
   }
 
-  function createTestee(params: {
+  async function setupMongoConverter(segments: Segment[], mongoSegments?: MongoSegment[]): Promise<MongoEntityConverter> {
+    const mongoEntityConverter: MongoEntityConverter = mock(MongoEntityConverter)
+    if (!mongoSegments) {
+      mongoSegments = segments.map(segment => createMongoSegment({rundownId: segment.rundownId}))
+    }
+
+    when(mongoEntityConverter.convertSegments(anything())).thenReturn(segments)
+    await testDatabase.populateDatabaseWithSegments(mongoSegments)
+    return mongoEntityConverter
+  }
+
+  function createTestee(params:  {
     partRepository?: PartRepository
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
-  }): MongoSegmentRepository {
-    const partRepository: PartRepository = params.partRepository ?? mock<PartRepository>()
-    const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
-
+  } = {}): MongoSegmentRepository {
     if (!params.mongoDb) {
       params.mongoDb = mock(MongoDatabase)
       when(params.mongoDb.getCollection(COLLECTION_NAME)).thenReturn(
@@ -291,6 +347,16 @@ describe(`${MongoSegmentRepository.name}`, () => {
       )
     }
 
-    return new MongoSegmentRepository(instance(params.mongoDb), instance(mongoConverter), instance(partRepository))
+    if (!params.partRepository) {
+      params.partRepository = mock<PartRepository>()
+      when(params.partRepository.getParts(anyString())).thenResolve([])
+    }
+
+    if (!params.mongoConverter) {
+      params.mongoConverter = mock(MongoEntityConverter)
+      when(params.mongoConverter.convertSegments(anything())).thenReturn([])
+    }
+
+    return new MongoSegmentRepository(instance(params.mongoDb), instance(params.mongoConverter), instance(params.partRepository))
   }
 })
