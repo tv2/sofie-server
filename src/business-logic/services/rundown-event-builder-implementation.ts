@@ -11,10 +11,13 @@ import {
   RundownDeletedEvent,
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
+  SegmentCreatedEvent,
+  SegmentDeletedEvent,
 } from '../../model/value-objects/rundown-event'
-import { RundownEventType } from '../../model/enums/rundown-event-type'
+import { IngestEventType, RundownEventType } from '../../model/enums/event-type'
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
+import { Segment } from '../../model/entities/segment'
 
 export class RundownEventBuilderImplementation implements RundownEventBuilder {
   public buildDeletedEvent(rundown: Rundown): RundownDeletedEvent {
@@ -158,6 +161,24 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
         start: piece.getStart(),
         duration: piece.duration
       }
+    }
+  }
+
+  public buildSegmentCreatedEvent(rundown: Rundown, segment: Segment): SegmentCreatedEvent {
+    return {
+      type: IngestEventType.SEGMENT_CREATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId: segment.id // TODO: Should this emit the entire new Segment, or should the clients fetch them themselves?
+    }
+  }
+
+  public buildSegmentDeletedEvent(rundown: Rundown, segmentId: string): SegmentDeletedEvent {
+    return {
+      type: IngestEventType.SEGMENT_DELETED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId
     }
   }
 }

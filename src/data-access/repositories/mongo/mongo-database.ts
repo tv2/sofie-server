@@ -19,9 +19,11 @@ export class MongoDatabase {
   private client: mongodb.MongoClient
   private db: mongodb.Db
 
+  private readonly onConnectCallbacks: Map<string, () => void> = new Map()
+
   private constructor() {
     this.connectToDatabase()
-      .catch(() => console.error('Failed connecting to mongo database.'))
+      .catch((reason) => console.error('Failed connecting to mongo database.', reason))
   }
 
   private async connectToDatabase(): Promise<void> {
@@ -35,6 +37,8 @@ export class MongoDatabase {
 
     this.db = this.client.db(MONGO_DB_NAME)
     console.log(`### Connected to database: ${this.db.databaseName}`)
+
+    this.onConnectCallbacks.forEach(callback => callback())
   }
 
   public getCollection(collectionName: string): Collection {
@@ -50,5 +54,9 @@ export class MongoDatabase {
 
   public getDatabaseName(): string {
     return MONGO_DB_NAME
+  }
+
+  public onConnect(callbackIdentifier: string, callback: () => void): void {
+    this.onConnectCallbacks.set(callbackIdentifier, callback)
   }
 }

@@ -1,14 +1,17 @@
-import { RundownEventType } from '../enums/rundown-event-type'
+import { EventType, IngestEventType, RundownEventType } from '../enums/event-type'
 import { TypedEvent } from './typed-event'
 import { AutoNext } from './auto-next'
 
 export interface RundownEvent extends TypedEvent {
-  type: RundownEventType
+  type: EventType
   rundownId: string
 }
 
-export interface PartEvent extends RundownEvent {
+export interface SegmentEvent extends RundownEvent {
   segmentId: string
+}
+
+export interface PartEvent extends SegmentEvent {
   partId: string
 }
 
@@ -110,4 +113,12 @@ export interface RundownInfinitePieceAddedEvent extends RundownEvent {
     name: string
     layer: string
   }
+}
+
+export interface SegmentCreatedEvent extends SegmentEvent {
+  type: IngestEventType.SEGMENT_CREATED
+}
+
+export interface SegmentDeletedEvent extends SegmentEvent {
+  type : IngestEventType.SEGMENT_DELETED
 }

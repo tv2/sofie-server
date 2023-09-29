@@ -10,10 +10,12 @@ import { DeleteResult } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'
 import { TimelineObject } from '../../../model/entities/timeline-object'
+import { UnsupportedOperation } from '../../../model/exceptions/unsupported-operation'
 
 const RUNDOWN_COLLECTION_NAME: string = 'rundowns'
 
 export class MongoRundownRepository extends BaseMongoRepository implements RundownRepository {
+
   constructor(
     mongoDatabase: MongoDatabase,
     mongoEntityConverter: MongoEntityConverter,
@@ -51,6 +53,10 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     const rundown: Rundown = this.mongoEntityConverter.convertRundown(mongoRundown, baselineTimelineObjects)
     rundown.setSegments(await this.segmentRepository.getSegments(rundown.id))
     return rundown
+  }
+
+  public getRundownBySegmentId(segmentId: string): Promise<Rundown> {
+    throw new UnsupportedOperation(`${MongoRundownRepository.name} does not support getting a Rundown from a Segment id. Trying to find Rundown with Segment id: ${segmentId}`)
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {

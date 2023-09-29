@@ -2,6 +2,7 @@ import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 export class CachedRundownRepository implements RundownRepository {
   private static instance: RundownRepository
@@ -24,6 +25,16 @@ export class CachedRundownRepository implements RundownRepository {
       this.cachedRundowns.set(rundownId, rundown)
     }
     return this.cachedRundowns.get(rundownId) as Rundown
+  }
+
+  public getRundownBySegmentId(segmentId: string): Promise<Rundown> {
+    for (const rundown of this.cachedRundowns.values()) {
+      const rundownHasSegment: boolean = rundown.getSegments().some(segment => segment.id === segmentId)
+      if (rundownHasSegment) {
+        return Promise.resolve(rundown)
+      }
+    }
+    throw new NotFoundException(`No Rundown found with a Segment for Segment id: ${segmentId}`)
   }
 
   public async getBasicRundowns(): Promise<BasicRundown[]> {

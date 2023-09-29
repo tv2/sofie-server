@@ -6,7 +6,7 @@ import { TimelineRepository } from '../../../data-access/repositories/interfaces
 import { TimelineBuilder } from '../interfaces/timeline-builder'
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { ActiveRundownException } from '../../../model/exceptions/active-rundown-exception'
-import { RundownEventType } from '../../../model/enums/rundown-event-type'
+import { RundownEventType } from '../../../model/enums/event-type'
 import { RundownTimelineService } from '../rundown-timeline-service'
 import { CallbackScheduler } from '../interfaces/callback-scheduler'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
