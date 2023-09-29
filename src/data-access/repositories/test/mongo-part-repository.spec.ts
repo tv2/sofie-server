@@ -226,10 +226,7 @@ describe(MongoPartRepository.name, () => {
         isNext: nonQueuedPart.isNext(),
       } as MongoPart)
 
-      const testee: PartRepository = createTestee({
-        mongoDb: mongoDb,
-        mongoConverter: mongoConverter,
-      })
+      const testee: PartRepository = createTestee({ mongoDb, mongoConverter })
       await testee.savePart(nonQueuedPart)
 
       const result: MongoPart = (await db
@@ -241,7 +238,7 @@ describe(MongoPartRepository.name, () => {
 
   describe(MongoPartRepository.prototype.getParts.name, () => {
     it('gets zero parts from database when no parts for given segmentId exist', async () => {
-      const mongoParts: MongoPart[] = [createMongoPart({segmentId: 'someSegmentId'})]
+      const mongoParts: MongoPart[] = [createMongoPart({ segmentId: 'someSegmentId' })]
       const nonExistingId: string = 'nonExistingId'
       await testDatabase.populateDatabaseWithParts(mongoParts)
 
@@ -254,10 +251,10 @@ describe(MongoPartRepository.name, () => {
 
     it('returns one part when segmentId is given', async () => {
       const segmentId: string = 'someSegmentId'
-      const parts: Part[] = [TestEntityFactory.createPart({segmentId: segmentId})]
+      const parts: Part[] = [TestEntityFactory.createPart({ segmentId })]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(parts)
 
-      const testee: PartRepository = createTestee({mongoConverter: mongoConverter})
+      const testee: PartRepository = createTestee({ mongoConverter })
 
       const result: Part[] = await testee.getParts(segmentId)
 
@@ -266,10 +263,10 @@ describe(MongoPartRepository.name, () => {
 
     it('returns multiple parts when segmentId is given', async () => {
       const segmentId: string = 'someSegmentId'
-      const parts: Part[] = [TestEntityFactory.createPart({segmentId: segmentId}), TestEntityFactory.createPart({segmentId: segmentId})]
+      const parts: Part[] = [TestEntityFactory.createPart({ segmentId }), TestEntityFactory.createPart({ segmentId })]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(parts)
 
-      const testee: PartRepository = createTestee({mongoConverter: mongoConverter})
+      const testee: PartRepository = createTestee({ mongoConverter })
 
       const result: Part[] = await testee.getParts(segmentId)
 
@@ -279,13 +276,11 @@ describe(MongoPartRepository.name, () => {
     it('retrieves pieces equal times to amount of parts retrieved', async () => {
       const pieceRepository: PieceRepository = mock<PieceRepository>()
       const segmentId: string = 'someSegmentId'
-      const parts: Part[] = [TestEntityFactory.createPart({segmentId: segmentId}), TestEntityFactory.createPart({segmentId: segmentId})]
+      const parts: Part[] = [TestEntityFactory.createPart({ segmentId }), TestEntityFactory.createPart({ segmentId })]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(parts)
 
       when(pieceRepository.getPieces(anyString())).thenResolve([])
-      const testee: PartRepository = createTestee({
-        pieceRepository: pieceRepository, mongoConverter: mongoConverter
-      })
+      const testee: PartRepository = createTestee({ pieceRepository, mongoConverter })
 
       await testee.getParts(segmentId)
 
@@ -306,7 +301,7 @@ describe(MongoPartRepository.name, () => {
   async function setupMongoConverter(parts: Part[], mongoParts?: MongoPart[]): Promise<MongoEntityConverter> {
     const mongoEntityConverter: MongoEntityConverter = mock(MongoEntityConverter)
     if (!mongoParts) {
-      mongoParts = parts.map(segment => createMongoPart({segmentId: segment.segmentId}))
+      mongoParts = parts.map(part => createMongoPart({ segmentId: part.getSegmentId() }))
     }
 
     when(mongoEntityConverter.convertParts(anything())).thenReturn(parts)
