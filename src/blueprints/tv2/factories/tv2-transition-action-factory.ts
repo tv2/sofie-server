@@ -1,5 +1,5 @@
 import { Action, MutateActionMethods, PieceAction } from '../../../model/entities/action'
-import { ActionType } from '../../../model/enums/action-type'
+import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -16,7 +16,7 @@ const FRAMES_FOR_MIX_TRANSITION: number = 25 // TODO: Get from configuration.
 
 const MIX_TRANSITION_ID: string = 'nextTakeHasMixTransitionAction'
 
-export class Tv2TransitionFactory {
+export class Tv2TransitionActionFactory {
 
   public isTransitionAction(action: Action): boolean {
     return [MIX_TRANSITION_ID].includes(action.id)
@@ -54,7 +54,7 @@ export class Tv2TransitionFactory {
     return {
       id: MIX_TRANSITION_ID,
       name: 'Mix transition on next take',
-      type: ActionType.INSERT_PIECE_AS_NEXT,
+      type: PieceActionType.INSERT_PIECE_AS_NEXT,
       data: pieceInterface
     }
   }

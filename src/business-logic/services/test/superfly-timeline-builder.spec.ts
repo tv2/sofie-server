@@ -34,7 +34,7 @@ const LOOKAHEAD_PRIORITY: number = 0.1
 const BASELINE_PRIORITY: number = 0
 const LOW_PRIORITY: number = -1
 
-describe('superfly-timeline-builder', () => {
+describe(SuperflyTimelineBuilder.name, () => {
   describe('buildTimeline', () => {
     describe('for baseline', () => {
       describe('it creates a group for the baseline', () => {

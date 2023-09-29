@@ -5,7 +5,7 @@ import { Segment, SegmentInterface } from '../segment'
 import { EntityMockFactory } from './entity-mock-factory'
 import { capture, instance, verify } from '@typestrong/ts-mockito'
 
-describe(`${Segment.name}`, () => {
+describe(Segment.name, () => {
   describe(`${Segment.prototype.getFirstSpanningPieceForEachLayerBeforePart.name}`, () => {
     describe('Segment has two Parts', () => {
       describe('One Part is "after" the search point', () => {

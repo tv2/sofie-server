@@ -11,7 +11,7 @@ import { LastPartInSegmentException } from '../../exceptions/last-part-in-segmen
 import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
 import { AlreadyActivatedException } from '../../exceptions/already-activated-exception'
 
-describe(`${Rundown.name}`, () => {
+describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
     describe('"alreadyActiveProperties" is provided', () => {
       describe('active status is provided as false', () => {

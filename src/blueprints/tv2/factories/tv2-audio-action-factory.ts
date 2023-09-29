@@ -5,9 +5,9 @@ import { Tv2SisyfosLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { DeviceType } from '../../../model/enums/device-type'
-import { ActionType } from '../../../model/enums/action-type'
+import { PieceActionType } from '../../../model/enums/action-type'
 
-export class Tv2AudioFactory {
+export class Tv2AudioActionFactory {
 
   public createStopAudioBedAction(): PieceAction {
     const duration: number = 1000
@@ -44,7 +44,7 @@ export class Tv2AudioFactory {
     return {
       id: 'stopAudioBedAction',
       name: 'Stop audio bed',
-      type: ActionType.INSERT_PIECE_AS_ON_AIR,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: pieceInterface
     }
   }
