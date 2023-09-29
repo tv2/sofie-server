@@ -4,22 +4,22 @@ import { Action, MutateActionMethods } from '../../model/entities/action'
 import { Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2ShowStyleBlueprintConfiguration } from './value-objects/tv2-show-style-blueprint-configuration'
-import { Tv2CameraFactory } from './factories/tv2-camera-factory'
-import { Tv2TransitionFactory } from './factories/tv2-transition-factory'
-import { Tv2AudioFactory } from './factories/tv2-audio-factory'
+import { Tv2CameraActionFactory } from './factories/tv2-camera-action-factory'
+import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-factory'
+import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
 
   constructor(
-    private readonly cameraFactory: Tv2CameraFactory,
-    private readonly transitionFactory: Tv2TransitionFactory,
-    private readonly audioFactory: Tv2AudioFactory
+    private readonly cameraActionFactory: Tv2CameraActionFactory,
+    private readonly transitionActionFactory: Tv2TransitionActionFactory,
+    private readonly audioActionFactory: Tv2AudioActionFactory
   ) {
   }
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
-    if (this.transitionFactory.isTransitionAction(action)) {
-      return this.transitionFactory.getMutateActionMethods(action)
+    if (this.transitionActionFactory.isTransitionAction(action)) {
+      return this.transitionActionFactory.getMutateActionMethods(action)
     }
   }
 
@@ -32,16 +32,16 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
     const cameraActions: Action[] = blueprintConfiguration.studio.SourcesCam
       .slice(0, 5)
       .flatMap(source => [
-        this.cameraFactory.createInsertCameraAsNextAction(blueprintConfiguration, source),
-        this.cameraFactory.createInsertCameraAsOnAirAction(blueprintConfiguration, source)
+        this.cameraActionFactory.createInsertCameraAsNextAction(blueprintConfiguration, source),
+        this.cameraActionFactory.createInsertCameraAsOnAirAction(blueprintConfiguration, source)
       ])
 
     const audioActions: Action[] = [
-      this.audioFactory.createStopAudioBedAction()
+      this.audioActionFactory.createStopAudioBedAction()
     ]
 
     const transitionActions: Action[] = [
-      this.transitionFactory.createMixTransitionAction()
+      this.transitionActionFactory.createMixTransitionAction()
     ]
 
     return [
