@@ -23,7 +23,7 @@ import {
 } from '../../timeline-state-resolver-types/sisyfos-types'
 import { PartAction } from '../../../model/entities/action'
 
-export class Tv2CameraFactory {
+export class Tv2CameraActionFactory {
 
   public createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): PartAction {
     const partId: string = `cameraInsertActionPart_${cameraSource._id}`

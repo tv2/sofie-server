@@ -7,7 +7,7 @@ import { TransitionType } from '../../../model/enums/transition-type'
 import { DeviceType } from '../../../model/enums/device-type'
 import { ActionType } from '../../../model/enums/action-type'
 
-export class Tv2AudioFactory {
+export class Tv2AudioActionFactory {
 
   public createStopAudioBedAction(): PieceAction {
     const duration: number = 1000
