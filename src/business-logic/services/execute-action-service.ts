@@ -4,7 +4,7 @@ import { Blueprint } from '../../model/value-objects/blueprint'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
 import { ActionRepository } from '../../data-access/repositories/interfaces/action-repository'
-import { ActionType } from '../../model/enums/action-type'
+import { PartActionType, PieceActionType } from '../../model/enums/action-type'
 import { UnsupportedOperation } from '../../model/exceptions/unsupported-operation'
 import { RundownService } from './interfaces/rundown-service'
 import { Part, PartInterface } from '../../model/entities/part'
@@ -32,22 +32,22 @@ export class ExecuteActionService implements ActionService {
   public async executeAction(actionId: string, rundownId: string): Promise<void> {
     const action: Action = await this.actionRepository.getAction(actionId)
     switch (action.type) {
-      case ActionType.INSERT_PART_AS_ON_AIR: {
+      case PartActionType.INSERT_PART_AS_ON_AIR: {
         const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
         await this.insertPartAsOnAir(partAction, rundownId)
         break
       }
-      case ActionType.INSERT_PART_AS_NEXT: {
+      case PartActionType.INSERT_PART_AS_NEXT: {
         const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
         await this.insertPartAsNext(partAction, rundownId)
         break
       }
-      case ActionType.INSERT_PIECE_AS_ON_AIR: {
+      case PieceActionType.INSERT_PIECE_AS_ON_AIR: {
         const pieceAction: PieceAction = (await this.mutateAction(action, rundownId)) as PieceAction
         await this.insertPieceAsOnAir(pieceAction, rundownId)
         break
       }
-      case ActionType.INSERT_PIECE_AS_NEXT: {
+      case PieceActionType.INSERT_PIECE_AS_NEXT: {
         const pieceAction: PieceAction = (await this.mutateAction(action, rundownId)) as PieceAction
         await this.insertPieceAsNext(pieceAction, rundownId)
         break
