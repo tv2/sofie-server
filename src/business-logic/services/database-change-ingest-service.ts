@@ -35,14 +35,18 @@ export class DatabaseChangeIngestService implements IngestService {
   }
 
   public async segmentDeleted(segmentId: string): Promise<void> {
-    const rundown: Rundown = await this.rundownRepository.getRundownBySegmentId(segmentId)
-    rundown.removeSegment(segmentId)
+    try {
+      const rundown: Rundown = await this.rundownRepository.getRundownBySegmentId(segmentId)
+      rundown.removeSegment(segmentId)
 
-    const event: SegmentDeletedEvent = this.eventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
-    this.eventEmitter.emitRundownEvent(event)
+      const event: SegmentDeletedEvent = this.eventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
+      this.eventEmitter.emitRundownEvent(event)
 
-    // TODO: If the Segment belongs to an active Rundown we also need to rebuild the Timeline.
+      // TODO: If the Segment belongs to an active Rundown we also need to rebuild the Timeline.
 
-    await this.rundownRepository.saveRundown(rundown)
+      await this.rundownRepository.saveRundown(rundown)
+    } catch (error) {
+      console.error('Error while processing Segment Deleted event', error)
+    }
   }
 }
