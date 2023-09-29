@@ -17,9 +17,9 @@ export class AdLibPieceController extends BaseController {
   }
 
   @GetRequest('/rundowns/:rundownId')
-  public async getAdLibPiecesForRundown(reg: Request, res: Response): Promise<void> {
+  public async getAdLibPiecesForRundown(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
+      const rundownId: string = req.params.rundownId
       const identifiers: Identifier[] = await this.adLibPieceRepository.getAdLibPieceIdentifiers(rundownId)
       res.send(identifiers)
     } catch (error) {
@@ -28,10 +28,10 @@ export class AdLibPieceController extends BaseController {
   }
 
   @PutRequest('/:adLibPieceId/rundowns/:rundownId')
-  public async executeAdLibPiece(reg: Request, res: Response): Promise<void> {
+  public async executeAdLibPiece(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
-      const adLibId: string = reg.params.adLibPieceId
+      const rundownId: string = req.params.rundownId
+      const adLibId: string = req.params.adLibPieceId
       await this.rundownService.executeAdLibPiece(rundownId, adLibId)
       res.send(`Successfully executed AdLib ${adLibId} on Rundown ${rundownId}`)
     } catch (error) {
