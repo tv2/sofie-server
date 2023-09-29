@@ -1,12 +1,12 @@
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { Piece } from '../piece'
-import { Part } from '../part'
+import { Part, PartInterface } from '../part'
 import { Segment, SegmentInterface } from '../segment'
 import { EntityMockFactory } from './entity-mock-factory'
 import { capture, instance, verify } from '@typestrong/ts-mockito'
 
-describe('Segment', () => {
-  describe('getFirstSpanningPieceForEachLayerBeforePart', () => {
+describe(Segment.name, () => {
+  describe(`${Segment.prototype.getFirstSpanningPieceForEachLayerBeforePart.name}`, () => {
     describe('Segment has two Parts', () => {
       describe('One Part is "after" the search point', () => {
         it('does not include the Piece from the last Part', () => {
@@ -320,7 +320,7 @@ describe('Segment', () => {
     })
   })
 
-  describe('getFirstSpanningRundownPieceForEachLayerForAllParts', () => {
+  describe(`${Segment.prototype.getFirstSpanningRundownPieceForEachLayerForAllParts.name}`, () => {
     describe('it has one Part', () => {
       describe('Part has two Pieces', () => {
         describe('Pieces are on different layers', () => {
@@ -487,7 +487,7 @@ describe('Segment', () => {
     })
   })
 
-  describe('reset', () => {
+  describe(`${Segment.prototype.reset.name}`, () => {
     it('resets all parts', () => {
       const mockedPart1: Part = EntityMockFactory.createPartMock()
       const mockedPart2: Part = EntityMockFactory.createPartMock()
@@ -504,6 +504,80 @@ describe('Segment', () => {
       verify(mockedPart1.reset()).once()
       verify(mockedPart2.reset()).once()
       verify(mockedPart3.reset()).once()
+    })
+  })
+
+  describe(`${Segment.prototype.insertPartAfterActivePart.name}`, () => {
+    it('is not the Segment with the active Part - throws exception', () => {
+      const randomNotActivePart: Part = new Part({ isOnAir: false } as PartInterface)
+      const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: true } as PartInterface)
+
+      const testee: Segment = new Segment({ parts: [randomNotActivePart] } as SegmentInterface)
+
+      expect(() => testee.insertPartAfterActivePart(unplannedPart)).toThrow()
+    })
+
+    it('updates the SegmentId of the Part', () => {
+      const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
+      const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
+
+      const testee: Segment = new Segment({ id: 'segmentId', parts: [randomActivePart] } as SegmentInterface)
+
+      testee.insertPartAfterActivePart(unplannedPart)
+
+      expect(unplannedPart.getSegmentId()).toBe(testee.id)
+    })
+
+    describe('the active Part is the last Part of the Segment', () => {
+      it('inserts the Part as the last entry of the Parts array', () => {
+        const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
+        const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
+
+        const testee: Segment = new Segment({ parts: [randomActivePart] } as SegmentInterface)
+
+        testee.insertPartAfterActivePart(unplannedPart)
+
+        const lastPartOfSegment: Part = testee.getParts()[testee.getParts().length - 1]
+        expect(lastPartOfSegment).toBe(unplannedPart)
+      })
+    })
+
+    describe('the active Part is not the last Part of the Segment', () => {
+      describe('the Part after the active Part is an unplanned Part', () => {
+        it('replaces the "old" unplanned Part', () => {
+          const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
+          const unplannedPartAfterActivePart: Part = new Part({ id: 'oldUnplannedPartId', isOnAir: false, isPlanned: false } as PartInterface)
+          const unplannedPartToBeInserted: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
+
+          const testee: Segment = new Segment({ parts: [randomActivePart, unplannedPartAfterActivePart] } as SegmentInterface)
+
+          const indexOfOldUnplannedPart: number = testee.getParts().findIndex(part => part.id === unplannedPartAfterActivePart.id)
+
+          testee.insertPartAfterActivePart(unplannedPartToBeInserted)
+
+          expect(testee.getParts()).not.toContain(unplannedPartAfterActivePart)
+          expect(testee.getParts()).toContain(unplannedPartToBeInserted)
+          expect(testee.getParts()[indexOfOldUnplannedPart]).toBe(unplannedPartToBeInserted)
+        })
+      })
+
+      describe('the Part after the active Part is a planned Part', () => {
+        it('inserts the unplanned Part after the active Part and before the planned Part', () => {
+          const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
+          const plannedPartAfterActivePart: Part = new Part({ id: 'plannedPartId', isOnAir: false, isPlanned: true } as PartInterface)
+          const partToBeInserted: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
+
+          const testee: Segment = new Segment({ parts: [randomActivePart, plannedPartAfterActivePart] } as SegmentInterface)
+
+          const indexOfPlannedPart: number = testee.getParts().findIndex(part => part.id === plannedPartAfterActivePart.id)
+
+          testee.insertPartAfterActivePart(partToBeInserted)
+
+          expect(testee.getParts()).toContain(plannedPartAfterActivePart)
+          expect(testee.getParts()).toContain(partToBeInserted)
+          expect(testee.getParts()[indexOfPlannedPart]).toBe(partToBeInserted)
+        })
+      })
     })
   })
 })

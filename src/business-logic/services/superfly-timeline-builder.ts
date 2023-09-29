@@ -28,7 +28,6 @@ const LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX: string = '_forActive'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
-const NEXT_GROUP_PREFIX: string = 'next_group_'
 const INFINITE_GROUP_PREFIX: string = 'infinite_group_'
 const PIECE_PRE_ROLL_PREFIX: string = 'pre_roll_'
 
@@ -52,16 +51,17 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   public buildTimeline(rundown: Rundown, studio: Studio): Timeline {
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)
 
-    // TODO: Support that there might not be an active Part.
+    if (!rundown.isActivePartSet()) {
+      return this.createTimelineWithLookaheadGroup(rundown, studio, undefined, timeline)
+    }
+
     const activePartTimelineGroup: ActivePartTimelineObjectGroup = this.createActivePartGroup(rundown)
     timeline.timelineGroups.push(activePartTimelineGroup)
 
     timeline = this.createTimelineWithPreviousPartGroup(rundown, activePartTimelineGroup, timeline)
-    timeline = this.createTimelineWithNextPartGroup(rundown, activePartTimelineGroup, timeline)
     timeline = this.createTimelineWithLookaheadGroup(rundown, studio, activePartTimelineGroup, timeline)
     timeline = this.createTimelineWithInfiniteGroups(rundown, timeline)
-
-    // TODO: Call Blueprint "onTimelineGenerate". This will most likely need some tweaks.
+    timeline = this.updateTimelineAutoNextEpochTimestampFromNextPart(rundown, activePartTimelineGroup, timeline)
 
     return timeline
   }
@@ -128,10 +128,8 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     }
 
     if (pieceEnable.start === 'now') {
-      // TODO: We would like to try to not use "now", but they might be necessary for AdLibs. We have to double check when implementing AdLibs.
-      // TODO: This is mainly to alert of if we ever find a Piece with start==="now" while implementing the Timeline. Should be removed when done.
       throw new UnsupportedOperation(
-        `Found an enable.start="now" for control for Piece: ${piece.id}. We are trying to avoid those if possible.`
+        `Found an enable.start="now" for control for Piece: '${piece.id}'`
       )
     }
 
@@ -154,11 +152,6 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
 
       controlForPiece.enable.start = `#${preRollControlForPiece.id} + ${piece.preRollDuration}`
     }
-
-    // TODO: Core resolves Endcaps, but endCaps seems to be related to when a PieceInstance was stopped which is a concept we don't use.
-    // TODO: EnaCaps seems to be used to check when infinite pieces should stop. That logic should be in Rundown.ts so we shouldn't need to worry about that here
-    // TODO: EndCaps also seems to be used if the Part/Piece needs to stop i.e. a Server will end at some point or an overlay "bundt" is only shown for x seconds. But Blueprint define that on ingest on the TimelineObjects?
-    // TODO: Trying to leave out EndCaps for now and see how the Rundown behaves. Downside? We might have issues with "pieceStartOffset", whatever that is.
 
     childGroupForPiece.children = piece.timelineObjects.map((timelineObject) =>
       this.mapToTimelineObjectForPieceGroup(timelineObject, childGroupForPiece, piece)
@@ -189,7 +182,6 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     }
   }
 
-  // TODO: Find a way to remove undefined from the 'createXTimelineEnable' methods
   private createInTransitionTimelineEnable(
     partCalculatedTimings: PartTimings,
     piece: Piece
@@ -198,7 +190,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       return
     }
 
-    const startOffset: number = piece.start
+    const startOffset: number = piece.getStart()
     return {
       start: partCalculatedTimings.inTransitionStart + startOffset,
       duration: piece.duration,
@@ -233,11 +225,8 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           : piece.duration
 
     return {
-      // TODO: Core only adds "delayStartOfPiecesDuration" if it's not an adLib or if it is an adLib then only if it has been adLibbed into next Part
-      // TODO: Since handling AdLibs is no longer Part of building the Timeline, we should be safe to always add this? It should evaluate to zero in most cases.
-      // TODO: Verify when we implement adLibs.
-      start: piece.start + partCalculatedTimings.delayStartOfPiecesDuration,
-      duration: duration,
+      start: piece.getStart() + partCalculatedTimings.delayStartOfPiecesDuration,
+      duration: duration === 0 ? undefined : duration,
     }
   }
 
@@ -277,7 +266,6 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   }
 
   private shouldPieceHavePreRollGroup(controlForPiece: TimelineObject, piece: Piece): boolean {
-    // TODO: If we can't get rid of start="now" then we need to check for "now" here.
     return (controlForPiece.enable as TimelineEnable).start === 0 && piece.preRollDuration > 0
   }
 
@@ -300,7 +288,6 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     childGroupForPiece: TimelineObjectGroup,
     piece: Piece
   ): TimelineObject {
-    // TODO: Core checks "HoldMode" on the timelineObject - ignore for now
     const timelineObjectCopy: TimelineObject = this.objectCloner.clone(timelineObject)
     timelineObjectCopy.id = `${childGroupForPiece.id}_${piece.id}_${timelineObject.id}`
     timelineObjectCopy.inGroup = childGroupForPiece.id
@@ -310,7 +297,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   private createTimelineWithLookaheadGroup(
     rundown: Rundown,
     studio: Studio,
-    activeGroup: TimelineObjectGroup,
+    activeGroup: TimelineObjectGroup | undefined,
     timeline: Timeline
   ): Timeline {
     const lookaheadLayers: StudioLayer[] = studio.layers.filter(
@@ -335,7 +322,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return timeline
   }
 
-  private findLookaheadTimelineObjectsForLayers(lookaheadLayers: StudioLayer[], rundown: Rundown, activeGroup: TimelineObjectGroup): TimelineObject[] {
+  private findLookaheadTimelineObjectsForLayers(lookaheadLayers: StudioLayer[], rundown: Rundown, activeGroup: TimelineObjectGroup | undefined): TimelineObject[] {
     return lookaheadLayers.flatMap((layer) => {
       const lookaheadObjects: LookaheadTimelineObject[] = this.findLookaheadTimelineObjectsForFutureParts(
         rundown,
@@ -354,10 +341,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   private findLookaheadTimelineObjectsForFutureParts(
     rundown: Rundown,
     layer: StudioLayer,
-    activeGroup: TimelineObjectGroup
+    activeGroup: TimelineObjectGroup | undefined
   ): LookaheadTimelineObject[] {
     const lookAheadEnable: TimelineEnable = {
-      while: `#${activeGroup.id}`,
+      while: activeGroup ? `#${activeGroup.id}` : '1',
     }
     const lookAheadObjects: LookaheadTimelineObject[] = []
     let partToGetLookAheadObjectsFrom: Part = rundown.getNextPart()
@@ -405,8 +392,11 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   private findLookaheadTimelineObjectsForActivePart(
     rundown: Rundown,
     layer: StudioLayer,
-    activeGroup: TimelineObjectGroup
+    activeGroup: TimelineObjectGroup | undefined
   ): LookaheadTimelineObject[] {
+    if (!rundown.isActivePartSet() || !activeGroup) {
+      return []
+    }
     const activePartTimelineObjectEnable: TimelineEnable = {
       start: 0,
       end: `#${activeGroup.id}.start`,
@@ -450,9 +440,8 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       return timeline
     }
 
-    // TODO: This if-statement shouldn't be necessary in production
     if (previousPart.getExecutedAt() <= 0) {
-      throw new Error(
+      throw new UnsupportedOperation(
         `Previous Part: ${previousPart.name} does not have a valid "executedAt" - something went wrong when setting the previous Part.`
       )
     }
@@ -474,7 +463,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
 
     previousGroup.children = previousPart
       .getPiecesWithLifespan([PieceLifespan.WITHIN_PART])
-      .flatMap((piece) => this.generateGroupsAndTimelineObjectsForPiece(piece, previousPart, previousGroup))
+      .flatMap(piece => this.generateGroupsAndTimelineObjectsForPiece(piece, previousPart, previousGroup))
 
     timeline.timelineGroups.push(previousGroup)
     return timeline
@@ -485,13 +474,9 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     const infinitePieceTimelineObjectGroups: TimelineObjectGroup[] = []
     rundown
       .getInfinitePieces()
-      .filter(
-        (piece) =>
-          piece.transitionType ===
-                TransitionType.NO_TRANSITION /* TODO: && filter for not disabled - if that becomes a thing */
-      )
-      .filter((piece) => piece.partId !== activePart.id)
-      .forEach((piece) => {
+      .filter(piece => piece.transitionType === TransitionType.NO_TRANSITION)
+      .filter(piece => piece.getPartId() !== activePart.id)
+      .forEach(piece => {
         if (!piece.getExecutedAt()) {
           throw new UnsupportedOperation(
             `Found infinite Piece: ${piece.id} without an "executedAt". Infinite Pieces must have an "executedAt"! ${piece.pieceLifespan}`
@@ -510,31 +495,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           content: {}
         }
 
-        // TODO: Do infinite Pieces need a PreRoll group? In current implementation Piece.executedAt already includes PreRoll
-        // if (piece.preRollDuration > 0) {
-        //     // Create a new "startNow" object that is used to run in the preRoll.
-        //     const preRollInfiniteGroupForPiece: TimelineObjectGroup = {
-        //         id: `${PIECE_PRE_ROLL_PREFIX}${infiniteGroup.id}`,
-        //         enable: {
-        //             // start: now // TODO: Core sets this to "now", but Core also handles the initial addition of an infinite Piece to the Timeline differently than we do.
-        //             start: piece.executedAt
-        //         },
-        //         layer: '',
-        //         isGroup: true,
-        //         children: [],
-        //         content: {
-        //             type: TimelineObjectType.GROUP,
-        //             deviceType: DeviceType.ABSTRACT
-        //         }
-        //     }
-        //     infiniteGroup.enable.start = `#${preRollInfiniteGroupForPiece.id} + ${piece.preRollDuration}`
-        //     infinitePieceTimelineObjectGroups.push(preRollInfiniteGroupForPiece)
-        // }
-
-        infiniteGroup.children = piece.timelineObjects.flatMap((timelineObject) =>
-          this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece)
-        )
-
+        infiniteGroup.children = piece.timelineObjects.flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))
         infinitePieceTimelineObjectGroups.push(infiniteGroup)
       })
 
@@ -542,7 +503,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return timeline
   }
 
-  private createTimelineWithNextPartGroup(
+  private updateTimelineAutoNextEpochTimestampFromNextPart(
     rundown: Rundown,
     activeGroup: ActivePartTimelineObjectGroup,
     timeline: Timeline
@@ -553,39 +514,11 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     }
 
     const activePart: Part = rundown.getActivePart()
-    const nextPart: Part = rundown.getNextPart()
-
-    nextPart.calculateTimings(activePart)
-
-    const nextGroup: TimelineObjectGroup = {
-      id: `${NEXT_GROUP_PREFIX}${nextPart.id}`,
-      priority: HIGH_PRIORITY,
-      isGroup: true,
-      children: [],
-      enable: {
-        start: `#${activeGroup.id}.end - ${nextPart.getTimings().previousPartContinueIntoPartDuration}`,
-        // TODO: Core sets the duration to the enable.duration of the nextPart group which is being created with no enable.duration...
-        // TODO: Start should be enough. We call the "TakeNext" again when it's time to autoNext, and then duration will be set.
-      },
-      layer: '',
-      content: {}
-    }
-
-    nextGroup.children = nextPart
-      .getPiecesWithLifespan([PieceLifespan.WITHIN_PART])
-      .flatMap((piece) => this.generateGroupsAndTimelineObjectsForPiece(piece, nextPart, nextGroup))
-
-    if (Number.isNaN(activeGroup.enable.duration)) {
-      throw new UnsupportedOperation(
-        `Duration of activeGroup must be a number! Got: ${activeGroup.enable.duration}`
-      )
-    }
+    rundown.getNextPart().calculateTimings(activePart)
     timeline.autoNext = {
       epochTimeToTakeNext:
           activeGroup.autoNextEpochTime - rundown.getNextPart().getTimings().previousPartContinueIntoPartDuration,
     }
-
-    timeline.timelineGroups.push(nextGroup)
     return timeline
   }
 }

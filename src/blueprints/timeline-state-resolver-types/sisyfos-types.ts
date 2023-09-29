@@ -2,6 +2,13 @@ import { DeviceType } from '../../model/enums/device-type'
 import { TimelineObject } from '../../model/entities/timeline-object'
 
 // These values are taken from TSR
+export interface SisyfosChannelTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.SISYFOS;
+    type: SisyfosType.CHANNEL;
+  } & SisyfosChannelOptions;
+}
+
 export interface SisyfosChannelsTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.SISYFOS;
