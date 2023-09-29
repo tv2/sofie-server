@@ -28,7 +28,6 @@ const LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX: string = '_forActive'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
-const NEXT_GROUP_PREFIX: string = 'next_group_'
 const INFINITE_GROUP_PREFIX: string = 'infinite_group_'
 const PIECE_PRE_ROLL_PREFIX: string = 'pre_roll_'
 
@@ -60,9 +59,9 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     timeline.timelineGroups.push(activePartTimelineGroup)
 
     timeline = this.createTimelineWithPreviousPartGroup(rundown, activePartTimelineGroup, timeline)
-    timeline = this.createTimelineWithNextPartGroup(rundown, activePartTimelineGroup, timeline)
     timeline = this.createTimelineWithLookaheadGroup(rundown, studio, activePartTimelineGroup, timeline)
     timeline = this.createTimelineWithInfiniteGroups(rundown, timeline)
+    timeline = this.updateTimelineAutoNextEpochTimestampFromNextPart(rundown, activePartTimelineGroup, timeline)
 
     return timeline
   }
@@ -504,7 +503,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return timeline
   }
 
-  private createTimelineWithNextPartGroup(
+  private updateTimelineAutoNextEpochTimestampFromNextPart(
     rundown: Rundown,
     activeGroup: ActivePartTimelineObjectGroup,
     timeline: Timeline
@@ -515,37 +514,11 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     }
 
     const activePart: Part = rundown.getActivePart()
-    const nextPart: Part = rundown.getNextPart()
-
-    nextPart.calculateTimings(activePart)
-
-    const nextGroup: TimelineObjectGroup = {
-      id: `${NEXT_GROUP_PREFIX}${nextPart.id}`,
-      priority: HIGH_PRIORITY,
-      isGroup: true,
-      children: [],
-      enable: {
-        start: `#${activeGroup.id}.end - ${nextPart.getTimings().previousPartContinueIntoPartDuration}`,
-      },
-      layer: '',
-      content: {}
-    }
-
-    nextGroup.children = nextPart
-      .getPiecesWithLifespan([PieceLifespan.WITHIN_PART])
-      .flatMap((piece) => this.generateGroupsAndTimelineObjectsForPiece(piece, nextPart, nextGroup))
-
-    if (Number.isNaN(activeGroup.enable.duration)) {
-      throw new UnsupportedOperation(
-        `Duration of activeGroup must be a number! Got: ${activeGroup.enable.duration}`
-      )
-    }
+    rundown.getNextPart().calculateTimings(activePart)
     timeline.autoNext = {
       epochTimeToTakeNext:
           activeGroup.autoNextEpochTime - rundown.getNextPart().getTimings().previousPartContinueIntoPartDuration,
     }
-
-    timeline.timelineGroups.push(nextGroup)
     return timeline
   }
 }
