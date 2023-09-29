@@ -9,6 +9,7 @@ export interface SegmentInterface {
   rundownId: string
   name: string
   rank: number
+  budgetDuration: number
   parts: Part[]
   isOnAir: boolean
   isNext: boolean
@@ -19,6 +20,7 @@ export class Segment {
   public readonly rundownId: string
   public name: string
   public rank: number
+  public budgetDuration: number
 
   private isSegmentOnAir: boolean
   private isSegmentNext: boolean
@@ -31,7 +33,7 @@ export class Segment {
     this.rank = segment.rank
     this.isSegmentOnAir = segment.isOnAir
     this.isSegmentNext = segment.isNext
-
+    this.budgetDuration = segment.budgetDuration
     this.setParts(segment.parts ?? [])
   }
 

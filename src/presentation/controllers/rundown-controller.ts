@@ -30,9 +30,9 @@ export class RundownController extends BaseController {
   }
 
   @GetRequest('/:rundownId')
-  public async getRundown(reg: Request, res: Response): Promise<void> {
+  public async getRundown(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
+      const rundownId: string = req.params.rundownId
       const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
       res.send(new RundownDto(rundown))
     } catch (error) {
@@ -41,9 +41,9 @@ export class RundownController extends BaseController {
   }
 
   @PutRequest('/:rundownId/activate')
-  public async activate(reg: Request, res: Response): Promise<void> {
+  public async activate(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
+      const rundownId: string = req.params.rundownId
       await this.rundownService.activateRundown(rundownId)
       res.send(`Rundown "${rundownId}" successfully activated`)
     } catch (error) {
@@ -52,9 +52,9 @@ export class RundownController extends BaseController {
   }
 
   @PutRequest('/:rundownId/deactivate')
-  public async deactivate(reg: Request, res: Response): Promise<void> {
+  public async deactivate(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
+      const rundownId: string = req.params.rundownId
       await this.rundownService.deactivateRundown(rundownId)
       res.send(`Rundown "${rundownId}" successfully deactivated`)
     } catch (error) {
@@ -63,9 +63,9 @@ export class RundownController extends BaseController {
   }
 
   @PutRequest('/:rundownId/takeNext')
-  public async takeNext(reg: Request, res: Response): Promise<void> {
+  public async takeNext(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
+      const rundownId: string = req.params.rundownId
       await this.rundownService.takeNext(rundownId)
       res.send(`Rundown "${rundownId}" successfully took next`)
     } catch (error) {
@@ -74,11 +74,11 @@ export class RundownController extends BaseController {
   }
 
   @PutRequest('/:rundownId/segments/:segmentId/parts/:partId/setNext')
-  public async setNext(reg: Request, res: Response): Promise<void> {
+  public async setNext(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
-      const segmentId: string = reg.params.segmentId
-      const partId: string = reg.params.partId
+      const rundownId: string = req.params.rundownId
+      const segmentId: string = req.params.segmentId
+      const partId: string = req.params.partId
       await this.rundownService.setNext(rundownId, segmentId, partId)
       res.send(`Part "${partId}" is now set as next`)
     } catch (error) {
@@ -87,9 +87,9 @@ export class RundownController extends BaseController {
   }
 
   @PutRequest('/:rundownId/reset')
-  public async resetRundown(reg: Request, res: Response): Promise<void> {
+  public async resetRundown(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
+      const rundownId: string = req.params.rundownId
       await this.rundownService.resetRundown(rundownId)
       res.send(`Rundown "${rundownId}" has been reset`)
     } catch (error) {
@@ -98,9 +98,9 @@ export class RundownController extends BaseController {
   }
 
   @DeleteRequest('/:rundownId')
-  public async deleteRundown(reg: Request, res: Response): Promise<void> {
+  public async deleteRundown(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
+      const rundownId: string = req.params.rundownId
       await this.rundownService.deleteRundown(rundownId)
       res.send(`Rundown "${rundownId}" has been deleted`)
     } catch (error) {
