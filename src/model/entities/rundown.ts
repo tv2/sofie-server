@@ -6,7 +6,6 @@ import { LastPartInSegmentException } from '../exceptions/last-part-in-segment-e
 import { NotFoundException } from '../exceptions/not-found-exception'
 import { NotActivatedException } from '../exceptions/not-activated-exception'
 import { AlreadyActivatedException } from '../exceptions/already-activated-exception'
-import { AdLibPiece } from './ad-lib-piece'
 import { Piece } from './piece'
 import { BasicRundown } from './basic-rundown'
 import { PieceLifespan } from '../enums/piece-lifespan'
@@ -58,7 +57,6 @@ export class Rundown extends BasicRundown {
     if (rundown.alreadyActiveProperties) {
       if (
         !rundown.isRundownActive ||
-          // TODO: Should it be possible to instantiate the Rundown without active Part and active Segment?
           !rundown.alreadyActiveProperties.activePart ||
           !rundown.alreadyActiveProperties.nextPart ||
           !rundown.alreadyActiveProperties.activeSegment ||
@@ -100,7 +98,7 @@ export class Rundown extends BasicRundown {
   }
 
   private setNextFromActive(): void {
-    this.unmarkNextSegmentAndPart()
+    this.unmarkNextPart()
 
     try {
       this.nextPart = this.activeSegment.findNextPart(this.activePart)
@@ -108,30 +106,38 @@ export class Rundown extends BasicRundown {
       if ((exception as Exception).errorCode !== ErrorCode.LAST_PART_IN_SEGMENT) {
         throw exception
       }
+      this.unmarkNextSegment()
       const segment: Segment = this.findNextSegment()
       // TODO: Handle that we might be on the last Segment
       if (segment) {
         this.nextSegment = segment
+        this.markNextSegment()
         this.nextPart = this.nextSegment.findFirstPart()
       }
     }
 
-    this.markNextSegmentAndPart()
+    this.markNextPart()
   }
 
-  private unmarkNextSegmentAndPart(): void {
+  private unmarkNextSegment(): void {
     if (this.nextSegment) {
       this.nextSegment.removeAsNext()
     }
+  }
+
+  private unmarkNextPart(): void {
     if (this.nextPart) {
       this.nextPart.removeAsNext()
     }
   }
 
-  private markNextSegmentAndPart(): void {
+  private markNextSegment(): void {
     if (this.nextSegment) {
       this.nextSegment.setAsNext()
     }
+  }
+
+  private markNextPart(): void {
     if (this.nextPart) {
       this.nextPart.setAsNext()
     }
@@ -152,7 +158,8 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.deactivate.name)
     this.activeSegment.takeOffAir()
     this.activePart.takeOffAir()
-    this.unmarkNextSegmentAndPart()
+    this.unmarkNextSegment()
+    this.unmarkNextPart()
     this.infinitePieces = new Map()
     this.isRundownActive = false
     this.previousPart = undefined
@@ -202,7 +209,7 @@ export class Rundown extends BasicRundown {
   }
 
   private getSegmentIndexForPart(part: Part): number {
-    const segmentIndexForPart: number = this.segments.findIndex((segment) => segment.id === part.segmentId)
+    const segmentIndexForPart: number = this.segments.findIndex((segment) => segment.id === part.getSegmentId())
     if (segmentIndexForPart < 0) {
       throw new NotFoundException(
         `Part: "${part.id}" does not belong to any Segments on Rundown: "${this.id}"`
@@ -235,7 +242,7 @@ export class Rundown extends BasicRundown {
       // Strongly consider refactor into something less implicit.
       return
     }
-    this.previousPart = this.activePart
+    this.previousPart = this.activePart.clone()
   }
 
   private takeNextPart(): void {
@@ -368,13 +375,15 @@ export class Rundown extends BasicRundown {
 
   public setNext(segmentId: string, partId: string): void {
     this.assertActive(this.setNext.name)
+    if (!this.nextSegment || this.nextSegment.id !== segmentId) {
+      this.unmarkNextSegment()
+      this.nextSegment = this.findSegment(segmentId)
+      this.markNextSegment()
+    }
 
-    this.unmarkNextSegmentAndPart()
-
-    this.nextSegment = this.findSegment(segmentId)
+    this.unmarkNextPart()
     this.nextPart = this.nextSegment.findPart(partId)
-
-    this.markNextSegmentAndPart()
+    this.markNextPart()
   }
 
   private findSegment(segmentId: string): Segment {
@@ -393,11 +402,6 @@ export class Rundown extends BasicRundown {
     return this.segments
   }
 
-  public adAdLibPiece(adLibPiece: AdLibPiece): void {
-    this.assertActive(this.adAdLibPiece.name)
-    this.activePart.addAdLibPiece(adLibPiece)
-  }
-
   public getInfinitePieces(): Piece[] {
     return Array.from(this.infinitePieces.values())
   }
@@ -413,5 +417,22 @@ export class Rundown extends BasicRundown {
 
   public setPersistentState(rundownPersistentState: RundownPersistentState): void {
     this.persistentState = rundownPersistentState
+  }
+
+  public insertPartAsNext(part: Part): void {
+    this.assertActive(this.insertPartAsNext.name)
+    this.activeSegment.insertPartAfterActivePart(part)
+    this.setNext(this.activeSegment.id, part.id)
+  }
+
+  public insertPieceIntoActivePart(piece: Piece): void {
+    this.assertActive(this.insertPieceIntoActivePart.name)
+    this.activePart.insertPiece(piece)
+    this.updateInfinitePieces()
+  }
+
+  public insertPieceIntoNextPart(piece: Piece): void {
+    this.assertActive(this.insertPieceIntoNextPart.name)
+    this.nextPart.insertPiece(piece)
   }
 }

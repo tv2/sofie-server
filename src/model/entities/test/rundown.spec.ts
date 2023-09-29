@@ -10,7 +10,7 @@ import { NotFoundException } from '../../exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
 import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
 
-describe('Rundown', () => {
+describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
     describe('"alreadyActiveProperties" is provided', () => {
       describe('active status is provided as false', () => {
@@ -261,10 +261,6 @@ describe('Rundown', () => {
 
         verify(mockNextPart.putOnAir()).once()
       })
-    })
-
-    describe('it does not have a next Part', () => {
-      // TODO: Write tests
     })
 
     describe('next Part has no infinite Pieces', () => {

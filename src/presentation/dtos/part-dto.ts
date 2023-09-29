@@ -16,7 +16,7 @@ export class PartDto {
 
   constructor(part: Part) {
     this.id = part.id
-    this.segmentId = part.segmentId
+    this.segmentId = part.getSegmentId()
     this.name = part.name
     this.pieces = part.getPieces().map((piece) => new PieceDto(piece))
     this.isOnAir = part.isOnAir()

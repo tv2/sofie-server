@@ -34,7 +34,7 @@ const LOOKAHEAD_PRIORITY: number = 0.1
 const BASELINE_PRIORITY: number = 0
 const LOW_PRIORITY: number = -1
 
-describe('superfly-timeline-builder', () => {
+describe(SuperflyTimelineBuilder.name, () => {
   describe('buildTimeline', () => {
     describe('for baseline', () => {
       describe('it creates a group for the baseline', () => {
@@ -294,7 +294,7 @@ describe('superfly-timeline-builder', () => {
                   child.id.includes(PIECE_CONTROL_INFIX)
                 )!
 
-                expect(controlObject.enable.start).toBe(inTransitionStart + piece.start)
+                expect(controlObject.enable.start).toBe(inTransitionStart + piece.getStart())
               })
 
               it('sets TimelineEnable.duration to Piece.duration', () => {
@@ -459,7 +459,7 @@ describe('superfly-timeline-builder', () => {
                 child.id.includes(PIECE_CONTROL_INFIX)
               )!
 
-              expect(controlObject.enable.start).toBe(piece.start)
+              expect(controlObject.enable.start).toBe(piece.getStart())
             })
 
             describe('active Part has a delayStartOfPiecesDuration', () => {
@@ -485,7 +485,7 @@ describe('superfly-timeline-builder', () => {
                 )!
 
                 expect(controlObject.enable.start).toBe(
-                  piece.start + activePart.getTimings().delayStartOfPiecesDuration
+                  piece.getStart() + activePart.getTimings().delayStartOfPiecesDuration
                 )
               })
             })
@@ -547,7 +547,7 @@ describe('superfly-timeline-builder', () => {
               })
 
               describe('active Part does not have PostRoll', () => {
-                it('sets TimelineEnable.duration to be zero', () => {
+                it('sets TimelineEnable.duration to be undefined', () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     transitionType: TransitionType.NO_TRANSITION,
                   })
@@ -566,7 +566,7 @@ describe('superfly-timeline-builder', () => {
                     child.id.includes(PIECE_CONTROL_INFIX)
                   )!
 
-                  expect(controlObject.enable.duration).toBe(0)
+                  expect(controlObject.enable.duration).toBe(undefined)
                 })
               })
             })
@@ -1389,7 +1389,7 @@ describe('superfly-timeline-builder', () => {
                     child.id.includes(PIECE_CONTROL_INFIX)
                   )!
 
-                  expect(controlGroup.enable.start).toBe(inTransitionStart + piece.start)
+                  expect(controlGroup.enable.start).toBe(inTransitionStart + piece.getStart())
                 })
 
                 it('sets TimelineEnable.duration to Piece.duration', () => {
@@ -1612,7 +1612,7 @@ describe('superfly-timeline-builder', () => {
                   child.id.includes(PIECE_CONTROL_INFIX)
                 )!
 
-                expect(controlObject.enable.start).toBe(piece.start)
+                expect(controlObject.enable.start).toBe(piece.getStart())
               })
 
               describe('Piece has a duration', () => {
@@ -1691,7 +1691,7 @@ describe('superfly-timeline-builder', () => {
                 })
 
                 describe('previous Part does not have PostRoll', () => {
-                  it('sets TimelineEnable.duration to zero', () => {
+                  it('sets TimelineEnable.duration to undefined', () => {
                     const piece: Piece = EntityMockFactory.createPiece({
                       transitionType: TransitionType.NO_TRANSITION,
                     })
@@ -1720,7 +1720,7 @@ describe('superfly-timeline-builder', () => {
                       child.id.includes(PIECE_CONTROL_INFIX)
                     )!
 
-                    expect(controlObject.enable.duration).toBe(0)
+                    expect(controlObject.enable.duration).toBe(undefined)
                   })
                 })
               })
@@ -2721,7 +2721,7 @@ describe('superfly-timeline-builder', () => {
                       child.id.includes(PIECE_CONTROL_INFIX)
                     )!
 
-                    expect(controlGroup.enable.start).toBe(inTransitionStart + piece.start)
+                    expect(controlGroup.enable.start).toBe(inTransitionStart + piece.getStart())
                   })
 
                   it('sets TimelineEnable.duration to Piece.duration', () => {
@@ -2966,7 +2966,7 @@ describe('superfly-timeline-builder', () => {
                     child.id.includes(PIECE_CONTROL_INFIX)
                   )!
 
-                  expect(controlGroup.enable.start).toBe(piece.start)
+                  expect(controlGroup.enable.start).toBe(piece.getStart())
                 })
 
                 describe('Piece has a duration', () => {
@@ -3051,7 +3051,7 @@ describe('superfly-timeline-builder', () => {
                   })
 
                   describe('next Part does not have PostRoll', () => {
-                    it('sets TimelineEnable.duration to zero', () => {
+                    it('sets TimelineEnable.duration to undefined', () => {
                       const piece: Piece = EntityMockFactory.createPiece({
                         transitionType: TransitionType.NO_TRANSITION,
                       })
@@ -3082,7 +3082,7 @@ describe('superfly-timeline-builder', () => {
                         child.id.includes(PIECE_CONTROL_INFIX)
                       )!
 
-                      expect(controlGroup.enable.duration).toBe(0)
+                      expect(controlGroup.enable.duration).toBe(undefined)
                     })
                   })
                 })
@@ -4039,70 +4039,6 @@ describe('superfly-timeline-builder', () => {
 
                 expect(infiniteGroup.layer).toBe(layer)
               })
-
-              //TODO: Need to figure out if we even need a PreRoll group for infinite Pieces. Keep these in until then.
-              // describe('infinite Piece has PreRoll', () => {
-              // 	describe('it creates a preRoll infinite group for Piece', () => {
-              // 		it('sets correct preRoll infinite group id', () => {
-              //             const infinitePiece: Piece = EntityDefaultFactory.createPiece({ preRollDuration: 10, partId: 'randomPartId', transitionType: TransitionType.NO_TRANSITION, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE } )
-              //
-              //             const segment: Segment = createSegmentWithPieces([infinitePiece])
-              //             const rundown: Rundown = EntityDefaultFactory.createActiveRundown([segment])
-              //
-              //             const testee: TimelineBuilder = createTestee()
-              //             const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
-              //
-              //             const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group => group.id === `${INFINITE_GROUP_PREFIX}${segment.getParts()[0].id}_${infinitePiece.id}`)!
-              // 			const expectedPreRollGroupId: string = `${PIECE_PRE_ROLL_PREFIX}${infiniteGroup.id}`
-              // 			const preRollGroup: TimelineObject | undefined = timeline.timelineGroups.find(group => group.id === expectedPreRollGroupId)
-              //
-              //             expect(preRollGroup).not.toBeUndefined()
-              // 		})
-              //
-              // 		it('sets TimelineEnable.start to Piece.executedAt - Piece.preRollDuration', () => {
-              //             const infinitePiece: Piece = EntityDefaultFactory.createPiece({ preRollDuration: 10, partId: 'randomPartId', transitionType: TransitionType.NO_TRANSITION, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE } )
-              //
-              //             const segment: Segment = createSegmentWithPieces([infinitePiece])
-              //             const rundown: Rundown = EntityDefaultFactory.createActiveRundown([segment])
-              //
-              //             const testee: TimelineBuilder = createTestee()
-              //             const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
-              //
-              //             const preRollGroup: TimelineObject = timeline.timelineGroups.find(group => group.id.includes(PIECE_PRE_ROLL_PREFIX))!
-              //
-              //             expect(preRollGroup.enable.start).toBe(infinitePiece.executedAt - infinitePiece.preRollDuration)
-              // 		})
-              //
-              // 		it('sets empty layer', () => {
-              //             const infinitePiece: Piece = EntityDefaultFactory.createPiece({ preRollDuration: 10, partId: 'randomPartId', transitionType: TransitionType.NO_TRANSITION, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE } )
-              //
-              //             const segment: Segment = createSegmentWithPieces([infinitePiece])
-              //             const rundown: Rundown = EntityDefaultFactory.createActiveRundown([segment])
-              //
-              //             const testee: TimelineBuilder = createTestee()
-              //             const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
-              //
-              //             const preRollGroup: TimelineObject = timeline.timelineGroups.find(group => group.id.includes(PIECE_PRE_ROLL_PREFIX))!
-              //
-              //             expect(preRollGroup.layer).toBe('')
-              // 		})
-              //
-              // 		it('sets the TimelineEnable.start of the infinite group for Piece to preRollInfiniteGroup + Piece.preRollDuration', () => {
-              //             const infinitePiece: Piece = EntityDefaultFactory.createPiece({ preRollDuration: 10, partId: 'randomPartId', transitionType: TransitionType.NO_TRANSITION, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE } )
-              //
-              //             const segment: Segment = createSegmentWithPieces([infinitePiece])
-              //             const rundown: Rundown = EntityDefaultFactory.createActiveRundown([segment])
-              //
-              //             const testee: TimelineBuilder = createTestee()
-              //             const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
-              //
-              //             const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group => group.id === `${INFINITE_GROUP_PREFIX}${segment.getParts()[0].id}_${infinitePiece.id}`)!
-              //             const preRollGroup: TimelineObject = timeline.timelineGroups.find(group => group.id.includes(PIECE_PRE_ROLL_PREFIX))!
-              //
-              //             expect(infiniteGroup.enable.start).toBe(`#${preRollGroup.id} + ${infinitePiece.preRollDuration}`)
-              // 		})
-              // 	})
-              // })
 
               describe('infinite Piece has a TimelineObject', () => {
                 it('sets the id of the TimelineObject to be infinitePieceGroup.id_piece.id_timelineObject.id', () => {
@@ -5326,7 +5262,7 @@ describe('superfly-timeline-builder', () => {
                 })
                 const secondPart: Part = EntityMockFactory.createPart({ pieces: [secondPiece] })
 
-                const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+                const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                   nextPart: firstPart,
                 })
                 when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
@@ -5375,7 +5311,7 @@ describe('superfly-timeline-builder', () => {
                 })
                 const lastPart: Part = EntityMockFactory.createPart({ pieces: [lastPiece] })
 
-                const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+                const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                   nextPart: firstPart,
                 })
                 when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
@@ -5428,7 +5364,7 @@ describe('superfly-timeline-builder', () => {
                   pieces: [pieceOutsideSearchDistance],
                 })
 
-                const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+                const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                   nextPart: firstPart,
                 })
                 when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
@@ -5475,7 +5411,7 @@ describe('superfly-timeline-builder', () => {
               })
               const lookAheadPart: Part = EntityMockFactory.createPart({ pieces: [lookAheadPiece] })
 
-              const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+              const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                 activePart,
                 nextPart: lookAheadPart,
               })
@@ -5525,7 +5461,7 @@ describe('superfly-timeline-builder', () => {
               })
               const secondPart: Part = EntityMockFactory.createPart({ pieces: [secondPiece] })
 
-              const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+              const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                 nextPart: firstPart,
               })
               when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
@@ -5562,7 +5498,7 @@ describe('superfly-timeline-builder', () => {
                 EntityMockFactory.createPart({ id: 'thirdPartId' }),
               ]
 
-              const rundown: Rundown = EntityMockFactory.createActiveRundownMockInstance({
+              const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                 nextPart: parts[0],
               })
               when(rundown.getPartAfter(parts[0])).thenReturn(parts[1])

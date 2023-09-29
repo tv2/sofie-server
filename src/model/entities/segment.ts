@@ -55,6 +55,9 @@ export class Segment {
 
   public setAsNext(): void {
     this.isSegmentNext = true
+    if (!this.isSegmentOnAir) {
+      this.reset()
+    }
   }
 
   public removeAsNext(): void {
@@ -132,10 +135,38 @@ export class Segment {
   }
 
   public doesPieceBelongToSegment(piece: Piece): boolean {
-    return this.parts.some((part) => part.id === piece.partId)
+    return this.parts.some((part) => part.id === piece.getPartId())
   }
 
   public reset(): void {
+    this.removeUnplannedParts()
     this.parts.forEach(part => part.reset())
+  }
+
+  private removeUnplannedParts(): void {
+    this.parts = this.parts.filter(part => part.isPlanned)
+  }
+
+  public insertPartAfterActivePart(part: Part): void {
+    const activePartIndex: number = this.parts.findIndex(p => p.isOnAir())
+    if (activePartIndex < 0) {
+      throw new NotFoundException(`Not allowed to insert Part: ${part.id} into Segment: ${this.id} because Segment does not have the active Part.`)
+    }
+
+    part.setSegmentId(this.id)
+
+    const isActivePartLastPartInSegment: boolean = activePartIndex + 1 === this.parts.length
+    if (isActivePartLastPartInSegment) {
+      this.parts.push(part)
+      return
+    }
+
+    const isPartAfterActivePartAnUnplannedPart: boolean = !this.parts[activePartIndex + 1].isPlanned
+    if (isPartAfterActivePartAnUnplannedPart) {
+      this.parts[activePartIndex + 1] = part
+      return
+    }
+
+    this.parts.splice(activePartIndex + 1, 0, part)
   }
 }
