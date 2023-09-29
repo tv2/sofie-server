@@ -18,6 +18,7 @@ import { ShowStyle } from '../../../model/entities/show-style'
 export interface MongoRundown {
   _id: string
   name: string
+  showStyleVariantId: string
   modified: number
   isActive?: boolean // TODO: Remove optionality when we have control over data structure.
   persistentState?: unknown
@@ -117,6 +118,7 @@ export class MongoEntityConverter {
     return new Rundown({
       id: mongoRundown._id,
       name: mongoRundown.name,
+      showStyleVariantId: mongoRundown.showStyleVariantId,
       isRundownActive: mongoRundown.isActive ?? false,
       baselineTimelineObjects: baselineTimelineObjects ?? [],
       segments: [],
@@ -129,6 +131,7 @@ export class MongoEntityConverter {
     return {
       _id: rundown.id,
       name: rundown.name,
+      showStyleVariantId: rundown.getShowStyleVariantId(),
       isActive: rundown.isActive(),
       persistentState: rundown.getPersistentState()
     } as MongoRundown
