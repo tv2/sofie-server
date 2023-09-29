@@ -1,4 +1,4 @@
-import { ActionType } from '../enums/action-type'
+import { ActionType, PartActionType, PieceActionType } from '../enums/action-type'
 import { PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
 
@@ -10,7 +10,7 @@ export interface Action {
 }
 
 export interface PartAction extends Action {
-  type: ActionType.INSERT_PART_AS_ON_AIR | ActionType.INSERT_PART_AS_NEXT
+  type: PartActionType
   data: {
     partInterface: PartInterface,
     pieceInterfaces: PieceInterface[]
@@ -18,7 +18,7 @@ export interface PartAction extends Action {
 }
 
 export interface PieceAction extends Action {
-  type: ActionType.INSERT_PIECE_AS_ON_AIR | ActionType.INSERT_PIECE_AS_NEXT
+  type: PieceActionType
   data: PieceInterface
 }
 
