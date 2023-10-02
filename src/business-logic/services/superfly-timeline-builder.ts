@@ -21,6 +21,7 @@ import { LookaheadMode } from '../../model/enums/lookahead-mode'
 import { Exception } from '../../model/exceptions/exception'
 import { ErrorCode } from '../../model/enums/error-code'
 import { Timeline } from '../../model/entities/timeline'
+import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -48,7 +49,11 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return { timelineGroups: [] }
   }
 
-  public buildTimeline(rundown: Rundown, studio: Studio): Timeline {
+  public async buildTimeline(rundown: Rundown, studio?: Studio): Promise<Timeline> {
+    if (!studio) {
+      throw new MisconfigurationException(`No Studio provided when calling ${SuperflyTimelineBuilder.name}.${SuperflyTimelineBuilder.prototype.buildTimeline.name}`)
+    }
+
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)
 
     if (!rundown.isActivePartSet()) {
@@ -63,7 +68,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     timeline = this.createTimelineWithInfiniteGroups(rundown, timeline)
     timeline = this.updateTimelineAutoNextEpochTimestampFromNextPart(rundown, activePartTimelineGroup, timeline)
 
-    return timeline
+    return Promise.resolve(timeline)
   }
 
   private createTimelineWithBaseline(rundown: Rundown): Timeline {

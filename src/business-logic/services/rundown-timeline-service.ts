@@ -9,16 +9,15 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 import { RundownService } from './interfaces/rundown-service'
 import {
-  PartInsertedAsNextEvent, PartInsertedAsOnAirEvent, PieceInsertedEvent,
+  PartInsertedAsNextEvent,
+  PartInsertedAsOnAirEvent,
+  PieceInsertedEvent,
   RundownEvent,
   RundownInfinitePieceAddedEvent,
 } from '../../model/value-objects/rundown-event'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
-import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
-import { Configuration } from '../../model/entities/configuration'
-import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
 import { Part } from '../../model/entities/part'
 
 export class RundownTimelineService implements RundownService {
@@ -26,7 +25,6 @@ export class RundownTimelineService implements RundownService {
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly rundownRepository: RundownRepository,
     private readonly timelineRepository: TimelineRepository,
-    private readonly configurationRepository: ConfigurationRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly rundownEventBuilder: RundownEventBuilder,
     private readonly callbackScheduler: CallbackScheduler,
@@ -50,38 +48,10 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
-    return rundown.isActivePartSet()
-      ? this.buildAndPersistTimelineWithBlueprint(rundown)
-      : this.buildAndPersistTimelineWithoutBlueprint(rundown)
-  }
-
-  private async buildAndPersistTimelineWithoutBlueprint(rundown: Rundown): Promise<Timeline> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
-    this.timelineRepository.saveTimeline(timeline)
+  private async buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
+    const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
+    await this.timelineRepository.saveTimeline(timeline)
     return timeline
-  }
-
-  private async buildAndPersistTimelineWithBlueprint(rundown: Rundown): Promise<Timeline> {
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
-    return onTimelineGenerateResult.timeline
-  }
-
-  private async buildTimelineAndCallOnGenerate(rundown: Rundown): Promise<OnTimelineGenerateResult> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
-
-    return this.blueprint.onTimelineGenerate(
-      configuration,
-      timeline,
-      rundown.getActivePart(),
-      rundown.getPersistentState(),
-      rundown.getPreviousPart()
-    )
   }
 
   public async deactivateRundown(rundownId: string): Promise<void> {
@@ -92,7 +62,7 @@ export class RundownTimelineService implements RundownService {
     rundown.deactivate()
     const timeline: Timeline = this.timelineBuilder.getBaseTimeline()
 
-    this.timelineRepository.saveTimeline(timeline)
+    await this.timelineRepository.saveTimeline(timeline)
 
     this.sendEvents(rundown, [this.rundownEventBuilder.buildDeactivateEvent])
 
