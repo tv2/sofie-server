@@ -8,7 +8,7 @@ export class SegmentDto {
   public readonly parts: PartDto[]
   public readonly isOnAir: boolean
   public readonly isNext: boolean
-  public readonly budgetDuration: number
+  public readonly budgetDuration?: number
 
   constructor(segment: Segment) {
     this.id = segment.id
