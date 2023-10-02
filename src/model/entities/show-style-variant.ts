@@ -1,5 +1,5 @@
 export interface ShowStyleVariant {
-  _id: string
+  id: string
   showStyleBaseId: string
   name: string
   blueprintConfiguration: unknown

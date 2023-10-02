@@ -30,7 +30,7 @@ export class ConfigurationController extends BaseController {
     }
   }
 
-  @GetRequest('/:rundownId')
+  @GetRequest('/rundowns/:rundownId')
   public async getShowStyleVariant(req: Request, res: Response): Promise<void> {
     try {
       const rundownId: string = req.params.rundownId

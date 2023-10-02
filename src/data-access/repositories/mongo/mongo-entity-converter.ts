@@ -12,6 +12,7 @@ import { LookaheadMode } from '../../../model/enums/lookahead-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { ShowStyle } from '../../../model/entities/show-style'
+import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 
 export interface MongoRundown {
   _id: string
@@ -95,6 +96,14 @@ interface MongoLayerMappings {
 export interface MongoShowStyle {
   blueprintConfig: unknown
 }
+
+export interface MongoShowStyleVariant {
+  _id: string
+  showStyleBaseId: string
+  name: string
+  blueprintConfig: unknown
+}
+
 
 interface MongoLayerMapping {
   // Which Lookahead "mode" we are in.
@@ -330,6 +339,15 @@ export class MongoEntityConverter {
   public convertShowStyle(mongoShowStyle: MongoShowStyle): ShowStyle {
     return {
       blueprintConfiguration: mongoShowStyle.blueprintConfig,
+    }
+  }
+
+  public convertShowStyleVariant(mongoShowStyleVariant: MongoShowStyleVariant): ShowStyleVariant {
+    return {
+      id: mongoShowStyleVariant._id,
+      name: mongoShowStyleVariant.name,
+      showStyleBaseId: mongoShowStyleVariant.showStyleBaseId,
+      blueprintConfiguration: mongoShowStyleVariant.blueprintConfig
     }
   }
 }
