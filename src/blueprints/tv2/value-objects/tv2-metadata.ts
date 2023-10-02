@@ -32,6 +32,7 @@ export interface Tv2PieceMetadata {
 export interface Tv2BlueprintTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType
+    type: unknown
   }
   metaData?: Tv2TimelineObjectMetadata
   isLookahead?: boolean

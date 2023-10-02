@@ -1,5 +1,4 @@
 import { Piece } from './piece'
-import { AdLibPiece } from './ad-lib-piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { PartTimings } from '../value-objects/part-timings'
 import { UnsupportedOperation } from '../exceptions/unsupported-operation'
@@ -13,6 +12,7 @@ export interface PartInterface {
   segmentId: string
   name: string
   rank: number
+  isPlanned: boolean
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
@@ -31,9 +31,9 @@ export interface PartInterface {
 
 export class Part {
   public readonly id: string
-  public readonly segmentId: string
   public readonly name: string
   public readonly rank: number
+  public readonly isPlanned: boolean = true
 
   public readonly expectedDuration: number
 
@@ -43,12 +43,12 @@ export class Part {
   public readonly autoNext?: AutoNext
   public readonly disableNextInTransition: boolean
 
+  private segmentId: string
+
   private pieces: Piece[]
 
   private isPartOnAir: boolean
   private isPartNext: boolean
-
-  private readonly adLibPieces: AdLibPiece[] = []
 
   private executedAt: number
   private playedDuration: number
@@ -57,7 +57,6 @@ export class Part {
   /*
    * The EndState of the Part
    * This should be set when the Part becomes the Previous Part.
-   * // TODO: Should we reset it when it becomes the active?
    */
   private endState?: PartEndState
 
@@ -66,6 +65,7 @@ export class Part {
     this.segmentId = part.segmentId
     this.name = part.name
     this.rank = part.rank
+    this.isPlanned = part.isPlanned
     this.pieces = part.pieces ?? []
     this.isPartOnAir = part.isOnAir
     this.isPartNext = part.isNext
@@ -122,8 +122,16 @@ export class Part {
     this.pieces = pieces
   }
 
-  public addAdLibPiece(adLibPiece: AdLibPiece): void {
-    this.adLibPieces.push(adLibPiece)
+  public insertPiece(unPlannedPiece: Piece): void {
+    if (unPlannedPiece.isPlanned) {
+      throw new UnsupportedOperation(`Trying to insert a planned Piece ${unPlannedPiece.id} to Part ${this.id}.`)
+    }
+    unPlannedPiece.setPartId(this.id)
+    if (this.isPartOnAir) {
+      const timeSincePutOnAir: number = Date.now() - this.executedAt
+      unPlannedPiece.setStart(timeSincePutOnAir)
+    }
+    this.pieces.push(unPlannedPiece)
   }
 
   public getPiecesWithLifespan(lifespanFilters: PieceLifespan[]): Piece[] {
@@ -136,6 +144,17 @@ export class Part {
 
   public getPlayedDuration(): number {
     return this.playedDuration
+  }
+
+  public getSegmentId(): string {
+    return this.segmentId
+  }
+
+  public setSegmentId(segmentId: string): void {
+    if (this.isPlanned) {
+      throw new UnsupportedOperation(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
+    }
+    this.segmentId = segmentId
   }
 
   // TODO: This implementation currently reflects how Core implemented it. It's in dire need of a refactor.
@@ -225,5 +244,10 @@ export class Part {
   public reset(): void {
     this.executedAt = 0
     this.playedDuration = 0
+    this.pieces = this.pieces.filter(piece => piece.isPlanned)
+  }
+
+  public clone(): Part {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
   }
 }
