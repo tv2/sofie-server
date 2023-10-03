@@ -19,6 +19,7 @@ import { ActiveRundownException } from '../../model/exceptions/active-rundown-ex
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
 import { Part } from '../../model/entities/part'
+import { Owner } from '../../model/enums/owner'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -132,9 +133,9 @@ export class RundownTimelineService implements RundownService {
       })
   }
 
-  public async setNext(rundownId: string, segmentId: string, partId: string): Promise<void> {
+  public async setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.setNext(segmentId, partId)
+    rundown.setNext(segmentId, partId, owner)
 
     await this.buildAndPersistTimeline(rundown)
 
@@ -160,7 +161,7 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
     if (rundown.isActive()) {
-      throw new ActiveRundownException('Attempted to delete an active rundown')
+      throw new ActiveRundownException(`Unable to delete active Rundown: ${rundown.id}`)
     }
 
     await this.rundownRepository.deleteRundown(rundownId)

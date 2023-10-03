@@ -1,4 +1,4 @@
-import { Rundown } from '../../../model/entities/rundown'
+import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities/rundown'
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
@@ -12,13 +12,23 @@ import { LookaheadMode } from '../../../model/enums/lookahead-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { ShowStyle } from '../../../model/entities/show-style'
+import { Owner } from '../../../model/enums/owner'
+import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
 
 export interface MongoRundown {
   _id: string
   name: string
   modified: number
   isActive?: boolean // TODO: Remove optionality when we have control over data structure.
-  persistentState?: unknown
+  persistentState?: unknown,
+  activeCursor: MongoRundownCursor,
+  nextCursor: MongoRundownCursor
+}
+
+interface MongoRundownCursor {
+  partId: string,
+  segmentId: string,
+  owner: Owner
 }
 
 export interface MongoSegment {
@@ -105,16 +115,46 @@ interface MongoLayerMapping {
 }
 
 export class MongoEntityConverter {
-  public convertRundown(mongoRundown: MongoRundown, baselineTimelineObjects?: TimelineObject[]): Rundown {
+  public convertRundown(mongoRundown: MongoRundown, segments: Segment[], baselineTimelineObjects?: TimelineObject[]): Rundown {
+    let alreadyActiveProperties: RundownAlreadyActiveProperties | undefined
+    if (mongoRundown.isActive) {
+      alreadyActiveProperties = {
+        activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
+        nextCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.nextCursor, segments),
+        infinitePieces: new Map<string, Piece>() // TODO: Save and populate - Pieces are currently not being saved
+      }
+    }
     return new Rundown({
       id: mongoRundown._id,
       name: mongoRundown.name,
       isRundownActive: mongoRundown.isActive ?? false,
       baselineTimelineObjects: baselineTimelineObjects ?? [],
-      segments: [],
+      segments,
       modifiedAt: mongoRundown.modified,
-      persistentState: mongoRundown.persistentState
+      persistentState: mongoRundown.persistentState,
+      alreadyActiveProperties
     })
+  }
+
+  private convertMongoRundownCursorToRundownCursor(cursor: MongoRundownCursor | undefined, segments: Segment[]): RundownCursor | undefined {
+    if (!cursor) {
+      return
+    }
+    const segmentForCursor: Segment | undefined = segments.find(segment => segment.id === cursor.segmentId)
+    if (!segmentForCursor) {
+      return
+    }
+
+    const partForCursor: Part | undefined = segmentForCursor.getParts().find(part => part.id === cursor.partId)
+    if (!partForCursor) {
+      return
+    }
+
+    return {
+      part: partForCursor,
+      segment: segmentForCursor,
+      owner: cursor.owner
+    }
   }
 
   public convertToMongoRundown(rundown: Rundown): MongoRundown {
@@ -122,8 +162,21 @@ export class MongoEntityConverter {
       _id: rundown.id,
       name: rundown.name,
       isActive: rundown.isActive(),
-      persistentState: rundown.getPersistentState()
+      persistentState: rundown.getPersistentState(),
+      activeCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getActiveCursor()),
+      nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor())
     } as MongoRundown
+  }
+
+  public convertRundownCursorToMongoRundownCursor(cursor: RundownCursor | undefined): MongoRundownCursor | undefined {
+    if (!cursor) {
+      return
+    }
+    return {
+      partId: cursor.part.id,
+      segmentId: cursor.segment.id,
+      owner: cursor.owner
+    }
   }
 
   public convertToBasicRundown(mongoRundown: MongoRundown): BasicRundown {

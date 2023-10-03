@@ -210,23 +210,6 @@ describe(MongoRundownRepository.name, () => {
       verify(segmentRepository.getSegments(rundown.id)).once()
     })
 
-    it('sets the rundown segments, when existing rundownId is given', async () => {
-      const segmentRepository: SegmentRepository = mock<SegmentRepository>()
-      const rundown: Rundown = TestEntityFactory.createRundown()
-      const segments: Segment[] = [TestEntityFactory.createSegment({ rundownId: rundown.id }), TestEntityFactory.createSegment({ rundownId: rundown.id })]
-      const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
-
-      when(segmentRepository.getSegments(rundown.id)).thenResolve(segments)
-      const testee: RundownRepository = createTestee({
-        segmentRepository: segmentRepository,
-        mongoConverter: mongoConverter
-      })
-
-      await testee.getRundown(rundown.id)
-
-      expect(rundown.getSegments()).toBe(segments)
-    })
-
     it('returns rundown, when existing rundownId is given', async () => {
       const rundown: Rundown = TestEntityFactory.createRundown()
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
@@ -236,7 +219,6 @@ describe(MongoRundownRepository.name, () => {
 
       expect(result).not.toBeNull()
     })
-    
   })
 
   function createMongoRundown(mongoRundownInterface?: Partial<MongoRundown>): MongoRundown {
@@ -254,7 +236,7 @@ describe(MongoRundownRepository.name, () => {
       })
     }
 
-    when(mongoEntityConverter.convertRundown(objectContaining(mongoRundown), anything())).thenReturn(rundown)
+    when(mongoEntityConverter.convertRundown(objectContaining(mongoRundown), anything(), anything())).thenReturn(rundown)
     await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
     return mongoEntityConverter
   }
