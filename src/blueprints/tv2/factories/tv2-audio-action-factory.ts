@@ -1,4 +1,4 @@
-import { PieceAction } from '../../../model/entities/action'
+import { Action, PieceAction } from '../../../model/entities/action'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SisyfosLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -9,7 +9,13 @@ import { PieceActionType } from '../../../model/enums/action-type'
 
 export class Tv2AudioActionFactory {
 
-  public createStopAudioBedAction(): PieceAction {
+  public createAudioActions(): Action[] {
+    return [
+      this.createStopAudioBedAction()
+    ]
+  }
+
+  private createStopAudioBedAction(): PieceAction {
     const duration: number = 1000
     const pieceInterface: PieceInterface = {
       id: 'stopAudioBedPiece',
