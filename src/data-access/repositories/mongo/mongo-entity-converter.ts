@@ -14,10 +14,12 @@ import { TransitionType } from '../../../model/enums/transition-type'
 import { ShowStyle } from '../../../model/entities/show-style'
 import { Owner } from '../../../model/enums/owner'
 import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
+import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 
 export interface MongoRundown {
   _id: string
   name: string
+  showStyleVariantId: string
   modified: number
   isActive?: boolean // TODO: Remove optionality when we have control over data structure.
   persistentState?: unknown,
@@ -105,6 +107,14 @@ export interface MongoShowStyle {
   blueprintConfig: unknown
 }
 
+export interface MongoShowStyleVariant {
+  _id: string
+  showStyleBaseId: string
+  name: string
+  blueprintConfig: unknown
+}
+
+
 interface MongoLayerMapping {
   // Which Lookahead "mode" we are in.
   lookahead: number
@@ -127,6 +137,7 @@ export class MongoEntityConverter {
     return new Rundown({
       id: mongoRundown._id,
       name: mongoRundown.name,
+      showStyleVariantId: mongoRundown.showStyleVariantId,
       isRundownActive: mongoRundown.isActive ?? false,
       baselineTimelineObjects: baselineTimelineObjects ?? [],
       segments,
@@ -161,6 +172,7 @@ export class MongoEntityConverter {
     return {
       _id: rundown.id,
       name: rundown.name,
+      showStyleVariantId: rundown.getShowStyleVariantId(),
       isActive: rundown.isActive(),
       persistentState: rundown.getPersistentState(),
       activeCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getActiveCursor()),
@@ -380,6 +392,15 @@ export class MongoEntityConverter {
   public convertShowStyle(mongoShowStyle: MongoShowStyle): ShowStyle {
     return {
       blueprintConfiguration: mongoShowStyle.blueprintConfig,
+    }
+  }
+
+  public convertShowStyleVariant(mongoShowStyleVariant: MongoShowStyleVariant): ShowStyleVariant {
+    return {
+      id: mongoShowStyleVariant._id,
+      name: mongoShowStyleVariant.name,
+      showStyleBaseId: mongoShowStyleVariant.showStyleBaseId,
+      blueprintConfiguration: mongoShowStyleVariant.blueprintConfig
     }
   }
 }
