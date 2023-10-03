@@ -444,6 +444,20 @@ export class Rundown extends BasicRundown {
   public addSegment(segment: Segment): void {
     this.segments.push(segment)
     this.segments.sort(this.compareSegments)
+
+    this.updateNextCursor()
+  }
+
+  private updateNextCursor(): void {
+    if (!this.isActive()) {
+      return
+    }
+
+    if (this.nextCursor && this.nextCursor.owner === Owner.EXTERNAL) {
+      return
+    }
+
+    this.setNextFromActive(Owner.SYSTEM)
   }
 
   public removeSegment(segmentId: string): void {
