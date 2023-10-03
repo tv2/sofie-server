@@ -5,13 +5,15 @@ import { ExpressErrorHandler } from '../express-error-handler'
 import { BaseController } from '../controllers/base-controller'
 import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
+import { ConfigurationController } from '../controllers/configuration-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
     return [
       this.createRundownController(),
       this.createTimelineController(),
-      this.createActionController()
+      this.createActionController(),
+      this.createConfigurationController()
     ]
   }
 
@@ -29,5 +31,13 @@ export class ControllerFacade {
 
   private static createActionController(): ActionController {
     return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler())
+  }
+
+  private static createConfigurationController(): ConfigurationController {
+    return new ConfigurationController(
+      RepositoryFacade.createConfigurationRepository(),
+      RepositoryFacade.createShowStyleVariantRepository(),
+      new ExpressErrorHandler()
+    )
   }
 }
