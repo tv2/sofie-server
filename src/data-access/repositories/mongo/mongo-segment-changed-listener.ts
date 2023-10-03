@@ -34,9 +34,9 @@ export class MongoSegmentChangedListener extends BaseMongoRepository implements 
     ], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoSegment>) => {
       console.log(`### Got a "${change.operationType}" event!`)
-      console.log(change)
       switch (change.operationType) {
         case MongoChangeEvent.INSERT: {
+          console.log(change)
           const insertChange: ChangeStreamInsertDocument<MongoSegment> = change as ChangeStreamInsertDocument<MongoSegment>
           const segmentId: string = insertChange.fullDocument._id
           this.onCreatedCallback(segmentId)
@@ -46,6 +46,7 @@ export class MongoSegmentChangedListener extends BaseMongoRepository implements 
           break
         }
         case MongoChangeEvent.DELETE: {
+          console.log(change)
           const deleteChange: ChangeStreamDeleteDocument = change as ChangeStreamDeleteDocument
           const segmentId: string = deleteChange.documentKey._id as unknown as string
           this.onDeletedCallback(segmentId)

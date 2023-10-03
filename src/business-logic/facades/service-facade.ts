@@ -55,6 +55,8 @@ export class ServiceFacade {
     return new DatabaseChangeIngestService(
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createSegmentRepository(),
+      RepositoryFacade.createTimelineRepository(),
+      ServiceFacade.createTimelineBuilder(),
       RundownEventService.getInstance(),
       ServiceFacade.createRundownEventBuilder(),
       RepositoryFacade.createSegmentChangedListener()

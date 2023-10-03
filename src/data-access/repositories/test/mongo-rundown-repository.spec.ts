@@ -10,7 +10,6 @@ import { RundownBaselineRepository } from '../interfaces/rundown-baseline-reposi
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
-import { Segment } from '../../../model/entities/segment'
 import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
 
 const COLLECTION_NAME: string = 'rundowns'
