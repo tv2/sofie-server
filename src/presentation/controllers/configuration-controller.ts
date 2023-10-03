@@ -17,7 +17,7 @@ export class ConfigurationController extends BaseController {
     super()
   }
 
-  @GetRequest()
+  @GetRequest('/blueprints')
   public async getBlueprintConfiguration(_req: Request, res: Response): Promise<void> {
     try {
       const configuration: Configuration = await this.configurationRepository.getConfiguration()
