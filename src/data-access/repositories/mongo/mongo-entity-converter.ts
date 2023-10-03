@@ -32,7 +32,7 @@ export interface MongoSegment {
   isHidden: boolean
   isOnAir: boolean
   isNext: boolean
-  budgetDuration: number
+  budgetDuration?: number
 }
 
 export interface MongoPart {
@@ -160,7 +160,7 @@ export class MongoEntityConverter {
       isOnAir: false,
       isNext: false,
       parts: [],
-      budgetDuration: mongoSegment.budgetDuration,
+      budgetDuration: mongoSegment.budgetDuration ?? undefined, // Ensure that null values are stripped
     })
   }
 
