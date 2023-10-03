@@ -11,6 +11,7 @@ import { DeletionFailedException } from '../../../model/exceptions/deletion-fail
 import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { UnsupportedOperation } from '../../../model/exceptions/unsupported-operation'
+import { Segment } from '../../../model/entities/segment'
 
 const RUNDOWN_COLLECTION_NAME: string = 'rundowns'
 
@@ -50,9 +51,8 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     const baselineTimelineObjects: TimelineObject[] = await this.rundownBaselineRepository.getRundownBaseline(
       rundownId
     )
-    const rundown: Rundown = this.mongoEntityConverter.convertRundown(mongoRundown, baselineTimelineObjects)
-    rundown.setSegments(await this.segmentRepository.getSegments(rundown.id))
-    return rundown
+    const segments: Segment[] = await this.segmentRepository.getSegments(rundownId)
+    return this.mongoEntityConverter.convertRundown(mongoRundown, segments, baselineTimelineObjects)
   }
 
   public getRundownBySegmentId(segmentId: string): Promise<Rundown> {

@@ -15,6 +15,8 @@ import { TimelineObject } from './timeline-object'
 import { LastPartInRundownException } from '../exceptions/last-part-in-rundown-exception'
 import { RundownPersistentState } from '../value-objects/rundown-persistent-state'
 import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { RundownCursor } from '../value-objects/rundown-cursor'
+import { Owner } from '../enums/owner'
 
 export interface RundownInterface {
   id: string
@@ -25,24 +27,22 @@ export interface RundownInterface {
   modifiedAt: number
   persistentState?: RundownPersistentState
 
-  alreadyActiveProperties?: {
-    activePart: Part
-    activeSegment: Segment
-    nextPart: Part
-    nextSegment: Segment
-    infinitePieces: Map<string, Piece>
-  }
+  alreadyActiveProperties?: RundownAlreadyActiveProperties
 }
+
+export interface RundownAlreadyActiveProperties {
+  activeCursor: RundownCursor | undefined
+  nextCursor: RundownCursor | undefined
+  infinitePieces: Map<string, Piece>
+}
+
 
 export class Rundown extends BasicRundown {
   private readonly baselineTimelineObjects: TimelineObject[]
-  private segments: Segment[]
+  private readonly segments: Segment[]
 
-  private activeSegment?: Segment
-  private activePart?: Part
-
-  private nextSegment: Segment
-  private nextPart: Part
+  private activeCursor?: RundownCursor
+  private nextCursor?: RundownCursor
 
   private previousPart?: Part
 
@@ -56,21 +56,11 @@ export class Rundown extends BasicRundown {
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
 
     if (rundown.alreadyActiveProperties) {
-      if (
-        !rundown.isRundownActive ||
-          !rundown.alreadyActiveProperties.activePart ||
-          !rundown.alreadyActiveProperties.nextPart ||
-          !rundown.alreadyActiveProperties.activeSegment ||
-          !rundown.alreadyActiveProperties.nextSegment
-      ) {
-        throw new MisconfigurationException(
-          'Rundown is missing required values in order to be instantiated as an active Rundown'
-        )
+      if (!rundown.isRundownActive) {
+        throw new MisconfigurationException('Trying to instantiate an inactive Rundown as active')
       }
-      this.activePart = rundown.alreadyActiveProperties.activePart
-      this.activeSegment = rundown.alreadyActiveProperties.activeSegment
-      this.nextPart = rundown.alreadyActiveProperties.nextPart
-      this.nextSegment = rundown.alreadyActiveProperties.nextSegment
+      this.activeCursor = rundown.alreadyActiveProperties.activeCursor
+      this.nextCursor = rundown.alreadyActiveProperties.nextCursor
       this.infinitePieces = rundown.alreadyActiveProperties.infinitePieces ?? new Map()
     }
   }
@@ -82,8 +72,19 @@ export class Rundown extends BasicRundown {
     this.resetSegments()
     this.isRundownActive = true
 
-    this.nextSegment = this.findFirstSegment()
-    this.nextPart = this.nextSegment.findFirstPart()
+    const firstSegment: Segment = this.findFirstSegment()
+    this.nextCursor = {
+      part: firstSegment.findFirstPart(),
+      segment: firstSegment,
+      owner: Owner.SYSTEM
+    }
+  }
+
+  private createCursor(cursor: RundownCursor | undefined, cursorPatch: Partial<RundownCursor> = {}): RundownCursor | undefined {
+    if (!cursor) {
+      return
+    }
+    return {...cursor, ...cursorPatch}
   }
 
   private resetSegments(): void {
@@ -96,15 +97,16 @@ export class Rundown extends BasicRundown {
     })
   }
 
-  private setNextFromActive(): void {
+  private setNextFromActive(owner: Owner): void {
     this.unmarkNextPart()
 
-    if (!this.activeSegment || !this.activePart) {
+    if (!this.activeCursor) {
       return
     }
 
     try {
-      this.nextPart = this.activeSegment.findNextPart(this.activePart)
+      const nextPart: Part = this.activeCursor.segment.findNextPart(this.activeCursor.part)
+      this.nextCursor = this.createCursor(this.nextCursor, { part: nextPart, owner })
     } catch (exception) {
       if ((exception as Exception).errorCode !== ErrorCode.LAST_PART_IN_SEGMENT) {
         throw exception
@@ -113,9 +115,8 @@ export class Rundown extends BasicRundown {
       const segment: Segment = this.findNextSegment()
       // TODO: Handle that we might be on the last Segment
       if (segment) {
-        this.nextSegment = segment
+        this.nextCursor = this.createCursor(this.nextCursor, { segment, part: segment.findFirstPart(), owner })
         this.markNextSegment()
-        this.nextPart = this.nextSegment.findFirstPart()
       }
     }
 
@@ -123,31 +124,35 @@ export class Rundown extends BasicRundown {
   }
 
   private unmarkNextSegment(): void {
-    if (this.nextSegment) {
-      this.nextSegment.removeAsNext()
+    if (!this.nextCursor) {
+      return
     }
+    this.nextCursor.segment.removeAsNext()
   }
 
   private unmarkNextPart(): void {
-    if (this.nextPart) {
-      this.nextPart.removeAsNext()
+    if (!this.nextCursor) {
+      return
     }
+    this.nextCursor.part.removeAsNext()
   }
 
   private markNextSegment(): void {
-    if (this.nextSegment) {
-      this.nextSegment.setAsNext()
+    if (!this.nextCursor) {
+      return
     }
+    this.nextCursor.segment.setAsNext()
   }
 
   private markNextPart(): void {
-    if (this.nextPart) {
-      this.nextPart.setAsNext()
+    if (!this.nextCursor) {
+      return
     }
+    this.nextCursor.part.setAsNext()
   }
 
   private findNextSegment(): Segment {
-    const activeSegmentIndex: number = this.segments.findIndex((segment) => segment.id === this.activeSegment?.id)
+    const activeSegmentIndex: number = this.segments.findIndex((segment) => segment.id === this.activeCursor?.segment?.id)
     if (activeSegmentIndex === -1) {
       throw new NotFoundException('Segment does not exist in Rundown')
     }
@@ -162,6 +167,7 @@ export class Rundown extends BasicRundown {
     this.deactivateActivePartAndSegment()
     this.unmarkNextSegment()
     this.unmarkNextPart()
+    this.nextCursor = undefined
     this.infinitePieces = new Map()
     this.isRundownActive = false
     this.previousPart = undefined
@@ -175,20 +181,18 @@ export class Rundown extends BasicRundown {
   }
 
   private deactivateActivePartAndSegment(): void {
-    if (this.activePart) {
-      this.activePart.takeOffAir()
-      this.activePart = undefined
+    if (!this.activeCursor) {
+      return
     }
-    if (this.activeSegment) {
-      this.activeSegment.takeOffAir()
-      this.activeSegment = undefined
-    }
+    this.activeCursor.part.takeOffAir()
+    this.activeCursor.segment.takeOffAir()
+    this.activeCursor = undefined
   }
 
   public getActiveSegment(): Segment {
     this.assertActive(this.getActiveSegment.name)
-    this.assertNotUndefined(this.activeSegment, 'active Segment')
-    return this.activeSegment
+    this.assertNotUndefined(this.activeCursor, 'active Cursor')
+    return this.activeCursor.segment
   }
 
   private assertNotUndefined<T>(value: T, nameOfType: string): asserts value is NonNullable<T> {
@@ -199,22 +203,24 @@ export class Rundown extends BasicRundown {
 
   public getNextSegment(): Segment {
     this.assertActive(this.getNextSegment.name)
-    return this.nextSegment
+    this.assertNotUndefined(this.nextCursor, 'next Cursor')
+    return this.nextCursor.segment
   }
 
   public isActivePartSet(): boolean {
-    return !!this.activePart
+    return !!this.activeCursor
   }
 
   public getActivePart(): Part {
     this.assertActive(this.getActivePart.name)
-    this.assertNotUndefined(this.activePart, 'active Part')
-    return this.activePart
+    this.assertNotUndefined(this.activeCursor, 'active Cursor')
+    return this.activeCursor.part
   }
 
   public getNextPart(): Part {
     this.assertActive(this.getNextPart.name)
-    return this.nextPart
+    this.assertNotUndefined(this.nextCursor, 'next Cursor')
+    return this.nextCursor.part
   }
 
   public getPartAfter(part: Part): Part {
@@ -255,48 +261,42 @@ export class Rundown extends BasicRundown {
   public takeNext(): void {
     this.assertActive(this.takeNext.name)
     this.setPreviousPart()
-    this.takeNextPart()
-    this.takeNextSegment()
-    this.setNextFromActive()
+    this.takeNextCursor()
+    this.setNextFromActive(Owner.SYSTEM)
     this.updateInfinitePieces()
 
     // TODO: If we changed Segments and if the Segment we came from is removed by ingest, we should remove it from the Rundown
   }
 
   private setPreviousPart(): void {
-    if (!this.activePart?.isOnAir()) {
+    if (!this.activeCursor?.part.isOnAir()) {
       // Simple guard to prevent setting PreviousPart on Rundown.activate().
       // Strongly consider refactor into something less implicit.
       return
     }
-    this.previousPart = this.activePart.clone()
+    this.previousPart = this.activeCursor?.part.clone()
   }
 
-  private takeNextPart(): void {
-    if (this.activePart) {
-      this.activePart.takeOffAir()
+  private takeNextCursor(): void {
+    if (this.activeCursor) {
+      this.activeCursor.part.takeOffAir()
+      this.activeCursor.segment.takeOffAir()
+      this.activeCursor.segment.takeOffAir()
     }
-    this.activePart = this.nextPart
-    this.activePart.putOnAir()
-    this.activePart.calculateTimings(this.previousPart)
-  }
-
-  /**
-   * This needs information from the current active Part, so this must be called after the active Part has been updated.
-   */
-  private takeNextSegment(): void {
-    if (this.activeSegment && this.activeSegment.id !== this.nextSegment.id) {
-      this.activeSegment.takeOffAir()
+    if (!this.nextCursor) {
+      return
     }
-    this.activeSegment = this.nextSegment
-    this.activeSegment.putOnAir()
+    this.activeCursor = this.nextCursor
+    this.activeCursor.part.putOnAir()
+    this.activeCursor.part.calculateTimings(this.previousPart)
+    this.activeCursor.segment.putOnAir()
   }
 
   private updateInfinitePieces(): void {
-    this.assertNotUndefined(this.activePart, 'active Part')
+    this.assertNotUndefined(this.activeCursor, 'active Part')
 
     let layersWithPieces: Map<string, Piece> = new Map(
-      this.activePart
+      this.activeCursor.part
         .getPieces()
         .map((piece) => [piece.layer, piece])
     )
@@ -333,9 +333,9 @@ export class Rundown extends BasicRundown {
         return false
       }
       case PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE: {
-        this.assertNotUndefined(this.activeSegment, 'active Segment')
+        this.assertNotUndefined(this.activeCursor, 'active Cursor')
         // If the Piece belongs to the active Segment, then the Piece is NOT outlived.
-        return !this.activeSegment.doesPieceBelongToSegment(piece)
+        return !this.activeCursor.segment.doesPieceBelongToSegment(piece)
       }
       case PieceLifespan.SPANNING_UNTIL_RUNDOWN_END:
       case PieceLifespan.SPANNING_UNTIL_SEGMENT_END: {
@@ -368,11 +368,10 @@ export class Rundown extends BasicRundown {
   }
 
   private addSpanningPiecesNotOnLayersFromActiveSegment(layersWithPieces: Map<string, Piece>): Map<string, Piece> {
-    this.assertNotUndefined(this.activeSegment, 'active Segment')
-    this.assertNotUndefined(this.activePart, 'active Part')
+    this.assertNotUndefined(this.activeCursor, 'active Cursor')
 
-    const piecesToAdd: Piece[] = this.activeSegment
-      .getFirstSpanningPieceForEachLayerBeforePart(this.activePart, new Set(layersWithPieces.keys()))
+    const piecesToAdd: Piece[] = this.activeCursor.segment
+      .getFirstSpanningPieceForEachLayerBeforePart(this.activeCursor.part, new Set(layersWithPieces.keys()))
       .map(this.setExecutedAtIfMissing)
     return this.addPiecesToLayers(piecesToAdd, layersWithPieces)
   }
@@ -385,7 +384,7 @@ export class Rundown extends BasicRundown {
   }
 
   private addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces: Map<string, Piece>): Map<string, Piece> {
-    const indexOfActiveSegment: number = this.segments.findIndex((segment) => segment.id === this.activeSegment?.id)
+    const indexOfActiveSegment: number = this.segments.findIndex((segment) => segment.id === this.activeCursor?.segment?.id)
     for (let i = indexOfActiveSegment - 1; i >= 0; i--) {
       const piecesSpanningSegment: Piece[] = this.segments[i]
         .getFirstSpanningRundownPieceForEachLayerForAllParts(new Set(layersWithPieces.keys()))
@@ -405,16 +404,20 @@ export class Rundown extends BasicRundown {
     })
   }
 
-  public setNext(segmentId: string, partId: string): void {
+  public setNext(segmentId: string, partId: string, owner?: Owner): void {
     this.assertActive(this.setNext.name)
-    if (!this.nextSegment || this.nextSegment.id !== segmentId) {
-      this.unmarkNextSegment()
-      this.nextSegment = this.findSegment(segmentId)
-      this.markNextSegment()
-    }
+    this.assertNotUndefined(this.nextCursor, 'next Cursor')
 
+    let nextSegment: Segment = this.nextCursor.segment
+    if (this.nextCursor.segment.id !== segmentId) {
+      this.unmarkNextSegment()
+      nextSegment = this.findSegment(segmentId)
+    }
     this.unmarkNextPart()
-    this.nextPart = this.nextSegment.findPart(partId)
+
+    this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextSegment.findPart(partId), owner: owner ?? Owner.SYSTEM })
+
+    this.markNextSegment()
     this.markNextPart()
   }
 
@@ -424,10 +427,6 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Segment "${segmentId}" does not exist in Rundown "${this.id}"`)
     }
     return segment
-  }
-
-  public setSegments(segments: Segment[]): void {
-    this.segments = segments.sort(this.compareSegments)
   }
 
   private compareSegments(segmentOne: Segment, segmentTwo: Segment): number {
@@ -471,22 +470,31 @@ export class Rundown extends BasicRundown {
 
   public insertPartAsNext(part: Part): void {
     this.assertActive(this.insertPartAsNext.name)
-    this.assertNotUndefined(this.activeSegment, 'active Segment')
+    this.assertNotUndefined(this.activeCursor, 'active Segment')
 
-    this.activeSegment.insertPartAfterActivePart(part)
-    this.setNext(this.activeSegment.id, part.id)
+    this.activeCursor.segment.insertPartAfterActivePart(part)
+    this.setNext(this.activeCursor.segment.id, part.id)
   }
 
   public insertPieceIntoActivePart(piece: Piece): void {
     this.assertActive(this.insertPieceIntoActivePart.name)
-    this.assertNotUndefined(this.activePart, 'active Part')
+    this.assertNotUndefined(this.activeCursor, 'active Part')
 
-    this.activePart.insertPiece(piece)
+    this.activeCursor.part.insertPiece(piece)
     this.updateInfinitePieces()
   }
 
   public insertPieceIntoNextPart(piece: Piece): void {
     this.assertActive(this.insertPieceIntoNextPart.name)
-    this.nextPart.insertPiece(piece)
+    this.assertNotUndefined(this.nextCursor, 'next Cursor')
+    this.nextCursor.part.insertPiece(piece)
+  }
+
+  public getActiveCursor(): RundownCursor | undefined {
+    return this.activeCursor
+  }
+
+  public getNextCursor(): RundownCursor | undefined {
+    return this.nextCursor
   }
 }

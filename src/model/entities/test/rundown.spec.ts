@@ -10,6 +10,7 @@ import { NotFoundException } from '../../exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
 import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
 import { AlreadyActivatedException } from '../../exceptions/already-activated-exception'
+import { Owner } from '../../enums/owner'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -19,10 +20,16 @@ describe(Rundown.name, () => {
           const rundownInterface: RundownInterface = {
             isRundownActive: false,
             alreadyActiveProperties: {
-              activePart: EntityMockFactory.createPart(),
-              nextPart: EntityMockFactory.createPart(),
-              activeSegment: EntityMockFactory.createSegment(),
-              nextSegment: EntityMockFactory.createSegment(),
+              activeCursor: {
+                part: EntityMockFactory.createPart(),
+                segment: EntityMockFactory.createSegment(),
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: EntityMockFactory.createPart(),
+                segment: EntityMockFactory.createSegment(),
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map(),
             },
           } as RundownInterface
@@ -40,120 +47,6 @@ describe(Rundown.name, () => {
       })
 
       describe('active status is provided as true', () => {
-        describe('it has no active Part', () => {
-          it('throws error', () => {
-            const rundownInterface: RundownInterface = {
-              isRundownActive: true,
-              alreadyActiveProperties: {
-                nextPart: EntityMockFactory.createPart(),
-                activeSegment: EntityMockFactory.createSegment(),
-                nextSegment: EntityMockFactory.createSegment(),
-                infinitePieces: new Map(),
-              },
-            } as RundownInterface
-
-            try {
-              new Rundown(rundownInterface)
-            } catch (error) {
-              // Instantiation threw error, so all is well
-              return
-            }
-            throw new Error(
-              'Rundown didn\'t fail when instantiated with true active status, but missing active Part'
-            )
-          })
-        })
-
-        describe('it has no next Part', () => {
-          it('throws error', () => {
-            const rundownInterface: RundownInterface = {
-              isRundownActive: true,
-              alreadyActiveProperties: {
-                activePart: EntityMockFactory.createPart(),
-                activeSegment: EntityMockFactory.createSegment(),
-                nextSegment: EntityMockFactory.createSegment(),
-                infinitePieces: new Map(),
-              },
-            } as RundownInterface
-
-            try {
-              new Rundown(rundownInterface)
-            } catch (error) {
-              // Instantiation threw error, so all is well
-              return
-            }
-            throw new Error(
-              'Rundown didn\'t fail when instantiated with true active status, but missing next Part'
-            )
-          })
-        })
-
-        describe('it has no active Segment', () => {
-          it('throws error', () => {
-            const rundownInterface: RundownInterface = {
-              isRundownActive: true,
-              alreadyActiveProperties: {
-                activePart: EntityMockFactory.createPart(),
-                nextPart: EntityMockFactory.createPart(),
-                nextSegment: EntityMockFactory.createSegment(),
-                infinitePieces: new Map(),
-              },
-            } as RundownInterface
-
-            try {
-              new Rundown(rundownInterface)
-            } catch (error) {
-              // Instantiation threw error, so all is well
-              return
-            }
-            throw new Error(
-              'Rundown didn\'t fail when instantiated with true active status, but missing active Segment'
-            )
-          })
-        })
-
-        describe('it has no next Segment', () => {
-          it('throws error', () => {
-            const rundownInterface: RundownInterface = {
-              isRundownActive: true,
-              alreadyActiveProperties: {
-                activePart: EntityMockFactory.createPart(),
-                nextPart: EntityMockFactory.createPart(),
-                activeSegment: EntityMockFactory.createSegment(),
-                infinitePieces: new Map(),
-              },
-            } as RundownInterface
-
-            try {
-              new Rundown(rundownInterface)
-            } catch (error) {
-              // Instantiation threw error, so all is well
-              return
-            }
-            throw new Error(
-              'Rundown didn\'t fail when instantiated with true active status, but missing next Segment'
-            )
-          })
-        })
-
-        describe('no infinite Pieces are provided', () => {
-          describe('sets infinite Pieces to an empty map', () => {
-            const rundownInterface: RundownInterface = {
-              isRundownActive: true,
-              alreadyActiveProperties: {
-                activePart: EntityMockFactory.createPart(),
-                nextPart: EntityMockFactory.createPart(),
-                activeSegment: EntityMockFactory.createSegment(),
-                nextSegment: EntityMockFactory.createSegment(),
-              },
-            } as RundownInterface
-
-            const rundown: Rundown = new Rundown(rundownInterface)
-
-            expect(rundown.getInfinitePieces()).toHaveLength(0)
-          })
-        })
-
         describe('it provides all necessary values', () => {
           it('sets all values', () => {
             const activePart: Part = EntityMockFactory.createPart({ id: 'activePart' })
@@ -171,10 +64,16 @@ describe(Rundown.name, () => {
             const rundownInterface: RundownInterface = {
               isRundownActive: true,
               alreadyActiveProperties: {
-                activePart,
-                nextPart,
-                activeSegment,
-                nextSegment,
+                activeCursor: {
+                  part: activePart,
+                  segment: activeSegment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: nextPart,
+                  segment: nextSegment,
+                  owner: Owner.SYSTEM
+                },
                 infinitePieces: new Map([[piece.layer, piece]]),
               },
             } as RundownInterface
@@ -213,10 +112,16 @@ describe(Rundown.name, () => {
           segments: [segment],
           isRundownActive: true,
           alreadyActiveProperties: {
-            activePart: firstPart,
-            nextPart,
-            activeSegment: segment,
-            nextSegment: segment,
+            activeCursor: {
+              part: firstPart,
+              segment,
+              owner: Owner.SYSTEM
+            },
+            nextCursor: {
+              part: nextPart,
+              segment,
+              owner: Owner.SYSTEM
+            },
             infinitePieces: new Map(),
           },
         } as RundownInterface)
@@ -250,10 +155,16 @@ describe(Rundown.name, () => {
           segments: [segment],
           isRundownActive: true,
           alreadyActiveProperties: {
-            activePart: firstPart,
-            nextPart,
-            activeSegment: segment,
-            nextSegment: segment,
+            activeCursor: {
+              part: firstPart,
+              segment,
+              owner: Owner.SYSTEM
+            },
+            nextCursor: {
+              part: nextPart,
+              segment,
+              owner: Owner.SYSTEM
+            },
             infinitePieces: new Map(),
           },
         } as RundownInterface)
@@ -278,10 +189,16 @@ describe(Rundown.name, () => {
           segments: [segment],
           isRundownActive: true,
           alreadyActiveProperties: {
-            activePart: segment.findFirstPart(),
-            nextPart: partWithoutPieces,
-            activeSegment: segment,
-            nextSegment: segment,
+            activeCursor: {
+              part: segment.findFirstPart(),
+              segment,
+              owner: Owner.SYSTEM
+            },
+            nextCursor: {
+              part: partWithoutPieces,
+              segment,
+              owner: Owner.SYSTEM
+            },
             infinitePieces: new Map(),
           },
         } as RundownInterface)
@@ -318,10 +235,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: segment.findFirstPart(),
-              nextPart: nextPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: segment.findFirstPart(),
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map(),
             },
           } as RundownInterface)
@@ -368,10 +291,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map(),
             },
           } as RundownInterface)
@@ -420,10 +349,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map(),
             },
           } as RundownInterface)
@@ -475,10 +410,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -517,10 +458,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, nextSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart,
-              activeSegment: firstSegment,
-              nextSegment: nextSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment: nextSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -562,10 +509,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, nextSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart,
-              activeSegment: firstSegment,
-              nextSegment: nextSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment: nextSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -621,10 +574,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, middleSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: firstSegment,
-              nextSegment: lastSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -678,10 +637,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, middleSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: lastPart,
-              nextPart: firstPart,
-              activeSegment: lastSegment,
-              nextSegment: firstSegment,
+              activeCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
             },
           } as RundownInterface)
@@ -729,10 +694,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: firstSegment,
-              nextSegment: lastSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -780,10 +751,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: firstSegment,
-              nextSegment: lastSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -839,10 +816,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, middleSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: firstSegment,
-              nextSegment: lastSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map(),
             },
           } as RundownInterface)
@@ -898,10 +881,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, middleSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: firstSegment,
-              nextSegment: lastSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map(),
             },
           } as RundownInterface)
@@ -954,10 +943,16 @@ describe(Rundown.name, () => {
               segments: [firstSegment, middleSegment, lastSegment],
               isRundownActive: true,
               alreadyActiveProperties: {
-                activePart: lastPart,
-                nextPart: middlePart,
-                activeSegment: lastSegment,
-                nextSegment: middleSegment,
+                activeCursor: {
+                  part: lastPart,
+                  segment: lastSegment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: middlePart,
+                  segment: middleSegment,
+                  owner: Owner.SYSTEM
+                },
                 infinitePieces: new Map(),
               },
             } as RundownInterface)
@@ -1003,10 +998,16 @@ describe(Rundown.name, () => {
               segments: [firstSegment, middleSegment, lastSegment],
               isRundownActive: true,
               alreadyActiveProperties: {
-                activePart: lastPart,
-                nextPart: middlePart,
-                activeSegment: lastSegment,
-                nextSegment: middleSegment,
+                activeCursor: {
+                  part: lastPart,
+                  segment: lastSegment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: middlePart,
+                  segment: middleSegment,
+                  owner: Owner.SYSTEM
+                },
                 infinitePieces: new Map(),
               },
             } as RundownInterface)
@@ -1045,10 +1046,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: firstSegment,
-              nextSegment: lastSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1093,10 +1100,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, middleSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: firstSegment,
-              nextSegment: lastSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1146,10 +1159,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, nextSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: nextPart,
-              activeSegment: firstSegment,
-              nextSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment: nextSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1197,10 +1216,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: nextPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1249,10 +1274,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1301,10 +1332,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: lastPart,
-              nextPart: firstPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: lastPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
             },
           } as RundownInterface)
@@ -1351,10 +1388,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: nextPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1401,10 +1444,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: nextPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1455,10 +1504,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1498,10 +1553,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, nextSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: nextPart,
-              activeSegment: firstSegment,
-              nextSegment: nextSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment: nextSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1549,10 +1610,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1601,12 +1668,18 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
-            },
+            }
           } as RundownInterface)
 
           testee.takeNext()
@@ -1650,12 +1723,18 @@ describe(Rundown.name, () => {
               segments: [segment],
               isRundownActive: true,
               alreadyActiveProperties: {
-                activePart: lastPart,
-                nextPart: middlePart,
-                activeSegment: segment,
-                nextSegment: segment,
+                activeCursor: {
+                  part: lastPart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: middlePart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
                 infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
-              },
+              }
             } as RundownInterface)
 
             testee.takeNext()
@@ -1692,12 +1771,18 @@ describe(Rundown.name, () => {
               segments: [segment],
               isRundownActive: true,
               alreadyActiveProperties: {
-                activePart: lastPart,
-                nextPart: middlePart,
-                activeSegment: segment,
-                nextSegment: segment,
+                activeCursor: {
+                  part: lastPart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: middlePart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
                 infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
-              },
+              }
             } as RundownInterface)
 
             testee.takeNext()
@@ -1740,10 +1825,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1789,10 +1880,16 @@ describe(Rundown.name, () => {
             segments: [segment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: segment,
-              nextSegment: segment,
+              activeCursor: {
+                part: firstPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1832,10 +1929,16 @@ describe(Rundown.name, () => {
             segments: [firstSegment, nextSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: nextPart,
-              activeSegment: firstSegment,
-              nextSegment: nextSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment: nextSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
           } as RundownInterface)
@@ -1875,12 +1978,18 @@ describe(Rundown.name, () => {
             segments: [firstSegment, nextSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: nextPart,
-              activeSegment: firstSegment,
-              nextSegment: nextSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment: nextSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
-            },
+            }
           } as RundownInterface)
 
           testee.takeNext()
@@ -1922,12 +2031,18 @@ describe(Rundown.name, () => {
             segments: [firstSegment, middleSegment, lastSegment],
             isRundownActive: true,
             alreadyActiveProperties: {
-              activePart: firstPart,
-              nextPart: lastPart,
-              activeSegment: firstSegment,
-              nextSegment: lastSegment,
+              activeCursor: {
+                part: firstPart,
+                segment: firstSegment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: lastPart,
+                segment: lastSegment,
+                owner: Owner.SYSTEM
+              },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
-            },
+            }
           } as RundownInterface)
 
           testee.takeNext()
@@ -1970,12 +2085,18 @@ describe(Rundown.name, () => {
               segments: [firstSegment, middleSegment, lastSegment],
               isRundownActive: true,
               alreadyActiveProperties: {
-                activePart: lastPart,
-                nextPart: middlePart,
-                activeSegment: lastSegment,
-                nextSegment: middleSegment,
+                activeCursor: {
+                  part: lastPart,
+                  segment: lastSegment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: middlePart,
+                  segment: middleSegment,
+                  owner: Owner.SYSTEM
+                },
                 infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
-              },
+              }
             } as RundownInterface)
 
             testee.takeNext()
@@ -2013,12 +2134,18 @@ describe(Rundown.name, () => {
               segments: [firstSegment, middleSegment, lastSegment],
               isRundownActive: true,
               alreadyActiveProperties: {
-                activePart: lastPart,
-                nextPart: middlePart,
-                activeSegment: lastSegment,
-                nextSegment: middleSegment,
+                activeCursor: {
+                  part: lastPart,
+                  segment: lastSegment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: middlePart,
+                  segment: middleSegment,
+                  owner: Owner.SYSTEM
+                },
                 infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
-              },
+              }
             } as RundownInterface)
 
             testee.takeNext()
