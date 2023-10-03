@@ -20,6 +20,8 @@ import { CachedConfigurationRepository } from '../repositories/cache/cached-conf
 import { MongoShowStyleRepository } from '../repositories/mongo/mongo-show-style-repository'
 import { ConfigurationRepository } from '../repositories/interfaces/configuration-repository'
 import { MongoConfigurationRepository } from '../repositories/mongo/mongo-configuration-repository'
+import { ShowStyleVariantRepository } from '../repositories/interfaces/show-style-variant-repository'
+import { MongoShowStyleVariantRepository } from '../repositories/mongo/mongo-show-style-variant-repository'
 import { ActionRepository } from '../repositories/interfaces/action-repository'
 import { MongoActionRepository } from '../repositories/mongo/mongo-action-repository'
 
@@ -81,5 +83,9 @@ export class RepositoryFacade {
 
   public static createActionRepository(): ActionRepository {
     return new MongoActionRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  public static createShowStyleVariantRepository(): ShowStyleVariantRepository {
+    return new MongoShowStyleVariantRepository(MongoDatabase.getInstance(), new MongoEntityConverter(), this.createRundownRepository())
   }
 }
