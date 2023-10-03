@@ -21,6 +21,7 @@ import { Owner } from '../enums/owner'
 export interface RundownInterface {
   id: string
   name: string
+  showStyleVariantId: string
   segments: Segment[]
   baselineTimelineObjects: TimelineObject[]
   isRundownActive: boolean
@@ -50,10 +51,13 @@ export class Rundown extends BasicRundown {
 
   private persistentState?: RundownPersistentState
 
+  private readonly showStyleVariantId: string
+
   constructor(rundown: RundownInterface) {
     super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt)
     this.segments = rundown.segments ?? []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
+    this.showStyleVariantId = rundown.showStyleVariantId
 
     if (rundown.alreadyActiveProperties) {
       if (!rundown.isRundownActive) {
@@ -256,6 +260,10 @@ export class Rundown extends BasicRundown {
 
   public getBaseline(): TimelineObject[] {
     return this.baselineTimelineObjects
+  }
+
+  public getShowStyleVariantId(): string {
+    return this.showStyleVariantId
   }
 
   public takeNext(): void {
