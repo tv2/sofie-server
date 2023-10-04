@@ -473,6 +473,23 @@ export class Rundown extends BasicRundown {
     return this.segments
   }
 
+  public addPartToSegment(part: Part, segmentId: string): void {
+    const segment: Segment | undefined = this.segments.find(segment => segment.id === segmentId)
+    if (!segment) {
+      throw new NotFoundException(`Unable to find Segment for ${segmentId} in Rundown ${this.id}`)
+    }
+    segment.addPart(part)
+  }
+
+  public removePartFromSegment(partId: string): void {
+    const segment: Segment | undefined = this.segments.find(segment => segment.getParts().some(part => part.id === partId))
+    if (!segment) {
+      throw new NotFoundException(`Unable to find Segment for Part ${partId} in Rundown ${this.id}`)
+    }
+
+    segment.removePart(partId)
+  }
+
   public getInfinitePieces(): Piece[] {
     return Array.from(this.infinitePieces.values())
   }

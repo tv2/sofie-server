@@ -26,6 +26,9 @@ import { ActionRepository } from '../repositories/interfaces/action-repository'
 import { MongoActionRepository } from '../repositories/mongo/mongo-action-repository'
 import { DataChangedListener } from '../repositories/interfaces/data-changed-listener'
 import { MongoSegmentChangedListener } from '../repositories/mongo/mongo-segment-changed-listener'
+import { MongoPartChangedListener } from '../repositories/mongo/mongo-part-changed-listener'
+import { Segment } from '../../model/entities/segment'
+import { Part } from '../../model/entities/part'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -51,10 +54,11 @@ export class RepositoryFacade {
     )
   }
 
-  public static createSegmentChangedListener(): DataChangedListener {
+  public static createSegmentChangedListener(): DataChangedListener<Segment> {
     return new MongoSegmentChangedListener(
       MongoDatabase.getInstance(),
-      new MongoEntityConverter()
+      new MongoEntityConverter(),
+      RepositoryFacade.createSegmentRepository()
     )
   }
 
@@ -63,6 +67,14 @@ export class RepositoryFacade {
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
       this.createPieceRepository()
+    )
+  }
+
+  public static createPartChangedListener(): DataChangedListener<Part> {
+    return new MongoPartChangedListener(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter(),
+      RepositoryFacade.createPartRepository()
     )
   }
 

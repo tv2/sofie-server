@@ -1,6 +1,8 @@
 import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
+  PartCreatedEvent,
+  PartDeletedEvent,
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
@@ -179,6 +181,26 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       timestamp: Date.now(),
       rundownId: rundown.id,
       segmentId
+    }
+  }
+
+  public buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent {
+    return {
+      type: IngestEventType.PART_CREATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId: part.getSegmentId(),
+      partId: part.id
+    }
+  }
+
+  public buildPartDeletedEvent(rundown: Rundown, partId: string): PartDeletedEvent {
+    return {
+      type: IngestEventType.PART_DELETED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId: '',
+      partId: partId
     }
   }
 }

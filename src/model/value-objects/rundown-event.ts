@@ -122,3 +122,11 @@ export interface SegmentCreatedEvent extends SegmentEvent {
 export interface SegmentDeletedEvent extends SegmentEvent {
   type : IngestEventType.SEGMENT_DELETED
 }
+
+export interface PartCreatedEvent extends PartEvent {
+  type: IngestEventType.PART_CREATED
+}
+
+export interface PartDeletedEvent extends PartEvent {
+  type: IngestEventType.PART_DELETED
+}

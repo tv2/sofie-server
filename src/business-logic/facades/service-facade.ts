@@ -54,12 +54,12 @@ export class ServiceFacade {
   public static createIngestService(): IngestService {
     return new DatabaseChangeIngestService(
       RepositoryFacade.createRundownRepository(),
-      RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       RundownEventService.getInstance(),
       ServiceFacade.createRundownEventBuilder(),
-      RepositoryFacade.createSegmentChangedListener()
+      RepositoryFacade.createSegmentChangedListener(),
+      RepositoryFacade.createPartChangedListener()
     )
   }
 }

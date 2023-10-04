@@ -6,6 +6,8 @@ import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { DeleteResult } from 'mongodb'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { Piece } from '../../../model/entities/piece'
 
 const PART_COLLECTION_NAME: string = 'parts'
 
@@ -20,6 +22,20 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
 
   protected getCollectionName(): string {
     return PART_COLLECTION_NAME
+  }
+
+  public async getPart(partId: string): Promise<Part> {
+    this.assertDatabaseConnection(this.getPart.name)
+    const mongoPart: MongoPart | null = await this.getCollection().findOne<MongoPart>({
+      _id: partId
+    })
+    if (!mongoPart) {
+      throw new NotFoundException(`No Part found for partId: ${partId}`)
+    }
+    const part: Part = this.mongoEntityConverter.convertPart(mongoPart)
+    const pieces: Piece[] = await this.pieceRepository.getPieces(part.id)
+    part.setPieces(pieces)
+    return part
   }
 
   public async getParts(segmentId: string): Promise<Part[]> {
