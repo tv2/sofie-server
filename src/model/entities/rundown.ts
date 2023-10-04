@@ -460,6 +460,15 @@ export class Rundown extends BasicRundown {
     this.setNextFromActive(Owner.SYSTEM)
   }
 
+  public updateSegment(segment: Segment): void {
+    const segmentIndex: number = this.segments.findIndex(s => s.id === segment.id)
+    if (segmentIndex < 0) {
+      throw new NotFoundException(`Segment ${segment.id} does not belong to Rundown ${this.id}`)
+    }
+    this.segments[segmentIndex] = segment
+    this.segments.sort(this.compareSegments)
+  }
+
   public removeSegment(segmentId: string): void {
     const segmentIndex: number = this.segments.findIndex(s => s.id === segmentId)
     if (segmentIndex < 0) {
@@ -473,12 +482,20 @@ export class Rundown extends BasicRundown {
     return this.segments
   }
 
-  public addPartToSegment(part: Part, segmentId: string): void {
-    const segment: Segment | undefined = this.segments.find(segment => segment.id === segmentId)
+  public addPart(part: Part): void {
+    const segment: Segment | undefined = this.segments.find(segment => segment.id === part.getSegmentId())
     if (!segment) {
-      throw new NotFoundException(`Unable to find Segment for ${segmentId} in Rundown ${this.id}`)
+      throw new NotFoundException(`Unable to find Segment for Part ${part.id} in Rundown ${this.id}`)
     }
     segment.addPart(part)
+  }
+
+  public updatePart(part: Part): void {
+    const segment: Segment | undefined = this.segments.find(segment => segment.id === part.getSegmentId())
+    if (!segment) {
+      throw new NotFoundException(`Unable to find Segment for Part ${part.id} in Rundown ${this.id}`)
+    }
+    segment.updatePart(part)
   }
 
   public removePartFromSegment(partId: string): void {

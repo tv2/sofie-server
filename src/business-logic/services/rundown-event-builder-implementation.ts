@@ -7,6 +7,7 @@ import {
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
   PartTakenEvent,
+  PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownDeactivatedEvent,
@@ -15,6 +16,7 @@ import {
   RundownResetEvent,
   SegmentCreatedEvent,
   SegmentDeletedEvent,
+  SegmentUpdatedEvent,
 } from '../../model/value-objects/rundown-event'
 import { IngestEventType, RundownEventType } from '../../model/enums/event-type'
 import { Piece } from '../../model/entities/piece'
@@ -175,6 +177,15 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
     }
   }
 
+  public buildSegmentUpdatedEvent(rundown: Rundown, segment: Segment): SegmentUpdatedEvent {
+    return {
+      type: IngestEventType.SEGMENT_UPDATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId: segment.id
+    }
+  }
+
   public buildSegmentDeletedEvent(rundown: Rundown, segmentId: string): SegmentDeletedEvent {
     return {
       type: IngestEventType.SEGMENT_DELETED,
@@ -187,6 +198,16 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
   public buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent {
     return {
       type: IngestEventType.PART_CREATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId: part.getSegmentId(),
+      partId: part.id
+    }
+  }
+
+  public buildPartUpdatedEvent(rundown: Rundown, part: Part): PartUpdatedEvent {
+    return {
+      type: IngestEventType.PART_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       segmentId: part.getSegmentId(),
