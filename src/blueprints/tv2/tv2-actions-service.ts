@@ -40,7 +40,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
 
     return [
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
-      ...this.audioActionFactory.createAudioActions(),
+      ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
       ...this.staticActionFactory.createStaticActions(), // Todo(ASMA): Split into appropriate factories, and remove.
       ...this.graphicActionFactory.createGraphicsActions(blueprintConfiguration)

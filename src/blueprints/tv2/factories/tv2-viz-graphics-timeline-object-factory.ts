@@ -1,4 +1,4 @@
-import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/tv2-graphics-timeline-object-factory'
+import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/factories/tv2-graphics-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
   VizMseContinueTimelineObject,

@@ -4,7 +4,7 @@ import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/tv2-graphics-timeline-object-factory'
+import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/factories/tv2-graphics-timeline-object-factory'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
 
@@ -15,7 +15,7 @@ export class Tv2GraphicActionFactory {
 
   public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return [
-      this.createGraphicsThemeOutAction(blueprintConfiguration),
+      this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
       this.createContinueGraphicsAction(),
     ]
@@ -25,7 +25,7 @@ export class Tv2GraphicActionFactory {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = {
       ...this.createDefaultGraphicPieceInterface(),
-      id: 'continueGraphic',
+      id: 'continueGraphicPiece',
       name: 'Continue graphics ',
       duration,
       tags: [],
@@ -41,12 +41,11 @@ export class Tv2GraphicActionFactory {
     }
   }
 
-  // Todo: Question if 'Graphics' should be removed from method name.  
-  private createGraphicsThemeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createThemeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
     const duration: number = 3000 // Taken from Blueprints
     const pieceInterface: PieceInterface = {
       ...this.createDefaultGraphicPieceInterface(),
-      id: 'themeOut',
+      id: 'themeOutPiece',
       name: 'Theme Out',
       duration,
       tags: [],
@@ -83,7 +82,7 @@ export class Tv2GraphicActionFactory {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = {
       ...this.createDefaultGraphicPieceInterface(),
-      id: 'overlayInitialize',
+      id: 'overlayInitializePiece',
       name: 'Overlay Initialize',
       duration,
       tags: [],
