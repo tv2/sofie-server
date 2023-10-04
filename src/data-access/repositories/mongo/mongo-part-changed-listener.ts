@@ -56,7 +56,6 @@ export class MongoPartChangedListener extends BaseMongoRepository implements Dat
         break
       }
       case MongoChangeEvent.REPLACE: {
-        console.log(change)
         const replaceChange: ChangeStreamReplaceDocument = change as ChangeStreamReplaceDocument
         const partId: string = replaceChange.fullDocument._id
         const part: Part = await this.partRepository.getPart(partId)

@@ -105,6 +105,15 @@ export class Segment {
     this.parts.sort(this.compareParts)
   }
 
+  public updatePart(part: Part): void {
+    const partIndex: number = this.parts.findIndex(p => p.id === part.id)
+    if (partIndex < 0) {
+      throw new NotFoundException(`Part ${part.id} does not belong to Segment ${this.id}`)
+    }
+    this.parts[partIndex] = part
+    this.parts.sort(this.compareParts)
+  }
+
   public removePart(partId: string): void {
     this.parts = this.parts.filter(p => p.id !== partId)
   }

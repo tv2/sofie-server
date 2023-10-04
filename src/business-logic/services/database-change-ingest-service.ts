@@ -7,8 +7,10 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
+  PartUpdatedEvent,
   SegmentCreatedEvent,
-  SegmentDeletedEvent
+  SegmentDeletedEvent,
+  SegmentUpdatedEvent
 } from '../../model/value-objects/rundown-event'
 import { Segment } from '../../model/entities/segment'
 import { TimelineBuilder } from './interfaces/timeline-builder'
@@ -58,25 +60,48 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.timelineRepository.saveTimeline(timeline)
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   private async segmentUpdated(segment: Segment): Promise<void> {
-    console.log(`### Segment from update: ${segment.id}`)
+    let rundown: Rundown
+    try {
+      rundown = await this.rundownRepository.getRundownBySegmentId(segment.id)
+    } catch (exception) {
+      if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
+        throw exception
+      }
+      console.log(`Couldn't find a Rundown while updating Segment ${segment.id}`)
+      return
+    }
+
+    rundown.updateSegment(segment)
+
+    await this.buildAndPersistTimelineIfActiveRundown(rundown)
+
+    const event: SegmentUpdatedEvent = this.eventBuilder.buildSegmentUpdatedEvent(rundown, segment)
+    this.eventEmitter.emitRundownEvent(event)
+
+    await this.rundownRepository.saveRundown(rundown)
   }
 
   private async segmentDeleted(segmentId: string): Promise<void> {
+    let rundown: Rundown
     try {
-      const rundown: Rundown = await this.rundownRepository.getRundownBySegmentId(segmentId)
-      rundown.removeSegment(segmentId)
-
-      await this.buildAndPersistTimelineIfActiveRundown(rundown)
-
-      const event: SegmentDeletedEvent = this.eventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
-      this.eventEmitter.emitRundownEvent(event)
-
-      await this.rundownRepository.saveRundown(rundown)
-    } catch (error) {
-      console.error('Error while processing Segment Deleted event', error)
+      rundown = await this.rundownRepository.getRundownBySegmentId(segmentId)
+    } catch (exception) {
+      if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
+        throw exception
+      }
+      console.log(`### Unable to delete Segment ${segmentId}. Segment is not found on any Rundown`)
+      return
     }
+
+    rundown.removeSegment(segmentId)
+
+    await this.buildAndPersistTimelineIfActiveRundown(rundown)
+
+    const event: SegmentDeletedEvent = this.eventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
+    this.eventEmitter.emitRundownEvent(event)
+
+    await this.rundownRepository.saveRundown(rundown)
   }
 
   private async partCreated(part: Part): Promise<void> {
@@ -91,7 +116,9 @@ export class DatabaseChangeIngestService implements IngestService {
       return
     }
 
-    rundown.addPartToSegment(part, part.getSegmentId())
+    rundown.addPart(part)
+
+    await this.buildAndPersistTimelineIfActiveRundown(rundown)
 
     const event: PartCreatedEvent = this.eventBuilder.buildPartCreatedEvent(rundown, part)
     this.eventEmitter.emitRundownEvent(event)
@@ -99,26 +126,47 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   private async partUpdated(part: Part): Promise<void> {
-    console.log(`### Part from update: ${part.id}`)
-  }
-
-  private async partDeleted(partId: string): Promise<void> {
+    let rundown: Rundown
     try {
-      const rundown: Rundown = await this.rundownRepository.getRundownByPartId(partId)
-
-      rundown.removePartFromSegment(partId)
-
-      const event: PartDeletedEvent = this.eventBuilder.buildPartDeletedEvent(rundown, partId)
-      this.eventEmitter.emitRundownEvent(event)
-
-      await this.rundownRepository.saveRundown(rundown)
+      rundown = await this.rundownRepository.getRundownBySegmentId(part.getSegmentId())
     } catch (exception) {
       if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
         throw exception
       }
-      console.log(`### Something went wrong while trying to delete Part ${partId}`)
+      console.log(`Couldn't find a Rundown while updating Part ${part.id}`)
+      return
     }
+
+    rundown.updatePart(part)
+
+    await this.buildAndPersistTimelineIfActiveRundown(rundown)
+
+    const event: PartUpdatedEvent = this.eventBuilder.buildPartUpdatedEvent(rundown, part)
+    this.eventEmitter.emitRundownEvent(event)
+
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private async partDeleted(partId: string): Promise<void> {
+    let rundown: Rundown
+    try {
+      rundown = await this.rundownRepository.getRundownByPartId(partId)
+    } catch (exception) {
+      if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
+        throw exception
+      }
+      console.log(`### Unable to delete Part ${partId}. Part is not found on any Rundown`)
+      return
+    }
+
+    rundown.removePartFromSegment(partId)
+
+    await this.buildAndPersistTimelineIfActiveRundown(rundown)
+
+    const event: PartDeletedEvent = this.eventBuilder.buildPartDeletedEvent(rundown, partId)
+    this.eventEmitter.emitRundownEvent(event)
+
+    await this.rundownRepository.saveRundown(rundown)
   }
 }

@@ -6,6 +6,7 @@ import {
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
   PartTakenEvent,
+  PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownDeactivatedEvent,
@@ -14,6 +15,7 @@ import {
   RundownResetEvent,
   SegmentCreatedEvent,
   SegmentDeletedEvent,
+  SegmentUpdatedEvent,
 } from '../../../model/value-objects/rundown-event'
 import { Piece } from '../../../model/entities/piece'
 import { Part } from '../../../model/entities/part'
@@ -31,10 +33,11 @@ export interface RundownEventBuilder {
   buildPieceInsertedEvent(rundown: Rundown, piece: Piece): PieceInsertedEvent
   buildInfiniteRundownPieceAddedEvent(rundown: Rundown, infinitePiece: Piece): RundownInfinitePieceAddedEvent
 
-  // TODO: Should we make an IngestEventBuilder? Then our EventBuilder interface will be less bloated.
   buildSegmentCreatedEvent(rundown: Rundown, segment: Segment): SegmentCreatedEvent
+  buildSegmentUpdatedEvent(rundown: Rundown, segment: Segment): SegmentUpdatedEvent
   buildSegmentDeletedEvent(rundown: Rundown, segmentId: string): SegmentDeletedEvent
 
   buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent
+  buildPartUpdatedEvent(rundown: Rundown, part: Part): PartUpdatedEvent
   buildPartDeletedEvent(rundown: Rundown, partId: string): PartDeletedEvent
 }
