@@ -8,7 +8,8 @@ export enum Tv2SourceLayer {
   CAMERA = 'studio0_camera',
   JINGLE = 'studio0_jingle',
   AUDIO_BED = 'studio0_audio_bed',
-  GRAPHIC_ACTION_COMMAND = 'studio0_adlib_graphic_cmd'
+  GRAPHIC_ACTION_COMMAND = 'studio0_adlib_graphic_cmd',
+  AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs'
 }
 
 export enum Tv2AtemLayer {

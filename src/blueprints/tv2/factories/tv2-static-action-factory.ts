@@ -5,10 +5,8 @@ export class Tv2StaticActionFactory {
     return [
       // this.createDskOneOnAction(),
       // this.createResyncSisyfosAction(),
-      // this.createMicrophoneDownAction(),
       // this.createFadePersistedAudioAction(),
       // this.createGraphicsClearAction(),
-      // this.createMicrophoneUpAction(),
       // this.createGraphicsAlternativeOutAction()
     ]
   }
@@ -29,14 +27,6 @@ export class Tv2StaticActionFactory {
   //
   // // Todo: Find out what 'Dsk' stands for and write it out.
   // private createDskOneOnAction(): Action {
-  //
-  // }
-  //
-  // private createMicrophoneUpAction(): Action {
-  //
-  // }
-  //
-  // private createMicrophoneDownAction(): Action {
   //
   // }
   //
