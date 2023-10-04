@@ -88,7 +88,25 @@ export class Segment {
   }
 
   public setParts(parts: Part[]): void {
-    this.parts = parts.sort((partOne: Part, partTwo: Part) => partOne.rank - partTwo.rank)
+    this.parts = parts.sort(this.compareParts)
+  }
+
+  private compareParts(partOne: Part, partTwo: Part): number {
+    return partOne.rank - partTwo.rank
+  }
+
+  public addPart(part: Part): void {
+    const doesPartAlreadyExistOnSegment: boolean = this.parts.some(p => p.id === part.id)
+    if (doesPartAlreadyExistOnSegment) {
+      console.log(`Part ${part.id} already exist on Segment ${this.id}`)
+      return
+    }
+    this.parts.push(part)
+    this.parts.sort(this.compareParts)
+  }
+
+  public removePart(partId: string): void {
+    this.parts = this.parts.filter(p => p.id !== partId)
   }
 
   public getParts(): Part[] {

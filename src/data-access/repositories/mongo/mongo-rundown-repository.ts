@@ -59,6 +59,10 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     throw new UnsupportedOperation(`${MongoRundownRepository.name} does not support getting a Rundown from a Segment id. Trying to find Rundown with Segment id: ${segmentId}`)
   }
 
+  public getRundownByPartId(partId: string): Promise<Rundown> {
+    throw new UnsupportedOperation(`${MongoRundownRepository.name} does not support getting a Rundown from a Part id. Trying to find Rundown with Part id: ${partId}`)
+  }
+
   public async saveRundown(rundown: Rundown): Promise<void> {
     const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
     await this.getCollection().updateOne({ _id: rundown.id }, { $set: mongoRundown })
