@@ -28,7 +28,6 @@ export class Tv2GraphicActionFactory {
       id: 'continueGraphicPiece',
       name: 'Continue graphics ',
       duration,
-      tags: [],
       timelineObjects: [
         this.graphicsTimelineObjectFactory.createContinueGraphicsTimelineObject(duration)
       ]
@@ -48,7 +47,6 @@ export class Tv2GraphicActionFactory {
       id: 'themeOutPiece',
       name: 'Theme Out',
       duration,
-      tags: [],
       timelineObjects: [
         this.graphicsTimelineObjectFactory.createThemeOutTimelineObject(
           blueprintConfiguration,
@@ -66,6 +64,9 @@ export class Tv2GraphicActionFactory {
 
   private createDefaultGraphicPieceInterface(): PieceInterface {
     return {
+      id: '',
+      name: '',
+      duration: 0,
       partId: '',
       type: PieceType.GRAPHIC,
       layer: Tv2SourceLayer.GRAPHIC_ACTION_COMMAND,
@@ -75,7 +76,9 @@ export class Tv2GraphicActionFactory {
       start: 0,
       preRollDuration: 0,
       postRollDuration: 0,
-    } as PieceInterface
+      tags: [],
+      timelineObjects: [],
+    }
   }
 
   private createOverlayInitializeAction(): PieceAction {
@@ -85,7 +88,6 @@ export class Tv2GraphicActionFactory {
       id: 'overlayInitializePiece',
       name: 'Overlay Initialize',
       duration,
-      tags: [],
       timelineObjects: [
         this.graphicsTimelineObjectFactory.createOverlayInitializeTimelineObject(duration)
       ]
