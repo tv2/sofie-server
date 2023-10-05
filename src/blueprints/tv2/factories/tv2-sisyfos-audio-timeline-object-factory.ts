@@ -1,8 +1,13 @@
 import { Tv2AudioTimelineObjectFactory } from '../value-objects/factories/tv2-audio-timeline-object-factory'
-import { SisyfosChannelsTimelineObject, SisyfosType } from '../../timeline-state-resolver-types/sisyfos-types'
+import {
+  SisyfosChannelsTimelineObject,
+  SisyfosResynchronizeTimelineObject,
+  SisyfosType
+} from '../../timeline-state-resolver-types/sisyfos-types'
 import { Tv2SisyfosLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
+import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
   public createMicrophoneDownTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
@@ -30,6 +35,38 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
           isPgm: isPmg
         })),
         overridePriority: 10
+      }
+    }
+  }
+
+  public createResynchronizeTimelineObject(): SisyfosResynchronizeTimelineObject {
+    return {
+      id: '',
+      enable: {
+        start: 0
+      },
+      priority: 2,
+      layer: Tv2SisyfosLayer.RESYNCHRONIZE,
+      content: {
+        deviceType: DeviceType.SISYFOS,
+        type: SisyfosType.CHANNEL,
+        resync: true
+      }
+    }
+  }
+
+  public createStopAudioBedTimelineObject(duration: number): EmptyTimelineObject {
+    return {
+      id: '',
+      enable: {
+        start: 0,
+        duration
+      },
+      priority: 1,
+      layer: Tv2SisyfosLayer.AUDIO_BED,
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: 'empty'
       }
     }
   }
