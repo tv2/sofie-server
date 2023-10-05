@@ -9,17 +9,22 @@ import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
 
+enum SisyfosFaderState {
+  OFF = 0,
+  ON = 1,
+  VOICE_OVER = 2
+}
+
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
   public createMicrophoneDownTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    return this.createMicrophoneTimelineObject(blueprintConfiguration, 0)
+    return this.createMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.OFF)
   }
 
   public createMicrophoneUpTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    return this.createMicrophoneTimelineObject(blueprintConfiguration, 1)
+    return this.createMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.ON)
   }
 
-  // Todo: Figure out what 'isPmg' stands for and write full name instead of abbreviation
-  private createMicrophoneTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, isPmg:  0 | 1 | 2): SisyfosChannelsTimelineObject {
+  private createMicrophoneTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, isPgm:  SisyfosFaderState): SisyfosChannelsTimelineObject {
     return {
       id: '',
       enable: {
@@ -32,7 +37,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
         type: SisyfosType.CHANNELS,
         channels: blueprintConfiguration.studio.StudioMics.map(studioMic => ({
           mappedLayer: studioMic,
-          isPgm: isPmg
+          isPgm
         })),
         overridePriority: 10
       }

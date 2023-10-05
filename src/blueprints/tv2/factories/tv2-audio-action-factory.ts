@@ -73,7 +73,6 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  // Todo: move TimeLine Object creation to the factory.
   private createStopAudioBedAction(): PieceAction {
     const duration: number = 1000
     const pieceInterface: PieceInterface = {
