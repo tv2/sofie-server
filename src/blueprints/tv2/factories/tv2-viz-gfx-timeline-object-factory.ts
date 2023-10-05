@@ -1,4 +1,4 @@
-import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/factories/tv2-graphics-timeline-object-factory'
+import { Tv2GfxTimelineObjectFactory } from '../value-objects/factories/tv2-gfx-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
   VizMseContinueTimelineObject,
@@ -9,7 +9,7 @@ import {
 import { Tv2VizLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 
-export class Tv2VizGraphicsTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
+export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
     return {
       id: '',
@@ -45,7 +45,7 @@ export class Tv2VizGraphicsTimelineObjectFactory implements Tv2GraphicsTimelineO
     }
   }
 
-  public createContinueGraphicsTimelineObject(duration: number): VizMseContinueTimelineObject {
+  public createContinueGfxTimelineObject(duration: number): VizMseContinueTimelineObject {
     return {
       id: '',
       enable: {

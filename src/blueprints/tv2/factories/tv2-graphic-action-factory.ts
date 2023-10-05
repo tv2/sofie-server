@@ -4,32 +4,32 @@ import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/factories/tv2-graphics-timeline-object-factory'
+import { Tv2GfxTimelineObjectFactory } from '../value-objects/factories/tv2-gfx-timeline-object-factory'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
 
 export class Tv2GraphicActionFactory {
   constructor(
-    private readonly graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory
+    private readonly gfxTimelineObjectFactory: Tv2GfxTimelineObjectFactory
   ) { }
 
-  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
+  public createGfxActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return [
       this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
-      this.createContinueGraphicsAction(),
+      this.createContinueGfxAction(),
     ]
   }
 
-  private createContinueGraphicsAction(): PieceAction {
+  private createContinueGfxAction(): PieceAction {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = {
-      ...this.createDefaultGraphicPieceInterface(),
+      ...this.createDefaultGfxPieceInterface(),
       id: 'continueGraphicPiece',
       name: 'Continue graphics ',
       duration,
       timelineObjects: [
-        this.graphicsTimelineObjectFactory.createContinueGraphicsTimelineObject(duration)
+        this.gfxTimelineObjectFactory.createContinueGfxTimelineObject(duration)
       ]
     }
     return {
@@ -43,12 +43,12 @@ export class Tv2GraphicActionFactory {
   private createThemeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
     const duration: number = 3000 // Taken from Blueprints
     const pieceInterface: PieceInterface = {
-      ...this.createDefaultGraphicPieceInterface(),
+      ...this.createDefaultGfxPieceInterface(),
       id: 'themeOutPiece',
       name: 'Theme Out',
       duration,
       timelineObjects: [
-        this.graphicsTimelineObjectFactory.createThemeOutTimelineObject(
+        this.gfxTimelineObjectFactory.createThemeOutTimelineObject(
           blueprintConfiguration,
           duration
         )
@@ -62,7 +62,7 @@ export class Tv2GraphicActionFactory {
     }
   }
 
-  private createDefaultGraphicPieceInterface(): PieceInterface {
+  private createDefaultGfxPieceInterface(): PieceInterface {
     return {
       id: '',
       name: '',
@@ -84,12 +84,12 @@ export class Tv2GraphicActionFactory {
   private createOverlayInitializeAction(): PieceAction {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = {
-      ...this.createDefaultGraphicPieceInterface(),
+      ...this.createDefaultGfxPieceInterface(),
       id: 'overlayInitializePiece',
       name: 'Overlay Initialize',
       duration,
       timelineObjects: [
-        this.graphicsTimelineObjectFactory.createOverlayInitializeTimelineObject(duration)
+        this.gfxTimelineObjectFactory.createOverlayInitializeTimelineObject(duration)
       ]
     }
     return {
