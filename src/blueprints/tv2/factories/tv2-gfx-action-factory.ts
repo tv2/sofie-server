@@ -8,7 +8,7 @@ import { Tv2GfxTimelineObjectFactory } from '../value-objects/factories/tv2-gfx-
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
 
-export class Tv2GraphicActionFactory {
+export class Tv2GfxActionFactory {
   constructor(
     private readonly gfxTimelineObjectFactory: Tv2GfxTimelineObjectFactory
   ) { }
