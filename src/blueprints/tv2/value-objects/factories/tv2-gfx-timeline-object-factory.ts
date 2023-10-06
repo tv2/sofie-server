@@ -5,4 +5,6 @@ export interface Tv2GfxTimelineObjectFactory {
   createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject
   createOverlayInitializeTimelineObject(duration: number): TimelineObject
   createContinueGfxTimelineObject(duration: number): TimelineObject
+  createGfxClearTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject
+  createGfxAlternativeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject
 }
