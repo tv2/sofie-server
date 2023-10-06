@@ -54,6 +54,7 @@ export interface MongoPart {
   expectedDuration: number
   isOnAir: boolean
   isNext: boolean
+  isUnsynced?: boolean
   inTransition?: {
     previousPartKeepaliveDuration: number
     partContentDelayDuration: number
@@ -243,6 +244,7 @@ export class MongoEntityConverter {
       expectedDuration: mongoPart.expectedDuration,
       isOnAir: false,
       isNext: false,
+      isUnsynced: mongoPart.isUnsynced ?? false,
       pieces: [],
       inTransition: {
         keepPreviousPartAliveDuration: mongoPart.inTransition?.previousPartKeepaliveDuration ?? 0,
@@ -268,9 +270,10 @@ export class MongoEntityConverter {
       expectedDuration: part.expectedDuration,
       title: part.name,
       segmentId: part.getSegmentId(),
-      _rank: part.rank,
+      _rank: part.getRank(),
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
+      isUnsynced: part.isUnsynced(),
       endState: part.getEndState()
     } as MongoPart
   }

@@ -38,7 +38,6 @@ export class RepositoryFacade {
       this.createRundownBaselineRepository(),
       this.createSegmentRepository()
     )
-
     return CachedRundownRepository.getInstance(mongoRundownRepository)
   }
 

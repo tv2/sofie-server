@@ -17,9 +17,9 @@ const SEGMENT_COLLECTION_NAME: string = 'segments'
 
 export class MongoSegmentChangedListener extends BaseMongoRepository implements DataChangedListener<Segment> {
 
-  private onCreatedCallback: (segment: Segment) => Promise<void>
-  private onUpdatedCallback: (segment: Segment) => Promise<void>
-  private onDeletedCallback: (segmentId: string) => Promise<void>
+  private onCreatedCallback: (segment: Segment) => void
+  private onUpdatedCallback: (segment: Segment) => void
+  private onDeletedCallback: (segmentId: string) => void
 
   constructor(
     mongoDatabase: MongoDatabase,
@@ -56,7 +56,6 @@ export class MongoSegmentChangedListener extends BaseMongoRepository implements 
         break
       }
       case MongoChangeEvent.REPLACE: {
-        console.log(change)
         const replaceChange: ChangeStreamReplaceDocument<MongoSegment> = change as ChangeStreamReplaceDocument<MongoSegment>
         const segmentId: string = replaceChange.fullDocument._id
         const segment: Segment = await this.segmentRepository.getSegment(segmentId)
@@ -74,15 +73,15 @@ export class MongoSegmentChangedListener extends BaseMongoRepository implements 
     return SEGMENT_COLLECTION_NAME
   }
 
-  public onCreated(onCreatedCallback: (segment: Segment) => Promise<void>): void {
+  public onCreated(onCreatedCallback: (segment: Segment) => void): void {
     this.onCreatedCallback = onCreatedCallback
   }
 
-  public onUpdated(onUpdatedCallback: (segment: Segment) => Promise<void>): void {
+  public onUpdated(onUpdatedCallback: (segment: Segment) => void): void {
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  public onDeleted(onDeletedCallback: (segmentId: string) => Promise<void>): void {
+  public onDeleted(onDeletedCallback: (segmentId: string) => void): void {
     this.onDeletedCallback = onDeletedCallback
   }
 }

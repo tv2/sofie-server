@@ -20,11 +20,13 @@ import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
 import { Part } from '../../model/entities/part'
 import { Owner } from '../../model/enums/owner'
+import { PartRepository } from '../../data-access/repositories/interfaces/part-repository'
 
 export class RundownTimelineService implements RundownService {
   constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly rundownRepository: RundownRepository,
+    private readonly partRepository: PartRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly rundownEventBuilder: RundownEventBuilder,
@@ -86,6 +88,7 @@ export class RundownTimelineService implements RundownService {
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBefore: Piece[] = rundown.getInfinitePieces()
+    const previousSegmentId: string | undefined = rundown.getActiveCursor()?.segment.id
 
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
@@ -104,6 +107,10 @@ export class RundownTimelineService implements RundownService {
     ])
 
     await this.rundownRepository.saveRundown(rundown)
+
+    if (previousSegmentId) {
+      await this.partRepository.deleteUnsyncedPartsForSegment(previousSegmentId)
+    }
   }
 
   private getEndStateForActivePart(rundown: Rundown): PartEndState {

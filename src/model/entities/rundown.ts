@@ -289,7 +289,7 @@ export class Rundown extends BasicRundown {
     if (this.activeCursor) {
       this.activeCursor.part.takeOffAir()
       this.activeCursor.segment.takeOffAir()
-      this.activeCursor.segment.takeOffAir()
+      this.removeUnsyncedPartsFromActiveSegment()
     }
     if (!this.nextCursor) {
       return
@@ -298,6 +298,12 @@ export class Rundown extends BasicRundown {
     this.activeCursor.part.putOnAir()
     this.activeCursor.part.calculateTimings(this.previousPart)
     this.activeCursor.segment.putOnAir()
+  }
+
+  private removeUnsyncedPartsFromActiveSegment(): void {
+    // We have to find the Segment in the Segments array, since the Segment on the active cursor does not share the same reference in memory.
+    const segment: Segment | undefined = this.segments.find(segment => segment.id === this.activeCursor!.segment.id)
+    segment?.removeUnsyncedParts()
   }
 
   private updateInfinitePieces(): void {
@@ -465,8 +471,17 @@ export class Rundown extends BasicRundown {
     if (segmentIndex < 0) {
       throw new NotFoundException(`Segment ${segment.id} does not belong to Rundown ${this.id}`)
     }
+
+    const oldSegment: Segment = this.segments[segmentIndex]
+    if (oldSegment.isOnAir()) {
+      segment.setParts(oldSegment.getParts())
+      segment.putOnAir()
+    }
+
     this.segments[segmentIndex] = segment
     this.segments.sort(this.compareSegments)
+
+    this.updateNextCursor()
   }
 
   public removeSegment(segmentId: string): void {
@@ -488,6 +503,8 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find Segment for Part ${part.id} in Rundown ${this.id}`)
     }
     segment.addPart(part)
+
+    this.updateNextCursor()
   }
 
   public updatePart(part: Part): void {
@@ -496,6 +513,8 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find Segment for Part ${part.id} in Rundown ${this.id}`)
     }
     segment.updatePart(part)
+
+    this.updateNextCursor()
   }
 
   public removePartFromSegment(partId: string): void {
@@ -505,6 +524,8 @@ export class Rundown extends BasicRundown {
     }
 
     segment.removePart(partId)
+
+    this.updateNextCursor()
   }
 
   public getInfinitePieces(): Piece[] {

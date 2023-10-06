@@ -16,6 +16,7 @@ export interface PartInterface {
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
+  isUnsynced: boolean
   expectedDuration: number
   executedAt?: number
   playedDuration?: number
@@ -32,7 +33,6 @@ export interface PartInterface {
 export class Part {
   public readonly id: string
   public readonly name: string
-  public readonly rank: number
   public readonly isPlanned: boolean = true
 
   public readonly expectedDuration: number
@@ -44,11 +44,14 @@ export class Part {
   public readonly disableNextInTransition: boolean
 
   private segmentId: string
+  private rank: number
 
   private pieces: Piece[]
 
   private isPartOnAir: boolean
   private isPartNext: boolean
+
+  private isPartUnsynced: boolean = false
 
   private executedAt: number
   private playedDuration: number
@@ -81,6 +84,8 @@ export class Part {
     this.playedDuration = part.playedDuration ?? 0
 
     this.endState = part.endState
+
+    this.isPartUnsynced = part.isUnsynced
   }
 
   public putOnAir(): void {
@@ -96,6 +101,15 @@ export class Part {
     this.isPartOnAir = false
     // TODO: Correct the flow such that we don't take offAir when executedAt is 0.
     this.playedDuration = this.executedAt === 0 ? 0 : Date.now() - this.executedAt
+  }
+
+  public markAsUnsynced(): void {
+    this.isPartUnsynced = true
+    this.rank = this.rank - 1
+  }
+
+  public isUnsynced(): boolean {
+    return this.isPartUnsynced
   }
 
   public isOnAir(): boolean {
@@ -148,6 +162,10 @@ export class Part {
 
   public getSegmentId(): string {
     return this.segmentId
+  }
+
+  public getRank(): number {
+    return this.rank
   }
 
   public setSegmentId(segmentId: string): void {

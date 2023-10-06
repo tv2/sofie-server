@@ -17,9 +17,9 @@ const PART_COLLECTION_NAME: string = 'parts'
 
 export class MongoPartChangedListener extends BaseMongoRepository implements DataChangedListener<Part> {
 
-  private onCreatedCallback: (part: Part) => Promise<void>
-  private onUpdatedCallback: (part: Part) => Promise<void>
-  private onDeletedCallback: (partId: string) => Promise<void>
+  private onCreatedCallback: (part: Part) => void
+  private onUpdatedCallback: (part: Part) => void
+  private onDeletedCallback: (partId: string) => void
 
   constructor(
     mongoDatabase: MongoDatabase,
@@ -73,15 +73,15 @@ export class MongoPartChangedListener extends BaseMongoRepository implements Dat
     return PART_COLLECTION_NAME
   }
 
-  public onCreated(onCreatedCallback: (part: Part) => Promise<void>): void {
+  public onCreated(onCreatedCallback: (part: Part) => void): void {
     this.onCreatedCallback = onCreatedCallback
   }
 
-  public onUpdated(onUpdatedCallback: (part: Part) => Promise<void>): void {
+  public onUpdated(onUpdatedCallback: (part: Part) => void): void {
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  public onDeleted(onDeletedCallback: (id: string) => Promise<void>): void {
+  public onDeleted(onDeletedCallback: (id: string) => void): void {
     this.onDeletedCallback = onDeletedCallback
   }
 }

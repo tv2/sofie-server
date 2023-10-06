@@ -49,6 +49,10 @@ export class Segment {
     this.isSegmentOnAir = false
   }
 
+  public removeUnsyncedParts(): void {
+    this.parts = this.parts.filter(part => !part.isUnsynced())
+  }
+
   public isOnAir(): boolean {
     return this.isSegmentOnAir
   }
@@ -92,7 +96,7 @@ export class Segment {
   }
 
   private compareParts(partOne: Part, partTwo: Part): number {
-    return partOne.rank - partTwo.rank
+    return partOne.getRank() - partTwo.getRank()
   }
 
   public addPart(part: Part): void {
@@ -115,6 +119,15 @@ export class Segment {
   }
 
   public removePart(partId: string): void {
+    const partToDelete: Part | undefined = this.parts.find(part => part.id === partId)
+    if (!partToDelete) {
+      return
+    }
+
+    if (partToDelete.isOnAir()) {
+      partToDelete.markAsUnsynced()
+      return
+    }
     this.parts = this.parts.filter(p => p.id !== partId)
   }
 
