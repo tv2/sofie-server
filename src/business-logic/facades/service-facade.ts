@@ -20,6 +20,7 @@ export class ServiceFacade {
     return new RundownTimelineService(
       RundownEventService.getInstance(),
       RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createPartRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createRundownEventBuilder(),

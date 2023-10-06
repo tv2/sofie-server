@@ -22,6 +22,11 @@ import { ErrorCode } from '../../model/enums/error-code'
 
 export class DatabaseChangeIngestService implements IngestService {
 
+  // TODO: Singleton
+
+  private readonly eventQueue: (() => Promise<void>)[] = []
+  private isExecutingEvent: boolean = false
+
   constructor(
     private readonly rundownRepository: RundownRepository,
     private readonly timelineRepository: TimelineRepository,
@@ -31,13 +36,34 @@ export class DatabaseChangeIngestService implements IngestService {
     segmentChangedListener: DataChangedListener<Segment>,
     partChangedListener: DataChangedListener<Part>
   ) {
-    segmentChangedListener.onCreated(segment => this.segmentCreated(segment))
-    segmentChangedListener.onUpdated(segment => this.segmentUpdated(segment))
-    segmentChangedListener.onDeleted(segmentId => this.segmentDeleted(segmentId))
+    segmentChangedListener.onCreated(segment => this.enqueueEvent(() => this.segmentCreated(segment)))
+    segmentChangedListener.onUpdated(segment => this.enqueueEvent(() => this.segmentUpdated(segment)))
+    segmentChangedListener.onDeleted(segmentId => this.enqueueEvent(() => this.segmentDeleted(segmentId)))
 
-    partChangedListener.onCreated(part => this.partCreated(part))
-    partChangedListener.onUpdated(part => this.partUpdated(part))
-    partChangedListener.onDeleted(partId => this.partDeleted(partId))
+    partChangedListener.onCreated(part => this.enqueueEvent(() => this.partCreated(part)))
+    partChangedListener.onUpdated(part => this.enqueueEvent(() => this.partUpdated(part)))
+    partChangedListener.onDeleted(partId => this.enqueueEvent(() => this.partDeleted(partId)))
+  }
+
+  private enqueueEvent(event: () => Promise<void>): void {
+    this.eventQueue.push(event)
+    this.executeNextEvent()
+  }
+
+  private executeNextEvent(): void {
+    if (this.isExecutingEvent) {
+      return
+    }
+    const eventCallback: (() => Promise<void>) | undefined = this.eventQueue.shift()
+    if (!eventCallback) {
+      return
+    }
+
+    this.isExecutingEvent = true
+    eventCallback().then(() => {
+      this.isExecutingEvent = false
+      this.executeNextEvent()
+    }).catch(error => console.error(error))
   }
 
   private async segmentCreated(segment: Segment): Promise<void> {

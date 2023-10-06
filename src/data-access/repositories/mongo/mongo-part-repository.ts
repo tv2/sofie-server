@@ -5,7 +5,7 @@ import { MongoDatabase } from './mongo-database'
 import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { DeleteResult } from 'mongodb'
+import { DeleteResult, Filter } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Piece } from '../../../model/entities/piece'
 
@@ -38,10 +38,10 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
     return part
   }
 
-  public async getParts(segmentId: string): Promise<Part[]> {
+  public async getParts(segmentId: string, filters?: Filter<MongoPart>): Promise<Part[]> {
     this.assertDatabaseConnection(this.getParts.name)
     const mongoParts: MongoPart[] = (await this.getCollection()
-      .find<MongoPart>({ segmentId: segmentId })
+      .find<MongoPart>({ ...filters, segmentId: segmentId })
       .toArray())
     const parts: Part[] = this.mongoEntityConverter.convertParts(mongoParts)
     return Promise.all(
@@ -54,7 +54,7 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
 
   public async savePart(part: Part): Promise<void> {
     const mongoPart: MongoPart = this.mongoEntityConverter.convertToMongoPart(part)
-    await this.getCollection().updateOne({ _id: part.id }, { $set: mongoPart })
+    await this.getCollection().updateOne({ _id: part.id }, { $set: mongoPart }, { upsert: true })
   }
 
   public async deletePartsForSegment(segmentId: string): Promise<void> {
@@ -64,6 +64,20 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
     await Promise.all(parts.map(async (part) => this.pieceRepository.deletePiecesForPart(part.id)))
 
     const partsDeletedResult: DeleteResult = await this.getCollection().deleteMany({ segmentId: segmentId })
+
+    if (!partsDeletedResult.acknowledged) {
+      throw new DeletionFailedException(`Deletion of parts was not acknowledged, for segmentId: ${segmentId}`)
+    }
+  }
+
+  public async deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deleteUnsyncedPartsForSegment.name)
+    const unsyncedFilter: Filter<MongoPart> = { isUnsynced: true }
+    const unsyncedParts: Part[] = await this.getParts(segmentId, unsyncedFilter)
+
+    await Promise.all(unsyncedParts.map(async (part) => this.pieceRepository.deletePiecesForPart(part.id)))
+
+    const partsDeletedResult: DeleteResult = await this.getCollection().deleteMany({ ...unsyncedFilter, segmentId: segmentId })
 
     if (!partsDeletedResult.acknowledged) {
       throw new DeletionFailedException(`Deletion of parts was not acknowledged, for segmentId: ${segmentId}`)
