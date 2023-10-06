@@ -83,10 +83,13 @@ export class DatabaseChangeIngestService implements IngestService {
 
     this.isExecutingEvent = true
     console.debug('[DEBUG] Executing Ingest Event')
-    eventCallback().then(() => {
-      this.isExecutingEvent = false
-      this.executeNextEvent()
-    }).catch(error => console.error(error))
+    eventCallback()
+      .then(() => {})
+      .catch(error => console.error(error))
+      .finally(() => {
+        this.isExecutingEvent = false
+        this.executeNextEvent()
+      })
   }
 
   private async segmentCreated(segment: Segment): Promise<void> {
