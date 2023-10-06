@@ -3,6 +3,7 @@ import { LastPartInSegmentException } from '../exceptions/last-part-in-segment-e
 import { NotFoundException } from '../exceptions/not-found-exception'
 import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
+import { AlreadyExistException } from '../exceptions/already-exist-exception'
 
 export interface SegmentInterface {
   id: string
@@ -102,8 +103,7 @@ export class Segment {
   public addPart(part: Part): void {
     const doesPartAlreadyExistOnSegment: boolean = this.parts.some(p => p.id === part.id)
     if (doesPartAlreadyExistOnSegment) {
-      console.log(`Part ${part.id} already exist on Segment ${this.id}`)
-      return
+      throw new AlreadyExistException(`Unable to add Part to Segment. Part ${part.id} already exist on Segment ${this.id}`)
     }
     this.parts.push(part)
     this.parts.sort(this.compareParts)
