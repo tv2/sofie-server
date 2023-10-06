@@ -8,6 +8,7 @@ import {
   PartCreatedEvent,
   PartDeletedEvent,
   PartUpdatedEvent,
+  RundownEvent,
   SegmentCreatedEvent,
   SegmentDeletedEvent,
   SegmentUpdatedEvent
@@ -108,12 +109,8 @@ export class DatabaseChangeIngestService implements IngestService {
       return
     }
 
-    await this.buildAndPersistTimelineIfActiveRundown(rundown)
-
-    const event: SegmentCreatedEvent = this.eventBuilder.buildSegmentCreatedEvent(rundown, segment)
-    this.eventEmitter.emitRundownEvent(event)
-
-    await this.rundownRepository.saveRundown(rundown)
+    const segmentCreatedEvent: SegmentCreatedEvent = this.eventBuilder.buildSegmentCreatedEvent(rundown, segment)
+    await this.persistRundown(rundown, segmentCreatedEvent)
   }
 
   private throwIfNot(errorCodeToCheck: ErrorCode, exception: Exception): void {
@@ -131,6 +128,12 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.timelineRepository.saveTimeline(timeline)
   }
 
+  private async persistRundown(rundown: Rundown, eventToEmit: RundownEvent): Promise<void> {
+    await this.buildAndPersistTimelineIfActiveRundown(rundown)
+    this.eventEmitter.emitRundownEvent(eventToEmit)
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
   private async updatedSegment(segment: Segment): Promise<void> {
     let rundown: Rundown
     try {
@@ -143,12 +146,8 @@ export class DatabaseChangeIngestService implements IngestService {
 
     rundown.updateSegment(segment)
 
-    await this.buildAndPersistTimelineIfActiveRundown(rundown)
-
-    const event: SegmentUpdatedEvent = this.eventBuilder.buildSegmentUpdatedEvent(rundown, segment)
-    this.eventEmitter.emitRundownEvent(event)
-
-    await this.rundownRepository.saveRundown(rundown)
+    const segmentUpdatedEvent: SegmentUpdatedEvent = this.eventBuilder.buildSegmentUpdatedEvent(rundown, segment)
+    await this.persistRundown(rundown, segmentUpdatedEvent)
   }
 
   private async deleteSegment(segmentId: string): Promise<void> {
@@ -163,12 +162,8 @@ export class DatabaseChangeIngestService implements IngestService {
 
     rundown.removeSegment(segmentId)
 
-    await this.buildAndPersistTimelineIfActiveRundown(rundown)
-
-    const event: SegmentDeletedEvent = this.eventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
-    this.eventEmitter.emitRundownEvent(event)
-
-    await this.rundownRepository.saveRundown(rundown)
+    const segmentDeletedEvent: SegmentDeletedEvent = this.eventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
+    await this.persistRundown(rundown, segmentDeletedEvent)
   }
 
   private async createPart(part: Part): Promise<void> {
@@ -181,14 +176,16 @@ export class DatabaseChangeIngestService implements IngestService {
       return
     }
 
-    rundown.addPart(part)
+    try {
+      rundown.addPart(part)
+    } catch (exception) {
+      this.throwIfNot(ErrorCode.ALREADY_EXIST, exception as Exception)
+      // Part already exist, so no need to add it again.
+      return
+    }
 
-    await this.buildAndPersistTimelineIfActiveRundown(rundown)
-
-    const event: PartCreatedEvent = this.eventBuilder.buildPartCreatedEvent(rundown, part)
-    this.eventEmitter.emitRundownEvent(event)
-
-    await this.rundownRepository.saveRundown(rundown)
+    const partCreatedEvent: PartCreatedEvent = this.eventBuilder.buildPartCreatedEvent(rundown, part)
+    await this.persistRundown(rundown, partCreatedEvent)
   }
 
   private async updatePart(part: Part): Promise<void> {
@@ -203,12 +200,8 @@ export class DatabaseChangeIngestService implements IngestService {
 
     rundown.updatePart(part)
 
-    await this.buildAndPersistTimelineIfActiveRundown(rundown)
-
-    const event: PartUpdatedEvent = this.eventBuilder.buildPartUpdatedEvent(rundown, part)
-    this.eventEmitter.emitRundownEvent(event)
-
-    await this.rundownRepository.saveRundown(rundown)
+    const partUpdatedEvent: PartUpdatedEvent = this.eventBuilder.buildPartUpdatedEvent(rundown, part)
+    await this.persistRundown(rundown, partUpdatedEvent)
   }
 
   private async deletePart(partId: string): Promise<void> {
@@ -223,11 +216,7 @@ export class DatabaseChangeIngestService implements IngestService {
 
     rundown.removePartFromSegment(partId)
 
-    await this.buildAndPersistTimelineIfActiveRundown(rundown)
-
-    const event: PartDeletedEvent = this.eventBuilder.buildPartDeletedEvent(rundown, partId)
-    this.eventEmitter.emitRundownEvent(event)
-
-    await this.rundownRepository.saveRundown(rundown)
+    const partDeletedEvent: PartDeletedEvent = this.eventBuilder.buildPartDeletedEvent(rundown, partId)
+    await this.persistRundown(rundown, partDeletedEvent)
   }
 }
