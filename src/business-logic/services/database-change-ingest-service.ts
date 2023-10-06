@@ -22,12 +22,34 @@ import { ErrorCode } from '../../model/enums/error-code'
 
 export class DatabaseChangeIngestService implements IngestService {
 
-  // TODO: Singleton
+  private static instance: IngestService
+
+  public static getInstance(rundownRepository: RundownRepository,
+    timelineRepository: TimelineRepository,
+    timelineBuilder: TimelineBuilder,
+    eventEmitter: RundownEventEmitter,
+    eventBuilder: RundownEventBuilder,
+    segmentChangedListener: DataChangedListener<Segment>,
+    partChangedListener: DataChangedListener<Part>
+  ): IngestService {
+    if (!this.instance) {
+      this.instance = new DatabaseChangeIngestService(
+        rundownRepository,
+        timelineRepository,
+        timelineBuilder,
+        eventEmitter,
+        eventBuilder,
+        segmentChangedListener,
+        partChangedListener
+      )
+    }
+    return this.instance
+  }
 
   private readonly eventQueue: (() => Promise<void>)[] = []
   private isExecutingEvent: boolean = false
 
-  constructor(
+  private constructor(
     private readonly rundownRepository: RundownRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
@@ -60,6 +82,7 @@ export class DatabaseChangeIngestService implements IngestService {
     }
 
     this.isExecutingEvent = true
+    console.debug('[DEBUG] Executing Ingest Event')
     eventCallback().then(() => {
       this.isExecutingEvent = false
       this.executeNextEvent()

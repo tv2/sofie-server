@@ -53,7 +53,7 @@ export class ServiceFacade {
   }
 
   public static createIngestService(): IngestService {
-    return new DatabaseChangeIngestService(
+    return DatabaseChangeIngestService.getInstance(
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
