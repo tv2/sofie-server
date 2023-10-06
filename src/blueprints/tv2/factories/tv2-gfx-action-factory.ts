@@ -18,23 +18,63 @@ export class Tv2GfxActionFactory {
       this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
       this.createContinueGfxAction(),
+      this.createGfxClearAction(blueprintConfiguration),
+      this.createGfxAlternativeOutAction(blueprintConfiguration),
     ]
+  }
+
+  private createGfxAlternativeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+    const duration: number = 3000 // Taken from Blueprints
+    const pieceInterface: PieceInterface = {
+      ...this.createDefaultGfxPieceInterface(),
+      id: 'gfxAlternativeOutPiece',
+      name: 'Gfx Alternative Out',
+      duration,
+      timelineObjects: [
+        this.gfxTimelineObjectFactory.createGfxAlternativeOutTimelineObject(blueprintConfiguration, duration)
+      ]
+    }
+    return {
+      id: 'gfxAlternativeOutAction',
+      name: 'Gfx Alternative Out',
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+      data: pieceInterface
+    }
+  }
+
+  private createGfxClearAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+    const duration: number = 3000 // Taken from Blueprints
+    const pieceInterface: PieceInterface = {
+      ...this.createDefaultGfxPieceInterface(),
+      id: 'gfxClearPiece',
+      name: 'Gfx Clear',
+      duration,
+      timelineObjects: [
+        this.gfxTimelineObjectFactory.createGfxClearTimelineObject(blueprintConfiguration, duration)
+      ]
+    }
+    return {
+      id: 'gfxClearAction',
+      name: 'Gfx Clear',
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+      data: pieceInterface
+    }
   }
 
   private createContinueGfxAction(): PieceAction {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = {
       ...this.createDefaultGfxPieceInterface(),
-      id: 'continueGraphicPiece',
-      name: 'Continue graphics ',
+      id: 'continueGfxPiece',
+      name: 'Continue gfx ',
       duration,
       timelineObjects: [
         this.gfxTimelineObjectFactory.createContinueGfxTimelineObject(duration)
       ]
     }
     return {
-      id: 'continueGraphicAction',
-      name: 'Continue Graphic',
+      id: 'continueGfxAction',
+      name: 'Continue gfx',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: pieceInterface
     }

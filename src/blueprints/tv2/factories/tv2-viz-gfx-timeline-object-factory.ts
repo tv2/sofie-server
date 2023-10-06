@@ -1,6 +1,7 @@
 import { Tv2GfxTimelineObjectFactory } from '../value-objects/factories/tv2-gfx-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
+  VizMseClearGfxTimelineObject,
   VizMseContinueTimelineObject,
   VizMseElementInternalTimelineObject,
   VizMseLoadAllElementsTimelineObject,
@@ -18,7 +19,7 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
         duration
       },
       priority: 100,
-      layer: Tv2VizLayer.GRAPHIC_ACTIONS,
+      layer: Tv2VizLayer.GFX_ACTIONS,
       content: {
         deviceType: DeviceType.VIZMSE,
         type: VizType.ELEMENT_INTERNAL,
@@ -37,7 +38,7 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
         duration
       },
       priority: 100,
-      layer: Tv2VizLayer.GRAPHIC_ACTIONS,
+      layer: Tv2VizLayer.GFX_ACTIONS,
       content: {
         deviceType: DeviceType.VIZMSE,
         type: VizType.LOAD_ALL_ELEMENTS
@@ -53,7 +54,7 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
         duration
       },
       priority: 100,
-      layer: Tv2VizLayer.GRAPHIC_ACTIONS,
+      layer: Tv2VizLayer.GFX_ACTIONS,
       content: {
         deviceType: DeviceType.VIZMSE,
         type: VizType.CONTINUE,
@@ -61,6 +62,33 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
         reference: Tv2VizLayer.GRAPHIC_PILOT     
       }
     }
+  }
+
+  public createGfxClearTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseClearGfxTimelineObject {
+    return this.buildGfxClearTimelineObject(blueprintConfiguration, duration, true)
+  }
+
+  private buildGfxClearTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number, sendCommands: boolean): VizMseClearGfxTimelineObject {
+    return {
+      id: '',
+      enable: {
+        start: 0,
+        duration
+      },
+      priority: 100,
+      layer: Tv2VizLayer.GFX_ACTIONS,
+      content: {
+        deviceType: DeviceType.VIZMSE,
+        type: VizType.CLEAR_ALL_ELEMENTS,
+        channelsToSendCommands: sendCommands ? ['OVL1', 'FULL1', 'WALL1'] : undefined,
+        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+      }
+    }
+  }
+
+  public createGfxAlternativeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseClearGfxTimelineObject {
+    return this.buildGfxClearTimelineObject(blueprintConfiguration, duration, false)
+
   }
 
 }

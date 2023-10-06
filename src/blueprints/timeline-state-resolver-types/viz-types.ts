@@ -27,6 +27,15 @@ export interface VizMseContinueTimelineObject extends TimelineObject {
   }
 }
 
+export interface VizMseClearGfxTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.VIZMSE
+    type: VizType.CLEAR_ALL_ELEMENTS
+    channelsToSendCommands?: string[]
+    showName: string
+  }
+}
+
 export enum VizType {
   ELEMENT_INTERNAL = 'element_internal',
   ELEMENT_PILOT = 'element_pilot',

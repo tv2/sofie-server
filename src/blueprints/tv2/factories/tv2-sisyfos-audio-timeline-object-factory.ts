@@ -17,14 +17,14 @@ enum SisyfosFaderState {
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
   public createMicrophoneDownTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    return this.createMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.OFF)
+    return this.buildMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.OFF)
   }
 
   public createMicrophoneUpTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    return this.createMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.ON)
+    return this.buildMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.ON)
   }
 
-  private createMicrophoneTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, isPgm:  SisyfosFaderState): SisyfosChannelsTimelineObject {
+  private buildMicrophoneTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, isPgm:  SisyfosFaderState): SisyfosChannelsTimelineObject {
     return {
       id: '',
       enable: {
