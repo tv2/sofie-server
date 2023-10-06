@@ -58,13 +58,20 @@ export class DatabaseChangeIngestService implements IngestService {
     segmentChangedListener: DataChangedListener<Segment>,
     partChangedListener: DataChangedListener<Part>
   ) {
-    segmentChangedListener.onCreated(segment => this.enqueueEvent(() => this.segmentCreated(segment)))
-    segmentChangedListener.onUpdated(segment => this.enqueueEvent(() => this.segmentUpdated(segment)))
-    segmentChangedListener.onDeleted(segmentId => this.enqueueEvent(() => this.segmentDeleted(segmentId)))
+    this.listenForSegmentChanges(segmentChangedListener)
+    this.listenForPartChanges(partChangedListener)
+  }
 
-    partChangedListener.onCreated(part => this.enqueueEvent(() => this.partCreated(part)))
-    partChangedListener.onUpdated(part => this.enqueueEvent(() => this.partUpdated(part)))
-    partChangedListener.onDeleted(partId => this.enqueueEvent(() => this.partDeleted(partId)))
+  private listenForSegmentChanges(segmentChangedListener: DataChangedListener<Segment>): void {
+    segmentChangedListener.onCreated(segment => this.enqueueEvent(() => this.createSegment(segment)))
+    segmentChangedListener.onUpdated(segment => this.enqueueEvent(() => this.updatedSegment(segment)))
+    segmentChangedListener.onDeleted(segmentId => this.enqueueEvent(() => this.deleteSegment(segmentId)))
+  }
+
+  private listenForPartChanges(partChangedListener: DataChangedListener<Part>): void {
+    partChangedListener.onCreated(part => this.enqueueEvent(() => this.createPart(part)))
+    partChangedListener.onUpdated(part => this.enqueueEvent(() => this.updatePart(part)))
+    partChangedListener.onDeleted(partId => this.enqueueEvent(() => this.deletePart(partId)))
   }
 
   private enqueueEvent(event: () => Promise<void>): void {
@@ -84,7 +91,6 @@ export class DatabaseChangeIngestService implements IngestService {
     this.isExecutingEvent = true
     console.debug('[DEBUG] Executing Ingest Event')
     eventCallback()
-      .then(() => {})
       .catch(error => console.error(error))
       .finally(() => {
         this.isExecutingEvent = false
@@ -92,9 +98,15 @@ export class DatabaseChangeIngestService implements IngestService {
       })
   }
 
-  private async segmentCreated(segment: Segment): Promise<void> {
+  private async createSegment(segment: Segment): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(segment.rundownId)
-    rundown.addSegment(segment)
+    try {
+      rundown.addSegment(segment)
+    } catch (error) {
+      this.throwIfNot(ErrorCode.ALREADY_EXIST, error as Exception)
+      // Segment already exist on Rundown, so we don't need to do anything else.
+      return
+    }
 
     await this.buildAndPersistTimelineIfActiveRundown(rundown)
 
@@ -102,6 +114,13 @@ export class DatabaseChangeIngestService implements IngestService {
     this.eventEmitter.emitRundownEvent(event)
 
     await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private throwIfNot(errorCodeToCheck: ErrorCode, exception: Exception): void {
+    if (exception.errorCode === errorCodeToCheck) {
+      return
+    }
+    throw exception
   }
 
   private async buildAndPersistTimelineIfActiveRundown(rundown: Rundown): Promise<void> {
@@ -112,15 +131,13 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.timelineRepository.saveTimeline(timeline)
   }
 
-  private async segmentUpdated(segment: Segment): Promise<void> {
+  private async updatedSegment(segment: Segment): Promise<void> {
     let rundown: Rundown
     try {
       rundown = await this.rundownRepository.getRundownBySegmentId(segment.id)
     } catch (exception) {
-      if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
-        throw exception
-      }
-      console.log(`Couldn't find a Rundown while updating Segment ${segment.id}`)
+      this.throwIfNot(ErrorCode.NOT_FOUND, exception as Exception)
+      // No Rundown found for Segment, so we have nowhere to update the Segment on.
       return
     }
 
@@ -134,15 +151,13 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private async segmentDeleted(segmentId: string): Promise<void> {
+  private async deleteSegment(segmentId: string): Promise<void> {
     let rundown: Rundown
     try {
       rundown = await this.rundownRepository.getRundownBySegmentId(segmentId)
     } catch (exception) {
-      if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
-        throw exception
-      }
-      console.log(`### Unable to delete Segment ${segmentId}. Segment is not found on any Rundown`)
+      this.throwIfNot(ErrorCode.NOT_FOUND, exception as Exception)
+      // Segment is not found on any Rundown which means it is already deleted.
       return
     }
 
@@ -156,15 +171,13 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private async partCreated(part: Part): Promise<void> {
+  private async createPart(part: Part): Promise<void> {
     let rundown: Rundown
     try {
       rundown = await this.rundownRepository.getRundownBySegmentId(part.getSegmentId())
     } catch (exception) {
-      if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
-        throw exception
-      }
-      // No Segment created for Part yet which means the creation of the Part will be handled by "SegmentCreated"
+      this.throwIfNot(ErrorCode.NOT_FOUND, exception as Exception)
+      // No Rundown found for Part, so we have nowhere to create the Part on.
       return
     }
 
@@ -178,15 +191,13 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private async partUpdated(part: Part): Promise<void> {
+  private async updatePart(part: Part): Promise<void> {
     let rundown: Rundown
     try {
       rundown = await this.rundownRepository.getRundownBySegmentId(part.getSegmentId())
     } catch (exception) {
-      if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
-        throw exception
-      }
-      console.log(`Couldn't find a Rundown while updating Part ${part.id}`)
+      this.throwIfNot(ErrorCode.NOT_FOUND, exception as Exception)
+      // No Rundown found for Part, so we have nowhere to update the Part on.
       return
     }
 
@@ -200,15 +211,13 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private async partDeleted(partId: string): Promise<void> {
+  private async deletePart(partId: string): Promise<void> {
     let rundown: Rundown
     try {
       rundown = await this.rundownRepository.getRundownByPartId(partId)
     } catch (exception) {
-      if ((exception as Exception).errorCode !== ErrorCode.NOT_FOUND) {
-        throw exception
-      }
-      console.log(`### Unable to delete Part ${partId}. Part is not found on any Rundown`)
+      this.throwIfNot(ErrorCode.NOT_FOUND, exception as Exception)
+      // Part isn't found means it's already deleted.
       return
     }
 

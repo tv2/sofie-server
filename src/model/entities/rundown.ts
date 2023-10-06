@@ -17,6 +17,7 @@ import { RundownPersistentState } from '../value-objects/rundown-persistent-stat
 import { UnsupportedOperation } from '../exceptions/unsupported-operation'
 import { RundownCursor } from '../value-objects/rundown-cursor'
 import { Owner } from '../enums/owner'
+import { AlreadyExistException } from '../exceptions/already-exist-exception'
 
 export interface RundownInterface {
   id: string
@@ -448,6 +449,9 @@ export class Rundown extends BasicRundown {
   }
 
   public addSegment(segment: Segment): void {
+    if (this.segments.some(s => s.id === segment.id)) {
+      throw new AlreadyExistException(`Unable to add Segment to Rundown. Segment ${segment.id} already exist on Rundown ${this.id}`)
+    }
     this.segments.push(segment)
     this.segments.sort(this.compareSegments)
 
