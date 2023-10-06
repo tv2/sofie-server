@@ -39,71 +39,56 @@ export interface PartSetAsNextEvent extends PartEvent {
   type: RundownEventType.SET_NEXT
 }
 
-// TODO: Find a better way to type Parts and Piece for Inserted events.
+// TODO: Find a better way to type Segments, Parts and Piece for Inserted events.
+export interface SegmentEventInterface {
+  id: string
+  rundownId: string
+  name: string
+  rank: number
+  isOnAir: boolean
+  isNext: boolean
+  budgetDuration?: number
+  parts: PartEventInterface[]
+}
+
+export interface PartEventInterface {
+  id: string
+  segmentId: string
+  name: string
+  isPlanned: false
+  expectedDuration: number
+  isPartNext: boolean
+  isPartOnAir: boolean
+  executedAt: number
+  playedDuration: number
+  autoNext?: AutoNext
+  pieces: PieceEventInterface[]
+}
+
+export interface PieceEventInterface {
+  id: string
+  partId: string
+  isPlanned: false
+  name: string
+  start: number
+  duration: number
+  layer: string
+  type: string
+}
+
 export interface PartInsertedAsOnAirEvent extends RundownEvent {
   type: RundownEventType.PART_INSERTED_AS_ON_AIR,
-  part: {
-    id: string,
-    segmentId: string
-    name: string,
-    isPlanned: false,
-    expectedDuration: number
-    isPartNext: false,
-    isPartOnAir: true,
-    executedAt: number
-    playedDuration: number
-    autoNext?: AutoNext
-    pieces: {
-      id: string,
-      partId: string,
-      isPlanned: false,
-      name: string,
-      start: number
-      duration: number,
-      layer: string,
-      type: string
-    }[]
-  }
+  part: PartEventInterface
 }
 
 export interface PartInsertedAsNextEvent extends RundownEvent {
   type: RundownEventType.PART_INSERTED_AS_NEXT,
-  part: {
-    id: string,
-    segmentId: string
-    name: string,
-    isPlanned: false,
-    expectedDuration: number
-    isPartNext: true,
-    isPartOnAir: false,
-    executedAt: number
-    playedDuration: number
-    autoNext?: AutoNext
-    pieces: {
-      id: string,
-      partId: string,
-      isPlanned: false,
-      name: string,
-      start: number
-      duration: number,
-      layer: string,
-      type: string
-    }[]
-  }
+  part: PartEventInterface
 }
 
 export interface PieceInsertedEvent extends RundownEvent {
   type: RundownEventType.PIECE_INSERTED,
-  piece: {
-    id: string,
-    partId: string,
-    isPlanned: false,
-    name: string,
-    start: number
-    duration: number,
-    layer: string,
-    type: string
-  }
+  piece: PieceEventInterface
 }
 
 export interface RundownInfinitePieceAddedEvent extends RundownEvent {
@@ -115,26 +100,32 @@ export interface RundownInfinitePieceAddedEvent extends RundownEvent {
   }
 }
 
-export interface SegmentCreatedEvent extends SegmentEvent {
+export interface SegmentCreatedEvent extends RundownEvent {
   type: IngestEventType.SEGMENT_CREATED
+  segment: SegmentEventInterface
 }
 
-export interface SegmentUpdatedEvent extends SegmentEvent {
+export interface SegmentUpdatedEvent extends RundownEvent {
   type: IngestEventType.SEGMENT_UPDATED
+  segment: SegmentEventInterface
 }
 
-export interface SegmentDeletedEvent extends SegmentEvent {
+export interface SegmentDeletedEvent extends RundownEvent {
   type : IngestEventType.SEGMENT_DELETED
+  segmentId: string
 }
 
-export interface PartCreatedEvent extends PartEvent {
+export interface PartCreatedEvent extends RundownEvent {
   type: IngestEventType.PART_CREATED
+  part: PartEventInterface
 }
 
-export interface PartUpdatedEvent extends PartEvent {
+export interface PartUpdatedEvent extends RundownEvent {
   type: IngestEventType.PART_UPDATED
+  part: PartEventInterface
 }
 
-export interface PartDeletedEvent extends PartEvent {
+export interface PartDeletedEvent extends RundownEvent {
   type: IngestEventType.PART_DELETED
+  partId: string
 }
