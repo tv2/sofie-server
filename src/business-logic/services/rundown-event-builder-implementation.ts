@@ -106,7 +106,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       expectedDuration: part.expectedDuration,
       playedDuration: part.getPlayedDuration(),
       autoNext: part.autoNext,
-      pieces: part.getPieces().map(this.convertPieceToEvent)
+      pieces: part.getPieces().map(piece => this.convertPieceToEvent(piece))
     }
   }
 
@@ -159,7 +159,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
       budgetDuration: segment.budgetDuration,
-      parts: segment.getParts().map(this.convertPartToEvent)
+      parts: segment.getParts().map(part => this.convertPartToEvent(part))
     }
   }
 
