@@ -2,12 +2,12 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
   PartCreatedEvent,
-  PartDeletedEvent,
+  PartDeletedEvent, PartEventInterface,
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
   PartTakenEvent,
-  PartUpdatedEvent,
+  PartUpdatedEvent, PieceEventInterface,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownDeactivatedEvent,
@@ -15,7 +15,7 @@ import {
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
   SegmentCreatedEvent,
-  SegmentDeletedEvent,
+  SegmentDeletedEvent, SegmentEventInterface,
   SegmentUpdatedEvent,
 } from '../../model/value-objects/rundown-event'
 import { IngestEventType, RundownEventType } from '../../model/enums/event-type'
@@ -90,30 +90,36 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.PART_INSERTED_AS_ON_AIR,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: {
-        id: part.id,
-        segmentId: part.getSegmentId(),
-        name: part.name,
-        isPlanned: false,
-        isPartOnAir: true,
-        isPartNext: false,
-        executedAt: part.getExecutedAt(),
-        expectedDuration: part.expectedDuration,
-        playedDuration: part.getPlayedDuration(),
-        autoNext: part.autoNext,
-        pieces: part.getPieces().map(piece => {
-          return {
-            id: piece.id,
-            partId: piece.id,
-            name: piece.name,
-            isPlanned: false,
-            layer: piece.layer,
-            type: piece.type,
-            start: piece.getStart(),
-            duration: piece.duration
-          }
-        })
-      }
+      part: this.convertPartToEvent(part)
+    }
+  }
+
+  private convertPartToEvent(part: Part): PartEventInterface {
+    return {
+      id: part.id,
+      segmentId: part.getSegmentId(),
+      name: part.name,
+      isPlanned: false,
+      isPartOnAir: true,
+      isPartNext: false,
+      executedAt: part.getExecutedAt(),
+      expectedDuration: part.expectedDuration,
+      playedDuration: part.getPlayedDuration(),
+      autoNext: part.autoNext,
+      pieces: part.getPieces().map(this.convertPieceToEvent)
+    }
+  }
+
+  private convertPieceToEvent(piece: Piece): PieceEventInterface {
+    return {
+      id: piece.id,
+      partId: piece.id,
+      name: piece.name,
+      isPlanned: false,
+      layer: piece.layer,
+      type: piece.type,
+      start: piece.getStart(),
+      duration: piece.duration
     }
   }
 
@@ -122,32 +128,8 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.PART_INSERTED_AS_NEXT,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: {
-        id: part.id,
-        segmentId: part.getSegmentId(),
-        name: part.name,
-        isPlanned: false,
-        isPartOnAir: false,
-        isPartNext: true,
-        executedAt: part.getExecutedAt(),
-        expectedDuration: part.expectedDuration,
-        playedDuration: part.getPlayedDuration(),
-        autoNext: part.autoNext,
-        pieces: part.getPieces().map(piece => {
-          return {
-            id: piece.id,
-            partId: piece.id,
-            name: piece.name,
-            isPlanned: false,
-            layer: piece.layer,
-            type: piece.type,
-            start: piece.getStart(),
-            duration: piece.duration
-          }
-        })
-      }
+      part: this.convertPartToEvent(part)
     }
-
   }
 
   public buildPieceInsertedEvent(rundown: Rundown, piece: Piece): PieceInsertedEvent {
@@ -155,16 +137,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.PIECE_INSERTED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      piece: {
-        id: piece.id,
-        partId: piece.id,
-        name: piece.name,
-        isPlanned: false,
-        layer: piece.layer,
-        type: piece.type,
-        start: piece.getStart(),
-        duration: piece.duration
-      }
+      piece: this.convertPieceToEvent(piece)
     }
   }
 
@@ -173,7 +146,20 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.SEGMENT_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segmentId: segment.id // TODO: Should this emit the entire new Segment, or should the clients fetch them themselves?
+      segment: this.convertSegmentToEvent(segment)
+    }
+  }
+
+  private convertSegmentToEvent(segment: Segment): SegmentEventInterface {
+    return {
+      id: segment.id,
+      rundownId: segment.rundownId,
+      name: segment.name,
+      rank: segment.rank,
+      isOnAir: segment.isOnAir(),
+      isNext: segment.isNext(),
+      budgetDuration: segment.budgetDuration,
+      parts: segment.getParts().map(this.convertPartToEvent)
     }
   }
 
@@ -182,7 +168,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.SEGMENT_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segmentId: segment.id
+      segment: this.convertSegmentToEvent(segment)
     }
   }
 
@@ -200,8 +186,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.PART_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segmentId: part.getSegmentId(),
-      partId: part.id
+      part: this.convertPartToEvent(part)
     }
   }
 
@@ -210,8 +195,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.PART_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segmentId: part.getSegmentId(),
-      partId: part.id
+      part: this.convertPartToEvent(part)
     }
   }
 
@@ -220,8 +204,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.PART_DELETED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segmentId: '',
-      partId: partId
+      partId
     }
   }
 }
