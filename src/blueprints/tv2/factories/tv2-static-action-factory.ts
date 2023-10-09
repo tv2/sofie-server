@@ -3,7 +3,7 @@ import { Action } from '../../../model/entities/action'
 export class Tv2StaticActionFactory {
   public createStaticActions(/*blueprintConfiguration: Tv2BlueprintConfiguration*/): Action[] {
     return [
-      // this.createDskOneOnAction(),
+      // this.createDownstreamKeyerOneOnAction(),
       // this.createFadePersistedAudioAction(),
     ]
   }
@@ -17,8 +17,7 @@ export class Tv2StaticActionFactory {
   //
 
   //
-  // // Todo: Find out what 'Dsk' stands for and write it out.
-  // private createDskOneOnAction(): Action {
+  // private createDownstreamKeyerOneOnAction(): Action {
   //
   // }
 }

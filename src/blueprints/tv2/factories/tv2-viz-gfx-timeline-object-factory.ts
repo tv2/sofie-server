@@ -9,6 +9,7 @@ import {
 } from '../../timeline-state-resolver-types/viz-types'
 import { Tv2VizLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
+import { TimelineObject } from '../../../model/entities/timeline-object'
 
 export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
@@ -65,10 +66,22 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
   }
 
   public createGfxClearTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseClearGfxTimelineObject {
-    return this.buildGfxClearTimelineObject(blueprintConfiguration, duration, true)
+    return (this.createBaseTimelineObjectWithContent(
+      duration,
+      this.createGfxClearContent(blueprintConfiguration)
+    ) as VizMseClearGfxTimelineObject)
   }
 
-  private buildGfxClearTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number, sendCommands: boolean): VizMseClearGfxTimelineObject {
+  private createGfxClearContent(blueprintConfiguration: Tv2BlueprintConfiguration): object {
+    return {
+      deviceType: DeviceType.VIZMSE,
+      type: VizType.CLEAR_ALL_ELEMENTS,
+      channelsToSendCommands: ['OVL1', 'FULL1', 'WALL1'],
+      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+    }
+  }
+
+  private createBaseTimelineObjectWithContent(duration: number, content: object): TimelineObject {
     return {
       id: '',
       enable: {
@@ -77,18 +90,24 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
       },
       priority: 100,
       layer: Tv2VizLayer.GFX_ACTIONS,
-      content: {
-        deviceType: DeviceType.VIZMSE,
-        type: VizType.CLEAR_ALL_ELEMENTS,
-        channelsToSendCommands: sendCommands ? ['OVL1', 'FULL1', 'WALL1'] : undefined,
-        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
-      }
+      content: content
     }
   }
 
   public createGfxAlternativeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseClearGfxTimelineObject {
-    return this.buildGfxClearTimelineObject(blueprintConfiguration, duration, false)
+    return (this.createBaseTimelineObjectWithContent(
+      duration,
+      this.createAlternativeGfxClearContent(blueprintConfiguration)
+    ) as VizMseClearGfxTimelineObject)
+  }
 
+  private createAlternativeGfxClearContent(blueprintConfiguration: Tv2BlueprintConfiguration): object {
+    return {
+      deviceType: DeviceType.VIZMSE,
+      type: VizType.CLEAR_ALL_ELEMENTS,
+      channelsToSendCommands: undefined,
+      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+    }
   }
 
 }
