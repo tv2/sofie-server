@@ -7,6 +7,8 @@ import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Tv2AudioTimelineObjectFactory } from '../value-objects/factories/tv2-audio-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
+import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+
 
 export class Tv2AudioActionFactory {
   constructor(private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory) { }
@@ -16,8 +18,34 @@ export class Tv2AudioActionFactory {
       this.createStopAudioBedAction(),
       this.createMicrophoneUpAction(blueprintConfiguration),
       this.createMicrophoneDownAction(blueprintConfiguration),
-      this.createResynchronizeAudioAction()
+      this.createResynchronizeAudioAction(),
+      this.createFadePersistedAudioAction()
     ]
+  }
+
+  private createFadePersistedAudioAction(): PieceAction {
+    const pieceInterface: PieceInterface = {
+      ...this.createDefaultAudioPieceInterface(),
+      id: 'fadePersistedAudioPiece',
+      name: 'Fade Persisted Audio',
+      metadata: this.createFadePersistedAudioMetadata()
+    }
+    return {
+      id: 'fadePersistedAudioAction',
+      name: 'Fade Persisted Audio',
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+      data: pieceInterface
+    }
+  }
+
+  private createFadePersistedAudioMetadata(): Tv2PieceMetadata {
+    return {
+      sisyfosPersistMetaData: {
+        sisyfosLayers: [],
+        acceptsPersistedAudio: false,
+        wantsToPersistAudio: false
+      }
+    }
   }
 
   private createMicrophoneUpAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
