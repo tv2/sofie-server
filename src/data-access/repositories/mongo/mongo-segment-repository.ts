@@ -5,7 +5,7 @@ import { MongoEntityConverter, MongoSegment } from './mongo-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { PartRepository } from '../interfaces/part-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { DeleteResult } from 'mongodb'
+import { DeleteResult, Filter } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Part } from '../../../model/entities/part'
 
@@ -38,10 +38,10 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
     return segment
   }
 
-  public async getSegments(rundownId: string): Promise<Segment[]> {
+  public async getSegments(rundownId: string, filters?: Filter<MongoSegment>): Promise<Segment[]> {
     this.assertDatabaseConnection(this.getSegments.name)
     const mongoSegments: MongoSegment[] = (await this.getCollection()
-      .find<MongoSegment>({ rundownId: rundownId })
+      .find<MongoSegment>({ ...filters, rundownId: rundownId })
       .toArray())
     const segments: Segment[] = this.mongoEntityConverter.convertSegments(mongoSegments)
     return Promise.all(
@@ -54,7 +54,11 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
 
   public async saveSegment(segment: Segment): Promise<void> {
     const mongoSegment: MongoSegment = this.mongoEntityConverter.convertToMongoSegment(segment)
-    await this.getCollection().updateOne({ _id: segment.id }, { $set: mongoSegment })
+    await this.getCollection().updateOne(
+      { _id: segment.id },
+      { $set: mongoSegment },
+      { upsert: segment.isUnsynced() }
+    )
     await Promise.all(segment.getParts().map(part => this.partRepository.savePart(part)))
   }
 
@@ -65,6 +69,20 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
     await Promise.all(segments.map(async (segment) => this.partRepository.deletePartsForSegment(segment.id)))
 
     const segmentDeleteResult: DeleteResult = await this.getCollection().deleteMany({ rundownId: rundownId })
+
+    if (!segmentDeleteResult.acknowledged) {
+      throw new DeletionFailedException(`Failed to delete Segments for Rundown: ${rundownId}`)
+    }
+  }
+
+  public async deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deleteUnsyncedSegmentsForRundown.name)
+    const unsyncedFilter: Filter<MongoSegment> = { isUnsynced: true }
+    const segments: Segment[] = await this.getSegments(rundownId, unsyncedFilter)
+
+    await Promise.all(segments.map(async (segment) => this.partRepository.deletePartsForSegment(segment.id)))
+
+    const segmentDeleteResult: DeleteResult = await this.getCollection().deleteMany({ ...unsyncedFilter, rundownId: rundownId })
 
     if (!segmentDeleteResult.acknowledged) {
       throw new DeletionFailedException(`Failed to delete Segments for Rundown: ${rundownId}`)

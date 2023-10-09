@@ -106,6 +106,7 @@ export class Part {
   public markAsUnsynced(): void {
     this.isPartUnsynced = true
     this.rank = this.rank - 1
+    this.pieces.forEach(piece => piece.markAsUnsynced())
   }
 
   public isUnsynced(): boolean {

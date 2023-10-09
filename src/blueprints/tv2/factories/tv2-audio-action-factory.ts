@@ -25,6 +25,7 @@ export class Tv2AudioActionFactory {
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
+      isUnsynced: false,
       timelineObjects: [
         {
           id: '',

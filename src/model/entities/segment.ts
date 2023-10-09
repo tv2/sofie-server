@@ -13,6 +13,7 @@ export interface SegmentInterface {
   parts: Part[]
   isOnAir: boolean
   isNext: boolean
+  isUnsynced: boolean
   budgetDuration?: number
 }
 
@@ -25,6 +26,8 @@ export class Segment {
 
   private isSegmentOnAir: boolean
   private isSegmentNext: boolean
+  private isSegmentUnsynced: boolean = false
+
   private parts: Part[]
 
   constructor(segment: SegmentInterface) {
@@ -34,6 +37,7 @@ export class Segment {
     this.rank = segment.rank
     this.isSegmentOnAir = segment.isOnAir
     this.isSegmentNext = segment.isNext
+    this.isSegmentUnsynced = segment.isUnsynced
     this.budgetDuration = segment.budgetDuration
     this.setParts(segment.parts ?? [])
   }
@@ -56,6 +60,16 @@ export class Segment {
 
   public isOnAir(): boolean {
     return this.isSegmentOnAir
+  }
+
+  public isUnsynced(): boolean {
+    return this.isSegmentUnsynced
+  }
+
+  public markAsUnsynced(): void {
+    this.isSegmentUnsynced = true
+    this.rank = this.rank - 1
+    this.parts.forEach(part => part.markAsUnsynced())
   }
 
   public setAsNext(): void {
@@ -101,12 +115,21 @@ export class Segment {
   }
 
   public addPart(part: Part): void {
+    if (!this.isInsertingPartAllowed(part)) {
+      return
+    }
+
     const doesPartAlreadyExistOnSegment: boolean = this.parts.some(p => p.id === part.id)
     if (doesPartAlreadyExistOnSegment) {
       throw new AlreadyExistException(`Unable to add Part to Segment. Part ${part.id} already exist on Segment ${this.id}`)
     }
     this.parts.push(part)
     this.parts.sort(this.compareParts)
+  }
+
+  private isInsertingPartAllowed(part: Part): boolean {
+    // We are not allowed to insert Parts into unsynced Segments unless it's the active Part!
+    return !this.isUnsynced() || part.isOnAir()
   }
 
   public updatePart(part: Part): void {

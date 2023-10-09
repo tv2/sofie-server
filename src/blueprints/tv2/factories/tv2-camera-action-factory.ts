@@ -68,6 +68,7 @@ export class Tv2CameraActionFactory {
       postRollDuration: 0,
       metadata,
       tags: [],
+      isUnsynced: false,
       timelineObjects: [
         ...cameraTimelineObjects,
         ...sisyfosTimelineObjects

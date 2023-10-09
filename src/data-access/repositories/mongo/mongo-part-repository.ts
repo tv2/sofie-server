@@ -59,6 +59,7 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
       { $set: mongoPart },
       { upsert: part.isUnsynced() } // Only upsert unsynced Parts. If we upsert all Parts we run into race conditions with deleted Parts.
     )
+    await Promise.all(part.getPieces().map(piece => this.pieceRepository.savePiece(piece)))
   }
 
   public async deletePartsForSegment(segmentId: string): Promise<void> {

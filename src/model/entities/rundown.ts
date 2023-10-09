@@ -41,7 +41,7 @@ export interface RundownAlreadyActiveProperties {
 
 export class Rundown extends BasicRundown {
   private readonly baselineTimelineObjects: TimelineObject[]
-  private readonly segments: Segment[]
+  private segments: Segment[]
 
   private activeCursor?: RundownCursor
   private nextCursor?: RundownCursor
@@ -232,7 +232,7 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.getPartAfter.name)
     const segmentIndexForPart: number = this.getSegmentIndexForPart(part)
     try {
-      return  this.segments[segmentIndexForPart].findNextPart(part)
+      return this.segments[segmentIndexForPart].findNextPart(part)
     } catch (exception) {
       if (!(exception instanceof LastPartInSegmentException)) {
         throw exception
@@ -240,7 +240,7 @@ export class Rundown extends BasicRundown {
       if (segmentIndexForPart + 1 === this.segments.length) {
         throw new LastPartInRundownException()
       }
-      return this.segments[segmentIndexForPart + 1].findFirstPart()
+      return this.findFirstPartOfSegmentSkippingUnsyncedSegment(segmentIndexForPart + 1)
     }
   }
 
@@ -252,6 +252,16 @@ export class Rundown extends BasicRundown {
       )
     }
     return segmentIndexForPart
+  }
+
+  private findFirstPartOfSegmentSkippingUnsyncedSegment(indexToSearchFrom: number): Part {
+    while (indexToSearchFrom < this.segments.length) {
+      if (!this.segments[indexToSearchFrom].isUnsynced()) {
+        return this.segments[indexToSearchFrom].findFirstPart()
+      }
+      indexToSearchFrom++
+    }
+    throw new LastPartInRundownException()
   }
 
   public getPreviousPart(): Part | undefined {
@@ -489,12 +499,17 @@ export class Rundown extends BasicRundown {
   }
 
   public removeSegment(segmentId: string): void {
-    const segmentIndex: number = this.segments.findIndex(s => s.id === segmentId)
-    if (segmentIndex < 0) {
+    const segment: Segment | undefined = this.segments.find(s => s.id === segmentId)
+    if (!segment) {
       return
     }
-    // TODO: Account for the Segment being on Air
-    this.segments.splice(segmentIndex, 1)
+
+    if (segment.isOnAir()) {
+      segment.markAsUnsynced()
+      return
+    }
+
+    this.segments = this.segments.filter(s => s.id !== segmentId)
   }
 
   public getSegments(): Segment[] {
@@ -507,7 +522,6 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find Segment for Part ${part.id} in Rundown ${this.id}`)
     }
     segment.addPart(part)
-
     this.updateNextCursor()
   }
 

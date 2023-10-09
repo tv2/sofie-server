@@ -41,6 +41,7 @@ export interface MongoSegment {
   externalId: string
   isHidden: boolean
   isOnAir: boolean
+  isUnsynced: boolean
   isNext: boolean
   budgetDuration?: number
 }
@@ -75,7 +76,7 @@ export interface MongoPiece {
   sourceLayerId: string
   enable: {
     start: number | string
-    duration: number
+    duration?: number
   }
   prerollDuration: number
   postrollDuration: number
@@ -86,6 +87,7 @@ export interface MongoPiece {
   metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
   content?: unknown
   tags?: string[]
+  isUnsynced: boolean
 }
 
 export interface MongoTimeline {
@@ -211,8 +213,9 @@ export class MongoEntityConverter {
       rundownId: mongoSegment.rundownId,
       name: mongoSegment.name,
       rank: mongoSegment._rank,
-      isOnAir: false,
-      isNext: false,
+      isOnAir: mongoSegment.isOnAir ?? false,
+      isNext: mongoSegment.isNext ?? false,
+      isUnsynced: mongoSegment.isUnsynced,
       parts: [],
       budgetDuration: mongoSegment.budgetDuration ?? undefined, // Ensure that null values are stripped
     })
@@ -230,6 +233,7 @@ export class MongoEntityConverter {
       _rank: segment.rank,
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
+      isUnsynced: segment.isUnsynced(),
       budgetDuration: segment.budgetDuration,
     } as MongoSegment
   }
@@ -296,6 +300,7 @@ export class MongoEntityConverter {
       metadata: mongoPiece.metaData,
       content: mongoPiece.content,
       tags: mongoPiece.tags ?? [],
+      isUnsynced: mongoPiece.isUnsynced
     })
   }
 
@@ -338,6 +343,73 @@ export class MongoEntityConverter {
 
   public convertPieces(mongoPieces: MongoPiece[]): Piece[] {
     return mongoPieces.map((mongoPiece) => this.convertPiece(mongoPiece))
+  }
+
+  public convertToMongoPiece(piece: Piece): MongoPiece {
+    let enable: { start: number, duration?: number} = {
+      start: piece.getStart()
+    }
+    if (piece.duration) {
+      enable = {
+        ...enable,
+        duration: piece.duration
+      }
+    }
+
+    return {
+      _id: piece.id,
+      name: piece.name,
+      startPartId: piece.getPartId(),
+      sourceLayerId: piece.layer,
+      lifespan: this.mapPieceLifespanToMongoPieceLifespan(piece.pieceLifespan),
+      isPlanned: piece.isPlanned,
+      enable,
+      prerollDuration: piece.preRollDuration,
+      postrollDuration: piece.postRollDuration,
+      pieceType: this.mapTransitionTypeToMongoTransitionType(piece.transitionType),
+      timelineObjectsString: JSON.stringify(piece.timelineObjects),
+      metaData: piece.metadata,
+      content: piece.content,
+      tags: piece.tags,
+      isUnsynced: piece.isUnsynced()
+    }
+  }
+
+  private mapPieceLifespanToMongoPieceLifespan(lifespan: PieceLifespan): string {
+    switch (lifespan) {
+      case PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE: {
+        return 'rundown-change'
+      }
+      case PieceLifespan.SPANNING_UNTIL_RUNDOWN_END: {
+        return 'rundown-end'
+      }
+      case PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE: {
+        return 'segment-change'
+      }
+      case PieceLifespan.SPANNING_UNTIL_SEGMENT_END: {
+        return 'segment-end'
+      }
+      case PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN: {
+        return 'rundown-change-segment-lookback'
+      }
+      case PieceLifespan.WITHIN_PART:
+      default: {
+        return 'part-only'
+      }
+    }
+  }
+
+  private mapTransitionTypeToMongoTransitionType(transitionType: TransitionType): string {
+    switch (transitionType) {
+      case TransitionType.IN_TRANSITION: {
+        return 'in-transition'
+      }
+      case TransitionType.OUT_TRANSITION:
+        return 'out-transition'
+      case TransitionType.NO_TRANSITION:
+      default:
+        return 'normal'
+    }
   }
 
   public convertToMongoTimeline(timeline: Timeline): MongoTimeline {
