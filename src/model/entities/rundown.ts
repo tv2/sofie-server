@@ -87,7 +87,9 @@ export class Rundown extends BasicRundown {
     this.isRundownActive = true
 
     this.nextSegment = this.findFirstSegment()
+    this.nextSegment.setAsNext()
     this.nextPart = this.nextSegment.findFirstPart()
+    this.nextPart.setAsNext()
   }
 
   private resetSegments(): void {
