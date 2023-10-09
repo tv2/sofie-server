@@ -11,7 +11,6 @@ import {
 import { Tv2CameraActionFactory } from './factories/tv2-camera-action-factory'
 import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-factory'
 import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
-import { Tv2StaticActionFactory } from './factories/tv2-static-action-factory'
 import { Tv2GfxActionFactory } from './factories/tv2-gfx-action-factory'
 import { ShowStyle } from '../../model/entities/show-style'
 
@@ -21,7 +20,6 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
     private readonly cameraActionFactory: Tv2CameraActionFactory,
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
-    private readonly staticActionFactory: Tv2StaticActionFactory,
     private readonly graphicActionFactory: Tv2GfxActionFactory
   ) {
   }
@@ -42,7 +40,6 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
-      ...this.staticActionFactory.createStaticActions(), // Todo(ASMA): Split into appropriate factories, and remove.
       ...this.graphicActionFactory.createGfxActions(blueprintConfiguration)
     ]
   }
@@ -58,7 +55,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       console.warn('Failed to find Selected Graphic Setup')
       return blueprintConfiguration
     }
-    blueprintConfiguration.selectedGraphicsSetup = graphicSetup
+    blueprintConfiguration.selectedGfxSetup = graphicSetup
     return blueprintConfiguration
   }
 }

@@ -1,6 +1,7 @@
 import { Tv2GfxTimelineObjectFactory } from '../value-objects/factories/tv2-gfx-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
+  GiveMeANameTimelineObject,
   VizMseClearGfxTimelineObject,
   VizMseContinueTimelineObject,
   VizMseElementInternalTimelineObject,
@@ -10,6 +11,7 @@ import {
 import { Tv2VizLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
+import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 
 export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
@@ -26,7 +28,7 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
         type: VizType.ELEMENT_INTERNAL,
         templateName: 'OUT_TEMA_H',
         templateData: [],
-        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+        showName: blueprintConfiguration.showStyle.selectedGfxSetup.OvlShowName ?? ''
       }
     }
   }
@@ -77,7 +79,7 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
       deviceType: DeviceType.VIZMSE,
       type: VizType.CLEAR_ALL_ELEMENTS,
       channelsToSendCommands: ['OVL1', 'FULL1', 'WALL1'],
-      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+      showName: blueprintConfiguration.showStyle.selectedGfxSetup.OvlShowName ?? ''
     }
   }
 
@@ -106,7 +108,22 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
       deviceType: DeviceType.VIZMSE,
       type: VizType.CLEAR_ALL_ELEMENTS,
       channelsToSendCommands: undefined,
-      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+      showName: blueprintConfiguration.showStyle.selectedGfxSetup.OvlShowName ?? ''
+    }
+  }
+
+  public createDownstreamKeyerOnTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string): GiveMeANameTimelineObject {
+    return {
+      id: '',
+      enable: {
+        while: 1
+      },
+      priority: 10,
+      layer: layer,
+      content: {
+        onAir: !downstreamKeyer.DefaultOn,
+        config: downstreamKeyer
+      }
     }
   }
 
