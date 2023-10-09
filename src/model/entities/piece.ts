@@ -13,7 +13,7 @@ export interface PieceInterface {
   pieceLifespan: PieceLifespan
   isPlanned: boolean
   start: number
-  duration: number
+  duration?: number
   preRollDuration: number
   postRollDuration: number
   transitionType: TransitionType
@@ -22,6 +22,7 @@ export interface PieceInterface {
   metadata?: unknown
   content?: unknown
   tags: string[]
+  isUnsynced: boolean
 }
 
 export class Piece {
@@ -31,7 +32,7 @@ export class Piece {
   public type: PieceType
   public pieceLifespan: PieceLifespan
   public isPlanned: boolean = true
-  public duration: number
+  public duration?: number
   public preRollDuration: number
   public postRollDuration: number
   public transitionType: TransitionType
@@ -44,6 +45,7 @@ export class Piece {
   private partId: string
   private start: number
   private executedAt: number
+  private isUnsyncedPiece: boolean = false
 
   constructor(piece: PieceInterface) {
     this.id = piece.id
@@ -63,6 +65,7 @@ export class Piece {
     this.metadata = piece.metadata
     this.content = piece.content
     this.tags = piece.tags
+    this.isUnsyncedPiece = piece.isUnsynced
   }
 
   public setExecutedAt(executedAt: number): void {
@@ -80,6 +83,14 @@ export class Piece {
 
   public getExecutedAt(): number {
     return this.executedAt
+  }
+
+  public markAsUnsynced(): void {
+    this.isUnsyncedPiece = true
+  }
+
+  public isUnsynced(): boolean {
+    return this.isUnsyncedPiece
   }
 
   public getPartId(): string {

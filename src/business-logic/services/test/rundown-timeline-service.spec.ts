@@ -13,6 +13,7 @@ import { EntityMockFactory } from '../../../model/entities/test/entity-mock-fact
 import { RundownDeletedEvent } from '../../../model/value-objects/rundown-event'
 import { Blueprint } from '../../../model/value-objects/blueprint'
 import { PartRepository } from '../../../data-access/repositories/interfaces/part-repository'
+import { SegmentRepository } from '../../../data-access/repositories/interfaces/segment-repository'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -97,6 +98,7 @@ function createDeletedRundownEvent(rundownId: string): RundownDeletedEvent {
 function createTestee(params: {
   rundownEventEmitter?: RundownEventEmitter
   rundownRepository?: RundownRepository
+  segmentRepository?: SegmentRepository,
   partRepository?: PartRepository
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
@@ -107,6 +109,7 @@ function createTestee(params: {
   return new RundownTimelineService(
     params.rundownEventEmitter ?? instance(mock<RundownEventEmitter>()),
     params.rundownRepository ?? instance(mock<RundownRepository>()),
+    params.segmentRepository ?? instance(mock<SegmentRepository>()),
     params.partRepository ?? instance(mock<PartRepository>()),
     params.timelineRepository ?? instance(mock<TimelineRepository>()),
     params.timelineBuilder ?? instance(mock<TimelineBuilder>()),

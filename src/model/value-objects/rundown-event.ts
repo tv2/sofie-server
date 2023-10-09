@@ -71,7 +71,7 @@ export interface PieceEventInterface {
   isPlanned: false
   name: string
   start: number
-  duration: number
+  duration?: number
   layer: string
   type: string
 }

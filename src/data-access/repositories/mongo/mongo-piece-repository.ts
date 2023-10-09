@@ -25,6 +25,16 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
     return this.mongoEntityConverter.convertPieces(mongoPieces)
   }
 
+  public async savePiece(piece:Piece): Promise<void> {
+    this.assertDatabaseConnection(this.savePiece.name)
+    const mongoPiece: MongoPiece = this.mongoEntityConverter.convertToMongoPiece(piece)
+    await this.getCollection().updateOne(
+      { _id: piece.id },
+      { $set: mongoPiece },
+      { upsert: piece.isUnsynced() }
+    )
+  }
+
   public async deletePiecesForPart(partId: string): Promise<void> {
     this.assertDatabaseConnection(this.deletePiecesForPart.name)
     const piecesDeletionResult: DeleteResult = await this.getCollection().deleteMany({ startPartId: partId })

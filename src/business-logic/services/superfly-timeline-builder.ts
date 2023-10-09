@@ -224,7 +224,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     piece: Piece,
     parentGroup: TimelineObjectGroup
   ): TimelineEnable | undefined {
-    const duration: string | number =
+    const duration: string | number | undefined =
         partCalculatedTimings.postRollDuration && !piece.duration
           ? `#${parentGroup.id} - ${partCalculatedTimings.postRollDuration}`
           : piece.duration
@@ -360,7 +360,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       }
 
       lookAheadObjects.push(
-        ...this.createLookAheadTimelineObjectsForPart(partToGetLookAheadObjectsFrom, layer, lookAheadEnable)
+        ...this.createLookaheadTimelineObjectsForPart(partToGetLookAheadObjectsFrom, layer, lookAheadEnable)
       )
       try {
         partToGetLookAheadObjectsFrom = rundown.getPartAfter(partToGetLookAheadObjectsFrom)
@@ -374,7 +374,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return lookAheadObjects
   }
 
-  private createLookAheadTimelineObjectsForPart(
+  private createLookaheadTimelineObjectsForPart(
     part: Part,
     layer: StudioLayer,
     enable: TimelineEnable,
@@ -406,7 +406,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       start: 0,
       end: `#${activeGroup.id}.start`,
     }
-    return this.createLookAheadTimelineObjectsForPart(
+    return this.createLookaheadTimelineObjectsForPart(
       rundown.getActivePart(),
       layer,
       activePartTimelineObjectEnable,

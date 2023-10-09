@@ -21,11 +21,14 @@ import { PartEndState } from '../../model/value-objects/part-end-state'
 import { Part } from '../../model/entities/part'
 import { Owner } from '../../model/enums/owner'
 import { PartRepository } from '../../data-access/repositories/interfaces/part-repository'
+import { Segment } from '../../model/entities/segment'
+import { SegmentRepository } from '../../data-access/repositories/interfaces/segment-repository'
 
 export class RundownTimelineService implements RundownService {
   constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly rundownRepository: RundownRepository,
+    private readonly segmentRepository: SegmentRepository,
     private readonly partRepository: PartRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
@@ -70,6 +73,8 @@ export class RundownTimelineService implements RundownService {
     this.sendEvents(rundown, [this.rundownEventBuilder.buildDeactivateEvent])
 
     await this.rundownRepository.saveRundown(rundown)
+
+    await this.deleteUnsyncedSegmentsAndParts(rundown)
   }
 
   private sendEvents(rundown: Rundown, buildEventCallbacks: ((rundown: Rundown) => RundownEvent)[]): void {
@@ -88,7 +93,6 @@ export class RundownTimelineService implements RundownService {
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBefore: Piece[] = rundown.getInfinitePieces()
-    const previousSegmentId: string | undefined = rundown.getActiveCursor()?.segment.id
 
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
@@ -108,8 +112,18 @@ export class RundownTimelineService implements RundownService {
 
     await this.rundownRepository.saveRundown(rundown)
 
-    if (previousSegmentId) {
-      await this.partRepository.deleteUnsyncedPartsForSegment(previousSegmentId)
+    await this.deleteUnsyncedSegmentsAndParts(rundown)
+  }
+
+  private async deleteUnsyncedSegmentsAndParts(rundown: Rundown): Promise<void> {
+    const unsyncedSegment: Segment | undefined = rundown.getSegments().find(segment => segment.isUnsynced())
+    if (!unsyncedSegment) {
+      return
+    }
+    if (unsyncedSegment.isOnAir()) {
+      await this.partRepository.deleteUnsyncedPartsForSegment(unsyncedSegment.id)
+    } else {
+      await this.segmentRepository.deleteUnsyncedSegmentsForRundown(rundown.id)
     }
   }
 
