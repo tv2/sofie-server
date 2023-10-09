@@ -7,7 +7,6 @@ import { Tv2ActionsService } from './tv2-actions-service'
 import { Tv2CameraActionFactory } from './factories/tv2-camera-action-factory'
 import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-factory'
 import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
-import { Tv2StaticActionFactory } from './factories/tv2-static-action-factory'
 import { Tv2GfxActionFactory } from './factories/tv2-gfx-action-factory'
 import { Tv2VizGfxTimelineObjectFactory } from './factories/tv2-viz-gfx-timeline-object-factory'
 import { Tv2SisyfosAudioTimelineObjectFactory } from './factories/tv2-sisyfos-audio-timeline-object-factory'
@@ -21,7 +20,6 @@ export class Tv2BlueprintsFacade {
         new Tv2CameraActionFactory(),
         new Tv2TransitionActionFactory(),
         new Tv2AudioActionFactory(new Tv2SisyfosAudioTimelineObjectFactory()),
-        new Tv2StaticActionFactory(),
         new Tv2GfxActionFactory(new Tv2VizGfxTimelineObjectFactory())
       )
     )

@@ -1,7 +1,7 @@
 export interface Tv2ShowStyleBlueprintConfiguration {
   GfxDefaults: GfxDefault
   GfxSetups: GfxSetup[]
-  selectedGraphicsSetup: GfxSetup
+  selectedGfxSetup: GfxSetup
 }
 
 export interface GfxDefault {
