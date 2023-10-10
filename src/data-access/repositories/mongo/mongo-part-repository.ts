@@ -5,7 +5,7 @@ import { MongoDatabase } from './mongo-database'
 import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { DeleteResult, Filter } from 'mongodb'
+import { DeleteResult } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Piece } from '../../../model/entities/piece'
 
@@ -38,7 +38,7 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
     return part
   }
 
-  public async getParts(segmentId: string, filters?: Filter<MongoPart>): Promise<Part[]> {
+  public async getParts(segmentId: string, filters?: Partial<MongoPart>): Promise<Part[]> {
     this.assertDatabaseConnection(this.getParts.name)
     const mongoParts: MongoPart[] = (await this.getCollection()
       .find<MongoPart>({ ...filters, segmentId: segmentId })
@@ -77,7 +77,7 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
 
   public async deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
     this.assertDatabaseConnection(this.deleteUnsyncedPartsForSegment.name)
-    const unsyncedFilter: Filter<MongoPart> = { isUnsynced: true }
+    const unsyncedFilter: Partial<MongoPart> = { isUnsynced: true }
     const unsyncedParts: Part[] = await this.getParts(segmentId, unsyncedFilter)
 
     await Promise.all(unsyncedParts.map(async (part) => this.pieceRepository.deletePiecesForPart(part.id)))

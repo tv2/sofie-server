@@ -16,8 +16,11 @@ import { Owner } from '../../../model/enums/owner'
 import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
 import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 
-export interface MongoRundown {
+export interface MongoId {
   _id: string
+}
+
+export interface MongoRundown extends MongoId {
   name: string
   showStyleVariantId: string
   modified: number
@@ -33,8 +36,7 @@ interface MongoRundownCursor {
   owner: Owner
 }
 
-export interface MongoSegment {
-  _id: string
+export interface MongoSegment extends MongoId {
   name: string
   _rank: number
   rundownId: string
@@ -46,8 +48,7 @@ export interface MongoSegment {
   budgetDuration?: number
 }
 
-export interface MongoPart {
-  _id: string
+export interface MongoPart extends MongoId {
   segmentId: string
   title: string
   _rank: number
@@ -69,8 +70,7 @@ export interface MongoPart {
   endState?: unknown
 }
 
-export interface MongoPiece {
-  _id: string
+export interface MongoPiece extends MongoId {
   startPartId: string
   name: string
   sourceLayerId: string
@@ -90,8 +90,7 @@ export interface MongoPiece {
   isUnsynced: boolean
 }
 
-export interface MongoTimeline {
-  _id: string
+export interface MongoTimeline extends MongoId {
   timelineHash: string
   generated: number
   timelineBlob: string
@@ -110,8 +109,7 @@ export interface MongoShowStyle {
   blueprintConfig: unknown
 }
 
-export interface MongoShowStyleVariant {
-  _id: string
+export interface MongoShowStyleVariant extends MongoId {
   showStyleBaseId: string
   name: string
   blueprintConfig: unknown

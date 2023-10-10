@@ -1,7 +1,7 @@
 import { MongoPartRepository } from '../mongo/mongo-part-repository'
 import { Part } from '../../../model/entities/part'
-import { Db } from 'mongodb'
-import { MongoEntityConverter, MongoPart } from '../mongo/mongo-entity-converter'
+import { Collection, Db } from 'mongodb'
+import { MongoEntityConverter, MongoId, MongoPart } from '../mongo/mongo-entity-converter'
 import { PartRepository } from '../interfaces/part-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
 import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
@@ -107,7 +107,7 @@ describe(MongoPartRepository.name, () => {
       const part: Part = EntityMockFactory.createPart({ segmentId: segmentId })
       await testDatabase.populateDatabaseWithParts([mongoPart])
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
       const spiedCollection = spy(collection)
 
       when(mongoConverter.convertParts(anything())).thenReturn([part])
@@ -134,7 +134,7 @@ describe(MongoPartRepository.name, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoPart(anything())).thenReturn({
@@ -149,7 +149,7 @@ describe(MongoPartRepository.name, () => {
       await testee.savePart(onAirPart)
 
       const result: MongoPart = (await db
-        .collection(COLLECTION_NAME)
+        .collection<MongoPart>(COLLECTION_NAME)
         .findOne({ _id: onAirPart.id })) as unknown as MongoPart
       expect(result.isOnAir).toBeTruthy()
     })
@@ -162,7 +162,7 @@ describe(MongoPartRepository.name, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoPart(anything())).thenReturn({
@@ -177,7 +177,7 @@ describe(MongoPartRepository.name, () => {
       await testee.savePart(inactivePart)
 
       const result: MongoPart = (await db
-        .collection(COLLECTION_NAME)
+        .collection<MongoPart>(COLLECTION_NAME)
         .findOne({ _id: inactivePart.id })) as unknown as MongoPart
       expect(result.isOnAir).toBeFalsy()
     })
@@ -190,7 +190,7 @@ describe(MongoPartRepository.name, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoPart(anything())).thenReturn({
@@ -205,7 +205,7 @@ describe(MongoPartRepository.name, () => {
       await testee.savePart(nextPart)
 
       const result: MongoPart = (await db
-        .collection(COLLECTION_NAME)
+        .collection<MongoPart>(COLLECTION_NAME)
         .findOne({ _id: nextPart.id })) as unknown as MongoPart
       expect(result.isNext).toBeTruthy()
     })
@@ -218,7 +218,7 @@ describe(MongoPartRepository.name, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoPart(anything())).thenReturn({
@@ -230,7 +230,7 @@ describe(MongoPartRepository.name, () => {
       await testee.savePart(nonQueuedPart)
 
       const result: MongoPart = (await db
-        .collection(COLLECTION_NAME)
+        .collection<MongoPart>(COLLECTION_NAME)
         .findOne({ _id: nonQueuedPart.id })) as unknown as MongoPart
       expect(result.isNext).toBeFalsy()
     })
@@ -318,7 +318,7 @@ describe(MongoPartRepository.name, () => {
 
     if (!params.mongoDb) {
       params.mongoDb = mock(MongoDatabase)
-      when(params.mongoDb.getCollection(COLLECTION_NAME)).thenReturn(
+      when(params.mongoDb!.getCollection(COLLECTION_NAME)).thenReturn(
         testDatabase.getDatabase().collection(COLLECTION_NAME)
       )
     }
@@ -328,6 +328,6 @@ describe(MongoPartRepository.name, () => {
       when(params.mongoConverter.convertParts(anything())).thenReturn([])
     }
 
-    return new MongoPartRepository(instance(params.mongoDb), instance(params.mongoConverter), instance(pieceRepository))
+    return new MongoPartRepository(instance(params.mongoDb!), instance(params.mongoConverter), instance(pieceRepository))
   }
 })
