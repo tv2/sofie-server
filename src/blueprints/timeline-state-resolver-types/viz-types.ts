@@ -1,6 +1,5 @@
 import { TimelineObject } from '../../model/entities/timeline-object'
 import { DeviceType } from '../../model/enums/device-type'
-import { Tv2DownstreamKeyer } from '../tv2/value-objects/tv2-studio-blueprint-configuration'
 
 export interface VizMseElementInternalTimelineObject extends TimelineObject {
   content: {
@@ -37,11 +36,10 @@ export interface VizMseClearGfxTimelineObject extends TimelineObject {
   }
 }
 
-// Todo: determine if placed correctly, and give a fitting name
-export interface GiveMeANameTimelineObject extends TimelineObject {
+export interface VizMseDownstreamKeyerTimelineObject extends TimelineObject {
   content: {
     onAir: boolean
-    config: Tv2DownstreamKeyer
+    config: unknown
   }
 }
 

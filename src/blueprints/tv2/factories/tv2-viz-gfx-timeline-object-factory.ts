@@ -1,9 +1,9 @@
 import { Tv2GfxTimelineObjectFactory } from '../value-objects/factories/tv2-gfx-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
-  GiveMeANameTimelineObject,
   VizMseClearGfxTimelineObject,
   VizMseContinueTimelineObject,
+  VizMseDownstreamKeyerTimelineObject,
   VizMseElementInternalTimelineObject,
   VizMseLoadAllElementsTimelineObject,
   VizType
@@ -112,7 +112,7 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
     }
   }
 
-  public createDownstreamKeyerOnTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string): GiveMeANameTimelineObject {
+  public createDownstreamKeyerOnTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string): VizMseDownstreamKeyerTimelineObject {
     return {
       id: '',
       enable: {
