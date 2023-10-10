@@ -31,12 +31,17 @@ export class Tv2CameraActionFactory {
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsNextAction_${cameraSource._id}`,
-      name: `Insert Camera ${cameraSource.SourceName}`,
+      name: `KAM ${cameraSource.SourceName}`,
+      description: `Insert Camera ${cameraSource.SourceName}`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
-      }
+      },
+      metadata: {
+        contentType: 'CAMERA', // TODO: Move to enum
+        cameraId: cameraSource.SourceName,
+      },
     }
   }
 
@@ -190,12 +195,17 @@ export class Tv2CameraActionFactory {
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsOnAirAction_${cameraSource._id}`,
-      name: `Insert and Take Camera ${cameraSource.SourceName}`,
+      name: `KAM ${cameraSource.SourceName}`,
+      description: `Insert and Take Camera ${cameraSource.SourceName}`,
       type: PartActionType.INSERT_PART_AS_ON_AIR,
       data: {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
-      }
+      },
+      metadata: {
+        contentType: 'CAMERA', // TODO: Move to enum
+        cameraId: cameraSource.SourceName,
+      },
     }
   }
 }

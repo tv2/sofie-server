@@ -5,11 +5,15 @@ export class ActionDto {
 
   public readonly id: string
   public readonly name: string
+  public readonly description?: string
   public readonly type: ActionType
+  public readonly metadata?: unknown
 
   constructor(action: Action) {
     this.id = action.id
     this.name = action.name
+    this.description = action.description
     this.type = action.type
+    this.metadata = action.metadata
   }
 }

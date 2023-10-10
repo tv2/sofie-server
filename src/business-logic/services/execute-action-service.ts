@@ -24,7 +24,20 @@ export class ExecuteActionService implements ActionService {
   public async getActions(): Promise<Action[]> {
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
     // TODO: The Actions should be generated on ingest. Move them once we control ingest.
-    const actions: Action[] = this.blueprint.generateActions(configuration)
+    const actions: Action[] = [
+      ...this.blueprint.generateActions(configuration),
+      {
+        id: 'insertVideoClipx_Mosartur_SBAsNext',
+        name: 'x_Mosartur_SB',
+        description: 'hello world',
+        type: PartActionType.INSERT_PART_AS_NEXT,
+        data: undefined,
+        metadata: {
+          contentType: 'VIDEO_CLIP',
+          sourceName: 'x_Mosartur_SB'
+        },
+      }
+    ]
     await this.actionRepository.saveActions(actions)
     return actions
   }
