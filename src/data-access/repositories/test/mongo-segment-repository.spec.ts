@@ -1,7 +1,7 @@
 import { MongoSegmentRepository } from '../mongo/mongo-segment-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
-import { MongoEntityConverter, MongoSegment } from '../mongo/mongo-entity-converter'
-import { Db } from 'mongodb'
+import { MongoEntityConverter, MongoId, MongoSegment } from '../mongo/mongo-entity-converter'
+import { Collection, Db } from 'mongodb'
 import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { PartRepository } from '../interfaces/part-repository'
 import { SegmentRepository } from '../interfaces/segment-repository'
@@ -112,7 +112,7 @@ describe(MongoSegmentRepository.name, () => {
       const mongoSegment: MongoSegment = createMongoSegment({ rundownId: rundownId })
       const segment: Segment = EntityMockFactory.createSegment({ rundownId: rundownId })
       await testDatabase.populateDatabaseWithSegments([mongoSegment])
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
       const spiedCollection = spy(collection)
 
       when(mongoConverter.convertSegments(anything())).thenReturn([segment])
@@ -198,7 +198,7 @@ describe(MongoSegmentRepository.name, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoSegment(anything())).thenReturn({
@@ -213,7 +213,7 @@ describe(MongoSegmentRepository.name, () => {
       await testee.saveSegment(onAirSegment)
 
       const result: MongoSegment = (await db
-        .collection(COLLECTION_NAME)
+        .collection<MongoSegment>(COLLECTION_NAME)
         .findOne({ _id: onAirSegment.id })) as unknown as MongoSegment
 
       expect(result.isOnAir).toBeTruthy()
@@ -230,7 +230,7 @@ describe(MongoSegmentRepository.name, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoSegment(anything())).thenReturn({
@@ -245,7 +245,7 @@ describe(MongoSegmentRepository.name, () => {
       await testee.saveSegment(inactiveSegment)
 
       const result: MongoSegment = (await db
-        .collection(COLLECTION_NAME)
+        .collection<MongoSegment>(COLLECTION_NAME)
         .findOne({ _id: inactiveSegment.id })) as unknown as MongoSegment
 
       expect(result.isOnAir).toBeFalsy()
@@ -262,7 +262,7 @@ describe(MongoSegmentRepository.name, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoSegment(anything())).thenReturn({
@@ -277,7 +277,7 @@ describe(MongoSegmentRepository.name, () => {
       await testee.saveSegment(nextSegment)
 
       const result: MongoSegment = (await db
-        .collection(COLLECTION_NAME)
+        .collection<MongoSegment>(COLLECTION_NAME)
         .findOne({ _id: nextSegment.id })) as unknown as MongoSegment
 
       expect(result.isNext).toBeTruthy()
@@ -294,7 +294,7 @@ describe(MongoSegmentRepository.name, () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
-      const collection = db.collection(COLLECTION_NAME)
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoSegment(anything())).thenReturn({
@@ -309,7 +309,7 @@ describe(MongoSegmentRepository.name, () => {
       await testee.saveSegment(nonQueuedSegment)
 
       const result: MongoSegment = (await db
-        .collection(COLLECTION_NAME)
+        .collection<MongoSegment>(COLLECTION_NAME)
         .findOne({ _id: nonQueuedSegment.id })) as unknown as MongoSegment
 
       expect(result.isNext).toBeFalsy()
@@ -342,7 +342,7 @@ describe(MongoSegmentRepository.name, () => {
   } = {}): MongoSegmentRepository {
     if (!params.mongoDb) {
       params.mongoDb = mock(MongoDatabase)
-      when(params.mongoDb.getCollection(COLLECTION_NAME)).thenReturn(
+      when(params.mongoDb!.getCollection(COLLECTION_NAME)).thenReturn(
         testDatabase.getDatabase().collection(COLLECTION_NAME)
       )
     }
@@ -357,6 +357,6 @@ describe(MongoSegmentRepository.name, () => {
       when(params.mongoConverter.convertSegments(anything())).thenReturn([])
     }
 
-    return new MongoSegmentRepository(instance(params.mongoDb), instance(params.mongoConverter), instance(params.partRepository))
+    return new MongoSegmentRepository(instance(params.mongoDb!), instance(params.mongoConverter), instance(params.partRepository))
   }
 })
