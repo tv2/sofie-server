@@ -36,12 +36,7 @@ export interface VizMseClearGfxTimelineObject extends TimelineObject {
   }
 }
 
-export interface VizMseDownstreamKeyerTimelineObject extends TimelineObject {
-  content: {
-    onAir: boolean
-    config: unknown
-  }
-}
+
 
 export enum VizType {
   ELEMENT_INTERNAL = 'element_internal',
