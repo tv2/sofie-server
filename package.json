@@ -13,7 +13,8 @@
     "lint-fix": "eslint --fix --ext .ts .",
     "validate": "yarn audit --level moderate --groups dependencies",
     "clean": "rimraf dist",
-    "reset": "rimraf dist node_modules coverage *.log"
+    "reset": "rimraf dist node_modules coverage *.log",
+    "start-mongo": "docker-compose -f ./mongodb/compose.yml up"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",
