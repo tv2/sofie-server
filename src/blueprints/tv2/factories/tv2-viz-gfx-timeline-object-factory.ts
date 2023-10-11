@@ -3,7 +3,6 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import {
   VizMseClearGfxTimelineObject,
   VizMseContinueTimelineObject,
-  VizMseDownstreamKeyerTimelineObject,
   VizMseElementInternalTimelineObject,
   VizMseLoadAllElementsTimelineObject,
   VizType
@@ -11,7 +10,6 @@ import {
 import { Tv2VizLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
-import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 
 export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
@@ -71,7 +69,7 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
     return (this.createBaseTimelineObjectWithContent(
       duration,
       this.createGfxClearContent(blueprintConfiguration)
-    ) as VizMseClearGfxTimelineObject)
+    ) as VizMseClearGfxTimelineObject) // Todo: figure out if this `as` usage is okay.
   }
 
   private createGfxClearContent(blueprintConfiguration: Tv2BlueprintConfiguration): object {
@@ -96,14 +94,14 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
     }
   }
 
-  public createGfxAlternativeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseClearGfxTimelineObject {
+  public createGfxAllOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseClearGfxTimelineObject {
     return (this.createBaseTimelineObjectWithContent(
       duration,
-      this.createAlternativeGfxClearContent(blueprintConfiguration)
-    ) as VizMseClearGfxTimelineObject)
+      this.createGfxAllOutContent(blueprintConfiguration)
+    ) as VizMseClearGfxTimelineObject) // Todo: figure out if this `as` usage is okay.
   }
 
-  private createAlternativeGfxClearContent(blueprintConfiguration: Tv2BlueprintConfiguration): object {
+  private createGfxAllOutContent(blueprintConfiguration: Tv2BlueprintConfiguration): object {
     return {
       deviceType: DeviceType.VIZMSE,
       type: VizType.CLEAR_ALL_ELEMENTS,
@@ -112,18 +110,5 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
     }
   }
 
-  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string, onAir: boolean): VizMseDownstreamKeyerTimelineObject {
-    return {
-      id: '',
-      enable: {
-        while: 1
-      },
-      priority: 10,
-      layer,
-      content: {
-        onAir,
-        config: downstreamKeyer
-      }
-    }
-  }
+
 }
