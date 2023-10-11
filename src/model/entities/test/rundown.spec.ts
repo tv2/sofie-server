@@ -2305,8 +2305,7 @@ describe(Rundown.name, () => {
     })
 
     it('does not set active Segment', () => {
-      const part: Part = EntityMockFactory.createPart()
-      const segment: Segment = new Segment({ parts: [part] } as SegmentInterface)
+      const segment: Segment = new Segment({} as SegmentInterface)
       const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
 
       testee.activate()

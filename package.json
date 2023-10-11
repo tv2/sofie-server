@@ -6,16 +6,14 @@
   "scripts": {
     "start": "node dist",
     "build": "tsc --build",
-    "watch": "yarn start-mongo && nodemon",
+    "watch": "nodemon",
     "test": "jest",
     "test-watch": "jest --watch --coverage",
     "lint": "eslint --ext .ts .",
     "lint-fix": "eslint --fix --ext .ts .",
     "validate": "yarn audit --level moderate --groups dependencies",
     "clean": "rimraf dist",
-    "reset": "rimraf dist node_modules coverage *.log",
-    "start-mongo": "docker-compose -f ./mongodb/compose.yml up -d",
-    "stop-mongo": "docker-compose -f ./mongodb/compose.yml down"
+    "reset": "rimraf dist node_modules coverage *.log"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",

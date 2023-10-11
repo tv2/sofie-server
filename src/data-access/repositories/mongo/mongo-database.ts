@@ -4,8 +4,8 @@ import { DatabaseNotConnectedException } from '../../../model/exceptions/databas
 import { MongoId } from './mongo-entity-converter'
 
 // TODO: Move to ENV variables
-const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3002'
-const MONGO_DB_NAME: string = 'sofie'
+const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
+const MONGO_DB_NAME: string = 'meteor'
 
 export class MongoDatabase<T extends MongoId = MongoId> {
   private static instance: MongoDatabase
@@ -24,7 +24,7 @@ export class MongoDatabase<T extends MongoId = MongoId> {
 
   private constructor() {
     this.connectToDatabase()
-      .catch((error) => console.error('Failed connecting to mongo database.', MONGO_CONNECTION_STRING, error))
+      .catch((reason) => console.error('Failed connecting to mongo database.', reason))
   }
 
   private async connectToDatabase(): Promise<void> {
@@ -33,7 +33,7 @@ export class MongoDatabase<T extends MongoId = MongoId> {
       return
     }
 
-    this.client = new mongodb.MongoClient(MONGO_CONNECTION_STRING, { replicaSet: 'rs0', directConnection: true })
+    this.client = new mongodb.MongoClient(MONGO_CONNECTION_STRING)
     await this.client.connect()
 
     this.db = this.client.db(MONGO_DB_NAME)

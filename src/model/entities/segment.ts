@@ -43,9 +43,6 @@ export class Segment {
   }
 
   public findFirstPart(): Part {
-    if (this.parts.length === 0) {
-      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no parts.`)
-    }
     return this.parts[0]
   }
 
