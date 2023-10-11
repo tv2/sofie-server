@@ -8,5 +8,5 @@ export interface Tv2GfxTimelineObjectFactory {
   createContinueGfxTimelineObject(duration: number): TimelineObject
   createGfxClearTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject
   createGfxAlternativeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject
-  createDownstreamKeyerOnTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string): TimelineObject
+  createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string, onAir: boolean): TimelineObject
 }

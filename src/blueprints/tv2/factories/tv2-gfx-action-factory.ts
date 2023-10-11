@@ -7,6 +7,7 @@ import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2GfxTimelineObjectFactory } from '../value-objects/factories/tv2-gfx-timeline-object-factory'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
+import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 
 export class Tv2GfxActionFactory {
   constructor(
@@ -21,30 +22,37 @@ export class Tv2GfxActionFactory {
       this.createGfxClearAction(blueprintConfiguration),
       this.createGfxAlternativeOutAction(blueprintConfiguration),
       ...this.createDownstreamKeyerOnActions(blueprintConfiguration),
+      ...this.createDownstreamKeyerOffActions(blueprintConfiguration)
     ]
   }
 
+  private createDownstreamKeyerOffActions(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction[] {
+    return blueprintConfiguration.studio.SwitcherSource.DSK.map(config => this.createDownStreamKeyerAction(config, 'Off', false))
+  }
+
+  private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): PieceAction {
+    const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
+    const layer: string = `dsk_${downstreamKeyerNumber}` // Taken from Blueprints
+    const pieceInterface: PieceInterface = {
+      ...this.createDefaultGfxPieceInterface(),
+      id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
+      name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
+      layer: layer,
+      pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+      timelineObjects: [
+        this.gfxTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, layer, isOn)
+      ]
+    }
+    return {
+      id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Action`,
+      name: `Downstream Keyer ${downstreamKeyerNumber} ${actionName}`,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+      data: pieceInterface
+    }
+  }
+
   private createDownstreamKeyerOnActions(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction[] {
-    return blueprintConfiguration.studio.SwitcherSource.DSK.map((downstreamKeyer) => {
-      const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
-      const layer: string = `dsk_${downstreamKeyerNumber}` // Taken from Blueprints
-      const pieceInterface: PieceInterface = {
-        ...this.createDefaultGfxPieceInterface(),
-        id: `downstreamKeyer${downstreamKeyerNumber}OnPiece`,
-        name: `DownstreamKeyer ${downstreamKeyerNumber} On`,
-        layer: layer,
-        pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
-        timelineObjects: [
-          this.gfxTimelineObjectFactory.createDownstreamKeyerOnTimelineObject(downstreamKeyer, layer)
-        ]
-      }
-      return {
-        id: `downstreamKeyer${downstreamKeyerNumber}OnAction`,
-        name: `Downstream Keyer ${downstreamKeyerNumber} On`,
-        type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-        data: pieceInterface
-      }
-    })
+    return blueprintConfiguration.studio.SwitcherSource.DSK.map(config => this.createDownStreamKeyerAction(config, 'On', true))
   }
 
   private createGfxAlternativeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
@@ -163,4 +171,6 @@ export class Tv2GfxActionFactory {
       data: pieceInterface
     }
   }
+
+
 }

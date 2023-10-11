@@ -112,19 +112,18 @@ export class Tv2VizGfxTimelineObjectFactory implements Tv2GfxTimelineObjectFacto
     }
   }
 
-  public createDownstreamKeyerOnTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string): VizMseDownstreamKeyerTimelineObject {
+  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string, onAir: boolean): VizMseDownstreamKeyerTimelineObject {
     return {
       id: '',
       enable: {
         while: 1
       },
       priority: 10,
-      layer: layer,
+      layer,
       content: {
-        onAir: !downstreamKeyer.DefaultOn,
+        onAir,
         config: downstreamKeyer
       }
     }
   }
-
 }
