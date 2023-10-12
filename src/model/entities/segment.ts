@@ -70,6 +70,7 @@ export class Segment {
     this.isSegmentUnsynced = true
     this.rank = this.rank - 1
     this.parts.forEach(part => part.markAsUnsynced())
+    this.parts = this.parts.filter(part => part.isOnAir())
   }
 
   public setAsNext(): void {

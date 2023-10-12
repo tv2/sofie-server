@@ -7,6 +7,7 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
+  PartSetAsNextEvent,
   PartUpdatedEvent,
   RundownEvent,
   SegmentCreatedEvent,
@@ -90,7 +91,6 @@ export class DatabaseChangeIngestService implements IngestService {
     }
 
     this.isExecutingEvent = true
-    console.debug('[DEBUG] Executing Ingest Event')
     eventCallback()
       .catch(error => console.error(error))
       .finally(() => {
@@ -110,7 +110,8 @@ export class DatabaseChangeIngestService implements IngestService {
     }
 
     const segmentCreatedEvent: SegmentCreatedEvent = this.eventBuilder.buildSegmentCreatedEvent(rundown, segment)
-    await this.persistRundown(rundown, segmentCreatedEvent)
+    const setNextEvent: PartSetAsNextEvent = this.eventBuilder.buildSetNextEvent(rundown)
+    await this.persistRundown(rundown, [segmentCreatedEvent, setNextEvent])
   }
 
   private throwIfNot(errorCodeToCheck: ErrorCode, exception: Exception): void {
@@ -128,9 +129,9 @@ export class DatabaseChangeIngestService implements IngestService {
     await this.timelineRepository.saveTimeline(timeline)
   }
 
-  private async persistRundown(rundown: Rundown, eventToEmit: RundownEvent): Promise<void> {
+  private async persistRundown(rundown: Rundown, eventsToEmit: RundownEvent[]): Promise<void> {
     await this.buildAndPersistTimelineIfActiveRundown(rundown)
-    this.eventEmitter.emitRundownEvent(eventToEmit)
+    eventsToEmit.forEach((event) => this.eventEmitter.emitRundownEvent(event))
     await this.rundownRepository.saveRundown(rundown)
   }
 
@@ -147,7 +148,8 @@ export class DatabaseChangeIngestService implements IngestService {
     rundown.updateSegment(segment)
 
     const segmentUpdatedEvent: SegmentUpdatedEvent = this.eventBuilder.buildSegmentUpdatedEvent(rundown, segment)
-    await this.persistRundown(rundown, segmentUpdatedEvent)
+    const setNextEvent: PartSetAsNextEvent = this.eventBuilder.buildSetNextEvent(rundown)
+    await this.persistRundown(rundown, [segmentUpdatedEvent, setNextEvent])
   }
 
   private async deleteSegment(segmentId: string): Promise<void> {
@@ -163,7 +165,8 @@ export class DatabaseChangeIngestService implements IngestService {
     rundown.removeSegment(segmentId)
 
     const segmentDeletedEvent: SegmentDeletedEvent = this.eventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
-    await this.persistRundown(rundown, segmentDeletedEvent)
+    const setNextEvent: PartSetAsNextEvent = this.eventBuilder.buildSetNextEvent(rundown)
+    await this.persistRundown(rundown, [segmentDeletedEvent, setNextEvent])
   }
 
   private async createPart(part: Part): Promise<void> {
@@ -185,7 +188,8 @@ export class DatabaseChangeIngestService implements IngestService {
     }
 
     const partCreatedEvent: PartCreatedEvent = this.eventBuilder.buildPartCreatedEvent(rundown, part)
-    await this.persistRundown(rundown, partCreatedEvent)
+    const setNextEvent: PartSetAsNextEvent = this.eventBuilder.buildSetNextEvent(rundown)
+    await this.persistRundown(rundown, [partCreatedEvent, setNextEvent])
   }
 
   private async updatePart(part: Part): Promise<void> {
@@ -201,7 +205,8 @@ export class DatabaseChangeIngestService implements IngestService {
     rundown.updatePart(part)
 
     const partUpdatedEvent: PartUpdatedEvent = this.eventBuilder.buildPartUpdatedEvent(rundown, part)
-    await this.persistRundown(rundown, partUpdatedEvent)
+    const setNextEvent: PartSetAsNextEvent = this.eventBuilder.buildSetNextEvent(rundown)
+    await this.persistRundown(rundown, [partUpdatedEvent, setNextEvent])
   }
 
   private async deletePart(partId: string): Promise<void> {
@@ -217,6 +222,7 @@ export class DatabaseChangeIngestService implements IngestService {
     rundown.removePartFromSegment(partId)
 
     const partDeletedEvent: PartDeletedEvent = this.eventBuilder.buildPartDeletedEvent(rundown, partId)
-    await this.persistRundown(rundown, partDeletedEvent)
+    const setNextEvent: PartSetAsNextEvent = this.eventBuilder.buildSetNextEvent(rundown)
+    await this.persistRundown(rundown, [partDeletedEvent, setNextEvent])
   }
 }
