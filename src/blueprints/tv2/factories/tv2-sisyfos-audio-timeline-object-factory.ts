@@ -24,7 +24,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
     return this.buildMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.ON)
   }
 
-  private buildMicrophoneTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, isPgm:  SisyfosFaderState): SisyfosChannelsTimelineObject {
+  private buildMicrophoneTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, sisyfosFaderState:  SisyfosFaderState): SisyfosChannelsTimelineObject {
     return {
       id: '',
       enable: {
@@ -37,7 +37,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
         type: SisyfosType.CHANNELS,
         channels: blueprintConfiguration.studio.StudioMics.map(studioMic => ({
           mappedLayer: studioMic,
-          isPgm
+          isPgm: sisyfosFaderState
         })),
         overridePriority: 10
       }

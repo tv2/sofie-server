@@ -5,6 +5,7 @@ export enum PieceType {
   GRAPHIC = 'GRAPHIC',
   SERVER = 'SERVER',
   AUDIO = 'AUDIO',
-  TRANSITION = 'TRANSITION'
+  TRANSITION = 'TRANSITION',
+  VIDEO_SWITCHER = 'VIDEO_SWITCHER'
   // Add as needed
 }

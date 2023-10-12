@@ -28,15 +28,14 @@ export class Tv2VideoSwitcherActionFactory {
 
   private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): PieceAction {
     const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
-    const layer: string = `${this.videoSwitcherTimelineObjectFactory.getDownstreamKeyerLayerPrefix()}_${downstreamKeyerNumber}` // Taken from Blueprints.
     const pieceInterface: PieceInterface = {
       ...this.createDefaultVideoSwitcherPieceInterface(),
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
       name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
-      layer: layer,
+      layer: `${Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       timelineObjects: [
-        this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, layer, isOn)
+        this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn)
       ]
     }
     return {
@@ -54,8 +53,8 @@ export class Tv2VideoSwitcherActionFactory {
       name: '',
       duration: 0,
       partId: '',
-      type: PieceType.GRAPHIC, // Todo: Is this still correct, now that it is in a 'VideoSwitcher' factory?
-      layer: Tv2SourceLayer.GRAPHIC_ACTION_COMMAND, // Todo: Is this still correct, now that it is in a 'VideoSwitcher' factory?
+      type: PieceType.VIDEO_SWITCHER,
+      layer: Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: false,

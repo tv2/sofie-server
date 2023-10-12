@@ -1,15 +1,16 @@
 // The enum values in this file is taken from Blueprints and still has to match those values until we control ingest.
-export enum Tv2VizLayer { // Todo: figure out if enum should have 'Viz' in name or not, as technically other graphics might need the same value.
-  GFX_ACTIONS = 'graphic_adlibs',
-  GRAPHIC_PILOT = 'graphic_pilot'
-}
-
 export enum Tv2SourceLayer {
   CAMERA = 'studio0_camera',
   JINGLE = 'studio0_jingle',
   AUDIO_BED = 'studio0_audio_bed',
   GRAPHIC_ACTION_COMMAND = 'studio0_adlib_graphic_cmd',
-  AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs'
+  AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs',
+  DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk' // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
+}
+
+export enum Tv2GraphicLayer {
+  GRAPHIC_ACTIONS = 'graphic_adlibs',
+  GRAPHIC_PILOT = 'graphic_pilot'
 }
 
 export enum Tv2AtemLayer {
