@@ -28,8 +28,7 @@ export class Tv2VideoSwitcherActionFactory {
 
   private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): PieceAction {
     const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
-    const pieceInterface: PieceInterface = {
-      ...this.createDefaultVideoSwitcherPieceInterface(),
+    const pieceInterface: PieceInterface = this.createVideoSwitcherPieceInterface({
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
       name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
       layer: `${Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
@@ -37,7 +36,7 @@ export class Tv2VideoSwitcherActionFactory {
       timelineObjects: [
         this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn)
       ]
-    }
+    })
     return {
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Action`,
       name: `Downstream Keyer ${downstreamKeyerNumber} ${actionName}`,
@@ -47,10 +46,8 @@ export class Tv2VideoSwitcherActionFactory {
   }
 
 
-  private createDefaultVideoSwitcherPieceInterface(): PieceInterface {
+  private createVideoSwitcherPieceInterface(pieceInterfaceWithRequiredValues: Pick<PieceInterface, 'id' | 'name'> & Partial<PieceInterface>): PieceInterface {
     return {
-      id: '',
-      name: '',
       duration: 0,
       partId: '',
       type: PieceType.VIDEO_SWITCHER,
@@ -63,6 +60,7 @@ export class Tv2VideoSwitcherActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [],
+      ...pieceInterfaceWithRequiredValues
     }
   }
 

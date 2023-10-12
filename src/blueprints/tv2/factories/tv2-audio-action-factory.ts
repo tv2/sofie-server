@@ -24,12 +24,11 @@ export class Tv2AudioActionFactory {
   }
 
   private createFadePersistedAudioAction(): PieceAction {
-    const pieceInterface: PieceInterface = {
-      ...this.createDefaultAudioPieceInterface(),
+    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'fadePersistedAudioPiece',
       name: 'Fade Persisted Audio',
       metadata: this.createFadePersistedAudioMetadata()
-    }
+    })
     return {
       id: 'fadePersistedAudioAction',
       name: 'Fade Persisted Audio',
@@ -49,14 +48,13 @@ export class Tv2AudioActionFactory {
   }
 
   private createMicrophoneUpAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
-    const pieceInterface: PieceInterface = {
-      ...this.createDefaultAudioPieceInterface(),
+    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'microphoneUpPiece',
       name: 'Microphone Up',
       timelineObjects: [
         this.audioTimelineObjectFactory.createMicrophoneUpTimelineObject(blueprintConfiguration)
       ]
-    }
+    })
     return {
       id: 'microphoneUpAction',
       name: 'Microphone Up',
@@ -65,10 +63,8 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  private createDefaultAudioPieceInterface(): PieceInterface {
+  private createAudioPieceInterface(pieceInterfaceWithRequiredValues: Pick<PieceInterface, 'id' | 'name'> & Partial<PieceInterface>): PieceInterface {
     return {
-      id: '',
-      name: '',
       duration: 0,
       partId: '',
       type: PieceType.AUDIO,
@@ -81,18 +77,18 @@ export class Tv2AudioActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [],
+      ...pieceInterfaceWithRequiredValues
     }
   }
 
   private createMicrophoneDownAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
-    const pieceInterface: PieceInterface = {
-      ...this.createDefaultAudioPieceInterface(),
+    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'microphoneDownPiece',
       name: 'Microphone Down',
       timelineObjects: [
         this.audioTimelineObjectFactory.createMicrophoneDownTimelineObject(blueprintConfiguration)
       ]
-    }
+    })
     return {
       id: 'microphoneDownAction',
       name: 'Microphone Down',
@@ -103,8 +99,7 @@ export class Tv2AudioActionFactory {
 
   private createStopAudioBedAction(): PieceAction {
     const duration: number = 1000
-    const pieceInterface: PieceInterface = {
-      ...this.createDefaultAudioPieceInterface(),
+    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'stopAudioBedPiece',
       name: 'Stop audio bed',
       layer: Tv2SourceLayer.AUDIO_BED,
@@ -112,7 +107,7 @@ export class Tv2AudioActionFactory {
       timelineObjects: [
         this.audioTimelineObjectFactory.createStopAudioBedTimelineObject(duration)
       ]
-    }
+    })
     return {
       id: 'stopAudioBedAction',
       name: 'Stop audio bed',
@@ -123,16 +118,14 @@ export class Tv2AudioActionFactory {
 
   private createResynchronizeAudioAction(): PieceAction {
     const duration: number = 1000
-    const pieceInterface: PieceInterface = {
-      ...this.createDefaultAudioPieceInterface(),
+    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'resynchronizeAudioPiece',
       name: 'Resynchronize Audio',
       duration,
-      tags: [],
       timelineObjects: [
         this.audioTimelineObjectFactory.createResynchronizeTimelineObject()
       ]
-    }
+    })
     return {
       id: 'resynchronizeAudioAction',
       name: 'Resynchronize Audio',
