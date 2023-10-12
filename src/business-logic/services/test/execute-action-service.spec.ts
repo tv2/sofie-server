@@ -91,6 +91,18 @@ describe(ExecuteActionService.name, () => {
 
         expect(firstExecutedPiece.id).not.toBe(lastExecutedPiece.id)
       })
+
+      it('updates Piece ExecutedAt to be set', async () => {
+        const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
+        const rundownServiceMock: RundownService = mock<RundownService>()
+
+        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        await testee.executeAction(action.id, 'rundownId')
+
+        const [, executedPiece] = capture(rundownServiceMock.insertPieceAsOnAir).first()
+
+        expect(executedPiece.getExecutedAt()).not.toBe(undefined)
+      })
     })
 
     describe('it receives an InsertPieceAsNextAction', () => {
