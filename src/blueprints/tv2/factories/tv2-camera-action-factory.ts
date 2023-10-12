@@ -40,7 +40,7 @@ export class Tv2CameraActionFactory {
       },
       metadata: {
         contentType: 'CAMERA', // TODO: Move to enum
-        cameraId: cameraSource.SourceName,
+        cameraNumber: cameraSource.SourceName,
       },
     }
   }
@@ -204,7 +204,7 @@ export class Tv2CameraActionFactory {
       },
       metadata: {
         contentType: 'CAMERA', // TODO: Move to enum
-        cameraId: cameraSource.SourceName,
+        cameraNumber: cameraSource.SourceName,
       },
     }
   }
