@@ -7,14 +7,15 @@ import { Tv2AtemLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 
 export class Tv2AtemVideoSwitcherTimelineFactory implements Tv2VideoSwitcherTimelineObjectFactory {
-  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, layer: string, onAir: boolean): AtemDownstreamKeyerTimelineObject {
+  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
+    const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
     return {
       id: '',
       enable: {
         while: 1
       },
       priority: 10,
-      layer,
+      layer: `${this.getDownstreamKeyerLayerPrefix()}_${downstreamKeyerNumber}`, // Taken from Blueprints.
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.DSK,
@@ -25,8 +26,8 @@ export class Tv2AtemVideoSwitcherTimelineFactory implements Tv2VideoSwitcherTime
             cutSource: downstreamKeyer.Key
           },
           properties: {
-            clip: downstreamKeyer.Clip * 10, // input is percents (0-100), atem uses 1-000
-            gain: downstreamKeyer.Gain * 10, // input is percents (0-100), atem uses 1-000
+            clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Clip), // input is percents (0-100), atem uses 1-000
+            gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Gain), // input is percents (0-100), atem uses 1-000
             mask: {
               enable: false
             }
@@ -36,7 +37,11 @@ export class Tv2AtemVideoSwitcherTimelineFactory implements Tv2VideoSwitcherTime
     }
   }
 
-  public getDownstreamKeyerLayerPrefix(): string {
+  private convertPercentageToAtemPercentageValue(percentage: number): number {
+    return percentage * 10
+  }
+
+  private getDownstreamKeyerLayerPrefix(): string {
     return Tv2AtemLayer.DOWNSTREAM_KEYER
   }
 }

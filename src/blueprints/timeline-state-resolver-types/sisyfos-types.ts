@@ -25,7 +25,6 @@ export interface SisyfosResynchronizeTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.SISYFOS;
     type: SisyfosType.CHANNEL;
-    // Todo: Figure out if 'resync' can be changed to `resynchronize`, or if it is the value that Sisyfos expects.
     resync: boolean
   }
 }

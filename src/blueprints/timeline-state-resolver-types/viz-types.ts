@@ -22,21 +22,17 @@ export interface VizMseContinueTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZMSE
     type: VizType.CONTINUE
-    direction: -1 | 1 | undefined // Taken directly from Blueprints. Perhaps can/should be changed.
+    direction: -1 | 1 | undefined // Taken directly from Blueprints.
     reference: string
   }
 }
 
-export interface VizMseClearGfxTimelineObject extends TimelineObject {
-  content: {
-    deviceType: DeviceType.VIZMSE
-    type: VizType.CLEAR_ALL_ELEMENTS
-    channelsToSendCommands?: string[]
-    showName: string
-  }
+export interface VizMseClearGraphicTimelineObjectContent {
+  deviceType: DeviceType.VIZMSE
+  type: VizType.CLEAR_ALL_ELEMENTS
+  channelsToSendCommands?: string[]
+  showName: string
 }
-
-
 
 export enum VizType {
   ELEMENT_INTERNAL = 'element_internal',
