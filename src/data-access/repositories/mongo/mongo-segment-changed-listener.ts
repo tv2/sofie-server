@@ -45,25 +45,21 @@ export class MongoSegmentChangedListener extends BaseMongoRepository implements 
       case MongoChangeEvent.INSERT: {
         const insertChange: ChangeStreamInsertDocument<MongoSegment> = change as ChangeStreamInsertDocument<MongoSegment>
         const segmentId: string = insertChange.fullDocument._id
-        if (insertChange.fullDocument.isHidden) {
-          // We don't want to insert hidden Segments into our Rundown
-          return
-        }
         const segment: Segment = await this.segmentRepository.getSegment(segmentId)
-        void this.onCreatedCallback(segment)
+        this.onCreatedCallback(segment)
         break
       }
       case MongoChangeEvent.DELETE: {
         const deleteChange: ChangeStreamDeleteDocument = change as ChangeStreamDeleteDocument
         const segmentId: string = deleteChange.documentKey._id as unknown as string
-        void this.onDeletedCallback(segmentId)
+        this.onDeletedCallback(segmentId)
         break
       }
       case MongoChangeEvent.REPLACE: {
         const replaceChange: ChangeStreamReplaceDocument<MongoSegment> = change as ChangeStreamReplaceDocument<MongoSegment>
         const segmentId: string = replaceChange.fullDocument._id
         const segment: Segment = await this.segmentRepository.getSegment(segmentId)
-        void this.onUpdatedCallback(segment)
+        this.onUpdatedCallback(segment)
         break
       }
       case MongoChangeEvent.UPDATE: {

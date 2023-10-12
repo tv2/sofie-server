@@ -111,7 +111,8 @@ export class Rundown extends BasicRundown {
 
     try {
       const nextPart: Part = this.activeCursor.segment.findNextPart(this.activeCursor.part)
-      this.nextCursor = this.createCursor(this.nextCursor, { part: nextPart, owner })
+      const nextSegment: Segment | undefined = this.segments.find(segment => segment.id === nextPart.getSegmentId())
+      this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextPart, owner })
     } catch (exception) {
       if ((exception as Exception).errorCode !== ErrorCode.LAST_PART_IN_SEGMENT) {
         throw exception
@@ -172,6 +173,7 @@ export class Rundown extends BasicRundown {
     this.deactivateActivePartAndSegment()
     this.unmarkNextSegment()
     this.unmarkNextPart()
+    this.segments.forEach(segment => segment.takeOffAir())
     this.nextCursor = undefined
     this.infinitePieces = new Map()
     this.isRundownActive = false
@@ -473,7 +475,13 @@ export class Rundown extends BasicRundown {
       return
     }
 
-    if (this.nextCursor && this.nextCursor.owner === Owner.EXTERNAL) {
+    const nextCursorSegment: Segment | undefined = this.segments.find(segment => segment.id === this.nextCursor?.segment.id)
+    const doesNextCursorPartExistInPartsForNextSegment: boolean | undefined = nextCursorSegment?.getParts().some(part => part.id === this.nextCursor?.part.id)
+    if (this.nextCursor
+      && this.nextCursor.owner === Owner.EXTERNAL
+      && nextCursorSegment
+      && doesNextCursorPartExistInPartsForNextSegment
+    ) {
       return
     }
 
@@ -510,6 +518,8 @@ export class Rundown extends BasicRundown {
     }
 
     this.segments = this.segments.filter(s => s.id !== segmentId)
+
+    this.updateNextCursor()
   }
 
   public getSegments(): Segment[] {
