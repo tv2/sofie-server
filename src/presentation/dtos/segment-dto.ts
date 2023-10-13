@@ -7,6 +7,7 @@ export class SegmentDto {
   public readonly name: string
   public readonly isOnAir: boolean
   public readonly isNext: boolean
+  public readonly isUnsynced: boolean
   public readonly budgetDuration?: number
   public readonly parts: PartDto[]
 
@@ -16,6 +17,7 @@ export class SegmentDto {
     this.name = segment.name
     this.isOnAir = segment.isOnAir()
     this.isNext = segment.isNext()
+    this.isUnsynced = segment.isUnsynced()
     this.budgetDuration = segment.budgetDuration
     this.parts = segment.getParts().map((part) => new PartDto(part))
   }

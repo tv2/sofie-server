@@ -3,6 +3,7 @@ import { TimelineObject } from './timeline-object'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { TransitionType } from '../enums/transition-type'
 import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface PieceInterface {
   id: string
@@ -87,6 +88,9 @@ export class Piece {
 
   public markAsUnsynced(): void {
     this.isUnsyncedPiece = true
+    if (!this.partId.endsWith(UNSYNCED_ID_POSTFIX)) {
+      this.partId = `${this.partId}${UNSYNCED_ID_POSTFIX}`
+    }
   }
 
   public isUnsynced(): boolean {
@@ -113,5 +117,9 @@ export class Piece {
 
   public getStart(): number {
     return this.start
+  }
+
+  public getUnsyncedCopy(): Piece {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
   }
 }

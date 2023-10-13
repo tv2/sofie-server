@@ -6,6 +6,7 @@ import { InTransition } from '../value-objects/in-transition'
 import { OutTransition } from '../value-objects/out-transition'
 import { AutoNext } from '../value-objects/auto-next'
 import { PartEndState } from '../value-objects/part-end-state'
+import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface PartInterface {
   id: string
@@ -106,7 +107,11 @@ export class Part {
   public markAsUnsynced(): void {
     this.isPartUnsynced = true
     this.rank = this.rank - 1
+    if (!this.segmentId.endsWith(UNSYNCED_ID_POSTFIX)) {
+      this.segmentId = `${this.segmentId}${UNSYNCED_ID_POSTFIX}`
+    }
     this.pieces.forEach(piece => piece.markAsUnsynced())
+    this.pieces = this.pieces.map(piece => piece.getUnsyncedCopy())
   }
 
   public isUnsynced(): boolean {
@@ -268,5 +273,9 @@ export class Part {
 
   public clone(): Part {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
+  }
+
+  public getUnsyncedCopy(): Part {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
   }
 }

@@ -213,14 +213,16 @@ export class MongoEntityConverter {
       rank: mongoSegment._rank,
       isOnAir: mongoSegment.isOnAir ?? false,
       isNext: mongoSegment.isNext ?? false,
-      isUnsynced: mongoSegment.isUnsynced,
+      isUnsynced: mongoSegment.isUnsynced ?? false,
       parts: [],
       budgetDuration: mongoSegment.budgetDuration ?? undefined, // Ensure that null values are stripped
     })
   }
 
   public convertSegments(mongoSegments: MongoSegment[]): Segment[] {
-    return mongoSegments.filter((segment) => !segment.isHidden).map(this.convertSegment.bind(this))
+    return mongoSegments
+      .filter((segment) => !segment.isHidden || (segment.isHidden && segment.isUnsynced))
+      .map(this.convertSegment.bind(this))
   }
 
   public convertToMongoSegment(segment: Segment): MongoSegment {

@@ -29,7 +29,7 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
     this.assertDatabaseConnection(this.savePiece.name)
     const mongoPiece: MongoPiece = this.mongoEntityConverter.convertToMongoPiece(piece)
     await this.getCollection().updateOne(
-      { _id: piece.id },
+      { _id: mongoPiece._id },
       { $set: mongoPiece },
       { upsert: piece.isUnsynced() }
     )

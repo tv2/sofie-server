@@ -4,6 +4,7 @@ import { NotFoundException } from '../exceptions/not-found-exception'
 import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
+import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface SegmentInterface {
   id: string
@@ -70,7 +71,7 @@ export class Segment {
     this.isSegmentUnsynced = true
     this.rank = this.rank - 1
     this.parts.forEach(part => part.markAsUnsynced())
-    this.parts = this.parts.filter(part => part.isOnAir())
+    this.parts = this.parts.filter(part => part.isOnAir()).map(part => part.getUnsyncedCopy())
   }
 
   public setAsNext(): void {
@@ -232,5 +233,9 @@ export class Segment {
     }
 
     this.parts.splice(activePartIndex + 1, 0, part)
+  }
+
+  public getUnsyncedCopy(): Segment {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
   }
 }
