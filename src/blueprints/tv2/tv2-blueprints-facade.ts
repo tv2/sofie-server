@@ -10,8 +10,8 @@ import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
 import { Tv2GraphicActionFactory } from './factories/tv2-graphic-action-factory'
 import { Tv2VizGraphicTimelineObjectFactory } from './factories/tv2-viz-graphic-timeline-object-factory'
 import { Tv2SisyfosAudioTimelineObjectFactory } from './factories/tv2-sisyfos-audio-timeline-object-factory'
-import { Tv2VideoSwitcherActionFactory } from './factories/tv2-video-switcher-action-factory'
-import { Tv2AtemVideoSwitcherTimelineFactory } from './factories/tv2-atem-video-switcher-timeline-factory'
+import { Tv2VideoMixerActionFactory } from './factories/tv2-video-mixer-action-factory'
+import { Tv2AtemVideoMixerTimelineFactory } from './factories/tv2-atem-video-mixer-timeline-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -23,7 +23,7 @@ export class Tv2BlueprintsFacade {
         new Tv2TransitionActionFactory(),
         new Tv2AudioActionFactory(new Tv2SisyfosAudioTimelineObjectFactory()),
         new Tv2GraphicActionFactory(new Tv2VizGraphicTimelineObjectFactory()),
-        new Tv2VideoSwitcherActionFactory(new Tv2AtemVideoSwitcherTimelineFactory())
+        new Tv2VideoMixerActionFactory(new Tv2AtemVideoMixerTimelineFactory())
       )
     )
   }

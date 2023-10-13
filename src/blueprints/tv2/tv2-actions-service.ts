@@ -13,7 +13,7 @@ import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-fa
 import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
 import { Tv2GraphicActionFactory } from './factories/tv2-graphic-action-factory'
 import { ShowStyle } from '../../model/entities/show-style'
-import { Tv2VideoSwitcherActionFactory } from './factories/tv2-video-switcher-action-factory'
+import { Tv2VideoMixerActionFactory } from './factories/tv2-video-mixer-action-factory'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
 
@@ -22,7 +22,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicActionFactory: Tv2GraphicActionFactory,
-    private readonly videoSwitcherActionFactory: Tv2VideoSwitcherActionFactory
+    private readonly videoSwitcherActionFactory: Tv2VideoMixerActionFactory
   ) {
   }
 
@@ -43,7 +43,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
       ...this.graphicActionFactory.createGraphicActions(blueprintConfiguration),
-      ...this.videoSwitcherActionFactory.createVideoSwitcherActions(blueprintConfiguration)
+      ...this.videoSwitcherActionFactory.createVideoMixerActions(blueprintConfiguration)
     ]
   }
 

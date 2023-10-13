@@ -1,8 +1,6 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Action, PieceAction } from '../../../model/entities/action'
-import {
-  Tv2VideoSwitcherTimelineObjectFactory
-} from '../value-objects/factories/tv2-video-switcher-timeline-object-factory'
+import { Tv2VideoMixerTimelineObjectFactory } from '../value-objects/factories/tv2-video-mixer-timeline-object-factory'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -11,11 +9,11 @@ import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 
-export class Tv2VideoSwitcherActionFactory {
-  constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoSwitcherTimelineObjectFactory) {
+export class Tv2VideoMixerActionFactory {
+  constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
   }
 
-  public createVideoSwitcherActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
+  public createVideoMixerActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return [
       ...this.createDownstreamKeyerOnActions(blueprintConfiguration),
       ...this.createDownstreamKeyerOffActions(blueprintConfiguration)
@@ -50,7 +48,7 @@ export class Tv2VideoSwitcherActionFactory {
     return {
       duration: 0,
       partId: '',
-      type: PieceType.VIDEO_SWITCHER,
+      type: PieceType.VIDEO_MIXER,
       layer: Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
