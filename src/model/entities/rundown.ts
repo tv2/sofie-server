@@ -302,6 +302,11 @@ export class Rundown extends BasicRundown {
     if (this.activeCursor) {
       this.activeCursor.part.takeOffAir()
       this.activeCursor.segment.takeOffAir()
+      if (this.activeCursor.segment.isUnsynced()) {
+        // The unsynced Segment is not using the same reference in memory as the activeCursor.segment, so we need to update it in the Segments array.
+        const unsyncedSegment: Segment | undefined = this.segments.find(segment => segment.id === this.activeCursor?.segment.id)
+        unsyncedSegment?.takeOffAir()
+      }
       this.removeUnsyncedPartsFromActiveSegment()
     }
     if (!this.nextCursor) {
@@ -513,13 +518,24 @@ export class Rundown extends BasicRundown {
     }
 
     if (segment.isOnAir()) {
-      segment.markAsUnsynced()
-      return
+      this.unsyncSegment(segment)
     }
 
     this.segments = this.segments.filter(s => s.id !== segmentId)
 
     this.updateNextCursor()
+  }
+
+  private unsyncSegment(segmentToUnsync: Segment): void {
+    segmentToUnsync.markAsUnsynced()
+    const unsyncedSegment: Segment = segmentToUnsync.getUnsyncedCopy()
+    const unsyncedPart: Part | undefined = unsyncedSegment.getParts().find(part => part.isOnAir())
+    if (!unsyncedPart) {
+      throw new NotFoundException(`Unsynced onAir Part not found in unsynced Segment ${unsyncedSegment.id}`)
+    }
+    this.activeCursor = this.createCursor(this.activeCursor, { segment: unsyncedSegment, part:  unsyncedPart })
+    this.segments.push(unsyncedSegment)
+    this.segments.sort(this.compareSegments)
   }
 
   public getSegments(): Segment[] {

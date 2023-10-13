@@ -55,7 +55,7 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
   public async saveSegment(segment: Segment): Promise<void> {
     const mongoSegment: MongoSegment = this.mongoEntityConverter.convertToMongoSegment(segment)
     await this.getCollection().updateOne(
-      { _id: segment.id },
+      { _id: mongoSegment._id },
       { $set: mongoSegment },
       { upsert: segment.isUnsynced() }
     )
