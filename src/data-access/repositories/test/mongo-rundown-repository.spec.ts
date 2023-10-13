@@ -13,6 +13,7 @@ import { EntityMockFactory } from '../../../model/entities/test/entity-mock-fact
 import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
 
 const COLLECTION_NAME: string = 'rundowns'
+
 describe(MongoRundownRepository.name, () => {
   const testDatabase: MongoTestDatabase = new MongoTestDatabase()
   beforeEach(async () => testDatabase.setupDatabase())
@@ -71,22 +72,9 @@ describe(MongoRundownRepository.name, () => {
       const db: Db = testDatabase.getDatabase()
 
       const testee: MongoRundownRepository = createTestee()
+      await testee.deleteRundown(nonExistingId)
 
-      await expect(testee.deleteRundown(nonExistingId)).rejects.toThrow(NotFoundException)
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
-      await expect(db.collection(COLLECTION_NAME).findOne({ name: rundownName })).resolves.not.toBeNull()
-    })
-
-    it('throws exception, when nonexistent rundownId is given', async () => {
-      const nonExistingId: string = 'nonExistingId'
-      const rundownName: string = 'someName'
-      const mongoRundown: MongoRundown = createMongoRundown({ name: rundownName })
-      await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
-      const db: Db = testDatabase.getDatabase()
-
-      const testee: MongoRundownRepository = createTestee()
-
-      await expect(testee.deleteRundown(nonExistingId)).rejects.toThrow(NotFoundException)
       await expect(db.collection(COLLECTION_NAME).findOne({ name: rundownName })).resolves.not.toBeNull()
     })
 

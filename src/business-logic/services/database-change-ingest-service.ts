@@ -8,7 +8,10 @@ import {
   PartCreatedEvent,
   PartDeletedEvent,
   PartUpdatedEvent,
+  RundownCreatedEvent,
+  RundownDeletedEvent,
   RundownEvent,
+  RundownUpdatedEvent,
   SegmentCreatedEvent,
   SegmentDeletedEvent,
   SegmentUpdatedEvent
@@ -30,6 +33,7 @@ export class DatabaseChangeIngestService implements IngestService {
     timelineBuilder: TimelineBuilder,
     eventEmitter: RundownEventEmitter,
     eventBuilder: RundownEventBuilder,
+    rundownChangeListener: DataChangedListener<Rundown>,
     segmentChangedListener: DataChangedListener<Segment>,
     partChangedListener: DataChangedListener<Part>
   ): IngestService {
@@ -40,6 +44,7 @@ export class DatabaseChangeIngestService implements IngestService {
         timelineBuilder,
         eventEmitter,
         eventBuilder,
+        rundownChangeListener,
         segmentChangedListener,
         partChangedListener
       )
@@ -56,11 +61,19 @@ export class DatabaseChangeIngestService implements IngestService {
     private readonly timelineBuilder: TimelineBuilder,
     private readonly eventEmitter: RundownEventEmitter,
     private readonly eventBuilder: RundownEventBuilder,
+    rundownChangeListener: DataChangedListener<Rundown>,
     segmentChangedListener: DataChangedListener<Segment>,
     partChangedListener: DataChangedListener<Part>
   ) {
+    this.listenForRundownChanges(rundownChangeListener)
     this.listenForSegmentChanges(segmentChangedListener)
     this.listenForPartChanges(partChangedListener)
+  }
+
+  private listenForRundownChanges(rundownChangeListener: DataChangedListener<Rundown>): void {
+    rundownChangeListener.onCreated(rundown => this.enqueueEvent(() => this.createRundown(rundown)))
+    rundownChangeListener.onUpdated(rundown => this.enqueueEvent(() => this.updateRundown(rundown)))
+    rundownChangeListener.onDeleted(rundownId => this.enqueueEvent(() => this.deleteRundown(rundownId)))
   }
 
   private listenForSegmentChanges(segmentChangedListener: DataChangedListener<Segment>): void {
@@ -96,6 +109,24 @@ export class DatabaseChangeIngestService implements IngestService {
         this.isExecutingEvent = false
         this.executeNextEvent()
       })
+  }
+
+  private async createRundown(rundown: Rundown): Promise<void> {
+    const rundownCreatedEvent: RundownCreatedEvent = this.eventBuilder.buildRundownCreatedEvent(rundown)
+    this.eventEmitter.emitRundownEvent(rundownCreatedEvent)
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private async updateRundown(rundown: Rundown): Promise<void> {
+    const rundownUpdatedEvent: RundownUpdatedEvent = this.eventBuilder.buildRundownUpdatedEvent(rundown)
+    this.eventEmitter.emitRundownEvent(rundownUpdatedEvent)
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private async deleteRundown(rundownId: string): Promise<void> {
+    const rundownDeletedEvent: RundownDeletedEvent = this.eventBuilder.buildRundownDeletedEvent(rundownId)
+    this.eventEmitter.emitRundownEvent(rundownDeletedEvent)
+    await this.rundownRepository.deleteRundown(rundownId)
   }
 
   private async createSegment(segment: Segment): Promise<void> {

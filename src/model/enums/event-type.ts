@@ -3,7 +3,6 @@ export type EventType = RundownEventType | IngestEventType
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
   DEACTIVATED = 'DEACTIVATED',
-  DELETED = 'DELETED',
   RESET = 'RESET',
   TAKEN = 'TAKEN',
   SET_NEXT = 'SET_NEXT',
@@ -14,6 +13,9 @@ export enum RundownEventType {
 }
 
 export enum IngestEventType {
+  RUNDOWN_CREATED = 'RUNDOWN_CREATED',
+  RUNDOWN_UPDATED = 'RUNDOWN_UPDATED',
+  RUNDOWN_DELETED = 'RUNDOWN_DELETED',
   SEGMENT_CREATED = 'SEGMENT_CREATED',
   SEGMENT_UPDATED = 'SEGMENT_UPDATED',
   SEGMENT_DELETED = 'SEGMENT_DELETED',

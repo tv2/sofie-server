@@ -12,6 +12,7 @@ import {
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PieceInsertedEvent,
+  RundownDeletedEvent,
   RundownEvent,
   RundownInfinitePieceAddedEvent,
 } from '../../model/value-objects/rundown-event'
@@ -186,7 +187,8 @@ export class RundownTimelineService implements RundownService {
 
     await this.rundownRepository.deleteRundown(rundownId)
 
-    this.sendEvents(rundown, [this.rundownEventBuilder.buildDeletedEvent])
+    const rundownDeletedEvent: RundownDeletedEvent = this.rundownEventBuilder.buildRundownDeletedEvent(rundownId)
+    this.rundownEventEmitter.emitRundownEvent(rundownDeletedEvent)
   }
 
   public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {

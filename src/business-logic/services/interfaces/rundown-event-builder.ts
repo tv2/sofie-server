@@ -9,10 +9,12 @@ import {
   PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
+  RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
+  RundownUpdatedEvent,
   SegmentCreatedEvent,
   SegmentDeletedEvent,
   SegmentUpdatedEvent,
@@ -27,11 +29,14 @@ export interface RundownEventBuilder {
   buildResetEvent(rundown: Rundown): RundownResetEvent
   buildTakeEvent(rundown: Rundown): PartTakenEvent
   buildSetNextEvent(rundown: Rundown): PartSetAsNextEvent
-  buildDeletedEvent(rundown: Rundown): RundownDeletedEvent
   buildPartInsertedAsOnAirEvent(rundown: Rundown, part: Part): PartInsertedAsOnAirEvent
   buildPartInsertedAsNextEvent(rundown: Rundown, part: Part): PartInsertedAsNextEvent
   buildPieceInsertedEvent(rundown: Rundown, piece: Piece): PieceInsertedEvent
   buildInfiniteRundownPieceAddedEvent(rundown: Rundown, infinitePiece: Piece): RundownInfinitePieceAddedEvent
+
+  buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent
+  buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent
+  buildRundownDeletedEvent(rundownId: string): RundownDeletedEvent
 
   buildSegmentCreatedEvent(rundown: Rundown, segment: Segment): SegmentCreatedEvent
   buildSegmentUpdatedEvent(rundown: Rundown, segment: Segment): SegmentUpdatedEvent

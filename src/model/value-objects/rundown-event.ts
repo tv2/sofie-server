@@ -23,10 +23,6 @@ export interface RundownDeactivatedEvent extends RundownEvent {
   type: RundownEventType.DEACTIVATED
 }
 
-export interface RundownDeletedEvent extends RundownEvent {
-  type: RundownEventType.DELETED
-}
-
 export interface RundownResetEvent extends RundownEvent {
   type: RundownEventType.RESET
 }
@@ -98,6 +94,18 @@ export interface RundownInfinitePieceAddedEvent extends RundownEvent {
     name: string
     layer: string
   }
+}
+
+export interface RundownCreatedEvent extends RundownEvent {
+  type: IngestEventType.RUNDOWN_CREATED
+}
+
+export interface RundownUpdatedEvent extends RundownEvent {
+  type: IngestEventType.RUNDOWN_UPDATED
+}
+
+export interface RundownDeletedEvent extends RundownEvent {
+  type: IngestEventType.RUNDOWN_DELETED
 }
 
 export interface SegmentCreatedEvent extends RundownEvent {

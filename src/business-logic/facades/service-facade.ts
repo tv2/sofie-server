@@ -60,6 +60,7 @@ export class ServiceFacade {
       ServiceFacade.createTimelineBuilder(),
       RundownEventService.getInstance(),
       ServiceFacade.createRundownEventBuilder(),
+      RepositoryFacade.createRundownChangeListener(),
       RepositoryFacade.createSegmentChangedListener(),
       RepositoryFacade.createPartChangedListener()
     )
