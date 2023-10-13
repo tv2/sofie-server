@@ -9,13 +9,11 @@ import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-fa
 import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
-
   constructor(
     private readonly cameraActionFactory: Tv2CameraActionFactory,
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory
-  ) {
-  }
+  ) {}
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
     if (this.transitionActionFactory.isTransitionAction(action)) {

@@ -1,4 +1,3 @@
-import { PieceAction } from '../../../model/entities/action'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SisyfosLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -6,10 +5,11 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { DeviceType } from '../../../model/enums/device-type'
 import { PieceActionType } from '../../../model/enums/action-type'
+import { Tv2ActionContentType, Tv2AudioAction } from '../value-objects/tv2-action'
 
 export class Tv2AudioActionFactory {
 
-  public createStopAudioBedAction(): PieceAction {
+  public createStopAudioBedAction(): Tv2AudioAction {
     const duration: number = 1000
     const pieceInterface: PieceInterface = {
       id: 'stopAudioBedPiece',
@@ -44,8 +44,12 @@ export class Tv2AudioActionFactory {
     return {
       id: 'stopAudioBedAction',
       name: 'Stop audio bed',
+      description: 'Stops audio bed.',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.AUDIO,
+      },
     }
   }
 }
