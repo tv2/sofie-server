@@ -6,7 +6,7 @@ import { TimelineRepository } from '../../../data-access/repositories/interfaces
 import { TimelineBuilder } from '../interfaces/timeline-builder'
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { ActiveRundownException } from '../../../model/exceptions/active-rundown-exception'
-import { RundownEventType } from '../../../model/enums/event-type'
+import { IngestEventType } from '../../../model/enums/event-type'
 import { RundownTimelineService } from '../rundown-timeline-service'
 import { CallbackScheduler } from '../interfaces/callback-scheduler'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
@@ -36,7 +36,7 @@ describe(RundownTimelineService.name, () => {
       const rundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: false })
 
       when(mockRundownRepository.getRundown(rundown.id)).thenResolve(rundown)
-      when(mockRundownEventBuilder.buildDeletedEvent(anything())).thenReturn(
+      when(mockRundownEventBuilder.buildRundownDeletedEvent(anything())).thenReturn(
         createDeletedRundownEvent(rundown.id)
       )
 
@@ -47,7 +47,7 @@ describe(RundownTimelineService.name, () => {
 
       await testee.deleteRundown(rundown.id)
 
-      verify(mockRundownEventBuilder.buildDeletedEvent(anything())).once()
+      verify(mockRundownEventBuilder.buildRundownDeletedEvent(anything())).once()
     })
 
     it('emits a rundown deleted event, when it receives a valid RundownId', async () => {
@@ -58,7 +58,7 @@ describe(RundownTimelineService.name, () => {
       const rundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: false })
 
       when(mockRundownRepository.getRundown(rundown.id)).thenResolve(rundown)
-      when(mockRundownEventBuilder.buildDeletedEvent(anything())).thenReturn(
+      when(mockRundownEventBuilder.buildRundownDeletedEvent(anything())).thenReturn(
         createDeletedRundownEvent(rundown.id)
       )
 
@@ -70,7 +70,7 @@ describe(RundownTimelineService.name, () => {
 
       await testee.deleteRundown(rundown.id)
       const [rundownEvent] = capture(mockRundownEventEmitter.emitRundownEvent).last()
-      expect(rundownEvent.type).toBe(RundownEventType.DELETED)
+      expect(rundownEvent.type).toBe(IngestEventType.RUNDOWN_DELETED)
     })
 
     it('throws an exception, when it receives a RundownId of an active rundown', async () => {
@@ -89,7 +89,7 @@ describe(RundownTimelineService.name, () => {
 
 function createDeletedRundownEvent(rundownId: string): RundownDeletedEvent {
   return {
-    type: RundownEventType.DELETED,
+    type: IngestEventType.RUNDOWN_DELETED,
     timestamp: Date.now(),
     rundownId: rundownId,
   }

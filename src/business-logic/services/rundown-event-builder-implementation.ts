@@ -2,20 +2,25 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
   PartCreatedEvent,
-  PartDeletedEvent, PartEventInterface,
+  PartDeletedEvent,
+  PartEventInterface,
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
   PartTakenEvent,
-  PartUpdatedEvent, PieceEventInterface,
+  PartUpdatedEvent,
+  PieceEventInterface,
   PieceInsertedEvent,
   RundownActivatedEvent,
+  RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
+  RundownUpdatedEvent,
   SegmentCreatedEvent,
-  SegmentDeletedEvent, SegmentEventInterface,
+  SegmentDeletedEvent,
+  SegmentEventInterface,
   SegmentUpdatedEvent,
 } from '../../model/value-objects/rundown-event'
 import { IngestEventType, RundownEventType } from '../../model/enums/event-type'
@@ -24,13 +29,6 @@ import { Part } from '../../model/entities/part'
 import { Segment } from '../../model/entities/segment'
 
 export class RundownEventBuilderImplementation implements RundownEventBuilder {
-  public buildDeletedEvent(rundown: Rundown): RundownDeletedEvent {
-    return {
-      type: RundownEventType.DELETED,
-      timestamp: Date.now(),
-      rundownId: rundown.id,
-    }
-  }
 
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
@@ -138,6 +136,30 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       timestamp: Date.now(),
       rundownId: rundown.id,
       piece: this.convertPieceToEvent(piece)
+    }
+  }
+
+  public buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent {
+    return {
+      type: IngestEventType.RUNDOWN_CREATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id
+    }
+  }
+
+  public buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent {
+    return {
+      type: IngestEventType.RUNDOWN_UPDATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id
+    }
+  }
+
+  public buildRundownDeletedEvent(rundownId: string): RundownDeletedEvent {
+    return {
+      type: IngestEventType.RUNDOWN_DELETED,
+      timestamp: Date.now(),
+      rundownId: rundownId,
     }
   }
 
