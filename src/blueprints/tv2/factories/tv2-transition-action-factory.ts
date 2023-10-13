@@ -9,6 +9,7 @@ import { AtemMeTimelineObject, AtemTransition, AtemType } from '../../timeline-s
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { TimelineObject } from '../../../model/entities/timeline-object'
+import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
 
 const FRAME_RATE: number = 25
 
@@ -33,7 +34,7 @@ export class Tv2TransitionActionFactory {
     }
   }
 
-  public createMixTransitionAction(): PieceAction {
+  public createMixTransitionAction(): Tv2PieceAction {
     const pieceInterface: PieceInterface = {
       id: 'mixTransitionActionPiece',
       name: 'Mix transition',
@@ -53,9 +54,13 @@ export class Tv2TransitionActionFactory {
 
     return {
       id: MIX_TRANSITION_ID,
-      name: 'Mix transition on next take',
+      name: `MIX ${FRAMES_FOR_MIX_TRANSITION}`,
+      description: `Mix transition on next take over ${FRAMES_FOR_MIX_TRANSITION} frames.`,
       type: PieceActionType.INSERT_PIECE_AS_NEXT,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.TRANSITION
+      }
     }
   }
 
