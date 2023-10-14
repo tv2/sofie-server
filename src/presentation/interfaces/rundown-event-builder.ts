@@ -1,4 +1,4 @@
-import { Rundown } from '../../../model/entities/rundown'
+import { Rundown } from '../../model/entities/rundown'
 import {
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
@@ -10,9 +10,9 @@ import {
   RundownDeletedEvent,
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
-} from '../../../model/value-objects/rundown-event'
-import { Piece } from '../../../model/entities/piece'
-import { Part } from '../../../model/entities/part'
+} from '../value-objects/rundown-event'
+import { Piece } from '../../model/entities/piece'
+import { Part } from '../../model/entities/part'
 
 export interface RundownEventBuilder {
   buildActivateEvent(rundown: Rundown): RundownActivatedEvent

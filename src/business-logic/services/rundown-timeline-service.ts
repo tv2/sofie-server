@@ -5,14 +5,14 @@ import { TimelineRepository } from '../../data-access/repositories/interfaces/ti
 import { TimelineBuilder } from './interfaces/timeline-builder'
 import { Timeline } from '../../model/entities/timeline'
 import { Piece } from '../../model/entities/piece'
-import { RundownEventBuilder } from './interfaces/rundown-event-builder'
+import { RundownEventBuilder } from '../../presentation/interfaces/rundown-event-builder'
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 import { RundownService } from './interfaces/rundown-service'
 import {
   PartInsertedAsNextEvent, PartInsertedAsOnAirEvent, PieceInsertedEvent,
   RundownEvent,
   RundownInfinitePieceAddedEvent,
-} from '../../model/value-objects/rundown-event'
+} from '../../presentation/value-objects/rundown-event'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
@@ -28,7 +28,6 @@ export class RundownTimelineService implements RundownService {
     private readonly timelineRepository: TimelineRepository,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly timelineBuilder: TimelineBuilder,
-    private readonly rundownEventBuilder: RundownEventBuilder,
     private readonly callbackScheduler: CallbackScheduler,
     private readonly blueprint: Blueprint
   ) {}
@@ -42,10 +41,8 @@ export class RundownTimelineService implements RundownService {
 
     this.emitAddInfinitePieces(rundown, [])
 
-    this.sendEvents(rundown, [
-      this.rundownEventBuilder.buildActivateEvent,
-      this.rundownEventBuilder.buildSetNextEvent
-    ])
+    this.rundownEventEmitter.emitActivateEvent(rundown)
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -94,16 +91,9 @@ export class RundownTimelineService implements RundownService {
 
     this.timelineRepository.saveTimeline(timeline)
 
-    this.sendEvents(rundown, [this.rundownEventBuilder.buildDeactivateEvent])
+    this.rundownEventEmitter.emitDeactivateEvent(rundown)
 
     await this.rundownRepository.saveRundown(rundown)
-  }
-
-  private sendEvents(rundown: Rundown, buildEventCallbacks: ((rundown: Rundown) => RundownEvent)[]): void {
-    buildEventCallbacks.forEach(buildEventCallback => {
-      const event: RundownEvent = buildEventCallback(rundown)
-      this.rundownEventEmitter.emitRundownEvent(event)
-    })
   }
 
   private stopAutoNext(): void {
@@ -127,10 +117,8 @@ export class RundownTimelineService implements RundownService {
     // TODO: Emit if any infinite Pieces no longer exist e.g. we had a Segment infinite Piece and we changed Segment
     // TODO: Should we just emit a list of current infinite Pieces? That would be easy, but it then we would potentially emit the same pieces over and over again.
 
-    this.sendEvents(rundown, [
-      this.rundownEventBuilder.buildTakeEvent,
-      this.rundownEventBuilder.buildSetNextEvent
-    ])
+    this.rundownEventEmitter.emitTakeEvent(rundown)
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -155,11 +143,7 @@ export class RundownTimelineService implements RundownService {
     const infinitePiecesAfter: Piece[] = rundown.getInfinitePieces()
     infinitePiecesAfter
       .filter((piece) => !infinitePiecesBefore.includes(piece))
-      .forEach((piece) => {
-        const infinitePieceAddedEvent: RundownInfinitePieceAddedEvent =
-              this.rundownEventBuilder.buildInfiniteRundownPieceAddedEvent(rundown, piece)
-        this.rundownEventEmitter.emitRundownEvent(infinitePieceAddedEvent)
-      })
+      .forEach((piece) => this.rundownEventEmitter.emitInfiniteRundownPieceAddedEvent(rundown, piece))
   }
 
   public async setNext(rundownId: string, segmentId: string, partId: string): Promise<void> {
@@ -168,7 +152,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    this.sendEvents(rundown, [this.rundownEventBuilder.buildSetNextEvent])
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -181,7 +165,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    this.sendEvents(rundown, [this.rundownEventBuilder.buildResetEvent])
+    this.rundownEventEmitter.emitResetEvent(rundown)
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -195,7 +179,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.rundownRepository.deleteRundown(rundownId)
 
-    this.sendEvents(rundown, [this.rundownEventBuilder.buildDeletedEvent])
+    this.rundownEventEmitter.emitDeletedEvent(rundown)
   }
 
   public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {
@@ -206,8 +190,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const partInsertedEvent: PartInsertedAsOnAirEvent = this.rundownEventBuilder.buildPartInsertedAsOnAirEvent(rundown, part)
-    this.rundownEventEmitter.emitRundownEvent(partInsertedEvent)
+    this.rundownEventEmitter.emitPartInsertedAsOnAirEvent(rundown, part)
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -218,8 +201,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const partInsertedEvent: PartInsertedAsNextEvent = this.rundownEventBuilder.buildPartInsertedAsNextEvent(rundown, part)
-    this.rundownEventEmitter.emitRundownEvent(partInsertedEvent)
+    this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, part)
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -230,8 +212,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const pieceInsertedEvent: PieceInsertedEvent = this.rundownEventBuilder.buildPieceInsertedEvent(rundown, piece)
-    this.rundownEventEmitter.emitRundownEvent(pieceInsertedEvent)
+    this.rundownEventEmitter.emitPieceInsertedEvent(rundown, piece)
 
     await this.rundownRepository.saveRundown(rundown)
   }
@@ -242,8 +223,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const pieceInsertedEvent: PieceInsertedEvent = this.rundownEventBuilder.buildPieceInsertedEvent(rundown, piece)
-    this.rundownEventEmitter.emitRundownEvent(pieceInsertedEvent)
+    this.rundownEventEmitter.emitPieceInsertedEvent(rundown, piece)
 
     await this.rundownRepository.saveRundown(rundown)
   }
