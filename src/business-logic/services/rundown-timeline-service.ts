@@ -5,14 +5,8 @@ import { TimelineRepository } from '../../data-access/repositories/interfaces/ti
 import { TimelineBuilder } from './interfaces/timeline-builder'
 import { Timeline } from '../../model/entities/timeline'
 import { Piece } from '../../model/entities/piece'
-import { RundownEventBuilder } from '../../presentation/interfaces/rundown-event-builder'
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 import { RundownService } from './interfaces/rundown-service'
-import {
-  PartInsertedAsNextEvent, PartInsertedAsOnAirEvent, PieceInsertedEvent,
-  RundownEvent,
-  RundownInfinitePieceAddedEvent,
-} from '../../presentation/value-objects/rundown-event'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'

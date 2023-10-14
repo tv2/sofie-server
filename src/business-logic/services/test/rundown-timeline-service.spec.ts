@@ -1,4 +1,4 @@
-import { anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown } from '../../../model/entities/rundown'
 import { RundownEventEmitter } from '../interfaces/rundown-event-emitter'
 import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
@@ -29,26 +29,6 @@ describe(RundownTimelineService.name, () => {
       verify(mockRundownRepository.deleteRundown(rundown.id)).once()
     })
 
-    it('builds a rundown deleted event, when it receives a valid RundownId', async () => {
-      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
-      const mockRundownEventBuilder: RundownEventBuilder = mock<RundownEventBuilder>()
-      const rundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: false })
-
-      when(mockRundownRepository.getRundown(rundown.id)).thenResolve(rundown)
-      when(mockRundownEventBuilder.buildDeletedEvent(anything())).thenReturn(
-        createDeletedRundownEvent(rundown.id)
-      )
-
-      const testee: RundownTimelineService = createTestee({
-        rundownRepository: instance(mockRundownRepository),
-        rundownEventBuilder: instance(mockRundownEventBuilder),
-      })
-
-      await testee.deleteRundown(rundown.id)
-
-      verify(mockRundownEventBuilder.buildDeletedEvent(anything())).once()
-    })
-
     it('emits a rundown deleted event, when it receives a valid RundownId', async () => {
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
       const mockRundownEventBuilder: RundownEventBuilder = mock<RundownEventBuilder>()
@@ -68,8 +48,9 @@ describe(RundownTimelineService.name, () => {
       })
 
       await testee.deleteRundown(rundown.id)
-      const [rundownEvent] = capture(mockRundownEventEmitter.emitRundownEvent).last()
-      expect(rundownEvent.type).toBe(RundownEventType.DELETED)
+
+      verify(mockRundownEventEmitter.emitDeletedEvent(anything())).once()
+
     })
 
     it('throws an exception, when it receives a RundownId of an active rundown', async () => {
@@ -110,7 +91,6 @@ function createTestee(params: {
     params.timelineRepository ?? instance(mock<TimelineRepository>()),
     params.configurationRepository ?? instance(mock<ConfigurationRepository>()),
     params.timelineBuilder ?? instance(mock<TimelineBuilder>()),
-    params.rundownEventBuilder ?? instance(mock<RundownEventBuilder>()),
     params.callbackScheduler ?? instance(mock<CallbackScheduler>()),
     params.blueprint ?? instance(mock<Blueprint>())
   )
