@@ -185,7 +185,6 @@ export class Tv2CameraActionFactory {
       outTransition: {
         keepAliveDuration: 0
       },
-      expectedDuration: 0,
       disableNextInTransition: false
     }
   }
