@@ -4,7 +4,7 @@ import { PartTimings } from '../../value-objects/part-timings'
 import { Piece, PieceInterface } from '../piece'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { instance, verify } from '@typestrong/ts-mockito'
-import { TestEntityFactory } from './test-entity-factory'
+import { EntityTestFactory } from './entity-test-factory'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -2265,9 +2265,9 @@ describe(Part.name, () => {
     })
 
     it('converts all its pieces into unsynced copies', () => {
-      const pieceOne: Piece = TestEntityFactory.createPiece({ id: '1' } as PieceInterface)
-      const pieceTwo: Piece = TestEntityFactory.createPiece({ id: '2' } as PieceInterface)
-      const pieceThree: Piece = TestEntityFactory.createPiece({ id: '3' } as PieceInterface)
+      const pieceOne: Piece = EntityTestFactory.createPiece({ id: '1' } as PieceInterface)
+      const pieceTwo: Piece = EntityTestFactory.createPiece({ id: '2' } as PieceInterface)
+      const pieceThree: Piece = EntityTestFactory.createPiece({ id: '3' } as PieceInterface)
 
       const pieces: Piece[] = [pieceOne, pieceTwo, pieceThree]
 
