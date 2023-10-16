@@ -62,8 +62,8 @@ export class RundownEventService implements RundownEventEmitter, RundownEventLis
     this.emitRundownEvent(event)
   }
 
-  public emitPieceInsertedEvent(rundown: Rundown, piece: Piece): void {
-    const event: PieceInsertedEvent = this.rundownEventBuilder.buildPieceInsertedEvent(rundown, piece)
+  public emitPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): void {
+    const event: PieceInsertedEvent = this.rundownEventBuilder.buildPieceInsertedEvent(rundown, segmentId, piece)
     this.emitRundownEvent(event)
   }
 
