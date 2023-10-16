@@ -6,7 +6,7 @@ import { DeviceType } from '../../../model/enums/device-type'
 
 export class Tv2AtemVideoMixerTimelineFactory implements Tv2VideoMixerTimelineObjectFactory {
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
-    const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
+    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
       id: '',
       enable: {
