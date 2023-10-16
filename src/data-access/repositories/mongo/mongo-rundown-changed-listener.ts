@@ -6,7 +6,7 @@ import {
   ChangeStreamDeleteDocument,
   ChangeStreamDocument,
   ChangeStreamInsertDocument,
-  ChangeStreamUpdateDocument
+  ChangeStreamReplaceDocument
 } from 'mongodb'
 import { MongoEntityConverter, MongoRundown, MongoSegment } from './mongo-entity-converter'
 import { MongoDatabase } from './mongo-database'
@@ -50,9 +50,9 @@ export class MongoRundownChangedListener extends BaseMongoRepository implements 
         this.onCreatedCallback(rundown)
         break
       }
-      case MongoChangeEvent.UPDATE: {
-        const updateChange: ChangeStreamUpdateDocument<MongoRundown> = change as ChangeStreamUpdateDocument<MongoRundown>
-        const rundownId: string = updateChange.documentKey._id as unknown as string
+      case MongoChangeEvent.REPLACE: {
+        const replaceChange: ChangeStreamReplaceDocument<MongoRundown> = change as ChangeStreamReplaceDocument<MongoRundown>
+        const rundownId: string = replaceChange.documentKey._id as unknown as string
         const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
         this.onUpdatedCallback(rundown)
         break

@@ -7,6 +7,7 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
+  PartSetAsNextEvent,
   PartUpdatedEvent,
   RundownCreatedEvent,
   RundownDeletedEvent,
@@ -23,6 +24,8 @@ import { Timeline } from '../../model/entities/timeline'
 import { Part } from '../../model/entities/part'
 import { Exception } from '../../model/exceptions/exception'
 import { ErrorCode } from '../../model/enums/error-code'
+
+const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
 export class DatabaseChangeIngestService implements IngestService {
 
@@ -54,6 +57,8 @@ export class DatabaseChangeIngestService implements IngestService {
 
   private readonly eventQueue: (() => Promise<void>)[] = []
   private isExecutingEvent: boolean = false
+  private lastBulkExecutionStartTimestamp: number = 0
+  private readonly rundownIdsToBuild: Set<string> = new Set<string>()
 
   private constructor(
     private readonly rundownRepository: RundownRepository,
@@ -97,6 +102,9 @@ export class DatabaseChangeIngestService implements IngestService {
     if (this.isExecutingEvent) {
       return
     }
+    if (Date.now() - this.lastBulkExecutionStartTimestamp >= BULK_EXECUTION_TIMESPAN_IN_MS) {
+      this.lastBulkExecutionStartTimestamp = Date.now()
+    }
     const eventCallback: (() => Promise<void>) | undefined = this.eventQueue.shift()
     if (!eventCallback) {
       return
@@ -104,11 +112,42 @@ export class DatabaseChangeIngestService implements IngestService {
 
     this.isExecutingEvent = true
     eventCallback()
-      .catch(error => console.error(error))
+      .catch(error => console.error('Error when executing Ingest event:', error))
       .finally(() => {
         this.isExecutingEvent = false
+        void this.buildRundowns()
         this.executeNextEvent()
       })
+  }
+
+  private async buildRundowns(): Promise<void> {
+    try {
+      if (Date.now() - this.lastBulkExecutionStartTimestamp < BULK_EXECUTION_TIMESPAN_IN_MS && this.eventQueue.length > 0) {
+        return
+      }
+
+      for (const rundownId of this.rundownIdsToBuild.values()) {
+        const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+        if (!rundown.isActive()) {
+          continue
+        }
+        await this.buildAndPersistTimeline(rundown)
+        this.emitSetNextEvent(rundown)
+      }
+      this.rundownIdsToBuild.clear()
+    } catch (error) {
+      console.log('Error when trying to build Rundowns for bulk', error)
+    }
+  }
+
+  private async buildAndPersistTimeline(rundown: Rundown): Promise<void> {
+    const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
+    await this.timelineRepository.saveTimeline(timeline)
+  }
+
+  private emitSetNextEvent(rundown: Rundown): void {
+    const setNextEvent: PartSetAsNextEvent = this.eventBuilder.buildSetNextEvent(rundown)
+    this.eventEmitter.emitRundownEvent(setNextEvent)
   }
 
   private async createRundown(rundown: Rundown): Promise<void> {
@@ -150,20 +189,9 @@ export class DatabaseChangeIngestService implements IngestService {
     throw exception
   }
 
-  private async buildAndPersistTimelineIfActiveRundown(rundown: Rundown): Promise<void> {
-    if (!rundown.isActive()) {
-      return
-    }
-    const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
-    await this.timelineRepository.saveTimeline(timeline)
-  }
-
   private async persistRundown(rundown: Rundown, eventToEmit: RundownEvent): Promise<void> {
-    await this.buildAndPersistTimelineIfActiveRundown(rundown)
+    this.rundownIdsToBuild.add(rundown.id)
     this.eventEmitter.emitRundownEvent(eventToEmit)
-    if (rundown.isActive()) {
-      this.eventEmitter.emitRundownEvent(this.eventBuilder.buildSetNextEvent(rundown))
-    }
     await this.rundownRepository.saveRundown(rundown)
   }
 
