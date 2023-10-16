@@ -1,5 +1,4 @@
 import { RundownService } from '../services/interfaces/rundown-service'
-import { RundownEventService } from '../../presentation/services/rundown-event-service'
 import { RundownTimelineService } from '../services/rundown-timeline-service'
 import { RepositoryFacade } from '../../data-access/facades/repository-facade'
 import { TimelineBuilder } from '../services/interfaces/timeline-builder'
@@ -9,11 +8,12 @@ import { JsonObjectCloner } from '../services/json-object-cloner'
 import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
+import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
     return new RundownTimelineService(
-      RundownEventService.getInstance(),
+      EventEmitterFacade.createRundownEventEmitter(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createTimelineRepository(),
       RepositoryFacade.createConfigurationRepository(),
@@ -31,7 +31,7 @@ export class ServiceFacade {
     return new ExecuteActionService(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionRepository(),
-      this.createRundownService(),
+      ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       BlueprintsFacade.createBlueprint()
     )
