@@ -11,6 +11,10 @@ import { LastPartInSegmentException } from '../../exceptions/last-part-in-segmen
 import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
 import { AlreadyActivatedException } from '../../exceptions/already-activated-exception'
 import { Owner } from '../../enums/owner'
+import { EntityTestFactory } from './entity-test-factory'
+import { AlreadyExistException } from '../../exceptions/already-exist-exception'
+import { RundownCursor } from '../../value-objects/rundown-cursor'
+import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -91,7 +95,7 @@ describe(Rundown.name, () => {
     })
   })
 
-  describe(`${Rundown.prototype.takeNext.name}`, () => {
+  describe(Rundown.prototype.takeNext.name, () => {
     describe('it has a next Part', () => {
       it('sets the next Part as the active Part', () => {
         const firstPart: Part = EntityMockFactory.createPart({
@@ -2158,7 +2162,7 @@ describe(Rundown.name, () => {
     })
   })
 
-  describe(`${Rundown.prototype.getPartAfter.name}`, () => {
+  describe(Rundown.prototype.getPartAfter.name, () => {
     describe('rundown is not active', () => {
       it('throws NotActivatedException', () => {
         const testee: Rundown = new Rundown({ isRundownActive: false } as RundownInterface)
@@ -2257,7 +2261,7 @@ describe(Rundown.name, () => {
     })
   })
 
-  describe(`${Rundown.prototype.activate.name}`, () => {
+  describe(Rundown.prototype.activate.name, () => {
     describe('Rundown is already active', () => {
       it('throws AlreadyActivatedException', () => {
         const testee: Rundown = new Rundown({ isRundownActive: true } as RundownInterface)
@@ -2336,4 +2340,409 @@ describe(Rundown.name, () => {
       verify(mockedSegment3.reset()).once()
     })
   })
+
+  describe(Rundown.prototype.addSegment.name, () => {
+    describe('Segment already exist in Rundown', () => {
+      it('throws already found exception', () => {
+        const existingSegment: Segment = EntityTestFactory.createSegment()
+        const testee: Rundown = new Rundown({ segments: [existingSegment] } as RundownInterface)
+
+        expect(() => testee.addSegment(existingSegment)).toThrow(AlreadyExistException)
+      })
+    })
+
+    describe('Segment does not exist in Rundown', () => {
+      it('adds the Segment', () => {
+        const segment: Segment = EntityTestFactory.createSegment()
+        const testee: Rundown = new Rundown({ } as RundownInterface)
+
+        expect(testee.getSegments()).not.toContain(segment)
+        testee.addSegment(segment)
+        expect(testee.getSegments()).toContain(segment)
+      })
+
+      it('sorts the Segment according to rank', () => {
+        const segmentOne: Segment = EntityTestFactory.createSegment({ id: '1', rank: 1 })
+        const segmentTwo: Segment = EntityTestFactory.createSegment({ id: '2', rank: 10 })
+
+        const segmentToAdd: Segment = EntityTestFactory.createSegment({ id: 'toAdd', rank: 5 })
+
+        const testee: Rundown = new Rundown({ segments: [segmentOne, segmentTwo] } as RundownInterface)
+
+        testee.addSegment(segmentToAdd)
+
+        expect(testee.getSegments()[0]).toBe(segmentOne)
+        expect(testee.getSegments()[1]).toBe(segmentToAdd)
+        expect(testee.getSegments()[2]).toBe(segmentTwo)
+      })
+    })
+
+    // This describe block is to the test functionality of how to update the next cursor. It's a private method so we are using 'addSegment()'
+    describe('it updates the next cursor', () => {
+      describe('the Rundown is not active', () => {
+        it('does not update the Next cursor', () => {
+          const segmentToAdd: Segment = EntityTestFactory.createSegment()
+          const testee: Rundown = new Rundown({ isRundownActive: false } as RundownInterface)
+
+          const nextCursorBefore: RundownCursor | undefined = testee.getNextCursor()
+          testee.addSegment(segmentToAdd)
+          const nextCursorAfter: RundownCursor | undefined = testee.getNextCursor()
+
+          expect(nextCursorBefore).toBe(nextCursorAfter)
+        })
+      })
+
+      describe('the Rundown is active', () => {
+        it('update the next cursor when the "Owner" is not "External"', () => {
+          const segmentToAdd: Segment = EntityTestFactory.createSegment({ id: 'toAdd' })
+
+          const testee: Rundown = createTesteeWithActiveAndNextCursors({ nextOwner: Owner.SYSTEM })
+          const nextCursorBefore: RundownCursor | undefined = testee.getNextCursor()
+
+          testee.addSegment(segmentToAdd)
+
+          expect(testee.getNextCursor()).not.toBe(nextCursorBefore)
+        })
+
+        it('updates the next cursor when current next cursor points to a non existing Segment in the Rundown', () => {
+          const segmentToAdd: Segment = EntityTestFactory.createSegment({ id: 'toAdd' })
+          const nonExistingSegment: Segment = EntityTestFactory.createSegment({ id: 'nonExistingSegment' })
+
+          const testee: Rundown = createTesteeWithActiveAndNextCursors({ nextSegment: nonExistingSegment })
+          const nextCursorBefore: RundownCursor | undefined = testee.getNextCursor()
+
+          testee.addSegment(segmentToAdd)
+
+          expect(testee.getNextCursor()).not.toBe(nextCursorBefore)
+        })
+
+        it('updates the next cursor when the current next cursor points to a non existing Part in the Rundown', () => {
+          const segmentToAdd: Segment = EntityTestFactory.createSegment({ id: 'toAdd' })
+          const nonExistingPart: Part = EntityTestFactory.createPart({ id: 'nonExistingPart' })
+
+          const testee: Rundown = createTesteeWithActiveAndNextCursors({ nextPart: nonExistingPart })
+          const nextCursorBefore: RundownCursor | undefined = testee.getNextCursor()
+
+          testee.addSegment(segmentToAdd)
+
+          expect(testee.getNextCursor()).not.toBe(nextCursorBefore)
+        })
+
+        it('does not update the next Cursor when the "Owner" is "External and the next cursor is pointing at a Segment and Part that exist in the Rundown', () => {
+          const segmentToAdd: Segment = EntityTestFactory.createSegment({ id: 'toAdd' })
+
+          // This relies on the default values of "createTesteeWithActiveAndNextCursors" being set correctly.
+          const testee: Rundown = createTesteeWithActiveAndNextCursors( )
+          const nextCursorBefore: RundownCursor | undefined = testee.getNextCursor()
+
+          testee.addSegment(segmentToAdd)
+
+          expect(testee.getNextCursor()).toBe(nextCursorBefore)
+        })
+      })
+    })
+  })
+
+  describe(Rundown.prototype.updateSegment.name, () => {
+    describe('Segment does not belong to Rundown', () => {
+      it('throws NotFound exception', () => {
+        const nonExistingSegment: Segment = EntityTestFactory.createSegment({ id: 'nonExistingSegment' })
+        const testee: Rundown = new Rundown({} as RundownInterface)
+
+        expect(() => testee.updateSegment(nonExistingSegment)).toThrow(NotFoundException)
+      })
+    })
+
+    describe('Segment belongs to Rundown', () => {
+      it('updates the old Segment', () => {
+        const segmentId: string = 'segmentId'
+        const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId })
+        const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId })
+
+        const testee: Rundown = new Rundown({ segments: [oldSegment] } as RundownInterface)
+
+        expect(testee.getSegments()).toContain(oldSegment)
+        expect(testee.getSegments()).not.toContain(newSegment)
+
+        testee.updateSegment(newSegment)
+
+        expect(testee.getSegments()).not.toContain(oldSegment)
+        expect(testee.getSegments()).toContain(newSegment)
+      })
+
+      it('sorts the Segments according to rank', () => {
+        const segmentId: string = 'segmentId'
+        const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, rank: 1})
+        const segmentTwo: Segment = EntityTestFactory.createSegment({ id: '2', rank: 5})
+        const segmentThree: Segment = EntityTestFactory.createSegment({ id: '3', rank: 10})
+
+        const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, rank: 15 })
+
+        const testee: Rundown = new Rundown({ segments: [oldSegment, segmentTwo, segmentThree] } as RundownInterface)
+
+        expect(testee.getSegments()[0]).toBe(oldSegment)
+        expect(testee.getSegments()[1]).toBe(segmentTwo)
+        expect(testee.getSegments()[2]).toBe(segmentThree)
+
+        testee.updateSegment(newSegment)
+
+        expect(testee.getSegments()[0]).toBe(segmentTwo)
+        expect(testee.getSegments()[1]).toBe(segmentThree)
+        expect(testee.getSegments()[2]).toBe(newSegment)
+      })
+
+      describe('the old Segment is on Air', () => {
+        it('takes the Parts of the old Segment and gives them to the new Segment', () => {
+          const segmentId: string = 'segmentId'
+          const parts: Part[] = [
+            EntityTestFactory.createPart({ id: 'partOne' }),
+            EntityTestFactory.createPart({ id: 'partTwo' })
+          ]
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId })
+
+          const testee: Rundown = new Rundown({ segments: [oldSegment] } as RundownInterface)
+
+          expect(newSegment.getParts()).not.toBe(parts)
+          testee.updateSegment(newSegment)
+          expect(newSegment.getParts()).toBe(parts)
+        })
+
+        it('puts the new Segment on Air', () => {
+          const segmentId: string = 'segmentId'
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false })
+
+          const testee: Rundown = new Rundown({ segments: [oldSegment] } as RundownInterface)
+
+          expect(newSegment.isOnAir()).toBeFalsy()
+          testee.updateSegment(newSegment)
+          expect(newSegment.isOnAir()).toBeTruthy()
+        })
+      })
+
+      // It should also update the next cursor, but those tests are covered by "addSegment()".
+    })
+  })
+
+  describe(Rundown.prototype.removeSegment.name, () => {
+    describe('Segment does not exist on Rundown', () => {
+      it('does not delete anything', () => {
+        const nonExistingSegmentId: string = 'nonExistingSegmentId'
+        const existingSegment: Segment = EntityTestFactory.createSegment()
+        const testee: Rundown = new Rundown({ segments: [existingSegment] } as RundownInterface)
+
+        expect(testee.getSegments()).toHaveLength(1)
+        testee.removeSegment(nonExistingSegmentId)
+        expect(testee.getSegments()).toHaveLength(1)
+      })
+    })
+
+    describe('Segment exist on Rundown', () => {
+      it('removes the Segment from the Rundown', () => {
+        const segment: Segment = EntityTestFactory.createSegment()
+        const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
+
+        expect(testee.getSegments()).toContain(segment)
+        testee.removeSegment(segment.id)
+        expect(testee.getSegments()).not.toContain(segment)
+      })
+
+      describe('Segment is on Air', () => {
+        it('marks the Segment as unsynced', () => {
+          const part: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const segment: Segment = EntityTestFactory.createSegment({ isOnAir: true, isUnsynced: false, parts: [part] })
+          const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
+
+          expect(segment.isUnsynced()).toBeFalsy()
+          testee.removeSegment(segment.id)
+          expect(segment.isUnsynced()).toBeTruthy()
+        })
+
+        describe('it gets an unsynced copy of the Segment', () => {
+          describe('the unsynced Segment does not have a Part on Air', () => {
+            it('throws a NotFound exception', () => {
+              const segment: Segment = EntityTestFactory.createSegment({ isOnAir: true })
+              const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
+
+              expect(() => testee.removeSegment(segment.id)).toThrow(NotFoundException)
+            })
+          })
+
+          it('sets the unsynced Segment and unsynced onAir Part as the active cursor', () => {
+            const part: Part = EntityTestFactory.createPart({ isOnAir: true })
+            const segment: Segment = EntityTestFactory.createSegment({ isOnAir: true, parts: [part] })
+
+            const activeCursor: RundownCursor = {
+              segment: EntityTestFactory.createSegment(),
+              part: EntityTestFactory.createPart(),
+              owner: Owner.SYSTEM
+            }
+
+            const testee: Rundown = new Rundown({ segments: [segment], isRundownActive: true, alreadyActiveProperties: { activeCursor } } as RundownInterface)
+
+            expect(activeCursor).toBe(testee.getActiveCursor())
+            testee.removeSegment(segment.id)
+            expect(activeCursor).not.toBe(testee.getActiveCursor())
+          })
+
+          it('adds the unsynced Segment to the Segments array', () => {
+            const part: Part = EntityTestFactory.createPart({ isOnAir: true })
+            const segment: Segment = EntityTestFactory.createSegment({ isOnAir: true, parts: [part] })
+            const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
+
+            expect(testee.getSegments()).toHaveLength(1)
+            expect(testee.getSegments()).toContain(segment)
+
+            testee.removeSegment(segment.id)
+
+            expect(testee.getSegments()).toHaveLength(1)
+            expect(testee.getSegments()).not.toContain(segment)
+            expect(testee.getSegments()[0].id).toContain(UNSYNCED_ID_POSTFIX)
+          })
+
+          it('sorts the Segments according to ranks', () => {
+            const part: Part = EntityTestFactory.createPart({ isOnAir: true })
+            const segmentToDelete: Segment = EntityTestFactory.createSegment({ isOnAir: true, parts: [part], rank: 1 })
+            const segmentTwo: Segment = EntityTestFactory.createSegment({ id: '2', rank: 5 })
+            const segmentThree: Segment = EntityTestFactory.createSegment({ id: '3', rank: 10 })
+
+            const testee: Rundown = new Rundown({ segments: [segmentToDelete, segmentTwo, segmentThree] } as RundownInterface)
+
+            expect(testee.getSegments()[0]).toBe(segmentToDelete)
+            expect(testee.getSegments()[1]).toBe(segmentTwo)
+            expect(testee.getSegments()[2]).toBe(segmentThree)
+
+            testee.removeSegment(segmentToDelete.id)
+
+            expect(testee.getSegments()[0].id).toContain(UNSYNCED_ID_POSTFIX)
+            expect(testee.getSegments()[1]).toBe(segmentTwo)
+            expect(testee.getSegments()[2]).toBe(segmentThree)
+          })
+        })
+      })
+    })
+
+    // It should also update the NextCursor, but that is being tested by "addSegment()".
+  })
+
+  describe(Rundown.prototype.addPart.name, () => {
+    describe('Part does not have a Segment id for any Segments in the Rundown', () => {
+      it('throws a NotFound exception', () => {
+        const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId: 'nonExistingSegmentId' })
+        const testee: Rundown = new Rundown({} as RundownInterface)
+
+        expect(() => testee.addPart(part)).toThrow(NotFoundException)
+      })
+    })
+
+    describe('Part does have a Segment id for a Segment in the Rundown', () => {
+      it('adds the Part to the Segment', () => {
+        const segmentId: string = 'segmentId'
+        const segment: Segment = EntityMockFactory.createSegmentMock({ id: segmentId })
+        const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId })
+        const testee: Rundown = new Rundown({ segments: [instance(segment)] } as RundownInterface)
+
+        when(segment.id).thenReturn(segmentId)
+
+        testee.addPart(part)
+
+        const [partThatWasAdded] = capture(segment.addPart).last()
+        expect(partThatWasAdded).toBe(part)
+      })
+
+      // It should also update the NextCursor, but that is being tested by "addSegment()".
+    })
+  })
+
+  describe(Rundown.prototype.updatePart.name, () => {
+    describe('Part does not have a Segment id for any Segments in the Rundown', () => {
+      it('throws a NotFound exception', () => {
+        const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId: 'nonExistingSegmentId' })
+        const testee: Rundown = new Rundown({} as RundownInterface)
+
+        expect(() => testee.updatePart(part)).toThrow(NotFoundException)
+      })
+    })
+
+    describe('Part does have a Segment id for a Segment in the Rundown', () => {
+      it('adds the Part to the Segment', () => {
+        const segmentId: string = 'segmentId'
+        const segment: Segment = EntityMockFactory.createSegmentMock({ id: segmentId })
+        const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId })
+        const testee: Rundown = new Rundown({ segments: [instance(segment)] } as RundownInterface)
+
+        when(segment.id).thenReturn(segmentId)
+
+        testee.updatePart(part)
+
+        const [partThatWasUpdated] = capture(segment.updatePart).last()
+        expect(partThatWasUpdated).toBe(part)
+      })
+
+      // It should also update the NextCursor, but that is being tested by "addSegment()".
+    })
+  })
+
+  describe(Rundown.prototype.removePartFromSegment.name, () => {
+    describe('PartId does not belong to any Parts in the Rundown', () => {
+      it('throws not found exception', () => {
+        const partId: string = 'partId'
+        const testee: Rundown = new Rundown({} as RundownInterface)
+
+        expect(() => testee.removePartFromSegment(partId)).toThrow(NotFoundException)
+      })
+    })
+
+    describe('PartId does belong to a Part in the Rundown', () => {
+      it('calls removePart on Segment', () => {
+        const segmentId: string = 'segmentId'
+        const segment: Segment = EntityMockFactory.createSegmentMock({ id: segmentId })
+        const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId })
+        const testee: Rundown = new Rundown({ segments: [instance(segment)] } as RundownInterface)
+
+        when(segment.id).thenReturn(segmentId)
+        when(segment.getParts()).thenReturn([part])
+
+        testee.removePartFromSegment(part.id)
+
+        const [partIdToBeRemoved] = capture(segment.removePart).last()
+        expect(partIdToBeRemoved).toBe(part.id)
+      })
+
+      // It should also update the NextCursor, but that is being tested by "addSegment()".
+    })
+  })
 })
+
+function createTesteeWithActiveAndNextCursors(params?: {
+  nextSegment?: Segment,
+  nextPart?: Part,
+  nextOwner?: Owner
+}): Rundown {
+  const existingActivePart: Part = EntityTestFactory.createPart({ id: 'existingActivePart' })
+  const existingActiveSegment: Segment = EntityTestFactory.createSegment({ id: 'existingActiveSegment', parts: [existingActivePart] })
+
+  const existingNextPart: Part = EntityTestFactory.createPart({ id: 'existingNextPart' })
+  const existingNextSegment: Segment = EntityTestFactory.createSegment({ id: 'existingNextSegment', parts: [existingNextPart] })
+
+  const activeCursor: RundownCursor = {
+    segment: existingActiveSegment,
+    part: existingActivePart,
+    owner: Owner.SYSTEM
+  }
+
+  const nextCursor: RundownCursor = {
+    segment: params?.nextSegment ?? existingNextSegment,
+    part: params?.nextPart ?? existingNextPart,
+    owner: params?.nextOwner ?? Owner.EXTERNAL
+  }
+  return new Rundown({
+    isRundownActive: true,
+    alreadyActiveProperties: {
+      activeCursor,
+      nextCursor
+    },
+    segments: [existingActiveSegment, existingNextSegment]
+  } as RundownInterface)
+}
