@@ -10,7 +10,7 @@ import { RundownBaselineRepository } from '../interfaces/rundown-baseline-reposi
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
-import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
+import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 
 const COLLECTION_NAME: string = 'rundowns'
 
@@ -183,7 +183,7 @@ describe(MongoRundownRepository.name, () => {
 
     it('retrieves segments from the segment repository, when existing rundownId is given', async () => {
       const segmentRepository: SegmentRepository = mock<SegmentRepository>()
-      const rundown: Rundown = TestEntityFactory.createRundown()
+      const rundown: Rundown = EntityTestFactory.createRundown()
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
 
       when(segmentRepository.getSegments(anyString())).thenResolve([])
@@ -198,7 +198,7 @@ describe(MongoRundownRepository.name, () => {
     })
 
     it('returns rundown, when existing rundownId is given', async () => {
-      const rundown: Rundown = TestEntityFactory.createRundown()
+      const rundown: Rundown = EntityTestFactory.createRundown()
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(rundown)
       const testee: RundownRepository = createTestee({mongoConverter: mongoConverter})
 
