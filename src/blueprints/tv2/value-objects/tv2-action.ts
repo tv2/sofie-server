@@ -1,7 +1,5 @@
 import { PartAction, PieceAction } from '../../../model/entities/action'
 
-export type Tv2Action = Tv2PartAction | Tv2PieceAction
-
 export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
   VIDEO_CLIP = 'VIDEO_CLIP',
@@ -21,21 +19,21 @@ export interface Tv2PieceAction extends PieceAction {
   }
 }
 
-export interface Tv2VideoClipAction extends PartAction {
+export interface Tv2VideoClipAction extends Tv2PartAction {
   metadata: {
     contentType: Tv2ActionContentType.VIDEO_CLIP,
     sourceName: string
   }
 }
 
-export interface Tv2CameraAction extends PartAction {
+export interface Tv2CameraAction extends Tv2PartAction {
   metadata: {
     contentType: Tv2ActionContentType.CAMERA,
     cameraNumber: string
   }
 }
 
-export interface Tv2TransitionAction extends PieceAction {
+export interface Tv2TransitionAction extends Tv2PieceAction {
   metadata: {
     contentType: Tv2ActionContentType.TRANSITION,
   }
