@@ -94,8 +94,7 @@ export class Part {
 
   public takeOffAir(): void {
     this.isPartOnAir = false
-    // TODO: Correct the flow such that we don't take offAir when executedAt is 0.
-    this.playedDuration = this.executedAt === 0 ? 0 : Date.now() - this.executedAt
+    this.playedDuration = Date.now() - this.executedAt
   }
 
   public isOnAir(): boolean {

@@ -420,7 +420,7 @@ export class Rundown extends BasicRundown {
       this.nextSegment = this.findSegment(segmentId)
       this.markNextSegment()
     }
-
+    this.removeUnplannedPiecesFromNextPart()
     this.unmarkNextPart()
     this.nextPart = this.nextSegment.findPart(partId)
     this.markNextPart()
@@ -432,6 +432,10 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Segment "${segmentId}" does not exist in Rundown "${this.id}"`)
     }
     return segment
+  }
+
+  private removeUnplannedPiecesFromNextPart(): void {
+    this.nextPart?.reset()
   }
 
   public setSegments(segments: Segment[]): void {
