@@ -1,4 +1,4 @@
-import { Action, MutateActionMethods, PieceAction } from '../../../model/entities/action'
+import { Action, MutateActionMethods } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
@@ -9,7 +9,7 @@ import { AtemMeTimelineObject, AtemTransition, AtemType } from '../../timeline-s
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { TimelineObject } from '../../../model/entities/timeline-object'
-import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
+import { Tv2ActionContentType, Tv2TransitionAction } from '../value-objects/tv2-action'
 
 const FRAME_RATE: number = 25
 
@@ -27,14 +27,14 @@ export class Tv2TransitionActionFactory {
     switch (action.id) {
       case MIX_TRANSITION_ID: {
         return {
-          updateActionWithPlannedPieceData: (action: Action, plannedPiece: Piece) => this.updateAtemMeInput(action, plannedPiece),
+          updateActionWithPlannedPieceData: (action: Action, plannedPiece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, plannedPiece),
           plannedPiecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
         }
       }
     }
   }
 
-  public createMixTransitionAction(): Tv2PieceAction {
+  public createMixTransitionAction(): Tv2TransitionAction {
     const pieceInterface: PieceInterface = {
       id: 'mixTransitionActionPiece',
       name: 'Mix transition',
@@ -92,7 +92,7 @@ export class Tv2TransitionActionFactory {
     }
   }
 
-  private updateAtemMeInput(action: Action, plannedPiece: Piece): Action {
+  private updateAtemMeInput(action: Tv2TransitionAction, plannedPiece: Piece): Tv2TransitionAction {
     const timelineObject: TimelineObject | undefined = plannedPiece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
     if (!timelineObject) {
       console.log(`Can't update Atem Me Input. No TimelineObject for '${Tv2AtemLayer.PROGRAM}' found on Piece '${plannedPiece.id}'.`)
@@ -108,8 +108,7 @@ export class Tv2TransitionActionFactory {
     const sourceInput: number = atemMeTimelineObject.content.me.input
     const mixTransitionTimelineObject: AtemMeTimelineObject = this.createAtemMixTransitionTimelineObject(sourceInput)
 
-    const pieceAction: PieceAction = action as PieceAction
-    pieceAction.data.timelineObjects.push(mixTransitionTimelineObject)
-    return pieceAction
+    action.data.timelineObjects.push(mixTransitionTimelineObject)
+    return action
   }
 }
