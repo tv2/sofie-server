@@ -557,7 +557,6 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find Segment for Part ${part.id} in Rundown ${this.id}`)
     }
     segment.updatePart(part)
-
     this.updateNextCursor()
   }
 
@@ -566,9 +565,7 @@ export class Rundown extends BasicRundown {
     if (!segment) {
       throw new NotFoundException(`Unable to find Segment for Part ${partId} in Rundown ${this.id}`)
     }
-
     segment.removePart(partId)
-
     this.updateNextCursor()
   }
 
