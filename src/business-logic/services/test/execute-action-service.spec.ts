@@ -93,6 +93,8 @@ describe(ExecuteActionService.name, () => {
       })
 
       it('updates Piece ExecutedAt to be set', async () => {
+        const utcDate = Date.UTC(2023, 9, 3, 15, 10)
+        Date.now = jest.fn(() => new Date(utcDate).valueOf())
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
@@ -101,7 +103,7 @@ describe(ExecuteActionService.name, () => {
 
         const [, executedPiece] = capture(rundownServiceMock.insertPieceAsOnAir).first()
 
-        expect(executedPiece.getExecutedAt()).not.toBe(undefined)
+        expect(executedPiece.getExecutedAt()).toBe(utcDate.valueOf())
       })
     })
 
