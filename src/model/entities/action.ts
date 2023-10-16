@@ -2,13 +2,13 @@ import { ActionType, PartActionType, PieceActionType } from '../enums/action-typ
 import { PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
 
-export interface Action {
+export interface Action<Metadata = unknown> {
   id: string
   name: string
   description?: string
   type: ActionType
   data: unknown
-  metadata?: unknown
+  metadata?: Metadata
 }
 
 export interface PartAction extends Action {
