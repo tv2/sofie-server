@@ -2,9 +2,12 @@ import { Part, PartInterface } from '../part'
 import { EntityMockFactory } from './entity-mock-factory'
 import { PartTimings } from '../../value-objects/part-timings'
 import { Piece, PieceInterface } from '../piece'
+import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
+import { instance, verify } from '@typestrong/ts-mockito'
+import { TestEntityFactory } from './test-entity-factory'
 
 describe(Part.name, () => {
-  describe(`${Part.prototype.getTimings.name}`, () => {
+  describe(Part.prototype.getTimings.name, () => {
     it('has not had its timings calculated yet - throws error', () => {
       const testee: Part = new Part({} as PartInterface)
       expect(() => testee.getTimings()).toThrow()
@@ -18,7 +21,7 @@ describe(Part.name, () => {
     })
   })
 
-  describe(`${Part.prototype.putOnAir.name}`, () => {
+  describe(Part.prototype.putOnAir.name, () => {
     afterEach(() => jest.useRealTimers())
 
     it('sets part to be on air', () => {
@@ -43,7 +46,7 @@ describe(Part.name, () => {
     })
   })
 
-  describe(`${Part.prototype.takeOffAir.name}`, () => {
+  describe(Part.prototype.takeOffAir.name, () => {
     afterEach(() => jest.useRealTimers())
 
     it('sets part to be off air', () => {
@@ -69,7 +72,7 @@ describe(Part.name, () => {
     })
   })
 
-  describe(`${Part.prototype.reset.name}`, () => {
+  describe(Part.prototype.reset.name, () => {
     it('has an executedAt value of 0 after being reset', () => {
       const testee: Part = new Part({ executedAt: 123456789 } as PartInterface)
 
@@ -110,7 +113,7 @@ describe(Part.name, () => {
     })
   })
 
-  describe(`${Part.prototype.setSegmentId.name}`, () => {
+  describe(Part.prototype.setSegmentId.name, () => {
     describe('Part is planned', () => {
       it('throws an error', () => {
         const testee: Part = new Part({ isPlanned: true } as PartInterface)
@@ -130,7 +133,7 @@ describe(Part.name, () => {
     })
   })
 
-  describe(`${Part.prototype.insertPiece.name}`, () => {
+  describe(Part.prototype.insertPiece.name, () => {
     describe('Piece is a planned Piece', () => {
       it('throws an error', () => {
         const plannedPiece: Piece = EntityMockFactory.createPiece({ isPlanned: true })
@@ -175,7 +178,7 @@ describe(Part.name, () => {
     })
   })
 
-  describe(`${Part.prototype.calculateTimings.name}`, () => {
+  describe(Part.prototype.calculateTimings.name, () => {
     describe('there is no previous Part', () => {
       it('has no inTransitionStart', () => {
         const testee: Part = new Part({} as PartInterface)
@@ -2208,6 +2211,72 @@ describe(Part.name, () => {
           })
         })
       })
+    })
+  })
+
+  describe(Part.prototype.markAsUnsynced.name, () => {
+    it('marks the Part as unsynced',() => {
+      const testee: Part = new Part({ isUnsynced: false, segmentId: 'someSegmentId' } as PartInterface)
+      expect(testee.isUnsynced()).toBeFalsy()
+      testee.markAsUnsynced()
+      expect(testee.isUnsynced()).toBeTruthy()
+    })
+
+    it('sets the rank to one lower than the original rank', () => {
+      const rank: number = 500
+      const testee: Part = new Part({ rank, segmentId: 'someSegmentId' } as PartInterface)
+      testee.markAsUnsynced()
+      expect(testee.getRank()).toBe(rank - 1)
+    })
+
+    it('postfix the segment id with the unsynced postfix', () => {
+      const segmentIdWithoutPostfix: string = 'someSegmentId'
+      const testee: Part = new Part({ segmentId: segmentIdWithoutPostfix } as PartInterface)
+      testee.markAsUnsynced()
+      expect(testee.getSegmentId()).toBe(`${segmentIdWithoutPostfix}${UNSYNCED_ID_POSTFIX}`)
+    })
+
+    describe('segment id already have the unsynced postfix', () => {
+      it('does not add an extra postfix', () => {
+        const segmentIdWithPostfix: string = `someSegmentId${UNSYNCED_ID_POSTFIX}`
+        const testee: Part = new Part({ segmentId: segmentIdWithPostfix } as PartInterface)
+        testee.markAsUnsynced()
+        expect(testee.getSegmentId()).toBe(segmentIdWithPostfix)
+      })
+    })
+
+    it('marks all its Pieces as unsynced', () => {
+      const pieceOne: Piece = EntityMockFactory.createPieceMock({ id: '1' } as PieceInterface)
+      const pieceTwo: Piece = EntityMockFactory.createPieceMock({ id: '2' } as PieceInterface)
+      const pieceThree: Piece = EntityMockFactory.createPieceMock({ id: '3' } as PieceInterface)
+
+      const pieces: Piece[] = [
+        instance(pieceOne),
+        instance(pieceTwo),
+        instance(pieceThree)
+      ]
+
+      const testee: Part = new Part({ pieces, segmentId: 'segmentId' } as PartInterface)
+      testee.markAsUnsynced()
+
+      verify(pieceOne.markAsUnsynced()).once()
+      verify(pieceTwo.markAsUnsynced()).once()
+      verify(pieceThree.markAsUnsynced()).once()
+    })
+
+    it('converts all its pieces into unsynced copies', () => {
+      const pieceOne: Piece = TestEntityFactory.createPiece({ id: '1' } as PieceInterface)
+      const pieceTwo: Piece = TestEntityFactory.createPiece({ id: '2' } as PieceInterface)
+      const pieceThree: Piece = TestEntityFactory.createPiece({ id: '3' } as PieceInterface)
+
+      const pieces: Piece[] = [pieceOne, pieceTwo, pieceThree]
+
+      const testee: Part = new Part({ pieces, segmentId: 'segmentId' } as PartInterface)
+
+      testee.markAsUnsynced()
+
+      expect(testee.getPieces()).not.toEqual(pieces)
+      testee.getPieces().forEach(piece => expect(piece.id).toContain(UNSYNCED_ID_POSTFIX))
     })
   })
 })
