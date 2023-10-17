@@ -285,8 +285,6 @@ export class Rundown extends BasicRundown {
     this.takeNextCursor()
     this.setNextFromActive(Owner.SYSTEM)
     this.updateInfinitePieces()
-
-    // TODO: If we changed Segments and if the Segment we came from is removed by ingest, we should remove it from the Rundown
   }
 
   private setPreviousPart(): void {

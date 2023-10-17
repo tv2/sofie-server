@@ -17,6 +17,7 @@ export interface PieceInterface {
   duration?: number
   preRollDuration: number
   postRollDuration: number
+  executedAt?: number
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
 
@@ -67,6 +68,8 @@ export class Piece {
     this.content = piece.content
     this.tags = piece.tags
     this.isUnsyncedPiece = piece.isUnsynced
+
+    this.setExecutedAt(piece.executedAt ?? 0)
   }
 
   public setExecutedAt(executedAt: number): void {

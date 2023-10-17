@@ -15,6 +15,10 @@ import { ShowStyle } from '../../../model/entities/show-style'
 import { Owner } from '../../../model/enums/owner'
 import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
 import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { PartTimings } from '../../../model/value-objects/part-timings'
+import { Exception } from '../../../model/exceptions/exception'
+import { ErrorCode } from '../../../model/enums/error-code'
 
 export interface MongoId {
   _id: string
@@ -25,14 +29,15 @@ export interface MongoRundown extends MongoId {
   showStyleVariantId: string
   modified: number
   isActive?: boolean // TODO: Remove optionality when we have control over data structure.
-  persistentState?: unknown,
-  activeCursor: MongoRundownCursor,
-  nextCursor: MongoRundownCursor
+  infinitePieceIds: string[]
+  persistentState?: unknown
+  activeCursor: MongoRundownCursor | undefined
+  nextCursor: MongoRundownCursor | undefined
 }
 
 interface MongoRundownCursor {
-  partId: string,
-  segmentId: string,
+  partId: string
+  segmentId: string
   owner: Owner
 }
 
@@ -67,6 +72,7 @@ export interface MongoPart extends MongoId {
   autoNext: boolean
   autoNextOverlap: number
   disableNextInTransition: boolean
+  timings?: PartTimings
   endState?: unknown
 }
 
@@ -80,6 +86,7 @@ export interface MongoPiece extends MongoId {
   }
   prerollDuration: number
   postrollDuration: number
+  executedAt: number
   timelineObjectsString: string
   lifespan: string
   pieceType: string
@@ -132,7 +139,7 @@ export class MongoEntityConverter {
       alreadyActiveProperties = {
         activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
         nextCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.nextCursor, segments),
-        infinitePieces: new Map<string, Piece>() // TODO: Save and populate - Pieces are currently not being saved
+        infinitePieces: this.findInfinitePieces(mongoRundown.infinitePieceIds, segments)
       }
     }
     return new Rundown({
@@ -169,12 +176,26 @@ export class MongoEntityConverter {
     }
   }
 
+  private findInfinitePieces(infinitePieceIds: string[], segments: Segment[]): Map<string, Piece> {
+    const infinitePieces: Piece[] = segments
+      .flatMap(segment => segment.getParts())
+      .flatMap(part => part.getPieces())
+      .filter(piece =>  infinitePieceIds.includes(piece.id))
+
+    if (infinitePieceIds.length !== infinitePieces.length) {
+      throw new NotFoundException(`Unable to find all infinitePieces. Expected to find ${infinitePieceIds.length} Pieces, but only found ${infinitePieces.length}`)
+    }
+
+    return new Map(infinitePieces.map(piece => [piece.layer, piece]))
+  }
+
   public convertToMongoRundown(rundown: Rundown): MongoRundown {
     return {
       _id: rundown.id,
       name: rundown.name,
       showStyleVariantId: rundown.getShowStyleVariantId(),
       isActive: rundown.isActive(),
+      infinitePieceIds: rundown.getInfinitePieces().map(piece => piece.id),
       persistentState: rundown.getPersistentState(),
       activeCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getActiveCursor()),
       nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor())
@@ -259,6 +280,7 @@ export class MongoEntityConverter {
       },
       autoNext: mongoPart.autoNext ? { overlap: mongoPart.autoNextOverlap } : undefined,
       disableNextInTransition: mongoPart.disableNextInTransition,
+      timings: mongoPart.timings,
       endState: mongoPart.endState,
     })
   }
@@ -268,6 +290,14 @@ export class MongoEntityConverter {
   }
 
   public convertToMongoPart(part: Part): MongoPart {
+    let timings: PartTimings | undefined = undefined
+    try {
+      timings = part.getTimings()
+    } catch (error) {
+      if ((error as Exception).errorCode !== ErrorCode.UNSUPPORTED_OPERATION) {
+        throw error
+      }
+    }
     return {
       _id: part.id,
       isPlanned: part.isPlanned,
@@ -278,6 +308,7 @@ export class MongoEntityConverter {
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
       isUnsynced: part.isUnsynced(),
+      timings,
       endState: part.getEndState()
     } as MongoPart
   }
@@ -295,6 +326,7 @@ export class MongoEntityConverter {
       duration: mongoPiece.enable.duration,
       preRollDuration: mongoPiece.prerollDuration,
       postRollDuration: mongoPiece.prerollDuration,
+      executedAt: mongoPiece.executedAt,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
       metadata: mongoPiece.metaData,
@@ -366,6 +398,7 @@ export class MongoEntityConverter {
       enable,
       prerollDuration: piece.preRollDuration,
       postrollDuration: piece.postRollDuration,
+      executedAt: piece.getExecutedAt(),
       pieceType: this.mapTransitionTypeToMongoTransitionType(piece.transitionType),
       timelineObjectsString: JSON.stringify(piece.timelineObjects),
       metaData: piece.metadata,
