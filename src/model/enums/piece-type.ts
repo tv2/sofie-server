@@ -6,6 +6,5 @@ export enum PieceType {
   SERVER = 'SERVER',
   AUDIO = 'AUDIO',
   TRANSITION = 'TRANSITION',
-  VIDEO_MIXER = 'VIDEO_MIXER'
   // Add as needed
 }

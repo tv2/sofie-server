@@ -1,16 +1,16 @@
 export interface Tv2ShowStyleBlueprintConfiguration {
-  GfxDefaults: GraphicDefault
-  GfxSetups: GraphicSetup[]
-  selectedGraphicSetup: GraphicSetup
+  GfxDefaults: GraphicsDefault
+  GfxSetups: GraphicsSetup[]
+  selectedGraphicsSetup: GraphicsSetup
 }
 
-export interface GraphicDefault {
+export interface GraphicsDefault {
   DefaultSetupName: { value: string; label: string }
   DefaultSchema: { value: string; label: string }
   DefaultDesign: { value: string; label: string }
 }
 
-export interface GraphicSetup {
+export interface GraphicsSetup {
   _id: string
   Name: string
   HtmlPackageFolder: string
