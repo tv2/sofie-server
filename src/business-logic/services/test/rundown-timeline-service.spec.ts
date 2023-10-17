@@ -27,10 +27,10 @@ describe(RundownTimelineService.name, () => {
     })
 
     it('emits a rundown deleted event, when it receives a valid RundownId', async () => {
-      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
-      const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
-
       const rundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: false })
+      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
+      when(mockRundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+      const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
 
       const testee: RundownTimelineService = createTestee({
         rundownRepository: instance(mockRundownRepository),
