@@ -9,7 +9,7 @@ import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 
-export class Tv2VideoMixerActionFactory {
+export class Tv2VideoMixerConfigurationActionFactory {
   constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
   }
 
@@ -48,7 +48,7 @@ export class Tv2VideoMixerActionFactory {
     return {
       duration: 0,
       partId: '',
-      type: PieceType.VIDEO_MIXER,
+      type: PieceType.UNKNOWN,
       layer: Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,

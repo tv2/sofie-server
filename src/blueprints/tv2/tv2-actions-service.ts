@@ -4,16 +4,16 @@ import { Action, MutateActionMethods } from '../../model/entities/action'
 import { Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import {
-  GraphicDefault,
-  GraphicSetup,
+  GraphicsDefault,
+  GraphicsSetup,
   Tv2ShowStyleBlueprintConfiguration
 } from './value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2CameraActionFactory } from './factories/tv2-camera-action-factory'
 import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-factory'
 import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
-import { Tv2GraphicActionFactory } from './factories/tv2-graphic-action-factory'
+import { Tv2GraphicsActionFactory } from './factories/tv2-graphics-action-factory'
 import { ShowStyle } from '../../model/entities/show-style'
-import { Tv2VideoMixerActionFactory } from './factories/tv2-video-mixer-action-factory'
+import { Tv2VideoMixerConfigurationActionFactory } from './factories/tv2-video-mixer-configuration-action-factory'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
 
@@ -21,8 +21,8 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
     private readonly cameraActionFactory: Tv2CameraActionFactory,
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
-    private readonly graphicActionFactory: Tv2GraphicActionFactory,
-    private readonly videoSwitcherActionFactory: Tv2VideoMixerActionFactory
+    private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
+    private readonly videoSwitcherActionFactory: Tv2VideoMixerConfigurationActionFactory
   ) {
   }
 
@@ -42,23 +42,23 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
-      ...this.graphicActionFactory.createGraphicActions(blueprintConfiguration),
+      ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
       ...this.videoSwitcherActionFactory.createVideoMixerActions(blueprintConfiguration)
     ]
   }
 
   private mapToShowStyleBlueprintConfiguration(showStyle: ShowStyle): Tv2ShowStyleBlueprintConfiguration {
     const blueprintConfiguration: Tv2ShowStyleBlueprintConfiguration = showStyle.blueprintConfiguration as Tv2ShowStyleBlueprintConfiguration
-    blueprintConfiguration.GfxDefaults = (blueprintConfiguration.GfxDefaults as unknown as GraphicDefault[])[0] // Hack to not have saved as array of length 1.
+    blueprintConfiguration.GfxDefaults = (blueprintConfiguration.GfxDefaults as unknown as GraphicsDefault[])[0] // Hack to not have saved as array of length 1.
 
-    const graphicSetup: GraphicSetup | undefined = blueprintConfiguration.GfxSetups.find(
-      graphicSetup => graphicSetup._id === blueprintConfiguration.GfxDefaults.DefaultSetupName.value
+    const graphicsSetup: GraphicsSetup | undefined = blueprintConfiguration.GfxSetups.find(
+      graphicsSetup => graphicsSetup._id === blueprintConfiguration.GfxDefaults.DefaultSetupName.value
     )
-    if (!graphicSetup) {
+    if (!graphicsSetup) {
       console.warn('Failed to find Selected Graphic Setup')
       return blueprintConfiguration
     }
-    blueprintConfiguration.selectedGraphicSetup = graphicSetup
+    blueprintConfiguration.selectedGraphicsSetup = graphicsSetup
     return blueprintConfiguration
   }
 }

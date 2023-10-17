@@ -27,7 +27,7 @@ export interface VizMseContinueTimelineObject extends TimelineObject {
   }
 }
 
-export interface VizMseClearGraphicTimelineObjectContent {
+export interface VizMseClearGraphicsTimelineObjectContent {
   deviceType: DeviceType.VIZMSE
   type: VizType.CLEAR_ALL_ELEMENTS
   channelsToSendCommands?: string[]
