@@ -28,6 +28,7 @@ export interface PartInterface {
   autoNext?: AutoNext
   disableNextInTransition: boolean
 
+  timings?: PartTimings
   endState?: PartEndState
 }
 
@@ -86,6 +87,7 @@ export class Part {
 
     this.endState = part.endState
 
+    this.timings = part.timings
     this.isPartUnsynced = part.isUnsynced
   }
 
