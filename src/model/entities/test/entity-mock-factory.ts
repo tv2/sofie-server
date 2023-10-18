@@ -29,6 +29,7 @@ export class EntityMockFactory {
 
     when(mockedRundown.getBaseline()).thenReturn(rundownInterface.baselineTimelineObjects ?? [])
     when(mockedRundown.getPartAfter(anything())).thenReturn(this.createPart())
+    when(mockedRundown.getInfinitePieces()).thenReturn([])
 
     return mockedRundown
   }

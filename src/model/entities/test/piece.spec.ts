@@ -93,13 +93,6 @@ describe(Piece.name, () => {
       expect(testee.isUnsynced()).toBeTruthy()
     })
 
-    it('postfix the Part id as unsynced', () => {
-      const partIdWithoutPostfix: string = 'somePartId'
-      const testee: Piece = new Piece({ partId: partIdWithoutPostfix } as PieceInterface)
-      testee.markAsUnsynced()
-      expect(testee.getPartId()).toBe(`${partIdWithoutPostfix}${UNSYNCED_ID_POSTFIX}`)
-    })
-
     describe('Part id is already postfix as unsynced', () => {
       it('does not postfix the Part id again', () => {
         const partIdWithPostfix: string = `somePartId${UNSYNCED_ID_POSTFIX}`
@@ -107,6 +100,15 @@ describe(Piece.name, () => {
         testee.markAsUnsynced()
         expect(testee.getPartId()).toBe(`${partIdWithPostfix}`)
       })
+    })
+  })
+
+  describe(Piece.prototype.markAsUnsyncedWithUnsyncedPart.name, () => {
+    it('postfix the Part id as unsynced', () => {
+      const partIdWithoutPostfix: string = 'somePartId'
+      const testee: Piece = new Piece({ partId: partIdWithoutPostfix } as PieceInterface)
+      testee.markAsUnsyncedWithUnsyncedPart()
+      expect(testee.getPartId()).toBe(`${partIdWithoutPostfix}${UNSYNCED_ID_POSTFIX}`)
     })
   })
 })

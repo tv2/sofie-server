@@ -6,4 +6,5 @@ export interface PartRepository {
   savePart(part: Part): Promise<void>
   deletePartsForSegment(segmentId: string): Promise<void>
   deleteUnsyncedPartsForSegment(segmentId: string): Promise<void>
+  deleteAllUnsyncedParts(): Promise<void>
 }

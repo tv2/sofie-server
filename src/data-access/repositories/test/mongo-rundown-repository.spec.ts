@@ -11,6 +11,7 @@ import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
+import { PieceRepository } from '../interfaces/piece-repository'
 
 const COLLECTION_NAME: string = 'rundowns'
 
@@ -109,7 +110,7 @@ describe(MongoRundownRepository.name, () => {
       const inactiveMongoRundown: MongoRundown = createMongoRundown({
         _id: 'rundownId',
       })
-      const activeRundown: Rundown = EntityMockFactory.createRundown({
+      const activeRundown: Rundown = EntityMockFactory.createActiveRundown({}, {
         id: inactiveMongoRundown._id,
         isRundownActive: true,
       })
@@ -223,16 +224,17 @@ describe(MongoRundownRepository.name, () => {
       })
     }
 
-    when(mongoEntityConverter.convertRundown(objectContaining(mongoRundown), anything(), anything())).thenReturn(rundown)
+    when(mongoEntityConverter.convertRundown(objectContaining(mongoRundown), anything(), anything(), anything())).thenReturn(rundown)
     await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
     return mongoEntityConverter
   }
 
   function createTestee(params: {
-    segmentRepository?: SegmentRepository
     mongoDb?: MongoDatabase
     mongoConverter?: MongoEntityConverter
     baselineRepository?: RundownBaselineRepository
+    segmentRepository?: SegmentRepository
+    pieceRepository?: PieceRepository
   } = {}): MongoRundownRepository {
     const mongoConverter: MongoEntityConverter = params.mongoConverter ?? mock(MongoEntityConverter)
 
@@ -253,11 +255,16 @@ describe(MongoRundownRepository.name, () => {
       when(params.segmentRepository.getSegments(anyString())).thenResolve([])
     }
 
+    if (!params.pieceRepository) {
+      params.pieceRepository = mock<PieceRepository>()
+    }
+
     return new MongoRundownRepository(
       instance(params.mongoDb!),
       instance(mongoConverter),
       instance(params.baselineRepository),
-      instance(params.segmentRepository)
+      instance(params.segmentRepository),
+      instance(params.pieceRepository)
     )
   }
 })

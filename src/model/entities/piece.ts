@@ -89,11 +89,15 @@ export class Piece {
     return this.executedAt
   }
 
-  public markAsUnsynced(): void {
-    this.isUnsyncedPiece = true
+  public markAsUnsyncedWithUnsyncedPart(): void {
     if (!this.partId.endsWith(UNSYNCED_ID_POSTFIX)) {
       this.partId = `${this.partId}${UNSYNCED_ID_POSTFIX}`
     }
+    this.markAsUnsynced()
+  }
+
+  public markAsUnsynced(): void {
+    this.isUnsyncedPiece = true
   }
 
   public isUnsynced(): boolean {
@@ -123,6 +127,7 @@ export class Piece {
   }
 
   public getUnsyncedCopy(): Piece {
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
+    const unsyncedId: string = this.id.endsWith(UNSYNCED_ID_POSTFIX) ? this.id : `${this.id}${UNSYNCED_ID_POSTFIX}`
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: unsyncedId})
   }
 }

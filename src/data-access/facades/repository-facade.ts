@@ -37,8 +37,9 @@ export class RepositoryFacade {
     const mongoRundownRepository: RundownRepository = new MongoRundownRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
-      this.createRundownBaselineRepository(),
-      this.createSegmentRepository()
+      RepositoryFacade.createRundownBaselineRepository(),
+      RepositoryFacade.createSegmentRepository(),
+      RepositoryFacade.createPieceRepository()
     )
     return CachedRundownRepository.getInstance(mongoRundownRepository)
   }
@@ -59,7 +60,7 @@ export class RepositoryFacade {
     return new MongoSegmentRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
-      this.createPartRepository()
+      RepositoryFacade.createPartRepository()
     )
   }
 
@@ -75,7 +76,7 @@ export class RepositoryFacade {
     return new MongoPartRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
-      this.createPieceRepository()
+      RepositoryFacade.createPieceRepository()
     )
   }
 
@@ -97,8 +98,8 @@ export class RepositoryFacade {
 
   public static createConfigurationRepository(): ConfigurationRepository {
     const configurationRepository: ConfigurationRepository = new MongoConfigurationRepository(
-      this.createStudioRepository(),
-      this.createShowStyleRepository()
+      RepositoryFacade.createStudioRepository(),
+      RepositoryFacade.createShowStyleRepository()
     )
     return CachedConfigurationRepository.getInstance(configurationRepository)
   }

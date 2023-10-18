@@ -2712,6 +2712,69 @@ describe(Rundown.name, () => {
 
       // It should also update the NextCursor, but that is being tested by "addSegment()".
     })
+
+    describe('Rundown has an Infinite Piece belonging to the PartId', () => {
+      it('marks the Infinite Piece as unsynced', () => {
+        const partId: string = 'somePartId'
+        const infinitePiece: Piece = EntityMockFactory.createPieceMock({
+          id: 'somePieceId',
+          partId,
+          pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
+          layer: 'someLayer'
+        })
+        when(infinitePiece.getUnsyncedCopy()).thenReturn(infinitePiece)
+
+        const infinitePieceMap: Map<string, Piece> = new Map()
+        infinitePieceMap.set(infinitePiece.layer, instance(infinitePiece))
+
+
+        const part: Part = EntityTestFactory.createPart({ id: partId })
+        const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
+
+        const testee: Rundown = new Rundown({
+          isRundownActive: true,
+          alreadyActiveProperties: {
+            infinitePieces: infinitePieceMap
+          },
+          segments: [segment]
+        } as RundownInterface)
+
+        testee.removePartFromSegment(partId)
+
+        verify(infinitePiece.markAsUnsynced()).once()
+      })
+
+      it('updates the Infinite Piece to be the unsynced copy', () => {
+        const partId: string = 'somePartId'
+        const infinitePiece: Piece = EntityTestFactory.createPiece({
+          id: 'somePieceId',
+          partId,
+          pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
+          layer: 'someLayer'
+        })
+
+        const infinitePieceMap: Map<string, Piece> = new Map()
+        infinitePieceMap.set(infinitePiece.layer, infinitePiece)
+
+
+        const part: Part = EntityTestFactory.createPart({ id: partId })
+        const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
+
+        const testee: Rundown = new Rundown({
+          isRundownActive: true,
+          alreadyActiveProperties: {
+            infinitePieces: infinitePieceMap
+          },
+          segments: [segment]
+        } as RundownInterface)
+
+        testee.removePartFromSegment(partId)
+
+        const unsyncedInfinitePiece: Piece = testee.getInfinitePieces()[0]
+        expect(unsyncedInfinitePiece).not.toBe(infinitePiece)
+        expect(unsyncedInfinitePiece.id).toContain(UNSYNCED_ID_POSTFIX)
+      })
+    })
   })
 })
 

@@ -564,7 +564,17 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find Segment for Part ${partId} in Rundown ${this.id}`)
     }
     segment.removePart(partId)
+
+    this.markInfinitePiecesFromPartUnsynced(partId)
     this.updateNextCursor()
+  }
+
+  private markInfinitePiecesFromPartUnsynced(partId: string): void {
+    const infinitePiecesFromPart: Piece[] = [...this.infinitePieces.values()].filter(piece => piece.getPartId() === partId)
+    infinitePiecesFromPart.map(piece => {
+      piece.markAsUnsynced()
+      return piece.getUnsyncedCopy()
+    }).forEach(unsyncedPiece => this.infinitePieces.set(unsyncedPiece.layer, unsyncedPiece))
   }
 
   public getInfinitePieces(): Piece[] {

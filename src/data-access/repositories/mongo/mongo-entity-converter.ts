@@ -15,7 +15,6 @@ import { ShowStyle } from '../../../model/entities/show-style'
 import { Owner } from '../../../model/enums/owner'
 import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
 import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { PartTimings } from '../../../model/value-objects/part-timings'
 import { Exception } from '../../../model/exceptions/exception'
 import { ErrorCode } from '../../../model/enums/error-code'
@@ -133,13 +132,13 @@ interface MongoLayerMapping {
 }
 
 export class MongoEntityConverter {
-  public convertRundown(mongoRundown: MongoRundown, segments: Segment[], baselineTimelineObjects?: TimelineObject[]): Rundown {
+  public convertRundown(mongoRundown: MongoRundown, segments: Segment[], baselineTimelineObjects?: TimelineObject[], infinitePieces?: Piece[]): Rundown {
     let alreadyActiveProperties: RundownAlreadyActiveProperties | undefined
     if (mongoRundown.isActive) {
       alreadyActiveProperties = {
         activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
         nextCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.nextCursor, segments),
-        infinitePieces: this.findInfinitePieces(mongoRundown.infinitePieceIds, segments)
+        infinitePieces: this.mapToInfinitePieceMap(infinitePieces ?? [])
       }
     }
     return new Rundown({
@@ -176,16 +175,7 @@ export class MongoEntityConverter {
     }
   }
 
-  private findInfinitePieces(infinitePieceIds: string[], segments: Segment[]): Map<string, Piece> {
-    const infinitePieces: Piece[] = segments
-      .flatMap(segment => segment.getParts())
-      .flatMap(part => part.getPieces())
-      .filter(piece =>  infinitePieceIds.includes(piece.id))
-
-    if (infinitePieceIds.length !== infinitePieces.length) {
-      throw new NotFoundException(`Unable to find all infinitePieces. Expected to find ${infinitePieceIds.length} Pieces, but only found ${infinitePieces.length}`)
-    }
-
+  private mapToInfinitePieceMap(infinitePieces: Piece[]): Map<string, Piece> {
     return new Map(infinitePieces.map(piece => [piece.layer, piece]))
   }
 

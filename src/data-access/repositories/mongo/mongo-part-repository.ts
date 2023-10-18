@@ -88,4 +88,15 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
       throw new DeletionFailedException(`Deletion of parts was not acknowledged, for segmentId: ${segmentId}`)
     }
   }
+
+  /*
+  * NOTE: This will delete ALL unsynced Parts in the database. Should only be used on deactivate or activate Rundown.
+  * NOTE: This will NOT delete the associated Pieces.
+  */
+  public async deleteAllUnsyncedParts(): Promise<void> {
+    this.assertDatabaseConnection(this.deleteAllUnsyncedParts.name)
+    await this.getCollection().deleteMany({
+      isUnsynced: true
+    })
+  }
 }
