@@ -99,11 +99,13 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
 
   }
 
-  public buildPieceInsertedEvent(rundown: Rundown, piece: Piece): PieceInsertedEvent {
+  public buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent {
     return {
       type: RundownEventType.PIECE_INSERTED,
       timestamp: Date.now(),
       rundownId: rundown.id,
+      segmentId,
+      partId: piece.getPartId(),
       piece: new PieceDto(piece)
     }
   }

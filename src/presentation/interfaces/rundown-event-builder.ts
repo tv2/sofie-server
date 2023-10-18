@@ -23,6 +23,6 @@ export interface RundownEventBuilder {
   buildDeletedEvent(rundown: Rundown): RundownDeletedEvent
   buildPartInsertedAsOnAirEvent(rundown: Rundown, part: Part): PartInsertedAsOnAirEvent
   buildPartInsertedAsNextEvent(rundown: Rundown, part: Part): PartInsertedAsNextEvent
-  buildPieceInsertedEvent(rundown: Rundown, piece: Piece): PieceInsertedEvent
+  buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent
   buildInfiniteRundownPieceAddedEvent(rundown: Rundown, infinitePiece: Piece): RundownInfinitePieceAddedEvent
 }

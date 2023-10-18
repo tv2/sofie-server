@@ -47,7 +47,7 @@ export interface PartInsertedAsNextEvent extends RundownEvent {
   part: PartDto
 }
 
-export interface PieceInsertedEvent extends RundownEvent {
+export interface PieceInsertedEvent extends PartEvent {
   type: RundownEventType.PIECE_INSERTED,
   piece: PieceDto
 }
