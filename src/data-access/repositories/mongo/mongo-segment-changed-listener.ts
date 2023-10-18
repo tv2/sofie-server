@@ -34,13 +34,10 @@ export class MongoSegmentChangedListener extends BaseMongoRepository implements 
     const options = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoSegment, ChangeStreamDocument<MongoSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoSegment>) => void this.onChange(change))
-    console.log('### Listening for Segment collection changes...')
+    console.debug('### Listening for Segment collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoSegment>): Promise<void> {
-    if (change.operationType !== MongoChangeEvent.UPDATE) {
-      console.log(`### SegmentListener: Got a "${change.operationType}" event!`)
-    }
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
         const insertChange: ChangeStreamInsertDocument<MongoSegment> = change as ChangeStreamInsertDocument<MongoSegment>

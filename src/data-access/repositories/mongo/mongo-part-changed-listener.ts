@@ -34,13 +34,10 @@ export class MongoPartChangedListener extends BaseMongoRepository implements Dat
     const options = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoSegment, ChangeStreamDocument<MongoSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoPart>) => void this.onChange(change))
-    console.log('### Listening for Part collection changes...')
+    console.debug('### Listening for Part collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoPart>): Promise<void> {
-    if (change.operationType !== MongoChangeEvent.UPDATE) {
-      console.log(`### PartListener: Got a "${change.operationType}" event!`)
-    }
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
         const insertChange: ChangeStreamInsertDocument<MongoPart> = change as ChangeStreamInsertDocument<MongoPart>
