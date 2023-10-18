@@ -14,6 +14,7 @@ import { RundownDeletedEvent } from '../../../model/value-objects/rundown-event'
 import { Blueprint } from '../../../model/value-objects/blueprint'
 import { PartRepository } from '../../../data-access/repositories/interfaces/part-repository'
 import { SegmentRepository } from '../../../data-access/repositories/interfaces/segment-repository'
+import { PieceRepository } from '../../../data-access/repositories/interfaces/piece-repository'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -98,8 +99,9 @@ function createDeletedRundownEvent(rundownId: string): RundownDeletedEvent {
 function createTestee(params: {
   rundownEventEmitter?: RundownEventEmitter
   rundownRepository?: RundownRepository
-  segmentRepository?: SegmentRepository,
+  segmentRepository?: SegmentRepository
   partRepository?: PartRepository
+  pieceRepository?: PieceRepository
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
   rundownEventBuilder?: RundownEventBuilder
@@ -111,6 +113,7 @@ function createTestee(params: {
     params.rundownRepository ?? instance(mock<RundownRepository>()),
     params.segmentRepository ?? instance(mock<SegmentRepository>()),
     params.partRepository ?? instance(mock<PartRepository>()),
+    params.pieceRepository ?? instance(mock<PieceRepository>()),
     params.timelineRepository ?? instance(mock<TimelineRepository>()),
     params.timelineBuilder ?? instance(mock<TimelineBuilder>()),
     params.rundownEventBuilder ?? instance(mock<RundownEventBuilder>()),

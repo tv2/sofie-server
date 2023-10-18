@@ -22,6 +22,7 @@ export class ServiceFacade {
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPartRepository(),
+      RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createRundownEventBuilder(),

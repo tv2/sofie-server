@@ -24,6 +24,7 @@ import { Owner } from '../../model/enums/owner'
 import { PartRepository } from '../../data-access/repositories/interfaces/part-repository'
 import { Segment } from '../../model/entities/segment'
 import { SegmentRepository } from '../../data-access/repositories/interfaces/segment-repository'
+import { PieceRepository } from '../../data-access/repositories/interfaces/piece-repository'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -31,6 +32,7 @@ export class RundownTimelineService implements RundownService {
     private readonly rundownRepository: RundownRepository,
     private readonly segmentRepository: SegmentRepository,
     private readonly partRepository: PartRepository,
+    private readonly pieceRepository: PieceRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly rundownEventBuilder: RundownEventBuilder,
@@ -75,7 +77,15 @@ export class RundownTimelineService implements RundownService {
 
     await this.rundownRepository.saveRundown(rundown)
 
-    await this.deleteUnsyncedSegmentsAndParts(rundown)
+    await this.deleteAllUnsynced()
+  }
+
+  private async deleteAllUnsynced(): Promise<void> {
+    await Promise.all([
+      this.segmentRepository.deleteAllUnsyncedSegments(),
+      this.partRepository.deleteAllUnsyncedParts(),
+      this.pieceRepository.deleteAllUnsyncedPieces()
+    ])
   }
 
   private sendEvents(rundown: Rundown, buildEventCallbacks: ((rundown: Rundown) => RundownEvent)[]): void {
@@ -125,6 +135,7 @@ export class RundownTimelineService implements RundownService {
       }
       await this.segmentRepository.deleteUnsyncedSegmentsForRundown(rundown.id)
     }))
+    await this.pieceRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
   }
 
   private getEndStateForActivePart(rundown: Rundown): PartEndState {

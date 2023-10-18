@@ -6,4 +6,5 @@ export interface SegmentRepository {
   saveSegment(segment: Segment): Promise<void>
   deleteSegmentsForRundown(rundownId: string): Promise<void>
   deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void>
+  deleteAllUnsyncedSegments(): Promise<void>
 }

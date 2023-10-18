@@ -610,9 +610,9 @@ describe(Segment.name, () => {
       const testee: Segment = new Segment({ parts } as SegmentInterface)
       testee.markAsUnsynced()
 
-      verify(partOne.markAsUnsynced()).once()
-      verify(partTwo.markAsUnsynced()).once()
-      verify(partThree.markAsUnsynced()).once()
+      verify(partOne.markAsUnsyncedWithUnsyncedSegment()).once()
+      verify(partTwo.markAsUnsyncedWithUnsyncedSegment()).once()
+      verify(partThree.markAsUnsyncedWithUnsyncedSegment()).once()
     })
 
     describe('it does not have any Parts on Air', () => {

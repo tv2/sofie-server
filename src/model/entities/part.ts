@@ -106,13 +106,17 @@ export class Part {
     this.playedDuration = this.executedAt === 0 ? 0 : Date.now() - this.executedAt
   }
 
-  public markAsUnsynced(): void {
-    this.isPartUnsynced = true
-    this.rank = this.rank - 1
+  public markAsUnsyncedWithUnsyncedSegment(): void {
     if (!this.segmentId.endsWith(UNSYNCED_ID_POSTFIX)) {
       this.segmentId = `${this.segmentId}${UNSYNCED_ID_POSTFIX}`
     }
-    this.pieces.forEach(piece => piece.markAsUnsynced())
+    this.markAsUnsynced()
+  }
+
+  public markAsUnsynced(): void {
+    this.isPartUnsynced = true
+    this.rank = this.rank - 1
+    this.pieces.forEach(piece => piece.markAsUnsyncedWithUnsyncedPart())
     this.pieces = this.pieces.map(piece => piece.getUnsyncedCopy())
   }
 

@@ -12,6 +12,8 @@ import { RundownBaselineRepository } from '../interfaces/rundown-baseline-reposi
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { UnsupportedOperation } from '../../../model/exceptions/unsupported-operation'
 import { Segment } from '../../../model/entities/segment'
+import { PieceRepository } from '../interfaces/piece-repository'
+import { Piece } from '../../../model/entities/piece'
 
 const RUNDOWN_COLLECTION_NAME: string = 'rundowns'
 
@@ -21,7 +23,8 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     mongoDatabase: MongoDatabase,
     mongoEntityConverter: MongoEntityConverter,
     private readonly rundownBaselineRepository: RundownBaselineRepository,
-    private readonly segmentRepository: SegmentRepository
+    private readonly segmentRepository: SegmentRepository,
+    private readonly pieceRepository: PieceRepository
   ) {
     super(mongoDatabase, mongoEntityConverter)
   }
@@ -51,8 +54,9 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     const baselineTimelineObjects: TimelineObject[] = await this.rundownBaselineRepository.getRundownBaseline(
       rundownId
     )
+    const infinitePieces: Piece[] = await this.pieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
     const segments: Segment[] = await this.segmentRepository.getSegments(rundownId)
-    return this.mongoEntityConverter.convertRundown(mongoRundown, segments, baselineTimelineObjects)
+    return this.mongoEntityConverter.convertRundown(mongoRundown, segments, baselineTimelineObjects, infinitePieces)
   }
 
   public getRundownBySegmentId(segmentId: string): Promise<Rundown> {
@@ -66,7 +70,12 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
   public async saveRundown(rundown: Rundown): Promise<void> {
     const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
     await this.getCollection().updateOne({ _id: rundown.id }, { $set: mongoRundown })
-    await Promise.all(rundown.getSegments().map(segment => this.segmentRepository.saveSegment(segment)))
+
+    const unsyncedInfinitePieces: Piece[] = rundown.getInfinitePieces().filter(piece => piece.isUnsynced())
+    await Promise.all([
+      ...rundown.getSegments().map(segment => this.segmentRepository.saveSegment(segment)),
+      ...unsyncedInfinitePieces.map(piece => this.pieceRepository.savePiece(piece))
+    ])
   }
 
   public async deleteRundown(rundownId: string): Promise<void> {

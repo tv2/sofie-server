@@ -88,4 +88,15 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
       throw new DeletionFailedException(`Failed to delete Segments for Rundown: ${rundownId}`)
     }
   }
+
+  /*
+  * NOTE: This will delete ALL unsynced Segments in the database. Should only be used on deactivate or activate Rundown.
+  * NOTE: This will NOT delete the associated Parts.
+  */
+  public async deleteAllUnsyncedSegments(): Promise<void> {
+    this.assertDatabaseConnection(this.deleteAllUnsyncedSegments.name)
+    await this.getCollection().deleteMany({
+      isUnsynced: true
+    })
+  }
 }

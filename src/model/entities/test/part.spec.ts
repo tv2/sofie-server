@@ -2229,13 +2229,6 @@ describe(Part.name, () => {
       expect(testee.getRank()).toBe(rank - 1)
     })
 
-    it('postfix the segment id with the unsynced postfix', () => {
-      const segmentIdWithoutPostfix: string = 'someSegmentId'
-      const testee: Part = new Part({ segmentId: segmentIdWithoutPostfix } as PartInterface)
-      testee.markAsUnsynced()
-      expect(testee.getSegmentId()).toBe(`${segmentIdWithoutPostfix}${UNSYNCED_ID_POSTFIX}`)
-    })
-
     describe('segment id already have the unsynced postfix', () => {
       it('does not add an extra postfix', () => {
         const segmentIdWithPostfix: string = `someSegmentId${UNSYNCED_ID_POSTFIX}`
@@ -2259,9 +2252,9 @@ describe(Part.name, () => {
       const testee: Part = new Part({ pieces, segmentId: 'segmentId' } as PartInterface)
       testee.markAsUnsynced()
 
-      verify(pieceOne.markAsUnsynced()).once()
-      verify(pieceTwo.markAsUnsynced()).once()
-      verify(pieceThree.markAsUnsynced()).once()
+      verify(pieceOne.markAsUnsyncedWithUnsyncedPart()).once()
+      verify(pieceTwo.markAsUnsyncedWithUnsyncedPart()).once()
+      verify(pieceThree.markAsUnsyncedWithUnsyncedPart()).once()
     })
 
     it('converts all its pieces into unsynced copies', () => {
@@ -2277,6 +2270,15 @@ describe(Part.name, () => {
 
       expect(testee.getPieces()).not.toEqual(pieces)
       testee.getPieces().forEach(piece => expect(piece.id).toContain(UNSYNCED_ID_POSTFIX))
+    })
+  })
+
+  describe(Part.prototype.markAsUnsyncedWithUnsyncedSegment.name, () => {
+    it('postfix the segment id with the unsynced postfix', () => {
+      const segmentIdWithoutPostfix: string = 'someSegmentId'
+      const testee: Part = new Part({ segmentId: segmentIdWithoutPostfix } as PartInterface)
+      testee.markAsUnsyncedWithUnsyncedSegment()
+      expect(testee.getSegmentId()).toBe(`${segmentIdWithoutPostfix}${UNSYNCED_ID_POSTFIX}`)
     })
   })
 })
