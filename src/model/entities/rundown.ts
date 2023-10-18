@@ -420,7 +420,7 @@ export class Rundown extends BasicRundown {
       this.nextSegment = this.findSegment(segmentId)
       this.markNextSegment()
     }
-
+    this.nextPart?.reset()
     this.unmarkNextPart()
     this.nextPart = this.nextSegment.findPart(partId)
     this.markNextPart()
