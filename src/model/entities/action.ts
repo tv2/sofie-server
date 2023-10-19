@@ -1,6 +1,12 @@
 import { ActionType, PartActionType, PieceActionType } from '../enums/action-type'
 import { PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
+import { PieceType } from '../enums/piece-type'
+
+export interface ActionManifest {
+  actionType: PieceType
+  userData: unknown
+}
 
 export interface Action {
   id: string

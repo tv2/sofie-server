@@ -13,6 +13,7 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { ShowStyle } from '../../../model/entities/show-style'
 import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
+import { ActionManifest } from '../../../model/entities/action'
 
 export interface MongoRundown {
   _id: string
@@ -104,7 +105,6 @@ export interface MongoShowStyleVariant {
   blueprintConfig: unknown
 }
 
-
 interface MongoLayerMapping {
   // Which Lookahead "mode" we are in.
   lookahead: number
@@ -112,6 +112,17 @@ interface MongoLayerMapping {
   lookaheadDepth: number
   // The maximum distance to search for lookahead
   lookaheadMaxSearchDistance: number
+}
+
+export interface MongoActionManifest {
+  actionId: MongoActionManifestId
+  userData: unknown
+}
+
+const enum MongoActionManifestId {
+  SELECT_FULL_GRAPHIC = 'select_full_grafik',
+  SELECT_SERVER_CLIP = 'select_server_clip',
+  SELECT_DVE = 'select_dve'
 }
 
 export class MongoEntityConverter {
@@ -348,6 +359,26 @@ export class MongoEntityConverter {
       name: mongoShowStyleVariant.name,
       showStyleBaseId: mongoShowStyleVariant.showStyleBaseId,
       blueprintConfiguration: mongoShowStyleVariant.blueprintConfig
+    }
+  }
+
+  public convertActionManifests(mongoActionManifests: MongoActionManifest[]): ActionManifest[] {
+    return mongoActionManifests.map((mongoActionManifest) => this.convertActionManifest(mongoActionManifest))
+  }
+
+  public convertActionManifest(mongoActionManifest: MongoActionManifest): ActionManifest {
+    return {
+      actionType: this.mapMongoActionManifestIdToPieceType(mongoActionManifest.actionId),
+      userData: mongoActionManifest.userData
+    }
+  }
+
+  private mapMongoActionManifestIdToPieceType(id: MongoActionManifestId): PieceType {
+    switch (id) {
+      case MongoActionManifestId.SELECT_FULL_GRAPHIC: return PieceType.GRAPHIC
+      case MongoActionManifestId.SELECT_SERVER_CLIP: return PieceType.SERVER
+      case MongoActionManifestId.SELECT_DVE:
+      default: return PieceType.UNKNOWN
     }
   }
 }
