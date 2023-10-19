@@ -36,6 +36,7 @@ export class ServiceFacade {
 
   public static createActionService(): ActionService {
     return new ExecuteActionService(
+      RepositoryFacade.createManifestRepository(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionRepository(),
       this.createRundownService(),
