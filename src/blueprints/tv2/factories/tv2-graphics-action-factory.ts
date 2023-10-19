@@ -1,25 +1,39 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, PieceAction } from '../../../model/entities/action'
+import { Action, PartAction, PieceAction } from '../../../model/entities/action'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/factories/tv2-graphics-timeline-object-factory'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { PieceActionType } from '../../../model/enums/action-type'
+import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
+import { Tv2GraphicActionManifest } from '../value-objects/tv2-action-manifest'
+import { Tv2GraphicsType } from '../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2VizGraphicsTimelineObjectFactory } from './tv2-viz-graphics-timeline-object-factory'
+import { PartInterface } from '../../../model/entities/part'
+import { Tv2AudioTimelineObjectFactory } from '../value-objects/factories/tv2-audio-timeline-object-factory'
+import { Tv2VideoMixerTimelineObjectFactory } from '../value-objects/factories/tv2-video-mixer-timeline-object-factory'
+import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
+import { Tv2TimelineObjectGraphicContent } from '../value-objects/tv2-content'
+import { AtemFullPilotTimelineObjectProperties, AtemTransition } from '../../timeline-state-resolver-types/atem-types'
+import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
+
 
 export class Tv2GraphicsActionFactory {
   constructor(
-    private readonly graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory
+    private readonly vizGraphicsTimelineObjectFactory: Tv2VizGraphicsTimelineObjectFactory,
+    // private readonly casparCgGraphicsTimelineObjectFactory: Tv2CasparCgGraphicsTimelineObjectFactory,
+    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory
   ) { }
 
-  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
+  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicActionManifest[]): Action[] {
     return [
       this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
       this.createContinueGraphicsAction(),
       this.createClearGraphicsAction(blueprintConfiguration),
       this.createAllOutGraphicsAction(blueprintConfiguration),
+      ...this.createFullscreenGraphicActionsFromActionManifests(blueprintConfiguration, actionManifests)
     ]
   }
 
@@ -30,7 +44,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Gfx All Out',
       duration,
       timelineObjects: [
-        this.graphicsTimelineObjectFactory.createAllOutGraphicsTimelineObject(blueprintConfiguration, duration)
+        this.vizGraphicsTimelineObjectFactory.createAllOutGraphicsTimelineObject(blueprintConfiguration, duration)
       ]
     })
     return {
@@ -48,7 +62,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Gfx Clear',
       duration,
       timelineObjects: [
-        this.graphicsTimelineObjectFactory.createClearGraphicsTimelineObject(blueprintConfiguration, duration)
+        this.vizGraphicsTimelineObjectFactory.createClearGraphicsTimelineObject(blueprintConfiguration, duration)
       ]
     })
     return {
@@ -66,7 +80,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Gfx continue',
       duration,
       timelineObjects: [
-        this.graphicsTimelineObjectFactory.createContinueGraphicsTimelineObject(duration)
+        this.vizGraphicsTimelineObjectFactory.createContinueGraphicsTimelineObject(duration)
       ]
     })
     return {
@@ -84,7 +98,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Theme Out',
       duration,
       timelineObjects: [
-        this.graphicsTimelineObjectFactory.createThemeOutTimelineObject(
+        this.vizGraphicsTimelineObjectFactory.createThemeOutTimelineObject(
           blueprintConfiguration,
           duration
         )
@@ -123,7 +137,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Overlay Initialize',
       duration,
       timelineObjects: [
-        this.graphicsTimelineObjectFactory.createOverlayInitializeTimelineObject(duration)
+        this.vizGraphicsTimelineObjectFactory.createOverlayInitializeTimelineObject(duration)
       ]
     })
     return {
@@ -133,6 +147,163 @@ export class Tv2GraphicsActionFactory {
       data: pieceInterface
     }
   }
+
+  private createFullscreenGraphicActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicActionManifest[]): PartAction[] {
+    switch (blueprintConfiguration.studio.GraphicsType) {
+      case Tv2GraphicsType.HTML: return this.createCasparCgFullscreen(blueprintConfiguration, actionManifests)
+      case Tv2GraphicsType.VIZ:
+      default: return this.createVizFullscreen(blueprintConfiguration, actionManifests)
+    }
+  }
+
+  private createVizFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicActionManifest[]): PartAction[] {
+    return actionManifests.map((manifest) => this.createVizGraphicsActionFromManifest(
+      blueprintConfiguration,
+      manifest
+    ))
+  }
+
+  private createVizGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicActionManifest): PartAction {
+    const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
+    const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, manifest)
+    const partInterface: PartInterface = this.createGraphicsPartInterface({
+      id: `${this.getGraphicTargetAsCamelString(target)}Part`, // Todo: make id unique
+      name: `${this.getGraphicTargetAsCamelString(target)} ${manifest.userData.name}`,
+      inTransition: {
+        keepPreviousPartAliveDuration: blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
+        delayPiecesDuration: 0
+      },
+    })
+    return {
+      id: '',
+      name: '',
+      type: PartActionType.INSERT_PART_AS_NEXT,
+      data: {
+        partInterface: partInterface,
+        pieceInterfaces: [ fullGraphicPiece ]
+      }
+    }
+  }
+
+  private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicActionManifest): PieceInterface {
+    return this.createGraphicsPieceInterface({
+      id: 'fullGraphicPiece', // Todo: make id unique
+      name: manifest.userData.name,
+      preRollDuration: blueprintConfiguration.studio.VizPilotGraphics.PrerollDuration,
+      pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, manifest),
+      layer: Tv2SourceLayer.PILOT_GRAPHIC,
+      content: this.createVizFullGraphicsPieceContent(blueprintConfiguration, manifest)
+    })
+  }
+
+  private createGraphicsPartInterface(partInterfaceWithRequiredValues: Pick<PartInterface, 'id' | 'name'> & Partial<PartInterface>): PartInterface {
+    return {
+      disableNextInTransition: false,
+      expectedDuration: 0,
+      inTransition: {
+        keepPreviousPartAliveDuration: 0,
+        delayPiecesDuration: 0
+      },
+      isNext: true,
+      isOnAir: false,
+      isPlanned: false,
+      outTransition: {
+        keepAliveDuration: 0
+      },
+      pieces: [],
+      rank: 0,
+      segmentId: '',
+      ...partInterfaceWithRequiredValues
+    }
+  }
+
+  private getGraphicTargetAsCamelString(target: Tv2GraphicsTarget): string {
+    return target.toString().charAt(0) + target.toString().substring(1).toLowerCase()
+  }
+
+  private findInfiniteModeFromConfig(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicActionManifest): PieceLifespan {
+    const template: GraphicsTemplate | undefined = blueprintConfiguration.showStyle.GfxTemplates.find(
+      graphic => graphic.VizTemplate ? graphic.VizTemplate.toUpperCase() === manifest.userData.name : false
+    )
+
+    if (
+      !template ||
+      (!template.OutType || !template.OutType.toString().length) ||
+      (template.OutType !== 'B' && template.OutType !== 'S' && template.OutType !== 'O')
+    ) {
+      return PieceLifespan.WITHIN_PART
+    }
+
+    return this.getPieceLifeSpanFromMode(template.OutType)
+  }
+
+  private getPieceLifeSpanFromMode(mode: 'B' | 'S' | 'O'): PieceLifespan {
+    switch (mode) {
+      case 'B':
+        return PieceLifespan.WITHIN_PART
+      case 'S':
+        return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
+      case 'O':
+        return PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE
+    }
+  }
+
+  private createVizFullGraphicsPieceContent(
+    blueprintConfiguration: Tv2BlueprintConfiguration,
+    manifest: Tv2GraphicActionManifest
+  ): Tv2TimelineObjectGraphicContent {
+    return {
+      fileName: `PILOT_${manifest.userData.vcpid}`,
+      path: manifest.userData.vcpid.toString(),
+      timelineObjects: [
+        ...this.videoMixerTimelineObjectFactory.createFullPilotTimelineObjects(blueprintConfiguration, this.createVizFullPilotTimelineObjectProperties(blueprintConfiguration)),
+        ...this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration),
+        ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration),
+      ]
+    }
+  }
+
+  private createVizFullPilotTimelineObjectProperties(blueprintConfiguration: Tv2BlueprintConfiguration): AtemFullPilotTimelineObjectProperties {
+    return {
+      enable: {
+        start: blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer
+      },
+      content: {
+        input: blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground,
+        transition: AtemTransition.CUT
+      }
+    }
+  }
+
+
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, _actionManifests: Tv2GraphicActionManifest[] ): PartAction[] {
+    this.createCasparCgFullPilotTimelineObjectProperties(blueprintConfiguration)
+    throw new Error('Method not implemented.')
+  }
+
+  private createCasparCgFullPilotTimelineObjectProperties(blueprintConfiguration: Tv2BlueprintConfiguration): AtemFullPilotTimelineObjectProperties {
+    return {
+      enable: {
+        start: blueprintConfiguration.studio.CasparPrerollDuration
+      },
+      content: {
+        input: -1, //Todo: find 'fill' value for Full Dsk.
+        transition: AtemTransition.WIPE,
+        transitionSettings: {
+          wipe: {
+            rate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
+            pattern: 1,
+            reverseDirection: true,
+            borderSoftness: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.borderSoftness
+          }
+        }
+      }
+    }
+  }
+
+
 
 
 }

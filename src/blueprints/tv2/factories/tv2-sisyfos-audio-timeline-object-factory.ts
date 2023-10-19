@@ -8,6 +8,7 @@ import { Tv2SisyfosLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
+import { TimelineObject } from '../../../model/entities/timeline-object'
 
 const enum SisyfosFaderState {
   OFF = 0,
@@ -16,6 +17,10 @@ const enum SisyfosFaderState {
 }
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public createFullPilotGraphicsTimelineObjects(_blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
+    throw new Error('Method not implemented.')    
+  }
   public createMicrophoneDownTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
     return this.buildMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.OFF)
   }
