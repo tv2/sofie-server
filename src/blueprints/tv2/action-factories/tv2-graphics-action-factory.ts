@@ -4,7 +4,7 @@ import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/factories/tv2-graphics-timeline-object-factory'
+import { Tv2GraphicsTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-graphics-timeline-object-factory'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
 
@@ -133,6 +133,4 @@ export class Tv2GraphicsActionFactory {
       data: pieceInterface
     }
   }
-
-
 }
