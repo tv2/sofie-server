@@ -5,6 +5,34 @@ export interface Tv2StudioBlueprintConfiguration {
   StudioMics: string[]
   ABMediaPlayers: Tv2MediaPlayer[]
   SwitcherSource: Tv2SwitcherSource
+  GraphicsType: Tv2GraphicsType
+  VizPilotGraphics: Tv2VizGraphics
+  HTMLGraphics: Tv2HtmlGraphics
+  CasparPrerollDuration: number
+  PreventOverlayWithFull: boolean
+}
+
+export enum Tv2GraphicsType {
+  VIZ = 'VIZ',
+  HTML = 'HTML'
+}
+
+export interface Tv2VizGraphics extends Tv2PilotGraphics {
+  PrerollDuration: number
+  OutTransitionDuration: number
+  CutToMediaPlayer: number
+  FullGraphicBackground: number
+}
+
+export interface Tv2HtmlGraphics extends Tv2PilotGraphics {
+  TransitionSettings: {
+    wipeRate: number,
+    borderSoftness: number
+  }
+}
+
+export interface Tv2PilotGraphics {
+  KeepAliveDuration: number
 }
 
 export interface Tv2SourceMapping {

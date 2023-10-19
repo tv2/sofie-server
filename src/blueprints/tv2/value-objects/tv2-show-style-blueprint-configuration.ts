@@ -1,6 +1,8 @@
+
 export interface Tv2ShowStyleBlueprintConfiguration {
   GfxDefaults: GraphicsDefault
   GfxSetups: GraphicsSetup[]
+  GfxTemplates: GraphicsTemplate[]
   selectedGraphicsSetup: GraphicsSetup
 }
 
@@ -16,4 +18,9 @@ export interface GraphicsSetup {
   HtmlPackageFolder: string
   OvlShowName?: string
   FullShowName?: string
+}
+
+export interface GraphicsTemplate {
+  VizTemplate?: string
+  OutType?: string
 }
