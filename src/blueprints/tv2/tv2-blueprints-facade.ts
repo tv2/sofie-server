@@ -12,18 +12,28 @@ import { Tv2VizGraphicsTimelineObjectFactory } from './factories/tv2-viz-graphic
 import { Tv2SisyfosAudioTimelineObjectFactory } from './factories/tv2-sisyfos-audio-timeline-object-factory'
 import { Tv2VideoMixerConfigurationActionFactory } from './factories/tv2-video-mixer-configuration-action-factory'
 import { Tv2AtemVideoMixerTimelineFactory } from './factories/tv2-atem-video-mixer-timeline-factory'
+import { Tv2VideoMixerTimelineObjectFactory } from './value-objects/factories/tv2-video-mixer-timeline-object-factory'
+import { Tv2AudioTimelineObjectFactory } from './value-objects/factories/tv2-audio-timeline-object-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
+    const audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
+    const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineFactory()
+
     return new Tv2Blueprint(
       new Tv2EndStateForPartService(new Tv2SisyfosPersistentLayerFinder()),
       new Tv2OnTimelineGenerateService(new Tv2SisyfosPersistentLayerFinder()),
       new Tv2ActionsService(
         new Tv2CameraActionFactory(),
         new Tv2TransitionActionFactory(),
-        new Tv2AudioActionFactory(new Tv2SisyfosAudioTimelineObjectFactory()),
-        new Tv2GraphicsActionFactory(new Tv2VizGraphicsTimelineObjectFactory()),
-        new Tv2VideoMixerConfigurationActionFactory(new Tv2AtemVideoMixerTimelineFactory())
+        new Tv2AudioActionFactory(audioTimelineObjectFactory),
+        new Tv2GraphicsActionFactory(
+          new Tv2VizGraphicsTimelineObjectFactory(),
+          //new Tv2CasparCgGraphicsTimelineObjectFactory(),
+          audioTimelineObjectFactory,
+          videoMixerTimelineObjectFactory
+        ),
+        new Tv2VideoMixerConfigurationActionFactory(videoMixerTimelineObjectFactory)
       )
     )
   }
