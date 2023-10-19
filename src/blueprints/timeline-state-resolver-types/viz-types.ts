@@ -1,6 +1,10 @@
 import { TimelineObject } from '../../model/entities/timeline-object'
 import { DeviceType } from '../../model/enums/device-type'
 
+export const enum VizMseTransitionType { // Taken directly from blueprint.
+  DELAY = 0
+}
+
 export interface VizMseElementInternalTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZMSE

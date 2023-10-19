@@ -76,6 +76,24 @@ export interface AtemTransitionSettings {
     input: number
   },
   wipe?: {
+    /** 1 - 250 frames */
+    rate?: number;
+    /** 0 - 17 */
+    pattern?: number;
+    /** 0 - 10000 */
+    borderSoftness?: number;
+    reverseDirection?: boolean;
     //...
+  }
+}
+
+export interface AtemFullPilotTimelineObjectProperties {
+  enable: {
+    start: number
+  },
+  content: {
+    input: number
+    transition: AtemTransition
+    transitionSettings?: AtemTransitionSettings
   }
 }
