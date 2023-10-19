@@ -1,6 +1,6 @@
 import { BlueprintGenerateActions } from '../../model/value-objects/blueprint'
 import { Configuration } from '../../model/entities/configuration'
-import { Action, MutateActionMethods } from '../../model/entities/action'
+import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
 import { Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import {
@@ -14,6 +14,8 @@ import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
 import { Tv2GraphicsActionFactory } from './factories/tv2-graphics-action-factory'
 import { ShowStyle } from '../../model/entities/show-style'
 import { Tv2VideoMixerConfigurationActionFactory } from './factories/tv2-video-mixer-configuration-action-factory'
+import { PieceType } from '../../model/enums/piece-type'
+import { Tv2GraphicActionManifest } from './value-objects/tv2-action-manifest'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
 
@@ -32,7 +34,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
     }
   }
 
-  public generateActions(configuration: Configuration): Action[] {
+  public generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[] {
     const blueprintConfiguration: Tv2BlueprintConfiguration = {
       studio: configuration.studio.blueprintConfiguration as Tv2StudioBlueprintConfiguration,
       showStyle: this.mapToShowStyleBlueprintConfiguration(configuration.showStyle)
@@ -42,9 +44,13 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
-      ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
+      ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, this.getActionManifestsSubset(actionManifests, PieceType.GRAPHIC) as Tv2GraphicActionManifest[]),
       ...this.videoSwitcherActionFactory.createVideoMixerActions(blueprintConfiguration)
     ]
+  }
+
+  private getActionManifestsSubset(actionManifests: ActionManifest[], pieceType: PieceType): ActionManifest[] {
+    return actionManifests.filter(manifest => manifest.actionType === pieceType)
   }
 
   private mapToShowStyleBlueprintConfiguration(showStyle: ShowStyle): Tv2ShowStyleBlueprintConfiguration {

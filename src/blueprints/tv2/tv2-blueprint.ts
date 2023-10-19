@@ -6,7 +6,7 @@ import { Tv2EndStateForPartService } from './tv2-end-state-for-part-service'
 import { Timeline } from '../../model/entities/timeline'
 import { Tv2OnTimelineGenerateService } from './tv2-on-timeline-generate-service'
 import { Configuration } from '../../model/entities/configuration'
-import { Action, MutateActionMethods } from '../../model/entities/action'
+import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
 import { Tv2ActionsService } from './tv2-actions-service'
 
 export class Tv2Blueprint implements Blueprint {
@@ -44,8 +44,8 @@ export class Tv2Blueprint implements Blueprint {
     )
   }
 
-  public generateActions(configuration: Configuration): Action[] {
-    return this.actionsService.generateActions(configuration)
+  public generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[] {
+    return this.actionsService.generateActions(configuration, actionManifests)
   }
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {

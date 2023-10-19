@@ -1,5 +1,5 @@
 import { ActionService } from './interfaces/action-service'
-import { Action, MutateActionMethods, PartAction, PieceAction } from '../../model/entities/action'
+import { Action, ActionManifest, MutateActionMethods, PartAction, PieceAction } from '../../model/entities/action'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
@@ -11,9 +11,11 @@ import { Part, PartInterface } from '../../model/entities/part'
 import { Piece, PieceInterface } from '../../model/entities/piece'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
+import { ManifestRepository } from '../../data-access/repositories/interfaces/manifest-repository'
 
 export class ExecuteActionService implements ActionService {
   constructor(
+    private readonly manifestRepository: ManifestRepository,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly actionRepository: ActionRepository,
     private readonly rundownService: RundownService,
@@ -23,8 +25,9 @@ export class ExecuteActionService implements ActionService {
 
   public async getActions(): Promise<Action[]> {
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const actionManifests: ActionManifest[] = await this.manifestRepository.getActionManifests()
     // TODO: The Actions should be generated on ingest. Move them once we control ingest.
-    const actions: Action[] = this.blueprint.generateActions(configuration)
+    const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
     await this.actionRepository.saveActions(actions)
     return actions
   }
