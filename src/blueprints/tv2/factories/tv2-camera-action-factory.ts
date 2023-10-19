@@ -21,11 +21,20 @@ import {
   SisyfosChannelTimelineObject,
   SisyfosType
 } from '../../timeline-state-resolver-types/sisyfos-types'
-import { PartAction } from '../../../model/entities/action'
+import { Action, PartAction } from '../../../model/entities/action'
 
 export class Tv2CameraActionFactory {
 
-  public createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): PartAction {
+  public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
+    return blueprintConfiguration.studio.SourcesCam
+      .slice(0, 5)
+      .flatMap(source => [
+        this.createInsertCameraAsNextAction(blueprintConfiguration, source),
+        this.createInsertCameraAsOnAirAction(blueprintConfiguration, source)
+      ])
+  }
+
+  private createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): PartAction {
     const partId: string = `cameraInsertActionPart_${cameraSource._id}`
     const cameraPieceInterface: PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
