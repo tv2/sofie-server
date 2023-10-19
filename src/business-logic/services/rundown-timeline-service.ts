@@ -9,7 +9,9 @@ import { RundownEventBuilder } from './interfaces/rundown-event-builder'
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 import { RundownService } from './interfaces/rundown-service'
 import {
-  PartInsertedAsNextEvent, PartInsertedAsOnAirEvent, PieceInsertedEvent,
+  PartInsertedAsNextEvent,
+  PartInsertedAsOnAirEvent,
+  PieceInsertedEvent,
   RundownEvent,
   RundownInfinitePieceAddedEvent,
 } from '../../model/value-objects/rundown-event'
@@ -227,6 +229,7 @@ export class RundownTimelineService implements RundownService {
   public async insertPieceAsOnAir(rundownId: string, piece: Piece): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.insertPieceIntoActivePart(piece)
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
     await this.buildAndPersistTimeline(rundown)
 

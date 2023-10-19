@@ -7,6 +7,11 @@ import { Tv2ActionsService } from './tv2-actions-service'
 import { Tv2CameraActionFactory } from './factories/tv2-camera-action-factory'
 import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-factory'
 import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
+import { Tv2GraphicsActionFactory } from './factories/tv2-graphics-action-factory'
+import { Tv2VizGraphicsTimelineObjectFactory } from './factories/tv2-viz-graphics-timeline-object-factory'
+import { Tv2SisyfosAudioTimelineObjectFactory } from './factories/tv2-sisyfos-audio-timeline-object-factory'
+import { Tv2VideoMixerConfigurationActionFactory } from './factories/tv2-video-mixer-configuration-action-factory'
+import { Tv2AtemVideoMixerTimelineFactory } from './factories/tv2-atem-video-mixer-timeline-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -16,7 +21,9 @@ export class Tv2BlueprintsFacade {
       new Tv2ActionsService(
         new Tv2CameraActionFactory(),
         new Tv2TransitionActionFactory(),
-        new Tv2AudioActionFactory()
+        new Tv2AudioActionFactory(new Tv2SisyfosAudioTimelineObjectFactory()),
+        new Tv2GraphicsActionFactory(new Tv2VizGraphicsTimelineObjectFactory()),
+        new Tv2VideoMixerConfigurationActionFactory(new Tv2AtemVideoMixerTimelineFactory())
       )
     )
   }
