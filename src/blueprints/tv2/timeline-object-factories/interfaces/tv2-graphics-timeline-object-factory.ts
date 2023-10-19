@@ -1,4 +1,4 @@
-import { Tv2BlueprintConfiguration } from '../tv2-blueprint-configuration'
+import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { TimelineObject } from '../../../../model/entities/timeline-object'
 
 export interface Tv2GraphicsTimelineObjectFactory {
