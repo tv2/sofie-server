@@ -24,6 +24,10 @@ import { ShowStyleVariantRepository } from '../repositories/interfaces/show-styl
 import { MongoShowStyleVariantRepository } from '../repositories/mongo/mongo-show-style-variant-repository'
 import { ActionRepository } from '../repositories/interfaces/action-repository'
 import { MongoActionRepository } from '../repositories/mongo/mongo-action-repository'
+import { ActionManifestRepository } from '../repositories/interfaces/action-manifest-repository'
+import { MongoActionManifestRepository } from '../repositories/mongo/mongo-action-manifest-repository'
+import { MediaRepository } from '../repositories/interfaces/MediaRepository'
+import { MongoMediaRepository } from '../repositories/mongo/mongo-media-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -87,5 +91,13 @@ export class RepositoryFacade {
 
   public static createShowStyleVariantRepository(): ShowStyleVariantRepository {
     return new MongoShowStyleVariantRepository(MongoDatabase.getInstance(), new MongoEntityConverter(), this.createRundownRepository())
+  }
+
+  public static createActionManifestRepository(): ActionManifestRepository {
+    return new MongoActionManifestRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  public static createMediaRepository(): MediaRepository {
+    return new MongoMediaRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 }

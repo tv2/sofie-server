@@ -22,7 +22,8 @@ export interface Tv2PieceAction extends PieceAction {
 export interface Tv2VideoClipAction extends Tv2PartAction {
   metadata: {
     contentType: Tv2ActionContentType.VIDEO_CLIP,
-    sourceName: string
+    fileName: string
+    configuredVideoClipPostrollDuration: number
   }
 }
 

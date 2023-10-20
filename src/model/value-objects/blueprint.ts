@@ -4,9 +4,9 @@ import { RundownPersistentState } from './rundown-persistent-state'
 import { Timeline } from '../entities/timeline'
 import { Configuration } from '../entities/configuration'
 import { OnTimelineGenerateResult } from './on-timeline-generate-result'
-import { Action, MutateActionMethods } from '../entities/action'
+import { Action, ActionManifest, MutateActionMethods } from '../entities/action'
 
-export interface Blueprint extends BlueprintOnTimelineGenerate, BlueprintGetEndStateForPart, BlueprintGenerateActions {}
+export type Blueprint = BlueprintOnTimelineGenerate & BlueprintGetEndStateForPart & BlueprintGenerateActions
 
 export interface BlueprintOnTimelineGenerate {
   onTimelineGenerate(
@@ -28,7 +28,7 @@ export interface BlueprintGetEndStateForPart {
 }
 
 export interface BlueprintGenerateActions {
-  generateActions(configuration: Configuration): Action[]
+  generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[]
 
   /**
    * If any Action need to have data only accessible at the time of executing the action,
