@@ -1,10 +1,10 @@
-import { Tv2VideoMixerTimelineObjectFactory } from '../value-objects/factories/tv2-video-mixer-timeline-object-factory'
+import { Tv2VideoMixerTimelineObjectFactory } from './interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { AtemDownstreamKeyerTimelineObject, AtemType } from '../../timeline-state-resolver-types/atem-types'
 import { Tv2AtemLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 
-export class Tv2AtemVideoMixerTimelineFactory implements Tv2VideoMixerTimelineObjectFactory {
+export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {

@@ -8,12 +8,14 @@ import {
   GraphicsSetup,
   Tv2ShowStyleBlueprintConfiguration
 } from './value-objects/tv2-show-style-blueprint-configuration'
-import { Tv2CameraActionFactory } from './factories/tv2-camera-action-factory'
-import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-factory'
-import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
-import { Tv2GraphicsActionFactory } from './factories/tv2-graphics-action-factory'
 import { ShowStyle } from '../../model/entities/show-style'
-import { Tv2VideoMixerConfigurationActionFactory } from './factories/tv2-video-mixer-configuration-action-factory'
+import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
+import { Tv2TransitionActionFactory } from './action-factories/tv2-transition-action-factory'
+import { Tv2AudioActionFactory } from './action-factories/tv2-audio-action-factory'
+import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action-factory'
+import {
+  Tv2VideoMixerConfigurationActionFactory
+} from './action-factories/tv2-video-mixer-configuration-action-factory'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
   constructor(
