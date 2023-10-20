@@ -19,6 +19,12 @@ const MIX_TRANSITION_ID: string = 'nextTakeHasMixTransitionAction'
 
 export class Tv2TransitionActionFactory {
 
+  public createTransitionActions(): Action[] {
+    return [
+      this.createMixTransitionAction()
+    ]
+  }
+
   public isTransitionAction(action: Action): boolean {
     return [MIX_TRANSITION_ID].includes(action.id)
   }
@@ -34,7 +40,7 @@ export class Tv2TransitionActionFactory {
     }
   }
 
-  public createMixTransitionAction(): Tv2TransitionAction {
+  private createMixTransitionAction(): Tv2TransitionAction {
     const pieceInterface: PieceInterface = {
       id: 'mixTransitionActionPiece',
       name: 'Mix transition',
