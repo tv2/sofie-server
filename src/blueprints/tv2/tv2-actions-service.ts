@@ -16,15 +16,13 @@ import { ShowStyle } from '../../model/entities/show-style'
 import { Tv2VideoMixerConfigurationActionFactory } from './factories/tv2-video-mixer-configuration-action-factory'
 
 export class Tv2ActionsService implements BlueprintGenerateActions {
-
   constructor(
     private readonly cameraActionFactory: Tv2CameraActionFactory,
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
     private readonly videoSwitcherActionFactory: Tv2VideoMixerConfigurationActionFactory
-  ) {
-  }
+  ) {}
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
     if (this.transitionActionFactory.isTransitionAction(action)) {
@@ -48,7 +46,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
   }
 
   private mapToShowStyleBlueprintConfiguration(showStyle: ShowStyle): Tv2ShowStyleBlueprintConfiguration {
-    const blueprintConfiguration: Tv2ShowStyleBlueprintConfiguration = showStyle.blueprintConfiguration as Tv2ShowStyleBlueprintConfiguration
+    const blueprintConfiguration: Tv2ShowStyleBlueprintConfiguration = { ...(showStyle.blueprintConfiguration as Tv2ShowStyleBlueprintConfiguration) }
     blueprintConfiguration.GfxDefaults = (blueprintConfiguration.GfxDefaults as unknown as GraphicsDefault[])[0] // Hack to not have saved as array of length 1.
 
     const graphicsSetup: GraphicsSetup | undefined = blueprintConfiguration.GfxSetups.find(
