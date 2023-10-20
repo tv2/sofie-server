@@ -4,6 +4,7 @@ export interface Tv2StudioBlueprintConfiguration {
   SourcesRM: Tv2SourceMappingWithSound[] // Lives
   StudioMics: string[]
   ABMediaPlayers: Tv2MediaPlayer[]
+  SwitcherSource: Tv2SwitcherSource
 }
 
 export interface Tv2SourceMapping {
@@ -20,3 +21,20 @@ export interface Tv2SourceMappingWithSound extends Tv2SourceMapping {
   WantsToPersistAudio?: boolean
   AcceptPersistAudio?: boolean
 }
+
+export interface Tv2SwitcherSource {
+  DSK: Tv2DownstreamKeyer[]
+}
+
+export interface Tv2DownstreamKeyer {
+  _id: string
+  Number: number
+  Key: number
+  Fill: number
+  DefaultOn: boolean
+  Roles: string[]
+  Clip: number,
+  Gain: number
+}
+
+

@@ -67,6 +67,8 @@ describe(ExecuteActionService.name, () => {
     })
 
     describe('it receives an InsertPieceAsOnAirAction', () => {
+      beforeEach(() => jest.useFakeTimers())
+      afterEach(() => jest.useRealTimers())
       it('calls RundownService.insertPieceAsOnAir', async () => {
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
@@ -90,6 +92,19 @@ describe(ExecuteActionService.name, () => {
         const [, lastExecutedPiece] = capture(rundownServiceMock.insertPieceAsOnAir).last()
 
         expect(firstExecutedPiece.id).not.toBe(lastExecutedPiece.id)
+      })
+
+      it('updates Piece ExecutedAt to be set', async () => {
+        const now = Date.now()
+        const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
+        const rundownServiceMock: RundownService = mock<RundownService>()
+
+        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        await testee.executeAction(action.id, 'rundownId')
+
+        const [, executedPiece] = capture(rundownServiceMock.insertPieceAsOnAir).first()
+
+        expect(executedPiece.getExecutedAt()).toBe(now)
       })
     })
 
