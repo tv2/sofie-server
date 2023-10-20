@@ -41,8 +41,8 @@ export class Tv2CameraActionFactory {
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsNextAction_${cameraSource._id}`,
-      name: `KAM ${cameraSource.SourceName}`,
-      description: `Insert Camera ${cameraSource.SourceName}`,
+      name: `KAM ${cameraSource.SourceName} PVW`,
+      description: `Insert Camera ${cameraSource.SourceName} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -205,7 +205,7 @@ export class Tv2CameraActionFactory {
     return {
       id: `cameraAsOnAirAction_${cameraSource._id}`,
       name: `KAM ${cameraSource.SourceName}`,
-      description: `Insert and Take Camera ${cameraSource.SourceName}`,
+      description: `Insert and Take Camera ${cameraSource.SourceName}.`,
       type: PartActionType.INSERT_PART_AS_ON_AIR,
       data: {
         partInterface: partInterface,
