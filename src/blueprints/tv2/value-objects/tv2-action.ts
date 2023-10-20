@@ -4,7 +4,9 @@ export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
   VIDEO_CLIP = 'VIDEO_CLIP',
   TRANSITION = 'TRANSITION',
+  GRAPHICS = 'GRAPHICS',
   AUDIO = 'AUDIO',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export interface Tv2PartAction extends PartAction {
