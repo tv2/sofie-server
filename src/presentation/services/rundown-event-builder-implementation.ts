@@ -1,4 +1,4 @@
-import { RundownEventBuilder } from './interfaces/rundown-event-builder'
+import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
   PartInsertedAsNextEvent,
@@ -11,10 +11,12 @@ import {
   RundownDeletedEvent,
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
-} from '../../model/value-objects/rundown-event'
-import { RundownEventType } from '../../model/enums/rundown-event-type'
+} from '../value-objects/rundown-event'
+import { RundownEventType } from '../enums/rundown-event-type'
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
+import { PartDto } from '../dtos/part-dto'
+import { PieceDto } from '../dtos/piece-dto'
 
 export class RundownEventBuilderImplementation implements RundownEventBuilder {
   public buildDeletedEvent(rundown: Rundown): RundownDeletedEvent {
@@ -74,7 +76,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.INFINITE_PIECE_ADDED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      infinitePiece,
+      infinitePiece: new PieceDto(infinitePiece),
     }
   }
 
@@ -83,30 +85,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.PART_INSERTED_AS_ON_AIR,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: {
-        id: part.id,
-        segmentId: part.getSegmentId(),
-        name: part.name,
-        isPlanned: false,
-        isPartOnAir: true,
-        isPartNext: false,
-        executedAt: part.getExecutedAt(),
-        expectedDuration: part.expectedDuration,
-        playedDuration: part.getPlayedDuration(),
-        autoNext: part.autoNext,
-        pieces: part.getPieces().map(piece => {
-          return {
-            id: piece.id,
-            partId: piece.id,
-            name: piece.name,
-            isPlanned: false,
-            layer: piece.layer,
-            type: piece.type,
-            start: piece.getStart(),
-            duration: piece.duration
-          }
-        })
-      }
+      part: new PartDto(part)
     }
   }
 
@@ -115,49 +94,19 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.PART_INSERTED_AS_NEXT,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: {
-        id: part.id,
-        segmentId: part.getSegmentId(),
-        name: part.name,
-        isPlanned: false,
-        isPartOnAir: false,
-        isPartNext: true,
-        executedAt: part.getExecutedAt(),
-        expectedDuration: part.expectedDuration,
-        playedDuration: part.getPlayedDuration(),
-        autoNext: part.autoNext,
-        pieces: part.getPieces().map(piece => {
-          return {
-            id: piece.id,
-            partId: piece.id,
-            name: piece.name,
-            isPlanned: false,
-            layer: piece.layer,
-            type: piece.type,
-            start: piece.getStart(),
-            duration: piece.duration
-          }
-        })
-      }
+      part: new PartDto(part)
     }
 
   }
 
-  public buildPieceInsertedEvent(rundown: Rundown, piece: Piece): PieceInsertedEvent {
+  public buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent {
     return {
       type: RundownEventType.PIECE_INSERTED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      piece: {
-        id: piece.id,
-        partId: piece.id,
-        name: piece.name,
-        isPlanned: false,
-        layer: piece.layer,
-        type: piece.type,
-        start: piece.getStart(),
-        duration: piece.duration
-      }
+      segmentId,
+      partId: piece.getPartId(),
+      piece: new PieceDto(piece)
     }
   }
 }
