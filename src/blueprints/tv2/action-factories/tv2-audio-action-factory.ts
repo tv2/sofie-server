@@ -53,7 +53,7 @@ export class Tv2AudioActionFactory {
       id: 'microphoneUpPiece',
       name: 'Microphone Up',
       timelineObjects: [
-        this.audioTimelineObjectFactory.createMicrophoneUpTimelineObject(blueprintConfiguration)
+        this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration)
       ]
     })
     return {
@@ -90,7 +90,7 @@ export class Tv2AudioActionFactory {
       id: 'microphoneDownPiece',
       name: 'Microphone Down',
       timelineObjects: [
-        this.audioTimelineObjectFactory.createMicrophoneDownTimelineObject(blueprintConfiguration)
+        this.audioTimelineObjectFactory.createStudioMicrophonesDownTimelineObject(blueprintConfiguration)
       ]
     })
     return {

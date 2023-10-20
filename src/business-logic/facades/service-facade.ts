@@ -31,8 +31,10 @@ export class ServiceFacade {
     return new ExecuteActionService(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionRepository(),
-      ServiceFacade.createRundownService(),
+      RepositoryFacade.createActionManifestRepository(),
       RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createMediaRepository(),
+      ServiceFacade.createRundownService(),
       BlueprintsFacade.createBlueprint()
     )
   }
