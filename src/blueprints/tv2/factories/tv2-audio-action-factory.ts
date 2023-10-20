@@ -5,6 +5,7 @@ import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceActionType } from '../../../model/enums/action-type'
+import { Tv2ActionContentType, Tv2AudioAction } from '../value-objects/tv2-action'
 import { Tv2AudioTimelineObjectFactory } from '../value-objects/factories/tv2-audio-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
@@ -47,7 +48,7 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  private createMicrophoneUpAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createMicrophoneUpAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2AudioAction {
     const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'microphoneUpPiece',
       name: 'Microphone Up',
@@ -59,7 +60,10 @@ export class Tv2AudioActionFactory {
       id: 'microphoneUpAction',
       name: 'Microphone Up',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.AUDIO,
+      },
     }
   }
 
@@ -111,8 +115,12 @@ export class Tv2AudioActionFactory {
     return {
       id: 'stopAudioBedAction',
       name: 'Stop audio bed',
+      description: 'Stops audio bed.',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.AUDIO,
+      },
     }
   }
 
