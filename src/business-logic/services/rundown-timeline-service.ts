@@ -203,6 +203,7 @@ export class RundownTimelineService implements RundownService {
   public async insertPieceAsOnAir(rundownId: string, piece: Piece): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.insertPieceIntoActivePart(piece)
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
     await this.buildAndPersistTimeline(rundown)
 
