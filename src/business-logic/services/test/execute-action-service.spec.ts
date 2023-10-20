@@ -1,5 +1,5 @@
 import { ExecuteActionService } from '../execute-action-service'
-import { Action, ActionManifest, PartAction, PieceAction } from '../../../model/entities/action'
+import { Action, PartAction, PieceAction } from '../../../model/entities/action'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { Part, PartInterface } from '../../../model/entities/part'
 import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
