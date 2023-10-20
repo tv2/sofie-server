@@ -2396,8 +2396,9 @@ describe(SuperflyTimelineBuilder.name, () => {
               group.id.includes(ACTIVE_GROUP_PREFIX)
             )!
 
+            const expectedDurationOfActivePart: number = activePart.expectedDuration ?? 0
             expect(activeGroup.enable.duration).toBe(
-              activePart.expectedDuration + delayStartOfPiecesDuration
+              expectedDurationOfActivePart + delayStartOfPiecesDuration
             )
           })
         })
@@ -2443,8 +2444,9 @@ describe(SuperflyTimelineBuilder.name, () => {
           const timeline: Timeline = testee.buildTimeline(rundown, createBasicStudioMock())
 
           expect(timeline.autoNext).not.toBeUndefined()
+          const expectedDurationOfActivePart: number = activePart.expectedDuration ?? 0
           const expectedEpochTimeToTakeNext: number =
-              activePart.getExecutedAt() + activePart.expectedDuration + delayStartOfPiecesDuration - continueIntoPartDuration
+              activePart.getExecutedAt() + expectedDurationOfActivePart + delayStartOfPiecesDuration - continueIntoPartDuration
           expect(timeline.autoNext?.epochTimeToTakeNext).toBe(expectedEpochTimeToTakeNext)
         })
       })
