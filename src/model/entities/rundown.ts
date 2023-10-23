@@ -79,8 +79,11 @@ export class Rundown extends BasicRundown {
     this.isRundownActive = true
 
     const firstSegment: Segment = this.findFirstSegment()
+    firstSegment.setAsNext()
+    const firstPart: Part = firstSegment.findFirstPart()
+    firstPart.setAsNext()
     this.nextCursor = {
-      part: firstSegment.findFirstPart(),
+      part: firstPart,
       segment: firstSegment,
       owner: Owner.SYSTEM
     }
@@ -141,6 +144,7 @@ export class Rundown extends BasicRundown {
     if (!this.nextCursor) {
       return
     }
+    // this.nextCursor.part.reset()
     this.nextCursor.part.removeAsNext()
   }
 

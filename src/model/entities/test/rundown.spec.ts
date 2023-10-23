@@ -4,7 +4,7 @@ import { Part } from '../part'
 import { Piece } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { anyString, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { NotActivatedException } from '../../exceptions/not-activated-exception'
 import { NotFoundException } from '../../exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
@@ -2309,7 +2309,8 @@ describe(Rundown.name, () => {
     })
 
     it('does not set active Segment', () => {
-      const segment: Segment = new Segment({} as SegmentInterface)
+      const part: Part = EntityMockFactory.createPart()
+      const segment: Segment = new Segment({ parts: [part] } as SegmentInterface)
       const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
 
       testee.activate()
@@ -2774,6 +2775,41 @@ describe(Rundown.name, () => {
         expect(unsyncedInfinitePiece).not.toBe(infinitePiece)
         expect(unsyncedInfinitePiece.id).toContain(UNSYNCED_ID_POSTFIX)
       })
+    })
+  })
+
+  describe(Rundown.prototype.setNext.name, () => {
+    it('resets next part right before changing next cursor', () => {
+      const mockedNextPart: Part = EntityMockFactory.createPartMock({ isNext: true })
+      const nextPart: Part = instance(mockedNextPart)
+      const mockedNextSegment: Segment = EntityMockFactory.createSegmentMock({ isNext: true, parts: [nextPart] })
+      const nextSegment: Segment = instance(mockedNextSegment)
+      const activePart: Part = EntityMockFactory.createPart({ isOnAir: true })
+      const otherPartInActiveSegment: Part = EntityMockFactory.createPart()
+      const activeSegment: Segment = EntityMockFactory.createSegment({ isOnAir: true, parts: [activePart, otherPartInActiveSegment] })
+
+      when(mockedNextSegment.findPart(anyString())).thenReturn(nextPart)
+
+      const testee: Rundown = new Rundown({
+        isRundownActive: true,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: activePart,
+            segment: activeSegment,
+            owner: Owner.SYSTEM
+          },
+          nextCursor: {
+            part: instance(mockedNextPart),
+            segment: nextSegment,
+            owner: Owner.SYSTEM
+          },
+          infinitePieces: new Map(),
+        },
+      } as RundownInterface)
+
+      testee.setNext(activeSegment.id, otherPartInActiveSegment.id)
+
+      verify(mockedNextPart.reset()).once()
     })
   })
 })

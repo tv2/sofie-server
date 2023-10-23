@@ -1,15 +1,13 @@
-import { RundownEventBuilder } from './interfaces/rundown-event-builder'
+import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
-  PartEventInterface,
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
   PartTakenEvent,
   PartUpdatedEvent,
-  PieceEventInterface,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
@@ -20,12 +18,15 @@ import {
   RundownUpdatedEvent,
   SegmentCreatedEvent,
   SegmentDeletedEvent,
-  SegmentEventInterface,
   SegmentUpdatedEvent,
-} from '../../model/value-objects/rundown-event'
-import { IngestEventType, RundownEventType } from '../../model/enums/event-type'
+} from '../value-objects/rundown-event'
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
+import { PartDto } from '../dtos/part-dto'
+import { PieceDto } from '../dtos/piece-dto'
+import { IngestEventType, RundownEventType } from '../enums/rundown-event-type'
+import { SegmentDto } from '../dtos/segment-dto'
+import { RundownDto } from '../dtos/rundown-dto'
 import { Segment } from '../../model/entities/segment'
 
 export class RundownEventBuilderImplementation implements RundownEventBuilder {
@@ -79,7 +80,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.INFINITE_PIECE_ADDED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      infinitePiece,
+      infinitePiece: new PieceDto(infinitePiece),
     }
   }
 
@@ -88,36 +89,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.PART_INSERTED_AS_ON_AIR,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: this.convertPartToEvent(part)
-    }
-  }
-
-  private convertPartToEvent(part: Part): PartEventInterface {
-    return {
-      id: part.id,
-      segmentId: part.getSegmentId(),
-      name: part.name,
-      isPlanned: false,
-      isPartOnAir: true,
-      isPartNext: false,
-      executedAt: part.getExecutedAt(),
-      expectedDuration: part.expectedDuration,
-      playedDuration: part.getPlayedDuration(),
-      autoNext: part.autoNext,
-      pieces: part.getPieces().map(piece => this.convertPieceToEvent(piece))
-    }
-  }
-
-  private convertPieceToEvent(piece: Piece): PieceEventInterface {
-    return {
-      id: piece.id,
-      partId: piece.id,
-      name: piece.name,
-      isPlanned: false,
-      layer: piece.layer,
-      type: piece.type,
-      start: piece.getStart(),
-      duration: piece.duration
+      part: new PartDto(part)
     }
   }
 
@@ -126,16 +98,18 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: RundownEventType.PART_INSERTED_AS_NEXT,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: this.convertPartToEvent(part)
+      part: new PartDto(part)
     }
   }
 
-  public buildPieceInsertedEvent(rundown: Rundown, piece: Piece): PieceInsertedEvent {
+  public buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent {
     return {
       type: RundownEventType.PIECE_INSERTED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      piece: this.convertPieceToEvent(piece)
+      segmentId,
+      partId: piece.getPartId(),
+      piece: new PieceDto(piece)
     }
   }
 
@@ -143,7 +117,8 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
     return {
       type: IngestEventType.RUNDOWN_CREATED,
       timestamp: Date.now(),
-      rundownId: rundown.id
+      rundownId: rundown.id,
+      rundown: new RundownDto(rundown)
     }
   }
 
@@ -151,7 +126,8 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
     return {
       type: IngestEventType.RUNDOWN_UPDATED,
       timestamp: Date.now(),
-      rundownId: rundown.id
+      rundownId: rundown.id,
+      rundown: new RundownDto(rundown)
     }
   }
 
@@ -168,20 +144,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.SEGMENT_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segment: this.convertSegmentToEvent(segment)
-    }
-  }
-
-  private convertSegmentToEvent(segment: Segment): SegmentEventInterface {
-    return {
-      id: segment.id,
-      rundownId: segment.rundownId,
-      name: segment.name,
-      rank: segment.rank,
-      isOnAir: segment.isOnAir(),
-      isNext: segment.isNext(),
-      budgetDuration: segment.budgetDuration,
-      parts: segment.getParts().map(part => this.convertPartToEvent(part))
+      segment: new SegmentDto(segment)
     }
   }
 
@@ -190,7 +153,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.SEGMENT_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segment: this.convertSegmentToEvent(segment)
+      segment: new SegmentDto(segment)
     }
   }
 
@@ -208,7 +171,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.PART_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: this.convertPartToEvent(part)
+      part: new PartDto(part)
     }
   }
 
@@ -217,7 +180,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.PART_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: this.convertPartToEvent(part)
+      part: new PartDto(part)
     }
   }
 
