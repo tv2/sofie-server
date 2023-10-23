@@ -447,6 +447,7 @@ export class Rundown extends BasicRundown {
       this.unmarkNextSegment()
       nextSegment = this.findSegment(segmentId)
     }
+    this.nextCursor?.part.reset()
     this.unmarkNextPart()
 
     this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextSegment.findPart(partId), owner: owner ?? Owner.SYSTEM })
