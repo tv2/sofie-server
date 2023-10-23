@@ -18,6 +18,7 @@ import { UnsupportedOperation } from '../exceptions/unsupported-operation'
 import { RundownCursor } from '../value-objects/rundown-cursor'
 import { Owner } from '../enums/owner'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
+import { LastSegmentInRundown } from '../exceptions/last-segment-in-rundown'
 
 export interface RundownInterface {
   id: string
@@ -163,7 +164,7 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException('Segment does not exist in Rundown')
     }
     if (activeSegmentIndex === this.segments.length + 1) {
-      throw new LastPartInSegmentException()
+      throw new LastSegmentInRundown(`Segment: ${this.activeCursor?.segment?.id} is the last Segment of Rundown: ${this.id}`)
     }
     return this.segments[activeSegmentIndex + 1]
   }
@@ -240,7 +241,7 @@ export class Rundown extends BasicRundown {
         throw exception
       }
       if (segmentIndexForPart + 1 === this.segments.length) {
-        throw new LastPartInRundownException()
+        throw new LastPartInRundownException(`Part: ${part.id} is the last Part of Rundown: ${this.id}`)
       }
       return this.findFirstPartOfSegmentSkippingUnsyncedSegment(segmentIndexForPart + 1)
     }
@@ -263,7 +264,7 @@ export class Rundown extends BasicRundown {
       }
       indexToSearchFrom++
     }
-    throw new LastPartInRundownException()
+    throw new LastPartInRundownException(`No more Parts in the Rundown: ${this.id}`)
   }
 
   public getPreviousPart(): Part | undefined {

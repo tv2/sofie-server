@@ -95,7 +95,7 @@ export class Segment {
       throw new NotFoundException('Part does not exist in Segment')
     }
     if (fromPartIndex + 1 === this.parts.length) {
-      throw new LastPartInSegmentException()
+      throw new LastPartInSegmentException(`Part: ${fromPart.id} is the last Part in Segment: ${this.id}`)
     }
     return this.parts[fromPartIndex + 1]
   }
