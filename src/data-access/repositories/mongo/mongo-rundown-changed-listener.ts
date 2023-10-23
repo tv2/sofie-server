@@ -53,14 +53,14 @@ export class MongoRundownChangedListener extends BaseMongoRepository implements 
       }
       case MongoChangeEvent.REPLACE: {
         const replaceChange: ChangeStreamReplaceDocument<MongoRundown> = change as ChangeStreamReplaceDocument<MongoRundown>
-        const rundownId: string = replaceChange.documentKey._id as unknown as string
+        const rundownId: string = replaceChange.documentKey._id
         const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
         this.onUpdatedCallback(rundown)
         break
       }
       case MongoChangeEvent.DELETE: {
-        const deleteChange: ChangeStreamDeleteDocument = change as ChangeStreamDeleteDocument
-        const rundownId: string = deleteChange.documentKey._id as unknown as string
+        const deleteChange: ChangeStreamDeleteDocument<MongoRundown> = change as ChangeStreamDeleteDocument<MongoRundown>
+        const rundownId: string = deleteChange.documentKey._id
         this.onDeletedCallback(rundownId)
         break
       }
