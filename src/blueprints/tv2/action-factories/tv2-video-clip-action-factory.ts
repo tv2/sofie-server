@@ -6,7 +6,7 @@ import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2CasparCgLayer, Tv2VideoClipLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2CasparCgLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2VideoClipData } from '../value-objects/tv2-video-clip-data'
 import { DeviceType } from '../../../model/enums/device-type'
@@ -71,11 +71,11 @@ export class Tv2VideoClipActionFactory {
   }
 
   public createVideoClipActions(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData[]): Tv2VideoClipAction[] {
-    return videoClipData.map(server => this.createInsertVideoClipAsNextAction(configuration, server))
+    return videoClipData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
   }
 
   private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData): Tv2VideoClipAction {
-    const partId: string = 'serverInsertAction'
+    const partId: string = 'videoClipInsertAction'
     const partInterface: PartInterface = this.createPartInterface(partId, videoClipData)
     return {
       id: `${VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX}_${videoClipData.fileName}`,
@@ -123,32 +123,16 @@ export class Tv2VideoClipActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [
-        this.createEnableServerTimelineObject(),
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoSwitcherEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoSwitcherEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoSwitcherEnable),
-        this.createCasparCgServerTimelineObject(videoClipData),
+        this.createCasparCgVideoClipTimelineObject(videoClipData),
         ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
       ]
     }
   }
 
-  private createEnableServerTimelineObject(): Tv2BlueprintTimelineObject {
-    // TODO: Can this be removed?
-    return {
-      id: 'video_clip_enable',
-      enable: {
-        start: 0
-      },
-      layer: Tv2VideoClipLayer.VIDEO_CLIP_ENABLE_PENDING,
-      content: {
-        deviceType: DeviceType.ABSTRACT,
-        type: 'empty'
-      }
-    }
-  }
-
-  private createCasparCgServerTimelineObject(videoClipData: Tv2VideoClipData): CasparCgMediaTimelineObject {
+  private createCasparCgVideoClipTimelineObject(videoClipData: Tv2VideoClipData): CasparCgMediaTimelineObject {
     return {
       id: `casparCg_${videoClipData.fileName}`,
       enable: {
