@@ -1,4 +1,4 @@
-import { Tv2AudioTimelineObjectFactory } from '../value-objects/factories/tv2-audio-timeline-object-factory'
+import { Tv2AudioTimelineObjectFactory } from './interfaces/tv2-audio-timeline-object-factory'
 import {
   SisyfosChannelsTimelineObject,
   SisyfosResynchronizeTimelineObject,
@@ -80,5 +80,4 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       }
     }
   }
-
 }

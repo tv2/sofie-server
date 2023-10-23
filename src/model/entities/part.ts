@@ -16,7 +16,7 @@ export interface PartInterface {
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
-  expectedDuration: number
+  expectedDuration?: number
   executedAt?: number
   playedDuration?: number
 
@@ -35,7 +35,7 @@ export class Part {
   public readonly rank: number
   public readonly isPlanned: boolean = true
 
-  public readonly expectedDuration: number
+  public readonly expectedDuration?: number
 
   public readonly inTransition: InTransition
   public readonly outTransition: OutTransition
@@ -94,8 +94,7 @@ export class Part {
 
   public takeOffAir(): void {
     this.isPartOnAir = false
-    // TODO: Correct the flow such that we don't take offAir when executedAt is 0.
-    this.playedDuration = this.executedAt === 0 ? 0 : Date.now() - this.executedAt
+    this.playedDuration = Date.now() - this.executedAt
   }
 
   public isOnAir(): boolean {

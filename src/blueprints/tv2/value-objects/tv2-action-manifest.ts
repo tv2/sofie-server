@@ -1,7 +1,7 @@
 import { ActionManifest } from '../../../model/entities/action'
 import { PieceType } from '../../../model/enums/piece-type'
 
-export interface Tv2GraphicActionManifest extends ActionManifest {
+export interface Tv2GraphicsActionManifest extends ActionManifest {
   pieceType: PieceType.GRAPHIC
   userData: {
     name: string,

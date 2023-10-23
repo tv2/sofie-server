@@ -1,4 +1,4 @@
-import { Tv2GraphicsTimelineObjectFactory } from '../value-objects/factories/tv2-graphics-timeline-object-factory'
+import { Tv2GraphicsTimelineObjectFactory } from './interfaces/tv2-graphics-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
   VizMseClearGraphicsTimelineObjectContent,
@@ -13,7 +13,7 @@ import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BaseGraphicTimelineObjectFactory } from './tv2-base-graphic-timeline-object-factory'
 import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
-import { Tv2GraphicActionManifest } from '../value-objects/tv2-action-manifest'
+import { Tv2GraphicsActionManifest } from '../value-objects/tv2-action-manifest'
 
 export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
@@ -114,7 +114,7 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
     }
   }
 
-  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicActionManifest): TimelineObject {
+  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): TimelineObject {
     return {
       id: '',
       enable: {
@@ -126,7 +126,7 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
     }
   }
 
-  protected createFullGraphicTimelineObjectContent(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicActionManifest): object { // Todo: find/create proper return type.
+  protected createFullGraphicTimelineObjectContent(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): object { // Todo: find/create proper return type.
     return {
       deviceType: DeviceType.VIZMSE,
       type: VizType.ELEMENT_PILOT,

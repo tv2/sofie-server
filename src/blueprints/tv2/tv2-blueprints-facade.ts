@@ -4,21 +4,31 @@ import { Tv2EndStateForPartService } from './tv2-end-state-for-part-service'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
 import { Tv2OnTimelineGenerateService } from './tv2-on-timeline-generate-service'
 import { Tv2ActionsService } from './tv2-actions-service'
-import { Tv2CameraActionFactory } from './factories/tv2-camera-action-factory'
-import { Tv2TransitionActionFactory } from './factories/tv2-transition-action-factory'
-import { Tv2AudioActionFactory } from './factories/tv2-audio-action-factory'
-import { Tv2GraphicsActionFactory } from './factories/tv2-graphics-action-factory'
-import { Tv2VizGraphicsTimelineObjectFactory } from './factories/tv2-viz-graphics-timeline-object-factory'
-import { Tv2SisyfosAudioTimelineObjectFactory } from './factories/tv2-sisyfos-audio-timeline-object-factory'
-import { Tv2VideoMixerConfigurationActionFactory } from './factories/tv2-video-mixer-configuration-action-factory'
-import { Tv2AtemVideoMixerTimelineFactory } from './factories/tv2-atem-video-mixer-timeline-factory'
-import { Tv2VideoMixerTimelineObjectFactory } from './value-objects/factories/tv2-video-mixer-timeline-object-factory'
-import { Tv2AudioTimelineObjectFactory } from './value-objects/factories/tv2-audio-timeline-object-factory'
+import {
+  Tv2VizGraphicsTimelineObjectFactory
+} from './timeline-object-factories/tv2-viz-graphics-timeline-object-factory'
+import {
+  Tv2SisyfosAudioTimelineObjectFactory
+} from './timeline-object-factories/tv2-sisyfos-audio-timeline-object-factory'
+import {
+  Tv2AtemVideoMixerTimelineObjectFactory
+} from './timeline-object-factories/tv2-atem-video-mixer-timeline-object-factory'
+import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
+import { Tv2TransitionActionFactory } from './action-factories/tv2-transition-action-factory'
+import { Tv2AudioActionFactory } from './action-factories/tv2-audio-action-factory'
+import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action-factory'
+import {
+  Tv2VideoMixerConfigurationActionFactory
+} from './action-factories/tv2-video-mixer-configuration-action-factory'
+import { Tv2AudioTimelineObjectFactory } from './timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+import {
+  Tv2VideoMixerTimelineObjectFactory
+} from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
     const audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
-    const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineFactory()
+    const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
 
     return new Tv2Blueprint(
       new Tv2EndStateForPartService(new Tv2SisyfosPersistentLayerFinder()),

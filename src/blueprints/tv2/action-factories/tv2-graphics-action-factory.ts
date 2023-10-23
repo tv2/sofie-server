@@ -6,16 +6,22 @@ import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
-import { Tv2GraphicActionManifest } from '../value-objects/tv2-action-manifest'
+import { Tv2GraphicsActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2GraphicsType } from '../value-objects/tv2-studio-blueprint-configuration'
-import { Tv2VizGraphicsTimelineObjectFactory } from './tv2-viz-graphics-timeline-object-factory'
 import { PartInterface } from '../../../model/entities/part'
-import { Tv2AudioTimelineObjectFactory } from '../value-objects/factories/tv2-audio-timeline-object-factory'
-import { Tv2VideoMixerTimelineObjectFactory } from '../value-objects/factories/tv2-video-mixer-timeline-object-factory'
 import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
 import { Tv2TimelineObjectGraphicContent } from '../value-objects/tv2-content'
 import { AtemFullPilotTimelineObjectProperties, AtemTransition } from '../../timeline-state-resolver-types/atem-types'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
+import {
+  Tv2VizGraphicsTimelineObjectFactory
+} from '../timeline-object-factories/tv2-viz-graphics-timeline-object-factory'
+import {
+  Tv2AudioTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+import {
+  Tv2VideoMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 
 
 export class Tv2GraphicsActionFactory {
@@ -26,7 +32,7 @@ export class Tv2GraphicsActionFactory {
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory
   ) { }
 
-  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicActionManifest[]): Action[] {
+  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[]): Action[] {
     return [
       this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
@@ -148,7 +154,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createFullscreenGraphicActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicActionManifest[]): PartAction[] {
+  private createFullscreenGraphicActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[]): PartAction[] {
     switch (blueprintConfiguration.studio.GraphicsType) {
       case Tv2GraphicsType.HTML: return this.createCasparCgFullscreen(blueprintConfiguration, actionManifests)
       case Tv2GraphicsType.VIZ:
@@ -156,14 +162,14 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createVizFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicActionManifest[]): PartAction[] {
+  private createVizFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[]): PartAction[] {
     return actionManifests.map((manifest) => this.createVizGraphicsActionFromManifest(
       blueprintConfiguration,
       manifest
     ))
   }
 
-  private createVizGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicActionManifest): PartAction {
+  private createVizGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): PartAction {
     const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
     const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, manifest)
     const partInterface: PartInterface = this.createGraphicsPartInterface({
@@ -185,7 +191,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicActionManifest): PieceInterface {
+  private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): PieceInterface {
     return this.createGraphicsPieceInterface({
       id: 'fullGraphicPiece', // Todo: make id unique
       name: manifest.userData.name,
@@ -221,7 +227,7 @@ export class Tv2GraphicsActionFactory {
     return target.toString().charAt(0) + target.toString().substring(1).toLowerCase()
   }
 
-  private findInfiniteModeFromConfig(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicActionManifest): PieceLifespan {
+  private findInfiniteModeFromConfig(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): PieceLifespan {
     const template: GraphicsTemplate | undefined = blueprintConfiguration.showStyle.GfxTemplates.find(
       graphic => graphic.VizTemplate ? graphic.VizTemplate.toUpperCase() === manifest.userData.name : false
     )
@@ -250,7 +256,7 @@ export class Tv2GraphicsActionFactory {
 
   private createVizFullGraphicsPieceContent(
     blueprintConfiguration: Tv2BlueprintConfiguration,
-    manifest: Tv2GraphicActionManifest
+    manifest: Tv2GraphicsActionManifest
   ): Tv2TimelineObjectGraphicContent {
     return {
       fileName: `PILOT_${manifest.userData.vcpid}`,
@@ -278,7 +284,7 @@ export class Tv2GraphicsActionFactory {
 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, _actionManifests: Tv2GraphicActionManifest[] ): PartAction[] {
+  private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, _actionManifests: Tv2GraphicsActionManifest[] ): PartAction[] {
     this.createCasparCgFullPilotTimelineObjectProperties(blueprintConfiguration)
     throw new Error('Method not implemented.')
   }
@@ -302,8 +308,4 @@ export class Tv2GraphicsActionFactory {
       }
     }
   }
-
-
-
-
 }
