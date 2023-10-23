@@ -86,14 +86,3 @@ export interface AtemTransitionSettings {
     //...
   }
 }
-
-export interface AtemFullPilotTimelineObjectProperties {
-  enable: {
-    start: number
-  },
-  content: {
-    input: number
-    transition: AtemTransition
-    transitionSettings?: AtemTransitionSettings
-  }
-}
