@@ -1,5 +1,5 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, PartAction, PieceAction } from '../../../model/entities/action'
+import { Action } from '../../../model/entities/action'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -22,7 +22,7 @@ import {
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
-
+import { Tv2ActionContentType, Tv2PartAction, Tv2PieceAction } from '../value-objects/tv2-action'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -43,7 +43,7 @@ export class Tv2GraphicsActionFactory {
     ]
   }
 
-  private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'allOutGraphicsPiece',
@@ -57,11 +57,14 @@ export class Tv2GraphicsActionFactory {
       id: 'allOutGraphicsAction',
       name: 'Gfx All Out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
-  private createClearGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createClearGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'clearGraphicsPiece',
@@ -75,11 +78,14 @@ export class Tv2GraphicsActionFactory {
       id: 'clearGraphicsAction',
       name: 'Gfx Clear',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
-  private createContinueGraphicsAction(): PieceAction {
+  private createContinueGraphicsAction(): Tv2PieceAction {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'continueGraphicsPiece',
@@ -93,11 +99,14 @@ export class Tv2GraphicsActionFactory {
       id: 'continueGraphicsAction',
       name: 'Gfx continue',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
-  private createThemeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createThemeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'themeOutPiece',
@@ -114,7 +123,10 @@ export class Tv2GraphicsActionFactory {
       id: 'themeOutAction',
       name: 'Theme out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
@@ -136,7 +148,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createOverlayInitializeAction(): PieceAction {
+  private createOverlayInitializeAction(): Tv2PieceAction {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'overlayInitializePiece',
@@ -150,11 +162,14 @@ export class Tv2GraphicsActionFactory {
       id: 'overlayInitializeAction',
       name: 'Overlay initialize',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
-  private createFullscreenGraphicActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[]): PartAction[] {
+  private createFullscreenGraphicActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[]): Tv2PartAction[] {
     switch (blueprintConfiguration.studio.GraphicsType) {
       case Tv2GraphicsType.HTML: return this.createCasparCgFullscreen(blueprintConfiguration, actionManifests)
       case Tv2GraphicsType.VIZ:
@@ -162,14 +177,14 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createVizFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[]): PartAction[] {
+  private createVizFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[]): Tv2PartAction[] {
     return actionManifests.map((manifest) => this.createVizGraphicsActionFromManifest(
       blueprintConfiguration,
       manifest
     ))
   }
 
-  private createVizGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): PartAction {
+  private createVizGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): Tv2PartAction {
     const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
     const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, manifest)
     const partInterface: PartInterface = this.createGraphicsPartInterface({
@@ -187,6 +202,9 @@ export class Tv2GraphicsActionFactory {
       data: {
         partInterface: partInterface,
         pieceInterfaces: [ fullGraphicPiece ]
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS
       }
     }
   }
@@ -284,7 +302,7 @@ export class Tv2GraphicsActionFactory {
 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, _actionManifests: Tv2GraphicsActionManifest[] ): PartAction[] {
+  private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, _actionManifests: Tv2GraphicsActionManifest[] ): Tv2PartAction[] {
     this.createCasparCgFullPilotTimelineObjectProperties(blueprintConfiguration)
     throw new Error('Method not implemented.')
   }
