@@ -144,7 +144,6 @@ export class Rundown extends BasicRundown {
     if (!this.nextCursor) {
       return
     }
-    // this.nextCursor.part.reset()
     this.nextCursor.part.removeAsNext()
   }
 
