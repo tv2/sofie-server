@@ -2216,7 +2216,7 @@ describe(Rundown.name, () => {
               id: firstSegmentId,
               parts: [part],
             })
-            when(firstSegmentMock.findNextPart(part)).thenThrow(new LastPartInSegmentException())
+            when(firstSegmentMock.findNextPart(part)).thenThrow(new LastPartInSegmentException(''))
             const firstSegment: Segment = instance(firstSegmentMock)
 
             const secondSegmentId: string = 'secondSegmentId'
@@ -2246,7 +2246,7 @@ describe(Rundown.name, () => {
               id: firstSegmentId,
               parts: [part],
             })
-            when(firstSegmentMock.findNextPart(part)).thenThrow(new LastPartInSegmentException())
+            when(firstSegmentMock.findNextPart(part)).thenThrow(new LastPartInSegmentException(''))
             const firstSegment: Segment = instance(firstSegmentMock)
 
             const testee: Rundown = new Rundown({

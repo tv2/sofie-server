@@ -4141,7 +4141,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
               when(rundown.getPartAfter(parts[0])).thenReturn(parts[1])
               when(rundown.getPartAfter(parts[1])).thenReturn(parts[2])
-              when(rundown.getPartAfter(parts[2])).thenThrow(new LastPartInRundownException())
+              when(rundown.getPartAfter(parts[2])).thenThrow(new LastPartInRundownException(''))
 
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
