@@ -1,11 +1,11 @@
-import { Action, PieceAction } from '../../../model/entities/action'
+import { Action } from '../../../model/entities/action'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { Tv2ActionContentType, Tv2AudioAction } from '../value-objects/tv2-action'
+import { Tv2ActionContentType, Tv2AudioAction, Tv2PieceAction } from '../value-objects/tv2-action'
 import { Tv2AudioTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
@@ -24,7 +24,7 @@ export class Tv2AudioActionFactory {
     ]
   }
 
-  private createFadePersistedAudioAction(): PieceAction {
+  private createFadePersistedAudioAction(): Tv2PieceAction {
     const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'fadePersistedAudioPiece',
       name: 'Fade Persisted Audio',
@@ -34,7 +34,10 @@ export class Tv2AudioActionFactory {
       id: 'fadePersistedAudioAction',
       name: 'Fade Persisted Audio',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.AUDIO
+      }
     }
   }
 
@@ -85,7 +88,7 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  private createMicrophoneDownAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createMicrophoneDownAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'microphoneDownPiece',
       name: 'Microphone Down',
@@ -97,11 +100,14 @@ export class Tv2AudioActionFactory {
       id: 'microphoneDownAction',
       name: 'Microphone Down',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.AUDIO
+      }
     }
   }
 
-  private createStopAudioBedAction(): PieceAction {
+  private createStopAudioBedAction(): Tv2PieceAction {
     const duration: number = 1000
     const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'stopAudioBedPiece',
@@ -124,7 +130,7 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  private createResynchronizeAudioAction(): PieceAction {
+  private createResynchronizeAudioAction(): Tv2PieceAction {
     const duration: number = 1000
     const pieceInterface: PieceInterface = this.createAudioPieceInterface({
       id: 'resynchronizeAudioPiece',
@@ -138,7 +144,10 @@ export class Tv2AudioActionFactory {
       id: 'resynchronizeAudioAction',
       name: 'Resynchronize Audio',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.AUDIO
+      }
     }
   }
 }
