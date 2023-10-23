@@ -57,7 +57,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)
 
     if (!rundown.isActivePartSet()) {
-      return this.createTimelineWithLookaheadGroup(rundown, studio, undefined, timeline)
+      return Promise.resolve(this.createTimelineWithLookaheadGroup(rundown, studio, undefined, timeline))
     }
 
     const activePartTimelineGroup: ActivePartTimelineObjectGroup = this.createActivePartGroup(rundown)

@@ -7,6 +7,7 @@ import {
   ChangeStreamDeleteDocument,
   ChangeStreamDocument,
   ChangeStreamInsertDocument,
+  ChangeStreamOptions,
   ChangeStreamReplaceDocument
 } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
@@ -31,7 +32,7 @@ export class MongoSegmentChangedListener extends BaseMongoRepository implements 
   }
 
   private listenForChanges(): void {
-    const options = { fullDocument: 'updateLookup' }
+    const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoSegment, ChangeStreamDocument<MongoSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoSegment>) => void this.onChange(change))
     console.debug('### Listening for Segment collection changes...')
