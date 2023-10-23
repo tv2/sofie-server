@@ -191,7 +191,7 @@ export class Tv2GraphicsActionFactory {
       name: manifest.userData.name,
       preRollDuration: blueprintConfiguration.studio.VizPilotGraphics.PrerollDuration,
       pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, manifest),
-      layer: Tv2SourceLayer.PILOT_GRAPHIC,
+      layer: Tv2SourceLayer.PILOT_GRAPHICS,
       content: this.createVizFullGraphicsPieceContent(blueprintConfiguration, manifest)
     })
   }

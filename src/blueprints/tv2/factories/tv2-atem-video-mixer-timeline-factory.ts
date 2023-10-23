@@ -7,7 +7,7 @@ import {
   AtemMeTimelineObject,
   AtemType
 } from '../../timeline-state-resolver-types/atem-types'
-import { Tv2AtemLayer, Tv2SwitcherAuxLayer, Tv2SwitcherMixEffectLayer } from '../value-objects/tv2-layers'
+import { Tv2AtemLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { TimelineObject } from '../../../model/entities/timeline-object'
@@ -61,8 +61,8 @@ export class Tv2AtemVideoMixerTimelineFactory implements Tv2VideoMixerTimelineOb
 
   public createFullPilotTimelineObjects(_blueprintConfiguration: Tv2BlueprintConfiguration, properties: AtemFullPilotTimelineObjectProperties): TimelineObject[] {
     return [
-      this.createPrimaryMixEffectTimelineObject(Tv2SwitcherMixEffectLayer.PROGRAM, properties),
-      this.createPrimaryMixEffectTimelineObject(Tv2SwitcherMixEffectLayer.CLEAN, properties),
+      this.createPrimaryMixEffectTimelineObject(Tv2AtemLayer.PROGRAM, properties),
+      this.createPrimaryMixEffectTimelineObject(Tv2AtemLayer.CLEAN, properties),
       this.createNextAuxTimelineObject(properties)
     ]
   }
@@ -72,7 +72,7 @@ export class Tv2AtemVideoMixerTimelineFactory implements Tv2VideoMixerTimelineOb
       id: '',
       enable: { start: 0 },
       priority: 0,
-      layer: `atem_${Tv2SwitcherAuxLayer.LOOKAHEAD}`,
+      layer: Tv2AtemLayer.LOOKAHEAD,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.AUX,
@@ -83,8 +83,8 @@ export class Tv2AtemVideoMixerTimelineFactory implements Tv2VideoMixerTimelineOb
     }
   }
 
-  private createPrimaryMixEffectTimelineObject(layer: Tv2SwitcherMixEffectLayer, properties: AtemFullPilotTimelineObjectProperties): AtemMeTimelineObject {
-    const id: string = '' // Todo: get hashId value of 'Tv2SwitcherMixEffectLayer.PROGRAM'
+  private createPrimaryMixEffectTimelineObject(layer: Tv2AtemLayer, properties: AtemFullPilotTimelineObjectProperties): AtemMeTimelineObject {
+    const id: string = '' // Todo: get hashId value of 'layer'
 
     return {
       id,
