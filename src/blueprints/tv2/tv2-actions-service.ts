@@ -50,7 +50,7 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
   }
 
   private getActionManifestsSubset(actionManifests: ActionManifest[], pieceType: PieceType): ActionManifest[] {
-    return actionManifests.filter(manifest => manifest.actionType === pieceType)
+    return actionManifests.filter(manifest => manifest.pieceType === pieceType)
   }
 
   private mapToShowStyleBlueprintConfiguration(showStyle: ShowStyle): Tv2ShowStyleBlueprintConfiguration {
