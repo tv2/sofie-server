@@ -1,5 +1,5 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, PieceAction } from '../../../model/entities/action'
+import { Action } from '../../../model/entities/action'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -7,6 +7,7 @@ import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2GraphicsTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-graphics-timeline-object-factory'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
+import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -23,7 +24,7 @@ export class Tv2GraphicsActionFactory {
     ]
   }
 
-  private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'allOutGraphicsPiece',
@@ -37,11 +38,14 @@ export class Tv2GraphicsActionFactory {
       id: 'allOutGraphicsAction',
       name: 'Gfx All Out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
-  private createClearGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createClearGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'clearGraphicsPiece',
@@ -55,11 +59,14 @@ export class Tv2GraphicsActionFactory {
       id: 'clearGraphicsAction',
       name: 'Gfx Clear',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
-  private createContinueGraphicsAction(): PieceAction {
+  private createContinueGraphicsAction(): Tv2PieceAction {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'continueGraphicsPiece',
@@ -73,11 +80,14 @@ export class Tv2GraphicsActionFactory {
       id: 'continueGraphicsAction',
       name: 'Gfx continue',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
-  private createThemeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction {
+  private createThemeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'themeOutPiece',
@@ -94,7 +104,10 @@ export class Tv2GraphicsActionFactory {
       id: 'themeOutAction',
       name: 'Theme out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 
@@ -116,7 +129,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createOverlayInitializeAction(): PieceAction {
+  private createOverlayInitializeAction(): Tv2PieceAction {
     const duration: number = 1000 // Taken from Blueprints
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: 'overlayInitializePiece',
@@ -130,7 +143,10 @@ export class Tv2GraphicsActionFactory {
       id: 'overlayInitializeAction',
       name: 'Overlay initialize',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS,
+      },
     }
   }
 }
