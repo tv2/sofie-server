@@ -2210,4 +2210,29 @@ describe(Rundown.name, () => {
       verify(mockedSegment3.reset()).once()
     })
   })
+
+  describe(Rundown.prototype.setNext.name, () => {
+    it('resets next part right before changing next cursor', () => {
+      const mockedNextPart: Part = EntityMockFactory.createPartMock({ isNext: true })
+      const nextPart: Part = instance(mockedNextPart)
+      const nextSegment: Segment = EntityMockFactory.createSegment({ isNext: true, parts: [nextPart] })
+      const activePart: Part = EntityMockFactory.createPart({ isOnAir: true })
+      const otherPartInActiveSegment: Part = EntityMockFactory.createPart()
+      const activeSegment: Segment = EntityMockFactory.createSegment({ isOnAir: true, parts: [activePart, otherPartInActiveSegment] })
+      const testee: Rundown = new Rundown({
+        isRundownActive: true,
+        alreadyActiveProperties: {
+          activeSegment,
+          activePart,
+          nextSegment,
+          nextPart: instance(mockedNextPart),
+          infinitePieces: new Map(),
+        },
+      } as RundownInterface)
+
+      testee.setNext(activeSegment.id, otherPartInActiveSegment.id)
+
+      verify(mockedNextPart.reset()).once()
+    })
+  })
 })

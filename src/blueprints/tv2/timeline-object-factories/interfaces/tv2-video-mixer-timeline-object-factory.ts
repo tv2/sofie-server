@@ -1,7 +1,7 @@
-import { Tv2DownstreamKeyer } from '../tv2-studio-blueprint-configuration'
+import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
 import { TimelineObject } from '../../../../model/entities/timeline-object'
-import { Tv2BlueprintConfiguration } from '../tv2-blueprint-configuration'
 import { AtemFullPilotTimelineObjectProperties } from '../../../timeline-state-resolver-types/atem-types'
+import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 
 
 export interface Tv2VideoMixerTimelineObjectFactory {
