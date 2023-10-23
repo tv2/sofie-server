@@ -122,8 +122,7 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
       },
       priority: 1,
       layer: this.getLayerNameFromGraphicTarget(Tv2GraphicsTarget.FULL),
-      content: this.createFullGraphicTimelineObjectContent(blueprintConfiguration, manifest),
-      classes: ['full']
+      content: this.createFullGraphicTimelineObjectContent(blueprintConfiguration, manifest)
     }
   }
 
