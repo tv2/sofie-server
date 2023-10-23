@@ -17,22 +17,20 @@ export enum Tv2GraphicsType {
   HTML = 'HTML'
 }
 
-export interface Tv2VizGraphics extends Tv2PilotGraphics {
+export interface Tv2VizGraphics {
+  KeepAliveDuration: number
   PrerollDuration: number
   OutTransitionDuration: number
   CutToMediaPlayer: number
   FullGraphicBackground: number
 }
 
-export interface Tv2HtmlGraphics extends Tv2PilotGraphics {
+export interface Tv2HtmlGraphics {
+  KeepAliveDuration: number
   TransitionSettings: {
     wipeRate: number,
     borderSoftness: number
   }
-}
-
-export interface Tv2PilotGraphics {
-  KeepAliveDuration: number
 }
 
 export interface Tv2SourceMapping {
