@@ -6,6 +6,7 @@ import {
   ChangeStreamDeleteDocument,
   ChangeStreamDocument,
   ChangeStreamInsertDocument,
+  ChangeStreamOptions,
   ChangeStreamReplaceDocument
 } from 'mongodb'
 import { MongoEntityConverter, MongoRundown, MongoSegment } from './mongo-entity-converter'
@@ -35,7 +36,7 @@ export class MongoRundownChangedListener extends BaseMongoRepository implements 
   }
 
   private listenForChanges(): void {
-    const options = { fullDocument: 'updateLookup' }
+    const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoSegment, ChangeStreamDocument<MongoSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoRundown>) => void this.onChange(change))
     console.debug('### Listening for Rundown collection changes...')

@@ -116,16 +116,16 @@ export class Segment {
     return partOne.getRank() - partTwo.getRank()
   }
 
-  public addPart(part: Part): void {
-    if (!this.isInsertingPartAllowed(part)) {
+  public addPart(partToAdd: Part): void {
+    if (!this.isInsertingPartAllowed(partToAdd)) {
       return
     }
 
-    const doesPartAlreadyExistOnSegment: boolean = this.parts.some(p => p.id === part.id)
+    const doesPartAlreadyExistOnSegment: boolean = this.parts.some(part => part.id === partToAdd.id)
     if (doesPartAlreadyExistOnSegment) {
-      throw new AlreadyExistException(`Unable to add Part to Segment. Part ${part.id} already exist on Segment ${this.id}`)
+      throw new AlreadyExistException(`Unable to add Part to Segment. Part ${partToAdd.id} already exist on Segment ${this.id}`)
     }
-    this.parts.push(part)
+    this.parts.push(partToAdd)
     this.parts.sort(this.compareParts)
   }
 

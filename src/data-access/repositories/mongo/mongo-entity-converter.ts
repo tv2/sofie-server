@@ -133,14 +133,13 @@ interface MongoLayerMapping {
 
 export class MongoEntityConverter {
   public convertRundown(mongoRundown: MongoRundown, segments: Segment[], baselineTimelineObjects?: TimelineObject[], infinitePieces?: Piece[]): Rundown {
-    let alreadyActiveProperties: RundownAlreadyActiveProperties | undefined
-    if (mongoRundown.isActive) {
-      alreadyActiveProperties = {
+    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = mongoRundown.isActive
+      ? {
         activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
         nextCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.nextCursor, segments),
         infinitePieces: this.mapToInfinitePieceMap(infinitePieces ?? [])
       }
-    }
+      : undefined
     return new Rundown({
       id: mongoRundown._id,
       name: mongoRundown.name,
@@ -280,14 +279,6 @@ export class MongoEntityConverter {
   }
 
   public convertToMongoPart(part: Part): MongoPart {
-    let timings: PartTimings | undefined = undefined
-    try {
-      timings = part.getTimings()
-    } catch (error) {
-      if ((error as Exception).errorCode !== ErrorCode.UNSUPPORTED_OPERATION) {
-        throw error
-      }
-    }
     return {
       _id: part.id,
       isPlanned: part.isPlanned,
@@ -298,9 +289,19 @@ export class MongoEntityConverter {
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
       isUnsynced: part.isUnsynced(),
-      timings,
-      endState: part.getEndState()
+      timings: this.getTimings(part),
+      endState: part.getEndState(),
     } as MongoPart
+  }
+
+  private getTimings(part: Part): PartTimings | undefined {
+    try {
+      return  part.getTimings()
+    } catch (error) {
+      if ((error as Exception).errorCode !== ErrorCode.UNSUPPORTED_OPERATION) {
+        throw error
+      }
+    }
   }
 
   public convertPiece(mongoPiece: MongoPiece): Piece {
@@ -368,14 +369,9 @@ export class MongoEntityConverter {
   }
 
   public convertToMongoPiece(piece: Piece): MongoPiece {
-    let enable: { start: number, duration?: number} = {
-      start: piece.getStart()
-    }
-    if (piece.duration) {
-      enable = {
-        ...enable,
-        duration: piece.duration
-      }
+    const enable: MongoPiece['enable'] = {
+      start: piece.getStart(),
+      duration: piece.duration
     }
 
     return {

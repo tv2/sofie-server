@@ -18,10 +18,10 @@ export class BlueprintTimelineBuilder implements TimelineBuilder {
     return this.timelineBuilder.getBaseTimeline()
   }
 
-  public async buildTimeline(rundown: Rundown): Promise<Timeline> {
-    return await (rundown.isActivePartSet()
+  public buildTimeline(rundown: Rundown): Promise<Timeline> {
+    return rundown.isActivePartSet()
       ? this.buildTimelineWithBlueprint(rundown)
-      : this.buildTimelineWithoutBlueprint(rundown))
+      : this.buildTimelineWithoutBlueprint(rundown)
   }
 
   private async buildTimelineWithoutBlueprint(rundown: Rundown): Promise<Timeline> {

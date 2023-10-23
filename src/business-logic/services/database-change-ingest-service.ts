@@ -172,8 +172,8 @@ export class DatabaseChangeIngestService implements IngestService {
     const rundown: Rundown = await this.rundownRepository.getRundown(segment.rundownId)
     try {
       rundown.addSegment(segment)
-    } catch (error) {
-      this.throwIfNot(ErrorCode.ALREADY_EXIST, error as Exception)
+    } catch (exception) {
+      this.throwIfNot(ErrorCode.ALREADY_EXIST, exception as Exception)
       // Segment already exist on Rundown, so we don't need to do anything else.
       return
     }
