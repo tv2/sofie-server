@@ -1,5 +1,5 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, PieceAction } from '../../../model/entities/action'
+import { Action } from '../../../model/entities/action'
 import { Tv2VideoMixerTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PieceInterface } from '../../../model/entities/piece'
@@ -8,6 +8,7 @@ import { PieceActionType } from '../../../model/enums/action-type'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
+import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
 
 export class Tv2VideoMixerConfigurationActionFactory {
   constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
@@ -20,11 +21,11 @@ export class Tv2VideoMixerConfigurationActionFactory {
     ]
   }
 
-  private createDownstreamKeyerOffActions(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction[] {
+  private createDownstreamKeyerOffActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction[] {
     return blueprintConfiguration.studio.SwitcherSource.DSK.map(config => this.createDownStreamKeyerAction(config, 'Off', false))
   }
 
-  private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): PieceAction {
+  private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): Tv2PieceAction {
     const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
     const pieceInterface: PieceInterface = this.createVideoSwitcherPieceInterface({
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
@@ -39,7 +40,10 @@ export class Tv2VideoMixerConfigurationActionFactory {
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Action`,
       name: `Downstream Keyer ${downstreamKeyerNumber} ${actionName}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.UNKNOWN
+      }
     }
   }
 
@@ -62,7 +66,7 @@ export class Tv2VideoMixerConfigurationActionFactory {
     }
   }
 
-  private createDownstreamKeyerOnActions(blueprintConfiguration: Tv2BlueprintConfiguration): PieceAction[] {
+  private createDownstreamKeyerOnActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction[] {
     return blueprintConfiguration.studio.SwitcherSource.DSK.map(config => this.createDownStreamKeyerAction(config, 'On', true))
   }
 }
