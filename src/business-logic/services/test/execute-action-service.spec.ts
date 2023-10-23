@@ -9,7 +9,7 @@ import { RundownRepository } from '../../../data-access/repositories/interfaces/
 import { Blueprint } from '../../../model/value-objects/blueprint'
 import { anyOfClass, anyString, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
-import { ManifestRepository } from '../../../data-access/repositories/interfaces/manifest-repository'
+import { ActionManifestsRepository } from '../../../data-access/repositories/interfaces/action-manifests-repository'
 
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
@@ -166,7 +166,7 @@ function createPieceAction(actionType: PieceActionType): PieceAction {
 
 function createTestee(
   params?: {
-    manifestRepository?: ManifestRepository
+    manifestRepository?: ActionManifestsRepository
     configurationRepository?: ConfigurationRepository,
     actionRepository?: ActionRepository,
     rundownService?: RundownService,
@@ -177,7 +177,7 @@ function createTestee(
     action?: Action
   }
 ): ExecuteActionService {
-  const manifestRepository: ManifestRepository = params?.manifestRepository ?? mock<ManifestRepository>()
+  const manifestRepository: ActionManifestsRepository = params?.manifestRepository ?? mock<ActionManifestsRepository>()
   const configurationRepository: ConfigurationRepository = params?.configurationRepository ?? mock<ConfigurationRepository>()
   const actionRepository: ActionRepository = params?.actionRepository ?? mock<ActionRepository>()
   const rundownService: RundownService = params?.rundownService ?? mock<RundownService>()

@@ -1,12 +1,12 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { ManifestRepository } from '../interfaces/manifest-repository'
+import { ActionManifestsRepository } from '../interfaces/action-manifests-repository'
 import { ActionManifest } from '../../../model/entities/action'
 import { MongoDatabase } from './mongo-database'
 import { MongoActionManifest, MongoEntityConverter } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'adLibActions'
 
-export class MongoManifestRepository extends BaseMongoRepository implements ManifestRepository {
+export class MongoActionManifestsRepository extends BaseMongoRepository implements ActionManifestsRepository {
   constructor(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase, mongoEntityConverter)
   }
