@@ -91,7 +91,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return {
       id: 'atem_lookahead',
       enable,
-      priority: 1,
+      priority: 0,
       layer: Tv2AtemLayer.LOOKAHEAD,
       content: {
         deviceType: DeviceType.ATEM,
