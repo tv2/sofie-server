@@ -11,7 +11,7 @@ import { Tv2GraphicsType } from '../value-objects/tv2-studio-blueprint-configura
 import { PartInterface } from '../../../model/entities/part'
 import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
 import { Tv2TimelineObjectGraphicContent } from '../value-objects/tv2-content'
-import { AtemFullPilotTimelineObjectProperties, AtemTransition } from '../../timeline-state-resolver-types/atem-types'
+import { AtemTransition, AtemTransitionSettings } from '../../timeline-state-resolver-types/atem-types'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
 import {
   Tv2VizGraphicsTimelineObjectFactory
@@ -184,6 +184,8 @@ export class Tv2GraphicsActionFactory {
     ))
   }
 
+
+
   private createVizGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): Tv2PartAction {
     const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
     const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, manifest)
@@ -276,54 +278,89 @@ export class Tv2GraphicsActionFactory {
     blueprintConfiguration: Tv2BlueprintConfiguration,
     manifest: Tv2GraphicsActionManifest
   ): Tv2TimelineObjectGraphicContent {
+    const start: number = blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer
+    const input: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
+    const transition: AtemTransition = AtemTransition.CUT
+
     return {
       fileName: `PILOT_${manifest.userData.vcpid}`,
       path: manifest.userData.vcpid.toString(),
       timelineObjects: [
-        ...this.videoMixerTimelineObjectFactory.createFullPilotTimelineObjects(blueprintConfiguration, this.createVizFullPilotTimelineObjectProperties(blueprintConfiguration)),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition),
+        this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition),
+        this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
         ...this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration),
         ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration),
       ]
     }
   }
 
-  private createVizFullPilotTimelineObjectProperties(blueprintConfiguration: Tv2BlueprintConfiguration): AtemFullPilotTimelineObjectProperties {
-    return {
-      enable: {
-        start: blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer
+  private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[] ): Tv2PartAction[] {
+    return actionManifests.map((manifest) => this.createCasparCgGraphicsActionFromManifest(
+      blueprintConfiguration,
+      manifest
+    ))
+  }
+
+  private createCasparCgGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): Tv2PartAction {
+    const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
+    const fullGraphicPiece: PieceInterface = this.createCasparCgFullGraphicsPiece(blueprintConfiguration, manifest)
+    const partInterface: PartInterface = this.createGraphicsPartInterface({
+      id: `${this.getGraphicTargetAsCamelString(target)}Part`, // Todo: make id unique
+      name: `${this.getGraphicTargetAsCamelString(target)} ${manifest.userData.name}`,
+      inTransition: {
+        keepPreviousPartAliveDuration: blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
+        delayPiecesDuration: 0
       },
-      content: {
-        input: blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground,
-        transition: AtemTransition.CUT
+    })
+    return {
+      id: '',
+      name: '',
+      type: PartActionType.INSERT_PART_AS_NEXT,
+      data: {
+        partInterface: partInterface,
+        pieceInterfaces: [ fullGraphicPiece ]
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS
       }
     }
   }
 
-
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, _actionManifests: Tv2GraphicsActionManifest[] ): Tv2PartAction[] {
-    this.createCasparCgFullPilotTimelineObjectProperties(blueprintConfiguration)
-    throw new Error('Method not implemented.')
+  private createCasparCgFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): PieceInterface {
+    return this.createGraphicsPieceInterface({
+      id: 'fullGraphicPiece', // Todo: make id unique
+      name: manifest.userData.name,
+      preRollDuration: blueprintConfiguration.studio.CasparPrerollDuration,
+      pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, manifest),
+      layer: Tv2SourceLayer.PILOT_GRAPHICS,
+      content: this.createCasparCgFullGraphicsPieceContent(blueprintConfiguration, manifest)
+    })
   }
 
-  private createCasparCgFullPilotTimelineObjectProperties(blueprintConfiguration: Tv2BlueprintConfiguration): AtemFullPilotTimelineObjectProperties {
-    return {
-      enable: {
-        start: blueprintConfiguration.studio.CasparPrerollDuration
-      },
-      content: {
-        input: -1, //Todo: find 'fill' value for Full Dsk.
-        transition: AtemTransition.WIPE,
-        transitionSettings: {
-          wipe: {
-            rate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
-            pattern: 1,
-            reverseDirection: true,
-            borderSoftness: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.borderSoftness
-          }
-        }
+  private createCasparCgFullGraphicsPieceContent(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): Tv2TimelineObjectGraphicContent {
+    const start: number = blueprintConfiguration.studio.CasparPrerollDuration
+    const input: number = -1 //Todo: find 'fill' value for Full Dsk.
+    const transition: AtemTransition = AtemTransition.WIPE
+    const transitionSettings: AtemTransitionSettings = {
+      wipe: {
+        rate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
+        pattern: 1,
+        reverseDirection: true,
+        borderSoftness: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.borderSoftness
       }
+    }
+
+    return {
+      fileName: `PILOT_${manifest.userData.vcpid}`,
+      path: manifest.userData.vcpid.toString(),
+      timelineObjects: [
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition, transitionSettings),
+        this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition, transitionSettings),
+        this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
+        ...this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration),
+        ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration),
+      ]
     }
   }
 }

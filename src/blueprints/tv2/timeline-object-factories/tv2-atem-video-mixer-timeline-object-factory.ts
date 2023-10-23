@@ -3,8 +3,8 @@ import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-config
 import {
   AtemAuxTimelineObject,
   AtemDownstreamKeyerTimelineObject,
-  AtemFullPilotTimelineObjectProperties,
   AtemMeTimelineObject,
+  AtemTransitionSettings,
   AtemType
 } from '../../timeline-state-resolver-types/atem-types'
 import { Tv2AtemLayer } from '../value-objects/tv2-layers'
@@ -59,15 +59,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return []
   }
 
-  public createFullPilotTimelineObjects(_blueprintConfiguration: Tv2BlueprintConfiguration, properties: AtemFullPilotTimelineObjectProperties): TimelineObject[] {
-    return [
-      this.createPrimaryMixEffectTimelineObject(Tv2AtemLayer.PROGRAM, properties),
-      this.createPrimaryMixEffectTimelineObject(Tv2AtemLayer.CLEAN, properties),
-      this.createNextAuxTimelineObject(properties)
-    ]
-  }
-
-  private createNextAuxTimelineObject(properties: AtemFullPilotTimelineObjectProperties): AtemAuxTimelineObject {
+  public createNextAuxTimelineObject(input: number): AtemAuxTimelineObject {
     return {
       id: '',
       enable: { start: 0 },
@@ -77,26 +69,37 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         deviceType: DeviceType.ATEM,
         type: AtemType.AUX,
         aux: {
-          input: properties.content.input
+          input
         }
       }
     }
   }
 
-  private createPrimaryMixEffectTimelineObject(layer: Tv2AtemLayer, properties: AtemFullPilotTimelineObjectProperties): AtemMeTimelineObject {
+  public createProgramTimelineObject(start: number, input: number, transition: number, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
+    return this.createTimelineObjectForLayer(Tv2AtemLayer.PROGRAM, start, input, transition, transitionSettings)
+  }
+
+  public createCleanTimelineObject(start: number, input: number, transition: number, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
+    return this.createTimelineObjectForLayer(Tv2AtemLayer.CLEAN, start, input, transition, transitionSettings)
+  }
+
+  private createTimelineObjectForLayer(layer: Tv2AtemLayer, start: number, input: number, transition: number, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
     const id: string = '' // Todo: get hashId value of 'layer'
 
     return {
       id,
-      enable: properties.enable,
+      enable: {
+        start
+      },
       priority: 1,
       layer,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.ME,
         me: {
-          input: properties.content.input,
-          transition: properties.content.transition
+          input,
+          transition,
+          transitionSettings
         }
       }
     }
