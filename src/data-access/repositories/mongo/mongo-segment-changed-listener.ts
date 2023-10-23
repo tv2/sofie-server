@@ -48,8 +48,8 @@ export class MongoSegmentChangedListener extends BaseMongoRepository implements 
         break
       }
       case MongoChangeEvent.DELETE: {
-        const deleteChange: ChangeStreamDeleteDocument = change as ChangeStreamDeleteDocument
-        const segmentId: string = deleteChange.documentKey._id as unknown as string
+        const deleteChange: ChangeStreamDeleteDocument<MongoSegment> = change as ChangeStreamDeleteDocument<MongoSegment>
+        const segmentId: string = deleteChange.documentKey._id
         this.onDeletedCallback(segmentId)
         break
       }

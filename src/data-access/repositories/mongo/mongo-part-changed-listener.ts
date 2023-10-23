@@ -48,13 +48,13 @@ export class MongoPartChangedListener extends BaseMongoRepository implements Dat
         break
       }
       case MongoChangeEvent.DELETE: {
-        const deleteChange: ChangeStreamDeleteDocument = change as ChangeStreamDeleteDocument
-        const partId: string = deleteChange.documentKey._id as unknown as string
+        const deleteChange: ChangeStreamDeleteDocument<MongoPart> = change as ChangeStreamDeleteDocument<MongoPart>
+        const partId: string = deleteChange.documentKey._id
         void this.onDeletedCallback(partId)
         break
       }
       case MongoChangeEvent.REPLACE: {
-        const replaceChange: ChangeStreamReplaceDocument = change as ChangeStreamReplaceDocument
+        const replaceChange: ChangeStreamReplaceDocument<MongoPart> = change as ChangeStreamReplaceDocument<MongoPart>
         const partId: string = replaceChange.fullDocument._id
         const part: Part = await this.partRepository.getPart(partId)
         void this.onUpdatedCallback(part)
