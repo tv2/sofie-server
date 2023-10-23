@@ -24,8 +24,8 @@ import { ShowStyleVariantRepository } from '../repositories/interfaces/show-styl
 import { MongoShowStyleVariantRepository } from '../repositories/mongo/mongo-show-style-variant-repository'
 import { ActionRepository } from '../repositories/interfaces/action-repository'
 import { MongoActionRepository } from '../repositories/mongo/mongo-action-repository'
-import { ManifestRepository } from '../repositories/interfaces/manifest-repository'
-import { MongoManifestRepository } from '../repositories/mongo/mongo-manifest-repository'
+import { ActionManifestsRepository } from '../repositories/interfaces/action-manifests-repository'
+import { MongoActionManifestsRepository } from '../repositories/mongo/mongo-action-manifests-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -91,7 +91,7 @@ export class RepositoryFacade {
     return new MongoShowStyleVariantRepository(MongoDatabase.getInstance(), new MongoEntityConverter(), this.createRundownRepository())
   }
 
-  public static createManifestRepository(): ManifestRepository {
-    return new MongoManifestRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  public static createManifestRepository(): ActionManifestsRepository {
+    return new MongoActionManifestsRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 }

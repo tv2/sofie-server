@@ -11,11 +11,11 @@ import { Part, PartInterface } from '../../model/entities/part'
 import { Piece, PieceInterface } from '../../model/entities/piece'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
-import { ManifestRepository } from '../../data-access/repositories/interfaces/manifest-repository'
+import { ActionManifestsRepository } from '../../data-access/repositories/interfaces/action-manifests-repository'
 
 export class ExecuteActionService implements ActionService {
   constructor(
-    private readonly manifestRepository: ManifestRepository,
+    private readonly manifestRepository: ActionManifestsRepository,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly actionRepository: ActionRepository,
     private readonly rundownService: RundownService,

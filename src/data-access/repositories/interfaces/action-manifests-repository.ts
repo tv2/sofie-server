@@ -1,5 +1,5 @@
 import { ActionManifest } from '../../../model/entities/action'
 
-export interface ManifestRepository {
+export interface ActionManifestsRepository {
   getActionManifests(): Promise<ActionManifest[]>
 }
