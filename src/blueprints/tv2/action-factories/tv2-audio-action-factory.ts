@@ -6,7 +6,7 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Tv2ActionContentType, Tv2AudioAction, Tv2PieceAction } from '../value-objects/tv2-action'
-import { Tv2AudioTimelineObjectFactory } from '../value-objects/factories/tv2-audio-timeline-object-factory'
+import { Tv2AudioTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 
