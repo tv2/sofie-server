@@ -368,7 +368,7 @@ export class MongoEntityConverter {
 
   public convertActionManifest(mongoActionManifest: MongoActionManifest): ActionManifest {
     return {
-      actionType: this.mapMongoActionManifestIdToPieceType(mongoActionManifest.actionId),
+      pieceType: this.mapMongoActionManifestIdToPieceType(mongoActionManifest.actionId),
       userData: mongoActionManifest.userData
     }
   }

@@ -4,7 +4,7 @@ import { Piece, PieceInterface } from './piece'
 import { PieceType } from '../enums/piece-type'
 
 export interface ActionManifest {
-  actionType: PieceType
+  pieceType: PieceType
   userData: unknown
 }
 
