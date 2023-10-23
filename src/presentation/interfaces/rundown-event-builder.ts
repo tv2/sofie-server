@@ -1,4 +1,4 @@
-import { Rundown } from '../../../model/entities/rundown'
+import { Rundown } from '../../model/entities/rundown'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
@@ -18,10 +18,10 @@ import {
   SegmentCreatedEvent,
   SegmentDeletedEvent,
   SegmentUpdatedEvent,
-} from '../../../model/value-objects/rundown-event'
-import { Piece } from '../../../model/entities/piece'
-import { Part } from '../../../model/entities/part'
-import { Segment } from '../../../model/entities/segment'
+} from '../value-objects/rundown-event'
+import { Piece } from '../../model/entities/piece'
+import { Part } from '../../model/entities/part'
+import { Segment } from '../../model/entities/segment'
 
 export interface RundownEventBuilder {
   buildActivateEvent(rundown: Rundown): RundownActivatedEvent
@@ -31,7 +31,7 @@ export interface RundownEventBuilder {
   buildSetNextEvent(rundown: Rundown): PartSetAsNextEvent
   buildPartInsertedAsOnAirEvent(rundown: Rundown, part: Part): PartInsertedAsOnAirEvent
   buildPartInsertedAsNextEvent(rundown: Rundown, part: Part): PartInsertedAsNextEvent
-  buildPieceInsertedEvent(rundown: Rundown, piece: Piece): PieceInsertedEvent
+  buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent
   buildInfiniteRundownPieceAddedEvent(rundown: Rundown, infinitePiece: Piece): RundownInfinitePieceAddedEvent
 
   buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent

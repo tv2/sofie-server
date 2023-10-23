@@ -13,7 +13,7 @@ export class ActionController extends BaseController {
     super()
   }
 
-  @GetRequest()
+  @GetRequest('/rundowns/:rundownId')
   public async getActions(_reg: Request, res: Response): Promise<void> {
     try {
       const actions: Action[] = await this.actionService.getActions()

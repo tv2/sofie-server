@@ -5,8 +5,10 @@ import { Piece, PieceInterface } from './piece'
 export interface Action {
   id: string
   name: string
+  description?: string
   type: ActionType
   data: unknown
+  metadata?: unknown
 }
 
 export interface PartAction extends Action {

@@ -21,6 +21,14 @@ export interface SisyfosChannelsTimelineObject extends TimelineObject {
   }
 }
 
+export interface SisyfosResynchronizeTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.SISYFOS;
+    type: SisyfosType.CHANNEL;
+    resync: boolean
+  }
+}
+
 export enum SisyfosType {
   CHANNEL = 'channel',
   CHANNELS = 'channels',

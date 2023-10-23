@@ -21,22 +21,37 @@ import {
   SisyfosChannelTimelineObject,
   SisyfosType
 } from '../../timeline-state-resolver-types/sisyfos-types'
-import { PartAction } from '../../../model/entities/action'
+import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
+import { Action } from '../../../model/entities/action'
 
 export class Tv2CameraActionFactory {
 
-  public createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): PartAction {
+  public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
+    return blueprintConfiguration.studio.SourcesCam
+      .slice(0, 5)
+      .flatMap(source => [
+        this.createInsertCameraAsNextAction(blueprintConfiguration, source),
+        this.createInsertCameraAsOnAirAction(blueprintConfiguration, source)
+      ])
+  }
+
+  private createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
     const partId: string = `cameraInsertActionPart_${cameraSource._id}`
     const cameraPieceInterface: PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsNextAction_${cameraSource._id}`,
-      name: `Insert Camera ${cameraSource.SourceName}`,
+      name: `KAM ${cameraSource.SourceName} PVW`,
+      description: `Insert Camera ${cameraSource.SourceName} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
-      }
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.CAMERA,
+        cameraNumber: cameraSource.SourceName,
+      },
     }
   }
 
@@ -181,23 +196,27 @@ export class Tv2CameraActionFactory {
       outTransition: {
         keepAliveDuration: 0
       },
-      expectedDuration: 0,
       disableNextInTransition: false
     }
   }
 
-  public createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): PartAction {
+  public createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
     const partId: string = `cameraInsertAndTakeActionPart_${cameraSource._id}`
     const cameraPieceInterface: PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsOnAirAction_${cameraSource._id}`,
-      name: `Insert and Take Camera ${cameraSource.SourceName}`,
+      name: `KAM ${cameraSource.SourceName}`,
+      description: `Insert and Take Camera ${cameraSource.SourceName}.`,
       type: PartActionType.INSERT_PART_AS_ON_AIR,
       data: {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
-      }
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.CAMERA,
+        cameraNumber: cameraSource.SourceName,
+      },
     }
   }
 }

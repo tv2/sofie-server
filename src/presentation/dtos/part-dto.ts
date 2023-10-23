@@ -9,10 +9,11 @@ export class PartDto {
   public readonly isOnAir: boolean
   public readonly isNext: boolean
   public readonly isUnsynced: boolean
-  public readonly expectedDuration: number
+  public readonly expectedDuration?: number
   public readonly executedAt: number
   public readonly playedDuration: number
   public readonly autoNext?: AutoNext
+  public readonly isPlanned: boolean
   public readonly pieces: PieceDto[]
 
   constructor(part: Part) {
@@ -26,6 +27,7 @@ export class PartDto {
     this.executedAt = part.getExecutedAt()
     this.playedDuration = part.getPlayedDuration()
     this.autoNext = part.autoNext
+    this.isPlanned = part.isPlanned
     this.pieces = part.getPieces().map((piece) => new PieceDto(piece))
   }
 }

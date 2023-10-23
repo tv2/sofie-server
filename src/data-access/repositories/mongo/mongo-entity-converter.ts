@@ -314,7 +314,7 @@ export class MongoEntityConverter {
       pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
       isPlanned: mongoPiece.isPlanned ?? true,
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
-      duration: mongoPiece.enable.duration,
+      duration: mongoPiece.enable.duration ?? undefined,
       preRollDuration: mongoPiece.prerollDuration,
       postRollDuration: mongoPiece.prerollDuration,
       executedAt: mongoPiece.executedAt,
