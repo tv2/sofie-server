@@ -10,7 +10,7 @@ import { Tv2GraphicsActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2GraphicsType } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PartInterface } from '../../../model/entities/part'
 import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
-import { Tv2TimelineObjectGraphicContent } from '../value-objects/tv2-content'
+import { Tv2TimelineObjectGraphicsContent } from '../value-objects/tv2-content'
 import { AtemTransition, AtemTransitionSettings } from '../../timeline-state-resolver-types/atem-types'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
 import {
@@ -23,13 +23,19 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2ActionContentType, Tv2PartAction, Tv2PieceAction } from '../value-objects/tv2-action'
+import {
+  Tv2CasparCgGraphicsTimelineObjectFactory
+} from '../timeline-object-factories/tv2-caspar-cg-graphics-timeline-object-factory'
+import { TimelineObject } from '../../../model/entities/timeline-object'
+import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
 
 export class Tv2GraphicsActionFactory {
   constructor(
     private readonly vizGraphicsTimelineObjectFactory: Tv2VizGraphicsTimelineObjectFactory,
-    // private readonly casparCgGraphicsTimelineObjectFactory: Tv2CasparCgGraphicsTimelineObjectFactory,
+    private readonly casparCgGraphicsTimelineObjectFactory: Tv2CasparCgGraphicsTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory
+    private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
+    private readonly casparCgPathFixer: Tv2CasparCgPathFixer
   ) { }
 
   public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[]): Action[] {
@@ -277,22 +283,31 @@ export class Tv2GraphicsActionFactory {
   private createVizFullGraphicsPieceContent(
     blueprintConfiguration: Tv2BlueprintConfiguration,
     manifest: Tv2GraphicsActionManifest
-  ): Tv2TimelineObjectGraphicContent {
-    const start: number = blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer
-    const input: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
-    const transition: AtemTransition = AtemTransition.CUT
-
+  ): Tv2TimelineObjectGraphicsContent {
     return {
       fileName: `PILOT_${manifest.userData.vcpid}`,
       path: manifest.userData.vcpid.toString(),
       timelineObjects: [
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition),
-        this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition),
-        this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
-        ...this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration),
-        ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration),
+        this.vizGraphicsTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, manifest),
+        ...this.createVizFullPilotTimelineObjects(blueprintConfiguration),
       ]
     }
+  }
+
+  private createVizFullPilotTimelineObjects(
+    blueprintConfiguration: Tv2BlueprintConfiguration
+  ): TimelineObject[] {
+    const start: number = blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer
+    const input: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
+    const transition: AtemTransition = AtemTransition.CUT
+
+    return [
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition),
+      this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition),
+      this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
+      ...this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration),
+      ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration)
+    ]
   }
 
   private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2GraphicsActionManifest[] ): Tv2PartAction[] {
@@ -338,7 +353,28 @@ export class Tv2GraphicsActionFactory {
     })
   }
 
-  private createCasparCgFullGraphicsPieceContent(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): Tv2TimelineObjectGraphicContent {
+  private createCasparCgFullGraphicsPieceContent(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): Tv2TimelineObjectGraphicsContent {
+    const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
+    const graphicsFolder: string = rawGraphicsFolder ? `${rawGraphicsFolder}\\` : ''
+    const sceneChunks: string[] = manifest.userData.name.split('/')
+    const sceneName: string = sceneChunks[sceneChunks.length - 1]
+    const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, rawGraphicsFolder)
+
+    return {
+      fileName,
+      path: this.casparCgPathFixer.joinAssetToNetworkPath(blueprintConfiguration.studio.GraphicNetworkBasePath, sceneName, blueprintConfiguration.studio.GraphicFileExtension, graphicsFolder),
+      mediaFlowIds: [blueprintConfiguration.studio.GraphicMediaFlowId],
+      ignoreMediaObjectStatus: blueprintConfiguration.studio.GraphicIgnoreStatus,
+      ignoreBlackFrames: true,
+      ignoreFreezeFrame: true,
+      timelineObjects: [
+        this.casparCgGraphicsTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, manifest),
+        ...this.createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration)
+      ]
+    }
+  }
+
+  private createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
     const start: number = blueprintConfiguration.studio.CasparPrerollDuration
     const input: number = -1 //Todo: find 'fill' value for Full Dsk.
     const transition: AtemTransition = AtemTransition.WIPE
@@ -351,16 +387,11 @@ export class Tv2GraphicsActionFactory {
       }
     }
 
-    return {
-      fileName: `PILOT_${manifest.userData.vcpid}`,
-      path: manifest.userData.vcpid.toString(),
-      timelineObjects: [
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition, transitionSettings),
-        this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition, transitionSettings),
-        this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
-        ...this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration),
-        ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration),
-      ]
-    }
+    return [
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition, transitionSettings),
+      this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition, transitionSettings),
+      this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
+      ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration),
+    ]
   }
 }
