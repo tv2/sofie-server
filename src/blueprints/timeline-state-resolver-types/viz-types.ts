@@ -15,6 +15,22 @@ export interface VizMseElementInternalTimelineObject extends TimelineObject {
   }
 }
 
+export interface VizMseElementPilotTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.VIZMSE
+    type: VizType.ELEMENT_PILOT
+    templateVcpId: number
+    continueStep: number
+    noAutoPreloading: boolean
+    channelName: string
+    delayTakeAfterOutTransition?: boolean
+    outTransition?: {
+      type: VizMseTransitionType.DELAY
+      delay: number
+    }
+  }
+}
+
 export interface VizMseLoadAllElementsTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZMSE
