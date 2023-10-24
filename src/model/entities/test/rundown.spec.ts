@@ -10,6 +10,8 @@ import { NotFoundException } from '../../exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
 import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
 import { AlreadyActivatedException } from '../../exceptions/already-activated-exception'
+import { ActivePartException } from '../../exceptions/active-part-exception'
+import { TestEntityFactory } from './test-entity-factory'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -2215,10 +2217,12 @@ describe(Rundown.name, () => {
     it('resets next part right before changing next cursor', () => {
       const mockedNextPart: Part = EntityMockFactory.createPartMock({ isNext: true })
       const nextPart: Part = instance(mockedNextPart)
-      const nextSegment: Segment = EntityMockFactory.createSegment({ isNext: true, parts: [nextPart] })
-      const activePart: Part = EntityMockFactory.createPart({ isOnAir: true })
-      const otherPartInActiveSegment: Part = EntityMockFactory.createPart()
-      const activeSegment: Segment = EntityMockFactory.createSegment({ isOnAir: true, parts: [activePart, otherPartInActiveSegment] })
+      const nextSegment: Segment = EntityMockFactory.createSegment({ id: 'next-segment-id', isNext: true, parts: [nextPart] })
+      const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+      const otherPartInActiveSegment: Part = EntityMockFactory.createPart({ id: 'other-part-in-active-segment-id' })
+      const mockedActiveSegment: Segment = EntityMockFactory.createSegmentMock({ id: 'active-segment-id', isOnAir: true, parts: [activePart, otherPartInActiveSegment] })
+      when(mockedActiveSegment.findPart(otherPartInActiveSegment.id)).thenReturn(otherPartInActiveSegment)
+      const activeSegment: Segment = instance(mockedActiveSegment)
       const testee: Rundown = new Rundown({
         isRundownActive: true,
         alreadyActiveProperties: {
@@ -2228,11 +2232,43 @@ describe(Rundown.name, () => {
           nextPart: instance(mockedNextPart),
           infinitePieces: new Map(),
         },
+        segments: [
+          activeSegment,
+          nextSegment,
+        ],
       } as RundownInterface)
 
       testee.setNext(activeSegment.id, otherPartInActiveSegment.id)
 
       verify(mockedNextPart.reset()).once()
+    })
+
+    describe('when next part is on air', () => {
+      it('throws an active part exception', () => {
+        const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+        const mockedActiveSegment: Segment = EntityMockFactory.createSegmentMock({ id: 'active-segment-id', parts: [activePart] })
+        when(mockedActiveSegment.findPart(activePart.id)).thenReturn(activePart)
+        const activeSegment: Segment = instance(mockedActiveSegment)
+        const nextPart: Part = TestEntityFactory.createPart({ id: 'next-part-id', isNext: true })
+        const nextSegment: Segment = TestEntityFactory.createSegment({ id: 'next-segment-id', isNext: true, parts: [nextPart]})
+        const rundown: Rundown = new Rundown({
+          isRundownActive: true,
+          alreadyActiveProperties: {
+            activeSegment,
+            activePart,
+            nextSegment,
+            nextPart,
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment,
+          ],
+        } as RundownInterface)
+
+        const result: () => void = () => rundown.setNext(activeSegment.id, activePart.id)
+
+        expect(result).toThrow(ActivePartException)
+      })
     })
   })
 })
