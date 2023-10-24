@@ -24,11 +24,16 @@ import { Tv2AudioTimelineObjectFactory } from './timeline-object-factories/inter
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
+import { Tv2CasparCgPathFixer } from './helpers/tv2-caspar-cg-path-fixer'
+import {
+  Tv2CasparCgGraphicsTimelineObjectFactory
+} from './timeline-object-factories/tv2-caspar-cg-graphics-timeline-object-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
     const audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
     const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
+    const casparCgPathFixer: Tv2CasparCgPathFixer = new Tv2CasparCgPathFixer()
 
     return new Tv2Blueprint(
       new Tv2EndStateForPartService(new Tv2SisyfosPersistentLayerFinder()),
@@ -39,9 +44,10 @@ export class Tv2BlueprintsFacade {
         new Tv2AudioActionFactory(audioTimelineObjectFactory),
         new Tv2GraphicsActionFactory(
           new Tv2VizGraphicsTimelineObjectFactory(),
-          //new Tv2CasparCgGraphicsTimelineObjectFactory(),
+          new Tv2CasparCgGraphicsTimelineObjectFactory(casparCgPathFixer),
           audioTimelineObjectFactory,
-          videoMixerTimelineObjectFactory
+          videoMixerTimelineObjectFactory,
+          casparCgPathFixer
         ),
         new Tv2VideoMixerConfigurationActionFactory(videoMixerTimelineObjectFactory)
       )
