@@ -1,12 +1,13 @@
 import * as mongodb from 'mongodb'
 import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
+import { MongoId } from './mongo-entity-converter'
 
 // TODO: Move to ENV variables
 const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
 const MONGO_DB_NAME: string = 'meteor'
 
-export class MongoDatabase {
+export class MongoDatabase<T extends MongoId = MongoId> {
   private static instance: MongoDatabase
 
   public static getInstance(): MongoDatabase {
@@ -19,9 +20,11 @@ export class MongoDatabase {
   private client: mongodb.MongoClient
   private db: mongodb.Db
 
+  private readonly onConnectCallbacks: Map<string, () => void> = new Map()
+
   private constructor() {
     this.connectToDatabase()
-      .catch(() => console.error('Failed connecting to mongo database.'))
+      .catch((reason) => console.error('Failed connecting to mongo database.', reason))
   }
 
   private async connectToDatabase(): Promise<void> {
@@ -35,11 +38,13 @@ export class MongoDatabase {
 
     this.db = this.client.db(MONGO_DB_NAME)
     console.log(`### Connected to database: ${this.db.databaseName}`)
+
+    this.onConnectCallbacks.forEach(callback => callback())
   }
 
-  public getCollection(collectionName: string): Collection {
+  public getCollection(collectionName: string): Collection<T> {
     this.assertDatabaseConnection()
-    return this.db.collection(collectionName)
+    return this.db.collection<T>(collectionName)
   }
 
   private assertDatabaseConnection(): void {
@@ -50,5 +55,9 @@ export class MongoDatabase {
 
   public getDatabaseName(): string {
     return MONGO_DB_NAME
+  }
+
+  public onConnect(callbackIdentifier: string, callback: () => void): void {
+    this.onConnectCallbacks.set(callbackIdentifier, callback)
   }
 }

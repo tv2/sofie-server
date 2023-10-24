@@ -24,16 +24,23 @@ import { ShowStyleVariantRepository } from '../repositories/interfaces/show-styl
 import { MongoShowStyleVariantRepository } from '../repositories/mongo/mongo-show-style-variant-repository'
 import { ActionRepository } from '../repositories/interfaces/action-repository'
 import { MongoActionRepository } from '../repositories/mongo/mongo-action-repository'
+import { DataChangedListener } from '../repositories/interfaces/data-changed-listener'
+import { MongoSegmentChangedListener } from '../repositories/mongo/mongo-segment-changed-listener'
+import { MongoPartChangedListener } from '../repositories/mongo/mongo-part-changed-listener'
+import { Segment } from '../../model/entities/segment'
+import { Part } from '../../model/entities/part'
+import { Rundown } from '../../model/entities/rundown'
+import { MongoRundownChangedListener } from '../repositories/mongo/mongo-rundown-changed-listener'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
     const mongoRundownRepository: RundownRepository = new MongoRundownRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
-      this.createRundownBaselineRepository(),
-      this.createSegmentRepository()
+      RepositoryFacade.createRundownBaselineRepository(),
+      RepositoryFacade.createSegmentRepository(),
+      RepositoryFacade.createPieceRepository()
     )
-
     return CachedRundownRepository.getInstance(mongoRundownRepository)
   }
 
@@ -41,11 +48,27 @@ export class RepositoryFacade {
     return new MongoRundownBaselineRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 
+  public static createRundownChangeListener(): DataChangedListener<Rundown> {
+    return new MongoRundownChangedListener(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter(),
+      RepositoryFacade.createRundownRepository()
+    )
+  }
+
   public static createSegmentRepository(): SegmentRepository {
     return new MongoSegmentRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
-      this.createPartRepository()
+      RepositoryFacade.createPartRepository()
+    )
+  }
+
+  public static createSegmentChangedListener(): DataChangedListener<Segment> {
+    return new MongoSegmentChangedListener(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter(),
+      RepositoryFacade.createSegmentRepository()
     )
   }
 
@@ -53,7 +76,15 @@ export class RepositoryFacade {
     return new MongoPartRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
-      this.createPieceRepository()
+      RepositoryFacade.createPieceRepository()
+    )
+  }
+
+  public static createPartChangedListener(): DataChangedListener<Part> {
+    return new MongoPartChangedListener(
+      MongoDatabase.getInstance(),
+      new MongoEntityConverter(),
+      RepositoryFacade.createPartRepository()
     )
   }
 
@@ -67,8 +98,8 @@ export class RepositoryFacade {
 
   public static createConfigurationRepository(): ConfigurationRepository {
     const configurationRepository: ConfigurationRepository = new MongoConfigurationRepository(
-      this.createStudioRepository(),
-      this.createShowStyleRepository()
+      RepositoryFacade.createStudioRepository(),
+      RepositoryFacade.createShowStyleRepository()
     )
     return CachedConfigurationRepository.getInstance(configurationRepository)
   }

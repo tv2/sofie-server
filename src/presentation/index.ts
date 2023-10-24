@@ -3,6 +3,7 @@ import express, { Express, Router } from 'express'
 import { BaseController } from './controllers/base-controller'
 import { ControllerFacade } from './facades/controller-facade'
 import { RundownEventServerFacade } from './facades/rundown-event-server-facade'
+import { ServiceFacade } from '../business-logic/facades/service-facade'
 
 export * from './controllers/rundown-controller'
 
@@ -40,21 +41,12 @@ class SofieServer {
   }
 }
 
-/**
- * Connect our Express instance to the same port as Meteor is running.
- */
-// function attachExpressServerToMeteor() {
-// 	WebApp.connectHandlers.use(new SofieServer().server)
-// }
-
 function startSofieServer(): void {
   attachExpressServerToPort(REST_API_PORT)
   startRundownEventServer()
+  startSystemServices()
 }
 
-/**
- * Connect to our Express instance without using Meteor
- */
 function attachExpressServerToPort(port: number): void {
   new SofieServer().server.listen(port, () => {
     return console.log(`### Express is listening at http://localhost:${port}`)
@@ -63,6 +55,10 @@ function attachExpressServerToPort(port: number): void {
 
 function startRundownEventServer(): void {
   RundownEventServerFacade.createRundownEventServer().startServer(RUNDOWN_EVENT_SERVER_PORT)
+}
+
+function startSystemServices(): void {
+  ServiceFacade.createIngestService()
 }
 
 startSofieServer()
