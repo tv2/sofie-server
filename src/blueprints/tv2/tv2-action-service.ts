@@ -13,6 +13,7 @@ import {
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { Tv2ActionManifestData, Tv2VideoClipData } from './value-objects/tv2-video-clip-data'
 import { PieceType } from '../../model/enums/piece-type'
+import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
@@ -23,7 +24,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
     private readonly serverActionFactory: Tv2VideoClipActionFactory,
-    private readonly videoSwitcherActionFactory: Tv2VideoMixerConfigurationActionFactory
+    private readonly videoSwitcherActionFactory: Tv2VideoMixerConfigurationActionFactory,
+    private readonly dveActionFactory: Tv2DveActionFactory
   ) {}
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
@@ -47,7 +49,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.transitionActionFactory.createTransitionActions(),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
       ...this.serverActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
-      ...this.videoSwitcherActionFactory.createVideoMixerActions(blueprintConfiguration)
+      ...this.videoSwitcherActionFactory.createVideoMixerActions(blueprintConfiguration),
+      ...this.dveActionFactory.createDveActions(blueprintConfiguration)
     ]
   }
 

@@ -12,6 +12,17 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
     length?: number
     playing?: boolean
     noStarttime?: boolean // The typo is used by TSR... :(
+    mixer?: {
+      keyer?: boolean
+    }
+  }
+}
+
+export interface CasparCgTemplateTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.CASPAR_CG,
+    type: CasparCgType.TEMPLATE
+    // TODO: When CasparCgTimelineObjectFactory is implemented
   }
 }
 

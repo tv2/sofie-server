@@ -42,7 +42,7 @@ export class Tv2BlueprintConfigurationMapper {
       graphicsDefault: this.mapGraphicsDefault(coreConfiguration.GfxDefaults),
       graphicsSetups: this.mapGraphicsSetups(coreConfiguration.GfxSetups),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
-      dveConfigs: this.mapDveConfigurations(coreConfiguration.DVEStyles)
+      dveConfigurations: this.mapDveConfigurations(coreConfiguration.DVEStyles)
     }
   }
 
@@ -82,11 +82,11 @@ export class Tv2BlueprintConfigurationMapper {
 
   private mapDveConfigurations(coreDveStyles: CoreDveStyle[]): DveConfiguration[] {
     return coreDveStyles.map(dveStyle => {
-      return{
+      return {
         id: dveStyle._id,
         name: dveStyle.DVEName,
         inputs: dveStyle.DVEInputs,
-        json: dveStyle.DVEJSON,
+        layoutProperties: JSON.parse(dveStyle.DVEJSON),
         graphicsTemplateJson: dveStyle.DVEGraphicsTemplateJSON,
         key: dveStyle.DVEGraphicsKey,
         frame: dveStyle.DVEGraphicsFrame
