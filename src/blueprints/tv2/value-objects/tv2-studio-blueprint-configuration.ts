@@ -10,6 +10,11 @@ export interface Tv2StudioBlueprintConfiguration {
   HTMLGraphics: Tv2HtmlGraphics
   CasparPrerollDuration: number
   PreventOverlayWithFull: boolean
+  GraphicFolder?: string
+  GraphicFileExtension: string
+  GraphicMediaFlowId: string
+  GraphicIgnoreStatus: boolean
+  GraphicNetworkBasePath: string
 }
 
 export enum Tv2GraphicsType {
@@ -27,6 +32,7 @@ export interface Tv2VizGraphics {
 
 export interface Tv2HtmlGraphics {
   KeepAliveDuration: number
+  GraphicURL: string
   TransitionSettings: {
     wipeRate: number,
     borderSoftness: number
