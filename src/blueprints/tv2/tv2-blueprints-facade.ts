@@ -28,6 +28,7 @@ import {
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
+import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 
 export class Tv2BlueprintsFacade {
@@ -47,7 +48,8 @@ export class Tv2BlueprintsFacade {
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory
       ),
-      new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory)
+      new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory),
+      new Tv2DveActionFactory(tv2VideoMixerTimelineObjectFactory)
     )
 
     return new Tv2Blueprint(
