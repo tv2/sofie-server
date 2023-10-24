@@ -28,6 +28,7 @@ import {
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
+import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -36,20 +37,23 @@ export class Tv2BlueprintsFacade {
     const tv2GraphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = new Tv2VizGraphicsTimelineObjectFactory()
     const tv2VideoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
 
+    const actionService: Tv2ActionService = new Tv2ActionService(
+      new Tv2BlueprintConfigurationMapper(),
+      new Tv2CameraActionFactory(tv2AudioTimelineObjectFactory),
+      new Tv2TransitionActionFactory(),
+      new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory),
+      new Tv2GraphicsActionFactory(tv2GraphicsTimelineObjectFactory),
+      new Tv2VideoClipActionFactory(
+        tv2VideoMixerTimelineObjectFactory,
+        tv2AudioTimelineObjectFactory
+      ),
+      new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory)
+    )
+
     return new Tv2Blueprint(
       new Tv2EndStateForPartService(tv2SisyfosPersistentLayerFinder),
       new Tv2OnTimelineGenerateService(tv2SisyfosPersistentLayerFinder),
-      new Tv2ActionService(
-        new Tv2CameraActionFactory(tv2AudioTimelineObjectFactory),
-        new Tv2TransitionActionFactory(),
-        new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory),
-        new Tv2GraphicsActionFactory(tv2GraphicsTimelineObjectFactory),
-        new Tv2VideoClipActionFactory(
-          tv2VideoMixerTimelineObjectFactory,
-          tv2AudioTimelineObjectFactory
-        ),
-        new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory)
-      )
+      actionService
     )
   }
 }
