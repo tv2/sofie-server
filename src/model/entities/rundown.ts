@@ -15,6 +15,7 @@ import { TimelineObject } from './timeline-object'
 import { LastPartInRundownException } from '../exceptions/last-part-in-rundown-exception'
 import { RundownPersistentState } from '../value-objects/rundown-persistent-state'
 import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { ActivePartException } from '../exceptions/active-part-exception'
 
 export interface RundownInterface {
   id: string
@@ -415,14 +416,23 @@ export class Rundown extends BasicRundown {
 
   public setNext(segmentId: string, partId: string): void {
     this.assertActive(this.setNext.name)
-    if (!this.nextSegment || this.nextSegment.id !== segmentId) {
+    const isMovingNextCursorToOtherSegment: boolean = this.nextSegment?.id !== segmentId
+    const nextSegment: Segment = isMovingNextCursorToOtherSegment ? this.findSegment(segmentId) : this.nextSegment
+    const nextPart: Part = nextSegment.findPart(partId)
+
+    if (nextPart.isOnAir()) {
+      throw new ActivePartException('Can\'t set active part as next.')
+    }
+
+    if (isMovingNextCursorToOtherSegment) {
       this.unmarkNextSegment()
-      this.nextSegment = this.findSegment(segmentId)
+      this.nextSegment = nextSegment
       this.markNextSegment()
     }
+
     this.nextPart?.reset()
     this.unmarkNextPart()
-    this.nextPart = this.nextSegment.findPart(partId)
+    this.nextPart = nextPart
     this.markNextPart()
   }
 
