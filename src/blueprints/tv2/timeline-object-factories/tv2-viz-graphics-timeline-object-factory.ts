@@ -4,6 +4,7 @@ import {
   VizMseClearGraphicsTimelineObjectContent,
   VizMseContinueTimelineObject,
   VizMseElementInternalTimelineObject,
+  VizMseElementPilotTimelineObject,
   VizMseLoadAllElementsTimelineObject,
   VizMseTransitionType,
   VizType
@@ -114,7 +115,7 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
     }
   }
 
-  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): TimelineObject {
+  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): VizMseElementPilotTimelineObject {
     return {
       id: '',
       enable: {
@@ -122,23 +123,24 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
       },
       priority: 1,
       layer: this.getLayerNameFromGraphicTarget(Tv2GraphicsTarget.FULL),
-      content: this.createFullGraphicTimelineObjectContent(blueprintConfiguration, manifest)
+      content: {
+        deviceType: DeviceType.VIZMSE,
+        type: VizType.ELEMENT_PILOT,
+        templateVcpId: manifest.userData.vcpid,
+        continueStep: -1,
+        noAutoPreloading: false,
+        channelName: this.getChannelNameFromGraphicTarget(Tv2GraphicsTarget.FULL),
+        ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
+      }
     }
   }
 
-  protected createFullGraphicTimelineObjectContent(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): object { // Todo: find/create proper return type.
-    return {
-      deviceType: DeviceType.VIZMSE,
-      type: VizType.ELEMENT_PILOT,
-      templateVcpId: manifest.userData.vcpid,
-      continueStep: -1,
-      noAutoPreloading: false,
-      channelName: this.getChannelNameFromGraphicTarget(Tv2GraphicsTarget.FULL),
-      ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
-    }
-  }
-
-  private getFullGraphicOutTransitionProperties(blueprintConfiguration: Tv2BlueprintConfiguration): object {
+  private getFullGraphicOutTransitionProperties(
+    blueprintConfiguration: Tv2BlueprintConfiguration
+  ): {
+      delayTakeAfterOutTransition?: boolean
+      outTransition?: VizMseElementPilotTimelineObject['content']['outTransition']
+    } {
     if (!blueprintConfiguration.studio.PreventOverlayWithFull) {
       return {}
     }
