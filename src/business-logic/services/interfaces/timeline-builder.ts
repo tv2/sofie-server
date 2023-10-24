@@ -4,5 +4,5 @@ import { Studio } from '../../../model/entities/studio'
 
 export interface TimelineBuilder {
   getBaseTimeline(): Timeline
-  buildTimeline(rundown: Rundown, studio: Studio): Timeline
+  buildTimeline(rundown: Rundown, studio?: Studio): Promise<Timeline>
 }

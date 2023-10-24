@@ -6,6 +6,8 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { PartRepository } from '../interfaces/part-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { DeleteResult } from 'mongodb'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { Part } from '../../../model/entities/part'
 
 const SEGMENT_COLLECTION_NAME: string = 'segments'
 
@@ -22,10 +24,24 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
     return SEGMENT_COLLECTION_NAME
   }
 
-  public async getSegments(rundownId: string): Promise<Segment[]> {
+  public async getSegment(segmentId: string): Promise<Segment> {
+    this.assertDatabaseConnection(this.getSegment.name)
+    const mongoSegment: MongoSegment | null = await this.getCollection().findOne<MongoSegment>({
+      _id: segmentId
+    })
+    if (!mongoSegment) {
+      throw new NotFoundException(`No Segment found for segmentId: ${segmentId}`)
+    }
+    const segment: Segment = this.mongoEntityConverter.convertSegment(mongoSegment)
+    const parts: Part[] = await this.partRepository.getParts(segment.id)
+    segment.setParts(parts)
+    return segment
+  }
+
+  public async getSegments(rundownId: string, filters?: Partial<MongoSegment>): Promise<Segment[]> {
     this.assertDatabaseConnection(this.getSegments.name)
     const mongoSegments: MongoSegment[] = (await this.getCollection()
-      .find<MongoSegment>({ rundownId: rundownId })
+      .find<MongoSegment>({ ...filters, rundownId: rundownId })
       .toArray())
     const segments: Segment[] = this.mongoEntityConverter.convertSegments(mongoSegments)
     return Promise.all(
@@ -38,10 +54,12 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
 
   public async saveSegment(segment: Segment): Promise<void> {
     const mongoSegment: MongoSegment = this.mongoEntityConverter.convertToMongoSegment(segment)
-    await this.getCollection().updateOne({ _id: segment.id }, { $set: mongoSegment })
-    for (const part of segment.getParts()) {
-      await this.partRepository.savePart(part)
-    }
+    await this.getCollection().updateOne(
+      { _id: mongoSegment._id },
+      { $set: mongoSegment },
+      { upsert: segment.isUnsynced() }
+    )
+    await Promise.all(segment.getParts().map(part => this.partRepository.savePart(part)))
   }
 
   public async deleteSegmentsForRundown(rundownId: string): Promise<void> {
@@ -53,7 +71,32 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
     const segmentDeleteResult: DeleteResult = await this.getCollection().deleteMany({ rundownId: rundownId })
 
     if (!segmentDeleteResult.acknowledged) {
-      throw new DeletionFailedException(`Deletion of segments was not acknowledged, for rundownId: ${rundownId}`)
+      throw new DeletionFailedException(`Failed to delete Segments for Rundown: ${rundownId}`)
     }
+  }
+
+  public async deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deleteUnsyncedSegmentsForRundown.name)
+    const unsyncedFilter: Partial<MongoSegment> = { isUnsynced: true }
+    const segments: Segment[] = await this.getSegments(rundownId, unsyncedFilter)
+
+    await Promise.all(segments.map(async (segment) => this.partRepository.deletePartsForSegment(segment.id)))
+
+    const segmentDeleteResult: DeleteResult = await this.getCollection().deleteMany({ ...unsyncedFilter, rundownId: rundownId })
+
+    if (!segmentDeleteResult.acknowledged) {
+      throw new DeletionFailedException(`Failed to delete Segments for Rundown: ${rundownId}`)
+    }
+  }
+
+  /*
+  * NOTE: This will delete ALL unsynced Segments in the database. Should only be used on deactivate or activate Rundown.
+  * NOTE: This will NOT delete the associated Parts.
+  */
+  public async deleteAllUnsyncedSegments(): Promise<void> {
+    this.assertDatabaseConnection(this.deleteAllUnsyncedSegments.name)
+    await this.getCollection().deleteMany({
+      isUnsynced: true
+    })
   }
 }
