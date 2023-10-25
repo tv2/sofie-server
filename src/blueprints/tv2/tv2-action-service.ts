@@ -35,6 +35,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.serverActionFactory.isVideoClipAction(action)) {
       return this.serverActionFactory.getMutateActionMethods(action)
     }
+    if (this.dveActionFactory.isDveAction(action)) {
+      return this.dveActionFactory.getMutateActionMethods(action)
+    }
   }
 
   public generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[] {

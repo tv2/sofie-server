@@ -9,6 +9,8 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): TimelineObject
   createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): TimelineObject
   createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): TimelineObject
-  createDveBoxesTimelineObject(boxes: DveBoxProperties[]): TimelineObject
+  createDveBoxesTimelineObject(boxes: DveBoxProperties[], priority?: number): TimelineObject
   createDvePropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, layoutProperties: DveLayoutProperties): TimelineObject
+
+  getDveBoxesLayer(): string
 }

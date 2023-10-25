@@ -1,5 +1,6 @@
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { DeviceType } from '../../../model/enums/device-type'
+import { DveBoxProperties } from './tv2-show-style-blueprint-configuration'
 
 export interface Tv2SisyfosPersistenceMetadata {
   /**
@@ -26,6 +27,7 @@ export interface Tv2SisyfosPersistenceMetadata {
 
 export interface Tv2PieceMetadata {
   sisyfosPersistMetaData?: Tv2SisyfosPersistenceMetadata // Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
+  dveBoxes?: DveBoxProperties[]
 }
 
 export interface Tv2BlueprintTimelineObject extends TimelineObject {
