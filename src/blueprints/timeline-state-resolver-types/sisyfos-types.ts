@@ -13,12 +13,14 @@ export interface SisyfosChannelsTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.SISYFOS;
     type: SisyfosType.CHANNELS;
-    channels: ({
-      /** The mapping layer to look up the channel from */
-      mappedLayer: string;
-    } & SisyfosChannelOptions)[];
+    channels: SisyfosChannel[];
     overridePriority?: number;
   }
+}
+
+export interface SisyfosChannel extends SisyfosChannelOptions {
+  /** The mapping layer to look up the channel from */
+  mappedLayer: string
 }
 
 export interface SisyfosResynchronizeTimelineObject extends TimelineObject {
