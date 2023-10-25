@@ -1,4 +1,3 @@
-import { PieceType } from '../enums/piece-type'
 import { TimelineObject } from './timeline-object'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { TransitionType } from '../enums/transition-type'
@@ -9,7 +8,7 @@ export interface PieceInterface {
   partId: string
   name: string
   layer: string
-  type: PieceType
+  outputLayer: string
   pieceLifespan: PieceLifespan
   isPlanned: boolean
   start: number
@@ -28,7 +27,7 @@ export class Piece {
   public readonly id: string
   public name: string
   public layer: string
-  public type: PieceType
+  public outputLayer: string
   public pieceLifespan: PieceLifespan
   public isPlanned: boolean = true
   public duration: number
@@ -50,7 +49,7 @@ export class Piece {
     this.partId = piece.partId
     this.name = piece.name
     this.layer = piece.layer
-    this.type = piece.type
+    this.outputLayer = piece.outputLayer
     this.pieceLifespan = piece.pieceLifespan
     this.isPlanned = piece.isPlanned
     this.start = piece.start

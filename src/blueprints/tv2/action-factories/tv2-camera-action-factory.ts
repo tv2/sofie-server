@@ -5,7 +5,6 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2AtemLayer, Tv2SisyfosLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -23,6 +22,7 @@ import {
 } from '../../timeline-state-resolver-types/sisyfos-types'
 import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
 import { Action } from '../../../model/entities/action'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 export class Tv2CameraActionFactory {
 
@@ -72,7 +72,7 @@ export class Tv2CameraActionFactory {
       id: `cameraAction_${source._id}`,
       partId: parentPartId,
       name: `KAM ${source.SourceName}`,
-      type: PieceType.CAMERA,
+      outputLayer: Tv2OutputLayer.PROGRAM,
       layer: Tv2SourceLayer.CAMERA,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,

@@ -7,7 +7,7 @@ export class PieceDto {
   public readonly start: number
   public readonly duration: number
   public readonly layer: string
-  public readonly type: string
+  public readonly outputLayer: string
   public readonly isPlanned: boolean
 
   constructor(piece: Piece) {
@@ -17,7 +17,7 @@ export class PieceDto {
     this.start = piece.getStart()
     this.duration = piece.duration
     this.layer = piece.layer
-    this.type = piece.type
+    this.outputLayer = piece.outputLayer
     this.isPlanned = piece.isPlanned
   }
 }

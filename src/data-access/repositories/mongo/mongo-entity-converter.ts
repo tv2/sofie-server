@@ -2,7 +2,6 @@ import { Rundown } from '../../../model/entities/rundown'
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Timeline } from '../../../model/entities/timeline'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { TimelineObject } from '../../../model/entities/timeline-object'
@@ -62,6 +61,7 @@ export interface MongoPiece {
   startPartId: string
   name: string
   sourceLayerId: string
+  outputLayerId: string
   enable: {
     start: number | string
     duration: number
@@ -228,7 +228,7 @@ export class MongoEntityConverter {
       partId: mongoPiece.startPartId,
       name: mongoPiece.name,
       layer: mongoPiece.sourceLayerId,
-      type: PieceType.UNKNOWN,
+      outputLayer: mongoPiece.outputLayerId,
       pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
       isPlanned: mongoPiece.isPlanned ?? true,
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,

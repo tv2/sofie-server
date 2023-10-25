@@ -5,10 +5,10 @@ import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-config
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 export class Tv2VideoMixerConfigurationActionFactory {
   constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
@@ -52,8 +52,8 @@ export class Tv2VideoMixerConfigurationActionFactory {
     return {
       duration: 0,
       partId: '',
-      type: PieceType.UNKNOWN,
       layer: Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
+      outputLayer: Tv2OutputLayer.SECONDARY,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: false,

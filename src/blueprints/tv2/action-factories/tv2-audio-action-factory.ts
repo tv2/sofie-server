@@ -1,6 +1,5 @@
 import { Action } from '../../../model/entities/action'
 import { PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -9,6 +8,7 @@ import { Tv2ActionContentType, Tv2AudioAction, Tv2PieceAction } from '../value-o
 import { Tv2AudioTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 
 export class Tv2AudioActionFactory {
@@ -74,7 +74,7 @@ export class Tv2AudioActionFactory {
     return {
       duration: 0,
       partId: '',
-      type: PieceType.AUDIO,
+      outputLayer: Tv2OutputLayer.SECONDARY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       layer: Tv2SourceLayer.AUDIO_ACTION_COMMAND,
