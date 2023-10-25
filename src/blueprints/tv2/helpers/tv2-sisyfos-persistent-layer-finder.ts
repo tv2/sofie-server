@@ -54,10 +54,9 @@ export class Tv2SisyfosPersistentLayerFinder {
 
   private isPiecePlaying(piece: Piece, partExecutedAt: number, time: number): boolean{
     const hasPieceStoppedPlaying: boolean = piece.duration
-      ? (piece.duration > 0 && piece.getStart() + piece.duration + partExecutedAt <= time)
+      ? piece.getStart() + piece.duration + partExecutedAt <= time
       : false
     return !hasPieceStoppedPlaying
-
   }
 
   public findLayersToPersistForPieceMetadata(lastPlayingPieceMetadata: Tv2SisyfosPersistenceMetadata, layersWantingToPersistFromPreviousPart: string[]): string[] {
