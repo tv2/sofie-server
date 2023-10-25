@@ -2818,9 +2818,7 @@ describe(Rundown.name, () => {
     describe('when next part is on air', () => {
       it('throws an active part exception', () => {
         const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
-        const mockedActiveSegment: Segment = EntityMockFactory.createSegmentMock({ id: 'active-segment-id', parts: [activePart] })
-        when(mockedActiveSegment.findPart(activePart.id)).thenReturn(activePart)
-        const activeSegment: Segment = instance(mockedActiveSegment)
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
         const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true })
         const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', isNext: true, parts: [nextPart]})
         const rundown: Rundown = new Rundown({
