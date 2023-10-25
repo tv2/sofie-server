@@ -7,7 +7,11 @@ import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { Tv2GraphicsActionManifest } from '../value-objects/tv2-action-manifest'
-import { Tv2GraphicsType } from '../value-objects/tv2-studio-blueprint-configuration'
+import {
+  Tv2DownstreamKeyer,
+  Tv2DownstreamKeyerRole,
+  Tv2GraphicsType
+} from '../value-objects/tv2-studio-blueprint-configuration'
 import { PartInterface } from '../../../model/entities/part'
 import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
 import { Tv2TimelineObjectGraphicsContent } from '../value-objects/tv2-content'
@@ -250,7 +254,10 @@ export class Tv2GraphicsActionFactory {
   }
 
   private getGraphicTargetAsCamelString(target: Tv2GraphicsTarget): string {
-    return target.toString().charAt(0) + target.toString().substring(1).toLowerCase()
+    return target.toString()
+      .split('_')
+      .map(fragment => fragment.charAt(0).toUpperCase() + fragment.substring(1).toLowerCase())
+      .join('_')
   }
 
   private findInfiniteModeFromConfig(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): PieceLifespan {
@@ -305,7 +312,11 @@ export class Tv2GraphicsActionFactory {
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition),
       this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition),
       this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
-      ...this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration),
+      this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObject(blueprintConfiguration),
+      this.videoMixerTimelineObjectFactory.createUpstreamKeyerFullPilotTimelineObject(
+        blueprintConfiguration,
+        blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration
+      ),
       this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration)
     ]
   }
@@ -376,7 +387,7 @@ export class Tv2GraphicsActionFactory {
 
   private createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
     const start: number = blueprintConfiguration.studio.CasparPrerollDuration
-    const input: number = -1 //Todo: find 'fill' value for Full Dsk.
+    const input: number = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).Fill
     const transition: AtemTransition = AtemTransition.WIPE
     const transitionSettings: AtemTransitionSettings = {
       wipe: {
@@ -393,5 +404,12 @@ export class Tv2GraphicsActionFactory {
       this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
       this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration),
     ]
+  }
+
+  // Todo: merge usage with copy in 'Tv2AtemVideoMixerTimelineObjectFactory'
+  private getDownstreamkeyerMatchingRole(blueprintConfiguration: Tv2BlueprintConfiguration, role: Tv2DownstreamKeyerRole): Tv2DownstreamKeyer {
+    return blueprintConfiguration.studio.SwitcherSource.DSK.find(
+      downstreamKeyer => downstreamKeyer.Roles.some(
+        keyerRole => keyerRole === role)) ?? blueprintConfiguration.studio.SwitcherSource.DSK[0]
   }
 }

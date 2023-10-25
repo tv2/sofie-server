@@ -24,7 +24,8 @@ export enum Tv2AtemLayer {
   PROGRAM = 'atem_me_program',
   CLEAN = 'atem_me_clean',
   LOOKAHEAD = 'atem_aux_lookahead',
-  DOWNSTREAM_KEYER = 'atem_dsk'
+  DOWNSTREAM_KEYER = 'atem_dsk',
+  CLEAN_USK_FULL = 'atem_clean_usk_full'
 }
 
 export enum Tv2CasparCgLayer {

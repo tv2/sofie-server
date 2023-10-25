@@ -45,6 +45,30 @@ export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
   }
 }
 
+export interface AtemMeUpstreamKeyersTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.ATEM,
+    type: AtemType.ME,
+    me: {
+      upstreamKeyers: AtemUpstreamKeyer[]
+    }
+  }
+}
+
+export interface AtemUpstreamKeyer {
+  upstreamKeyerId: number,
+  onAir: boolean,
+  mixEffectKeyType: number,
+  flyEnabled: boolean,
+  fillSource: number,
+  cutSource: number,
+  maskEnabled: boolean,
+  lumaSettings: {
+    clip: number,
+    gain: number,
+  }
+}
+
 // Taken from TSR, so we must have the same values. // TODO: Find a better way to get the types from TSR
 export enum AtemType {
   ME = 'me',

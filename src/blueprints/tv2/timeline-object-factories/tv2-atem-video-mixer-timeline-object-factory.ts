@@ -1,16 +1,16 @@
 import { Tv2VideoMixerTimelineObjectFactory } from './interfaces/tv2-video-mixer-timeline-object-factory'
-import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
 import {
   AtemAuxTimelineObject,
   AtemDownstreamKeyerTimelineObject,
   AtemMeTimelineObject,
+  AtemMeUpstreamKeyersTimelineObject,
   AtemTransitionSettings,
   AtemType
 } from '../../timeline-state-resolver-types/atem-types'
 import { Tv2AtemLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { TimelineObject } from '../../../model/entities/timeline-object'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
@@ -21,7 +21,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         while: 1
       },
       priority: 10,
-      layer: `${this.getDownstreamKeyerLayerPrefix()}_${downstreamKeyerNumber}`,
+      layer: `${Tv2AtemLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.DSK,
@@ -50,13 +50,76 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return percentage * 10
   }
 
-  private getDownstreamKeyerLayerPrefix(): string {
-    return Tv2AtemLayer.DOWNSTREAM_KEYER
+  // Todo: merge duplicate parts for this and 'createDownstreamKeyerTimelineObject'
+  public createDownstreamKeyerFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): AtemDownstreamKeyerTimelineObject {
+    const downstreamKeyer = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
+    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
+    return {
+      id: '',
+      enable: {
+        start: 0
+      },
+      priority: 0,
+      layer: `${Tv2AtemLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.DSK,
+        dsk: {
+          onAir: true,
+          sources: {
+            fillSource: downstreamKeyer.Fill,
+            cutSource: downstreamKeyer.Key
+          },
+          properties: {
+            clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Clip),
+            gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Gain),
+            mask: {
+              enable: false
+            }
+          }
+        }
+      }
+    }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createDownstreamKeyerFullPilotTimelineObjects(_blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
-    return []
+  public createUpstreamKeyerFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, start: number): AtemMeUpstreamKeyersTimelineObject {
+    const downstreamKeyer = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
+    return {
+      id: '',
+      enable: {
+        start
+      },
+      priority: 1,
+      layer: Tv2AtemLayer.CLEAN_USK_FULL,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.ME,
+        me: {
+          upstreamKeyers: [
+            {
+              upstreamKeyerId: downstreamKeyer.Number,
+              onAir: true,
+              mixEffectKeyType: 0,
+              flyEnabled: false,
+              fillSource: downstreamKeyer.Fill,
+              cutSource: downstreamKeyer.Key,
+              maskEnabled: false,
+              lumaSettings: {
+                clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Clip),
+                gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Gain),
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+
+  // Todo: merge usage with copy in 'Tv2GraphicsActionFactory'
+  private getDownstreamkeyerMatchingRole(blueprintConfiguration: Tv2BlueprintConfiguration, role: Tv2DownstreamKeyerRole): Tv2DownstreamKeyer {
+    return blueprintConfiguration.studio.SwitcherSource.DSK.find(
+      downstreamKeyer => downstreamKeyer.Roles.some(
+        keyerRole => keyerRole === role)) ?? blueprintConfiguration.studio.SwitcherSource.DSK[0]
   }
 
   public createNextAuxTimelineObject(input: number): AtemAuxTimelineObject {

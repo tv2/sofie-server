@@ -7,5 +7,6 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createProgramTimelineObject(start: number, input: number, transition: number, transitionSettings?: unknown): TimelineObject
   createCleanTimelineObject(start: number, input: number, transition: number, transitionSettings?: unknown): TimelineObject
   createNextAuxTimelineObject(input: number): TimelineObject
-  createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[]
+  createDownstreamKeyerFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject
+  createUpstreamKeyerFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, start: number): TimelineObject
 }
