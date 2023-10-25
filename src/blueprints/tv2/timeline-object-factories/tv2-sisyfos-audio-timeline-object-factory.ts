@@ -1,5 +1,6 @@
 import { Tv2AudioTimelineObjectFactory } from './interfaces/tv2-audio-timeline-object-factory'
 import {
+  SisyfosChannel,
   SisyfosChannelsTimelineObject,
   SisyfosResynchronizeTimelineObject,
   SisyfosType
@@ -8,7 +9,6 @@ import { Tv2SisyfosLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
-import { TimelineObject } from '../../../model/entities/timeline-object'
 
 const enum SisyfosFaderState {
   OFF = 0,
@@ -18,8 +18,26 @@ const enum SisyfosFaderState {
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createFullPilotGraphicsTimelineObjects(_blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
-    throw new Error('Method not implemented.')    
+  public createFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
+    const studioMicrohoneChannels: SisyfosChannel[] = blueprintConfiguration.studio.StudioMics.map(microphoneLayer => ({
+      mappedLayer: microphoneLayer,
+      isPgm: 1
+    }))
+
+    return {
+      id: '',
+      enable: {
+        start: 0
+      },
+      priority: studioMicrohoneChannels.length ? 2 : 0,
+      layer: Tv2SisyfosLayer.STUDIO_MICS,
+      content: {
+        deviceType: DeviceType.SISYFOS,
+        type: SisyfosType.CHANNELS,
+        channels: studioMicrohoneChannels,
+        overridePriority: 2
+      }
+    }
   }
   public createMicrophoneDownTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
     return this.buildMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.OFF)

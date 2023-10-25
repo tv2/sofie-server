@@ -306,7 +306,7 @@ export class Tv2GraphicsActionFactory {
       this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition),
       this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
       ...this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObjects(blueprintConfiguration),
-      ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration)
+      this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration)
     ]
   }
 
@@ -391,7 +391,7 @@ export class Tv2GraphicsActionFactory {
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition, transitionSettings),
       this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition, transitionSettings),
       this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
-      ...this.audioTimelineObjectFactory.createFullPilotGraphicsTimelineObjects(blueprintConfiguration),
+      this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration),
     ]
   }
 }

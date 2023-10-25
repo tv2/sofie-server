@@ -6,5 +6,6 @@ export interface Tv2AudioTimelineObjectFactory {
   createMicrophoneUpTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject
   createMicrophoneDownTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject
   createResynchronizeTimelineObject(): TimelineObject
-  createFullPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[]
+
+  createFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject
 }
