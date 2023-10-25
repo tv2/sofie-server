@@ -6,7 +6,6 @@ import { Rundown, RundownInterface } from '../rundown'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { TransitionType } from '../../enums/transition-type'
 import { PartTimings } from '../../value-objects/part-timings'
-import { Tv2OutputLayer } from '../../../blueprints/tv2/enums/tv2-output-layer'
 
 export class EntityMockFactory {
   public static createRundown(rundownInterface?: Partial<RundownInterface>): Rundown {
@@ -213,7 +212,7 @@ export class EntityMockFactory {
     when(mockedPiece.id).thenReturn(pieceInterface.id ?? 'pieceId')
     when(mockedPiece.name).thenReturn(pieceInterface.name ?? 'pieceName')
     when(mockedPiece.getPartId()).thenReturn(pieceInterface.partId ?? 'partId')
-    when(mockedPiece.outputLayer).thenReturn(pieceInterface.outputLayer ?? Tv2OutputLayer.NONE)
+    when(mockedPiece.outputLayer).thenReturn(pieceInterface.outputLayer ?? 'outputLayer')
     when(mockedPiece.layer).thenReturn(pieceInterface.layer ?? 'layer')
     when(mockedPiece.isPlanned).thenReturn(pieceInterface.isPlanned ?? true)
     when(mockedPiece.getStart()).thenReturn(pieceInterface.start ?? 0)
