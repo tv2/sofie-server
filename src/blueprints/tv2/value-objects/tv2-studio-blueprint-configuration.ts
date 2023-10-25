@@ -23,6 +23,7 @@ export enum Tv2GraphicsType {
 }
 
 export interface Tv2VizGraphics {
+  CleanFeedPrerollDuration: number
   KeepAliveDuration: number
   PrerollDuration: number
   OutTransitionDuration: number
@@ -64,9 +65,15 @@ export interface Tv2DownstreamKeyer {
   Key: number
   Fill: number
   DefaultOn: boolean
-  Roles: string[]
+  Roles: Tv2DownstreamKeyerRole[]
   Clip: number,
   Gain: number
+}
+
+export enum Tv2DownstreamKeyerRole {
+  FULL_GRAPHICS = 'full_graphics',
+  OVERLAY_GRAPHICS = 'overlay_graphics',
+  JINGLE = 'jingle'
 }
 
 
