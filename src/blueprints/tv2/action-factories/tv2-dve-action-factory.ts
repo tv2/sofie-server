@@ -1,11 +1,11 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, PartAction } from '../../../model/entities/action'
-import { PartActionType } from '../../../model/enums/action-type'
-import { PieceInterface } from '../../../model/entities/piece'
+import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
+import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { PartInterface } from '../../../model/entities/part'
 import { DveBoxProperties, DveConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { PieceType } from '../../../model/enums/piece-type'
-import { Tv2CasparCgLayer, Tv2GraphicsLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2AtemLayer, Tv2CasparCgLayer, Tv2GraphicsLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
@@ -19,8 +19,21 @@ import {
   CasparCgType
 } from '../../timeline-state-resolver-types/caspar-cg-types'
 import { DeviceType } from '../../../model/enums/device-type'
+import {
+  Tv2ActionContentType,
+  Tv2DveInsertSourceInputAction,
+  Tv2DveLayoutAction,
+  Tv2PartAction,
+  Tv2PieceAction
+} from '../value-objects/tv2-action'
+import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 
+const NUMBER_OF_DVE_BOXES: number = 4
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
+
+// The "Layout" priority must be lower than the "Insert" priority for the inserted sources to "persist" through a Take.
+const LAYOUT_TIMELINE_OBJECT_PRIORITY: number = 0.5
+const INSERT_SOURCE_TO_INPUT_TIMELINE_OBJECT_PRIORITY: number = 1
 
 export class Tv2DveActionFactory {
 
@@ -30,10 +43,31 @@ export class Tv2DveActionFactory {
 
 
   public createDveActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
-    return this.createDveLayoutActions(blueprintConfiguration)
+    return [
+      ...this.createDveLayoutActions(blueprintConfiguration),
+      ...this.createInsertCameraToInputActions(blueprintConfiguration)
+    ]
   }
 
-  private createDveLayoutActions(blueprintConfiguration: Tv2BlueprintConfiguration): PartAction[] {
+  public isDveAction(action: Action): boolean {
+    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
+    return [Tv2ActionContentType.DVE_LAYOUT, Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT].includes(tv2Action.metadata.contentType)
+  }
+
+  public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
+    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
+    switch (tv2Action.metadata.contentType) {
+      case Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT: {
+        return {
+          type: MutateActionType.PIECE,
+          updateActionWithPieceData: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
+          piecePredicate: (piece: Piece) => this.doesPieceHaveDveBoxesTimelineObject(piece)
+        }
+      }
+    }
+  }
+
+  private createDveLayoutActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveLayoutAction[] {
     return blueprintConfiguration.showStyle.dveConfigurations.map(dveConfiguration => {
       const partId: string = `dveLayoutInsertActionPart_${dveConfiguration.name}`
 
@@ -49,7 +83,7 @@ export class Tv2DveActionFactory {
       }
 
       const dveLayoutTimelineObjects: TimelineObject[] = [
-        this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes),
+        this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, LAYOUT_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(ATEM_SUPER_SOURCE_INDEX, timelineEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(ATEM_SUPER_SOURCE_INDEX, timelineEnable),
@@ -66,7 +100,10 @@ export class Tv2DveActionFactory {
         type: PartActionType.INSERT_PART_AS_NEXT,
         data: {
           partInterface: this.createPartInterface(partId, dveConfiguration),
-          pieceInterfaces: [this.createDvePieceInterface(partId, dveConfiguration.name, dveLayoutTimelineObjects)]
+          pieceInterfaces: [this.createDvePieceInterface(partId, dveConfiguration.name, boxes, dveLayoutTimelineObjects)]
+        },
+        metadata: {
+          contentType: Tv2ActionContentType.DVE_LAYOUT
         }
       }
     })
@@ -93,7 +130,10 @@ export class Tv2DveActionFactory {
     }
   }
 
-  private createDvePieceInterface(partId: string, name: string, timelineObjects: TimelineObject[]): PieceInterface {
+  private createDvePieceInterface(partId: string, name: string, dveBoxes: DveBoxProperties[], timelineObjects: TimelineObject[]): PieceInterface {
+    const metadata: Tv2PieceMetadata = {
+      dveBoxes
+    }
     return {
       id: `${partId}_piece`,
       partId,
@@ -108,6 +148,7 @@ export class Tv2DveActionFactory {
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
+      metadata,
       timelineObjects
     }
   }
@@ -181,5 +222,54 @@ export class Tv2DveActionFactory {
     const assetFileWithoutLeadingSlashes = assetWithForwardSlashes.replace(/^\/+/, '')
 
     return `${folderWithoutTrailingSlashes}/${assetFileWithoutLeadingSlashes}`
+  }
+
+  private createInsertCameraToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertSourceInputAction[] {
+    const actions: Tv2DveInsertSourceInputAction[] = []
+    for (let inputIndex = 0; inputIndex < NUMBER_OF_DVE_BOXES; inputIndex++) {
+      const cameraActions: Tv2DveInsertSourceInputAction[] = blueprintConfiguration.studio.SourcesCam
+        .slice(0, 5)
+        .map(cameraSource => {
+
+          return {
+            id: `insert_camera_${cameraSource.SourceName}_to_dve_input_${inputIndex}_action`,
+            name: `Insert Camera ${cameraSource.SourceName} in DVE input ${inputIndex}`,
+            description: `Insert Camera ${cameraSource.SourceName} in DVE input ${inputIndex}`,
+            type: PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT,
+            data: {} as PieceInterface,
+            metadata: {
+              contentType: Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT,
+              inputIndex,
+              videoMixerSource: cameraSource.SwitcherSource
+            }
+          }
+        })
+
+      actions.push(...cameraActions)
+    }
+    return actions
+  }
+
+  private updateInsertToInputAction(action: Action, dvePieceFromRundown: Piece): Action {
+    const metadata: Tv2PieceMetadata = dvePieceFromRundown.metadata as Tv2PieceMetadata
+    if (!metadata.dveBoxes) {
+      return action
+    }
+
+    const insertSourceInputAction: Tv2DveInsertSourceInputAction = action as Tv2DveInsertSourceInputAction
+
+    const dveBoxes: DveBoxProperties[] = metadata.dveBoxes
+    dveBoxes[insertSourceInputAction.metadata.inputIndex].source = insertSourceInputAction.metadata.videoMixerSource
+
+    const dveBoxesTimelineObject: TimelineObject = this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(dveBoxes, INSERT_SOURCE_TO_INPUT_TIMELINE_OBJECT_PRIORITY)
+    dveBoxesTimelineObject.id = `${dveBoxesTimelineObject}_${Date.now()}`
+
+    const dveAction: Tv2DveInsertSourceInputAction = action as Tv2DveInsertSourceInputAction
+    dveAction.data = this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, dveBoxes, [dveBoxesTimelineObject])
+    return dveAction
+  }
+
+  private doesPieceHaveDveBoxesTimelineObject(piece: Piece): boolean {
+    return piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getDveBoxesLayer())
   }
 }

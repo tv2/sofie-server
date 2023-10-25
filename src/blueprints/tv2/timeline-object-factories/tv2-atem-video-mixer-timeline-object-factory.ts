@@ -110,13 +110,13 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createDveBoxesTimelineObject(boxes: DveBoxProperties[]): AtemSuperSourceTimelineObject {
+  public createDveBoxesTimelineObject(boxes: DveBoxProperties[], priority: number = 1): AtemSuperSourceTimelineObject {
     return {
       id: 'atem_dve_boxes',
       enable: {
         start: 0
       },
-      priority: 1,
+      priority,
       layer: Tv2AtemLayer.DVE_BOXES,
       content: {
         deviceType: DeviceType.ATEM,
@@ -168,5 +168,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         }
       }
     }
+  }
+
+  public getDveBoxesLayer(): string {
+    return Tv2AtemLayer.DVE_BOXES
   }
 }

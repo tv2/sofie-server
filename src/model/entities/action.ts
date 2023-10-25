@@ -26,23 +26,23 @@ export interface PieceAction extends Action {
   data: PieceInterface
 }
 
-export type MutateActionMethods = MutateActionWithPlannedPieceMethods | MutateActionWithMedia
+export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia
 
 export enum MutateActionType {
-  PLANNED_PIECE = 'PLANNED_PIECE',
+  PIECE = 'PIECE',
   MEDIA = 'MEDIA'
+}
+
+export interface MutateActionWithPieceMethods {
+  type: MutateActionType.PIECE
+  updateActionWithPieceData: (action: Action, piece: Piece) => Action
+  piecePredicate: (piece: Piece) => boolean
 }
 
 export interface MutateActionWithMedia {
   type: MutateActionType.MEDIA
   updateActionWithMedia: (action: Action, media?: Media) => Action
   getMediaId: () => string
-}
-
-export interface MutateActionWithPlannedPieceMethods {
-  type: MutateActionType.PLANNED_PIECE
-  updateActionWithPlannedPieceData: (action: Action, plannedPiece: Piece) => Action
-  plannedPiecePredicate: (piece: Piece) => boolean
 }
 
 /**

@@ -5,7 +5,7 @@ import {
   MutateActionMethods,
   MutateActionType,
   MutateActionWithMedia,
-  MutateActionWithPlannedPieceMethods,
+  MutateActionWithPieceMethods,
   PartAction,
   PieceAction
 } from '../../model/entities/action'
@@ -68,6 +68,11 @@ export class ExecuteActionService implements ActionService {
         await this.insertPieceAsNext(pieceAction, rundownId)
         break
       }
+      case PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT: {
+        // TODO: Write tests for this once IngestUpdate changes has been merged.
+        await this.tryInsertPieceActionAsOnAirThenAsNext(action, rundownId)
+        break
+      }
       default: {
         throw new UnsupportedOperation(`ActionType ${action.type} is not yet supported/implemented`)
       }
@@ -75,16 +80,13 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async mutateAction(action: Action, rundownId: string): Promise<Action> {
-    if (!this.blueprint.getMutateActionMethods) {
-      return action
-    }
-    const mutateActionMethods: MutateActionMethods | undefined = this.blueprint.getMutateActionMethods(action)
+    const mutateActionMethods: MutateActionMethods | undefined = this.getMutateActionsMethodsFromAction(action)
     if (!mutateActionMethods) {
       return action
     }
     switch (mutateActionMethods.type) {
-      case MutateActionType.PLANNED_PIECE: {
-        return await this.mutateActionWithPlannedPiece(rundownId, mutateActionMethods, action)
+      case MutateActionType.PIECE: {
+        return await this.mutateActionWithPieceFromNextPart(rundownId, mutateActionMethods, action)
       }
       case MutateActionType.MEDIA: {
         return await this.mutateActionWithMedia(mutateActionMethods, action)
@@ -92,13 +94,20 @@ export class ExecuteActionService implements ActionService {
     }
   }
 
-  private async mutateActionWithPlannedPiece(rundownId: string, mutateActionMethods: MutateActionWithPlannedPieceMethods, action: Action): Promise<Action> {
+  private getMutateActionsMethodsFromAction(action: Action): MutateActionMethods | undefined {
+    if (!this.blueprint.getMutateActionMethods) {
+      return
+    }
+    return this.blueprint.getMutateActionMethods(action)
+  }
+
+  private async mutateActionWithPieceFromNextPart(rundownId: string, mutateActionMethods: MutateActionWithPieceMethods, action: Action): Promise<Action> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const plannedPiece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.plannedPiecePredicate)
-    if (!plannedPiece) {
+    const piece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
+    if (!piece) {
       return action
     }
-    return mutateActionMethods.updateActionWithPlannedPieceData(action, plannedPiece)
+    return mutateActionMethods.updateActionWithPieceData(action, piece)
   }
 
   private async mutateActionWithMedia(mutateActionMethods: MutateActionWithMedia, action: Action): Promise<Action> {
@@ -112,11 +121,13 @@ export class ExecuteActionService implements ActionService {
   }
 
   private createPartFromAction(partAction: PartAction): Part {
-    const pieces: Piece[] = partAction.data.pieceInterfaces.map(pieceInterface => new Piece(pieceInterface))
-
     const partInterface: PartInterface = partAction.data.partInterface
     partInterface.id = this.makeUnique(partInterface.id)
-    partInterface.pieces = pieces
+
+    partInterface.pieces = partAction.data.pieceInterfaces.map(pieceInterface => new Piece({
+      ...pieceInterface,
+      partId: partInterface.id
+    }))
 
     return new Part(partInterface)
   }
@@ -145,5 +156,36 @@ export class ExecuteActionService implements ActionService {
   private async insertPieceAsNext(pieceAction: PieceAction, rundownId: string): Promise<void> {
     const piece: Piece = this.createPieceFromAction(pieceAction)
     await this.rundownService.insertPieceAsNext(rundownId, piece)
+  }
+
+  private async tryInsertPieceActionAsOnAirThenAsNext(action: Action, rundownId: string): Promise<void> {
+    const mutateActionMethods: MutateActionWithPieceMethods = this.findMutateActionsForTryInsertPieceAsOnAirThenNext(action)
+
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const pieceFromRundown: Piece | undefined = rundown.getActivePart().getPieces().find(mutateActionMethods.piecePredicate)
+      ?? rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
+
+    if (!pieceFromRundown) {
+      return
+    }
+
+    const updatedAction: Action = mutateActionMethods.updateActionWithPieceData(action, pieceFromRundown)
+
+    const piece: Piece = this.createPieceFromAction(updatedAction as PieceAction)
+    rundown.getActivePart().id === pieceFromRundown.getPartId()
+      ? await this.rundownService.insertPieceAsOnAir(rundownId, piece)
+      : await this.rundownService.insertPieceAsNext(rundownId, piece)
+  }
+
+  private findMutateActionsForTryInsertPieceAsOnAirThenNext(action: Action): MutateActionWithPieceMethods {
+    const mutateActionMethods: MutateActionMethods | undefined = this.getMutateActionsMethodsFromAction(action)
+    if (!mutateActionMethods) {
+      throw new UnsupportedOperation(`${PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT} requires the Action to have implemented "getMutateActionMethods"`)
+    }
+
+    if (mutateActionMethods.type !== MutateActionType.PIECE) {
+      throw new UnsupportedOperation(`${PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT} requires the mutateActionMethods to be ${MutateActionType.PIECE}`)
+    }
+    return mutateActionMethods
   }
 }
