@@ -3,15 +3,15 @@ import { MongoEntityConverter, MongoId } from './mongo-entity-converter'
 import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
 
-export abstract class BaseMongoRepository<T extends MongoId = MongoId> {
+export abstract class BaseMongoRepository {
   protected constructor(
-    protected mongoDatabase: MongoDatabase<T>,
+    protected mongoDatabase: MongoDatabase,
     protected mongoEntityConverter: MongoEntityConverter
   ) {}
 
   protected abstract getCollectionName(): string
 
-  protected getCollection(): Collection<T> {
+  protected getCollection<Model extends MongoId = MongoId>(): Collection<Model> {
     return this.mongoDatabase.getCollection(this.getCollectionName())
   }
 
