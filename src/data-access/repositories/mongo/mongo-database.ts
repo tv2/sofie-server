@@ -7,7 +7,7 @@ import { MongoId } from './mongo-entity-converter'
 const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
 const MONGO_DB_NAME: string = 'meteor'
 
-export class MongoDatabase<T extends MongoId = MongoId> {
+export class MongoDatabase<Model extends MongoId = MongoId> {
   private static instance: MongoDatabase
 
   public static getInstance(): MongoDatabase {
@@ -42,9 +42,9 @@ export class MongoDatabase<T extends MongoId = MongoId> {
     this.onConnectCallbacks.forEach(callback => callback())
   }
 
-  public getCollection(collectionName: string): Collection<T> {
+  public getCollection(collectionName: string): Collection<Model> {
     this.assertDatabaseConnection()
-    return this.db.collection<T>(collectionName)
+    return this.db.collection<Model>(collectionName)
   }
 
   private assertDatabaseConnection(): void {
