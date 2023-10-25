@@ -7,9 +7,10 @@ export interface AtemMeTimelineObject extends TimelineObject {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
     me: {
-      input: number
-      transition: AtemTransition,
+      input?: number
+      transition?: AtemTransition,
       transitionSettings?: AtemTransitionSettings
+      upstreamKeyers?: AtemUpstreamKeyer[]
     }
   }
 }
@@ -41,16 +42,6 @@ export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
           enable: boolean
         }
       }
-    }
-  }
-}
-
-export interface AtemMeUpstreamKeyersTimelineObject extends TimelineObject {
-  content: {
-    deviceType: DeviceType.ATEM,
-    type: AtemType.ME,
-    me: {
-      upstreamKeyers: AtemUpstreamKeyer[]
     }
   }
 }
