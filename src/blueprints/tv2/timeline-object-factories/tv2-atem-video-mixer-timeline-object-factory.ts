@@ -4,7 +4,6 @@ import {
   AtemAuxTimelineObject,
   AtemDownstreamKeyerTimelineObject,
   AtemMeTimelineObject,
-  AtemMeUpstreamKeyersTimelineObject,
   AtemTransitionSettings,
   AtemType
 } from '../../timeline-state-resolver-types/atem-types'
@@ -14,13 +13,22 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
-    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
-    return {
+    return this.createAtemDownstreamKeyerTimelineObject(downstreamKeyer, onAir, {
       id: '',
       enable: {
         while: 1
       },
       priority: 10,
+    })
+  }
+
+  private createAtemDownstreamKeyerTimelineObject(
+    downstreamKeyer: Tv2DownstreamKeyer,
+    onAir: boolean,
+    timelineObjectWithRequiredValues: Pick<AtemDownstreamKeyerTimelineObject, 'id' | 'enable' | 'priority'> & Partial<AtemDownstreamKeyerTimelineObject>
+  ): AtemDownstreamKeyerTimelineObject {
+    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
+    return {
       layer: `${Tv2AtemLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
       content: {
         deviceType: DeviceType.ATEM,
@@ -39,7 +47,8 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
             }
           }
         }
-      }
+      },
+      ...timelineObjectWithRequiredValues
     }
   }
 
@@ -50,39 +59,18 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return percentage * 10
   }
 
-  // Todo: merge duplicate parts for this and 'createDownstreamKeyerTimelineObject'
   public createDownstreamKeyerFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): AtemDownstreamKeyerTimelineObject {
     const downstreamKeyer = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
-    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
-    return {
+    return this.createAtemDownstreamKeyerTimelineObject(downstreamKeyer, true, {
       id: '',
       enable: {
         start: 0
       },
       priority: 0,
-      layer: `${Tv2AtemLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
-      content: {
-        deviceType: DeviceType.ATEM,
-        type: AtemType.DSK,
-        dsk: {
-          onAir: true,
-          sources: {
-            fillSource: downstreamKeyer.Fill,
-            cutSource: downstreamKeyer.Key
-          },
-          properties: {
-            clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Clip),
-            gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Gain),
-            mask: {
-              enable: false
-            }
-          }
-        }
-      }
-    }
+    })
   }
 
-  public createUpstreamKeyerFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, start: number): AtemMeUpstreamKeyersTimelineObject {
+  public createUpstreamKeyerFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, start: number): AtemMeTimelineObject {
     const downstreamKeyer = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
     return {
       id: '',
@@ -90,7 +78,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         start
       },
       priority: 1,
-      layer: Tv2AtemLayer.CLEAN_USK_FULL,
+      layer: Tv2AtemLayer.CLEAN_UPSTREAM_KEYER,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.ME,
