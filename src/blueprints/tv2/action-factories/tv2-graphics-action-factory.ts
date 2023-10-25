@@ -1,13 +1,13 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Action } from '../../../model/entities/action'
 import { PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2GraphicsTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-graphics-timeline-object-factory'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -115,8 +115,8 @@ export class Tv2GraphicsActionFactory {
     return {
       duration: 0,
       partId: '',
-      type: PieceType.GRAPHIC,
       layer: Tv2SourceLayer.GRAPHICS_ACTION_COMMAND,
+      outputLayer: Tv2OutputLayer.SECONDARY,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: false,
