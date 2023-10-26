@@ -74,7 +74,7 @@ export class Tv2TransitionActionFactory {
     return (1000 / FRAME_RATE) * frames
   }
 
-  private createAtemMixTransitionTimelineObject(sourceInput: number): AtemMeTimelineObject {
+  private createAtemMixTransitionTimelineObject(sourceInput?: number): AtemMeTimelineObject {
     return {
       id: '',
       enable: {
@@ -111,7 +111,7 @@ export class Tv2TransitionActionFactory {
     }
 
     const atemMeTimelineObject: AtemMeTimelineObject = blueprintTimelineObject as AtemMeTimelineObject
-    const sourceInput: number = atemMeTimelineObject.content.me.input
+    const sourceInput: number | undefined = atemMeTimelineObject.content.me.input
     const mixTransitionTimelineObject: AtemMeTimelineObject = this.createAtemMixTransitionTimelineObject(sourceInput)
 
     action.data.timelineObjects.push(mixTransitionTimelineObject)
