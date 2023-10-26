@@ -14,6 +14,8 @@ import { ConfigurationRepository } from '../../data-access/repositories/interfac
 import { Configuration } from '../../model/entities/configuration'
 import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
 import { Part } from '../../model/entities/part'
+import {BasicRundown} from "../../model/entities/basic-rundown";
+import {AlreadyActivatedException} from "../../model/exceptions/already-activated-exception";
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -27,6 +29,13 @@ export class RundownTimelineService implements RundownService {
   ) {}
 
   public async activateRundown(rundownId: string): Promise<void> {
+
+    const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns();
+    const activeRundown: BasicRundown | undefined = basicRundowns? basicRundowns.find(rundown => rundown.isActive()) : undefined;
+
+    if (activeRundown) {
+      throw new AlreadyActivatedException(`Unable to activate rundown, because: ${activeRundown.name} is active. `)
+    }
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
     rundown.activate()
