@@ -13,6 +13,7 @@ import {
 import { Tv2GraphicsLayer } from '../value-objects/tv2-layers'
 import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
 import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
+import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 
 export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   constructor(private readonly casparCgPathFixer: Tv2CasparCgPathFixer) {
@@ -82,6 +83,13 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
   }
 
   private createStillTemplateData(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): CasparCgTemplateData {
+    if (!blueprintConfiguration.studio.HTMLGraphics) {
+      throw new MisconfigurationException(
+        'Missing configuration of \'HTMLGraphics\' in settings. ' +
+        'Make sure it exists, and contains a value for \'GraphicURL\''
+      )
+    }
+
     const absoluteFilePath: string = `${blueprintConfiguration.studio.HTMLGraphics.GraphicURL}\\${fileName}${blueprintConfiguration.studio.GraphicFileExtension}`
     return {
       display: 'program',

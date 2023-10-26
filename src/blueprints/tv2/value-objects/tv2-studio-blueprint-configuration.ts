@@ -7,7 +7,7 @@ export interface Tv2StudioBlueprintConfiguration {
   SwitcherSource: Tv2SwitcherSource
   GraphicsType: Tv2GraphicsType
   VizPilotGraphics: Tv2VizGraphics
-  HTMLGraphics: Tv2HtmlGraphics
+  HTMLGraphics?: Tv2HtmlGraphics
   CasparPrerollDuration: number
   PreventOverlayWithFull: boolean
   GraphicFolder?: string
@@ -23,7 +23,7 @@ export enum Tv2GraphicsType {
 }
 
 export interface Tv2VizGraphics {
-  CleanFeedPrerollDuration: number
+  CleanFeedPrerollDuration?: number
   KeepAliveDuration: number
   PrerollDuration: number
   OutTransitionDuration: number
