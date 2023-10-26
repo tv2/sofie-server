@@ -139,6 +139,7 @@ export class Tv2DveActionFactory {
       isPlanned: false,
       isOnAir: false,
       isNext: false,
+      isUnsynced: false,
       inTransition: {
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
@@ -160,6 +161,7 @@ export class Tv2DveActionFactory {
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
+      isUnsynced: false,
       start: 0,
       duration: 0,
       preRollDuration: 0,
