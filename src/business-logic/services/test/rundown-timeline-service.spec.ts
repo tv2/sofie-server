@@ -9,7 +9,9 @@ import { RundownTimelineService } from '../rundown-timeline-service'
 import { CallbackScheduler } from '../interfaces/callback-scheduler'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Blueprint } from '../../../model/value-objects/blueprint'
-import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
+import { PartRepository } from '../../../data-access/repositories/interfaces/part-repository'
+import { SegmentRepository } from '../../../data-access/repositories/interfaces/segment-repository'
+import { PieceRepository } from '../../../data-access/repositories/interfaces/piece-repository'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -39,7 +41,7 @@ describe(RundownTimelineService.name, () => {
 
       await testee.deleteRundown(rundown.id)
 
-      verify(mockRundownEventEmitter.emitDeletedEvent(anything())).once()
+      verify(mockRundownEventEmitter.emitRundownDeleted(anything())).once()
     })
 
     it('throws an exception, when it receives a RundownId of an active rundown', async () => {
@@ -59,8 +61,10 @@ describe(RundownTimelineService.name, () => {
 function createTestee(params: {
   rundownEventEmitter?: RundownEventEmitter
   rundownRepository?: RundownRepository
+  segmentRepository?: SegmentRepository
+  partRepository?: PartRepository
+  pieceRepository?: PieceRepository
   timelineRepository?: TimelineRepository
-  configurationRepository?: ConfigurationRepository
   timelineBuilder?: TimelineBuilder
   callbackScheduler?: CallbackScheduler
   blueprint?: Blueprint
@@ -68,8 +72,10 @@ function createTestee(params: {
   return new RundownTimelineService(
     params.rundownEventEmitter ?? instance(mock<RundownEventEmitter>()),
     params.rundownRepository ?? instance(mock<RundownRepository>()),
+    params.segmentRepository ?? instance(mock<SegmentRepository>()),
+    params.partRepository ?? instance(mock<PartRepository>()),
+    params.pieceRepository ?? instance(mock<PieceRepository>()),
     params.timelineRepository ?? instance(mock<TimelineRepository>()),
-    params.configurationRepository ?? instance(mock<ConfigurationRepository>()),
     params.timelineBuilder ?? instance(mock<TimelineBuilder>()),
     params.callbackScheduler ?? instance(mock<CallbackScheduler>()),
     params.blueprint ?? instance(mock<Blueprint>())
