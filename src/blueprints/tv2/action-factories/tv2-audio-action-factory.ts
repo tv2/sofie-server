@@ -1,14 +1,17 @@
 import { Action } from '../../../model/entities/action'
-import { PieceInterface } from '../../../model/entities/piece'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Tv2ActionContentType, Tv2AudioAction, Tv2PieceAction } from '../value-objects/tv2-action'
-import { Tv2AudioTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+import {
+  Tv2AudioTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2Piece } from '../entities/tv2-piece'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 
 export class Tv2AudioActionFactory {
@@ -25,7 +28,7 @@ export class Tv2AudioActionFactory {
   }
 
   private createFadePersistedAudioAction(): Tv2PieceAction {
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2Piece = this.createAudioPieceInterface({
       id: 'fadePersistedAudioPiece',
       name: 'Fade Persisted Audio',
       metadata: this.createFadePersistedAudioMetadata()
@@ -43,6 +46,8 @@ export class Tv2AudioActionFactory {
 
   private createFadePersistedAudioMetadata(): Tv2PieceMetadata {
     return {
+      type: Tv2PieceType.COMMAND,
+      outputLayer: Tv2OutputLayer.AUDIO,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: false,
@@ -52,7 +57,7 @@ export class Tv2AudioActionFactory {
   }
 
   private createMicrophoneUpAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2AudioAction {
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2Piece = this.createAudioPieceInterface({
       id: 'microphoneUpPiece',
       name: 'Microphone Up',
       timelineObjects: [
@@ -70,11 +75,10 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  private createAudioPieceInterface(pieceInterfaceWithRequiredValues: Pick<PieceInterface, 'id' | 'name'> & Partial<PieceInterface>): PieceInterface {
+  private createAudioPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2Piece, 'id' | 'name'> & Partial<Tv2Piece>): Tv2Piece {
     return {
       duration: 0,
       partId: '',
-      outputLayer: Tv2OutputLayer.SECONDARY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       layer: Tv2SourceLayer.AUDIO_ACTION_COMMAND,
@@ -84,12 +88,16 @@ export class Tv2AudioActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [],
+      metadata: {
+        type: Tv2PieceType.COMMAND,
+        outputLayer: Tv2OutputLayer.SECONDARY,
+      },
       ...pieceInterfaceWithRequiredValues
     }
   }
 
   private createMicrophoneDownAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2Piece = this.createAudioPieceInterface({
       id: 'microphoneDownPiece',
       name: 'Microphone Down',
       timelineObjects: [
@@ -109,7 +117,7 @@ export class Tv2AudioActionFactory {
 
   private createStopAudioBedAction(): Tv2PieceAction {
     const duration: number = 1000
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2Piece = this.createAudioPieceInterface({
       id: 'stopAudioBedPiece',
       name: 'Stop audio bed',
       layer: Tv2SourceLayer.AUDIO_BED,
@@ -132,7 +140,7 @@ export class Tv2AudioActionFactory {
 
   private createResynchronizeAudioAction(): Tv2PieceAction {
     const duration: number = 1000
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2Piece = this.createAudioPieceInterface({
       id: 'resynchronizeAudioPiece',
       name: 'Resynchronize Audio',
       duration,

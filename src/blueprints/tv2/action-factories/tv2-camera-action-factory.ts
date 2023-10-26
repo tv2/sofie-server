@@ -1,4 +1,3 @@
-import { PieceInterface } from '../../../model/entities/piece'
 import { PartInterface } from '../../../model/entities/part'
 import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
@@ -23,6 +22,8 @@ import {
 import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
 import { Action } from '../../../model/entities/action'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2Piece } from '../entities/tv2-piece'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 export class Tv2CameraActionFactory {
 
@@ -37,7 +38,7 @@ export class Tv2CameraActionFactory {
 
   private createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
     const partId: string = `cameraInsertActionPart_${cameraSource._id}`
-    const cameraPieceInterface: PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
+    const cameraPieceInterface: Tv2Piece = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsNextAction_${cameraSource._id}`,
@@ -47,19 +48,20 @@ export class Tv2CameraActionFactory {
       data: {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
-      },
-      metadata: {
+      }, metadata: {
         contentType: Tv2ActionContentType.CAMERA,
         cameraNumber: cameraSource.SourceName,
       },
     }
   }
 
-  private createCameraPiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): PieceInterface {
+  private createCameraPiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2Piece {
     const cameraTimelineObjects: TimelineObject[] = this.createCameraTimelineObjects(source)
     const sisyfosTimelineObjects: TimelineObject[] = this.createSisyfosTimelineObjects(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
+      type: Tv2PieceType.CAMERA,
+      outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: source.AcceptPersistAudio
@@ -72,7 +74,6 @@ export class Tv2CameraActionFactory {
       id: `cameraAction_${source._id}`,
       partId: parentPartId,
       name: `KAM ${source.SourceName}`,
-      outputLayer: Tv2OutputLayer.PROGRAM,
       layer: Tv2SourceLayer.CAMERA,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -200,7 +201,7 @@ export class Tv2CameraActionFactory {
 
   public createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
     const partId: string = `cameraInsertAndTakeActionPart_${cameraSource._id}`
-    const cameraPieceInterface: PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
+    const cameraPieceInterface: Tv2Piece = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsOnAirAction_${cameraSource._id}`,

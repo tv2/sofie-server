@@ -6,5 +6,4 @@ export enum Tv2OutputLayer {
   AUXILIARY = 'AUXILIARY',
   MANUS = 'MANUS',
   AUDIO = 'AUDIO',
-  NONE = 'NONE'
 }

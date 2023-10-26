@@ -1,6 +1,6 @@
 import { Action, MutateActionMethods } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { Piece, PieceInterface } from '../../../model/entities/piece'
+import { Piece } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -10,6 +10,8 @@ import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2ActionContentType, Tv2TransitionAction } from '../value-objects/tv2-action'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2Piece } from '../entities/tv2-piece'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 const FRAME_RATE: number = 25
 
@@ -41,11 +43,10 @@ export class Tv2TransitionActionFactory {
   }
 
   private createMixTransitionAction(): Tv2TransitionAction {
-    const pieceInterface: PieceInterface = {
+    const pieceInterface: Tv2Piece = {
       id: 'mixTransitionActionPiece',
       name: 'Mix transition',
       partId: '',
-      outputLayer: Tv2OutputLayer.SECONDARY,
       layer: Tv2SourceLayer.JINGLE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.IN_TRANSITION,
@@ -55,7 +56,11 @@ export class Tv2TransitionActionFactory {
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
-      timelineObjects: []
+      timelineObjects: [],
+      metadata: {
+        type: Tv2PieceType.TRANSITION,
+        outputLayer: Tv2OutputLayer.SECONDARY,
+      }
     }
 
     return {
