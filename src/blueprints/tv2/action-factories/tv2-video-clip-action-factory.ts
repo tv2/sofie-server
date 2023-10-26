@@ -8,7 +8,7 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2CasparCgLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { Tv2VideoClipData } from '../value-objects/tv2-video-clip-data'
+import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { CasparCgMediaTimelineObject, CasparCgType } from '../../timeline-state-resolver-types/caspar-cg-types'
@@ -70,11 +70,11 @@ export class Tv2VideoClipActionFactory {
     return videoClipAction
   }
 
-  public createVideoClipActions(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData[]): Tv2VideoClipAction[] {
+  public createVideoClipActions(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData[]): Tv2VideoClipAction[] {
     return videoClipData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
   }
 
-  private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData): Tv2VideoClipAction {
+  private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): Tv2VideoClipAction {
     const partId: string = 'videoClipInsertAction'
     const partInterface: PartInterface = this.createPartInterface(partId, videoClipData)
     return {
@@ -95,7 +95,7 @@ export class Tv2VideoClipActionFactory {
     }
   }
 
-  private createProgramPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipData): PieceInterface {
+  private createProgramPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): PieceInterface {
     const metadata: Tv2PieceMetadata = {
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
@@ -132,7 +132,7 @@ export class Tv2VideoClipActionFactory {
     }
   }
 
-  private createCasparCgVideoClipTimelineObject(videoClipData: Tv2VideoClipData): CasparCgMediaTimelineObject {
+  private createCasparCgVideoClipTimelineObject(videoClipData: Tv2VideoClipManifestData): CasparCgMediaTimelineObject {
     return {
       id: `casparCg_${videoClipData.fileName}`,
       enable: {
@@ -151,7 +151,7 @@ export class Tv2VideoClipActionFactory {
     }
   }
 
-  private createPartInterface(partId: string, videoClipData: Tv2VideoClipData): PartInterface {
+  private createPartInterface(partId: string, videoClipData: Tv2VideoClipManifestData): PartInterface {
     return {
       id: partId,
       name: videoClipData.name,

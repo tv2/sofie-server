@@ -24,13 +24,16 @@ import {
   Tv2DveInsertSourceInputAction,
   Tv2DveLayoutAction,
   Tv2PartAction,
-  Tv2PieceAction
+  Tv2PieceAction,
+  Tv2PlannedDveAction
 } from '../value-objects/tv2-action'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
+import { DveBoxInput, Tv2DveManifestData } from '../value-objects/tv2-action-manifest-data'
+import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 
 const NUMBER_OF_DVE_BOXES: number = 4
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
@@ -38,6 +41,7 @@ const ATEM_SUPER_SOURCE_INDEX: number = 6000
 // The "Layout" priority must be lower than the "Insert" priority for the inserted sources to "persist" through a Take.
 const LAYOUT_TIMELINE_OBJECT_PRIORITY: number = 0.5
 const INSERT_SOURCE_TO_INPUT_TIMELINE_OBJECT_PRIORITY: number = 1
+const PLANNED_DVE_TIMELINE_OBJECT_PRIORITY: number = 1
 
 const CAMERA_SOURCE_NAME: string = 'Camera'
 const LIVE_SOURCE_NAME: string = 'Live'
@@ -50,10 +54,11 @@ export class Tv2DveActionFactory {
   ) {}
 
 
-  public createDveActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
+  public createDveActions(blueprintConfiguration: Tv2BlueprintConfiguration, dveManifestData: Tv2DveManifestData[]): Action[] {
     return [
       ...this.createDveLayoutActions(blueprintConfiguration),
-      ...this.createInsertToInputActions(blueprintConfiguration)
+      ...this.createInsertToInputActions(blueprintConfiguration),
+      ...this.createDveActionsFromDveManifestData(blueprintConfiguration, dveManifestData)
     ]
   }
 
@@ -317,5 +322,86 @@ export class Tv2DveActionFactory {
 
   private doesPieceHaveDveBoxesTimelineObject(piece: Piece): boolean {
     return piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getDveBoxesLayer())
+  }
+
+  private createDveActionsFromDveManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, dveManifestData: Tv2DveManifestData[]): Tv2PlannedDveAction[] {
+    return dveManifestData.map(data => {
+      const dveConfiguration: DveConfiguration | undefined = blueprintConfiguration.showStyle.dveConfigurations.find(dveConfiguration => dveConfiguration.name.toLowerCase() === data.template.toLowerCase())
+      if (!dveConfiguration) {
+        throw new MisconfigurationException(`No configured DVE found for planned DVE action ${data.name}`)
+      }
+
+      const partId: string = `plannedDveInsertActionPart_${dveConfiguration.name}`
+
+      const boxes: DveBoxProperties[] = Object.entries(dveConfiguration.layoutProperties.boxes).map(([, box]) => {
+        return {
+          ...box,
+          source: blueprintConfiguration.studio.SwitcherSource.Default
+        }
+      })
+
+      const audioTimelineObjectsForBoxes: { [inputIndex: number]: TimelineObject[] } = {}
+      data.sources.forEach((source: Tv2SourceMappingWithSound, input: DveBoxInput) => {
+        const dveInputIndex: number = this.mapDveBoxInputToNumber(input)
+        audioTimelineObjectsForBoxes[dveInputIndex] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source)
+        boxes[dveInputIndex].source = source.SwitcherSource
+      })
+
+      const audioTimelineObjects: TimelineObject[] = Object.values(audioTimelineObjectsForBoxes).flat()
+
+      const metadata: Tv2PieceMetadata = {
+        dve: {
+          boxes,
+          audioTimelineObjectsForBoxes
+        }
+      }
+
+      const videoSwitcherTimelineEnable: TimelineEnable = {
+        start: 0
+      }
+
+      const dveTimelineObjects: TimelineObject[] = [
+        this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, PLANNED_DVE_TIMELINE_OBJECT_PRIORITY),
+        this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
+        this.createCasparCgDveKeyTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
+        this.createCasparCgDveFrameTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
+        this.createCasparCgDveLocatorTimelineObject(),
+        ...audioTimelineObjects
+      ]
+
+      return {
+        id: `plannedDveAsNextAction_${data.name.replace(/\s/g, '')}`,
+        name: data.template,
+        description: '',
+        type: PartActionType.INSERT_PART_AS_NEXT,
+        metadata: {
+          contentType: Tv2ActionContentType.DVE
+        },
+        data: {
+          partInterface: this.createPartInterface(partId, dveConfiguration),
+          pieceInterfaces: [this.createDvePieceInterface(partId, dveConfiguration.name, metadata, dveTimelineObjects)]
+        }
+      }
+    })
+  }
+
+  private mapDveBoxInputToNumber(dveBoxInput: DveBoxInput): number {
+    switch (dveBoxInput) {
+      case DveBoxInput.INPUT_1: {
+        return 0
+      }
+      case DveBoxInput.INPUT_2: {
+        return 1
+      }
+      case DveBoxInput.INPUT_3: {
+        return 2
+      }
+      case DveBoxInput.INPUT_4: {
+        return 3
+      }
+    }
   }
 }

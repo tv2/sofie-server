@@ -8,6 +8,7 @@ export enum Tv2ActionContentType {
   TRANSITION = 'TRANSITION',
   GRAPHICS = 'GRAPHICS',
   AUDIO = 'AUDIO',
+  DVE = 'DVE',
   DVE_LAYOUT = 'DVE_LAYOUT',
   DVE_INSERT_SOURCE_TO_INPUT = 'DVE_INSERT_SOURCE_TO_INPUT',
   UNKNOWN = 'UNKNOWN'
@@ -49,6 +50,12 @@ export interface Tv2TransitionAction extends Tv2PieceAction {
 export interface Tv2AudioAction extends Tv2PieceAction {
   metadata: {
     contentType: Tv2ActionContentType.AUDIO,
+  }
+}
+
+export interface Tv2PlannedDveAction extends Tv2PartAction {
+  metadata: {
+    contentType: Tv2ActionContentType.DVE
   }
 }
 

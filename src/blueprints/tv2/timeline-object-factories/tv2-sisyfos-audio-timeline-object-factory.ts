@@ -9,7 +9,7 @@ import { Tv2SisyfosLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
-import { Tv2VideoClipData } from '../value-objects/tv2-video-clip-data'
+import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 
 const enum SisyfosFaderState {
@@ -23,7 +23,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
       return {
-        id: source._id,
+        id: `${source._id}_${this.generateRandomWholeNumber()}`,
         enable: {
           start: 0
         },
@@ -42,14 +42,18 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
 
     return [
       ...sisyfosChannelTimelineObjects,
-      this.createStudioMicrophonesTimelineObject(configuration, `_${source._id}`)
+      this.createStudioMicrophonesTimelineObject(configuration)
     ]
   }
 
-  private createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, idPostFix?: string): SisyfosChannelsTimelineObject {
+  private generateRandomWholeNumber(): number {
+    return Math.floor(Math.random() * 10000)
+  }
+
+  private createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
     const priority: number = configuration.studio.StudioMics ? 2 : 0
     const overridePriority: number = 2
-    return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, overridePriority, idPostFix)
+    return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, overridePriority)
   }
 
   public createStudioMicrophonesDownTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
@@ -62,9 +66,9 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
     return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, priority)
   }
 
-  private buildStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, sisyfosFaderState:  SisyfosFaderState, priority: number, overridePriority: number, idPostFix?: string): SisyfosChannelsTimelineObject {
+  private buildStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, sisyfosFaderState:  SisyfosFaderState, priority: number, overridePriority: number): SisyfosChannelsTimelineObject {
     return {
-      id: `studio_microphones${idPostFix}`,
+      id: `studio_microphones_${this.generateRandomWholeNumber()}`,
       enable: {
         start: 0
       },
@@ -114,7 +118,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
     }
   }
 
-  public createVideoClipAudioTimelineObjects(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData): SisyfosTimelineObject[] {
+  public createVideoClipAudioTimelineObjects(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): SisyfosTimelineObject[] {
     const serverPendingTimelineObject: SisyfosChannelTimelineObject = {
       id: `sisyfos_server_pending_${videoClipData.fileName}`,
       enable: {

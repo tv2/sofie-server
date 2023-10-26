@@ -1,6 +1,6 @@
 import { TimelineObject } from '../../../../model/entities/timeline-object'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
-import { Tv2VideoClipData } from '../../value-objects/tv2-video-clip-data'
+import { Tv2VideoClipManifestData } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithSound } from '../../value-objects/tv2-studio-blueprint-configuration'
 import { DeviceType } from '../../../../model/enums/device-type'
 
@@ -10,7 +10,7 @@ export interface Tv2AudioTimelineObjectFactory {
   createStudioMicrophonesDownTimelineObject(configuration: Tv2BlueprintConfiguration): TimelineObject
   createStopAudioBedTimelineObject(duration: number): TimelineObject
   createResynchronizeTimelineObject(): TimelineObject
-  createVideoClipAudioTimelineObjects(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData): TimelineObject[]
+  createVideoClipAudioTimelineObjects(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): TimelineObject[]
 
   getAudioDeviceType(): DeviceType
 }
