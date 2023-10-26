@@ -17,8 +17,8 @@ export class Tv2AudioActionFactory {
   public createAudioActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return [
       this.createStopAudioBedAction(),
-      this.createMicrophoneUpAction(blueprintConfiguration),
-      this.createMicrophoneDownAction(blueprintConfiguration),
+      this.createStudioMicrophonesUpAction(blueprintConfiguration),
+      this.createStudioMicrophonesDownAction(blueprintConfiguration),
       this.createResynchronizeAudioAction(),
       this.createFadePersistedAudioAction()
     ]
@@ -51,17 +51,17 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  private createMicrophoneUpAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2AudioAction {
+  private createStudioMicrophonesUpAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2AudioAction {
     const pieceInterface: PieceInterface = this.createAudioPieceInterface({
-      id: 'microphoneUpPiece',
-      name: 'Microphone Up',
+      id: 'studioMicrophonesUpPiece',
+      name: 'Studio Microphones Up',
       timelineObjects: [
-        this.audioTimelineObjectFactory.createMicrophoneUpTimelineObject(blueprintConfiguration)
+        this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration)
       ]
     })
     return {
-      id: 'microphoneUpAction',
-      name: 'Microphone Up',
+      id: 'studioMicrophonesUpAction',
+      name: 'Studio Microphones Up',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: pieceInterface,
       metadata: {
@@ -89,17 +89,17 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  private createMicrophoneDownAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
+  private createStudioMicrophonesDownAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const pieceInterface: PieceInterface = this.createAudioPieceInterface({
-      id: 'microphoneDownPiece',
-      name: 'Microphone Down',
+      id: 'studioMicrophonesDownPiece',
+      name: 'Studio Microphones Down',
       timelineObjects: [
-        this.audioTimelineObjectFactory.createMicrophoneDownTimelineObject(blueprintConfiguration)
+        this.audioTimelineObjectFactory.createStudioMicrophonesDownTimelineObject(blueprintConfiguration)
       ]
     })
     return {
-      id: 'microphoneDownAction',
-      name: 'Microphone Down',
+      id: 'studioMicrophonesDownAction',
+      name: 'Studio Microphones Down',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: pieceInterface,
       metadata: {

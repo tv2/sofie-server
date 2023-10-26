@@ -1,19 +1,21 @@
-import { Blueprint } from '../../model/value-objects/blueprint'
+import {
+  Blueprint,
+  BlueprintGenerateActions,
+  BlueprintGetEndStateForPart,
+  BlueprintOnTimelineGenerate
+} from '../../model/value-objects/blueprint'
 import { RundownPersistentState } from '../../model/value-objects/rundown-persistent-state'
 import { Part } from '../../model/entities/part'
 import { PartEndState } from '../../model/value-objects/part-end-state'
-import { Tv2EndStateForPartService } from './tv2-end-state-for-part-service'
 import { Timeline } from '../../model/entities/timeline'
-import { Tv2OnTimelineGenerateService } from './tv2-on-timeline-generate-service'
 import { Configuration } from '../../model/entities/configuration'
-import { Action, MutateActionMethods } from '../../model/entities/action'
-import { Tv2ActionsService } from './tv2-actions-service'
+import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
 
 export class Tv2Blueprint implements Blueprint {
   constructor(
-    private readonly endStateForPartService: Tv2EndStateForPartService,
-    private readonly onTimelineGenerateService: Tv2OnTimelineGenerateService,
-    private readonly actionsService: Tv2ActionsService
+    private readonly endStateForPartService: BlueprintGetEndStateForPart,
+    private readonly onTimelineGenerateService: BlueprintOnTimelineGenerate,
+    private readonly actionsService: BlueprintGenerateActions
   ) {}
 
   public getEndStateForPart(
@@ -44,11 +46,14 @@ export class Tv2Blueprint implements Blueprint {
     )
   }
 
-  public generateActions(configuration: Configuration): Action[] {
-    return this.actionsService.generateActions(configuration)
+  public generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[] {
+    return this.actionsService.generateActions(configuration, actionManifests)
   }
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
+    if (!this.actionsService.getMutateActionMethods) {
+      return
+    }
     return this.actionsService.getMutateActionMethods(action)
   }
 }

@@ -5,6 +5,8 @@ export interface Tv2StudioBlueprintConfiguration {
   StudioMics: string[]
   ABMediaPlayers: Tv2MediaPlayer[]
   SwitcherSource: Tv2SwitcherSource
+  CasparPrerollDuration: number,
+  ServerPostrollDuration: number
 }
 
 export interface Tv2SourceMapping {
