@@ -56,6 +56,7 @@ export class Tv2TransitionActionFactory {
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
+      isUnsynced: false,
       timelineObjects: []
     }
 

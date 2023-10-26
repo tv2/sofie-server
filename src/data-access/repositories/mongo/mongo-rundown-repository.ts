@@ -10,15 +10,21 @@ import { DeleteResult } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'
 import { TimelineObject } from '../../../model/entities/timeline-object'
+import { UnsupportedOperation } from '../../../model/exceptions/unsupported-operation'
+import { Segment } from '../../../model/entities/segment'
+import { PieceRepository } from '../interfaces/piece-repository'
+import { Piece } from '../../../model/entities/piece'
 
 const RUNDOWN_COLLECTION_NAME: string = 'rundowns'
 
 export class MongoRundownRepository extends BaseMongoRepository implements RundownRepository {
+
   constructor(
     mongoDatabase: MongoDatabase,
     mongoEntityConverter: MongoEntityConverter,
     private readonly rundownBaselineRepository: RundownBaselineRepository,
-    private readonly segmentRepository: SegmentRepository
+    private readonly segmentRepository: SegmentRepository,
+    private readonly pieceRepository: PieceRepository
   ) {
     super(mongoDatabase, mongoEntityConverter)
   }
@@ -48,24 +54,38 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     const baselineTimelineObjects: TimelineObject[] = await this.rundownBaselineRepository.getRundownBaseline(
       rundownId
     )
-    const rundown: Rundown = this.mongoEntityConverter.convertRundown(mongoRundown, baselineTimelineObjects)
-    rundown.setSegments(await this.segmentRepository.getSegments(rundown.id))
-    return rundown
+    const infinitePieces: Piece[] = await this.pieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
+    const segments: Segment[] = await this.segmentRepository.getSegments(rundownId)
+    return this.mongoEntityConverter.convertRundown(mongoRundown, segments, baselineTimelineObjects, infinitePieces)
+  }
+
+  public getRundownBySegmentId(segmentId: string): Promise<Rundown> {
+    throw new UnsupportedOperation(`${MongoRundownRepository.name} does not support getting a Rundown from a Segment id. Trying to find Rundown with Segment id: ${segmentId}`)
+  }
+
+  public getRundownByPartId(partId: string): Promise<Rundown> {
+    throw new UnsupportedOperation(`${MongoRundownRepository.name} does not support getting a Rundown from a Part id. Trying to find Rundown with Part id: ${partId}`)
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {
     const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
     await this.getCollection().updateOne({ _id: rundown.id }, { $set: mongoRundown })
-    for (const segment of rundown.getSegments()) {
-      await this.segmentRepository.saveSegment(segment)
-    }
+
+    const unsyncedInfinitePieces: Piece[] = rundown.getInfinitePieces().filter(piece => piece.isUnsynced())
+    await Promise.all([
+      ...rundown.getSegments().map(segment => this.segmentRepository.saveSegment(segment)),
+      ...unsyncedInfinitePieces.map(piece => this.pieceRepository.savePiece(piece))
+    ])
   }
 
   public async deleteRundown(rundownId: string): Promise<void> {
     this.assertDatabaseConnection(this.deleteRundown.name)
-    await this.assertRundownExist(rundownId)
-    await this.segmentRepository.deleteSegmentsForRundown(rundownId)
+    const doesRundownExist: boolean = await this.doesRundownExist(rundownId)
+    if (!doesRundownExist) {
+      return
+    }
 
+    await this.segmentRepository.deleteSegmentsForRundown(rundownId)
     const rundownDeletionResult: DeleteResult = await this.getCollection().deleteOne({
       _id: rundownId,
     })
@@ -74,10 +94,7 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     }
   }
 
-  private async assertRundownExist(rundownId: string): Promise<void> {
-    const doesRundownExist: boolean = (await this.getCollection().countDocuments({ _id: rundownId })) === 1
-    if (!doesRundownExist) {
-      throw new NotFoundException(`Failed to find a rundown with id: ${rundownId}`)
-    }
+  private async doesRundownExist(rundownId: string): Promise<boolean> {
+    return (await this.getCollection().countDocuments({ _id: rundownId })) === 1
   }
 }

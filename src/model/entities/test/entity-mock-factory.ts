@@ -29,6 +29,7 @@ export class EntityMockFactory {
 
     when(mockedRundown.getBaseline()).thenReturn(rundownInterface.baselineTimelineObjects ?? [])
     when(mockedRundown.getPartAfter(anything())).thenReturn(this.createPart())
+    when(mockedRundown.getInfinitePieces()).thenReturn([])
 
     return mockedRundown
   }
@@ -161,7 +162,7 @@ export class EntityMockFactory {
       partInterface.id ?? (partInterface.rank ? `part${partInterface.rank}` : 'partId')
     )
     when(mockedPart.getSegmentId()).thenReturn(partInterface.segmentId ?? 'segmentId')
-    when(mockedPart.rank).thenReturn(partInterface.rank ?? 1)
+    when(mockedPart.getRank()).thenReturn(partInterface.rank ?? 1)
     when(mockedPart.name).thenReturn(partInterface.name ?? 'partName')
     when(mockedPart.isNext()).thenReturn(partInterface.isNext ?? false)
     when(mockedPart.isOnAir()).thenReturn(partInterface.isOnAir ?? false)

@@ -1,10 +1,12 @@
-import { RundownEventType } from '../enums/rundown-event-type'
+import { EventType, IngestEventType, RundownEventType } from '../enums/rundown-event-type'
 import { TypedEvent } from './typed-event'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
+import { RundownDto } from '../dtos/rundown-dto'
+import { SegmentDto } from '../dtos/segment-dto'
 
 export interface RundownEvent extends TypedEvent {
-  type: RundownEventType
+  type: EventType
   rundownId: string
 }
 
@@ -19,10 +21,6 @@ export interface RundownActivatedEvent extends RundownEvent {
 
 export interface RundownDeactivatedEvent extends RundownEvent {
   type: RundownEventType.DEACTIVATED
-}
-
-export interface RundownDeletedEvent extends RundownEvent {
-  type: RundownEventType.DELETED
 }
 
 export interface RundownResetEvent extends RundownEvent {
@@ -55,4 +53,48 @@ export interface PieceInsertedEvent extends PartEvent {
 export interface RundownInfinitePieceAddedEvent extends RundownEvent {
   type: RundownEventType.INFINITE_PIECE_ADDED,
   infinitePiece: PieceDto
+}
+
+export interface RundownCreatedEvent extends RundownEvent {
+  type: IngestEventType.RUNDOWN_CREATED,
+  rundown: RundownDto
+}
+
+export interface RundownUpdatedEvent extends RundownEvent {
+  type: IngestEventType.RUNDOWN_UPDATED,
+  rundown: RundownDto
+}
+
+export interface RundownDeletedEvent extends RundownEvent {
+  type: IngestEventType.RUNDOWN_DELETED
+}
+
+export interface SegmentCreatedEvent extends RundownEvent {
+  type: IngestEventType.SEGMENT_CREATED
+  segment: SegmentDto
+}
+
+export interface SegmentUpdatedEvent extends RundownEvent {
+  type: IngestEventType.SEGMENT_UPDATED
+  segment: SegmentDto
+}
+
+export interface SegmentDeletedEvent extends RundownEvent {
+  type: IngestEventType.SEGMENT_DELETED
+  segmentId: string
+}
+
+export interface PartCreatedEvent extends RundownEvent {
+  type: IngestEventType.PART_CREATED
+  part: PartDto
+}
+
+export interface PartUpdatedEvent extends RundownEvent {
+  type: IngestEventType.PART_UPDATED
+  part: PartDto
+}
+
+export interface PartDeletedEvent extends RundownEvent {
+  type: IngestEventType.PART_DELETED
+  partId: string
 }

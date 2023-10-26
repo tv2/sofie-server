@@ -7,7 +7,7 @@ import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Piece } from '../../../model/entities/piece'
-import { TestEntityFactory } from '../../../model/entities/test/test-entity-factory'
+import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 
 const COLLECTION_NAME = 'pieces'
 
@@ -86,7 +86,7 @@ describe(MongoPieceRepository.name, () => {
 
     it('returns one piece when partId is given', async () => {
       const partId: string = 'somePartId'
-      const pieces: Piece[] = [TestEntityFactory.createPiece({ partId })]
+      const pieces: Piece[] = [EntityTestFactory.createPiece({ partId })]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(pieces)
 
       const testee: PieceRepository = createTestee({ mongoConverter })
@@ -98,7 +98,7 @@ describe(MongoPieceRepository.name, () => {
 
     it('returns multiple pieces when partId is given', async () => {
       const partId: string = 'somePartId'
-      const pieces: Piece[] = [TestEntityFactory.createPiece({ partId }), TestEntityFactory.createPiece({ partId })]
+      const pieces: Piece[] = [EntityTestFactory.createPiece({ partId }), EntityTestFactory.createPiece({ partId })]
       const mongoConverter: MongoEntityConverter = await setupMongoConverter(pieces)
 
       const testee: PieceRepository = createTestee({ mongoConverter })

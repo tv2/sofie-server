@@ -79,6 +79,7 @@ export class Tv2AudioActionFactory {
       transitionType: TransitionType.NO_TRANSITION,
       layer: Tv2SourceLayer.AUDIO_ACTION_COMMAND,
       isPlanned: false,
+      isUnsynced: false,
       start: 0,
       preRollDuration: 0,
       postRollDuration: 0,
