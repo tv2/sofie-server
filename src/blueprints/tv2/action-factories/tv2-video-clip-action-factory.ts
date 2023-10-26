@@ -103,7 +103,7 @@ export class Tv2VideoClipActionFactory {
       }
     }
 
-    const videoSwitcherEnable: TimelineEnable = {
+    const videoMixerEnable: TimelineEnable = {
       start: configuration.studio.CasparPrerollDuration
     }
 
@@ -123,9 +123,9 @@ export class Tv2VideoClipActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoSwitcherEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoSwitcherEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoSwitcherEnable),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.createCasparCgVideoClipTimelineObject(videoClipData),
         ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
       ]
