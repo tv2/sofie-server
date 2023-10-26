@@ -22,7 +22,6 @@ export interface GraphicsSetup {
 export interface DveConfiguration {
   id: string
   name: string
-  inputs: string
   layoutProperties: DveLayoutProperties
   graphicsTemplateJson: string
   key: string
