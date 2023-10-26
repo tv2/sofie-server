@@ -61,7 +61,6 @@ export interface MongoPiece {
   startPartId: string
   name: string
   sourceLayerId: string
-  outputLayerId: string
   enable: {
     start: number | string
     duration: number
@@ -228,7 +227,6 @@ export class MongoEntityConverter {
       partId: mongoPiece.startPartId,
       name: mongoPiece.name,
       layer: mongoPiece.sourceLayerId,
-      outputLayer: mongoPiece.outputLayerId,
       pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
       isPlanned: mongoPiece.isPlanned ?? true,
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,

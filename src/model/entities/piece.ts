@@ -8,7 +8,6 @@ export interface PieceInterface {
   partId: string
   name: string
   layer: string
-  outputLayer: string
   pieceLifespan: PieceLifespan
   isPlanned: boolean
   start: number
@@ -27,7 +26,6 @@ export class Piece {
   public readonly id: string
   public name: string
   public layer: string
-  public outputLayer: string
   public pieceLifespan: PieceLifespan
   public isPlanned: boolean = true
   public duration: number
@@ -49,7 +47,6 @@ export class Piece {
     this.partId = piece.partId
     this.name = piece.name
     this.layer = piece.layer
-    this.outputLayer = piece.outputLayer
     this.pieceLifespan = piece.pieceLifespan
     this.isPlanned = piece.isPlanned
     this.start = piece.start
