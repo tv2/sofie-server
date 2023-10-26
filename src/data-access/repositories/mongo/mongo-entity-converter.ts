@@ -1,4 +1,4 @@
-import { Rundown } from '../../../model/entities/rundown'
+import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities/rundown'
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
@@ -12,34 +12,50 @@ import { LookaheadMode } from '../../../model/enums/lookahead-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { ShowStyle } from '../../../model/entities/show-style'
+import { Owner } from '../../../model/enums/owner'
+import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
 import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
+import { PartTimings } from '../../../model/value-objects/part-timings'
+import { Exception } from '../../../model/exceptions/exception'
+import { ErrorCode } from '../../../model/enums/error-code'
 import { ActionManifest } from '../../../model/entities/action'
 import { UnexpectedCaseException } from '../../../model/exceptions/unexpected-case-exception'
 import { Media } from '../../../model/entities/media'
 
-export interface MongoRundown {
+export interface MongoId {
   _id: string
+}
+
+export interface MongoRundown extends MongoId {
   name: string
   showStyleVariantId: string
   modified: number
   isActive?: boolean // TODO: Remove optionality when we have control over data structure.
+  infinitePieceIds: string[]
   persistentState?: unknown
+  activeCursor: MongoRundownCursor | undefined
+  nextCursor: MongoRundownCursor | undefined
 }
 
-export interface MongoSegment {
-  _id: string
+interface MongoRundownCursor {
+  partId: string
+  segmentId: string
+  owner: Owner
+}
+
+export interface MongoSegment extends MongoId {
   name: string
   _rank: number
   rundownId: string
   externalId: string
   isHidden: boolean
   isOnAir: boolean
+  isUnsynced: boolean
   isNext: boolean
   budgetDuration?: number
 }
 
-export interface MongoPart {
-  _id: string
+export interface MongoPart extends MongoId {
   segmentId: string
   title: string
   _rank: number
@@ -47,6 +63,7 @@ export interface MongoPart {
   expectedDuration: number
   isOnAir: boolean
   isNext: boolean
+  isUnsynced?: boolean
   inTransition?: {
     previousPartKeepaliveDuration: number
     partContentDelayDuration: number
@@ -57,20 +74,21 @@ export interface MongoPart {
   autoNext: boolean
   autoNextOverlap: number
   disableNextInTransition: boolean
+  timings?: PartTimings
   endState?: unknown
 }
 
-export interface MongoPiece {
-  _id: string
+export interface MongoPiece extends MongoId {
   startPartId: string
   name: string
   sourceLayerId: string
   enable: {
     start: number | string
-    duration: number
+    duration?: number
   }
   prerollDuration: number
   postrollDuration: number
+  executedAt: number
   timelineObjectsString: string
   lifespan: string
   pieceType: string
@@ -78,10 +96,10 @@ export interface MongoPiece {
   metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
   content?: unknown
   tags?: string[]
+  isUnsynced: boolean
 }
 
-export interface MongoTimeline {
-  _id: string
+export interface MongoTimeline extends MongoId {
   timelineHash: string
   generated: number
   timelineBlob: string
@@ -100,8 +118,7 @@ export interface MongoShowStyle {
   blueprintConfig: unknown
 }
 
-export interface MongoShowStyleVariant {
-  _id: string
+export interface MongoShowStyleVariant extends MongoId {
   showStyleBaseId: string
   name: string
   blueprintConfig: unknown
@@ -131,17 +148,50 @@ export interface MongoMedia {
 }
 
 export class MongoEntityConverter {
-  public convertRundown(mongoRundown: MongoRundown, baselineTimelineObjects?: TimelineObject[]): Rundown {
+  public convertRundown(mongoRundown: MongoRundown, segments: Segment[], baselineTimelineObjects?: TimelineObject[], infinitePieces?: Piece[]): Rundown {
+    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = mongoRundown.isActive
+      ? {
+        activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
+        nextCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.nextCursor, segments),
+        infinitePieces: this.mapToInfinitePieceMap(infinitePieces ?? [])
+      }
+      : undefined
     return new Rundown({
       id: mongoRundown._id,
       name: mongoRundown.name,
       showStyleVariantId: mongoRundown.showStyleVariantId,
       isRundownActive: mongoRundown.isActive ?? false,
       baselineTimelineObjects: baselineTimelineObjects ?? [],
-      segments: [],
+      segments,
       modifiedAt: mongoRundown.modified,
-      persistentState: mongoRundown.persistentState
+      persistentState: mongoRundown.persistentState,
+      alreadyActiveProperties
     })
+  }
+
+  private convertMongoRundownCursorToRundownCursor(cursor: MongoRundownCursor | undefined, segments: Segment[]): RundownCursor | undefined {
+    if (!cursor) {
+      return
+    }
+    const segmentForCursor: Segment | undefined = segments.find(segment => segment.id === cursor.segmentId)
+    if (!segmentForCursor) {
+      return
+    }
+
+    const partForCursor: Part | undefined = segmentForCursor.getParts().find(part => part.id === cursor.partId)
+    if (!partForCursor) {
+      return
+    }
+
+    return {
+      part: partForCursor,
+      segment: segmentForCursor,
+      owner: cursor.owner
+    }
+  }
+
+  private mapToInfinitePieceMap(infinitePieces: Piece[]): Map<string, Piece> {
+    return new Map(infinitePieces.map(piece => [piece.layer, piece]))
   }
 
   public convertToMongoRundown(rundown: Rundown): MongoRundown {
@@ -150,8 +200,22 @@ export class MongoEntityConverter {
       name: rundown.name,
       showStyleVariantId: rundown.getShowStyleVariantId(),
       isActive: rundown.isActive(),
-      persistentState: rundown.getPersistentState()
+      infinitePieceIds: rundown.getInfinitePieces().map(piece => piece.id),
+      persistentState: rundown.getPersistentState(),
+      activeCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getActiveCursor()),
+      nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor())
     } as MongoRundown
+  }
+
+  public convertRundownCursorToMongoRundownCursor(cursor: RundownCursor | undefined): MongoRundownCursor | undefined {
+    if (!cursor) {
+      return
+    }
+    return {
+      partId: cursor.part.id,
+      segmentId: cursor.segment.id,
+      owner: cursor.owner
+    }
   }
 
   public convertToBasicRundown(mongoRundown: MongoRundown): BasicRundown {
@@ -173,15 +237,18 @@ export class MongoEntityConverter {
       rundownId: mongoSegment.rundownId,
       name: mongoSegment.name,
       rank: mongoSegment._rank,
-      isOnAir: false,
-      isNext: false,
+      isOnAir: mongoSegment.isOnAir ?? false,
+      isNext: mongoSegment.isNext ?? false,
+      isUnsynced: mongoSegment.isUnsynced ?? false,
       parts: [],
       budgetDuration: mongoSegment.budgetDuration ?? undefined, // Ensure that null values are stripped
     })
   }
 
   public convertSegments(mongoSegments: MongoSegment[]): Segment[] {
-    return mongoSegments.filter((segment) => !segment.isHidden).map(this.convertSegment.bind(this))
+    return mongoSegments
+      .filter((segment) => !segment.isHidden || (segment.isHidden && segment.isUnsynced))
+      .map(this.convertSegment.bind(this))
   }
 
   public convertToMongoSegment(segment: Segment): MongoSegment {
@@ -192,6 +259,7 @@ export class MongoEntityConverter {
       _rank: segment.rank,
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
+      isUnsynced: segment.isUnsynced(),
       budgetDuration: segment.budgetDuration,
     } as MongoSegment
   }
@@ -206,6 +274,7 @@ export class MongoEntityConverter {
       expectedDuration: mongoPart.expectedDuration,
       isOnAir: false,
       isNext: false,
+      isUnsynced: mongoPart.isUnsynced ?? false,
       pieces: [],
       inTransition: {
         keepPreviousPartAliveDuration: mongoPart.inTransition?.previousPartKeepaliveDuration ?? 0,
@@ -216,6 +285,7 @@ export class MongoEntityConverter {
       },
       autoNext: mongoPart.autoNext ? { overlap: mongoPart.autoNextOverlap } : undefined,
       disableNextInTransition: mongoPart.disableNextInTransition,
+      timings: mongoPart.timings,
       endState: mongoPart.endState,
     })
   }
@@ -231,11 +301,23 @@ export class MongoEntityConverter {
       expectedDuration: part.expectedDuration,
       title: part.name,
       segmentId: part.getSegmentId(),
-      _rank: part.rank,
+      _rank: part.getRank(),
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
-      endState: part.getEndState()
+      isUnsynced: part.isUnsynced(),
+      timings: this.getTimings(part),
+      endState: part.getEndState(),
     } as MongoPart
+  }
+
+  private getTimings(part: Part): PartTimings | undefined {
+    try {
+      return  part.getTimings()
+    } catch (error) {
+      if ((error as Exception).errorCode !== ErrorCode.UNSUPPORTED_OPERATION) {
+        throw error
+      }
+    }
   }
 
   public convertPiece(mongoPiece: MongoPiece): Piece {
@@ -248,14 +330,16 @@ export class MongoEntityConverter {
       pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
       isPlanned: mongoPiece.isPlanned ?? true,
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
-      duration: mongoPiece.enable.duration,
+      duration: mongoPiece.enable.duration ?? undefined,
       preRollDuration: mongoPiece.prerollDuration,
       postRollDuration: mongoPiece.prerollDuration,
+      executedAt: mongoPiece.executedAt,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
       metadata: mongoPiece.metaData,
       content: mongoPiece.content,
       tags: mongoPiece.tags ?? [],
+      isUnsynced: mongoPiece.isUnsynced
     })
   }
 
@@ -298,6 +382,69 @@ export class MongoEntityConverter {
 
   public convertPieces(mongoPieces: MongoPiece[]): Piece[] {
     return mongoPieces.map((mongoPiece) => this.convertPiece(mongoPiece))
+  }
+
+  public convertToMongoPiece(piece: Piece): MongoPiece {
+    const enable: MongoPiece['enable'] = {
+      start: piece.getStart(),
+      duration: piece.duration
+    }
+
+    return {
+      _id: piece.id,
+      name: piece.name,
+      startPartId: piece.getPartId(),
+      sourceLayerId: piece.layer,
+      lifespan: this.mapPieceLifespanToMongoPieceLifespan(piece.pieceLifespan),
+      isPlanned: piece.isPlanned,
+      enable,
+      prerollDuration: piece.preRollDuration,
+      postrollDuration: piece.postRollDuration,
+      executedAt: piece.getExecutedAt(),
+      pieceType: this.mapTransitionTypeToMongoTransitionType(piece.transitionType),
+      timelineObjectsString: JSON.stringify(piece.timelineObjects),
+      metaData: piece.metadata,
+      content: piece.content,
+      tags: piece.tags,
+      isUnsynced: piece.isUnsynced()
+    }
+  }
+
+  private mapPieceLifespanToMongoPieceLifespan(lifespan: PieceLifespan): string {
+    switch (lifespan) {
+      case PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE: {
+        return 'rundown-change'
+      }
+      case PieceLifespan.SPANNING_UNTIL_RUNDOWN_END: {
+        return 'rundown-end'
+      }
+      case PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE: {
+        return 'segment-change'
+      }
+      case PieceLifespan.SPANNING_UNTIL_SEGMENT_END: {
+        return 'segment-end'
+      }
+      case PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN: {
+        return 'rundown-change-segment-lookback'
+      }
+      case PieceLifespan.WITHIN_PART:
+      default: {
+        return 'part-only'
+      }
+    }
+  }
+
+  private mapTransitionTypeToMongoTransitionType(transitionType: TransitionType): string {
+    switch (transitionType) {
+      case TransitionType.IN_TRANSITION: {
+        return 'in-transition'
+      }
+      case TransitionType.OUT_TRANSITION:
+        return 'out-transition'
+      case TransitionType.NO_TRANSITION:
+      default:
+        return 'normal'
+    }
   }
 
   public convertToMongoTimeline(timeline: Timeline): MongoTimeline {

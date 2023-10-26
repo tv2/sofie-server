@@ -21,6 +21,7 @@ import { LookaheadMode } from '../../model/enums/lookahead-mode'
 import { Exception } from '../../model/exceptions/exception'
 import { ErrorCode } from '../../model/enums/error-code'
 import { Timeline } from '../../model/entities/timeline'
+import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -48,11 +49,15 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return { timelineGroups: [] }
   }
 
-  public buildTimeline(rundown: Rundown, studio: Studio): Timeline {
+  public async buildTimeline(rundown: Rundown, studio?: Studio): Promise<Timeline> {
+    if (!studio) {
+      throw new MisconfigurationException(`No Studio provided when calling ${SuperflyTimelineBuilder.name}.${SuperflyTimelineBuilder.prototype.buildTimeline.name}`)
+    }
+
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)
 
     if (!rundown.isActivePartSet()) {
-      return this.createTimelineWithLookaheadGroup(rundown, studio, undefined, timeline)
+      return Promise.resolve(this.createTimelineWithLookaheadGroup(rundown, studio, undefined, timeline))
     }
 
     const activePartTimelineGroup: ActivePartTimelineObjectGroup = this.createActivePartGroup(rundown)
@@ -63,7 +68,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     timeline = this.createTimelineWithInfiniteGroups(rundown, timeline)
     timeline = this.updateTimelineAutoNextEpochTimestampFromNextPart(rundown, activePartTimelineGroup, timeline)
 
-    return timeline
+    return Promise.resolve(timeline)
   }
 
   private createTimelineWithBaseline(rundown: Rundown): Timeline {
@@ -219,7 +224,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     piece: Piece,
     parentGroup: TimelineObjectGroup
   ): TimelineEnable | undefined {
-    const duration: string | number =
+    const duration: string | number | undefined =
         partCalculatedTimings.postRollDuration && !piece.duration
           ? `#${parentGroup.id} - ${partCalculatedTimings.postRollDuration}`
           : piece.duration
@@ -355,7 +360,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       }
 
       lookAheadObjects.push(
-        ...this.createLookAheadTimelineObjectsForPart(partToGetLookAheadObjectsFrom, layer, lookAheadEnable)
+        ...this.createLookaheadTimelineObjectsForPart(partToGetLookAheadObjectsFrom, layer, lookAheadEnable)
       )
       try {
         partToGetLookAheadObjectsFrom = rundown.getPartAfter(partToGetLookAheadObjectsFrom)
@@ -369,7 +374,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return lookAheadObjects
   }
 
-  private createLookAheadTimelineObjectsForPart(
+  private createLookaheadTimelineObjectsForPart(
     part: Part,
     layer: StudioLayer,
     enable: TimelineEnable,
@@ -401,7 +406,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       start: 0,
       end: `#${activeGroup.id}.start`,
     }
-    return this.createLookAheadTimelineObjectsForPart(
+    return this.createLookaheadTimelineObjectsForPart(
       rundown.getActivePart(),
       layer,
       activePartTimelineObjectEnable,
