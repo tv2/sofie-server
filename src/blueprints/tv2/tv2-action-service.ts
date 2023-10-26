@@ -26,16 +26,16 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
-    private readonly serverActionFactory: Tv2VideoClipActionFactory,
-    private readonly videoSwitcherActionFactory: Tv2VideoMixerConfigurationActionFactory
+    private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
+    private readonly videoMixerActionFactory: Tv2VideoMixerConfigurationActionFactory
   ) {}
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
     if (this.transitionActionFactory.isTransitionAction(action)) {
       return this.transitionActionFactory.getMutateActionMethods(action)
     }
-    if (this.serverActionFactory.isVideoClipAction(action)) {
-      return this.serverActionFactory.getMutateActionMethods(action)
+    if (this.videoClipActionFactory.isVideoClipAction(action)) {
+      return this.videoClipActionFactory.getMutateActionMethods(action)
     }
   }
 
@@ -50,8 +50,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
-      ...this.serverActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
-      ...this.videoSwitcherActionFactory.createVideoMixerActions(blueprintConfiguration)
+      ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
+      ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration)
     ]
   }
 
