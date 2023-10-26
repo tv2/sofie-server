@@ -10,6 +10,7 @@ import { CallbackScheduler } from '../interfaces/callback-scheduler'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Blueprint } from '../../../model/value-objects/blueprint'
 import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
+import {AlreadyActivatedException} from "../../../model/exceptions/already-activated-exception";
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -52,6 +53,22 @@ describe(RundownTimelineService.name, () => {
       const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
 
       await expect(() => testee.deleteRundown(rundown.id)).rejects.toThrow(ActiveRundownException)
+    })
+
+    it('throws an exception, when trying to active a rundown when there is another already activated rundown', async () => {
+      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
+      
+      const activeBasicRundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: true })
+      
+      const basicRundownArray: Rundown[] = [activeBasicRundown];
+
+      const rundownToActivate: Rundown = EntityMockFactory.createRundown({isRundownActive: false})
+
+      when(mockRundownRepository.getBasicRundowns()).thenResolve(basicRundownArray)
+
+      const testee: RundownTimelineService = createTestee({rundownRepository: instance(mockRundownRepository)})
+
+      await expect(() => testee.activateRundown(rundownToActivate.name)).rejects.toThrow(AlreadyActivatedException)
     })
   })
 })
