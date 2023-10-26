@@ -1,7 +1,7 @@
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 export class CachedRundownRepository implements RundownRepository {
   private static instance: RundownRepository
@@ -26,6 +26,26 @@ export class CachedRundownRepository implements RundownRepository {
     return this.cachedRundowns.get(rundownId) as Rundown
   }
 
+  public getRundownBySegmentId(segmentId: string): Promise<Rundown> {
+    for (const rundown of this.cachedRundowns.values()) {
+      const rundownHasSegment: boolean = rundown.getSegments().some(segment => segment.id === segmentId)
+      if (rundownHasSegment) {
+        return Promise.resolve(rundown)
+      }
+    }
+    throw new NotFoundException(`No Rundown found with a Segment for Segment id: ${segmentId}`)
+  }
+
+  public getRundownByPartId(partId: string): Promise<Rundown> {
+    for (const rundown of this.cachedRundowns.values()) {
+      const rundownHasPart: boolean = rundown.getSegments().some(segment => segment.getParts().some(part => part.id === partId))
+      if (rundownHasPart) {
+        return Promise.resolve(rundown)
+      }
+    }
+    throw new NotFoundException(`No Rundown found with a Part for Part id: ${partId}`)
+  }
+
   public async getBasicRundowns(): Promise<BasicRundown[]> {
     return await this.rundownRepository.getBasicRundowns()
   }
@@ -36,10 +56,7 @@ export class CachedRundownRepository implements RundownRepository {
   }
 
   public async deleteRundown(rundownId: string): Promise<void> {
-    const wasDeleted: boolean = this.cachedRundowns.delete(rundownId)
-    if (!wasDeleted) {
-      throw new DeletionFailedException(`Failed to delete rundown from cache, with rundownId: ${rundownId}`)
-    }
+    this.cachedRundowns.delete(rundownId)
     await this.rundownRepository.deleteRundown(rundownId)
   }
 }

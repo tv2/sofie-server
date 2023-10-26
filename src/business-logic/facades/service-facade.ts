@@ -9,14 +9,19 @@ import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
+import { IngestService } from '../services/interfaces/ingest-service'
+import { DatabaseChangeIngestService } from '../services/database-change-ingest-service'
+import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
     return new RundownTimelineService(
       EventEmitterFacade.createRundownEventEmitter(),
       RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createSegmentRepository(),
+      RepositoryFacade.createPartRepository(),
+      RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
-      RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createTimelineBuilder(),
       TimeoutCallbackScheduler.getInstance(),
       BlueprintsFacade.createBlueprint()
@@ -24,7 +29,12 @@ export class ServiceFacade {
   }
 
   public static createTimelineBuilder(): TimelineBuilder {
-    return new SuperflyTimelineBuilder(new JsonObjectCloner())
+    const superflyTimelineBuilder: TimelineBuilder = new SuperflyTimelineBuilder(new JsonObjectCloner())
+    return new BlueprintTimelineBuilder(
+      superflyTimelineBuilder,
+      RepositoryFacade.createConfigurationRepository(),
+      BlueprintsFacade.createBlueprint()
+    )
   }
 
   public static createActionService(): ActionService {
@@ -34,6 +44,18 @@ export class ServiceFacade {
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       BlueprintsFacade.createBlueprint()
+    )
+  }
+
+  public static createIngestService(): IngestService {
+    return DatabaseChangeIngestService.getInstance(
+      RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createTimelineRepository(),
+      ServiceFacade.createTimelineBuilder(),
+      EventEmitterFacade.createRundownEventEmitter(),
+      RepositoryFacade.createRundownChangeListener(),
+      RepositoryFacade.createSegmentChangedListener(),
+      RepositoryFacade.createPartChangedListener()
     )
   }
 }
