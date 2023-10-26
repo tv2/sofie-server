@@ -18,6 +18,9 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { PartTimings } from '../../../model/value-objects/part-timings'
 import { Exception } from '../../../model/exceptions/exception'
 import { ErrorCode } from '../../../model/enums/error-code'
+import { ActionManifest } from '../../../model/entities/action'
+import { UnexpectedCaseException } from '../../../model/exceptions/unexpected-case-exception'
+import { Media } from '../../../model/entities/media'
 
 export interface MongoId {
   _id: string
@@ -121,7 +124,6 @@ export interface MongoShowStyleVariant extends MongoId {
   blueprintConfig: unknown
 }
 
-
 interface MongoLayerMapping {
   // Which Lookahead "mode" we are in.
   lookahead: number
@@ -129,6 +131,20 @@ interface MongoLayerMapping {
   lookaheadDepth: number
   // The maximum distance to search for lookahead
   lookaheadMaxSearchDistance: number
+}
+
+export interface MongoActionManifest {
+  actionId: string
+  userData: unknown
+}
+
+export interface MongoMedia {
+  mediaId: string
+  mediainfo: {
+    format: {
+      duration: number
+    }
+  }
 }
 
 export class MongoEntityConverter {
@@ -495,6 +511,37 @@ export class MongoEntityConverter {
       name: mongoShowStyleVariant.name,
       showStyleBaseId: mongoShowStyleVariant.showStyleBaseId,
       blueprintConfiguration: mongoShowStyleVariant.blueprintConfig
+    }
+  }
+
+  public convertActionManifest(mongoActionManifest: MongoActionManifest): ActionManifest {
+    return {
+      pieceType: this.getPieceTypeFromMongoActionManifest(mongoActionManifest),
+      data: mongoActionManifest.userData
+    }
+  }
+
+  private getPieceTypeFromMongoActionManifest(mongoActionManifest: MongoActionManifest): PieceType {
+    switch (mongoActionManifest.actionId) {
+      case 'select_full_grafik': {
+        return PieceType.CAMERA
+      }
+      case 'select_server_clip': {
+        return PieceType.VIDEO_CLIP
+      }
+      case 'select_dve': {
+        return PieceType.DVE
+      }
+      default: {
+        throw new UnexpectedCaseException(`Unknown MongoActionManifestId: ${mongoActionManifest.actionId}`)
+      }
+    }
+  }
+
+  public convertMedia(mongoMedia: MongoMedia): Media {
+    return {
+      id: mongoMedia.mediaId,
+      duration: mongoMedia.mediainfo.format.duration
     }
   }
 }

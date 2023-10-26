@@ -6,7 +6,7 @@ import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { PieceType } from '../../../model/enums/piece-type'
-import { Tv2AtemLayer, Tv2SisyfosLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import {
@@ -16,15 +16,16 @@ import {
   AtemType
 } from '../../timeline-state-resolver-types/atem-types'
 import { DeviceType } from '../../../model/enums/device-type'
-import {
-  SisyfosChannelsTimelineObject,
-  SisyfosChannelTimelineObject,
-  SisyfosType
-} from '../../timeline-state-resolver-types/sisyfos-types'
 import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
 import { Action } from '../../../model/entities/action'
+import {
+  Tv2AudioTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 
 export class Tv2CameraActionFactory {
+
+  constructor(private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory) {
+  }
 
   public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return blueprintConfiguration.studio.SourcesCam
@@ -57,7 +58,7 @@ export class Tv2CameraActionFactory {
 
   private createCameraPiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): PieceInterface {
     const cameraTimelineObjects: TimelineObject[] = this.createCameraTimelineObjects(source)
-    const sisyfosTimelineObjects: TimelineObject[] = this.createSisyfosTimelineObjects(configuration, source)
+    const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
       sisyfosPersistMetaData: {
@@ -86,7 +87,7 @@ export class Tv2CameraActionFactory {
       isUnsynced: false,
       timelineObjects: [
         ...cameraTimelineObjects,
-        ...sisyfosTimelineObjects
+        ...audioTimelineObjects
       ]
     }
   }
@@ -126,56 +127,6 @@ export class Tv2CameraActionFactory {
     }
 
     return [programTimelineObject, lookaheadTimelineObject]
-  }
-
-  private createSisyfosTimelineObjects(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): TimelineObject[] {
-    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
-      return {
-        id: '',
-        enable: {
-          start: 0
-        },
-        layer: sisyfosLayer,
-        content: {
-          deviceType: DeviceType.SISYFOS,
-          type: SisyfosType.CHANNEL,
-          isPgm: 1
-        }
-      }
-    })
-
-    if (!source.StudioMics) {
-      return sisyfosChannelTimelineObjects
-    }
-
-    return [
-      ...sisyfosChannelTimelineObjects,
-      this.createSisyfosStudioMicsTimelineObject(configuration)
-    ]
-  }
-
-  private createSisyfosStudioMicsTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    const studioMicsChannels: SisyfosChannelsTimelineObject['content']['channels'] = configuration.studio.StudioMics.map(studioMicLayer => {
-      return {
-        mappedLayer: studioMicLayer,
-        isPgm: 1
-      }
-    })
-
-    return {
-      id: '',
-      enable: {
-        start: 0
-      },
-      priority: studioMicsChannels ? 2 : 0,
-      layer: Tv2SisyfosLayer.STUDIO_MICS,
-      content: {
-        deviceType: DeviceType.SISYFOS,
-        type: SisyfosType.CHANNELS,
-        channels: studioMicsChannels,
-        overridePriority: 2
-      }
-    }
   }
 
   private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
