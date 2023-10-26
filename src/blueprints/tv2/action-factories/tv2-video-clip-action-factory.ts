@@ -117,6 +117,7 @@ export class Tv2VideoClipActionFactory {
       transitionType: TransitionType.NO_TRANSITION,
       metadata,
       isPlanned: false,
+      isUnsynced: false,
       start: 0,
       duration: 0,
       preRollDuration: configuration.studio.CasparPrerollDuration,
@@ -161,6 +162,7 @@ export class Tv2VideoClipActionFactory {
       isPlanned: false,
       isOnAir: false,
       isNext: false,
+      isUnsynced: false,
       inTransition: {
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
