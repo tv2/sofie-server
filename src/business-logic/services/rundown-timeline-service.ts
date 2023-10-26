@@ -10,10 +10,12 @@ import { RundownService } from './interfaces/rundown-service'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
-import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
-import { Configuration } from '../../model/entities/configuration'
-import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
 import { Part } from '../../model/entities/part'
+import { Owner } from '../../model/enums/owner'
+import { PartRepository } from '../../data-access/repositories/interfaces/part-repository'
+import { Segment } from '../../model/entities/segment'
+import { SegmentRepository } from '../../data-access/repositories/interfaces/segment-repository'
+import { PieceRepository } from '../../data-access/repositories/interfaces/piece-repository'
 import {BasicRundown} from "../../model/entities/basic-rundown";
 import {AlreadyActivatedException} from "../../model/exceptions/already-activated-exception";
 
@@ -21,8 +23,10 @@ export class RundownTimelineService implements RundownService {
   constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly rundownRepository: RundownRepository,
+    private readonly segmentRepository: SegmentRepository,
+    private readonly partRepository: PartRepository,
+    private readonly pieceRepository: PieceRepository,
     private readonly timelineRepository: TimelineRepository,
-    private readonly configurationRepository: ConfigurationRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly callbackScheduler: CallbackScheduler,
     private readonly blueprint: Blueprint
@@ -50,38 +54,10 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
-    return rundown.isActivePartSet()
-      ? this.buildAndPersistTimelineWithBlueprint(rundown)
-      : this.buildAndPersistTimelineWithoutBlueprint(rundown)
-  }
-
-  private async buildAndPersistTimelineWithoutBlueprint(rundown: Rundown): Promise<Timeline> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
-    this.timelineRepository.saveTimeline(timeline)
+  private async buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
+    const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
+    await this.timelineRepository.saveTimeline(timeline)
     return timeline
-  }
-
-  private async buildAndPersistTimelineWithBlueprint(rundown: Rundown): Promise<Timeline> {
-    const onTimelineGenerateResult: OnTimelineGenerateResult = await this.buildTimelineAndCallOnGenerate(rundown)
-    rundown.setPersistentState(onTimelineGenerateResult.rundownPersistentState)
-    this.timelineRepository.saveTimeline(onTimelineGenerateResult.timeline)
-    return onTimelineGenerateResult.timeline
-  }
-
-  private async buildTimelineAndCallOnGenerate(rundown: Rundown): Promise<OnTimelineGenerateResult> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-
-    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration.studio)
-
-    return this.blueprint.onTimelineGenerate(
-      configuration,
-      timeline,
-      rundown.getActivePart(),
-      rundown.getPersistentState(),
-      rundown.getPreviousPart()
-    )
   }
 
   public async deactivateRundown(rundownId: string): Promise<void> {
@@ -92,11 +68,21 @@ export class RundownTimelineService implements RundownService {
     rundown.deactivate()
     const timeline: Timeline = this.timelineBuilder.getBaseTimeline()
 
-    this.timelineRepository.saveTimeline(timeline)
+    await this.timelineRepository.saveTimeline(timeline)
 
     this.rundownEventEmitter.emitDeactivateEvent(rundown)
 
     await this.rundownRepository.saveRundown(rundown)
+
+    await this.deleteAllUnsynced()
+  }
+
+  private async deleteAllUnsynced(): Promise<void> {
+    await Promise.all([
+      this.segmentRepository.deleteAllUnsyncedSegments(),
+      this.partRepository.deleteAllUnsyncedParts(),
+      this.pieceRepository.deleteAllUnsyncedPieces()
+    ])
   }
 
   private stopAutoNext(): void {
@@ -124,6 +110,20 @@ export class RundownTimelineService implements RundownService {
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.rundownRepository.saveRundown(rundown)
+
+    await this.deleteUnsyncedSegmentsAndParts(rundown)
+  }
+
+  private async deleteUnsyncedSegmentsAndParts(rundown: Rundown): Promise<void> {
+    const unsyncedSegments: Segment[] = rundown.getSegments().filter(segment => segment.isUnsynced())
+    await Promise.all(unsyncedSegments.map(async segment => {
+      if (rundown.isActive() && segment.isOnAir()) {
+        await this.partRepository.deleteUnsyncedPartsForSegment(segment.id)
+        return
+      }
+      await this.segmentRepository.deleteUnsyncedSegmentsForRundown(rundown.id)
+    }))
+    await this.pieceRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
   }
 
   private getEndStateForActivePart(rundown: Rundown): PartEndState {
@@ -149,9 +149,9 @@ export class RundownTimelineService implements RundownService {
       .forEach((piece) => this.rundownEventEmitter.emitInfiniteRundownPieceAddedEvent(rundown, piece))
   }
 
-  public async setNext(rundownId: string, segmentId: string, partId: string): Promise<void> {
+  public async setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.setNext(segmentId, partId)
+    rundown.setNext(segmentId, partId, owner)
 
     await this.buildAndPersistTimeline(rundown)
 
@@ -177,12 +177,12 @@ export class RundownTimelineService implements RundownService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
     if (rundown.isActive()) {
-      throw new ActiveRundownException('Attempted to delete an active rundown')
+      throw new ActiveRundownException(`Unable to delete active Rundown: ${rundown.id}`)
     }
 
     await this.rundownRepository.deleteRundown(rundownId)
 
-    this.rundownEventEmitter.emitDeletedEvent(rundown)
+    this.rundownEventEmitter.emitRundownDeleted(rundown.id)
   }
 
   public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {

@@ -1,31 +1,35 @@
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
+  PartCreatedEvent,
+  PartDeletedEvent,
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
   PartTakenEvent,
+  PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
+  RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
+  RundownUpdatedEvent,
+  SegmentCreatedEvent,
+  SegmentDeletedEvent,
+  SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
-import { RundownEventType } from '../enums/rundown-event-type'
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
+import { IngestEventType, RundownEventType } from '../enums/rundown-event-type'
+import { SegmentDto } from '../dtos/segment-dto'
+import { RundownDto } from '../dtos/rundown-dto'
+import { Segment } from '../../model/entities/segment'
 
 export class RundownEventBuilderImplementation implements RundownEventBuilder {
-  public buildDeletedEvent(rundown: Rundown): RundownDeletedEvent {
-    return {
-      type: RundownEventType.DELETED,
-      timestamp: Date.now(),
-      rundownId: rundown.id,
-    }
-  }
 
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
@@ -96,7 +100,6 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       rundownId: rundown.id,
       part: new PartDto(part)
     }
-
   }
 
   public buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent {
@@ -107,6 +110,86 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       segmentId,
       partId: piece.getPartId(),
       piece: new PieceDto(piece)
+    }
+  }
+
+  public buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent {
+    return {
+      type: IngestEventType.RUNDOWN_CREATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      rundown: new RundownDto(rundown)
+    }
+  }
+
+  public buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent {
+    return {
+      type: IngestEventType.RUNDOWN_UPDATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      rundown: new RundownDto(rundown)
+    }
+  }
+
+  public buildRundownDeletedEvent(rundownId: string): RundownDeletedEvent {
+    return {
+      type: IngestEventType.RUNDOWN_DELETED,
+      timestamp: Date.now(),
+      rundownId: rundownId,
+    }
+  }
+
+  public buildSegmentCreatedEvent(rundown: Rundown, segment: Segment): SegmentCreatedEvent {
+    return {
+      type: IngestEventType.SEGMENT_CREATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segment: new SegmentDto(segment)
+    }
+  }
+
+  public buildSegmentUpdatedEvent(rundown: Rundown, segment: Segment): SegmentUpdatedEvent {
+    return {
+      type: IngestEventType.SEGMENT_UPDATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segment: new SegmentDto(segment)
+    }
+  }
+
+  public buildSegmentDeletedEvent(rundown: Rundown, segmentId: string): SegmentDeletedEvent {
+    return {
+      type: IngestEventType.SEGMENT_DELETED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId
+    }
+  }
+
+  public buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent {
+    return {
+      type: IngestEventType.PART_CREATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      part: new PartDto(part)
+    }
+  }
+
+  public buildPartUpdatedEvent(rundown: Rundown, part: Part): PartUpdatedEvent {
+    return {
+      type: IngestEventType.PART_UPDATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      part: new PartDto(part)
+    }
+  }
+
+  public buildPartDeletedEvent(rundown: Rundown, partId: string): PartDeletedEvent {
+    return {
+      type: IngestEventType.PART_DELETED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      partId
     }
   }
 }

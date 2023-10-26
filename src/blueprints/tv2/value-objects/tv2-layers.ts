@@ -5,7 +5,10 @@ export enum Tv2SourceLayer {
   AUDIO_BED = 'studio0_audio_bed',
   GRAPHICS_ACTION_COMMAND = 'studio0_adlib_graphic_cmd',
   AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs',
-  DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk' // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
+  DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
+
+  VIDEO_CLIP = 'studio0_selected_clip',
+  SERVER_VOICE_OVER = 'studio0_selected_voiceover',
 }
 
 export enum Tv2GraphicsLayer {
@@ -15,12 +18,17 @@ export enum Tv2GraphicsLayer {
 
 export enum Tv2AtemLayer {
   PROGRAM = 'atem_me_program',
+  CLEAN_FEED = 'atem_me_clean',
   LOOKAHEAD = 'atem_aux_lookahead',
   DOWNSTREAM_KEYER = 'atem_dsk'
 }
 
 export enum Tv2CasparCgLayer {
   PLAYER_CLIP_PENDING = 'casparcg_player_clip_pending',
+}
+
+export enum Tv2VideoClipLayer {
+  VIDEO_CLIP_ENABLE_PENDING = 'server_enable_pending'
 }
 
 export enum Tv2SisyfosLayer {

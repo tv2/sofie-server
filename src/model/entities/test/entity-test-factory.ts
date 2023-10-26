@@ -3,7 +3,7 @@ import { Segment, SegmentInterface } from '../segment'
 import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 
-export class TestEntityFactory {
+export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
     return new Rundown({
       id: 'rundownId' + Math.floor(Math.random()*1000),
