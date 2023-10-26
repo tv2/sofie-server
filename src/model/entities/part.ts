@@ -6,6 +6,7 @@ import { InTransition } from '../value-objects/in-transition'
 import { OutTransition } from '../value-objects/out-transition'
 import { AutoNext } from '../value-objects/auto-next'
 import { PartEndState } from '../value-objects/part-end-state'
+import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface PartInterface {
   id: string
@@ -16,6 +17,7 @@ export interface PartInterface {
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
+  isUnsynced: boolean
   expectedDuration?: number
   executedAt?: number
   playedDuration?: number
@@ -26,13 +28,13 @@ export interface PartInterface {
   autoNext?: AutoNext
   disableNextInTransition: boolean
 
+  timings?: PartTimings
   endState?: PartEndState
 }
 
 export class Part {
   public readonly id: string
   public readonly name: string
-  public readonly rank: number
   public readonly isPlanned: boolean = true
 
   public readonly expectedDuration?: number
@@ -44,11 +46,14 @@ export class Part {
   public readonly disableNextInTransition: boolean
 
   private segmentId: string
+  private rank: number
 
   private pieces: Piece[]
 
   private isPartOnAir: boolean
   private isPartNext: boolean
+
+  private isPartUnsynced: boolean = false
 
   private executedAt: number
   private playedDuration: number
@@ -81,6 +86,9 @@ export class Part {
     this.playedDuration = part.playedDuration ?? 0
 
     this.endState = part.endState
+
+    this.timings = part.timings
+    this.isPartUnsynced = part.isUnsynced
   }
 
   public putOnAir(): void {
@@ -95,6 +103,24 @@ export class Part {
   public takeOffAir(): void {
     this.isPartOnAir = false
     this.playedDuration = Date.now() - this.executedAt
+  }
+
+  public markAsUnsyncedWithUnsyncedSegment(): void {
+    if (!this.segmentId.endsWith(UNSYNCED_ID_POSTFIX)) {
+      this.segmentId = `${this.segmentId}${UNSYNCED_ID_POSTFIX}`
+    }
+    this.markAsUnsynced()
+  }
+
+  public markAsUnsynced(): void {
+    this.isPartUnsynced = true
+    this.rank = this.rank - 1
+    this.pieces.forEach(piece => piece.markAsUnsyncedWithUnsyncedPart())
+    this.pieces = this.pieces.map(piece => piece.getUnsyncedCopy())
+  }
+
+  public isUnsynced(): boolean {
+    return this.isPartUnsynced
   }
 
   public isOnAir(): boolean {
@@ -147,6 +173,10 @@ export class Part {
 
   public getSegmentId(): string {
     return this.segmentId
+  }
+
+  public getRank(): number {
+    return this.rank
   }
 
   public setSegmentId(segmentId: string): void {
@@ -248,5 +278,9 @@ export class Part {
 
   public clone(): Part {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
+  }
+
+  public getUnsyncedCopy(): Part {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
   }
 }
