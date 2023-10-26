@@ -32,6 +32,7 @@ import {
 } from '../timeline-object-factories/tv2-caspar-cg-graphics-timeline-object-factory'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
+import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -198,18 +199,20 @@ export class Tv2GraphicsActionFactory {
 
   private createVizGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): Tv2PartAction {
     const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
-    const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, manifest)
+    const partId: string = `${this.getGraphicTargetAsCamelString(target)}Part`
+    const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, manifest, partId)
     const partInterface: PartInterface = this.createGraphicsPartInterface({
-      id: `${this.getGraphicTargetAsCamelString(target)}Part`, // Todo: make id unique
+      id: partId,
       name: `${this.getGraphicTargetAsCamelString(target)} ${manifest.userData.name}`,
       inTransition: {
         keepPreviousPartAliveDuration: blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
         delayPiecesDuration: 0
       },
     })
+
     return {
-      id: '',
-      name: '',
+      id: `manifestAction_${manifest.userData.name.replaceAll('/', '')}`,
+      name: `Manifest Action - ${manifest.userData.name}`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -221,9 +224,10 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): PieceInterface {
+  private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest, partId: string): PieceInterface {
     return this.createGraphicsPieceInterface({
-      id: 'fullGraphicPiece', // Todo: make id unique
+      id: 'fullGraphicPiece',
+      partId,
       name: manifest.userData.name,
       preRollDuration: blueprintConfiguration.studio.VizPilotGraphics.PrerollDuration,
       pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, manifest),
@@ -304,9 +308,16 @@ export class Tv2GraphicsActionFactory {
   private createVizFullPilotTimelineObjects(
     blueprintConfiguration: Tv2BlueprintConfiguration
   ): TimelineObject[] {
+    if (!blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration) {
+      throw new MisconfigurationException(
+        'Missing configuration of \'VizPilotGraphics.CleanFeedPrerollDuration\' in settings.'
+      )
+    }
+
     const start: number = blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer
     const input: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
     const transition: AtemTransition = AtemTransition.CUT
+    const upstreamStart: number = blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration
 
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition),
@@ -315,7 +326,7 @@ export class Tv2GraphicsActionFactory {
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObject(blueprintConfiguration),
       this.videoMixerTimelineObjectFactory.createUpstreamKeyerFullPilotTimelineObject(
         blueprintConfiguration,
-        blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration
+        upstreamStart
       ),
       this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration)
     ]
@@ -329,19 +340,28 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createCasparCgGraphicsActionFromManifest(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): Tv2PartAction {
+    if (!blueprintConfiguration.studio.HTMLGraphics) {
+      throw new MisconfigurationException(
+        'Missing configuration of \'HTMLGraphics\' in settings. ' +
+        'Make sure it exists, and contains a value for \'KeepAliveDuration\''
+      )
+    }
+
     const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
-    const fullGraphicPiece: PieceInterface = this.createCasparCgFullGraphicsPiece(blueprintConfiguration, manifest)
+    const partId: string = `${this.getGraphicTargetAsCamelString(target)}Part`
+    const fullGraphicPiece: PieceInterface = this.createCasparCgFullGraphicsPiece(blueprintConfiguration, manifest, partId)
     const partInterface: PartInterface = this.createGraphicsPartInterface({
-      id: `${this.getGraphicTargetAsCamelString(target)}Part`, // Todo: make id unique
+      id: partId,
       name: `${this.getGraphicTargetAsCamelString(target)} ${manifest.userData.name}`,
       inTransition: {
         keepPreviousPartAliveDuration: blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
         delayPiecesDuration: 0
       },
     })
+
     return {
-      id: '',
-      name: '',
+      id: `manifestAction_${manifest.userData.name.replaceAll('/', '')}`,
+      name: `Manifest Action - ${manifest.userData.name}`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -353,9 +373,10 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createCasparCgFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): PieceInterface {
+  private createCasparCgFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest, partId: string): PieceInterface {
     return this.createGraphicsPieceInterface({
-      id: 'fullGraphicPiece', // Todo: make id unique
+      id: 'fullGraphicPiece',
+      partId,
       name: manifest.userData.name,
       preRollDuration: blueprintConfiguration.studio.CasparPrerollDuration,
       pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, manifest),
@@ -386,9 +407,18 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
+    if (!blueprintConfiguration.studio.HTMLGraphics) {
+      throw new MisconfigurationException(
+        'Missing configuration of \'HTMLGraphics\' in settings. ' +
+        'Make sure it exists, and contains a value for \'TransitionSettings.wipeRate\' and  \'TransitionSettings.borderSoftness\''
+      )
+    }
+
     const start: number = blueprintConfiguration.studio.CasparPrerollDuration
     const input: number = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).Fill
     const transition: AtemTransition = AtemTransition.WIPE
+
+
     const transitionSettings: AtemTransitionSettings = {
       wipe: {
         rate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
