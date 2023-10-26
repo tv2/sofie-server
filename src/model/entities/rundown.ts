@@ -479,4 +479,19 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.insertPieceIntoNextPart.name)
     this.nextPart.insertPiece(piece)
   }
+
+  public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
+    this.assertActive(this.replacePiece.name)
+    if (this.getActivePart().id === pieceToBeReplaced.getPartId()) {
+      this.getActivePart().replacePiece(pieceToBeReplaced, newPiece)
+      return
+    }
+
+    if (this.getNextPart().id === pieceToBeReplaced.getPartId()) {
+      this.getNextPart().replacePiece(pieceToBeReplaced, newPiece)
+      return
+    }
+
+    throw new UnsupportedOperation(`Can't replace Piece on Rundown ${this.id}. Piece ${pieceToBeReplaced.id} is neither on the active or next Part.`)
+  }
 }

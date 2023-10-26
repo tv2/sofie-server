@@ -68,9 +68,9 @@ export class ExecuteActionService implements ActionService {
         await this.insertPieceAsNext(pieceAction, rundownId)
         break
       }
-      case PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT: {
+      case PieceActionType.REPLACE_PIECE: {
         // TODO: Write tests for this once IngestUpdate changes has been merged.
-        await this.tryInsertPieceActionAsOnAirThenAsNext(action, rundownId)
+        await this.replacePiece(action, rundownId)
         break
       }
       default: {
@@ -158,8 +158,8 @@ export class ExecuteActionService implements ActionService {
     await this.rundownService.insertPieceAsNext(rundownId, piece)
   }
 
-  private async tryInsertPieceActionAsOnAirThenAsNext(action: Action, rundownId: string): Promise<void> {
-    const mutateActionMethods: MutateActionWithPieceMethods = this.findMutateActionsForTryInsertPieceAsOnAirThenNext(action)
+  private async replacePiece(action: Action, rundownId: string): Promise<void> {
+    const mutateActionMethods: MutateActionWithPieceMethods = this.findMutateActionsForReplacePiece(action)
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const pieceFromRundown: Piece | undefined = rundown.getActivePart().getPieces().find(mutateActionMethods.piecePredicate)
@@ -172,19 +172,17 @@ export class ExecuteActionService implements ActionService {
     const updatedAction: Action = mutateActionMethods.updateActionWithPieceData(action, pieceFromRundown)
 
     const piece: Piece = this.createPieceFromAction(updatedAction as PieceAction)
-    rundown.getActivePart().id === pieceFromRundown.getPartId()
-      ? await this.rundownService.insertPieceAsOnAir(rundownId, piece)
-      : await this.rundownService.insertPieceAsNext(rundownId, piece)
+    await this.rundownService.replacePiece(rundownId, pieceFromRundown, piece)
   }
 
-  private findMutateActionsForTryInsertPieceAsOnAirThenNext(action: Action): MutateActionWithPieceMethods {
+  private findMutateActionsForReplacePiece(action: Action): MutateActionWithPieceMethods {
     const mutateActionMethods: MutateActionMethods | undefined = this.getMutateActionsMethodsFromAction(action)
     if (!mutateActionMethods) {
-      throw new UnsupportedOperation(`${PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT} requires the Action to have implemented "getMutateActionMethods"`)
+      throw new UnsupportedOperation(`${PieceActionType.REPLACE_PIECE} requires the Action to have implemented "getMutateActionMethods"`)
     }
 
     if (mutateActionMethods.type !== MutateActionType.PIECE) {
-      throw new UnsupportedOperation(`${PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT} requires the mutateActionMethods to be ${MutateActionType.PIECE}`)
+      throw new UnsupportedOperation(`${PieceActionType.REPLACE_PIECE} requires the mutateActionMethods to be ${MutateActionType.PIECE}`)
     }
     return mutateActionMethods
   }

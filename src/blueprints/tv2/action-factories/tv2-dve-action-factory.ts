@@ -26,7 +26,11 @@ import {
   Tv2PartAction,
   Tv2PieceAction
 } from '../value-objects/tv2-action'
-import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import {
+  Tv2AudioTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 
 const NUMBER_OF_DVE_BOXES: number = 4
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
@@ -35,17 +39,21 @@ const ATEM_SUPER_SOURCE_INDEX: number = 6000
 const LAYOUT_TIMELINE_OBJECT_PRIORITY: number = 0.5
 const INSERT_SOURCE_TO_INPUT_TIMELINE_OBJECT_PRIORITY: number = 1
 
+const CAMERA_SOURCE_NAME: string = 'Camera'
+const LIVE_SOURCE_NAME: string = 'Live'
+
 export class Tv2DveActionFactory {
 
   constructor(
-    private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory
+    private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
+    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
   ) {}
 
 
   public createDveActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return [
       ...this.createDveLayoutActions(blueprintConfiguration),
-      ...this.createInsertCameraToInputActions(blueprintConfiguration)
+      ...this.createInsertToInputActions(blueprintConfiguration)
     ]
   }
 
@@ -93,6 +101,13 @@ export class Tv2DveActionFactory {
         this.createCasparCgDveLocatorTimelineObject()
       ]
 
+      const metadata: Tv2PieceMetadata = {
+        dve: {
+          boxes,
+          audioTimelineObjectsForBoxes: []
+        }
+      }
+
       return {
         id: `dveLayoutAsNextAction_${dveConfiguration.name}`,
         name: dveConfiguration.name,
@@ -100,7 +115,7 @@ export class Tv2DveActionFactory {
         type: PartActionType.INSERT_PART_AS_NEXT,
         data: {
           partInterface: this.createPartInterface(partId, dveConfiguration),
-          pieceInterfaces: [this.createDvePieceInterface(partId, dveConfiguration.name, boxes, dveLayoutTimelineObjects)]
+          pieceInterfaces: [this.createDvePieceInterface(partId, dveConfiguration.name, metadata, dveLayoutTimelineObjects)]
         },
         metadata: {
           contentType: Tv2ActionContentType.DVE_LAYOUT
@@ -130,10 +145,7 @@ export class Tv2DveActionFactory {
     }
   }
 
-  private createDvePieceInterface(partId: string, name: string, dveBoxes: DveBoxProperties[], timelineObjects: TimelineObject[]): PieceInterface {
-    const metadata: Tv2PieceMetadata = {
-      dveBoxes
-    }
+  private createDvePieceInterface(partId: string, name: string, metadata: Tv2PieceMetadata, timelineObjects: TimelineObject[]): PieceInterface {
     return {
       id: `${partId}_piece`,
       partId,
@@ -224,49 +236,83 @@ export class Tv2DveActionFactory {
     return `${folderWithoutTrailingSlashes}/${assetFileWithoutLeadingSlashes}`
   }
 
-  private createInsertCameraToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertSourceInputAction[] {
+  private createInsertToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertSourceInputAction[] {
+    const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesCam.slice(0, 5)
+    const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesRM
+
+    return [
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, CAMERA_SOURCE_NAME),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, liveSources, LIVE_SOURCE_NAME)
+    ]
+  }
+
+  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string): Tv2DveInsertSourceInputAction[] {
     const actions: Tv2DveInsertSourceInputAction[] = []
     for (let inputIndex = 0; inputIndex < NUMBER_OF_DVE_BOXES; inputIndex++) {
-      const cameraActions: Tv2DveInsertSourceInputAction[] = blueprintConfiguration.studio.SourcesCam
-        .slice(0, 5)
-        .map(cameraSource => {
+      const actionsForInput: Tv2DveInsertSourceInputAction[] = sources
+        .map(source => {
+
+          const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source)
 
           return {
-            id: `insert_camera_${cameraSource.SourceName}_to_dve_input_${inputIndex}_action`,
-            name: `Insert Camera ${cameraSource.SourceName} in DVE input ${inputIndex}`,
-            description: `Insert Camera ${cameraSource.SourceName} in DVE input ${inputIndex}`,
-            type: PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT,
+            id: `insert_${name}_${source.SourceName}_to_dve_input_${inputIndex}_action`,
+            name: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
+            description: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
+            type: PieceActionType.REPLACE_PIECE,
             data: {} as PieceInterface,
             metadata: {
               contentType: Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT,
               inputIndex,
-              videoMixerSource: cameraSource.SwitcherSource
+              videoMixerSource: source.SwitcherSource,
+              audioTimelineObjects
             }
           }
         })
 
-      actions.push(...cameraActions)
+      actions.push(...actionsForInput)
     }
     return actions
   }
 
   private updateInsertToInputAction(action: Action, dvePieceFromRundown: Piece): Action {
     const metadata: Tv2PieceMetadata = dvePieceFromRundown.metadata as Tv2PieceMetadata
-    if (!metadata.dveBoxes) {
+    if (!metadata.dve) {
       return action
     }
 
+    const dveBoxTimelineObject: TimelineObject | undefined = dvePieceFromRundown.timelineObjects.find(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getDveBoxesLayer())
+    if (!dveBoxTimelineObject) {
+      return action
+    }
+
+    const timelineObjectsToKeep: TimelineObject[] = this.findTimelineObjectsToKeepForDveInsertSource(dvePieceFromRundown)
+
     const insertSourceInputAction: Tv2DveInsertSourceInputAction = action as Tv2DveInsertSourceInputAction
 
-    const dveBoxes: DveBoxProperties[] = metadata.dveBoxes
-    dveBoxes[insertSourceInputAction.metadata.inputIndex].source = insertSourceInputAction.metadata.videoMixerSource
+    metadata.dve.audioTimelineObjectsForBoxes[insertSourceInputAction.metadata.inputIndex] = insertSourceInputAction.metadata.audioTimelineObjects
+    const audioTimelineObjects: TimelineObject[] = Object.values(metadata.dve.audioTimelineObjectsForBoxes).flat()
 
+    const dveBoxes: DveBoxProperties[] = metadata.dve.boxes
+    dveBoxes[insertSourceInputAction.metadata.inputIndex].source = insertSourceInputAction.metadata.videoMixerSource
     const dveBoxesTimelineObject: TimelineObject = this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(dveBoxes, INSERT_SOURCE_TO_INPUT_TIMELINE_OBJECT_PRIORITY)
-    dveBoxesTimelineObject.id = `${dveBoxesTimelineObject}_${Date.now()}`
+
+    const timelineObjects: TimelineObject[] = [
+      ...timelineObjectsToKeep,
+      ...audioTimelineObjects,
+      dveBoxesTimelineObject
+    ]
 
     const dveAction: Tv2DveInsertSourceInputAction = action as Tv2DveInsertSourceInputAction
-    dveAction.data = this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, dveBoxes, [dveBoxesTimelineObject])
+    dveAction.data = this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, metadata, timelineObjects)
     return dveAction
+  }
+
+  private findTimelineObjectsToKeepForDveInsertSource(dvePieceFromRundown: Piece): TimelineObject[] {
+    return dvePieceFromRundown.timelineObjects.filter(timelineObject => {
+      const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
+      return blueprintTimelineObject.content.deviceType !== this.audioTimelineObjectFactory.getAudioDeviceType()
+        && blueprintTimelineObject.layer !== this.videoMixerTimelineObjectFactory.getDveBoxesLayer()
+    })
   }
 
   private doesPieceHaveDveBoxesTimelineObject(piece: Piece): boolean {

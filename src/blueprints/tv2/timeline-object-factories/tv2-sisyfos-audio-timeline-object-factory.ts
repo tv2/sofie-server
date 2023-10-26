@@ -23,7 +23,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
       return {
-        id: '',
+        id: source._id,
         enable: {
           start: 0
         },
@@ -42,14 +42,14 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
 
     return [
       ...sisyfosChannelTimelineObjects,
-      this.createStudioMicrophonesTimelineObject(configuration)
+      this.createStudioMicrophonesTimelineObject(configuration, `_${source._id}`)
     ]
   }
 
-  private createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
+  private createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, idPostFix?: string): SisyfosChannelsTimelineObject {
     const priority: number = configuration.studio.StudioMics ? 2 : 0
     const overridePriority: number = 2
-    return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, overridePriority)
+    return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, overridePriority, idPostFix)
   }
 
   public createStudioMicrophonesDownTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
@@ -62,9 +62,9 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
     return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, priority)
   }
 
-  private buildStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, sisyfosFaderState:  SisyfosFaderState, priority: number, overridePriority: number): SisyfosChannelsTimelineObject {
+  private buildStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, sisyfosFaderState:  SisyfosFaderState, priority: number, overridePriority: number, idPostFix?: string): SisyfosChannelsTimelineObject {
     return {
-      id: 'studio_microphones',
+      id: `studio_microphones${idPostFix}`,
       enable: {
         start: 0
       },
@@ -138,5 +138,9 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
     }
 
     return sisyfosServerTimelineObjects
+  }
+
+  public getAudioDeviceType(): DeviceType {
+    return DeviceType.SISYFOS
   }
 }

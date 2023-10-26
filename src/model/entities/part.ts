@@ -133,6 +133,20 @@ export class Part {
     this.pieces.push(unPlannedPiece)
   }
 
+  public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
+    if (pieceToBeReplaced.isPlanned) {
+      throw new UnsupportedOperation(`Can't replace Piece ${pieceToBeReplaced.id}. Only unplanned Pieces are allowed to be replaced.`)
+    }
+
+    const pieceIndex: number = this.pieces.findIndex(piece => piece.id === pieceToBeReplaced.id)
+    if (pieceIndex < 0) {
+      throw new UnsupportedOperation(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
+    }
+
+    // TODO: Mark pieceToBeReplaced as unsynced once receiving IngestUpdates changes.
+    this.pieces[pieceIndex] = newPiece
+  }
+
   public getPiecesWithLifespan(lifespanFilters: PieceLifespan[]): Piece[] {
     return this.pieces.filter((piece) => lifespanFilters.includes(piece.pieceLifespan))
   }

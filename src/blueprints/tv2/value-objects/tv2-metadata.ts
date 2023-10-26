@@ -27,7 +27,10 @@ export interface Tv2SisyfosPersistenceMetadata {
 
 export interface Tv2PieceMetadata {
   sisyfosPersistMetaData?: Tv2SisyfosPersistenceMetadata // Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
-  dveBoxes?: DveBoxProperties[]
+  dve?: {
+    boxes: DveBoxProperties[],
+    audioTimelineObjectsForBoxes: { [inputIndex: number]: TimelineObject[] }
+  }
 }
 
 export interface Tv2BlueprintTimelineObject extends TimelineObject {

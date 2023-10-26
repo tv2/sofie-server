@@ -49,7 +49,7 @@ export class Tv2BlueprintsFacade {
         tv2AudioTimelineObjectFactory
       ),
       new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory),
-      new Tv2DveActionFactory(tv2VideoMixerTimelineObjectFactory)
+      new Tv2DveActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory)
     )
 
     return new Tv2Blueprint(
