@@ -3,6 +3,8 @@ import { LastPartInSegmentException } from '../exceptions/last-part-in-segment-e
 import { NotFoundException } from '../exceptions/not-found-exception'
 import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
+import { AlreadyExistException } from '../exceptions/already-exist-exception'
+import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface SegmentInterface {
   id: string
@@ -12,6 +14,7 @@ export interface SegmentInterface {
   parts: Part[]
   isOnAir: boolean
   isNext: boolean
+  isUnsynced: boolean
   budgetDuration?: number
 }
 
@@ -24,6 +27,8 @@ export class Segment {
 
   private isSegmentOnAir: boolean
   private isSegmentNext: boolean
+  private isSegmentUnsynced: boolean = false
+
   private parts: Part[]
 
   constructor(segment: SegmentInterface) {
@@ -33,6 +38,7 @@ export class Segment {
     this.rank = segment.rank
     this.isSegmentOnAir = segment.isOnAir
     this.isSegmentNext = segment.isNext
+    this.isSegmentUnsynced = segment.isUnsynced
     this.budgetDuration = segment.budgetDuration
     this.setParts(segment.parts ?? [])
   }
@@ -52,8 +58,23 @@ export class Segment {
     this.isSegmentOnAir = false
   }
 
+  public removeUnsyncedParts(): void {
+    this.parts = this.parts.filter(part => !part.isUnsynced())
+  }
+
   public isOnAir(): boolean {
     return this.isSegmentOnAir
+  }
+
+  public isUnsynced(): boolean {
+    return this.isSegmentUnsynced
+  }
+
+  public markAsUnsynced(): void {
+    this.isSegmentUnsynced = true
+    this.rank = this.rank - 1
+    this.parts.forEach(part => part.markAsUnsyncedWithUnsyncedSegment())
+    this.parts = this.parts.filter(part => part.isOnAir()).map(part => part.getUnsyncedCopy())
   }
 
   public setAsNext(): void {
@@ -77,7 +98,7 @@ export class Segment {
       throw new NotFoundException('Part does not exist in Segment')
     }
     if (fromPartIndex + 1 === this.parts.length) {
-      throw new LastPartInSegmentException()
+      throw new LastPartInSegmentException(`Part: ${fromPart.id} is the last Part in Segment: ${this.id}`)
     }
     return this.parts[fromPartIndex + 1]
   }
@@ -91,7 +112,51 @@ export class Segment {
   }
 
   public setParts(parts: Part[]): void {
-    this.parts = parts.sort((partOne: Part, partTwo: Part) => partOne.rank - partTwo.rank)
+    this.parts = parts.sort(this.compareParts)
+  }
+
+  private compareParts(partOne: Part, partTwo: Part): number {
+    return partOne.getRank() - partTwo.getRank()
+  }
+
+  public addPart(partToAdd: Part): void {
+    if (!this.isInsertingPartAllowed(partToAdd)) {
+      return
+    }
+
+    const doesPartAlreadyExistOnSegment: boolean = this.parts.some(part => part.id === partToAdd.id)
+    if (doesPartAlreadyExistOnSegment) {
+      throw new AlreadyExistException(`Unable to add Part to Segment. Part ${partToAdd.id} already exist on Segment ${this.id}`)
+    }
+    this.parts.push(partToAdd)
+    this.parts.sort(this.compareParts)
+  }
+
+  private isInsertingPartAllowed(part: Part): boolean {
+    // We are not allowed to insert Parts into unsynced Segments unless it's the active Part!
+    return !this.isUnsynced() || part.isOnAir()
+  }
+
+  public updatePart(part: Part): void {
+    const partIndex: number = this.parts.findIndex(p => p.id === part.id)
+    if (partIndex < 0) {
+      throw new NotFoundException(`Part ${part.id} does not belong to Segment ${this.id}`)
+    }
+    this.parts[partIndex] = part
+    this.parts.sort(this.compareParts)
+  }
+
+  public removePart(partId: string): void {
+    const partToDelete: Part | undefined = this.parts.find(part => part.id === partId)
+    if (!partToDelete) {
+      return
+    }
+
+    if (partToDelete.isOnAir()) {
+      partToDelete.markAsUnsynced()
+      return
+    }
+    this.parts = this.parts.filter(p => p.id !== partId)
   }
 
   public getParts(): Part[] {
@@ -171,5 +236,9 @@ export class Segment {
     }
 
     this.parts.splice(activePartIndex + 1, 0, part)
+  }
+
+  public getUnsyncedCopy(): Segment {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
   }
 }
