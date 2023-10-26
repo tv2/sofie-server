@@ -120,6 +120,7 @@ export class Tv2GraphicsActionFactory {
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: false,
+      isUnsynced: false,
       start: 0,
       preRollDuration: 0,
       postRollDuration: 0,
