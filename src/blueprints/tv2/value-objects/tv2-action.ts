@@ -1,5 +1,6 @@
 import { PartAction, PieceAction } from '../../../model/entities/action'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
+import { TimelineObject } from '../../../model/entities/timeline-object'
 
 export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
@@ -59,10 +60,11 @@ export interface Tv2DveLayoutAction extends Tv2PartAction {
 }
 
 export interface Tv2DveInsertSourceInputAction extends Tv2PieceAction {
-  type: PieceActionType.TRY_INSERT_PIECE_AS_ON_AIR_THEN_AS_NEXT
+  type: PieceActionType.REPLACE_PIECE
   metadata: {
     contentType: Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT,
     inputIndex: number // zero-indexed
-    videoMixerSource: number
+    videoMixerSource: number,
+    audioTimelineObjects: TimelineObject[]
   }
 }
