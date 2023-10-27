@@ -24,7 +24,6 @@ import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 const VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX: string = 'videoClipAsNextAction'
-const DEFAULT_EXPECTED_DURATION_IN_MS: number = 1000
 
 export class Tv2VideoClipActionFactory {
 
@@ -172,7 +171,7 @@ export class Tv2VideoClipActionFactory {
       outTransition: {
         keepAliveDuration: 0
       },
-      expectedDuration: videoClipData.durationFromIngest > 0 ? videoClipData.durationFromIngest : DEFAULT_EXPECTED_DURATION_IN_MS,
+      expectedDuration: videoClipData.durationFromIngest > 0 ? videoClipData.durationFromIngest : undefined,
       disableNextInTransition: false
     }
   }
