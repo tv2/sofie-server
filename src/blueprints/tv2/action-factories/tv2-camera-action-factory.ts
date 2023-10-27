@@ -21,6 +21,7 @@ import { Action } from '../../../model/entities/action'
 import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 export class Tv2CameraActionFactory {
 
@@ -61,6 +62,7 @@ export class Tv2CameraActionFactory {
     const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
+      type: Tv2PieceType.CAMERA,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: source.AcceptPersistAudio
