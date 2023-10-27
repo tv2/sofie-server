@@ -1,4 +1,4 @@
-import { Action, MutateActionMethods } from '../../../model/entities/action'
+import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -35,8 +35,9 @@ export class Tv2TransitionActionFactory {
     switch (action.id) {
       case MIX_TRANSITION_ID: {
         return {
+          type: MutateActionType.PLANNED_PIECE,
           updateActionWithPlannedPieceData: (action: Action, plannedPiece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, plannedPiece),
-          plannedPiecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
+          plannedPiecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
         }
       }
     }
@@ -56,6 +57,7 @@ export class Tv2TransitionActionFactory {
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
+      isUnsynced: false,
       timelineObjects: [],
       metadata: {
         type: Tv2PieceType.TRANSITION,

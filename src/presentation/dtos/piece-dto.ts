@@ -5,7 +5,7 @@ export class PieceDto {
   public readonly partId: string
   public readonly name: string
   public readonly start: number
-  public readonly duration: number
+  public readonly duration?: number
   public readonly layer: string
   public readonly isPlanned: boolean
   public readonly metadata?: unknown

@@ -4,9 +4,13 @@ import { Part, PartInterface } from '../part'
 import { Segment, SegmentInterface } from '../segment'
 import { EntityMockFactory } from './entity-mock-factory'
 import { capture, instance, verify } from '@typestrong/ts-mockito'
+import { EntityTestFactory } from './entity-test-factory'
+import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
+import { AlreadyExistException } from '../../exceptions/already-exist-exception'
+import { NotFoundException } from '../../exceptions/not-found-exception'
 
 describe(Segment.name, () => {
-  describe(`${Segment.prototype.getFirstSpanningPieceForEachLayerBeforePart.name}`, () => {
+  describe(Segment.prototype.getFirstSpanningPieceForEachLayerBeforePart.name, () => {
     describe('Segment has two Parts', () => {
       describe('One Part is "after" the search point', () => {
         it('does not include the Piece from the last Part', () => {
@@ -320,7 +324,7 @@ describe(Segment.name, () => {
     })
   })
 
-  describe(`${Segment.prototype.getFirstSpanningRundownPieceForEachLayerForAllParts.name}`, () => {
+  describe(Segment.prototype.getFirstSpanningRundownPieceForEachLayerForAllParts.name, () => {
     describe('it has one Part', () => {
       describe('Part has two Pieces', () => {
         describe('Pieces are on different layers', () => {
@@ -487,7 +491,7 @@ describe(Segment.name, () => {
     })
   })
 
-  describe(`${Segment.prototype.reset.name}`, () => {
+  describe(Segment.prototype.reset.name, () => {
     it('resets all parts', () => {
       const mockedPart1: Part = EntityMockFactory.createPartMock()
       const mockedPart2: Part = EntityMockFactory.createPartMock()
@@ -507,7 +511,7 @@ describe(Segment.name, () => {
     })
   })
 
-  describe(`${Segment.prototype.insertPartAfterActivePart.name}`, () => {
+  describe(Segment.prototype.insertPartAfterActivePart.name, () => {
     it('is not the Segment with the active Part - throws exception', () => {
       const randomNotActivePart: Part = new Part({ isOnAir: false } as PartInterface)
       const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: true } as PartInterface)
@@ -576,6 +580,274 @@ describe(Segment.name, () => {
           expect(testee.getParts()).toContain(plannedPartAfterActivePart)
           expect(testee.getParts()).toContain(partToBeInserted)
           expect(testee.getParts()[indexOfPlannedPart]).toBe(partToBeInserted)
+        })
+      })
+    })
+  })
+
+  describe(Segment.prototype.markAsUnsynced.name, () => {
+    it('marks the Segment as unsynced', () => {
+      const testee: Segment = new Segment({ isUnsynced: false } as SegmentInterface)
+      expect(testee.isUnsynced()).toBeFalsy()
+      testee.markAsUnsynced()
+      expect(testee.isUnsynced()).toBeTruthy()
+    })
+
+    it('sets the rank to be one lower than the original rank', () => {
+      const rank: number = 500
+      const testee: Segment = new Segment({ rank } as SegmentInterface)
+      testee.markAsUnsynced()
+      expect(testee.rank).toBe(rank - 1)
+    })
+
+    it('marks all of its Parts as unsynced', () => {
+      const partOne: Part = EntityMockFactory.createPartMock({ id: '1' } as PartInterface)
+      const partTwo: Part = EntityMockFactory.createPartMock({ id: '2' } as PartInterface)
+      const partThree: Part = EntityMockFactory.createPartMock({ id: '3' } as PartInterface)
+
+      const parts: Part[] = [instance(partOne), instance(partTwo), instance(partThree)]
+
+      const testee: Segment = new Segment({ parts } as SegmentInterface)
+      testee.markAsUnsynced()
+
+      verify(partOne.markAsUnsyncedWithUnsyncedSegment()).once()
+      verify(partTwo.markAsUnsyncedWithUnsyncedSegment()).once()
+      verify(partThree.markAsUnsyncedWithUnsyncedSegment()).once()
+    })
+
+    describe('it does not have any Parts on Air', () => {
+      it('sets its Parts to be an empty array', () => {
+        const partOne: Part = EntityTestFactory.createPart({ id: '1', isOnAir: false } as PartInterface)
+        const partTwo: Part = EntityTestFactory.createPart({ id: '2', isOnAir: false } as PartInterface)
+        const partThree: Part = EntityTestFactory.createPart({ id: '3', isOnAir: false } as PartInterface)
+
+        const parts: Part[] = [partOne, partTwo, partThree]
+
+        const testee: Segment = new Segment({ parts } as SegmentInterface)
+        testee.markAsUnsynced()
+
+        expect(testee.getParts()).toHaveLength(0)
+      })
+    })
+
+    describe('it has a Part on Air', () => {
+      it('gets an unsynced copy of the active Part', () => {
+        const partOnAir: Part = EntityTestFactory.createPart({ id: '1', isOnAir: true } as PartInterface)
+        const partTwo: Part = EntityTestFactory.createPart({ id: '2', isOnAir: false } as PartInterface)
+        const partThree: Part = EntityTestFactory.createPart({ id: '3', isOnAir: false } as PartInterface)
+
+        const parts: Part[] = [partOnAir, partTwo, partThree]
+
+        const testee: Segment = new Segment({ parts } as SegmentInterface)
+        testee.markAsUnsynced()
+
+        expect(testee.getParts()[0].id).toContain(UNSYNCED_ID_POSTFIX)
+      })
+
+      it('only have the Part on Air in its Parts array', () => {
+        const partOnAir: Part = EntityTestFactory.createPart({ id: '1', isOnAir: true } as PartInterface)
+        const partTwo: Part = EntityTestFactory.createPart({ id: '2', isOnAir: false } as PartInterface)
+        const partThree: Part = EntityTestFactory.createPart({ id: '3', isOnAir: false } as PartInterface)
+
+        const parts: Part[] = [partOnAir, partTwo, partThree]
+
+        const testee: Segment = new Segment({ parts } as SegmentInterface)
+        testee.markAsUnsynced()
+
+        expect(testee.getParts()).toHaveLength(1)
+        expect(testee.getParts()[0].isOnAir()).toBeTruthy()
+      })
+    })
+  })
+
+  describe(Segment.prototype.removeUnsyncedParts.name, () => {
+    describe('it has no unsynced Parts', () => {
+      it('does not alter the Parts array', () => {
+        const partOne: Part = EntityTestFactory.createPart({ id: '1', isUnsynced: false } as PartInterface)
+        const partTwo: Part = EntityTestFactory.createPart({ id: '2', isUnsynced: false } as PartInterface)
+        const partThree: Part = EntityTestFactory.createPart({ id: '3', isUnsynced: false } as PartInterface)
+        const parts: Part[] = [partOne, partTwo, partThree]
+
+        const testee: Segment = new Segment({ parts} as SegmentInterface)
+        testee.removeUnsyncedParts()
+
+        expect(testee.getParts()).toHaveLength(parts.length)
+        expect(testee.getParts()).toEqual(parts)
+      })
+    })
+
+    describe('it has unsynced Parts', () => {
+      it('filters away the unsynced Parts from the Part array', () => {
+        const partOne: Part = EntityTestFactory.createPart({ id: '1', isUnsynced: true } as PartInterface)
+        const partTwo: Part = EntityTestFactory.createPart({ id: '2', isUnsynced: false } as PartInterface)
+        const partThree: Part = EntityTestFactory.createPart({ id: '3', isUnsynced: true } as PartInterface)
+        const parts: Part[] = [partOne, partTwo, partThree]
+
+        const testee: Segment = new Segment({ parts} as SegmentInterface)
+        testee.removeUnsyncedParts()
+
+        expect(testee.getParts()).toHaveLength(1)
+        expect(testee.getParts()).toContain(partTwo)
+      })
+    })
+  })
+
+  describe(Segment.prototype.addPart.name, () => {
+    describe('the Segment is unsynced', () => {
+      describe('the Part is on Air', () => {
+        it('adds the Part', () => {
+          const onAirPart: Part = new Part({ isOnAir: true } as PartInterface)
+          const testee: Segment = new Segment({ isUnsynced: true } as SegmentInterface)
+
+          expect(testee.getParts()).toHaveLength(0)
+          testee.addPart(onAirPart)
+          expect(testee.getParts()).toHaveLength(1)
+          expect(testee.getParts()).toContain(onAirPart)
+        })
+      })
+
+      describe('the Part is not on Air', () => {
+        it('does not add the Part', () => {
+          const offAirPart: Part = new Part({ isOnAir: false } as PartInterface)
+          const testee: Segment = new Segment({ isUnsynced: true } as SegmentInterface)
+
+          expect(testee.getParts()).toHaveLength(0)
+          testee.addPart(offAirPart)
+          expect(testee.getParts()).toHaveLength(0)
+        })
+      })
+    })
+
+    describe('the Part already exist on the Segment', () => {
+      it('throws an AlreadyExistException', () => {
+        const part: Part = new Part({ id: 'somePartId' } as PartInterface)
+        const testee: Segment = new Segment({ parts: [part] } as SegmentInterface)
+
+        expect(() => testee.addPart(part)).toThrow(AlreadyExistException)
+      })
+    })
+
+    describe('the Part does not exist on the Segment', () => {
+      it('adds the Part to the Segment', () => {
+        const part: Part = new Part({ id: 'somePartId' } as PartInterface)
+        const testee: Segment = new Segment({ } as SegmentInterface)
+
+        expect(testee.getParts()).not.toContain(part)
+        testee.addPart(part)
+        expect(testee.getParts()).toContain(part)
+      })
+
+      it('sorts the Parts according to rank', () => {
+        const partOne: Part = new Part({ id: '1', rank: 1 } as PartInterface)
+        const partTwo: Part = new Part({ id: '2', rank: 10 } as PartInterface)
+
+        const partToBeInserted: Part = new Part({ id: '3', rank: 5 } as PartInterface)
+
+        const testee: Segment = new Segment({ parts: [partOne, partTwo] } as SegmentInterface)
+
+        testee.addPart(partToBeInserted)
+
+        expect(testee.getParts()[0].getRank()).toBe(partOne.getRank())
+        expect(testee.getParts()[1].getRank()).toBe(partToBeInserted.getRank())
+        expect(testee.getParts()[2].getRank()).toBe(partTwo.getRank())
+      })
+    })
+  })
+
+  describe(Segment.prototype.updatePart.name, () => {
+    describe('Part does not exist on Segment', () => {
+      it('throws NotFound exception', () => {
+        const nonExistingPartOnSegment: Part = EntityTestFactory.createPart()
+        const testee: Segment = new Segment({ } as SegmentInterface)
+
+        expect(() => testee.updatePart(nonExistingPartOnSegment)).toThrow(NotFoundException)
+      })
+    })
+
+    describe('Part does exist on Segment', () => {
+      it('updates the existing Part with the new Part', () => {
+        const partId: string = 'partId'
+        const oldPart: Part = EntityTestFactory.createPart({ id: partId })
+        const newPart: Part = EntityTestFactory.createPart({ id: partId })
+
+        const testee: Segment = new Segment({ parts: [oldPart] } as SegmentInterface)
+
+        expect(testee.getParts()).toHaveLength(1)
+        expect(testee.getParts()).toContain(oldPart)
+
+        testee.updatePart(newPart)
+
+        expect(testee.getParts()).toHaveLength(1)
+        expect(testee.getParts()).toContain(newPart)
+      })
+
+      it('sorts Parts according to rank', () => {
+        const partId: string = 'partId'
+        const oldPart: Part = EntityTestFactory.createPart({ id: partId, rank: 1 })
+        const partTwo: Part = EntityTestFactory.createPart({ id: partId, rank: 5 })
+        const partThree: Part = EntityTestFactory.createPart({ id: partId, rank: 10 })
+
+        const newPart: Part = EntityTestFactory.createPart({ id: partId, rank: 20 })
+
+        const testee: Segment = new Segment({ parts: [oldPart, partTwo, partThree] } as SegmentInterface)
+
+        expect(testee.getParts()[0]).toBe(oldPart)
+        expect(testee.getParts()[1]).toBe(partTwo)
+        expect(testee.getParts()[2]).toBe(partThree)
+
+        testee.updatePart(newPart)
+
+        expect(testee.getParts()[0]).toBe(partTwo)
+        expect(testee.getParts()[1]).toBe(partThree)
+        expect(testee.getParts()[2]).toBe(newPart)
+
+      })
+    })
+  })
+
+  describe(Segment.prototype.removePart.name, () => {
+    describe('Part does not exist on Segment', () => {
+      it('does not remove any Parts', () => {
+        const nonExistingPartId: string = 'nonExistingPartId'
+        const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId'})
+
+        const testee: Segment = new Segment({ parts: [somePart]} as SegmentInterface)
+
+        expect(testee.getParts()).toHaveLength(1)
+        testee.removePart(nonExistingPartId)
+        expect(testee.getParts()).toHaveLength(1)
+      })
+    })
+
+    describe('Part exist on Segment', () => {
+      describe('Part is on Air', () => {
+        it('mark the Part as unsynced', () => {
+          const partId: string = 'somePartId'
+          const somePart: Part = EntityMockFactory.createPartMock({ id: partId, isOnAir: true})
+          const testee: Segment = new Segment({ parts: [instance(somePart)]} as SegmentInterface)
+
+          testee.removePart(partId)
+          verify(somePart.markAsUnsynced()).once()
+        })
+
+        it('does not remove the Part', () => {
+          const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId', isOnAir: true})
+          const testee: Segment = new Segment({ parts: [somePart]} as SegmentInterface)
+
+          expect(testee.getParts()).toHaveLength(1)
+          testee.removePart(somePart.id)
+          expect(testee.getParts()).toHaveLength(1)
+        })
+      })
+
+      describe('Part is not on Air', () => {
+        it('removes the Part', () => {
+          const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId', isOnAir: false})
+          const testee: Segment = new Segment({ parts: [somePart]} as SegmentInterface)
+
+          expect(testee.getParts()).toHaveLength(1)
+          testee.removePart(somePart.id)
+          expect(testee.getParts()).toHaveLength(0)
         })
       })
     })
