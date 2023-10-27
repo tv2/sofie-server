@@ -19,6 +19,7 @@ import { RundownCursor } from '../value-objects/rundown-cursor'
 import { Owner } from '../enums/owner'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { LastSegmentInRundown } from '../exceptions/last-segment-in-rundown'
+import { NoPartInHistoryException } from '../exceptions/no-part-in-history-exception'
 
 export interface RundownInterface {
   id: string
@@ -29,6 +30,7 @@ export interface RundownInterface {
   isRundownActive: boolean
   modifiedAt: number
   persistentState?: RundownPersistentState
+  history: Part[]
 
   alreadyActiveProperties?: RundownAlreadyActiveProperties
 }
@@ -39,6 +41,7 @@ export interface RundownAlreadyActiveProperties {
   infinitePieces: Map<string, Piece>
 }
 
+const MAXIMUM_HISTORY_ENTRIES: number = 30
 
 export class Rundown extends BasicRundown {
   private readonly baselineTimelineObjects: TimelineObject[]
@@ -55,11 +58,14 @@ export class Rundown extends BasicRundown {
 
   private readonly showStyleVariantId: string
 
+  private history: Part[]
+
   constructor(rundown: RundownInterface) {
     super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt)
     this.segments = rundown.segments ?? []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
+    this.history = rundown.history
 
     if (rundown.alreadyActiveProperties) {
       if (!rundown.isRundownActive) {
@@ -87,6 +93,12 @@ export class Rundown extends BasicRundown {
       segment: firstSegment,
       owner: Owner.SYSTEM
     }
+
+    this.resetHistory()
+  }
+
+  private resetHistory(): void {
+    this.history = []
   }
 
   private createCursor(cursor: RundownCursor | undefined, cursorPatch: Partial<RundownCursor> = {}): RundownCursor | undefined {
@@ -298,6 +310,15 @@ export class Rundown extends BasicRundown {
       return
     }
     this.previousPart = this.activeCursor?.part.clone()
+    this.addPartToHistory(this.previousPart)
+  }
+
+  private addPartToHistory(part: Part): void {
+    this.history.push(part)
+    if (this.history.length > MAXIMUM_HISTORY_ENTRIES) {
+      const entriesToDelete: number = this.history.length - MAXIMUM_HISTORY_ENTRIES
+      this.history.splice(0, entriesToDelete)
+    }
   }
 
   private takeNextCursor(): void {
@@ -642,5 +663,25 @@ export class Rundown extends BasicRundown {
     }
 
     throw new UnsupportedOperation(`Can't replace Piece on Rundown ${this.id}. Piece ${pieceToBeReplaced.id} is neither on the active or next Part.`)
+  }
+
+  public getHistory(): Part[] {
+    return this.history
+  }
+
+  public findPartInHistory(predicate: (part: Part) => boolean): Part {
+    const historicPart: Part | undefined = [...this.history].reverse().find(predicate)
+    if (!historicPart) {
+      throw new NoPartInHistoryException(`Rundown ${this.id} does not contain a Part with the specified conditions in its history`)
+    }
+    return historicPart
+  }
+
+  public getPart(partId: string): Part | undefined {
+    const segmentForPart: Segment | undefined = this.segments.find(segment => segment.getParts().some(part => part.id === partId))
+    if (!segmentForPart) {
+      return
+    }
+    return segmentForPart.findPart(partId)
   }
 }

@@ -4,6 +4,7 @@ import {
   ActionManifest,
   MutateActionMethods,
   MutateActionType,
+  MutateActionWithHistoricPartMethods,
   MutateActionWithMedia,
   MutateActionWithPieceMethods,
   PartAction,
@@ -91,6 +92,9 @@ export class ExecuteActionService implements ActionService {
       case MutateActionType.MEDIA: {
         return await this.mutateActionWithMedia(mutateActionMethods, action)
       }
+      case MutateActionType.HISTORIC_PART: {
+        return await this.mutateActionWithHistoricPart(rundownId, mutateActionMethods, action)
+      }
     }
   }
 
@@ -113,6 +117,14 @@ export class ExecuteActionService implements ActionService {
   private async mutateActionWithMedia(mutateActionMethods: MutateActionWithMedia, action: Action): Promise<Action> {
     const media: Media | undefined = await this.mediaRepository.getMedia(mutateActionMethods.getMediaId())
     return mutateActionMethods.updateActionWithMedia(action, media)
+  }
+
+  private async mutateActionWithHistoricPart(rundownId: string, mutateActionMethods: MutateActionWithHistoricPartMethods, action: Action): Promise<Action> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const historicPart: Part = rundown.findPartInHistory(mutateActionMethods.partPredicate)
+    const presentPart: Part | undefined = rundown.getPart(historicPart.id)
+
+    return mutateActionMethods.updateActionWithPartData(action, historicPart, presentPart)
   }
 
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {

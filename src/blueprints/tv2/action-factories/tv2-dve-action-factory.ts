@@ -2,7 +2,7 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
-import { PartInterface } from '../../../model/entities/part'
+import { Part, PartInterface } from '../../../model/entities/part'
 import { DveBoxProperties, DveConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2CasparCgLayer, Tv2GraphicsLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -21,11 +21,12 @@ import {
 import { DeviceType } from '../../../model/enums/device-type'
 import {
   Tv2ActionContentType,
+  Tv2DveAction,
   Tv2DveInsertSourceInputAction,
   Tv2DveLayoutAction,
   Tv2PartAction,
   Tv2PieceAction,
-  Tv2PlannedDveAction
+  Tv2RecallDveAction
 } from '../value-objects/tv2-action'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import {
@@ -34,6 +35,8 @@ import {
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { DveBoxInput, Tv2DveManifestData } from '../value-objects/tv2-action-manifest-data'
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
+import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-operation-exception'
 
 const NUMBER_OF_DVE_BOXES: number = 4
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
@@ -58,13 +61,14 @@ export class Tv2DveActionFactory {
     return [
       ...this.createDveLayoutActions(blueprintConfiguration),
       ...this.createInsertToInputActions(blueprintConfiguration),
-      ...this.createDveActionsFromDveManifestData(blueprintConfiguration, dveManifestData)
+      ...this.createDveActionsFromDveManifestData(blueprintConfiguration, dveManifestData),
+      this.createRecallLastDveAction()
     ]
   }
 
   public isDveAction(action: Action): boolean {
     const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
-    return [Tv2ActionContentType.DVE_LAYOUT, Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT].includes(tv2Action.metadata.contentType)
+    return [Tv2ActionContentType.DVE_LAYOUT, Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT, Tv2ActionContentType.RECALL_DVE].includes(tv2Action.metadata.contentType)
   }
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
@@ -75,6 +79,13 @@ export class Tv2DveActionFactory {
           type: MutateActionType.PIECE,
           updateActionWithPieceData: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
           piecePredicate: (piece: Piece) => this.doesPieceHaveDveBoxesTimelineObject(piece)
+        }
+      }
+      case Tv2ActionContentType.RECALL_DVE: {
+        return {
+          type: MutateActionType.HISTORIC_PART,
+          updateActionWithPartData: (action: Action, historicPart: Part, presentPart: Part | undefined) => this.updateRecallLastDveAction(action, historicPart, presentPart),
+          partPredicate: (part: Part) => this.recallLastDvePartPredicate(part)
         }
       }
     }
@@ -92,7 +103,7 @@ export class Tv2DveActionFactory {
       })
 
       const timelineEnable: TimelineEnable = {
-        start: blueprintConfiguration.studio.CasparPrerollDuration
+        start: 0
       }
 
       const dveLayoutTimelineObjects: TimelineObject[] = [
@@ -107,6 +118,7 @@ export class Tv2DveActionFactory {
       ]
 
       const metadata: Tv2PieceMetadata = {
+        type: Tv2PieceType.SPLIT_SCREEN,
         dve: {
           boxes,
           audioTimelineObjectsForBoxes: []
@@ -326,7 +338,7 @@ export class Tv2DveActionFactory {
     return piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getDveBoxesLayer())
   }
 
-  private createDveActionsFromDveManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, dveManifestData: Tv2DveManifestData[]): Tv2PlannedDveAction[] {
+  private createDveActionsFromDveManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, dveManifestData: Tv2DveManifestData[]): Tv2DveAction[] {
     return dveManifestData.map(data => {
       const dveConfiguration: DveConfiguration | undefined = blueprintConfiguration.showStyle.dveConfigurations.find(dveConfiguration => dveConfiguration.name.toLowerCase() === data.template.toLowerCase())
       if (!dveConfiguration) {
@@ -352,6 +364,7 @@ export class Tv2DveActionFactory {
       const audioTimelineObjects: TimelineObject[] = Object.values(audioTimelineObjectsForBoxes).flat()
 
       const metadata: Tv2PieceMetadata = {
+        type: Tv2PieceType.SPLIT_SCREEN,
         dve: {
           boxes,
           audioTimelineObjectsForBoxes
@@ -405,5 +418,87 @@ export class Tv2DveActionFactory {
         return 3
       }
     }
+  }
+
+  private createRecallLastDveAction(): Tv2RecallDveAction {
+    return {
+      id: 'recall_last_dve_action',
+      name: 'Recall DVE',
+      description: 'Recalls the last planned DVE that has been on Air',
+      type: PartActionType.INSERT_PART_AS_NEXT,
+      metadata: {
+        contentType: Tv2ActionContentType.RECALL_DVE
+      },
+      data: {
+        partInterface: {} as PartInterface,
+        pieceInterfaces: [] as PieceInterface[]
+      }
+    }
+  }
+
+  private updateRecallLastDveAction(action: Action, historicPart: Part, presentPart: Part | undefined): Action {
+    if (!presentPart) {
+      throw new Tv2UnavailableOperationException('Unable to recall DVE, since the DVE has since been updated!')
+    }
+
+    const clonedPart: Part = historicPart.clone()
+    clonedPart.reset()
+    const partInterface: PartInterface = {
+      id: `recall_last_dve_part_${clonedPart.id}`,
+      name: clonedPart.name,
+      segmentId: '',
+      rank: -1,
+      isPlanned: false,
+      isOnAir: false,
+      isNext: false,
+      isUnsynced: false,
+      inTransition: {
+        keepPreviousPartAliveDuration: 0,
+        delayPiecesDuration: 0
+      },
+      outTransition: {
+        keepAliveDuration: 0
+      },
+      disableNextInTransition: false,
+      pieces: []
+    }
+
+    const pieceInterfaces: PieceInterface[] = historicPart.getPieces().map(piece => {
+      return {
+        id: `recall_last_dve_piece_${piece.id}`,
+        partId: partInterface.id,
+        name: piece.name,
+        type: piece.type,
+        layer: piece.layer,
+        pieceLifespan: piece.pieceLifespan,
+        transitionType: piece.transitionType,
+        isPlanned: false,
+        start: piece.getStart(),
+        duration: piece.duration,
+        preRollDuration: piece.preRollDuration,
+        postRollDuration: piece.postRollDuration,
+        metadata: piece.metadata,
+        tags: [],
+        isUnsynced: false,
+        timelineObjects: piece.timelineObjects
+      }
+    })
+
+    const dveAction: Tv2RecallDveAction = action as Tv2RecallDveAction
+    dveAction.data = {
+      partInterface,
+      pieceInterfaces
+    }
+    return dveAction
+  }
+
+  private recallLastDvePartPredicate(part: Part): boolean {
+    return part.isPlanned && part.getPieces().some(piece => {
+      const metadata: Tv2PieceMetadata | undefined = piece.metadata as Tv2PieceMetadata | undefined
+      if (!metadata) {
+        return false
+      }
+      return metadata.type === Tv2PieceType.SPLIT_SCREEN
+    })
   }
 }

@@ -1,5 +1,5 @@
 import { ActionType, PartActionType, PieceActionType } from '../enums/action-type'
-import { PartInterface } from './part'
+import { Part, PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
 import { PieceType } from '../enums/piece-type'
 import { Media } from './media'
@@ -26,11 +26,12 @@ export interface PieceAction extends Action {
   data: PieceInterface
 }
 
-export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia
+export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods
 
 export enum MutateActionType {
   PIECE = 'PIECE',
-  MEDIA = 'MEDIA'
+  MEDIA = 'MEDIA',
+  HISTORIC_PART= 'HISTORIC_PART'
 }
 
 export interface MutateActionWithPieceMethods {
@@ -43,6 +44,12 @@ export interface MutateActionWithMedia {
   type: MutateActionType.MEDIA
   updateActionWithMedia: (action: Action, media?: Media) => Action
   getMediaId: () => string
+}
+
+export interface MutateActionWithHistoricPartMethods {
+  type: MutateActionType.HISTORIC_PART,
+  updateActionWithPartData: (action: Action, historicPart: Part, presentPart: Part | undefined) => Action
+  partPredicate: (part: Part) => boolean
 }
 
 /**

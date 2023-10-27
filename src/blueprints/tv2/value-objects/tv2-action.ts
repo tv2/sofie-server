@@ -9,6 +9,7 @@ export enum Tv2ActionContentType {
   GRAPHICS = 'GRAPHICS',
   AUDIO = 'AUDIO',
   DVE = 'DVE',
+  RECALL_DVE = 'RECALL_DVE',
   DVE_LAYOUT = 'DVE_LAYOUT',
   DVE_INSERT_SOURCE_TO_INPUT = 'DVE_INSERT_SOURCE_TO_INPUT',
   UNKNOWN = 'UNKNOWN'
@@ -53,9 +54,17 @@ export interface Tv2AudioAction extends Tv2PieceAction {
   }
 }
 
-export interface Tv2PlannedDveAction extends Tv2PartAction {
+export interface Tv2DveAction extends Tv2PartAction {
+  type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     contentType: Tv2ActionContentType.DVE
+  }
+}
+
+export interface Tv2RecallDveAction extends Tv2PartAction {
+  type: PartActionType.INSERT_PART_AS_NEXT
+  metadata: {
+    contentType: Tv2ActionContentType.RECALL_DVE
   }
 }
 

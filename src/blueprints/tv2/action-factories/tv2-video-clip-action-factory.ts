@@ -20,6 +20,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Media } from '../../../model/entities/media'
 import { Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 const VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX: string = 'videoClipAsNextAction'
@@ -97,6 +98,7 @@ export class Tv2VideoClipActionFactory {
 
   private createProgramPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): PieceInterface {
     const metadata: Tv2PieceMetadata = {
+      type: Tv2PieceType.VIDEO_CLIP,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.isVoiceOver
