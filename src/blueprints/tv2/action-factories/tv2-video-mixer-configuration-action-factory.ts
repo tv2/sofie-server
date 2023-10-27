@@ -9,7 +9,6 @@ import { PieceActionType } from '../../../model/enums/action-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2Piece } from '../entities/tv2-piece'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 
@@ -67,7 +66,6 @@ export class Tv2VideoMixerConfigurationActionFactory {
       timelineObjects: [],
       metadata: {
         type: Tv2PieceType.COMMAND,
-        outputLayer: Tv2OutputLayer.SECONDARY,
       },
       ...pieceInterfaceWithRequiredValues
     }
