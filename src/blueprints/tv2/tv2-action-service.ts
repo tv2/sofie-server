@@ -1,6 +1,6 @@
 import { BlueprintGenerateActions } from '../../model/value-objects/blueprint'
 import { Configuration } from '../../model/entities/configuration'
-import { Action, MutateActionMethods } from '../../model/entities/action'
+import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
 import { Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import {
@@ -16,23 +16,33 @@ import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action
 import {
   Tv2VideoMixerConfigurationActionFactory
 } from './action-factories/tv2-video-mixer-configuration-action-factory'
+import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
+import { Tv2ActionManifestData, Tv2VideoClipData } from './value-objects/tv2-video-clip-data'
+import { Tv2PieceType } from './enums/tv2-piece-type'
+import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
+import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
 
-export class Tv2ActionsService implements BlueprintGenerateActions {
+
+export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
     private readonly cameraActionFactory: Tv2CameraActionFactory,
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
-    private readonly videoSwitcherActionFactory: Tv2VideoMixerConfigurationActionFactory
+    private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
+    private readonly videoMixerActionFactory: Tv2VideoMixerConfigurationActionFactory
   ) {}
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
     if (this.transitionActionFactory.isTransitionAction(action)) {
       return this.transitionActionFactory.getMutateActionMethods(action)
     }
+    if (this.videoClipActionFactory.isVideoClipAction(action)) {
+      return this.videoClipActionFactory.getMutateActionMethods(action)
+    }
   }
 
-  public generateActions(configuration: Configuration): Action[] {
+  public generateActions(configuration: Configuration, actionManifests: Tv2ActionManifest[]): Action[] {
     const blueprintConfiguration: Tv2BlueprintConfiguration = {
       studio: configuration.studio.blueprintConfiguration as Tv2StudioBlueprintConfiguration,
       showStyle: this.mapToShowStyleBlueprintConfiguration(configuration.showStyle)
@@ -43,7 +53,8 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
-      ...this.videoSwitcherActionFactory.createVideoMixerActions(blueprintConfiguration)
+      ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
+      ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration)
     ]
   }
 
@@ -60,5 +71,37 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
     }
     blueprintConfiguration.selectedGraphicsSetup = graphicsSetup
     return blueprintConfiguration
+  }
+
+  private getVideoClipData(actionManifests: ActionManifest<Tv2ActionManifestData>[]): Tv2VideoClipData[] {
+    return actionManifests
+      .filter(actionManifest => this.getPieceTypeFromMongoActionManifest(actionManifest) === Tv2PieceType.VIDEO_CLIP)
+      .map(actionManifest => {
+        const data: Tv2ActionManifestData = actionManifest.data
+        return {
+          name: data.partDefinition.storyName,
+          fileName: data.partDefinition.fields.videoId,
+          durationFromIngest: data.duration,
+          adLibPix: data.adLibPix,
+          isVoiceOver: data.voLevels
+        }
+      })
+  }
+
+  private getPieceTypeFromMongoActionManifest(mongoActionManifest: ActionManifest): Tv2PieceType {
+    switch (mongoActionManifest.actionId) {
+      case 'select_full_grafik': {
+        return Tv2PieceType.CAMERA
+      }
+      case 'select_server_clip': {
+        return Tv2PieceType.VIDEO_CLIP
+      }
+      case 'select_dve': {
+        return Tv2PieceType.SPLIT_SCREEN
+      }
+      default: {
+        throw new UnexpectedCaseException(`Unknown MongoActionManifestId: ${mongoActionManifest.actionId}`)
+      }
+    }
   }
 }
