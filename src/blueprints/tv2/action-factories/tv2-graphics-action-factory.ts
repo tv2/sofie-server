@@ -318,16 +318,24 @@ export class Tv2GraphicsActionFactory {
     }
     const enable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer }
     const sourceInput: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
-    const upstreamStart: number = blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration
+    const upstreamEnable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration }
+    const downstreamKeyer = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
+    const downstreamKeyerEnable: TimelineEnable = { start: 0 }
+    const priority: number = 0
 
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(sourceInput, enable),
-      this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObject(blueprintConfiguration),
-      this.videoMixerTimelineObjectFactory.createUpstreamKeyerFullPilotTimelineObject(
-        blueprintConfiguration,
-        upstreamStart
+      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(
+        downstreamKeyer,
+        true,
+        downstreamKeyerEnable,
+        priority
+      ),
+      this.videoMixerTimelineObjectFactory.createUpstreamKeyerTimelineObject(
+        downstreamKeyer,
+        upstreamEnable
       ),
       this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration)
     ]

@@ -1,6 +1,8 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Action } from '../../../model/entities/action'
-import { Tv2VideoMixerTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
+import {
+  Tv2VideoMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -9,6 +11,7 @@ import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
+import { TimelineEnable } from '../../../model/entities/timeline-enable'
 
 export class Tv2VideoMixerConfigurationActionFactory {
   constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
@@ -27,13 +30,17 @@ export class Tv2VideoMixerConfigurationActionFactory {
 
   private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): Tv2PieceAction {
     const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
+    const enable: TimelineEnable = {
+      while: 1
+    }
+    const priority: number = 10
     const pieceInterface: PieceInterface = this.createVideoSwitcherPieceInterface({
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
       name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
       layer: `${Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       timelineObjects: [
-        this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn)
+        this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn, enable, priority)
       ]
     })
     return {
