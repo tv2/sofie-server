@@ -16,21 +16,27 @@ import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action
 import {
   Tv2VideoMixerConfigurationActionFactory
 } from './action-factories/tv2-video-mixer-configuration-action-factory'
+import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
+import { Tv2ActionManifestData, Tv2VideoClipData } from './value-objects/tv2-video-clip-data'
 import { PieceType } from '../../model/enums/piece-type'
 import { Tv2GraphicsActionManifest } from './value-objects/tv2-action-manifest'
 
-export class Tv2ActionsService implements BlueprintGenerateActions {
+export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
     private readonly cameraActionFactory: Tv2CameraActionFactory,
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
-    private readonly videoSwitcherActionFactory: Tv2VideoMixerConfigurationActionFactory
+    private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
+    private readonly videoMixerActionFactory: Tv2VideoMixerConfigurationActionFactory
   ) {}
 
   public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
     if (this.transitionActionFactory.isTransitionAction(action)) {
       return this.transitionActionFactory.getMutateActionMethods(action)
+    }
+    if (this.videoClipActionFactory.isVideoClipAction(action)) {
+      return this.videoClipActionFactory.getMutateActionMethods(action)
     }
   }
 
@@ -45,7 +51,8 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, this.getActionManifestsSubset(actionManifests, PieceType.GRAPHIC) as Tv2GraphicsActionManifest[]),
-      ...this.videoSwitcherActionFactory.createVideoMixerActions(blueprintConfiguration)
+      ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
+      ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration)
     ]
   }
 
@@ -66,5 +73,20 @@ export class Tv2ActionsService implements BlueprintGenerateActions {
     }
     blueprintConfiguration.selectedGraphicsSetup = graphicsSetup
     return blueprintConfiguration
+  }
+
+  private getVideoClipData(actionManifests: ActionManifest[]): Tv2VideoClipData[] {
+    return actionManifests
+      .filter(actionManifest => actionManifest.pieceType === PieceType.VIDEO_CLIP)
+      .map(actionManifest => {
+        const data: Tv2ActionManifestData = actionManifest.data as Tv2ActionManifestData
+        return {
+          name: data.partDefinition.storyName,
+          fileName: data.partDefinition.fields.videoId,
+          durationFromIngest: data.duration,
+          adLibPix: data.adLibPix,
+          isVoiceOver: data.voLevels
+        }
+      })
   }
 }

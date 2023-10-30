@@ -4,12 +4,14 @@ import {
   AtemAuxTimelineObject,
   AtemDownstreamKeyerTimelineObject,
   AtemMeTimelineObject,
+  AtemTransition,
   AtemTransitionSettings,
   AtemType
 } from '../../timeline-state-resolver-types/atem-types'
 import { Tv2AtemLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
+import { TimelineEnable } from '../../../model/entities/timeline-enable'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
@@ -126,31 +128,43 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createProgramTimelineObject(start: number, input: number, transition: number, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
-    return this.createTimelineObjectForLayer(Tv2AtemLayer.PROGRAM, start, input, transition, transitionSettings)
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer('atem_program', Tv2AtemLayer.PROGRAM, enable, sourceInput, transition, transitionSettings)
   }
 
-  public createCleanTimelineObject(start: number, input: number, transition: number, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
-    return this.createTimelineObjectForLayer(Tv2AtemLayer.CLEAN, start, input, transition, transitionSettings)
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer('atem_cleanFeed', Tv2AtemLayer.CLEAN_FEED, enable, sourceInput, transition, transitionSettings)
   }
 
-  private createTimelineObjectForLayer(layer: Tv2AtemLayer, start: number, input: number, transition: number, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
-    const id: string = '' // Todo: get hashId value of 'layer'
-
+  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, sourceInput: number, transition: number, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
     return {
       id,
-      enable: {
-        start
-      },
+      enable,
       priority: 1,
       layer,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.ME,
         me: {
-          input,
+          input: sourceInput,
           transition,
           transitionSettings
+        }
+      }
+    }
+  }
+
+  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
+    return {
+      id: 'atem_lookahead',
+      enable,
+      priority: 0,
+      layer: Tv2AtemLayer.LOOKAHEAD,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.AUX,
+        aux: {
+          input: sourceInput
         }
       }
     }

@@ -6,7 +6,7 @@ import { Configuration } from '../entities/configuration'
 import { OnTimelineGenerateResult } from './on-timeline-generate-result'
 import { Action, ActionManifest, MutateActionMethods } from '../entities/action'
 
-export interface Blueprint extends BlueprintOnTimelineGenerate, BlueprintGetEndStateForPart, BlueprintGenerateActions {}
+export type Blueprint = BlueprintOnTimelineGenerate & BlueprintGetEndStateForPart & BlueprintGenerateActions
 
 export interface BlueprintOnTimelineGenerate {
   onTimelineGenerate(

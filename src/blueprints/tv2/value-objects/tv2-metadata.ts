@@ -26,7 +26,6 @@ export interface Tv2SisyfosPersistenceMetadata {
 
 export interface Tv2PieceMetadata {
   sisyfosPersistMetaData?: Tv2SisyfosPersistenceMetadata // Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
-  mediaPlayerSessions?: string[] // Hardcoded in Blueprints for each Part.
 }
 
 export interface Tv2BlueprintTimelineObject extends TimelineObject {
