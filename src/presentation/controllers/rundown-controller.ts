@@ -8,6 +8,7 @@ import { Exception } from '../../model/exceptions/exception'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { BasicRundown } from '../../model/entities/basic-rundown'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
+import { Owner } from '../../model/enums/owner'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -79,7 +80,7 @@ export class RundownController extends BaseController {
       const rundownId: string = req.params.rundownId
       const segmentId: string = req.params.segmentId
       const partId: string = req.params.partId
-      await this.rundownService.setNext(rundownId, segmentId, partId)
+      await this.rundownService.setNext(rundownId, segmentId, partId, Owner.EXTERNAL)
       res.send(`Part "${partId}" is now set as next`)
     } catch (error) {
       this.httpErrorHandler.handleError(res, error as Exception)

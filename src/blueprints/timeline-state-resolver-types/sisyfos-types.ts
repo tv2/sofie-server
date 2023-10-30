@@ -2,10 +2,13 @@ import { DeviceType } from '../../model/enums/device-type'
 import { TimelineObject } from '../../model/entities/timeline-object'
 
 // These values are taken from TSR
+export type SisyfosTimelineObject = SisyfosChannelTimelineObject | SisyfosChannelsTimelineObject
+
 export interface SisyfosChannelTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.SISYFOS;
     type: SisyfosType.CHANNEL;
+    resync?: boolean
   } & SisyfosChannelOptions;
 }
 
@@ -21,14 +24,6 @@ export interface SisyfosChannelsTimelineObject extends TimelineObject {
 export interface SisyfosChannel extends SisyfosChannelOptions {
   /** The mapping layer to look up the channel from */
   mappedLayer: string
-}
-
-export interface SisyfosResynchronizeTimelineObject extends TimelineObject {
-  content: {
-    deviceType: DeviceType.SISYFOS;
-    type: SisyfosType.CHANNEL;
-    resync: boolean
-  }
 }
 
 export enum SisyfosType {

@@ -10,6 +10,8 @@ import { Blueprint } from '../../../model/value-objects/blueprint'
 import { anyOfClass, anyString, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { ActionManifestsRepository } from '../../../data-access/repositories/interfaces/action-manifests-repository'
+import { MediaRepository } from '../../../data-access/repositories/interfaces/MediaRepository'
+import { ActionManifestRepository } from '../../../data-access/repositories/interfaces/action-manifest-repository'
 
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
@@ -169,19 +171,22 @@ function createTestee(
     manifestRepository?: ActionManifestsRepository
     configurationRepository?: ConfigurationRepository,
     actionRepository?: ActionRepository,
-    rundownService?: RundownService,
+    actionManifestRepository?: ActionManifestRepository,
     rundownRepository?: RundownRepository,
+    mediaRepository?: MediaRepository
+    rundownService?: RundownService,
     blueprint?: Blueprint
   },
   misc?: {
     action?: Action
   }
 ): ExecuteActionService {
-  const manifestRepository: ActionManifestsRepository = params?.manifestRepository ?? mock<ActionManifestsRepository>()
   const configurationRepository: ConfigurationRepository = params?.configurationRepository ?? mock<ConfigurationRepository>()
   const actionRepository: ActionRepository = params?.actionRepository ?? mock<ActionRepository>()
-  const rundownService: RundownService = params?.rundownService ?? mock<RundownService>()
+  const actionManifestRepository: ActionManifestRepository = params?.actionManifestRepository ?? mock<ActionManifestRepository>()
   const rundownRepository: RundownRepository = params?.rundownRepository ?? mock<RundownRepository>()
+  const mediaRepository: MediaRepository = params?.mediaRepository ?? mock<MediaRepository>()
+  const rundownService: RundownService = params?.rundownService ?? mock<RundownService>()
   const blueprint: Blueprint = params?.blueprint ?? mock<Blueprint>()
 
   if (misc?.action) {
@@ -189,11 +194,12 @@ function createTestee(
   }
 
   return new ExecuteActionService(
-    instance(manifestRepository),
     instance(configurationRepository),
     instance(actionRepository),
-    instance(rundownService),
+    instance(actionManifestRepository),
     instance(rundownRepository),
+    instance(mediaRepository),
+    instance(rundownService),
     instance(blueprint)
   )
 }

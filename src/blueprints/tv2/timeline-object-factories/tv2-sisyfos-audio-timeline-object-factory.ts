@@ -2,13 +2,16 @@ import { Tv2AudioTimelineObjectFactory } from './interfaces/tv2-audio-timeline-o
 import {
   SisyfosChannel,
   SisyfosChannelsTimelineObject,
-  SisyfosResynchronizeTimelineObject,
+  SisyfosChannelTimelineObject,
+  SisyfosTimelineObject,
   SisyfosType
 } from '../../timeline-state-resolver-types/sisyfos-types'
 import { Tv2SisyfosLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
+import { Tv2VideoClipData } from '../value-objects/tv2-video-clip-data'
+import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 
 const enum SisyfosFaderState {
   OFF = 0,
@@ -17,9 +20,8 @@ const enum SisyfosFaderState {
 }
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    const studioMicrohoneChannels: SisyfosChannel[] = blueprintConfiguration.studio.StudioMics.map(microphoneLayer => ({
+    const studioMicrophonesChannels: SisyfosChannel[] = blueprintConfiguration.studio.StudioMics.map(microphoneLayer => ({
       mappedLayer: microphoneLayer,
       isPgm: 1
     }))
@@ -29,45 +31,80 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       enable: {
         start: 0
       },
-      priority: studioMicrohoneChannels.length ? 2 : 0,
+      priority: studioMicrophonesChannels.length ? 2 : 0,
       layer: Tv2SisyfosLayer.STUDIO_MICS,
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNELS,
-        channels: studioMicrohoneChannels,
+        channels: studioMicrophonesChannels,
         overridePriority: 2
       }
     }
   }
-  public createMicrophoneDownTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    return this.buildMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.OFF)
+
+  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): SisyfosTimelineObject[] {
+    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
+      return {
+        id: '',
+        enable: {
+          start: 0
+        },
+        layer: sisyfosLayer,
+        content: {
+          deviceType: DeviceType.SISYFOS,
+          type: SisyfosType.CHANNEL,
+          isPgm: SisyfosFaderState.ON
+        }
+      }
+    })
+
+    if (!source.StudioMics) {
+      return sisyfosChannelTimelineObjects
+    }
+
+    return [
+      ...sisyfosChannelTimelineObjects,
+      this.createStudioMicrophonesTimelineObject(configuration)
+    ]
   }
 
-  public createMicrophoneUpTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    return this.buildMicrophoneTimelineObject(blueprintConfiguration, SisyfosFaderState.ON)
+  private createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
+    const priority: number = configuration.studio.StudioMics ? 2 : 0
+    const overridePriority: number = 2
+    return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, overridePriority)
   }
 
-  private buildMicrophoneTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, sisyfosFaderState:  SisyfosFaderState): SisyfosChannelsTimelineObject {
+  public createStudioMicrophonesDownTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
+    const priority: number = 10
+    return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.OFF, priority, priority)
+  }
+
+  public createStudioMicrophonesUpTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
+    const priority: number = 10
+    return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, priority)
+  }
+
+  private buildStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, sisyfosFaderState:  SisyfosFaderState, priority: number, overridePriority: number): SisyfosChannelsTimelineObject {
     return {
-      id: '',
+      id: 'studio_microphones',
       enable: {
         start: 0
       },
-      priority: 10,
+      priority,
       layer: Tv2SisyfosLayer.STUDIO_MICS,
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNELS,
-        channels: blueprintConfiguration.studio.StudioMics.map(studioMic => ({
-          mappedLayer: studioMic,
+        channels: configuration.studio.StudioMics.map(studioMicrophoneLayer => ({
+          mappedLayer: studioMicrophoneLayer,
           isPgm: sisyfosFaderState
         })),
-        overridePriority: 10
+        overridePriority
       }
     }
   }
 
-  public createResynchronizeTimelineObject(): SisyfosResynchronizeTimelineObject {
+  public createResynchronizeTimelineObject(): SisyfosChannelTimelineObject {
     return {
       id: '',
       enable: {
@@ -97,5 +134,31 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
         type: 'empty'
       }
     }
+  }
+
+  public createVideoClipAudioTimelineObjects(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData): SisyfosTimelineObject[] {
+    const serverPendingTimelineObject: SisyfosChannelTimelineObject = {
+      id: `sisyfos_server_pending_${videoClipData.fileName}`,
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2SisyfosLayer.SOURCE_CLIP_PENDING,
+      content: {
+        deviceType: DeviceType.SISYFOS,
+        type: SisyfosType.CHANNEL,
+        isPgm: videoClipData.isVoiceOver ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
+      }
+    }
+
+    const sisyfosServerTimelineObjects: SisyfosTimelineObject[] = [
+      serverPendingTimelineObject
+    ]
+
+    if (videoClipData.isVoiceOver) {
+      sisyfosServerTimelineObjects.push(this.createStudioMicrophonesTimelineObject(configuration))
+    }
+
+    return sisyfosServerTimelineObjects
   }
 }

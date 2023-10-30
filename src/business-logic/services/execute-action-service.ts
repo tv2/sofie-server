@@ -1,5 +1,14 @@
 import { ActionService } from './interfaces/action-service'
-import { Action, ActionManifest, MutateActionMethods, PartAction, PieceAction } from '../../model/entities/action'
+import {
+  Action,
+  ActionManifest,
+  MutateActionMethods,
+  MutateActionType,
+  MutateActionWithMedia,
+  MutateActionWithPlannedPieceMethods,
+  PartAction,
+  PieceAction
+} from '../../model/entities/action'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
@@ -11,21 +20,25 @@ import { Part, PartInterface } from '../../model/entities/part'
 import { Piece, PieceInterface } from '../../model/entities/piece'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
-import { ActionManifestsRepository } from '../../data-access/repositories/interfaces/action-manifests-repository'
+import { ActionManifestRepository } from '../../data-access/repositories/interfaces/action-manifest-repository'
+import { MediaRepository } from '../../data-access/repositories/interfaces/MediaRepository'
+import { Media } from '../../model/entities/media'
 
 export class ExecuteActionService implements ActionService {
   constructor(
-    private readonly manifestRepository: ActionManifestsRepository,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly actionRepository: ActionRepository,
-    private readonly rundownService: RundownService,
+    private readonly actionManifestRepository: ActionManifestRepository,
     private readonly rundownRepository: RundownRepository,
+    private readonly mediaRepository: MediaRepository,
+    private readonly rundownService: RundownService,
     private readonly blueprint: Blueprint
   ) {}
 
   public async getActions(): Promise<Action[]> {
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    const actionManifests: ActionManifest[] = await this.manifestRepository.getActionManifests()
+    // TODO: Only fetch ActionManifest for a given Rundown
+    const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests()
     // TODO: The Actions should be generated on ingest. Move them once we control ingest.
     const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
     await this.actionRepository.saveActions(actions)
@@ -69,12 +82,28 @@ export class ExecuteActionService implements ActionService {
     if (!mutateActionMethods) {
       return action
     }
+    switch (mutateActionMethods.type) {
+      case MutateActionType.PLANNED_PIECE: {
+        return await this.mutateActionWithPlannedPiece(rundownId, mutateActionMethods, action)
+      }
+      case MutateActionType.MEDIA: {
+        return await this.mutateActionWithMedia(mutateActionMethods, action)
+      }
+    }
+  }
+
+  private async mutateActionWithPlannedPiece(rundownId: string, mutateActionMethods: MutateActionWithPlannedPieceMethods, action: Action): Promise<Action> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const plannedPiece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.plannedPiecePredicate)
     if (!plannedPiece) {
       return action
     }
     return mutateActionMethods.updateActionWithPlannedPieceData(action, plannedPiece)
+  }
+
+  private async mutateActionWithMedia(mutateActionMethods: MutateActionWithMedia, action: Action): Promise<Action> {
+    const media: Media | undefined = await this.mediaRepository.getMedia(mutateActionMethods.getMediaId())
+    return mutateActionMethods.updateActionWithMedia(action, media)
   }
 
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {

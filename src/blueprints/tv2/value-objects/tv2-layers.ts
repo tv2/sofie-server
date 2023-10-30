@@ -10,7 +10,9 @@ export enum Tv2SourceLayer {
   WALL_GRAPHIC = 'studio0_wall_graphics',
   TELEPHONE_GRAPHIC = 'studio0_graphicsTelefon',
   PILOT_GRAPHICS = 'studio0_pilot',
-  PILOT_OVERLAY_GRAPHICS = 'studio0_pilotOverlay'
+  PILOT_OVERLAY_GRAPHICS = 'studio0_pilotOverlay',
+  VIDEO_CLIP = 'studio0_selected_clip',
+  SERVER_VOICE_OVER = 'studio0_selected_voiceover'
 }
 
 export enum Tv2GraphicsLayer {
@@ -22,7 +24,7 @@ export enum Tv2GraphicsLayer {
 
 export enum Tv2AtemLayer {
   PROGRAM = 'atem_me_program',
-  CLEAN = 'atem_me_clean',
+  CLEAN_FEED = 'atem_me_clean',
   LOOKAHEAD = 'atem_aux_lookahead',
   DOWNSTREAM_KEYER = 'atem_dsk',
   CLEAN_UPSTREAM_KEYER = 'atem_clean_usk_full'
@@ -30,6 +32,10 @@ export enum Tv2AtemLayer {
 
 export enum Tv2CasparCgLayer {
   PLAYER_CLIP_PENDING = 'casparcg_player_clip_pending',
+}
+
+export enum Tv2VideoClipLayer {
+  VIDEO_CLIP_ENABLE_PENDING = 'server_enable_pending'
 }
 
 export enum Tv2SisyfosLayer {

@@ -1,11 +1,21 @@
 import { RundownEventListener } from '../interfaces/rundown-event-listener'
 import {
-  PartInsertedAsNextEvent, PartInsertedAsOnAirEvent,
-  PartSetAsNextEvent, PartTakenEvent, PieceInsertedEvent,
+  PartCreatedEvent, PartDeletedEvent,
+  PartInsertedAsNextEvent,
+  PartInsertedAsOnAirEvent,
+  PartSetAsNextEvent,
+  PartTakenEvent, PartUpdatedEvent,
+  PieceInsertedEvent,
   RundownActivatedEvent,
+  RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
-  RundownEvent, RundownInfinitePieceAddedEvent, RundownResetEvent
+  RundownEvent,
+  RundownInfinitePieceAddedEvent,
+  RundownResetEvent,
+  RundownUpdatedEvent,
+  SegmentCreatedEvent, SegmentDeletedEvent,
+  SegmentUpdatedEvent
 } from '../value-objects/rundown-event'
 import { RundownEventEmitter } from '../../business-logic/services/interfaces/rundown-event-emitter'
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
@@ -13,6 +23,7 @@ import { EventBuilderFacade } from '../facades/event-builder-facade'
 import { Rundown } from '../../model/entities/rundown'
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
+import { Segment } from '../../model/entities/segment'
 
 export class RundownEventService implements RundownEventEmitter, RundownEventListener {
   private static instance: RundownEventService
@@ -26,7 +37,9 @@ export class RundownEventService implements RundownEventEmitter, RundownEventLis
 
   private readonly callbacks: ((rundownEvent: RundownEvent) => void)[] = []
 
-  private constructor(private readonly rundownEventBuilder: RundownEventBuilder) { return }
+  private constructor(private readonly rundownEventBuilder: RundownEventBuilder) {
+    return
+  }
 
   private emitRundownEvent(rundownEvent: RundownEvent): void {
     this.callbacks.forEach((cb) => cb(rundownEvent))
@@ -39,11 +52,6 @@ export class RundownEventService implements RundownEventEmitter, RundownEventLis
 
   public emitDeactivateEvent(rundown: Rundown): void {
     const event: RundownDeactivatedEvent = this.rundownEventBuilder.buildDeactivateEvent(rundown)
-    this.emitRundownEvent(event)
-  }
-
-  public emitDeletedEvent(rundown: Rundown): void {
-    const event: RundownDeletedEvent = this.rundownEventBuilder.buildDeletedEvent(rundown)
     this.emitRundownEvent(event)
   }
 
@@ -79,6 +87,43 @@ export class RundownEventService implements RundownEventEmitter, RundownEventLis
 
   public emitTakeEvent(rundown: Rundown): void {
     const event: PartTakenEvent = this.rundownEventBuilder.buildTakeEvent(rundown)
+    this.emitRundownEvent(event)
+  }
+
+  public emitRundownCreated(rundown: Rundown): void {
+    const event: RundownCreatedEvent = this.rundownEventBuilder.buildRundownCreatedEvent(rundown)
+    this.emitRundownEvent(event)
+  }
+  public emitRundownUpdated(rundown: Rundown): void {
+    const event: RundownUpdatedEvent = this.rundownEventBuilder.buildRundownUpdatedEvent(rundown)
+    this.emitRundownEvent(event)
+  }
+  public emitRundownDeleted(rundownId: string): void {
+    const event: RundownDeletedEvent = this.rundownEventBuilder.buildRundownDeletedEvent(rundownId)
+    this.emitRundownEvent(event)
+  }
+  public emitSegmentCreated(rundown: Rundown, segment: Segment): void {
+    const event: SegmentCreatedEvent = this.rundownEventBuilder.buildSegmentCreatedEvent(rundown, segment)
+    this.emitRundownEvent(event)
+  }
+  public emitSegmentUpdated(rundown: Rundown, segment: Segment): void {
+    const event: SegmentUpdatedEvent = this.rundownEventBuilder.buildSegmentUpdatedEvent(rundown, segment)
+    this.emitRundownEvent(event)
+  }
+  public emitSegmentDeleted(rundown: Rundown, segmentId: string): void {
+    const event: SegmentDeletedEvent = this.rundownEventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
+    this.emitRundownEvent(event)
+  }
+  public emitPartCreated(rundown: Rundown, part: Part): void {
+    const event: PartCreatedEvent = this.rundownEventBuilder.buildPartCreatedEvent(rundown, part)
+    this.emitRundownEvent(event)
+  }
+  public emitPartUpdated(rundown: Rundown, part: Part): void {
+    const event: PartUpdatedEvent = this.rundownEventBuilder.buildPartUpdatedEvent(rundown, part)
+    this.emitRundownEvent(event)
+  }
+  public emitPartDeleted(rundown: Rundown, partId: string): void {
+    const event: PartDeletedEvent = this.rundownEventBuilder.buildPartDeletedEvent(rundown, partId)
     this.emitRundownEvent(event)
   }
 

@@ -33,6 +33,7 @@ import {
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
+import { TimelineEnable } from '../../../model/entities/timeline-enable'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -150,6 +151,7 @@ export class Tv2GraphicsActionFactory {
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: false,
+      isUnsynced: false,
       start: 0,
       preRollDuration: 0,
       postRollDuration: 0,
@@ -253,6 +255,7 @@ export class Tv2GraphicsActionFactory {
       pieces: [],
       rank: 0,
       segmentId: '',
+      isUnsynced: false,
       ...partInterfaceWithRequiredValues
     }
   }
@@ -313,16 +316,14 @@ export class Tv2GraphicsActionFactory {
         'Missing configuration of \'VizPilotGraphics.CleanFeedPrerollDuration\' in settings.'
       )
     }
-
-    const start: number = blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer
-    const input: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
-    const transition: AtemTransition = AtemTransition.CUT
+    const enable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer }
+    const sourceInput: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
     const upstreamStart: number = blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration
 
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition),
-      this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition),
-      this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(sourceInput, enable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerFullPilotTimelineObject(blueprintConfiguration),
       this.videoMixerTimelineObjectFactory.createUpstreamKeyerFullPilotTimelineObject(
         blueprintConfiguration,
@@ -414,11 +415,9 @@ export class Tv2GraphicsActionFactory {
       )
     }
 
-    const start: number = blueprintConfiguration.studio.CasparPrerollDuration
-    const input: number = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).Fill
+    const enable: TimelineEnable = { start: blueprintConfiguration.studio.CasparPrerollDuration }
+    const sourceInput: number = this.getDownstreamkeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).Fill
     const transition: AtemTransition = AtemTransition.WIPE
-
-
     const transitionSettings: AtemTransitionSettings = {
       wipe: {
         rate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
@@ -429,9 +428,9 @@ export class Tv2GraphicsActionFactory {
     }
 
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(start, input, transition, transitionSettings),
-      this.videoMixerTimelineObjectFactory.createCleanTimelineObject(start, input, transition, transitionSettings),
-      this.videoMixerTimelineObjectFactory.createNextAuxTimelineObject(input),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable, transition, transitionSettings),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable, transition, transitionSettings),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(sourceInput, enable),
       this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration),
     ]
   }
