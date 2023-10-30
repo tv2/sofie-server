@@ -1,6 +1,5 @@
 import { Tv2AudioTimelineObjectFactory } from './interfaces/tv2-audio-timeline-object-factory'
 import {
-  SisyfosChannel,
   SisyfosChannelsTimelineObject,
   SisyfosChannelTimelineObject,
   SisyfosTimelineObject,
@@ -20,28 +19,6 @@ const enum SisyfosFaderState {
 }
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
-  public createFullPilotTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    const studioMicrophonesChannels: SisyfosChannel[] = blueprintConfiguration.studio.StudioMics.map(microphoneLayer => ({
-      mappedLayer: microphoneLayer,
-      isPgm: 1
-    }))
-
-    return {
-      id: '',
-      enable: {
-        start: 0
-      },
-      priority: studioMicrophonesChannels.length ? 2 : 0,
-      layer: Tv2SisyfosLayer.STUDIO_MICS,
-      content: {
-        deviceType: DeviceType.SISYFOS,
-        type: SisyfosType.CHANNELS,
-        channels: studioMicrophonesChannels,
-        overridePriority: 2
-      }
-    }
-  }
-
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
       return {
@@ -68,7 +45,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
     ]
   }
 
-  private createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
+  public createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
     const priority: number = configuration.studio.StudioMics ? 2 : 0
     const overridePriority: number = 2
     return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, overridePriority)
