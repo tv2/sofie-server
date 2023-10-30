@@ -337,7 +337,7 @@ export class Tv2GraphicsActionFactory {
         downstreamKeyer,
         upstreamEnable
       ),
-      this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration)
+      this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration)
     ]
   }
 
@@ -439,7 +439,7 @@ export class Tv2GraphicsActionFactory {
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable, transition, transitionSettings),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable, transition, transitionSettings),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(sourceInput, enable),
-      this.audioTimelineObjectFactory.createFullPilotTimelineObject(blueprintConfiguration),
+      this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration)
     ]
   }
 
