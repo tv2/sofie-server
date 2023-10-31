@@ -4,7 +4,7 @@ import { Part } from '../part'
 import { Piece } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { EntityMockFactory } from './entity-mock-factory'
-import { anyString, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { NotActivatedException } from '../../exceptions/not-activated-exception'
 import { NotFoundException } from '../../exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
@@ -15,6 +15,7 @@ import { EntityTestFactory } from './entity-test-factory'
 import { AlreadyExistException } from '../../exceptions/already-exist-exception'
 import { RundownCursor } from '../../value-objects/rundown-cursor'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
+import { OnAirException } from '../../exceptions/on-air-exception'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -2782,14 +2783,12 @@ describe(Rundown.name, () => {
     it('resets next part right before changing next cursor', () => {
       const mockedNextPart: Part = EntityMockFactory.createPartMock({ isNext: true })
       const nextPart: Part = instance(mockedNextPart)
-      const mockedNextSegment: Segment = EntityMockFactory.createSegmentMock({ isNext: true, parts: [nextPart] })
-      const nextSegment: Segment = instance(mockedNextSegment)
-      const activePart: Part = EntityMockFactory.createPart({ isOnAir: true })
-      const otherPartInActiveSegment: Part = EntityMockFactory.createPart()
-      const activeSegment: Segment = EntityMockFactory.createSegment({ isOnAir: true, parts: [activePart, otherPartInActiveSegment] })
-
-      when(mockedNextSegment.findPart(anyString())).thenReturn(nextPart)
-
+      const nextSegment: Segment = EntityMockFactory.createSegment({ id: 'next-segment-id', isNext: true, parts: [nextPart] })
+      const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+      const otherPartInActiveSegment: Part = EntityMockFactory.createPart({ id: 'other-part-in-active-segment-id' })
+      const mockedActiveSegment: Segment = EntityMockFactory.createSegmentMock({ id: 'active-segment-id', isOnAir: true, parts: [activePart, otherPartInActiveSegment] })
+      when(mockedActiveSegment.findPart(otherPartInActiveSegment.id)).thenReturn(otherPartInActiveSegment)
+      const activeSegment: Segment = instance(mockedActiveSegment)
       const testee: Rundown = new Rundown({
         isRundownActive: true,
         alreadyActiveProperties: {
@@ -2805,11 +2804,45 @@ describe(Rundown.name, () => {
           },
           infinitePieces: new Map(),
         },
+        segments: [
+          activeSegment,
+          nextSegment,
+        ],
       } as RundownInterface)
 
       testee.setNext(activeSegment.id, otherPartInActiveSegment.id)
 
       verify(mockedNextPart.reset()).once()
+    })
+
+    describe('when next part is on air', () => {
+      it('throws an active part exception', () => {
+        const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true })
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', isNext: true, parts: [nextPart]})
+        const rundown: Rundown = new Rundown({
+          isRundownActive: true,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: activeSegment,
+              part: activePart,
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: nextPart,
+            },
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment,
+          ],
+        } as RundownInterface)
+
+        const result: () => void = () => rundown.setNext(activeSegment.id, activePart.id)
+
+        expect(result).toThrow(OnAirException)
+      })
     })
   })
 })
