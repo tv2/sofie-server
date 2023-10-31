@@ -12,6 +12,7 @@ export enum Tv2ActionContentType {
   RECALL_DVE = 'RECALL_DVE',
   DVE_LAYOUT = 'DVE_LAYOUT',
   DVE_INSERT_SOURCE_TO_INPUT = 'DVE_INSERT_SOURCE_TO_INPUT',
+  DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
   UNKNOWN = 'UNKNOWN'
 }
 
@@ -78,9 +79,24 @@ export interface Tv2DveLayoutAction extends Tv2PartAction {
 export interface Tv2DveInsertSourceInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
-    contentType: Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT,
-    inputIndex: number // zero-indexed
-    videoMixerSource: number,
-    audioTimelineObjects: TimelineObject[]
+    contentType: Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT
+  } & Tv2DveInsertSourceInputMetadata
+}
+
+export type Tv2DveInsertSourceInputMetadata = {
+  inputIndex: number // zero-indexed
+  videoMixerSource: number,
+  audioTimelineObjects: TimelineObject[]
+  videoClip?: {
+    timelineObjects: TimelineObject[]
+    mediaPlayerSession: string
+    isVoiceOver: boolean
   }
+}
+
+export interface Tv2DveInsertLastVideoClipInputAction extends Tv2PieceAction {
+  type: PieceActionType.REPLACE_PIECE
+  metadata: {
+    contentType: Tv2ActionContentType.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
+  } & Tv2DveInsertSourceInputMetadata
 }

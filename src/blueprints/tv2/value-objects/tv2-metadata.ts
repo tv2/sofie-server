@@ -33,6 +33,7 @@ export interface Tv2PieceMetadata {
     boxes: DveBoxProperties[],
     audioTimelineObjectsForBoxes: { [inputIndex: number]: TimelineObject[] }
   }
+  mediaPlayerSessions?: string[]
 }
 
 export interface Tv2BlueprintTimelineObject extends TimelineObject {

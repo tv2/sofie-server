@@ -50,9 +50,9 @@ export class Tv2Blueprint implements Blueprint {
     return this.actionsService.generateActions(configuration, actionManifests)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
+  public getMutateActionMethods(action: Action): MutateActionMethods[] {
     if (!this.actionsService.getMutateActionMethods) {
-      return
+      return []
     }
     return this.actionsService.getMutateActionMethods(action)
   }
