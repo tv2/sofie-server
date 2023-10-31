@@ -14,6 +14,8 @@ import { DatabaseChangeIngestService } from '../services/database-change-ingest-
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
 import {IngestService} from '../services/interfaces/ingest-service'
 import {Tv2InewsIngestService} from '../services/tv2-inews-ingest-service'
+import {HttpService} from '../services/interfaces/http-service'
+import {GotHttpService} from '../services/got-http-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -64,6 +66,7 @@ export class ServiceFacade {
   }
 
   public static createIngestService(): IngestService {
-    return new Tv2InewsIngestService()
+    const httpService: HttpService = new GotHttpService()
+    return new Tv2InewsIngestService(httpService)
   }
 }

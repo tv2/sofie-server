@@ -16,7 +16,7 @@ export class IngestController extends BaseController {
     try {
       const rundownName: string = req.params.rundownName
       await this.ingestService.reloadIngestData(rundownName)
-      res.send(`Successfully reloaded rundown data for rundown ${rundownName}`)
+      res.send(`Attempted reload of rundown data for ${rundownName}`)
     } catch (error) {
       this.httpErrorHandler.handleError(res, error as Exception)
     }
