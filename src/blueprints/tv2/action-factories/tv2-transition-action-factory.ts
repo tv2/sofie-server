@@ -29,16 +29,17 @@ export class Tv2TransitionActionFactory {
     return [MIX_TRANSITION_ID].includes(action.id)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
+  public getMutateActionMethods(action: Action): MutateActionMethods[] {
     switch (action.id) {
       case MIX_TRANSITION_ID: {
-        return {
+        return [{
           type: MutateActionType.PIECE,
           updateActionWithPieceData: (action: Action, piece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, piece),
           piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
-        }
+        }]
       }
     }
+    return []
   }
 
   private createMixTransitionAction(): Tv2TransitionAction {

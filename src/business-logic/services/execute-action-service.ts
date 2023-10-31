@@ -81,26 +81,39 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async mutateAction(action: Action, rundownId: string): Promise<Action> {
-    const mutateActionMethods: MutateActionMethods | undefined = this.getMutateActionsMethodsFromAction(action)
-    if (!mutateActionMethods) {
+    const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
+    if (!mutateActionMethodsArray) {
       return action
     }
+
+    for (let i = 0; i < mutateActionMethodsArray.length; i++) {
+      const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
+      action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId)
+    }
+
+    return action
+  }
+
+  private async executeMutateActionMethods(action: Action, mutateActionMethods: MutateActionMethods, rundownId: string): Promise<Action> {
     switch (mutateActionMethods.type) {
       case MutateActionType.PIECE: {
         return await this.mutateActionWithPieceFromNextPart(rundownId, mutateActionMethods, action)
       }
       case MutateActionType.MEDIA: {
-        return await this.mutateActionWithMedia(mutateActionMethods, action)
+        return this.mutateActionWithMedia(mutateActionMethods, action)
       }
       case MutateActionType.HISTORIC_PART: {
-        return await this.mutateActionWithHistoricPart(rundownId, mutateActionMethods, action)
+        return this.mutateActionWithHistoricPart(rundownId, mutateActionMethods, action)
+      }
+      default: {
+        return action
       }
     }
   }
 
-  private getMutateActionsMethodsFromAction(action: Action): MutateActionMethods | undefined {
+  private getMutateActionsMethodsFromAction(action: Action): MutateActionMethods[] {
     if (!this.blueprint.getMutateActionMethods) {
-      return
+      return []
     }
     return this.blueprint.getMutateActionMethods(action)
   }
@@ -171,31 +184,33 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async replacePiece(action: Action, rundownId: string): Promise<void> {
-    const mutateActionMethods: MutateActionWithPieceMethods = this.findMutateActionsForReplacePiece(action)
+    const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
 
-    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const pieceFromRundown: Piece | undefined = rundown.getActivePart().getPieces().find(mutateActionMethods.piecePredicate)
-      ?? rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
+    let pieceFromRundown: Piece | undefined
+
+    for (let i = 0; i < mutateActionMethodsArray.length; i++) {
+      const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
+      if (mutateActionMethods.type !== MutateActionType.PIECE) {
+        action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId)
+        continue
+      }
+
+      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+      pieceFromRundown = rundown.getActivePart().getPieces().find(mutateActionMethods.piecePredicate)
+        ?? rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
+
+      if (!pieceFromRundown) {
+        continue
+      }
+
+      action = mutateActionMethods.updateActionWithPieceData(action, pieceFromRundown)
+    }
 
     if (!pieceFromRundown) {
       return
     }
 
-    const updatedAction: Action = mutateActionMethods.updateActionWithPieceData(action, pieceFromRundown)
-
-    const piece: Piece = this.createPieceFromAction(updatedAction as PieceAction)
+    const piece: Piece = this.createPieceFromAction(action as PieceAction)
     await this.rundownService.replacePiece(rundownId, pieceFromRundown, piece)
-  }
-
-  private findMutateActionsForReplacePiece(action: Action): MutateActionWithPieceMethods {
-    const mutateActionMethods: MutateActionMethods | undefined = this.getMutateActionsMethodsFromAction(action)
-    if (!mutateActionMethods) {
-      throw new UnsupportedOperation(`${PieceActionType.REPLACE_PIECE} requires the Action to have implemented "getMutateActionMethods"`)
-    }
-
-    if (mutateActionMethods.type !== MutateActionType.PIECE) {
-      throw new UnsupportedOperation(`${PieceActionType.REPLACE_PIECE} requires the mutateActionMethods to be ${MutateActionType.PIECE}`)
-    }
-    return mutateActionMethods
   }
 }

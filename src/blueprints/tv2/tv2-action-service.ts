@@ -40,7 +40,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly dveActionFactory: Tv2DveActionFactory
   ) {}
 
-  public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
+  public getMutateActionMethods(action: Action): MutateActionMethods[] {
     if (this.transitionActionFactory.isTransitionAction(action)) {
       return this.transitionActionFactory.getMutateActionMethods(action)
     }
@@ -50,6 +50,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.dveActionFactory.isDveAction(action)) {
       return this.dveActionFactory.getMutateActionMethods(action)
     }
+    return []
   }
 
   public generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[] {

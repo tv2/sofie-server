@@ -670,7 +670,7 @@ export class Rundown extends BasicRundown {
   }
 
   public findPartInHistory(predicate: (part: Part) => boolean): Part {
-    const historicPart: Part | undefined = [...this.history].reverse().find(predicate)
+    const historicPart: Part | undefined = [...this.history, this.getActivePart().clone()].reverse().find(predicate)
     if (!historicPart) {
       throw new NoPartInHistoryException(`Rundown ${this.id} does not contain a Part with the specified conditions in its history`)
     }
