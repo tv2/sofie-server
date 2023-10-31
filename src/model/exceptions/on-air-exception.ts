@@ -1,8 +1,8 @@
 import { ErrorCode } from '../enums/error-code'
 import { Exception } from './exception'
 
-export class ActivePartException extends Exception {
+export class OnAirException extends Exception {
   constructor(message: string) {
-    super(ErrorCode.PART_IS_ACTIVE, message)
+    super(ErrorCode.ON_AIR, message)
   }
 }
