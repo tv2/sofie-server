@@ -15,7 +15,7 @@ import { EntityTestFactory } from './entity-test-factory'
 import { AlreadyExistException } from '../../exceptions/already-exist-exception'
 import { RundownCursor } from '../../value-objects/rundown-cursor'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
-import { ActivePartException } from '../../exceptions/active-part-exception'
+import { OnAirException } from '../../exceptions/on-air-exception'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -2841,7 +2841,7 @@ describe(Rundown.name, () => {
 
         const result: () => void = () => rundown.setNext(activeSegment.id, activePart.id)
 
-        expect(result).toThrow(ActivePartException)
+        expect(result).toThrow(OnAirException)
       })
     })
   })

@@ -19,7 +19,7 @@ import { RundownCursor } from '../value-objects/rundown-cursor'
 import { Owner } from '../enums/owner'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { LastSegmentInRundown } from '../exceptions/last-segment-in-rundown'
-import { ActivePartException } from '../exceptions/active-part-exception'
+import { OnAirException } from '../exceptions/on-air-exception'
 
 export interface RundownInterface {
   id: string
@@ -447,7 +447,7 @@ export class Rundown extends BasicRundown {
     const nextPart: Part = nextSegment.findPart(partId)
 
     if (nextPart.isOnAir()) {
-      throw new ActivePartException('Can\'t set active part as next.')
+      throw new OnAirException('Can\'t set active part as next.')
     }
 
     if (this.nextCursor.segment.id !== segmentId) {
