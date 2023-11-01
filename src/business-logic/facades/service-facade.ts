@@ -13,7 +13,7 @@ import { IngestChangeService } from '../services/interfaces/ingest-change-servic
 import { DatabaseChangeIngestService } from '../services/database-change-ingest-service'
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
 import {IngestService} from '../services/interfaces/ingest-service'
-import {Tv2InewsIngestService} from '../services/tv2-inews-ingest-service'
+import {Tv2INewsIngestService} from '../services/tv2-inews-ingest-service'
 import {HttpService} from '../services/interfaces/http-service'
 import {GotHttpService} from '../services/got-http-service'
 
@@ -67,6 +67,6 @@ export class ServiceFacade {
 
   public static createIngestService(): IngestService {
     const httpService: HttpService = new GotHttpService()
-    return new Tv2InewsIngestService(httpService)
+    return new Tv2INewsIngestService(httpService)
   }
 }
