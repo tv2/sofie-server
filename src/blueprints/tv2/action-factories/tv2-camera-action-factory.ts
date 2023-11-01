@@ -6,27 +6,26 @@ import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { PieceType } from '../../../model/enums/piece-type'
-import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import {
-  AtemAuxTimelineObject,
-  AtemMeTimelineObject,
-  AtemTransition,
-  AtemType
-} from '../../timeline-state-resolver-types/atem-types'
-import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
 import { Action } from '../../../model/entities/action'
 import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
+import {
+  Tv2VideoMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
+import { TimelineEnable } from '../../../model/entities/timeline-enable'
 
 export class Tv2CameraActionFactory {
 
-  constructor(private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory) {
-  }
+  constructor(
+    private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
+    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
+  ) {}
 
   public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return blueprintConfiguration.studio.SourcesCam
@@ -95,40 +94,11 @@ export class Tv2CameraActionFactory {
   }
 
   private createCameraTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
-    const programTimelineObject: AtemMeTimelineObject = {
-      id: `insertedProgram_${source._id}`,
-      enable: {
-        start: 0
-      },
-      priority: 1,
-      layer: Tv2AtemLayer.PROGRAM,
-      content: {
-        deviceType: DeviceType.ATEM,
-        type: AtemType.ME,
-        me: {
-          input: source.SwitcherSource,
-          transition: AtemTransition.CUT
-        }
-      }
-    }
-
-    const lookaheadTimelineObject: AtemAuxTimelineObject = {
-      id: `insertedLookahead_${source._id}`,
-      enable: {
-        start: 0
-      },
-      priority: 0,
-      layer: Tv2AtemLayer.LOOKAHEAD,
-      content: {
-        deviceType: DeviceType.ATEM,
-        type: AtemType.AUX,
-        aux: {
-          input: source.SwitcherSource
-        }
-      }
-    }
-
-    return [programTimelineObject, lookaheadTimelineObject]
+    const enable: TimelineEnable = { start: 0 }
+    return [
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable, `insertedProgram_${source._id}`),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.SwitcherSource, enable, `insertedLookahead_${source._id}`),
+    ]
   }
 
   private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
