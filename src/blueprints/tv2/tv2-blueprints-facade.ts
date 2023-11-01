@@ -42,7 +42,7 @@ export class Tv2BlueprintsFacade {
 
     const actionService: Tv2ActionService = new Tv2ActionService(
       new Tv2BlueprintConfigurationMapper(),
-      new Tv2CameraActionFactory(tv2AudioTimelineObjectFactory),
+      new Tv2CameraActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
       new Tv2TransitionActionFactory(),
       new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory),
       new Tv2GraphicsActionFactory(tv2GraphicsTimelineObjectFactory),

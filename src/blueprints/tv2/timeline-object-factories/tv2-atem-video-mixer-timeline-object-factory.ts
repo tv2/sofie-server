@@ -60,9 +60,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return Tv2AtemLayer.DOWNSTREAM_KEYER
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, id?: string): AtemMeTimelineObject {
     return {
-      id: 'atem_program',
+      id: id ?? 'atem_program',
       enable,
       priority: 1,
       layer: Tv2AtemLayer.PROGRAM,
@@ -94,9 +94,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
+  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable, id?: string): AtemAuxTimelineObject {
     return {
-      id: 'atem_lookahead',
+      id: id ?? 'atem_lookahead',
       enable,
       priority: 0,
       layer: Tv2AtemLayer.LOOKAHEAD,
