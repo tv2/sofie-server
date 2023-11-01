@@ -70,7 +70,6 @@ export class ExecuteActionService implements ActionService {
         break
       }
       case PieceActionType.REPLACE_PIECE: {
-        // TODO: Write tests for this once IngestUpdate changes has been merged.
         await this.replacePiece(action, rundownId)
         break
       }
