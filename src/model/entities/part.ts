@@ -169,7 +169,6 @@ export class Part {
       throw new UnsupportedOperation(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
     }
 
-    // TODO: Mark pieceToBeReplaced as unsynced once receiving IngestUpdates changes.
     this.pieces[pieceIndex] = newPiece
   }
 
