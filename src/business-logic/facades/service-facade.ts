@@ -67,6 +67,6 @@ export class ServiceFacade {
 
   public static createIngestService(): IngestService {
     const httpService: HttpService = new GotHttpService()
-    return new Tv2INewsIngestService(httpService)
+    return new Tv2INewsIngestService(httpService, RepositoryFacade.createRundownRepository())
   }
 }
