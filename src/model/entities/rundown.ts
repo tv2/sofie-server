@@ -19,6 +19,7 @@ import { RundownCursor } from '../value-objects/rundown-cursor'
 import { Owner } from '../enums/owner'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { LastSegmentInRundown } from '../exceptions/last-segment-in-rundown'
+import { OnAirException } from '../exceptions/on-air-exception'
 
 export interface RundownInterface {
   id: string
@@ -442,15 +443,21 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.setNext.name)
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
 
-    let nextSegment: Segment = this.nextCursor.segment
+    const nextSegment: Segment = this.findSegment(segmentId)
+    const nextPart: Part = nextSegment.findPart(partId)
+
+    if (nextPart.isOnAir()) {
+      throw new OnAirException('Can\'t set active part as next.')
+    }
+
     if (this.nextCursor.segment.id !== segmentId) {
       this.unmarkNextSegment()
-      nextSegment = this.findSegment(segmentId)
     }
+
     this.nextCursor?.part.reset()
     this.unmarkNextPart()
 
-    this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextSegment.findPart(partId), owner: owner ?? Owner.SYSTEM })
+    this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextPart, owner: owner ?? Owner.SYSTEM })
 
     this.markNextSegment()
     this.markNextPart()
