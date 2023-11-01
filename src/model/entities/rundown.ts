@@ -66,7 +66,7 @@ export class Rundown extends BasicRundown {
     this.segments = rundown.segments ?? []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
-    this.history = rundown.history
+    this.history = rundown.history ?? []
 
     if (rundown.alreadyActiveProperties) {
       if (!rundown.isRundownActive) {
