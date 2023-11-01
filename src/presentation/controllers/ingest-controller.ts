@@ -11,7 +11,7 @@ export class IngestController extends BaseController {
     super()
   }
 
-  @PostRequest('/reloadData/:rundownName')
+  @PostRequest('/reloadData/rundowns/:rundownName')
   public async reloadRundownData(req: Request, res: Response): Promise<void> {
     try {
       const rundownName: string = req.params.rundownName
