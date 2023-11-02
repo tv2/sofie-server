@@ -80,7 +80,6 @@ export class Tv2CameraActionFactory {
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
       start: 0,
-      duration: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       metadata,
