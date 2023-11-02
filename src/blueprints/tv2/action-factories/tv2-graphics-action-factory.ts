@@ -34,6 +34,9 @@ import { MisconfigurationException } from '../../../model/exceptions/misconfigur
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2GraphicsData } from '../value-objects/tv2-action-manifest-data'
 import { Tv2GraphicsContent } from '../value-objects/tv2-content'
+import {
+  Tv2GraphicsTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-graphics-timeline-object-factory'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -49,10 +52,16 @@ export class Tv2GraphicsActionFactory {
       blueprintConfiguration,
       graphicsData.filter(data => data.type === Tv2GraphicsTarget.FULL)
     )
-    const overlayActions: Action[] = this.createIdentGraphicsActionsFromGraphicsData(
+    // Todo: Only pass on graphics data related to ident actions
+    const identActions: Action[] = this.createIdentGraphicsActionsFromGraphicsData(
       blueprintConfiguration,
       graphicsData.filter(data => data.type === Tv2GraphicsTarget.OVL)
     )
+    // Todo: Only pass on graphics data related to lower third actions
+    // const lowerThirdActions: Action[] = this.createLowerThirdActionsFromGraphicsData(
+    //   blueprintConfiguration,
+    //   graphicsData.filter(data => data.type === Tv2GraphicsTarget.OVL)
+    // )
     return [
       this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
@@ -60,7 +69,7 @@ export class Tv2GraphicsActionFactory {
       this.createClearGraphicsAction(blueprintConfiguration),
       this.createAllOutGraphicsAction(blueprintConfiguration),
       ...fullScreenActions,
-      ...overlayActions
+      ...identActions
     ]
   }
 
@@ -193,16 +202,16 @@ export class Tv2GraphicsActionFactory {
 
   private createFullscreenGraphicsActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PartAction[] {
     switch (blueprintConfiguration.studio.GraphicsType) {
-      case Tv2GraphicsType.HTML: return this.createCasparCgFullscreen(blueprintConfiguration, graphicsData)
+      case Tv2GraphicsType.HTML: return this.createCasparCgFullscreenGraphics(blueprintConfiguration, graphicsData)
       case Tv2GraphicsType.VIZ:
-      default: return this.createVizFullscreen(blueprintConfiguration, graphicsData)
+      default: return this.createVizFullscreenGraphics(blueprintConfiguration, graphicsData)
     }
   }
 
-  private createVizFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PartAction[] {
-    return graphicsData.map((manifest) => this.createVizFullGraphicsActionFromGraphicsData(
+  private createVizFullscreenGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PartAction[] {
+    return graphicsData.map((data) => this.createVizFullGraphicsActionFromGraphicsData(
       blueprintConfiguration,
-      manifest
+      data
     ))
   }
 
@@ -341,7 +350,7 @@ export class Tv2GraphicsActionFactory {
     ]
   }
 
-  private createCasparCgFullscreen(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[] ): Tv2PartAction[] {
+  private createCasparCgFullscreenGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[] ): Tv2PartAction[] {
     return graphicsData.map((manifest) => this.createCasparCgFullGraphicsActionFromGraphicsData(
       blueprintConfiguration,
       manifest
@@ -450,57 +459,20 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createIdentGraphicsActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    switch (blueprintConfiguration.studio.GraphicsType) {
-      case Tv2GraphicsType.HTML: return this.createCasparCgIdentGraphics(blueprintConfiguration, graphicsData)
-      case Tv2GraphicsType.VIZ:
-      default: return this.createVizIdentGraphics(blueprintConfiguration, graphicsData)
-    }
+    return graphicsData.map(data => this.createIdentAction(blueprintConfiguration, data))
   }
 
-  private createVizIdentGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    return graphicsData.map(data => this.createVizIdentAction(blueprintConfiguration, data))
-  }
-
-  private createVizIdentAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PieceAction {
+  private createIdentAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
-    const templateName: string = graphicsData.name.split('-')[0].trim()
+    const chosenTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
+      ? this.casparCgGraphicsTimelineObjectFactory
+      : this.vizGraphicsTimelineObjectFactory
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: '',
       name: graphicsData.name,
       layer: Tv2SourceLayer.OVERLAY,
       timelineObjects: [
-        this.vizGraphicsTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
-        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
-      ],
-      content: {
-        fileName: templateName,
-        path: templateName,
-        ignoreMediaObjectStatus: true,
-      }
-    })
-    return {
-      id: `ident_${graphicsData.name.replaceAll(' ', '_')}`,
-      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      name: graphicsData.name,
-      data: pieceInterface,
-      metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
-      }
-    }
-  }
-
-  private createCasparCgIdentGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    return graphicsData.map(data => this.createCasparCgIdentAction(blueprintConfiguration, data))
-  }
-
-  private createCasparCgIdentAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PieceAction {
-    const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
-    const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
-      id: '',
-      name: graphicsData.name,
-      layer: Tv2SourceLayer.OVERLAY,
-      timelineObjects: [
-        this.casparCgGraphicsTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
+        chosenTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
       ]
     })
@@ -514,4 +486,26 @@ export class Tv2GraphicsActionFactory {
       }
     }
   }
+
+  // private createLowerThirdActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Action[] {
+  //   switch (blueprintConfiguration.studio.GraphicsType) {
+  //     case Tv2GraphicsType.HTML: return this.createCasparCgLowerThirdGraphics(blueprintConfiguration, graphicsData)
+  //     case Tv2GraphicsType.VIZ:
+  //     default: return this.createVizLowerThirdGraphics(blueprintConfiguration, graphicsData)
+  //   }
+  // }
+  //
+  // private createCasparCgLowerThirdGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Action[] {
+  //   return graphicsData.map((data) => this.createCasparCgLowerThirdGraphicsActionFromGraphicsData(
+  //     blueprintConfiguration,
+  //     data
+  //   ))
+  // }
+  //
+  // private createVizLowerThirdGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Action[] {
+  //   return graphicsData.map((data) => this.createVizLowerThirdGraphicsActionFromGraphicsData(
+  //     blueprintConfiguration,
+  //     data
+  //   ))
+  // }
 }
