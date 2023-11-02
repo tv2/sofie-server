@@ -52,7 +52,7 @@ export class Tv2RemoteActionFactory {
   }
 
   private createRemotePiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): PieceInterface {
-    const remoteTimelineObjects: TimelineObject[] = this.createRemoteTimelineObjects(source)
+    const videoMixerTimelineObjects: TimelineObject[] = this.createVideoMixerTimelineObjects(source)
     const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
@@ -82,13 +82,13 @@ export class Tv2RemoteActionFactory {
       tags: [],
       isUnsynced: false,
       timelineObjects: [
-        ...remoteTimelineObjects,
+        ...videoMixerTimelineObjects,
         ...audioTimelineObjects
       ]
     }
   }
 
-  private createRemoteTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
+  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable, `insertedProgram_${source._id}`),

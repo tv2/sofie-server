@@ -57,7 +57,7 @@ export class Tv2CameraActionFactory {
   }
 
   private createCameraPiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): PieceInterface {
-    const cameraTimelineObjects: TimelineObject[] = this.createCameraTimelineObjects(source)
+    const videoMixerTimelineObjects: TimelineObject[] = this.createVideoMixerTimelineObjects(source)
     const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
@@ -87,13 +87,13 @@ export class Tv2CameraActionFactory {
       tags: [],
       isUnsynced: false,
       timelineObjects: [
-        ...cameraTimelineObjects,
+        ...videoMixerTimelineObjects,
         ...audioTimelineObjects
       ]
     }
   }
 
-  private createCameraTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
+  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable, `insertedProgram_${source._id}`),
