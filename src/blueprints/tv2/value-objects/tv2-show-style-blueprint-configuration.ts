@@ -23,4 +23,6 @@ export interface GraphicsSetup {
 export interface GraphicsTemplate {
   VizTemplate?: string
   OutType?: string
+  INewsName?: string
+  LayerMapping: string
 }

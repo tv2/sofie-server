@@ -12,6 +12,7 @@ export interface VizMseElementInternalTimelineObject extends TimelineObject {
     templateName: string
     templateData: string[]
     showName: string
+    channelName?: string
   }
 }
 
