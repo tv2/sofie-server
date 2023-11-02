@@ -15,20 +15,11 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean, enable: TimelineEnable, priority: number): AtemDownstreamKeyerTimelineObject {
-    return this.createAtemDownstreamKeyerTimelineObject(downstreamKeyer, onAir, {
-      id: '',
-      enable,
-      priority,
-    })
-  }
-
-  private createAtemDownstreamKeyerTimelineObject(
-    downstreamKeyer: Tv2DownstreamKeyer,
-    onAir: boolean,
-    timelineObjectWithRequiredValues: Pick<AtemDownstreamKeyerTimelineObject, 'id' | 'enable' | 'priority'> & Partial<AtemDownstreamKeyerTimelineObject>
-  ): AtemDownstreamKeyerTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
+      id: `downstreamKeyer${downstreamKeyerNumber}`,
+      enable,
+      priority,
       layer: `${Tv2AtemLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
       content: {
         deviceType: DeviceType.ATEM,
@@ -48,7 +39,6 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
           }
         }
       },
-      ...timelineObjectWithRequiredValues
     }
   }
 
@@ -60,8 +50,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   }
 
   public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMeTimelineObject {
+    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
-      id: '',
+      id: `upstreamKeyer${downstreamKeyerNumber}`,
       enable,
       priority: 1,
       layer: Tv2AtemLayer.CLEAN_UPSTREAM_KEYER,
