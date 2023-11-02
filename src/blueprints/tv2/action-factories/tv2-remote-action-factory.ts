@@ -56,7 +56,7 @@ export class Tv2RemoteActionFactory {
     const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
-      type: Tv2PieceType.CAMERA,
+      type: Tv2PieceType.REMOTE,
       sisyfosPersistMetaData: {
         sisyfosLayers: source.SisyfosLayers,
         wantsToPersistAudio: source.WantsToPersistAudio,
