@@ -11,6 +11,7 @@ export interface Tv2AudioTimelineObjectFactory {
   createStopAudioBedTimelineObject(duration: number): TimelineObject
   createResynchronizeTimelineObject(): TimelineObject
   createVideoClipAudioTimelineObjects(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): TimelineObject[]
+  createBreakerAudioTimelineObject(): TimelineObject
 
   getAudioDeviceType(): DeviceType
 }

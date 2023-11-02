@@ -36,6 +36,7 @@ import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-layers'
 import { Tv2FileContent } from '../value-objects/tv2-content'
+import { AssetFolderHelper } from '../helpers/AssetFolderHelper'
 
 const NUMBER_OF_DVE_BOXES: number = 4
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
@@ -53,7 +54,8 @@ export class Tv2DveActionFactory {
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory
+    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
+    private readonly assetFolderHelper: AssetFolderHelper
   ) {}
 
 
@@ -133,9 +135,9 @@ export class Tv2DveActionFactory {
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(ATEM_SUPER_SOURCE_INDEX, timelineEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(ATEM_SUPER_SOURCE_INDEX, timelineEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.casparCgTimelineObjectFactory.createCasparCgDveKeyTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveFrameTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveLocatorTimelineObject()
+        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
+        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
+        this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject()
       ]
 
       const metadata: Tv2PieceMetadata = {
@@ -205,23 +207,6 @@ export class Tv2DveActionFactory {
     }
   }
 
-  // Copied from Blueprints // TODO: Use the helper class André is making.
-  private joinAssetToFolder(folder: string | undefined, assetFile: string): string {
-    if (!folder) {
-      return assetFile
-    }
-
-    // Replace every `\\` with `\`, then replace every `\` with `/`
-    const folderWithForwardSlashes = folder.replace(/\\\\/g, '\\').replace(/\\/g, '/')
-    const assetWithForwardSlashes = assetFile.replace(/\\\\/g, '\\').replace(/\\/g, '/')
-
-    // Remove trailing slash from folder and leading slash from asset
-    const folderWithoutTrailingSlashes = folderWithForwardSlashes.replace(/\/+$/, '')
-    const assetFileWithoutLeadingSlashes = assetWithForwardSlashes.replace(/^\/+/, '')
-
-    return `${folderWithoutTrailingSlashes}/${assetFileWithoutLeadingSlashes}`
-  }
-
   private createInsertToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertSourceInputAction[] {
     const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesCam.slice(0, 5)
     const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesRM
@@ -245,7 +230,9 @@ export class Tv2DveActionFactory {
             name: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
             description: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
             type: PieceActionType.REPLACE_PIECE,
-            data: {} as PieceInterface,
+            data: {
+              pieceInterface: {} as PieceInterface
+            },
             metadata: {
               contentType: Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT,
               inputIndex,
@@ -303,7 +290,9 @@ export class Tv2DveActionFactory {
     }
 
     const dveAction: Tv2DveInsertSourceInputAction = action as Tv2DveInsertSourceInputAction
-    dveAction.data = this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, pieceMetadata, timelineObjects)
+    dveAction.data = {
+      pieceInterface: this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, pieceMetadata, timelineObjects)
+    }
     return dveAction
   }
 
@@ -362,9 +351,9 @@ export class Tv2DveActionFactory {
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.casparCgTimelineObjectFactory.createCasparCgDveKeyTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveFrameTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveLocatorTimelineObject(),
+        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
+        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
+        this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject(),
         ...audioTimelineObjects
       ]
 
@@ -519,7 +508,9 @@ export class Tv2DveActionFactory {
           isVoiceOver
         }
       },
-      data: {} as PieceInterface
+      data: {
+        pieceInterface: {} as PieceInterface
+      }
     }
   }
 

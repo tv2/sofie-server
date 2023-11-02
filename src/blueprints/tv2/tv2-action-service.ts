@@ -7,7 +7,7 @@ import {
 } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
-import { Tv2TransitionActionFactory } from './action-factories/tv2-transition-action-factory'
+import { Tv2TransitionEffectActionFactory } from './action-factories/tv2-transition-effect-action-factory'
 import { Tv2AudioActionFactory } from './action-factories/tv2-audio-action-factory'
 import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action-factory'
 import {
@@ -32,7 +32,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
     private readonly configurationMapper: Tv2BlueprintConfigurationMapper,
     private readonly cameraActionFactory: Tv2CameraActionFactory,
-    private readonly transitionActionFactory: Tv2TransitionActionFactory,
+    private readonly transitionEffectActionFactory: Tv2TransitionEffectActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
     private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
@@ -41,8 +41,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   ) {}
 
   public getMutateActionMethods(action: Action): MutateActionMethods[] {
-    if (this.transitionActionFactory.isTransitionAction(action)) {
-      return this.transitionActionFactory.getMutateActionMethods(action)
+    if (this.transitionEffectActionFactory.isTransitionEffectAction(action)) {
+      return this.transitionEffectActionFactory.getMutateActionMethods(action)
     }
     if (this.videoClipActionFactory.isVideoClipAction(action)) {
       return this.videoClipActionFactory.getMutateActionMethods(action)
@@ -62,7 +62,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     return [
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
-      ...this.transitionActionFactory.createTransitionActions(),
+      ...this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
       ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration),

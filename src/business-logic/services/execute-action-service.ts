@@ -172,14 +172,14 @@ export class ExecuteActionService implements ActionService {
   }
 
   private createPieceFromAction(pieceAction: PieceAction): Piece {
-    const pieceInterface: PieceInterface = pieceAction.data
+    const pieceInterface: PieceInterface = pieceAction.data.pieceInterface
     pieceInterface.id = this.makeUnique(pieceInterface.id)
     return new Piece(pieceInterface)
   }
 
   private async insertPieceAsNext(pieceAction: PieceAction, rundownId: string): Promise<void> {
     const piece: Piece = this.createPieceFromAction(pieceAction)
-    await this.rundownService.insertPieceAsNext(rundownId, piece)
+    await this.rundownService.insertPieceAsNext(rundownId, piece, pieceAction.data.partInTransition)
   }
 
   private async replacePiece(action: Action, rundownId: string): Promise<void> {

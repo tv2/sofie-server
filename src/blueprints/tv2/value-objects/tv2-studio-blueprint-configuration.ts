@@ -7,7 +7,8 @@ export interface Tv2StudioBlueprintConfiguration {
   SwitcherSource: Tv2VideoMixerSources
   CasparPrerollDuration: number,
   ServerPostrollDuration: number
-  DVEFolder?: string
+  DVEFolder?: string,
+  JingleFolder?: string
 }
 
 export interface Tv2SourceMapping {
@@ -30,6 +31,7 @@ export interface Tv2VideoMixerSources {
   SplitArtFill: number
   SplitArtKey: number
   DSK: Tv2DownstreamKeyer[]
+  Dip: number
 }
 
 export interface Tv2DownstreamKeyer {
@@ -38,9 +40,15 @@ export interface Tv2DownstreamKeyer {
   Key: number
   Fill: number
   DefaultOn: boolean
-  Roles: string[]
+  Roles: Tv2DownstreamKeyerRole[]
   Clip: number,
   Gain: number
+}
+
+export enum Tv2DownstreamKeyerRole {
+  FULL_GRAPHICS = 'full_graphics',
+  OVERLAY_GRAPHICS = 'overlay_graphics',
+  JINGLE = 'jingle'
 }
 
 

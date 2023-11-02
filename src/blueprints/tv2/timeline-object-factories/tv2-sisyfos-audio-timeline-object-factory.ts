@@ -144,6 +144,22 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
     return sisyfosServerTimelineObjects
   }
 
+  public createBreakerAudioTimelineObject(): SisyfosChannelTimelineObject {
+    return {
+      id: 'breaker_sisyfos',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2SisyfosLayer.BREAKER,
+      content: {
+        deviceType: DeviceType.SISYFOS,
+        type: SisyfosType.CHANNEL,
+        isPgm: 1
+      }
+    }
+  }
+
   public getAudioDeviceType(): DeviceType {
     return DeviceType.SISYFOS
   }
