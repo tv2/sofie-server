@@ -14,7 +14,7 @@ import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BaseGraphicTimelineObjectFactory } from './tv2-base-graphic-timeline-object-factory'
 import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
-import { Tv2GraphicsActionManifest } from '../value-objects/tv2-action-manifest'
+import { Tv2GraphicsData } from '../value-objects/tv2-action-manifest-data'
 
 export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
@@ -115,9 +115,9 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
     }
   }
 
-  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, manifest: Tv2GraphicsActionManifest): VizMseElementPilotTimelineObject {
+  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): VizMseElementPilotTimelineObject {
     return {
-      id: '',
+      id: 'full',
       enable: {
         start: 0
       },
@@ -126,10 +126,10 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
       content: {
         deviceType: DeviceType.VIZMSE,
         type: VizType.ELEMENT_PILOT,
-        templateVcpId: manifest.userData.vcpid,
+        templateVcpId: graphicsData.vcpId!,
         continueStep: -1,
         noAutoPreloading: false,
-        channelName: this.getChannelNameFromGraphicTarget(Tv2GraphicsTarget.FULL),
+        channelName: 'FULL1',
         ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
       }
     }
@@ -153,12 +153,22 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
     }
   }
 
-  private getChannelNameFromGraphicTarget(target: Tv2GraphicsTarget): string {
-    switch (target) { // Todo: should the default case be here, throwing an 'UnexpectedCaseException'?
-      case Tv2GraphicsTarget.WALL: return 'WALL1'
-      case Tv2GraphicsTarget.OVL: return 'OVL1'
-      case Tv2GraphicsTarget.FULL:
-      case Tv2GraphicsTarget.TLF: return 'FULL1'
+  public createIdentGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): VizMseElementInternalTimelineObject {
+    return {
+      id: 'ident',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT,
+      content: {
+        deviceType: DeviceType.VIZMSE,
+        type: VizType.ELEMENT_INTERNAL,
+        templateName: this.getTemplateNameFromGraphicsData(graphicsData),
+        templateData: [this.getDisplayTextFromGraphicsData(graphicsData)],
+        channelName: 'OVL1',
+        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+      }
     }
   }
 }
