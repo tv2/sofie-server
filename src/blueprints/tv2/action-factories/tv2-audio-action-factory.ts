@@ -37,7 +37,9 @@ export class Tv2AudioActionFactory {
       id: 'fadePersistedAudioAction',
       name: 'Fade Persisted Audio',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.AUDIO
       }
@@ -67,7 +69,9 @@ export class Tv2AudioActionFactory {
       id: 'studioMicrophonesUpAction',
       name: 'Studio Microphones Up',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.AUDIO,
       },
@@ -105,7 +109,9 @@ export class Tv2AudioActionFactory {
       id: 'studioMicrophonesDownAction',
       name: 'Studio Microphones Down',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.AUDIO
       }
@@ -128,7 +134,9 @@ export class Tv2AudioActionFactory {
       name: 'Stop audio bed',
       description: 'Stops audio bed.',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.AUDIO,
       },
@@ -149,7 +157,9 @@ export class Tv2AudioActionFactory {
       id: 'resynchronizeAudioAction',
       name: 'Resynchronize Audio',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.AUDIO
       }
