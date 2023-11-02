@@ -9,8 +9,8 @@ import { Tv2SisyfosLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
-import { Tv2VideoClipData } from '../value-objects/tv2-video-clip-data'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2VideoClipData } from '../value-objects/tv2-action-manifest-data'
 
 const enum SisyfosFaderState {
   OFF = 0,
