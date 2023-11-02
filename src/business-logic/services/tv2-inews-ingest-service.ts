@@ -11,9 +11,13 @@ export class Tv2INewsIngestService implements IngestService {
 
   public async reloadIngestData(rundownId: string): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const domain: string = process.env.INEWS_DOMAIN ?? DEFAULT_URL
-    const url: string = `http://${domain}/reloadData/rundowns/${rundown.name}`
+    const url: string = this.getReingestUrl(rundown.name)
     const parameters: HttpRequestParameters = { url: url }
     await this.httpService.post(parameters)
+  }
+
+  private getReingestUrl(rundownName: string): string {
+    const domain: string = process.env.INEWS_DOMAIN ?? DEFAULT_URL
+    return `http://${domain}/rundowns/${rundownName}/reingest-data`
   }
 }
