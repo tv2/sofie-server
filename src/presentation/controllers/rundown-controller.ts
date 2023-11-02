@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { BaseController, DeleteRequest, GetRequest, PutRequest, RestController } from './base-controller'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
 import { RundownService } from '../../business-logic/services/interfaces/rundown-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
@@ -9,12 +9,14 @@ import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { BasicRundown } from '../../model/entities/basic-rundown'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { Owner } from '../../model/enums/owner'
+import { IngestService } from '../../business-logic/services/interfaces/ingest-service'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
   constructor(
     private readonly rundownService: RundownService,
     private readonly rundownRepository: RundownRepository,
+    private readonly ingestService: IngestService,
     private readonly httpErrorHandler: HttpErrorHandler
   ) {
     super()
@@ -93,6 +95,17 @@ export class RundownController extends BaseController {
       const rundownId: string = req.params.rundownId
       await this.rundownService.resetRundown(rundownId)
       res.send(`Rundown "${rundownId}" has been reset`)
+    } catch (error) {
+      this.httpErrorHandler.handleError(res, error as Exception)
+    }
+  }
+
+  @PostRequest('/:rundownId/reingest')
+  public async reloadRundownData(req: Request, res: Response): Promise<void> {
+    try {
+      const rundownId: string = req.params.rundownId
+      await this.ingestService.reloadIngestData(rundownId)
+      res.send(`Reingested rundown data for ${rundownId}`)
     } catch (error) {
       this.httpErrorHandler.handleError(res, error as Exception)
     }
