@@ -17,9 +17,9 @@ import {
   Tv2VideoMixerConfigurationActionFactory
 } from './action-factories/tv2-video-mixer-configuration-action-factory'
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
-import { Tv2ActionManifestData, Tv2VideoClipData } from './value-objects/tv2-video-clip-data'
 import { PieceType } from '../../model/enums/piece-type'
-import { Tv2GraphicsActionManifest } from './value-objects/tv2-action-manifest'
+import { Tv2ActionManifestData, Tv2GraphicsData, Tv2VideoClipData } from './value-objects/tv2-action-manifest-data'
+import { Tv2GraphicsTarget } from './value-objects/tv2-graphics-target'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
@@ -50,14 +50,10 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
-      ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, this.getActionManifestsSubset(actionManifests, PieceType.GRAPHIC) as Tv2GraphicsActionManifest[]),
+      ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, this.getGraphicsData(actionManifests)),
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
       ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration)
     ]
-  }
-
-  private getActionManifestsSubset(actionManifests: ActionManifest[], pieceType: PieceType): ActionManifest[] {
-    return actionManifests.filter(manifest => manifest.pieceType === pieceType)
   }
 
   private mapToShowStyleBlueprintConfiguration(showStyle: ShowStyle): Tv2ShowStyleBlueprintConfiguration {
@@ -73,6 +69,20 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     }
     blueprintConfiguration.selectedGraphicsSetup = graphicsSetup
     return blueprintConfiguration
+  }
+
+
+  private getGraphicsData(actionManifests: ActionManifest[]): Tv2GraphicsData[] {
+    return actionManifests
+      .filter(actionManifest => actionManifest.pieceType === PieceType.GRAPHIC)
+      .map(actionManifest => {
+        const data: Tv2ActionManifestData = actionManifest.data as Tv2ActionManifestData
+        return {
+          type: data.vcpid ? Tv2GraphicsTarget.FULL : Tv2GraphicsTarget.OVL,
+          name: data.name,
+          vcpId: data.vcpid
+        }
+      })
   }
 
   private getVideoClipData(actionManifests: ActionManifest[]): Tv2VideoClipData[] {
