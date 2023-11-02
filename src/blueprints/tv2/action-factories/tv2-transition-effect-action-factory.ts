@@ -51,19 +51,31 @@ export class Tv2TransitionEffectActionFactory {
   }
 
   public createTransitionEffectActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
-    return blueprintConfiguration.showStyle.transitionEffectConfigurations.map(transitionEffect => {
+    return blueprintConfiguration.showStyle.transitionEffectConfigurations.flatMap(transitionEffect => {
       switch (transitionEffect.type) {
         case TransitionEffectType.CUT: {
-          return this.createCutTransitionEffectOnNextTakeAction()
+          return [
+            this.createCutTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT),
+            this.createCutTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE)
+          ]
         }
         case TransitionEffectType.MIX: {
-          return this.createMixTransitionEffectOnNextTakeAction(transitionEffect)
+          return [
+            this.createMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect),
+            this.createMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect)
+          ]
         }
         case TransitionEffectType.DIP: {
-          return this.createDipTransitionEffectOnNextTakeAction(transitionEffect, blueprintConfiguration.studio.SwitcherSource.Dip)
+          return [
+            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration.studio.SwitcherSource.Dip),
+            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration.studio.SwitcherSource.Dip)
+          ]
         }
         case TransitionEffectType.BREAKER: {
-          return this.createBreakerTransitionEffectOnNextTakeAction(transitionEffect, blueprintConfiguration)
+          return [
+            this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
+            this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
+          ]
         }
       }
     })
@@ -88,14 +100,14 @@ export class Tv2TransitionEffectActionFactory {
     return []
   }
 
-  private createCutTransitionEffectOnNextTakeAction(): Tv2TransitionEffectAction {
+  private createCutTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
     const effectName: string = 'Cut'
     const pieceInterface: PieceInterface = this.createPieceInterface(effectName, 0)
     const metadata: Tv2CutTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.CUT
     }
-    return this.createTransitionEffectAction(effectName, metadata, pieceInterface)
+    return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
 
   private createPieceInterface(effectName: string, durationFrames: number): PieceInterface {
@@ -122,12 +134,12 @@ export class Tv2TransitionEffectActionFactory {
     return (1000 / FRAME_RATE) * frames
   }
 
-  private createTransitionEffectAction(effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: PieceInterface): Tv2TransitionEffectAction {
+  private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: PieceInterface): Tv2TransitionEffectAction {
     return {
-      id: `nextTakeHas${effectName}TransitionAction`,
+      id: `${effectName}_transition_action_${actionType.toString()}`,
       name: `${effectName}`,
       description: `${effectName} transition on next Take.`,
-      type: PieceActionType.INSERT_PIECE_AS_NEXT,
+      type: actionType,
       data: {
         pieceInterface
       },
@@ -135,7 +147,7 @@ export class Tv2TransitionEffectActionFactory {
     }
   }
 
-  private createMixTransitionEffectOnNextTakeAction(transitionEffect: MixTransitionEffect): Tv2TransitionEffectAction {
+  private createMixTransitionEffectAction(actionType: PieceActionType, transitionEffect: MixTransitionEffect): Tv2TransitionEffectAction {
     const effectName: string = `Mix${transitionEffect.durationInFrames}`
     const pieceInterface: PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
@@ -143,10 +155,10 @@ export class Tv2TransitionEffectActionFactory {
       transitionEffectType: TransitionEffectType.MIX,
       durationInFrames: transitionEffect.durationInFrames
     }
-    return this.createTransitionEffectAction(effectName, metadata, pieceInterface)
+    return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
 
-  private createDipTransitionEffectOnNextTakeAction(transitionEffect: DipTransitionEffect, configuredDipInput: number): Tv2TransitionEffectAction {
+  private createDipTransitionEffectAction(actionType: PieceActionType, transitionEffect: DipTransitionEffect, configuredDipInput: number): Tv2TransitionEffectAction {
     const effectName: string = `Dip${transitionEffect.durationInFrames}`
     const pieceInterface: PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
@@ -155,10 +167,10 @@ export class Tv2TransitionEffectActionFactory {
       durationInFrames: transitionEffect.durationInFrames,
       dipInput: configuredDipInput
     }
-    return this.createTransitionEffectAction(effectName, metadata, pieceInterface)
+    return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
 
-  private createBreakerTransitionEffectOnNextTakeAction(transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
+  private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker | undefined = configuration.showStyle.breakers.find(breaker => breaker.name === transitionEffect.name)
     if (!breaker) {
       throw new Tv2MisconfigurationException(`Can't create Transition Effect Action for ${transitionEffect.name}. ${transitionEffect.name} is missing in Configurations`)
@@ -178,7 +190,7 @@ export class Tv2TransitionEffectActionFactory {
       breakerFolder: configuration.studio.JingleFolder ?? '',
       breaker
     }
-    return this.createTransitionEffectAction(breaker.name, metadata, pieceInterface)
+    return this.createTransitionEffectAction(actionType, breaker.name, metadata, pieceInterface)
   }
 
   private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, piece: Piece): Tv2TransitionEffectAction {

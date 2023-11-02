@@ -69,6 +69,12 @@ export class ExecuteActionService implements ActionService {
         await this.insertPieceAsNext(pieceAction, rundownId)
         break
       }
+      case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
+        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId)) as PieceAction
+        await this.insertPieceAsNext(pieceAction, rundownId)
+        await this.rundownService.takeNext(rundownId)
+        break
+      }
       case PieceActionType.REPLACE_PIECE: {
         await this.replacePiece(action, rundownId)
         break
