@@ -1,7 +1,7 @@
 import { TimelineObject } from '../../../../model/entities/timeline-object'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
-import { Tv2VideoClipData } from '../../value-objects/tv2-video-clip-data'
 import { Tv2SourceMappingWithSound } from '../../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2VideoClipData } from '../../value-objects/tv2-action-manifest-data'
 
 export interface Tv2AudioTimelineObjectFactory {
   createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): TimelineObject[]
