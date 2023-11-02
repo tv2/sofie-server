@@ -8,7 +8,6 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2CasparCgLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { Tv2VideoClipData } from '../value-objects/tv2-video-clip-data'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { CasparCgMediaTimelineObject, CasparCgType } from '../../timeline-state-resolver-types/caspar-cg-types'
@@ -20,6 +19,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Media } from '../../../model/entities/media'
 import { Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
+import { Tv2VideoClipData } from '../value-objects/tv2-action-manifest-data'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 const VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX: string = 'videoClipAsNextAction'
