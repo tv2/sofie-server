@@ -17,7 +17,7 @@ import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
 import { Action } from '../../../model/entities/action'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { Tv2Piece } from '../entities/tv2-piece'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
   Tv2AudioTimelineObjectFactory
@@ -39,7 +39,7 @@ export class Tv2CameraActionFactory {
 
   private createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
     const partId: string = `cameraInsertActionPart_${cameraSource._id}`
-    const cameraPieceInterface: Tv2Piece = this.createCameraPiece(configuration, cameraSource, partId)
+    const cameraPieceInterface: Tv2PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsNextAction_${cameraSource._id}`,
@@ -56,7 +56,7 @@ export class Tv2CameraActionFactory {
     }
   }
 
-  private createCameraPiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2Piece {
+  private createCameraPiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2PieceInterface {
     const cameraTimelineObjects: TimelineObject[] = this.createCameraTimelineObjects(source)
     const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
@@ -154,7 +154,7 @@ export class Tv2CameraActionFactory {
 
   public createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
     const partId: string = `cameraInsertAndTakeActionPart_${cameraSource._id}`
-    const cameraPieceInterface: Tv2Piece = this.createCameraPiece(configuration, cameraSource, partId)
+    const cameraPieceInterface: Tv2PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsOnAirAction_${cameraSource._id}`,

@@ -10,7 +10,7 @@ import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2ActionContentType, Tv2TransitionAction } from '../value-objects/tv2-action'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { Tv2Piece } from '../entities/tv2-piece'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 const FRAME_RATE: number = 25
@@ -44,7 +44,7 @@ export class Tv2TransitionActionFactory {
   }
 
   private createMixTransitionAction(): Tv2TransitionAction {
-    const pieceInterface: Tv2Piece = {
+    const pieceInterface: Tv2PieceInterface = {
       id: 'mixTransitionActionPiece',
       name: 'Mix transition',
       partId: '',
