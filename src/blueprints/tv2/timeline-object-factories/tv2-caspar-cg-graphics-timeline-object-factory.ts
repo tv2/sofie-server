@@ -112,6 +112,7 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
       case Tv2GraphicsLayer.GRAPHICS_PILOT: return '250_full'
       case Tv2GraphicsLayer.GRAPHICS_OVERLAY_PILOT: return '260_overlay'
       case Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT: return '650_ident'
+      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER: return '450_lowerThird'
       default: return ''
     }
   }
@@ -138,6 +139,40 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
           partialUpdate: true,
           slots: {
             [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT)]: {
+              display: 'program',
+              payload: {
+                type: this.getTemplateNameFromGraphicsData(graphicsData),
+                0: this.getDisplayTextFromGraphicsData(graphicsData)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public createLowerThirdGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): CasparCgTemplateTimelineObject {
+    return {
+      id: 'lowerThird',
+      priority: 1,
+      enable: {
+        start: 0
+      },
+      layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER,
+      content: {
+        deviceType: DeviceType.CASPAR_CG,
+        type: CasparCgType.TEMPLATE,
+        templateType: 'html',
+        name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.HtmlPackageFolder),
+        useStopCommand: false,
+        mixer: {
+          opacity: 100
+        },
+        data: {
+          display: 'program',
+          partialUpdate: true,
+          slots: {
+            [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER)]: {
               display: 'program',
               payload: {
                 type: this.getTemplateNameFromGraphicsData(graphicsData),
