@@ -1,10 +1,9 @@
-import {HttpRequestParameters, HttpService} from './interfaces/http-service'
-import got, { Response } from 'got'
+import { HttpService } from './interfaces/http-service'
+import got from 'got'
 
 export class GotHttpService implements HttpService {
 
-  public async post(httpParameters: HttpRequestParameters): Promise<Response<string>> {
-    const url: string = httpParameters.url
-    return got.post(url)
+  public post(url: string, body: unknown): unknown {
+    return got.post(url, body ?? undefined)
   }
 }

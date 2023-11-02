@@ -6,7 +6,6 @@ import { BaseController } from '../controllers/base-controller'
 import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
-import {IngestController} from '../controllers/ingest-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -15,7 +14,6 @@ export class ControllerFacade {
       this.createTimelineController(),
       this.createActionController(),
       this.createConfigurationController(),
-      this.createIngestController()
     ]
   }
 
@@ -23,6 +21,7 @@ export class ControllerFacade {
     return new RundownController(
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
+      ServiceFacade.createIngestService(),
       new ExpressErrorHandler()
     )
   }
@@ -41,9 +40,5 @@ export class ControllerFacade {
       RepositoryFacade.createShowStyleVariantRepository(),
       new ExpressErrorHandler()
     )
-  }
-
-  private static createIngestController(): IngestController {
-    return new IngestController(ServiceFacade.createIngestService(), new ExpressErrorHandler())
   }
 }
