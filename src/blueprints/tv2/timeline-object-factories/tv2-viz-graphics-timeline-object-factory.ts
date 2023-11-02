@@ -171,4 +171,23 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
       }
     }
   }
+
+  public createLowerThirdGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): TimelineObject {
+    return {
+      id: 'lowerThird',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER,
+      content: {
+        deviceType: DeviceType.VIZMSE,
+        type: VizType.ELEMENT_INTERNAL,
+        templateName: this.getTemplateNameFromGraphicsData(graphicsData),
+        templateData: [this.getDisplayTextFromGraphicsData(graphicsData)],
+        channelName: 'OVL1',
+        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+      }
+    }
+  }
 }

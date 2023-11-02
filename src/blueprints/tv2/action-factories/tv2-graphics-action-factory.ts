@@ -58,10 +58,10 @@ export class Tv2GraphicsActionFactory {
       graphicsData.filter(data => data.type === Tv2GraphicsTarget.OVL)
     )
     // Todo: Only pass on graphics data related to lower third actions
-    // const lowerThirdActions: Action[] = this.createLowerThirdActionsFromGraphicsData(
-    //   blueprintConfiguration,
-    //   graphicsData.filter(data => data.type === Tv2GraphicsTarget.OVL)
-    // )
+    const lowerThirdActions: Action[] = this.createLowerThirdActionsFromGraphicsData(
+      blueprintConfiguration,
+      graphicsData.filter(data => data.type === Tv2GraphicsTarget.OVL)
+    )
     return [
       this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
@@ -69,7 +69,8 @@ export class Tv2GraphicsActionFactory {
       this.createClearGraphicsAction(blueprintConfiguration),
       this.createAllOutGraphicsAction(blueprintConfiguration),
       ...fullScreenActions,
-      ...identActions
+      ...identActions,
+      ...lowerThirdActions
     ]
   }
 
@@ -459,10 +460,10 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createIdentGraphicsActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    return graphicsData.map(data => this.createIdentAction(blueprintConfiguration, data))
+    return graphicsData.map(data => this.createIdentGraphicsAction(blueprintConfiguration, data))
   }
 
-  private createIdentAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PieceAction {
+  private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
     const chosenTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
       ? this.casparCgGraphicsTimelineObjectFactory
@@ -487,25 +488,36 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  // private createLowerThirdActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Action[] {
-  //   switch (blueprintConfiguration.studio.GraphicsType) {
-  //     case Tv2GraphicsType.HTML: return this.createCasparCgLowerThirdGraphics(blueprintConfiguration, graphicsData)
-  //     case Tv2GraphicsType.VIZ:
-  //     default: return this.createVizLowerThirdGraphics(blueprintConfiguration, graphicsData)
-  //   }
-  // }
-  //
-  // private createCasparCgLowerThirdGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Action[] {
-  //   return graphicsData.map((data) => this.createCasparCgLowerThirdGraphicsActionFromGraphicsData(
-  //     blueprintConfiguration,
-  //     data
-  //   ))
-  // }
-  //
-  // private createVizLowerThirdGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Action[] {
-  //   return graphicsData.map((data) => this.createVizLowerThirdGraphicsActionFromGraphicsData(
-  //     blueprintConfiguration,
-  //     data
-  //   ))
-  // }
+  private createLowerThirdActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
+    return graphicsData.map((data) => this.createLowerThirdGraphicsAction(
+      blueprintConfiguration,
+      data
+    ))
+  }
+
+  private createLowerThirdGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PieceAction {
+    const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
+    const chosenTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
+      ? this.casparCgGraphicsTimelineObjectFactory
+      : this.vizGraphicsTimelineObjectFactory
+    const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
+      id: '',
+      name: graphicsData.name,
+      layer: Tv2SourceLayer.OVERLAY,
+      timelineObjects: [
+        chosenTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
+        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
+      ]
+    })
+    return {
+      id: `lowerThird_${graphicsData.name.replaceAll(' ', '_')}`,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+      name: graphicsData.name,
+      data: pieceInterface,
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS
+      }
+    }
+  }
+
 }
