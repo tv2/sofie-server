@@ -3,6 +3,7 @@ export enum Tv2SourceLayer {
   CAMERA = 'studio0_camera',
   JINGLE = 'studio0_jingle',
   AUDIO_BED = 'studio0_audio_bed',
+  OVERLAY = 'studio0_overlay',
   GRAPHICS_ACTION_COMMAND = 'studio0_adlib_graphic_cmd',
   AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs',
   DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
@@ -20,6 +21,8 @@ export enum Tv2GraphicsLayer {
   GRAPHICS_PILOT = 'graphic_pilot',
   GRAPHICS_OVERLAY_PILOT = 'graphic_overlay_pilot',
   GRAPHICS_WALL = 'graphic_wall',
+  GRAPHICS_OVERLAY_IDENT = 'graphic_overlay_ident', // <= viz_layer_overlay_ident
+  GRAPHICS_OVERLAY_LOWER = 'graphic_overlay_lower', // <= viz_layer_overlay_lower
 }
 
 export enum Tv2AtemLayer {
