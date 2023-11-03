@@ -4,6 +4,7 @@ import { TimelineObject } from '../../../model/entities/timeline-object'
 
 export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
+  REMOTE = 'REMOTE',
   VIDEO_CLIP = 'VIDEO_CLIP',
   TRANSITION = 'TRANSITION',
   GRAPHICS = 'GRAPHICS',
@@ -45,6 +46,13 @@ export interface Tv2CameraAction extends Tv2PartAction {
   metadata: {
     contentType: Tv2ActionContentType.CAMERA,
     cameraNumber: string
+  }
+}
+
+export interface Tv2RemoteAction extends Tv2PartAction {
+  metadata: {
+    contentType: Tv2ActionContentType.REMOTE,
+    remoteNumber: string
   }
 }
 
