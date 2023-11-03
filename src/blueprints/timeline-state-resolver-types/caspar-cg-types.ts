@@ -27,6 +27,20 @@ export interface CasparCgTemplateData {
       display: string
     }
     '260_overlay'?: object
+    '450_lowerThird'?: {
+      payload: {
+        type: string
+        0: string
+      }
+      display: string
+    }
+    '650_ident'?: {
+      payload: {
+        type: string
+        0: string
+      }
+      display: string
+    }
   }
   partialUpdate: boolean
 }
