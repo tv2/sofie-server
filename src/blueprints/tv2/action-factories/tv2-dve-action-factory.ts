@@ -83,7 +83,7 @@ export class Tv2DveActionFactory {
       case Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT: {
         return [{
           type: MutateActionType.PIECE,
-          updateActionWithPieceData: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
+          updateActionWithPiece: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
           piecePredicate: (piece: Piece) => this.doesPieceHaveDveBoxesTimelineObject(piece)
         }]
       }
@@ -103,7 +103,7 @@ export class Tv2DveActionFactory {
           },
           {
             type: MutateActionType.PIECE,
-            updateActionWithPieceData: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
+            updateActionWithPiece: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
             piecePredicate: (piece: Piece) => this.doesPieceHaveDveBoxesTimelineObject(piece)
           }
         ]

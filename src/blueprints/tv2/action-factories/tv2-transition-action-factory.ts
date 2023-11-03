@@ -34,7 +34,7 @@ export class Tv2TransitionActionFactory {
       case MIX_TRANSITION_ID: {
         return [{
           type: MutateActionType.PIECE,
-          updateActionWithPieceData: (action: Action, piece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, piece),
+          updateActionWithPiece: (action: Action, piece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, piece),
           piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
         }]
       }

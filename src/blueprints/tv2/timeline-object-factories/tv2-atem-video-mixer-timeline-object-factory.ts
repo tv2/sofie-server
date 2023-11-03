@@ -129,25 +129,8 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   }
 
   public createDvePropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, layoutProperties: DveLayoutProperties): AtemSuperSourcePropertiesTimelineObject {
-
-    const superSourceProperties: SuperSourceProperties = layoutProperties.properties && !layoutProperties.properties.artPreMultiplied
-      ? {
-        artPreMultiplied: false,
-        artInvertKey: layoutProperties.properties.artInvertKey,
-        artClip: layoutProperties.properties.artClip * 10,
-        artGain: layoutProperties.properties.artGain * 10
-      }
-      : {
-        artPreMultiplied: true
-      }
-
-    const superSourceBorder: SuperSourceBorder = layoutProperties.border?.borderEnabled
-      ? {
-        ...layoutProperties.border
-      }
-      : {
-        borderEnabled: false
-      }
+    const superSourceProperties: SuperSourceProperties = this.getSuperSourceProperties(layoutProperties)
+    const superSourceBorder: SuperSourceBorder = this.getSuperSourceBorder(layoutProperties)
 
     return {
       id: 'atem_dve_properties',
@@ -168,6 +151,29 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         }
       }
     }
+  }
+
+  private getSuperSourceProperties(layoutProperties: DveLayoutProperties): SuperSourceProperties {
+    return layoutProperties.properties && !layoutProperties.properties.artPreMultiplied
+      ? {
+        artPreMultiplied: false,
+        artInvertKey: layoutProperties.properties.artInvertKey,
+        artClip: layoutProperties.properties.artClip * 10,
+        artGain: layoutProperties.properties.artGain * 10
+      }
+      : {
+        artPreMultiplied: true
+      }
+  }
+
+  private getSuperSourceBorder(layoutProperties: DveLayoutProperties): SuperSourceBorder {
+    return layoutProperties.border?.borderEnabled
+      ? {
+        ...layoutProperties.border
+      }
+      : {
+        borderEnabled: false
+      }
   }
 
   public getDveBoxesLayer(): string {

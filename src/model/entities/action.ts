@@ -36,7 +36,7 @@ export enum MutateActionType {
 
 export interface MutateActionWithPieceMethods {
   type: MutateActionType.PIECE
-  updateActionWithPieceData: (action: Action, piece: Piece) => Action
+  updateActionWithPiece: (action: Action, piece: Piece) => Action
   piecePredicate: (piece: Piece) => boolean
 }
 
