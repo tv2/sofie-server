@@ -169,6 +169,7 @@ export class Part {
       throw new UnsupportedOperation(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
     }
 
+    newPiece.setPartId(this.id)
     this.pieces[pieceIndex] = newPiece
   }
 
