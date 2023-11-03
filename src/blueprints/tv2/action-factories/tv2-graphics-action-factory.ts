@@ -202,40 +202,58 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createFullscreenGraphicsActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PartAction[] {
+    let chosenMethod: (blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData) => Tv2PartAction
     switch (blueprintConfiguration.studio.GraphicsType) {
-      case Tv2GraphicsType.HTML: return this.createCasparCgFullscreenGraphics(blueprintConfiguration, graphicsData)
+      case Tv2GraphicsType.HTML: {
+        chosenMethod = this.createCasparCgFullGraphicsActionFromGraphicsData
+        break
+      }
       case Tv2GraphicsType.VIZ:
-      default: return this.createVizFullscreenGraphics(blueprintConfiguration, graphicsData)
+      default: {
+        chosenMethod = this.createVizFullGraphicsActionFromGraphicsData
+        break
+      }
     }
-  }
 
-  private createVizFullscreenGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PartAction[] {
-    return graphicsData.map((data) => this.createVizFullGraphicsActionFromGraphicsData(
+    return graphicsData.map((data) => chosenMethod(
       blueprintConfiguration,
       data
     ))
   }
 
-  private createVizFullGraphicsActionFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsDataData: Tv2GraphicsData): Tv2PartAction {
-    const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
-    const partId: string = `${this.getGraphicTargetAsCamelString(target)}Part`
-    const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsDataData, partId)
+  private createVizFullGraphicsActionFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PartAction {
+    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}Part`
+    const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
+    return this.createFullGraphicsActionFromGraphicsData(
+      blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
+      partId,
+      fullGraphicPiece,
+      graphicsData
+    )
+  }
+
+  private createFullGraphicsActionFromGraphicsData(
+    keepPreviousPartAliveDuration: number,
+    partId: string,
+    pieceInterface: PieceInterface,
+    graphicsData: Tv2GraphicsData
+  ): Tv2PartAction {
     const partInterface: PartInterface = this.createGraphicsPartInterface({
       id: partId,
-      name: `${this.getGraphicTargetAsCamelString(target)} ${graphicsDataData.name}`,
+      name: `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)} ${graphicsData.name}`,
       inTransition: {
-        keepPreviousPartAliveDuration: blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
+        keepPreviousPartAliveDuration,
         delayPiecesDuration: 0
       },
     })
 
     return {
-      id: `manifestAction_${graphicsDataData.name.replaceAll('/', '')}`,
-      name: `Manifest Action - ${graphicsDataData.name}`,
+      id: `fullGraphics_${graphicsData.name.replaceAll('/', '')}`,
+      name: `Full Graphics - ${graphicsData.name}`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
-        pieceInterfaces: [ fullGraphicPiece ]
+        pieceInterfaces: [pieceInterface]
       },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS
@@ -351,13 +369,6 @@ export class Tv2GraphicsActionFactory {
     ]
   }
 
-  private createCasparCgFullscreenGraphics(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[] ): Tv2PartAction[] {
-    return graphicsData.map((manifest) => this.createCasparCgFullGraphicsActionFromGraphicsData(
-      blueprintConfiguration,
-      manifest
-    ))
-  }
-
   private createCasparCgFullGraphicsActionFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PartAction {
     if (!blueprintConfiguration.studio.HTMLGraphics) {
       throw new MisconfigurationException(
@@ -366,30 +377,14 @@ export class Tv2GraphicsActionFactory {
       )
     }
 
-    const target: Tv2GraphicsTarget = Tv2GraphicsTarget.FULL
-    const partId: string = `${this.getGraphicTargetAsCamelString(target)}Part`
+    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}Part`
     const fullGraphicPiece: PieceInterface = this.createCasparCgFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
-    const partInterface: PartInterface = this.createGraphicsPartInterface({
-      id: partId,
-      name: `${this.getGraphicTargetAsCamelString(target)} ${graphicsData.name}`,
-      inTransition: {
-        keepPreviousPartAliveDuration: blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
-        delayPiecesDuration: 0
-      },
-    })
-
-    return {
-      id: `manifestAction_${graphicsData.name.replaceAll('/', '')}`,
-      name: `Manifest Action - ${graphicsData.name}`,
-      type: PartActionType.INSERT_PART_AS_NEXT,
-      data: {
-        partInterface: partInterface,
-        pieceInterfaces: [ fullGraphicPiece ]
-      },
-      metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
-      }
-    }
+    return this.createFullGraphicsActionFromGraphicsData(
+      blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
+      partId,
+      fullGraphicPiece,
+      graphicsData
+    )
   }
 
   private createCasparCgFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData, partId: string): PieceInterface {
@@ -460,7 +455,10 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createIdentGraphicsActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    return graphicsData.map(data => this.createIdentGraphicsAction(blueprintConfiguration, data))
+    return graphicsData.map(data => this.createIdentGraphicsAction(
+      blueprintConfiguration,
+      data)
+    )
   }
 
   private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PieceAction {
@@ -519,5 +517,4 @@ export class Tv2GraphicsActionFactory {
       }
     }
   }
-
 }
