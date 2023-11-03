@@ -12,7 +12,7 @@ export class Tv2INewsIngestService implements IngestService {
   public async reloadIngestData(rundownId: string): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const url: string = this.getReingestUrl(rundown.name)
-    await this.httpService.post(url, {})
+    await this.httpService.post(url, null)
   }
 
   private getReingestUrl(rundownName: string): string {
