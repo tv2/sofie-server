@@ -123,7 +123,7 @@ export class ExecuteActionService implements ActionService {
     if (!piece) {
       return action
     }
-    return mutateActionMethods.updateActionWithPieceData(action, piece)
+    return mutateActionMethods.updateActionWithPiece(action, piece)
   }
 
   private async mutateActionWithMedia(mutateActionMethods: MutateActionWithMedia, action: Action): Promise<Action> {
@@ -202,7 +202,7 @@ export class ExecuteActionService implements ActionService {
         continue
       }
 
-      action = mutateActionMethods.updateActionWithPieceData(action, pieceFromRundown)
+      action = mutateActionMethods.updateActionWithPiece(action, pieceFromRundown)
     }
 
     if (!pieceFromRundown) {
