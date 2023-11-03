@@ -232,7 +232,9 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const segmentId: string = rundown.getActiveSegment().id
+    const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id
+      ? rundown.getActiveSegment().id
+      : rundown.getNextSegment().id
     this.rundownEventEmitter.emitPieceInsertedEvent(rundown, segmentId, newPiece)
 
     await this.rundownRepository.saveRundown(rundown)
