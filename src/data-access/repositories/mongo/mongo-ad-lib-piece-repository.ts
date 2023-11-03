@@ -33,7 +33,8 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
       pieceType: this.getPieceTypeFromAdLibPiece(adLibPiece),
       data: {
         name: adLibPiece.name
-      }
+      },
+      pieceLayer: adLibPiece.sourceLayerId
     }
   }
 

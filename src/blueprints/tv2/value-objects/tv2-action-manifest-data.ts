@@ -1,4 +1,4 @@
-import { Tv2GraphicsTarget } from './tv2-graphics-target'
+import { Tv2SourceLayer } from './tv2-layers'
 
 /**
  * This corresponds to the 'userData' field on the 'adLibActions' collection in the database
@@ -27,7 +27,7 @@ export interface Tv2VideoClipData {
 }
 
 export interface Tv2GraphicsData {
-  type: Tv2GraphicsTarget
+  pieceLayer?: Tv2SourceLayer
   name: string,
   vcpId?: number
 }

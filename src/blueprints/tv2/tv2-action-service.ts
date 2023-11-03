@@ -19,7 +19,7 @@ import {
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { PieceType } from '../../model/enums/piece-type'
 import { Tv2ActionManifestData, Tv2GraphicsData, Tv2VideoClipData } from './value-objects/tv2-action-manifest-data'
-import { Tv2GraphicsTarget } from './value-objects/tv2-graphics-target'
+import { Tv2SourceLayer } from './value-objects/tv2-layers'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
@@ -78,11 +78,15 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       .map(actionManifest => {
         const data: Tv2ActionManifestData = actionManifest.data as Tv2ActionManifestData
         return {
-          type: data.vcpid ? Tv2GraphicsTarget.FULL : Tv2GraphicsTarget.OVL,
+          pieceLayer: this.isTv2SourceLayer(actionManifest.pieceLayer) ? actionManifest.pieceLayer : undefined,
           name: data.name,
           vcpId: data.vcpid
         }
       })
+  }
+
+  private isTv2SourceLayer(layer: string | undefined): layer is Tv2SourceLayer {
+    return !!layer && (Object.values(Tv2SourceLayer) as string[]).includes(layer)
   }
 
   private getVideoClipData(actionManifests: ActionManifest[]): Tv2VideoClipData[] {

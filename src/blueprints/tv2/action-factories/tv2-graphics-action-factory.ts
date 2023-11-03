@@ -49,20 +49,15 @@ export class Tv2GraphicsActionFactory {
   ) { }
 
   public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Action[] {
-    const fullScreenActions: Action[] = this.createFullscreenGraphicsActionsFromGraphicsData(
-      blueprintConfiguration,
-      graphicsData.filter(data => data.type === Tv2GraphicsTarget.FULL)
-    )
-    // Todo: Only pass on graphics data related to ident actions
-    const identActions: Action[] = this.createIdentGraphicsActionsFromGraphicsData(
-      blueprintConfiguration,
-      graphicsData.filter(data => data.type === Tv2GraphicsTarget.OVL)
-    )
-    // Todo: Only pass on graphics data related to lower third actions
-    const lowerThirdActions: Action[] = this.createLowerThirdActionsFromGraphicsData(
-      blueprintConfiguration,
-      graphicsData.filter(data => data.type === Tv2GraphicsTarget.OVL)
-    )
+    const fullScreenData: Tv2GraphicsData[] = graphicsData.filter(data => this.isFullGraphics(data))
+    const fullScreenActions: Action[] = this.createFullscreenGraphicsActionsFromGraphicsData(blueprintConfiguration, fullScreenData)
+
+    const identData: Tv2GraphicsData[] = graphicsData.filter(data => data.pieceLayer === Tv2SourceLayer.IDENT)
+    const identActions: Action[] = this.createIdentGraphicsActionsFromGraphicsData(blueprintConfiguration, identData)
+
+    const lowerThirdData: Tv2GraphicsData[] = graphicsData.filter(data => data.pieceLayer === Tv2SourceLayer.LOWER_THIRD)
+    const lowerThirdActions: Action[] = this.createLowerThirdActionsFromGraphicsData(blueprintConfiguration, lowerThirdData)
+
     return [
       this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
@@ -73,6 +68,10 @@ export class Tv2GraphicsActionFactory {
       ...identActions,
       ...lowerThirdActions
     ]
+  }
+
+  private isFullGraphics(graphicsData: Tv2GraphicsData): boolean {
+    return graphicsData.pieceLayer === undefined
   }
 
   private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
@@ -475,7 +474,7 @@ export class Tv2GraphicsActionFactory {
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: '',
       name: graphicsData.name,
-      layer: Tv2SourceLayer.OVERLAY,
+      layer: Tv2SourceLayer.IDENT,
       timelineObjects: [
         chosenTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
@@ -509,7 +508,7 @@ export class Tv2GraphicsActionFactory {
     const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
       id: '',
       name: graphicsData.name,
-      layer: Tv2SourceLayer.OVERLAY,
+      layer: Tv2SourceLayer.LOWER_THIRD,
       timelineObjects: [
         chosenTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
