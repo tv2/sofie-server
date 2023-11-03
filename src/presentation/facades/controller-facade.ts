@@ -13,7 +13,7 @@ export class ControllerFacade {
       this.createRundownController(),
       this.createTimelineController(),
       this.createActionController(),
-      this.createConfigurationController()
+      this.createConfigurationController(),
     ]
   }
 
@@ -21,6 +21,7 @@ export class ControllerFacade {
     return new RundownController(
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
+      ServiceFacade.createIngestService(),
       new ExpressErrorHandler()
     )
   }
