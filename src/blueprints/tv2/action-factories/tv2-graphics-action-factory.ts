@@ -37,6 +37,7 @@ import { Tv2GraphicsContent } from '../value-objects/tv2-content'
 import {
   Tv2GraphicsTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-graphics-timeline-object-factory'
+import { createHash } from 'crypto'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -205,12 +206,12 @@ export class Tv2GraphicsActionFactory {
     let chosenMethod: (blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData) => Tv2PartAction
     switch (blueprintConfiguration.studio.GraphicsType) {
       case Tv2GraphicsType.HTML: {
-        chosenMethod = this.createCasparCgFullGraphicsActionFromGraphicsData
+        chosenMethod = this.createCasparCgFullGraphicsActionFromGraphicsData.bind(this)
         break
       }
       case Tv2GraphicsType.VIZ:
       default: {
-        chosenMethod = this.createVizFullGraphicsActionFromGraphicsData
+        chosenMethod = this.createVizFullGraphicsActionFromGraphicsData.bind(this)
         break
       }
     }
@@ -222,7 +223,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createVizFullGraphicsActionFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PartAction {
-    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}Part`
+    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}-part`
     const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
@@ -248,7 +249,7 @@ export class Tv2GraphicsActionFactory {
     })
 
     return {
-      id: `fullGraphics_${graphicsData.name.replaceAll('/', '')}`,
+      id: `full-graphics_${this.getHashedValue(graphicsData.name)}`,
       name: `Full Graphics - ${graphicsData.name}`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -259,6 +260,11 @@ export class Tv2GraphicsActionFactory {
         contentType: Tv2ActionContentType.GRAPHICS
       }
     }
+  }
+
+  // Todo: Figure out if it should be moved to a base class for all action factories
+  private getHashedValue(valueToBeHashed: string ): string {
+    return createHash('md5').update(valueToBeHashed).digest('hex')
   }
 
   private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData, partId: string): PieceInterface {
@@ -377,7 +383,7 @@ export class Tv2GraphicsActionFactory {
       )
     }
 
-    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}Part`
+    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}-part`
     const fullGraphicPiece: PieceInterface = this.createCasparCgFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
@@ -476,7 +482,7 @@ export class Tv2GraphicsActionFactory {
       ]
     })
     return {
-      id: `ident_${graphicsData.name.replaceAll(' ', '_')}`,
+      id: `ident_${this.getHashedValue(graphicsData.name)}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: graphicsData.name,
       data: pieceInterface,
@@ -485,6 +491,8 @@ export class Tv2GraphicsActionFactory {
       }
     }
   }
+
+
 
   private createLowerThirdActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
     return graphicsData.map((data) => this.createLowerThirdGraphicsAction(
@@ -507,8 +515,9 @@ export class Tv2GraphicsActionFactory {
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
       ]
     })
+
     return {
-      id: `lowerThird_${graphicsData.name.replaceAll(' ', '_')}`,
+      id: `lower-third_${this.getHashedValue(graphicsData.name)}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: graphicsData.name,
       data: pieceInterface,
@@ -517,4 +526,6 @@ export class Tv2GraphicsActionFactory {
       }
     }
   }
+
+
 }
