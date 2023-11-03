@@ -46,6 +46,7 @@ export interface MutateActionWithPlannedPieceMethods {
 }
 
 /**
+ * @remarks
  * Since we don't control Ingest we can't create Actions that requires data from the Ingest Gateway.
  * So we are forced to find the 'Actions' that Core has created and use the data from that to create our own Actions.
  * This interface is so we can retrieve those 'Actions' from the database and send them to Blueprints.
@@ -58,4 +59,5 @@ export interface MutateActionWithPlannedPieceMethods {
 export interface ActionManifest {
   pieceType: PieceType
   data: unknown
+  pieceLayer?: string
 }
