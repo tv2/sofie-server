@@ -9,9 +9,13 @@ import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
-import { IngestService } from '../services/interfaces/ingest-service'
+import { IngestChangeService } from '../services/interfaces/ingest-change-service'
 import { DatabaseChangeIngestService } from '../services/database-change-ingest-service'
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
+import {IngestService} from '../services/interfaces/ingest-service'
+import {Tv2INewsIngestService} from '../services/tv2-inews-ingest-service'
+import {HttpService} from '../services/interfaces/http-service'
+import {GotHttpService} from '../services/got-http-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -49,7 +53,7 @@ export class ServiceFacade {
     )
   }
 
-  public static createIngestService(): IngestService {
+  public static createIngestChangeService(): IngestChangeService {
     return DatabaseChangeIngestService.getInstance(
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createTimelineRepository(),
@@ -59,5 +63,10 @@ export class ServiceFacade {
       RepositoryFacade.createSegmentChangedListener(),
       RepositoryFacade.createPartChangedListener()
     )
+  }
+
+  public static createIngestService(): IngestService {
+    const httpService: HttpService = new GotHttpService()
+    return new Tv2INewsIngestService(httpService, RepositoryFacade.createRundownRepository())
   }
 }
