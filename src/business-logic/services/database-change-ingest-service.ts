@@ -1,4 +1,4 @@
-import { IngestService } from './interfaces/ingest-service'
+import { IngestChangeService } from './interfaces/ingest-change-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
@@ -13,9 +13,9 @@ import { ErrorCode } from '../../model/enums/error-code'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
-export class DatabaseChangeIngestService implements IngestService {
+export class DatabaseChangeIngestService implements IngestChangeService {
 
-  private static instance: IngestService
+  private static instance: IngestChangeService
 
   public static getInstance(
     rundownRepository: RundownRepository,
@@ -25,7 +25,7 @@ export class DatabaseChangeIngestService implements IngestService {
     rundownChangeListener: DataChangedListener<Rundown>,
     segmentChangedListener: DataChangedListener<Segment>,
     partChangedListener: DataChangedListener<Part>
-  ): IngestService {
+  ): IngestChangeService {
     if (!this.instance) {
       this.instance = new DatabaseChangeIngestService(
         rundownRepository,
