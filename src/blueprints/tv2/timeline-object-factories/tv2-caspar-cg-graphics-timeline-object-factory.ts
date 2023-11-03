@@ -10,7 +10,6 @@ import {
   CasparCgType
 } from '../../timeline-state-resolver-types/caspar-cg-types'
 import { Tv2GraphicsLayer } from '../value-objects/tv2-layers'
-import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
 import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 import { Tv2GraphicsData } from '../value-objects/tv2-action-manifest-data'
@@ -67,7 +66,7 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
         while: 1
       },
       priority: 100,
-      layer: this.getLayerNameFromGraphicTarget(Tv2GraphicsTarget.FULL),
+      layer: Tv2GraphicsLayer.GRAPHICS_PILOT,
       content: {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.TEMPLATE,
@@ -125,25 +124,33 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
         start: 0
       },
       layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT,
-      content: {
-        deviceType: DeviceType.CASPAR_CG,
-        type: CasparCgType.TEMPLATE,
-        templateType: 'html',
-        name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.HtmlPackageFolder),
-        useStopCommand: false,
-        mixer: {
-          opacity: 100
-        },
-        data: {
-          display: 'program',
-          partialUpdate: true,
-          slots: {
-            [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT)]: {
-              display: 'program',
-              payload: {
-                type: this.getTemplateNameFromGraphicsData(graphicsData),
-                0: this.getDisplayTextFromGraphicsData(graphicsData)
-              }
+      content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, graphicsData, Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT)
+    }
+  }
+
+  private createOverlayGraphicsTimelineObjectContent(
+    blueprintConfiguration: Tv2BlueprintConfiguration,
+    graphicsData: Tv2GraphicsData,
+    graphicsLayer: Tv2GraphicsLayer
+  ): CasparCgTemplateTimelineObject['content'] {
+    return {
+      deviceType: DeviceType.CASPAR_CG,
+      type: CasparCgType.TEMPLATE,
+      templateType: 'html',
+      name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.HtmlPackageFolder),
+      useStopCommand: false,
+      mixer: {
+        opacity: 100
+      },
+      data: {
+        display: 'program',
+        partialUpdate: true,
+        slots: {
+          [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(graphicsLayer)]: {
+            display: 'program',
+            payload: {
+              type: this.getTemplateNameFromGraphicsData(graphicsData),
+              0: this.getDisplayTextFromGraphicsData(graphicsData)
             }
           }
         }
@@ -159,31 +166,7 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
         start: 0
       },
       layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER,
-      content: {
-        deviceType: DeviceType.CASPAR_CG,
-        type: CasparCgType.TEMPLATE,
-        templateType: 'html',
-        name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.HtmlPackageFolder),
-        useStopCommand: false,
-        mixer: {
-          opacity: 100
-        },
-        data: {
-          display: 'program',
-          partialUpdate: true,
-          slots: {
-            [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER)]: {
-              display: 'program',
-              payload: {
-                type: this.getTemplateNameFromGraphicsData(graphicsData),
-                0: this.getDisplayTextFromGraphicsData(graphicsData)
-              }
-            }
-          }
-        }
-      }
+      content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, graphicsData, Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER)
     }
   }
-
-
 }

@@ -13,7 +13,6 @@ import { Tv2GraphicsLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BaseGraphicTimelineObjectFactory } from './tv2-base-graphic-timeline-object-factory'
-import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
 import { Tv2GraphicsData } from '../value-objects/tv2-action-manifest-data'
 
 export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
@@ -122,7 +121,7 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
         start: 0
       },
       priority: 1,
-      layer: this.getLayerNameFromGraphicTarget(Tv2GraphicsTarget.FULL),
+      layer: Tv2GraphicsLayer.GRAPHICS_PILOT,
       content: {
         deviceType: DeviceType.VIZMSE,
         type: VizType.ELEMENT_PILOT,
@@ -161,18 +160,25 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
       },
       priority: 1,
       layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT,
-      content: {
-        deviceType: DeviceType.VIZMSE,
-        type: VizType.ELEMENT_INTERNAL,
-        templateName: this.getTemplateNameFromGraphicsData(graphicsData),
-        templateData: [this.getDisplayTextFromGraphicsData(graphicsData)],
-        channelName: 'OVL1',
-        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
-      }
+      content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, graphicsData)
     }
   }
 
-  public createLowerThirdGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): TimelineObject {
+  private createOverlayGraphicsTimelineObjectContent(
+    blueprintConfiguration: Tv2BlueprintConfiguration,
+    graphicsData: Tv2GraphicsData
+  ): VizMseElementInternalTimelineObject['content'] {
+    return {
+      deviceType: DeviceType.VIZMSE,
+      type: VizType.ELEMENT_INTERNAL,
+      templateName: this.getTemplateNameFromGraphicsData(graphicsData),
+      templateData: [this.getDisplayTextFromGraphicsData(graphicsData)],
+      channelName: 'OVL1',
+      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+    }
+  }
+
+  public createLowerThirdGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): VizMseElementInternalTimelineObject {
     return {
       id: 'lowerThird',
       enable: {
@@ -180,14 +186,7 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
       },
       priority: 1,
       layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER,
-      content: {
-        deviceType: DeviceType.VIZMSE,
-        type: VizType.ELEMENT_INTERNAL,
-        templateName: this.getTemplateNameFromGraphicsData(graphicsData),
-        templateData: [this.getDisplayTextFromGraphicsData(graphicsData)],
-        channelName: 'OVL1',
-        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
-      }
+      content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, graphicsData)
     }
   }
 }
