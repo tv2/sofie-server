@@ -14,14 +14,13 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
+  Tv2Action,
   Tv2ActionContentType,
   Tv2DveAction,
   Tv2DveInsertLastVideoClipInputAction,
   Tv2DveInsertSourceInputAction,
   Tv2DveInsertSourceInputMetadata,
   Tv2DveLayoutAction,
-  Tv2PartAction,
-  Tv2PieceAction,
   Tv2RecallDveAction
 } from '../value-objects/tv2-action'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
@@ -69,19 +68,17 @@ export class Tv2DveActionFactory {
     ]
   }
 
-  public isDveAction(action: Action): boolean {
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
+  public isDveAction(action: Tv2Action): boolean {
     return [
       Tv2ActionContentType.DVE_LAYOUT,
       Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT,
       Tv2ActionContentType.RECALL_DVE,
       Tv2ActionContentType.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
-    ].includes(tv2Action.metadata.contentType)
+    ].includes(action.metadata.contentType)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods[] {
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
-    switch (tv2Action.metadata.contentType) {
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
+    switch (action.metadata.contentType) {
       case Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT: {
         return [{
           type: MutateActionType.PIECE,
@@ -231,7 +228,7 @@ export class Tv2DveActionFactory {
             description: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
             type: PieceActionType.REPLACE_PIECE,
             data: {
-              pieceInterface: {} as PieceInterface
+              pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
             },
             metadata: {
               contentType: Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT,
@@ -245,6 +242,10 @@ export class Tv2DveActionFactory {
       actions.push(...actionsForInput)
     }
     return actions
+  }
+
+  private createEmptyPieceInterfaceToBeUpdatedByMutateActions(): PieceInterface {
+    return {} as PieceInterface
   }
 
   private updateInsertToInputAction(action: Action, dvePieceFromRundown: Piece): Action {
@@ -509,7 +510,7 @@ export class Tv2DveActionFactory {
         }
       },
       data: {
-        pieceInterface: {} as PieceInterface
+        pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
       }
     }
   }

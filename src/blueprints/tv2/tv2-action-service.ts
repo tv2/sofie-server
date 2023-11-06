@@ -27,6 +27,7 @@ import { PieceType } from '../../model/enums/piece-type'
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
+import { Tv2Action } from './value-objects/tv2-action'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
@@ -40,7 +41,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly dveActionFactory: Tv2DveActionFactory
   ) {}
 
-  public getMutateActionMethods(action: Action): MutateActionMethods[] {
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
     if (this.transitionEffectActionFactory.isTransitionEffectAction(action)) {
       return this.transitionEffectActionFactory.getMutateActionMethods(action)
     }
