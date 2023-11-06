@@ -90,7 +90,7 @@ export class Tv2TransitionEffectActionFactory {
       case Tv2ActionContentType.TRANSITION: {
         return [{
           type: MutateActionType.PIECE,
-          updateActionWithPieceData: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
+          updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
           piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
         }]
       }

@@ -16,7 +16,6 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createCutTransitionEffectTimelineObject(sourceInput: number): TimelineObject
   createMixTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number): TimelineObject
   createDipTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number, dipInput: number): TimelineObject
-
   getDveBoxesLayer(): string
   getDveSourceInput(): number
   findProgramSourceInputFromPiece(piece: Piece): number | undefined

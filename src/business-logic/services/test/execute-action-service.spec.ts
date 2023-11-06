@@ -177,7 +177,7 @@ describe(ExecuteActionService.name, () => {
 
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
-            updateActionWithPieceData: (action) => action,
+            updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.id === activePiece.id
           }
 
@@ -201,7 +201,7 @@ describe(ExecuteActionService.name, () => {
 
           await testee.executeAction(action.id, rundown.id)
 
-          verify(rundownService.replacePiece(rundown.id, activePiece, anything())).once()
+          verify(rundownService.replacePieceOnAirOnOnNextPart(rundown.id, activePiece, anything())).once()
         })
       })
 
@@ -235,7 +235,7 @@ describe(ExecuteActionService.name, () => {
 
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
-            updateActionWithPieceData: (action) => action,
+            updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.id === nextPiece.id
           }
 
@@ -259,7 +259,7 @@ describe(ExecuteActionService.name, () => {
 
           await testee.executeAction(action.id, rundown.id)
 
-          verify(rundownService.replacePiece(rundown.id, nextPiece, anything())).once()
+          verify(rundownService.replacePieceOnAirOnOnNextPart(rundown.id, nextPiece, anything())).once()
         })
       })
 
@@ -299,7 +299,7 @@ describe(ExecuteActionService.name, () => {
 
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
-            updateActionWithPieceData: (action) => action,
+            updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.name === name
           }
 
@@ -323,7 +323,7 @@ describe(ExecuteActionService.name, () => {
 
           await testee.executeAction(action.id, rundown.id)
 
-          verify(rundownService.replacePiece(rundown.id, activePiece, anything())).once()
+          verify(rundownService.replacePieceOnAirOnOnNextPart(rundown.id, activePiece, anything())).once()
         })
       })
     })
