@@ -20,6 +20,8 @@ import { Piece } from '../../../model/entities/piece'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 
+const ATEM_SUPER_SOURCE_INDEX: number = 6000
+
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
 
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
@@ -175,6 +177,10 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
 
   public getDveBoxesLayer(): string {
     return Tv2AtemLayer.DVE_BOXES
+  }
+
+  public getDveSourceInput(): number {
+    return ATEM_SUPER_SOURCE_INDEX
   }
 
   public findProgramSourceInputFromPiece(piece: Piece): number | undefined {

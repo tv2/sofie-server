@@ -18,5 +18,6 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createDipTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number, dipInput: number): TimelineObject
 
   getDveBoxesLayer(): string
+  getDveSourceInput(): number
   findProgramSourceInputFromPiece(piece: Piece): number | undefined
 }
