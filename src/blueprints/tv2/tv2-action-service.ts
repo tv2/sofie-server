@@ -88,9 +88,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
 
   private getDveData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: ActionManifest[]): Tv2DveManifestData[] {
     return actionManifests
-      .filter(actionManifest => actionManifest.pieceType === PieceType.DVE)
+      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestDataForDve> => actionManifest.pieceType === PieceType.DVE)
       .map(actionManifest => {
-        const data: Tv2ActionManifestDataForDve = actionManifest.data as Tv2ActionManifestDataForDve
+        const data: Tv2ActionManifestDataForDve = actionManifest.data
         const sources: Map<DveBoxInput, Tv2SourceMappingWithSound> = this.getDveSourcesFromActionManifestData(data, blueprintConfiguration)
         return {
           name: data.name,

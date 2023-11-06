@@ -318,8 +318,7 @@ export class Rundown extends BasicRundown {
   private addPartToHistory(part: Part): void {
     this.history.push(part)
     if (this.history.length > MAXIMUM_HISTORY_ENTRIES) {
-      const entriesToDelete: number = this.history.length - MAXIMUM_HISTORY_ENTRIES
-      this.history.splice(0, entriesToDelete)
+      this.history = this.history.slice(-MAXIMUM_HISTORY_ENTRIES)
     }
   }
 
