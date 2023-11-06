@@ -38,7 +38,6 @@ import { Tv2FileContent } from '../value-objects/tv2-content'
 import { AssetFolderHelper } from '../helpers/asset-folder-helper'
 
 const NUMBER_OF_DVE_BOXES: number = 4
-const ATEM_SUPER_SOURCE_INDEX: number = 6000
 
 // The "Layout" priority must be lower than the "Insert" priority for the inserted sources to "persist" through a Take.
 const LAYOUT_TIMELINE_OBJECT_PRIORITY: number = 0.5
@@ -126,12 +125,14 @@ export class Tv2DveActionFactory {
         start: 0
       }
 
+      const dveSource: number = this.videoMixerTimelineObjectFactory.getDveSourceInput()
+
       const dveLayoutTimelineObjects: TimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, LAYOUT_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(ATEM_SUPER_SOURCE_INDEX, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(dveSource, timelineEnable),
         this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
         this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
         this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject()
@@ -346,12 +347,14 @@ export class Tv2DveActionFactory {
         start: 0
       }
 
+      const dveSource: number = this.videoMixerTimelineObjectFactory.getDveSourceInput()
+
       const dveTimelineObjects: TimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, PLANNED_DVE_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(dveSource, videoSwitcherTimelineEnable),
         this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
         this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
         this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject(),
