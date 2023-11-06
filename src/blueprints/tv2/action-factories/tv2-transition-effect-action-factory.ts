@@ -36,6 +36,7 @@ import {
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
 import { AssetFolderHelper } from '../helpers/asset-folder-helper'
+import { InTransition } from '../../../model/value-objects/in-transition'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
@@ -217,34 +218,40 @@ export class Tv2TransitionEffectActionFactory {
         break
       }
       case TransitionEffectType.BREAKER: {
-        const breaker: Breaker = action.metadata.breaker
-        const casparCgPreRollDuration: number = action.metadata.casparCgPreRollDuration
-
-        const videoMixerTimelineEnable: TimelineEnable = {
-          start: this.getTimeFromFrames(breaker.startAlpha) + casparCgPreRollDuration,
-          duration: this.getTimeFromFrames(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
-        }
-
-        const videoMixerInputSource: number = action.metadata.downstreamKeyer.Fill
-        const fileName: string = this.assetFolderHelper.joinAssetToFolder(action.metadata.breakerFolder, action.metadata.breaker.fileName)
-
-        const timelineObjects: TimelineObject[] = [
-          this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
-          this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
-          this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(action.metadata.downstreamKeyer, true),
-          this.casparCgTimelineObjectFactory.createBreakerTimelineObject(fileName),
-          this.audioTimelineObjectFactory.createBreakerAudioTimelineObject()
-        ]
-
-        action.data.pieceInterface.timelineObjects.push(...timelineObjects)
-        action.data.partInTransition = {
-          keepPreviousPartAliveDuration: this.getTimeFromFrames(breaker.startAlpha) + casparCgPreRollDuration,
-          delayPiecesDuration: this.getTimeFromFrames(breaker.durationInFrames - breaker.endAlpha) + casparCgPreRollDuration
-        }
+        action.data.pieceInterface.timelineObjects.push(...this.createTimelineObjectsForBreakerTransitionEffect(action.metadata))
+        action.data.partInTransition = this.createPartInTransitionForBreakerTransitionEffect(action.metadata)
         break
       }
     }
 
     return action
+  }
+
+  private createTimelineObjectsForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): TimelineObject[] {
+    const breaker: Breaker = breakerActionMetadata.breaker
+    const casparCgPreRollDuration: number = breakerActionMetadata.casparCgPreRollDuration
+
+    const videoMixerTimelineEnable: TimelineEnable = {
+      start: this.getTimeFromFrames(breaker.startAlpha) + casparCgPreRollDuration,
+      duration: this.getTimeFromFrames(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
+    }
+
+    const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.Fill
+    const fileName: string = this.assetFolderHelper.joinAssetToFolder(breakerActionMetadata.breakerFolder, breakerActionMetadata.breaker.fileName)
+
+    return [
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
+      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
+      this.casparCgTimelineObjectFactory.createBreakerTimelineObject(fileName),
+      this.audioTimelineObjectFactory.createBreakerAudioTimelineObject()
+    ]
+  }
+
+  private createPartInTransitionForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): InTransition {
+    return {
+      keepPreviousPartAliveDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
+      delayPiecesDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
+    }
   }
 }
