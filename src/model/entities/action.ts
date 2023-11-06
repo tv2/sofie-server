@@ -62,7 +62,7 @@ export interface MutateActionWithHistoricPartMethods {
  * The 'data' is of type 'unknown' since the data used to create Actions are Blueprints specific. Blueprints will have
  * to map 'data' into whatever structure Blueprints needs.
  */
-export interface ActionManifest {
+export interface ActionManifest<Data = unknown> {
   pieceType: PieceType
-  data: unknown
+  data: Data
 }
