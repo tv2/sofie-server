@@ -12,7 +12,6 @@ import {
   Tv2GraphicsType
 } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PartInterface } from '../../../model/entities/part'
-import { Tv2GraphicsTarget } from '../value-objects/tv2-graphics-target'
 import { AtemTransition, AtemTransitionSettings } from '../../timeline-state-resolver-types/atem-types'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
 import {
@@ -222,7 +221,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createVizFullGraphicsActionFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PartAction {
-    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}Part`
+    const partId: string = 'fullGraphicsPart'
     const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
@@ -240,7 +239,7 @@ export class Tv2GraphicsActionFactory {
   ): Tv2PartAction {
     const partInterface: PartInterface = this.createGraphicsPartInterface({
       id: partId,
-      name: `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)} ${graphicsData.name}`,
+      name: `Full ${graphicsData.name}`,
       inTransition: {
         keepPreviousPartAliveDuration,
         delayPiecesDuration: 0
@@ -305,13 +304,6 @@ export class Tv2GraphicsActionFactory {
       isUnsynced: false,
       ...partInterfaceWithRequiredValues
     }
-  }
-
-  private getGraphicTargetAsCamelString(target: Tv2GraphicsTarget): string {
-    return target.toString()
-      .split('_')
-      .map(fragment => fragment.charAt(0).toUpperCase() + fragment.substring(1).toLowerCase())
-      .join('_')
   }
 
   private findInfiniteModeFromConfig(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): PieceLifespan {
@@ -382,7 +374,7 @@ export class Tv2GraphicsActionFactory {
       )
     }
 
-    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}Part`
+    const partId: string = 'fullGraphicsPart'
     const fullGraphicPiece: PieceInterface = this.createCasparCgFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
@@ -491,8 +483,6 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-
-
   private createLowerThirdActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
     return graphicsData.map((data) => this.createLowerThirdGraphicsAction(
       blueprintConfiguration,
@@ -516,7 +506,7 @@ export class Tv2GraphicsActionFactory {
     })
 
     return {
-      id: `lower-third_${this.getHashedValue(graphicsData.name)}`,
+      id: `lower_third_${this.getHashedValue(graphicsData.name)}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: graphicsData.name,
       data: pieceInterface,
