@@ -222,7 +222,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createVizFullGraphicsActionFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): Tv2PartAction {
-    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}-part`
+    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}Part`
     const fullGraphicPiece: PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
@@ -248,7 +248,7 @@ export class Tv2GraphicsActionFactory {
     })
 
     return {
-      id: `full-graphics_${this.getHashedValue(graphicsData.name)}`,
+      id: `full_graphics_${this.getHashedValue(graphicsData.name)}`,
       name: `Full Graphics - ${graphicsData.name}`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -382,7 +382,7 @@ export class Tv2GraphicsActionFactory {
       )
     }
 
-    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}-part`
+    const partId: string = `${this.getGraphicTargetAsCamelString(Tv2GraphicsTarget.FULL)}Part`
     const fullGraphicPiece: PieceInterface = this.createCasparCgFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
