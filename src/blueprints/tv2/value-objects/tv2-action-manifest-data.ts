@@ -7,6 +7,7 @@ import { Tv2SourceLayer } from './tv2-layers'
 export interface Tv2ActionManifestData {
   name: string
   vcpid: number
+  expectedDuration?: number
   adLibPix: boolean
   voLevels: boolean
   duration: number
@@ -30,4 +31,5 @@ export interface Tv2GraphicsData {
   pieceLayer?: Tv2SourceLayer
   name: string,
   vcpId?: number
+  expectedDuration?: number
 }

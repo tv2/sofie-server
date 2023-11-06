@@ -80,7 +80,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
         return {
           pieceLayer: this.isTv2SourceLayer(actionManifest.pieceLayer) ? actionManifest.pieceLayer : undefined,
           name: data.name,
-          vcpId: data.vcpid
+          vcpId: data.vcpid,
+          expectedDuration: data.expectedDuration
         }
       })
   }
