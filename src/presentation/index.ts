@@ -58,6 +58,7 @@ function startRundownEventServer(): void {
 }
 
 function startSystemServices(): void {
+  ServiceFacade.createIngestChangeService()
   ServiceFacade.createIngestService()
 }
 
