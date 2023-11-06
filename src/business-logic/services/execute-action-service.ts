@@ -210,6 +210,6 @@ export class ExecuteActionService implements ActionService {
     }
 
     const piece: Piece = this.createPieceFromAction(action as PieceAction)
-    await this.rundownService.replacePieceOnAirOnOnNextPart(rundownId, pieceFromRundown, piece)
+    await this.rundownService.replacePieceOnAirOnNextPart(rundownId, pieceFromRundown, piece)
   }
 }
