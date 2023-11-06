@@ -11,6 +11,7 @@ const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
 interface AdLibPiece {
   sourceLayerId: string
   name: string
+  expectedDuration: number | null
 }
 
 export class MongoAdLibPieceRepository extends BaseMongoRepository implements ActionManifestRepository {
@@ -32,7 +33,8 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
     return {
       pieceType: this.getPieceTypeFromAdLibPiece(adLibPiece),
       data: {
-        name: adLibPiece.name
+        name: adLibPiece.name,
+        expectedDuration: adLibPiece.expectedDuration ?? undefined
       },
       pieceLayer: adLibPiece.sourceLayerId
     }

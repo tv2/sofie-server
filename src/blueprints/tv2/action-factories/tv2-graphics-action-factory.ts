@@ -467,6 +467,7 @@ export class Tv2GraphicsActionFactory {
       id: '',
       name: graphicsData.name,
       layer: Tv2SourceLayer.IDENT,
+      duration: graphicsData.expectedDuration,
       timelineObjects: [
         chosenTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
@@ -499,6 +500,7 @@ export class Tv2GraphicsActionFactory {
       id: '',
       name: graphicsData.name,
       layer: Tv2SourceLayer.LOWER_THIRD,
+      duration: graphicsData.expectedDuration,
       timelineObjects: [
         chosenTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
