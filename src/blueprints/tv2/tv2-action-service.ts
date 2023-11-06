@@ -75,7 +75,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
 
   private getVideoClipData(actionManifests: ActionManifest<Tv2ActionManifestData>[]): Tv2VideoClipData[] {
     return actionManifests
-      .filter(actionManifest => this.getPieceTypeFromMongoActionManifest(actionManifest) === Tv2PieceType.VIDEO_CLIP)
+      .filter(actionManifest => this.getPieceTypeFromActionManifest(actionManifest) === Tv2PieceType.VIDEO_CLIP)
       .map(actionManifest => {
         const data: Tv2ActionManifestData = actionManifest.data
         return {
@@ -88,8 +88,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       })
   }
 
-  private getPieceTypeFromMongoActionManifest(mongoActionManifest: ActionManifest): Tv2PieceType {
-    switch (mongoActionManifest.actionId) {
+  private getPieceTypeFromActionManifest(actionManifest: ActionManifest): Tv2PieceType {
+    switch (actionManifest.actionId) {
       case 'select_full_grafik': {
         return Tv2PieceType.CAMERA
       }
@@ -100,7 +100,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
         return Tv2PieceType.SPLIT_SCREEN
       }
       default: {
-        throw new UnexpectedCaseException(`Unknown MongoActionManifestId: ${mongoActionManifest.actionId}`)
+        throw new UnexpectedCaseException(`Unknown MongoActionManifestId: ${actionManifest.actionId}`)
       }
     }
   }
