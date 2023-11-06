@@ -35,7 +35,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
-import { AssetFolderHelper } from '../helpers/AssetFolderHelper'
+import { AssetFolderHelper } from '../helpers/asset-folder-helper'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000

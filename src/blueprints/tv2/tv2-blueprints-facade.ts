@@ -31,7 +31,7 @@ import {
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
-import { AssetFolderHelper } from './helpers/AssetFolderHelper'
+import { AssetFolderHelper } from './helpers/asset-folder-helper'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
