@@ -42,5 +42,5 @@ export interface BlueprintGenerateActions {
    *
    * Any Action not interested in mutating its data at execution time can simply ignore this method.
    */
-  getMutateActionMethods?(action: Action): MutateActionMethods | undefined
+  getMutateActionMethods?(action: Action): MutateActionMethods[]
 }

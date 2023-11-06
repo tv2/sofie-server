@@ -1,5 +1,5 @@
 import { ActionType, PartActionType, PieceActionType } from '../enums/action-type'
-import { PartInterface } from './part'
+import { Part, PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
 import { PieceType } from '../enums/piece-type'
 import { Media } from './media'
@@ -26,11 +26,18 @@ export interface PieceAction extends Action {
   data: PieceInterface
 }
 
-export type MutateActionMethods = MutateActionWithPlannedPieceMethods | MutateActionWithMedia
+export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods
 
 export enum MutateActionType {
-  PLANNED_PIECE = 'PLANNED_PIECE',
-  MEDIA = 'MEDIA'
+  PIECE = 'PIECE',
+  MEDIA = 'MEDIA',
+  HISTORIC_PART= 'HISTORIC_PART'
+}
+
+export interface MutateActionWithPieceMethods {
+  type: MutateActionType.PIECE
+  updateActionWithPiece: (action: Action, piece: Piece) => Action
+  piecePredicate: (piece: Piece) => boolean
 }
 
 export interface MutateActionWithMedia {
@@ -39,10 +46,10 @@ export interface MutateActionWithMedia {
   getMediaId: () => string
 }
 
-export interface MutateActionWithPlannedPieceMethods {
-  type: MutateActionType.PLANNED_PIECE
-  updateActionWithPlannedPieceData: (action: Action, plannedPiece: Piece) => Action
-  plannedPiecePredicate: (piece: Piece) => boolean
+export interface MutateActionWithHistoricPartMethods {
+  type: MutateActionType.HISTORIC_PART,
+  updateActionWithPartData: (action: Action, historicPart: Part, presentPart: Part | undefined) => Action
+  partPredicate: (part: Part) => boolean
 }
 
 /**
@@ -55,7 +62,7 @@ export interface MutateActionWithPlannedPieceMethods {
  * The 'data' is of type 'unknown' since the data used to create Actions are Blueprints specific. Blueprints will have
  * to map 'data' into whatever structure Blueprints needs.
  */
-export interface ActionManifest {
+export interface ActionManifest<Data = unknown> {
   pieceType: PieceType
-  data: unknown
+  data: Data
 }
