@@ -201,7 +201,7 @@ describe(ExecuteActionService.name, () => {
 
           await testee.executeAction(action.id, rundown.id)
 
-          verify(rundownService.replacePiece(rundown.id, activePiece, anything())).once()
+          verify(rundownService.replacePieceOnAirOnOnNextPart(rundown.id, activePiece, anything())).once()
         })
       })
 
@@ -259,7 +259,7 @@ describe(ExecuteActionService.name, () => {
 
           await testee.executeAction(action.id, rundown.id)
 
-          verify(rundownService.replacePiece(rundown.id, nextPiece, anything())).once()
+          verify(rundownService.replacePieceOnAirOnOnNextPart(rundown.id, nextPiece, anything())).once()
         })
       })
 
@@ -323,7 +323,7 @@ describe(ExecuteActionService.name, () => {
 
           await testee.executeAction(action.id, rundown.id)
 
-          verify(rundownService.replacePiece(rundown.id, activePiece, anything())).once()
+          verify(rundownService.replacePieceOnAirOnOnNextPart(rundown.id, activePiece, anything())).once()
         })
       })
     })
