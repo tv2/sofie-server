@@ -26,7 +26,7 @@ export class Tv2VizGraphicsTimelineObjectFactory implements Tv2GraphicsTimelineO
         type: VizType.ELEMENT_INTERNAL,
         templateName: 'OUT_TEMA_H',
         templateData: [],
-        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
       }
     }
   }
@@ -77,7 +77,7 @@ export class Tv2VizGraphicsTimelineObjectFactory implements Tv2GraphicsTimelineO
       deviceType: DeviceType.VIZMSE,
       type: VizType.CLEAR_ALL_ELEMENTS,
       channelsToSendCommands: ['OVL1', 'FULL1', 'WALL1'],
-      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }
   }
 
@@ -106,7 +106,7 @@ export class Tv2VizGraphicsTimelineObjectFactory implements Tv2GraphicsTimelineO
       deviceType: DeviceType.VIZMSE,
       type: VizType.CLEAR_ALL_ELEMENTS,
       channelsToSendCommands: undefined,
-      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
+      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }
   }
 }

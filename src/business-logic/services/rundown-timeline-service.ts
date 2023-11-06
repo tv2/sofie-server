@@ -224,4 +224,19 @@ export class RundownTimelineService implements RundownService {
 
     await this.rundownRepository.saveRundown(rundown)
   }
+
+  public async replacePieceOnAirOnNextPart(rundownId: string, pieceToBeReplaced: Piece, newPiece: Piece): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.replacePiece(pieceToBeReplaced, newPiece)
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
+
+    await this.buildAndPersistTimeline(rundown)
+
+    const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id
+      ? rundown.getActiveSegment().id
+      : rundown.getNextSegment().id
+    this.rundownEventEmitter.emitPieceInsertedEvent(rundown, segmentId, newPiece)
+
+    await this.rundownRepository.saveRundown(rundown)
+  }
 }

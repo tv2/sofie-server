@@ -5,6 +5,7 @@ import { Piece, PieceInterface } from '../piece'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { instance, verify } from '@typestrong/ts-mockito'
 import { EntityTestFactory } from './entity-test-factory'
+import { UnsupportedOperation } from '../../exceptions/unsupported-operation'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -175,6 +176,71 @@ describe(Part.name, () => {
           expect(unplannedPiece.getStart()).toBe(timeSincePartStartAndPieceInserted)
         })
       })
+    })
+  })
+
+  describe(Part.prototype.replacePiece.name, () => {
+    describe('Piece to replace is a planned Piece', () => {
+      it('throws an unsupported operation exception', () => {
+        const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: true })
+        const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
+
+        const testee: Part = new Part({ pieces: [pieceToBeReplaced] } as PartInterface)
+
+        expect(() => testee.replacePiece(pieceToBeReplaced, newPiece)).toThrow(UnsupportedOperation)
+      })
+    })
+
+    describe('Piece to replace is not a Piece on the Part', () => {
+      it('throws an unsupported operation exception', () => {
+        const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: false })
+        const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
+
+        const testee: Part = new Part({ } as PartInterface)
+
+        expect(() => testee.replacePiece(pieceToBeReplaced, newPiece)).toThrow(UnsupportedOperation)
+      })
+    })
+
+    it('removes the Piece to replace from the Part', () => {
+      const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: false })
+      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
+
+      const testee: Part = new Part({ pieces: [pieceToBeReplaced] } as PartInterface)
+
+      expect(testee.getPieces()).toContain(pieceToBeReplaced)
+
+      testee.replacePiece(pieceToBeReplaced, newPiece)
+
+      expect(testee.getPieces()).not.toContain(pieceToBeReplaced)
+    })
+
+    it('inserts the new Piece on the Part', () => {
+      const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: false })
+      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
+
+      const testee: Part = new Part({ pieces: [pieceToBeReplaced] } as PartInterface)
+
+      expect(testee.getPieces()).not.toContain(newPiece)
+
+      testee.replacePiece(pieceToBeReplaced, newPiece)
+
+      expect(testee.getPieces()).toContain(newPiece)
+    })
+
+    it('gives the new Piece the same index in the Pieces of the Part as the Piece to replace', () => {
+      const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: false })
+      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
+
+      const testee: Part = new Part({ pieces: [pieceToBeReplaced] } as PartInterface)
+
+      const indexOfPieceToBeReplaced: number = testee.getPieces().findIndex(piece => piece.id === pieceToBeReplaced.id)
+      expect(indexOfPieceToBeReplaced).not.toBe(-1)
+
+      testee.replacePiece(pieceToBeReplaced, newPiece)
+
+      const indexOfNewPiece: number = testee.getPieces().findIndex(piece => piece.id === newPiece.id)
+      expect(indexOfPieceToBeReplaced).toBe(indexOfNewPiece)
     })
   })
 

@@ -11,6 +11,8 @@ interface Tv2ABSourceLayers {
   }
 }
 
+export const A_B_SOURCE_INPUT_PLACEHOLDER: number = -1
+
 export const A_B_SOURCE_LAYERS: Tv2ABSourceLayers = {
   caspar: {
     clipPending: Tv2CasparCgLayer.PLAYER_CLIP_PENDING,
