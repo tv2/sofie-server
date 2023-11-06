@@ -18,6 +18,8 @@ export enum Tv2ActionContentType {
   UNKNOWN = 'UNKNOWN'
 }
 
+export type Tv2Action = Tv2PartAction | Tv2PieceAction
+
 export interface Tv2PartAction extends PartAction {
   metadata: {
     contentType: Tv2ActionContentType

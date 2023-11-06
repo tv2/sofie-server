@@ -7,13 +7,12 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import {
+  Tv2Action,
   Tv2ActionContentType,
   Tv2BreakerTransitionEffectActionMetadata,
   Tv2CutTransitionEffectActionMetadata,
   Tv2DipTransitionEffectActionMetadata,
   Tv2MixTransitionEffectActionMetadata,
-  Tv2PartAction,
-  Tv2PieceAction,
   Tv2TransitionEffectAction,
   Tv2TransitionEffectActionMetadata
 } from '../value-objects/tv2-action'
@@ -82,14 +81,12 @@ export class Tv2TransitionEffectActionFactory {
     })
   }
 
-  public isTransitionEffectAction(action: Action): boolean {
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
-    return [Tv2ActionContentType.TRANSITION].includes(tv2Action.metadata.contentType)
+  public isTransitionEffectAction(action: Tv2Action): boolean {
+    return [Tv2ActionContentType.TRANSITION].includes(action.metadata.contentType)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods[] {
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
-    switch (tv2Action.metadata.contentType) {
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
+    switch (action.metadata.contentType) {
       case Tv2ActionContentType.TRANSITION: {
         return [{
           type: MutateActionType.PIECE,

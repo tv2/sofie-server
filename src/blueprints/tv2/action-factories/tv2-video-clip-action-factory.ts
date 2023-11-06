@@ -17,12 +17,11 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Media } from '../../../model/entities/media'
-import { Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
+import { Tv2Action, Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
-const VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX: string = 'videoClipAsNextAction'
 const DEFAULT_EXPECTED_DURATION_IN_MS: number = 1000
 
 export class Tv2VideoClipActionFactory {
@@ -34,12 +33,12 @@ export class Tv2VideoClipActionFactory {
   ) {
   }
 
-  public isVideoClipAction(action: Action): boolean {
-    return action.id.includes(VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX)
+  public isVideoClipAction(action: Tv2Action): boolean {
+    return [Tv2ActionContentType.VIDEO_CLIP].includes(action.metadata.contentType)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods[] {
-    if (action.id.includes(VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX)) {
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
+    if (action.metadata.contentType === Tv2ActionContentType.VIDEO_CLIP) {
       return [{
         type: MutateActionType.MEDIA,
         getMediaId: () => action.name,
@@ -81,7 +80,7 @@ export class Tv2VideoClipActionFactory {
     const partId: string = 'videoClipInsertAction'
     const partInterface: PartInterface = this.createPartInterface(partId, videoClipData)
     return {
-      id: `${VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX}_${videoClipData.fileName}`,
+      id: `videoClipAsNextAction_${videoClipData.fileName}`,
       name: videoClipData.name,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
