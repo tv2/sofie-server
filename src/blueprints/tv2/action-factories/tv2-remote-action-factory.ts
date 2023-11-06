@@ -91,8 +91,8 @@ export class Tv2RemoteActionFactory {
   private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable, `insertedProgram_${source._id}`),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.SwitcherSource, enable, `insertedLookahead_${source._id}`),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(`insertedProgram_${source._id}`, source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(`insertedLookahead_${source._id}`, source.SwitcherSource, enable),
     ]
   }
 
