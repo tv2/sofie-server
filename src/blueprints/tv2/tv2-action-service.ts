@@ -54,6 +54,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.dveActionFactory.isDveAction(action)) {
       return this.dveActionFactory.getMutateActionMethods(action)
     }
+    if(this.remoteActionFactory.isRemoteAction(action)) {
+      return this.remoteActionFactory.getMutateActionMethods(action)
+    }
     return []
   }
 
