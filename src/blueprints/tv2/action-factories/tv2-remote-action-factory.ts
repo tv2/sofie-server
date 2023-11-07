@@ -5,7 +5,6 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -70,7 +69,6 @@ export class Tv2RemoteActionFactory {
       id: `remoteAction_${source._id}`,
       partId: parentPartId,
       name: `LIVE ${source.SourceName}`,
-      type: PieceType.REMOTE,
       layer: Tv2SourceLayer.REMOTE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,

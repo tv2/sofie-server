@@ -1,7 +1,6 @@
 import { Segment, SegmentInterface } from '../segment'
 import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
-import { PieceType } from '../../enums/piece-type'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { Rundown, RundownInterface } from '../rundown'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
@@ -214,7 +213,6 @@ export class EntityMockFactory {
     when(mockedPiece.id).thenReturn(pieceInterface.id ?? 'pieceId')
     when(mockedPiece.name).thenReturn(pieceInterface.name ?? 'pieceName')
     when(mockedPiece.getPartId()).thenReturn(pieceInterface.partId ?? 'partId')
-    when(mockedPiece.type).thenReturn(pieceInterface.type ?? PieceType.UNKNOWN)
     when(mockedPiece.layer).thenReturn(pieceInterface.layer ?? 'layer')
     when(mockedPiece.isPlanned).thenReturn(pieceInterface.isPlanned ?? true)
     when(mockedPiece.getStart()).thenReturn(pieceInterface.start ?? 0)
@@ -226,6 +224,7 @@ export class EntityMockFactory {
     when(mockedPiece.transitionType).thenReturn(pieceInterface.transitionType ?? TransitionType.NO_TRANSITION)
     when(mockedPiece.tags).thenReturn(pieceInterface.tags ?? [])
     when(mockedPiece.content).thenReturn(pieceInterface.content)
+    when(mockedPiece.metadata).thenReturn(pieceInterface.metadata)
 
     when(mockedPiece.getExecutedAt()).thenReturn(misc.executedAt ?? 0)
 
