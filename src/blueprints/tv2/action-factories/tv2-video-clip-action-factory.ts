@@ -27,6 +27,7 @@ const DEFAULT_EXPECTED_DURATION_IN_MS: number = 1000
 
 const VIDEO_CLIP_LOOKAHEAD_ID: string = 'videoClipLookahead'
 const VIDEO_CLIP_PROGRAM_ID: string = 'videoClipProgram'
+const VIDEO_CLIP_CLEAN_FEED_ID: string = 'videoClipCleanFeed'
 
 export class Tv2VideoClipActionFactory {
 
@@ -132,7 +133,7 @@ export class Tv2VideoClipActionFactory {
       tags: [],
       timelineObjects: [
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(VIDEO_CLIP_PROGRAM_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(VIDEO_CLIP_CLEAN_FEED_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(VIDEO_CLIP_LOOKAHEAD_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.casparCgTimelineObjectFactory.createVideoClipTimelineObject(videoClipData),
         ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)

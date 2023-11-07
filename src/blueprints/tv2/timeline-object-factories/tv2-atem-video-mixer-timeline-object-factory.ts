@@ -79,9 +79,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createCleanFeedTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
     return {
-      id: `${ID_PREFIX}cleanFeed`,
+      id: `${ID_PREFIX}${id}`,
       enable,
       priority: 1,
       layer: Tv2AtemLayer.CLEAN_FEED,
