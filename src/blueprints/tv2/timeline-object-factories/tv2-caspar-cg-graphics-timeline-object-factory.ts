@@ -149,8 +149,8 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
           [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(graphicsLayer)]: {
             display: 'program',
             payload: {
-              type: this.getTemplateNameFromGraphicsData(graphicsData),
-              0: this.getDisplayTextFromGraphicsData(graphicsData)
+              type: this.getTemplateName(graphicsData),
+              0: this.getDisplayText(graphicsData)
             }
           }
         }
