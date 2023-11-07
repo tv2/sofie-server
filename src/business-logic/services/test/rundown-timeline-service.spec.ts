@@ -12,7 +12,7 @@ import { Blueprint } from '../../../model/value-objects/blueprint'
 import { PartRepository } from '../../../data-access/repositories/interfaces/part-repository'
 import { SegmentRepository } from '../../../data-access/repositories/interfaces/segment-repository'
 import { PieceRepository } from '../../../data-access/repositories/interfaces/piece-repository'
-import {AlreadyActivatedException} from '../../../model/exceptions/already-activated-exception'
+import { AlreadyActivatedException } from '../../../model/exceptions/already-activated-exception'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
