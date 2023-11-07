@@ -1,1 +1,3 @@
-export interface IngestService {}
+export interface IngestService {
+  reloadIngestData(rundownName: string): Promise<void>
+}

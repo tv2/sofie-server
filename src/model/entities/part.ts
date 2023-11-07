@@ -159,6 +159,20 @@ export class Part {
     this.pieces.push(unPlannedPiece)
   }
 
+  public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
+    if (pieceToBeReplaced.isPlanned) {
+      throw new UnsupportedOperation(`Can't replace Piece ${pieceToBeReplaced.id}. Only unplanned Pieces are allowed to be replaced.`)
+    }
+
+    const pieceIndex: number = this.pieces.findIndex(piece => piece.id === pieceToBeReplaced.id)
+    if (pieceIndex < 0) {
+      throw new UnsupportedOperation(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
+    }
+
+    newPiece.setPartId(this.id)
+    this.pieces[pieceIndex] = newPiece
+  }
+
   public getPiecesWithLifespan(lifespanFilters: PieceLifespan[]): Piece[] {
     return this.pieces.filter((piece) => lifespanFilters.includes(piece.pieceLifespan))
   }
@@ -189,13 +203,12 @@ export class Part {
   // TODO: This implementation currently reflects how Core implemented it. It's in dire need of a refactor.
   public calculateTimings(previousPart?: Part): void {
     const maxPreRollDurationFromPieces: number = this.pieces
-    // Note: Core filters for !BlueprintPieceType.Normal and piece.enable.start !== 'now' - Will does Pieces ever have a PreRollDuration?
+    // Note: Core filters for !BlueprintPieceType.Normal and piece.enable.start !== 'now' - Will Pieces ever have a PreRollDuration?
       .reduce((preRollDuration: number, piece: Piece) => Math.max(preRollDuration, piece.preRollDuration ?? 0), 0)
 
     const maxPostRollDurationForPieces: number = this.pieces
       .filter((piece) => !!piece.postRollDuration && !piece.duration)
       .reduce((postRollDuration: number, piece: Piece) => Math.max(postRollDuration, piece.postRollDuration), 0)
-
     let inTransition: InTransition | undefined
     let allowTransition: boolean = false
 

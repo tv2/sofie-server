@@ -4,9 +4,10 @@ export interface Tv2StudioBlueprintConfiguration {
   SourcesRM: Tv2SourceMappingWithSound[] // Lives
   StudioMics: string[]
   ABMediaPlayers: Tv2MediaPlayer[]
-  SwitcherSource: Tv2SwitcherSource
+  SwitcherSource: Tv2VideoMixerSources
   CasparPrerollDuration: number,
   ServerPostrollDuration: number
+  DVEFolder?: string
 }
 
 export interface Tv2SourceMapping {
@@ -24,7 +25,10 @@ export interface Tv2SourceMappingWithSound extends Tv2SourceMapping {
   AcceptPersistAudio?: boolean
 }
 
-export interface Tv2SwitcherSource {
+export interface Tv2VideoMixerSources {
+  Default: number
+  SplitArtFill: number
+  SplitArtKey: number
   DSK: Tv2DownstreamKeyer[]
 }
 
