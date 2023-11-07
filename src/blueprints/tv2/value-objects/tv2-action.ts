@@ -18,6 +18,7 @@ export enum Tv2ActionSubtype {
   DVE_LAYOUT = 'DVE_LAYOUT',
   DVE_INSERT_SOURCE_TO_INPUT = 'DVE_INSERT_SOURCE_TO_INPUT',
   DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
+  RECALL_LAST_REMOTE = 'RECALL_LAST_REMOTE',
 }
 
 export interface Tv2PartAction extends PartAction {
@@ -53,6 +54,13 @@ export interface Tv2RemoteAction extends Tv2PartAction {
   metadata: {
     contentType: Tv2ActionContentType.REMOTE,
     remoteNumber: string
+  }
+}
+
+export interface Tv2RecallLastRemoteAsNextAction extends Tv2RemoteAction {
+  type: PartActionType.INSERT_PART_AS_NEXT,
+  metadata: Tv2RemoteAction['metadata'] & {
+    actionSubtype: Tv2ActionSubtype.RECALL_LAST_REMOTE,
   }
 }
 
