@@ -26,6 +26,7 @@ import {
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
+import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 import { Tv2PieceType } from './enums/tv2-piece-type'
 import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
 import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
@@ -34,6 +35,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
     private readonly configurationMapper: Tv2BlueprintConfigurationMapper,
     private readonly cameraActionFactory: Tv2CameraActionFactory,
+    private readonly remoteActionFactory: Tv2RemoteActionFactory,
     private readonly transitionActionFactory: Tv2TransitionActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
@@ -63,6 +65,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
 
     return [
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
+      ...this.remoteActionFactory.createRemoteActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionActionFactory.createTransitionActions(),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),

@@ -7,6 +7,7 @@ export enum Tv2SourceLayer {
   AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs',
   DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
   DVE = 'dve',
+  REMOTE = 'studio0_live',
 
   VIDEO_CLIP = 'studio0_selected_clip',
   SERVER_VOICE_OVER = 'studio0_selected_voiceover',
