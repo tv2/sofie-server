@@ -31,7 +31,7 @@ import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
-import { Tv2GraphicsData } from '../value-objects/tv2-action-manifest-data'
+import { Tv2GraphicsData, Tv2GraphicsDataType } from '../value-objects/tv2-action-manifest-data'
 import { Tv2GraphicsContent } from '../value-objects/tv2-content'
 import {
   Tv2GraphicsTimelineObjectFactory
@@ -58,10 +58,6 @@ export class Tv2GraphicsActionFactory {
       ...this.createIdentGraphicsActions(blueprintConfiguration, graphicsData),
       ...this.createLowerThirdActions(blueprintConfiguration, graphicsData)
     ]
-  }
-
-  private isFullGraphics(graphicsData: Tv2GraphicsData): boolean {
-    return graphicsData.pieceLayer === undefined
   }
 
   private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
@@ -205,7 +201,7 @@ export class Tv2GraphicsActionFactory {
       }
     }
 
-    const fullScreenData: Tv2GraphicsData[] = graphicsData.filter(data => this.isFullGraphics(data))
+    const fullScreenData: Tv2GraphicsData[] = graphicsData.filter(data => data.type === Tv2GraphicsDataType.FULL)
     return fullScreenData.map((data) => chosenMethod(
       blueprintConfiguration,
       data
@@ -444,7 +440,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createIdentGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    const identData: Tv2GraphicsData[] = graphicsData.filter(data => data.pieceLayer === Tv2SourceLayer.IDENT)
+    const identData: Tv2GraphicsData[] = graphicsData.filter(data => data.type === Tv2GraphicsDataType.IDENT)
     return identData.map(data => this.createIdentGraphicsAction(
       blueprintConfiguration,
       data)
@@ -488,7 +484,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createLowerThirdActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    const lowerThirdData: Tv2GraphicsData[] = graphicsData.filter(data => data.pieceLayer === Tv2SourceLayer.LOWER_THIRD)
+    const lowerThirdData: Tv2GraphicsData[] = graphicsData.filter(data => data.type === Tv2GraphicsDataType.LOWER_THIRD)
     return lowerThirdData.map((data) => this.createLowerThirdGraphicsAction(
       blueprintConfiguration,
       data

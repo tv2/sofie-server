@@ -18,7 +18,12 @@ import {
 } from './action-factories/tv2-video-mixer-configuration-action-factory'
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { PieceType } from '../../model/enums/piece-type'
-import { Tv2ActionManifestData, Tv2GraphicsData, Tv2VideoClipData } from './value-objects/tv2-action-manifest-data'
+import {
+  Tv2ActionManifestData,
+  Tv2GraphicsData,
+  Tv2GraphicsDataType,
+  Tv2VideoClipData
+} from './value-objects/tv2-action-manifest-data'
 import { Tv2SourceLayer } from './value-objects/tv2-layers'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
@@ -78,12 +83,21 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       .map(actionManifest => {
         const data: Tv2ActionManifestData = actionManifest.data as Tv2ActionManifestData
         return {
-          pieceLayer: this.isTv2SourceLayer(actionManifest.pieceLayer) ? actionManifest.pieceLayer : undefined,
+          type: this.getGraphicsDataType(actionManifest),
           name: data.name,
           vcpId: data.vcpid,
           expectedDuration: data.expectedDuration
         }
       })
+  }
+
+  private getGraphicsDataType(actionManifest: ActionManifest): Tv2GraphicsDataType {
+    const pieceLayer = this.isTv2SourceLayer(actionManifest.pieceLayer) ? actionManifest.pieceLayer : undefined
+    switch (pieceLayer) {
+      case Tv2SourceLayer.IDENT: return Tv2GraphicsDataType.IDENT
+      case Tv2SourceLayer.LOWER_THIRD: return Tv2GraphicsDataType.LOWER_THIRD
+      default: return Tv2GraphicsDataType.FULL
+    }
   }
 
   private isTv2SourceLayer(layer: string | undefined): layer is Tv2SourceLayer {

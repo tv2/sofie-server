@@ -1,5 +1,3 @@
-import { Tv2SourceLayer } from './tv2-layers'
-
 /**
  * This corresponds to the 'userData' field on the 'adLibActions' collection in the database
  * The attributes need to match the attributes in the database
@@ -27,8 +25,14 @@ export interface Tv2VideoClipData {
   isVoiceOver: boolean // userData.voLevels
 }
 
+export enum Tv2GraphicsDataType {
+  IDENT = 'IDENT',
+  LOWER_THIRD = 'LOWER_THIRD',
+  FULL = 'FULL'
+}
+
 export interface Tv2GraphicsData {
-  pieceLayer?: Tv2SourceLayer
+  type: Tv2GraphicsDataType
   name: string,
   vcpId?: number
   expectedDuration?: number
