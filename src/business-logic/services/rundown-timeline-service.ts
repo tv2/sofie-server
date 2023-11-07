@@ -34,10 +34,7 @@ export class RundownTimelineService implements RundownService {
 
   public async activateRundown(rundownId: string): Promise<void> {
 
-    const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns()
-    const activeRundown: BasicRundown | undefined = basicRundowns.find(rundown => rundown.isActive())
-
-    this.assertNoRundownIsActive(activeRundown)
+    await this.assertNoRundownIsActive()
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
     rundown.activate()
@@ -52,7 +49,9 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private assertNoRundownIsActive(activeRundown: BasicRundown | undefined): void {
+  private async assertNoRundownIsActive(): Promise<void> {
+    const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns()
+    const activeRundown: BasicRundown | undefined = basicRundowns.find(rundown => rundown.isActive())
     if (activeRundown) {
       throw new AlreadyActivatedException(`Unable to activate rundown, because the rundown ${activeRundown.name} is active. `)
     }
