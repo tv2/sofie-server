@@ -16,6 +16,7 @@ import { AlreadyExistException } from '../../exceptions/already-exist-exception'
 import { RundownCursor } from '../../value-objects/rundown-cursor'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { OnAirException } from '../../exceptions/on-air-exception'
+import { NoPartInHistoryException } from '../../exceptions/no-part-in-history-exception'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -177,6 +178,149 @@ describe(Rundown.name, () => {
         testee.takeNext()
 
         verify(mockNextPart.putOnAir()).once()
+      })
+
+      describe('it has an active Part', () => {
+        it('sets the active Part as the previous Part', () => {
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePartId', isOnAir: true })
+          activePart.calculateTimings()
+          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId' })
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [activePart, nextPart] })
+
+          const testee: Rundown = new Rundown({
+            segments: [segment],
+            isRundownActive: true,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: activePart,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                segment,
+                part: nextPart,
+                owner: Owner.SYSTEM
+              },
+              infinitePieces: new Map()
+            }
+          } as RundownInterface)
+
+          expect(testee.getPreviousPart()).toBeUndefined()
+
+          testee.takeNext()
+
+          expect(testee.getPreviousPart()?.id).toBe(activePart.id)
+        })
+
+        it('adds the new previous Part to the history', () => {
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePartId', isOnAir: true })
+          activePart.calculateTimings()
+          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId' })
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [activePart, nextPart] })
+
+          const testee: Rundown = new Rundown({
+            segments: [segment],
+            isRundownActive: true,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: activePart,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                segment,
+                part: nextPart,
+                owner: Owner.SYSTEM
+              },
+              infinitePieces: new Map()
+            }
+          } as RundownInterface)
+
+          expect(testee.getHistory().find(part => part.id === activePart.id)).toBeUndefined()
+
+          testee.takeNext()
+
+          expect(testee.getHistory().find(part => part.id === activePart.id)).not.toBeUndefined()
+        })
+
+        describe('history has exceed maximum history entries', () => {
+          it('removes the oldest entries to get down to maximum entries', () => {
+            const activePart: Part = EntityTestFactory.createPart({ id: 'activePartId', isOnAir: true })
+            activePart.calculateTimings()
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId' })
+            const segment: Segment = EntityTestFactory.createSegment({ parts: [activePart, nextPart] })
+
+            const historyPartIdPrefix: string = 'partId_'
+
+            const maximumHistoryEntries: number = 30 // Maximum entries is at the time of writing 30.
+            const numberToExceedHistory: number = 5
+
+            const history: Part[] = []
+            for (let i = 0; i < maximumHistoryEntries + numberToExceedHistory; i++) {
+              history.push(EntityTestFactory.createPart({ id: `${historyPartIdPrefix}${i}`}))
+            }
+
+            const testee: Rundown = new Rundown({
+              history,
+              segments: [segment],
+              isRundownActive: true,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment,
+                  part: activePart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                },
+                infinitePieces: new Map()
+              }
+            } as RundownInterface)
+
+            expect(testee.getHistory()).toHaveLength(maximumHistoryEntries + numberToExceedHistory)
+            for (let i = 0; i < numberToExceedHistory; i++) {
+              expect(testee.getHistory()[i].id).toBe(`${historyPartIdPrefix}${i}`)
+            }
+
+            testee.takeNext()
+
+            expect(testee.getHistory()).toHaveLength(maximumHistoryEntries)
+
+            for (let i = 0; i < numberToExceedHistory; i++) {
+              expect(testee.getHistory()[i].id).not.toBe(`${historyPartIdPrefix}${i}`)
+            }
+
+            expect(testee.getHistory()[testee.getHistory().length - 1].id).toBe(activePart.id)
+          })
+        })
+      })
+
+      describe('it does not have an active Part', () => {
+        it('does not set any Part as previous', () => {
+          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId' })
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
+
+          const testee: Rundown = new Rundown({
+            segments: [segment],
+            isRundownActive: true,
+            alreadyActiveProperties: {
+              nextCursor: {
+                segment,
+                part: nextPart,
+                owner: Owner.SYSTEM
+              },
+              infinitePieces: new Map()
+            }
+          } as RundownInterface)
+
+          expect(testee.getPreviousPart()).toBeUndefined()
+
+          testee.takeNext()
+
+          expect(testee.getPreviousPart()).toBeUndefined()
+        })
       })
     })
 
@@ -2341,6 +2485,23 @@ describe(Rundown.name, () => {
       verify(mockedSegment2.reset()).once()
       verify(mockedSegment3.reset()).once()
     })
+
+    it('resets the history to an empty array', () => {
+      const segment: Segment = EntityMockFactory.createSegment()
+      const history: Part[] = [
+        EntityTestFactory.createPart(),
+        EntityTestFactory.createPart(),
+        EntityTestFactory.createPart()
+      ]
+
+      const testee: Rundown = new Rundown({ history, segments: [segment] } as RundownInterface)
+
+      expect(testee.getHistory()).toHaveLength(history.length)
+
+      testee.activate()
+
+      expect(testee.getHistory()).toHaveLength(0)
+    })
   })
 
   describe(Rundown.prototype.addSegment.name, () => {
@@ -2842,6 +3003,148 @@ describe(Rundown.name, () => {
         const result: () => void = () => rundown.setNext(activeSegment.id, activePart.id)
 
         expect(result).toThrow(OnAirException)
+      })
+    })
+  })
+
+  describe(Rundown.prototype.findPartInHistory.name, () => {
+    describe('no Parts match the predicate', () => {
+      it('throws NoPartInHistory Exception', () => {
+        const history: Part[] = [
+          EntityTestFactory.createPart({ id: 'randomIdOne' }),
+          EntityTestFactory.createPart({ id: 'randomIdTwo' }),
+        ]
+
+        const noMatchingPartPredicate: (part: Part) => boolean = () => false
+
+        const testee: Rundown = new Rundown({
+          isRundownActive: true,
+          history,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: EntityTestFactory.createSegment(),
+              part: EntityTestFactory.createPart(),
+              owner: Owner.SYSTEM
+            }
+          }
+        } as RundownInterface)
+
+        expect(() => testee.findPartInHistory(noMatchingPartPredicate)).toThrow(NoPartInHistoryException)
+      })
+    })
+
+    describe('the active Part matches the predicate', () => {
+      it('returns a clone of the Active Part', () => {
+        const activePart: Part = EntityTestFactory.createPart({ id: 'activePartId' })
+        const history: Part[] = [
+          EntityTestFactory.createPart({ id: 'randomIdOne' }),
+          EntityTestFactory.createPart({ id: 'randomIdTwo' }),
+        ]
+
+        const predicate: (part: Part) => boolean = (part: Part) => part.id === activePart.id
+
+        const testee: Rundown = new Rundown({
+          isRundownActive: true,
+          history,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: EntityTestFactory.createSegment(),
+              part: activePart,
+              owner: Owner.SYSTEM
+            }
+          }
+        } as RundownInterface)
+
+        const result: Part = testee.findPartInHistory(predicate)
+
+        expect(result).not.toBe(activePart) // This asserts is not the same Object reference i.e. it's a clone
+        expect(result).toStrictEqual(activePart) // This asserts is still has the same values i.e. it has been cloned
+      })
+    })
+
+    describe('both the Active Part and a Part in the history matches the predicate', () => {
+      it('returns a clone of the Active Part', () => {
+        const name: string = 'someNameToIdentifyTwoParts'
+        const activePart: Part = EntityTestFactory.createPart({ id: 'activePartId', name })
+        const history: Part[] = [
+          EntityTestFactory.createPart({ id: 'randomIdOne', name }),
+          EntityTestFactory.createPart({ id: 'randomIdTwo' }),
+        ]
+
+        const predicate: (part: Part) => boolean = (part: Part) => part.name === name
+
+        const testee: Rundown = new Rundown({
+          isRundownActive: true,
+          history,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: EntityTestFactory.createSegment(),
+              part: activePart,
+              owner: Owner.SYSTEM
+            }
+          }
+        } as RundownInterface)
+
+        const result: Part = testee.findPartInHistory(predicate)
+
+        expect(result).not.toBe(activePart) // This asserts is not the same Object reference i.e. it's a clone
+        expect(result).toStrictEqual(activePart) // This asserts is still has the same values i.e. it has been cloned
+      })
+    })
+
+    describe('a history Part matches the predicate', () => {
+      it('returns the history Part', () => {
+        const historyPartToFind: Part = EntityTestFactory.createPart({ id: 'randomIdOne' })
+        const history: Part[] = [
+          historyPartToFind,
+          EntityTestFactory.createPart({ id: 'randomIdTwo' }),
+        ]
+
+        const predicate: (part: Part) => boolean = (part: Part) => part.id === historyPartToFind.id
+
+        const testee: Rundown = new Rundown({
+          isRundownActive: true,
+          history,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: EntityTestFactory.createSegment(),
+              part: EntityTestFactory.createPart(),
+              owner: Owner.SYSTEM
+            }
+          }
+        } as RundownInterface)
+
+        const result: Part = testee.findPartInHistory(predicate)
+        expect(result).toBe(historyPartToFind)
+      })
+    })
+
+    describe('two history Parts matches the predicate', () => {
+      it('returns the last inserted history Part', () => {
+        const name: string = 'someNameToIdentifyMultipleParts'
+        const firstPart: Part = EntityTestFactory.createPart({ id: 'randomIdOne', name })
+        const lastPart: Part = EntityTestFactory.createPart({ id: 'randomIdTwo', name })
+        const history: Part[] = [
+          firstPart,
+          lastPart,
+        ]
+
+        const predicate: (part: Part) => boolean = (part: Part) => part.name === name
+
+        const testee: Rundown = new Rundown({
+          isRundownActive: true,
+          history,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: EntityTestFactory.createSegment(),
+              part: EntityTestFactory.createPart(),
+              owner: Owner.SYSTEM
+            }
+          }
+        } as RundownInterface)
+
+        const result: Part = testee.findPartInHistory(predicate)
+        expect(result).toBe(lastPart)
       })
     })
   })

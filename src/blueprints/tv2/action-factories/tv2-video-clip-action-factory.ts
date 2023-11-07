@@ -3,15 +3,12 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { PartActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
 import { PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2CasparCgLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { Tv2VideoClipData } from '../value-objects/tv2-video-clip-data'
-import { DeviceType } from '../../../model/enums/device-type'
+import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
-import { CasparCgMediaTimelineObject, CasparCgType } from '../../timeline-state-resolver-types/caspar-cg-types'
 import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
@@ -19,17 +16,24 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Media } from '../../../model/entities/media'
+import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 const VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX: string = 'videoClipAsNextAction'
-const DEFAULT_EXPECTED_DURATION_IN_MS: number = 1000
+
+const VIDEO_CLIP_LOOKAHEAD_ID: string = 'videoClipLookahead'
+const VIDEO_CLIP_PROGRAM_ID: string = 'videoClipProgram'
+const VIDEO_CLIP_CLEAN_FEED_ID: string = 'videoClipCleanFeed'
 
 export class Tv2VideoClipActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
+    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory
   ) {
   }
 
@@ -37,14 +41,16 @@ export class Tv2VideoClipActionFactory {
     return action.id.includes(VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
-    if (action.id.includes(VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX)) {
-      return {
-        type: MutateActionType.MEDIA,
-        getMediaId: () => action.name,
-        updateActionWithMedia: (action, media) => this.updateVideoClipAction(action, media)
-      }
+  public getMutateActionMethods(action: Action): MutateActionMethods[] {
+    if (!this.isVideoClipAction(action)) {
+      return []
     }
+
+    return [{
+      type: MutateActionType.MEDIA,
+      getMediaId: () => action.name,
+      updateActionWithMedia: (action: Action, media: Media | undefined) => this.updateVideoClipAction(action, media)
+    }]
   }
 
   private updateVideoClipAction(action: Action, media?: Media): Action {
@@ -70,11 +76,11 @@ export class Tv2VideoClipActionFactory {
     return videoClipAction
   }
 
-  public createVideoClipActions(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData[]): Tv2VideoClipAction[] {
+  public createVideoClipActions(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData[]): Tv2VideoClipAction[] {
     return videoClipData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
   }
 
-  private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipData): Tv2VideoClipAction {
+  private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): Tv2VideoClipAction {
     const partId: string = 'videoClipInsertAction'
     const partInterface: PartInterface = this.createPartInterface(partId, videoClipData)
     return {
@@ -84,7 +90,7 @@ export class Tv2VideoClipActionFactory {
       data: {
         partInterface,
         pieceInterfaces: [
-          this.createProgramPieceInterface(configuration, partId, videoClipData)
+          this.createVideoClipPieceInterface(configuration, partId, videoClipData)
         ]
       },
       metadata: {
@@ -95,8 +101,10 @@ export class Tv2VideoClipActionFactory {
     }
   }
 
-  private createProgramPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipData): PieceInterface {
+  private createVideoClipPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): PieceInterface {
     const metadata: Tv2PieceMetadata = {
+      type: Tv2PieceType.VIDEO_CLIP,
+      outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.isVoiceOver
@@ -111,7 +119,6 @@ export class Tv2VideoClipActionFactory {
       id: `videoClipActionPiece_${videoClipData.fileName}`,
       partId,
       name: videoClipData.name,
-      type: PieceType.VIDEO_CLIP,
       layer: Tv2SourceLayer.VIDEO_CLIP,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -124,35 +131,16 @@ export class Tv2VideoClipActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
-        this.createCasparCgVideoClipTimelineObject(videoClipData),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(VIDEO_CLIP_PROGRAM_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(VIDEO_CLIP_CLEAN_FEED_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(VIDEO_CLIP_LOOKAHEAD_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.casparCgTimelineObjectFactory.createVideoClipTimelineObject(videoClipData),
         ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
       ]
     }
   }
 
-  private createCasparCgVideoClipTimelineObject(videoClipData: Tv2VideoClipData): CasparCgMediaTimelineObject {
-    return {
-      id: `casparCg_${videoClipData.fileName}`,
-      enable: {
-        start: 0
-      },
-      priority: 1,
-      layer: Tv2CasparCgLayer.PLAYER_CLIP_PENDING,
-      content: {
-        deviceType: DeviceType.CASPAR_CG,
-        type: CasparCgType.MEDIA,
-        file: videoClipData.fileName,
-        loop: videoClipData.adLibPix,
-        playing: true,
-        noStarttime: true
-      }
-    }
-  }
-
-  private createPartInterface(partId: string, videoClipData: Tv2VideoClipData): PartInterface {
+  private createPartInterface(partId: string, videoClipData: Tv2VideoClipManifestData): PartInterface {
     return {
       id: partId,
       name: videoClipData.name,
@@ -170,7 +158,7 @@ export class Tv2VideoClipActionFactory {
       outTransition: {
         keepAliveDuration: 0
       },
-      expectedDuration: videoClipData.durationFromIngest > 0 ? videoClipData.durationFromIngest : DEFAULT_EXPECTED_DURATION_IN_MS,
+      expectedDuration: videoClipData.durationFromIngest > 0 ? videoClipData.durationFromIngest : undefined,
       disableNextInTransition: false
     }
   }

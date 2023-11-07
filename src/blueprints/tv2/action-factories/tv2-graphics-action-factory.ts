@@ -1,13 +1,14 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Action } from '../../../model/entities/action'
-import { PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2GraphicsTimelineObjectFactory } from '../timeline-object-factories/interfaces/tv2-graphics-timeline-object-factory'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -26,7 +27,7 @@ export class Tv2GraphicsActionFactory {
 
   private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
-    const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: 'allOutGraphicsPiece',
       name: 'Gfx All Out',
       duration,
@@ -47,7 +48,7 @@ export class Tv2GraphicsActionFactory {
 
   private createClearGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
-    const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: 'clearGraphicsPiece',
       name: 'Gfx Clear',
       duration,
@@ -68,7 +69,7 @@ export class Tv2GraphicsActionFactory {
 
   private createContinueGraphicsAction(): Tv2PieceAction {
     const duration: number = 1000 // Taken from Blueprints
-    const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: 'continueGraphicsPiece',
       name: 'Gfx continue',
       duration,
@@ -89,7 +90,7 @@ export class Tv2GraphicsActionFactory {
 
   private createThemeOutAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
     const duration: number = 3000 // Taken from Blueprints
-    const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: 'themeOutPiece',
       name: 'Theme Out',
       duration,
@@ -111,11 +112,10 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createGraphicsPieceInterface(pieceInterfaceWithRequiredValues: Pick<PieceInterface, 'id' | 'name'> & Partial<PieceInterface>): PieceInterface {
+  private createGraphicsPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>): Tv2PieceInterface {
     return {
       duration: 0,
       partId: '',
-      type: PieceType.GRAPHIC,
       layer: Tv2SourceLayer.GRAPHICS_ACTION_COMMAND,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
@@ -126,13 +126,17 @@ export class Tv2GraphicsActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [],
+      metadata: {
+        type: Tv2PieceType.COMMAND,
+        outputLayer: Tv2OutputLayer.SECONDARY,
+      },
       ...pieceInterfaceWithRequiredValues
     }
   }
 
   private createOverlayInitializeAction(): Tv2PieceAction {
     const duration: number = 1000 // Taken from Blueprints
-    const pieceInterface: PieceInterface = this.createGraphicsPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: 'overlayInitializePiece',
       name: 'Overlay Initialize',
       duration,
