@@ -5,7 +5,7 @@ import { Tv2SourceMappingWithSound } from '../../value-objects/tv2-studio-bluepr
 import { DeviceType } from '../../../../model/enums/device-type'
 
 export interface Tv2AudioTimelineObjectFactory {
-  createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): TimelineObject[]
+  createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, isVoiceOver?: boolean): TimelineObject[]
   createStudioMicrophonesUpTimelineObject(configuration: Tv2BlueprintConfiguration): TimelineObject
   createStudioMicrophonesDownTimelineObject(configuration: Tv2BlueprintConfiguration): TimelineObject
   createStopAudioBedTimelineObject(duration: number): TimelineObject

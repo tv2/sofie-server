@@ -20,7 +20,7 @@ const enum SisyfosFaderState {
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
 
-  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): SisyfosTimelineObject[] {
+  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, isVoiceOver?: boolean): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
       return {
         id: `${source._id}_${this.generateRandomWholeNumber()}`,
@@ -31,7 +31,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
         content: {
           deviceType: DeviceType.SISYFOS,
           type: SisyfosType.CHANNEL,
-          isPgm: SisyfosFaderState.ON
+          isPgm: isVoiceOver ? SisyfosFaderState.VOICE_OVER: SisyfosFaderState.ON
         }
       }
     })
