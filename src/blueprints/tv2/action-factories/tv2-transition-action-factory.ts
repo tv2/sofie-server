@@ -31,16 +31,17 @@ export class Tv2TransitionActionFactory {
     return [MIX_TRANSITION_ID].includes(action.id)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
+  public getMutateActionMethods(action: Action): MutateActionMethods[] {
     switch (action.id) {
       case MIX_TRANSITION_ID: {
-        return {
-          type: MutateActionType.PLANNED_PIECE,
-          updateActionWithPlannedPieceData: (action: Action, plannedPiece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, plannedPiece),
-          plannedPiecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
-        }
+        return [{
+          type: MutateActionType.PIECE,
+          updateActionWithPiece: (action: Action, piece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, piece),
+          piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
+        }]
       }
     }
+    return []
   }
 
   private createMixTransitionAction(): Tv2TransitionAction {
@@ -105,10 +106,10 @@ export class Tv2TransitionActionFactory {
     }
   }
 
-  private updateAtemMeInput(action: Tv2TransitionAction, plannedPiece: Piece): Tv2TransitionAction {
-    const timelineObject: TimelineObject | undefined = plannedPiece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
+  private updateAtemMeInput(action: Tv2TransitionAction, piece: Piece): Tv2TransitionAction {
+    const timelineObject: TimelineObject | undefined = piece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
     if (!timelineObject) {
-      console.log(`Can't update Atem Me Input. No TimelineObject for '${Tv2AtemLayer.PROGRAM}' found on Piece '${plannedPiece.id}'.`)
+      console.log(`Can't update Atem Me Input. No TimelineObject for '${Tv2AtemLayer.PROGRAM}' found on Piece '${piece.id}'.`)
       return action
     }
     const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject

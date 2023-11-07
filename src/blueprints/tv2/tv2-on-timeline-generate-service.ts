@@ -11,8 +11,13 @@ import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from './value-objects/tv
 import { Tv2MediaPlayer, Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../model/entities/timeline'
 import { DeviceType } from '../../model/enums/device-type'
-import { AtemAuxTimelineObject, AtemMeTimelineObject, AtemType } from '../timeline-state-resolver-types/atem-types'
-import { A_B_SOURCE_LAYERS } from './value-objects/tv2-a-b-source-layers'
+import {
+  AtemAuxTimelineObject,
+  AtemMeTimelineObject,
+  AtemSuperSourceTimelineObject,
+  AtemType
+} from '../timeline-state-resolver-types/atem-types'
+import { A_B_SOURCE_INPUT_PLACEHOLDER, A_B_SOURCE_LAYERS } from './value-objects/tv2-a-b-source-layers'
 import { Configuration } from '../../model/entities/configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2ShowStyleBlueprintConfiguration } from './value-objects/tv2-show-style-blueprint-configuration'
@@ -209,7 +214,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       case DeviceType.ATEM: { // TODO: Fully implement VideoSwitcher composition strategy
         this.updateAtemProgramWithMediaPlayer(timelineObject, mediaPlayer)
         this.updateAtemLookaheadWithMediaPlayer(timelineObject, mediaPlayer)
-        // TODO: Implement for DVEs
+        this.updateAtemDveBoxesWithMediaPlayer(timelineObject, mediaPlayer)
         break
       }
       case DeviceType.SISYFOS: {
@@ -259,6 +264,20 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     }
     const atemAuxTimelineObject: AtemAuxTimelineObject = timelineObject as AtemAuxTimelineObject
     atemAuxTimelineObject.content.aux.input = mediaPlayer.SwitcherSource
+  }
+
+  private updateAtemDveBoxesWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+    if (timelineObject.content.deviceType !== DeviceType.ATEM || timelineObject.content.type !== AtemType.SUPER_SOURCE) {
+      return
+    }
+
+    const superSourceTimelineObject: AtemSuperSourceTimelineObject = timelineObject as AtemSuperSourceTimelineObject
+    for (const box of superSourceTimelineObject.content.ssrc.boxes) {
+      if (!box.source || box.source !== A_B_SOURCE_INPUT_PLACEHOLDER) {
+        continue
+      }
+      box.source = mediaPlayer.SwitcherSource
+    }
   }
 
   private updateSisyfosTimelineObjectWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {

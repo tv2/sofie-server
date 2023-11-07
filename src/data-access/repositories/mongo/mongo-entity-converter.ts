@@ -33,6 +33,7 @@ export interface MongoRundown extends MongoId {
   persistentState?: unknown
   activeCursor: MongoRundownCursor | undefined
   nextCursor: MongoRundownCursor | undefined
+  history: MongoPart[]
 }
 
 interface MongoRundownCursor {
@@ -163,6 +164,7 @@ export class MongoEntityConverter {
       segments,
       modifiedAt: mongoRundown.modified,
       persistentState: mongoRundown.persistentState,
+      history: this.convertParts(mongoRundown.history ?? []),
       alreadyActiveProperties
     })
   }
@@ -201,7 +203,8 @@ export class MongoEntityConverter {
       infinitePieceIds: rundown.getInfinitePieces().map(piece => piece.id),
       persistentState: rundown.getPersistentState(),
       activeCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getActiveCursor()),
-      nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor())
+      nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor()),
+      history: rundown.getHistory().map(part => this.convertToMongoPart(part))
     } as MongoRundown
   }
 
