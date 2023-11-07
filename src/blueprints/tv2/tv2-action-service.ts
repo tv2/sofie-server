@@ -100,7 +100,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
         return Tv2PieceType.SPLIT_SCREEN
       }
       default: {
-        throw new UnexpectedCaseException(`Unknown MongoActionManifestId: ${actionManifest.actionId}`)
+        throw new UnexpectedCaseException(`Unknown action manifest id: ${actionManifest.actionId}`)
       }
     }
   }
