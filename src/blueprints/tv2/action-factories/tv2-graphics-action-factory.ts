@@ -48,24 +48,15 @@ export class Tv2GraphicsActionFactory {
   ) { }
 
   public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Action[] {
-    const fullScreenData: Tv2GraphicsData[] = graphicsData.filter(data => this.isFullGraphics(data))
-    const fullScreenActions: Action[] = this.createFullscreenGraphicsActionsFromGraphicsData(blueprintConfiguration, fullScreenData)
-
-    const identData: Tv2GraphicsData[] = graphicsData.filter(data => data.pieceLayer === Tv2SourceLayer.IDENT)
-    const identActions: Action[] = this.createIdentGraphicsActionsFromGraphicsData(blueprintConfiguration, identData)
-
-    const lowerThirdData: Tv2GraphicsData[] = graphicsData.filter(data => data.pieceLayer === Tv2SourceLayer.LOWER_THIRD)
-    const lowerThirdActions: Action[] = this.createLowerThirdActionsFromGraphicsData(blueprintConfiguration, lowerThirdData)
-
     return [
       this.createThemeOutAction(blueprintConfiguration),
       this.createOverlayInitializeAction(),
       this.createContinueGraphicsAction(),
       this.createClearGraphicsAction(blueprintConfiguration),
       this.createAllOutGraphicsAction(blueprintConfiguration),
-      ...fullScreenActions,
-      ...identActions,
-      ...lowerThirdActions
+      ...this.createFullscreenGraphicsActions(blueprintConfiguration, graphicsData),
+      ...this.createIdentGraphicsActions(blueprintConfiguration, graphicsData),
+      ...this.createLowerThirdActions(blueprintConfiguration, graphicsData)
     ]
   }
 
@@ -200,7 +191,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createFullscreenGraphicsActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PartAction[] {
+  private createFullscreenGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PartAction[] {
     let chosenMethod: (blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData) => Tv2PartAction
     switch (blueprintConfiguration.studio.GraphicsType) {
       case Tv2GraphicsType.HTML: {
@@ -214,7 +205,8 @@ export class Tv2GraphicsActionFactory {
       }
     }
 
-    return graphicsData.map((data) => chosenMethod(
+    const fullScreenData: Tv2GraphicsData[] = graphicsData.filter(data => this.isFullGraphics(data))
+    return fullScreenData.map((data) => chosenMethod(
       blueprintConfiguration,
       data
     ))
@@ -451,8 +443,9 @@ export class Tv2GraphicsActionFactory {
         keyerRole => keyerRole === role)) ?? blueprintConfiguration.studio.SwitcherSource.DSK[0]
   }
 
-  private createIdentGraphicsActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    return graphicsData.map(data => this.createIdentGraphicsAction(
+  private createIdentGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
+    const identData: Tv2GraphicsData[] = graphicsData.filter(data => data.pieceLayer === Tv2SourceLayer.IDENT)
+    return identData.map(data => this.createIdentGraphicsAction(
       blueprintConfiguration,
       data)
     )
@@ -494,8 +487,9 @@ export class Tv2GraphicsActionFactory {
     return graphicsData.name.split('-')[0].trim()
   }
 
-  private createLowerThirdActionsFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
-    return graphicsData.map((data) => this.createLowerThirdGraphicsAction(
+  private createLowerThirdActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData[]): Tv2PieceAction[] {
+    const lowerThirdData: Tv2GraphicsData[] = graphicsData.filter(data => data.pieceLayer === Tv2SourceLayer.LOWER_THIRD)
+    return lowerThirdData.map((data) => this.createLowerThirdGraphicsAction(
       blueprintConfiguration,
       data
     ))
