@@ -50,8 +50,7 @@ export class RundownTimelineService implements RundownService {
   }
 
   private async assertNoRundownIsActive(): Promise<void> {
-    const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns()
-    const activeRundown: BasicRundown | undefined = basicRundowns.find(rundown => rundown.isActive())
+    const activeRundown: BasicRundown | undefined = (await this.rundownRepository.getBasicRundowns()).find(rundown => rundown.isActive())
     if (activeRundown) {
       throw new AlreadyActivatedException(`Unable to activate rundown, because the rundown ${activeRundown.name} is active. `)
     }
