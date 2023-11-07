@@ -271,7 +271,7 @@ export class Tv2GraphicsActionFactory {
       partId,
       name: graphicsData.name,
       preRollDuration: blueprintConfiguration.studio.VizPilotGraphics.PrerollDuration,
-      pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, graphicsData.name),
+      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, graphicsData.name),
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       content: {
         fileName: `PILOT_${graphicsData.vcpId}`,
@@ -306,7 +306,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private findInfiniteModeFromConfig(blueprintConfiguration: Tv2BlueprintConfiguration, templateName: string): PieceLifespan {
+  private findPieceLifespan(blueprintConfiguration: Tv2BlueprintConfiguration, templateName: string): PieceLifespan {
     const template: GraphicsTemplate | undefined = blueprintConfiguration.showStyle.GfxTemplates.find(
       graphic => graphic.VizTemplate ? graphic.VizTemplate.toUpperCase() === templateName.toUpperCase() : false
     )
@@ -390,7 +390,7 @@ export class Tv2GraphicsActionFactory {
       partId,
       name: graphicsData.name,
       preRollDuration: blueprintConfiguration.studio.CasparPrerollDuration,
-      pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, graphicsData.name),
+      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, graphicsData.name),
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       content: this.createCasparCgFullGraphicsPieceContent(blueprintConfiguration, graphicsData),
       timelineObjects: [
@@ -468,7 +468,7 @@ export class Tv2GraphicsActionFactory {
       name: graphicsData.name,
       layer: Tv2SourceLayer.IDENT,
       duration: graphicsData.expectedDuration,
-      pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, this.getTemplateName(graphicsData)),
+      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(graphicsData)),
       timelineObjects: [
         chosenTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
@@ -511,7 +511,7 @@ export class Tv2GraphicsActionFactory {
       name: graphicsData.name,
       layer: Tv2SourceLayer.LOWER_THIRD,
       duration: graphicsData.expectedDuration,
-      pieceLifespan: this.findInfiniteModeFromConfig(blueprintConfiguration, this.getTemplateName(graphicsData)),
+      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(graphicsData)),
       timelineObjects: [
         chosenTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
