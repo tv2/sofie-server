@@ -171,8 +171,8 @@ export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineO
     return {
       deviceType: DeviceType.VIZMSE,
       type: VizType.ELEMENT_INTERNAL,
-      templateName: this.getTemplateNameFromGraphicsData(graphicsData),
-      templateData: [this.getDisplayTextFromGraphicsData(graphicsData)],
+      templateName: this.getTemplateName(graphicsData),
+      templateData: [this.getDisplayText(graphicsData)],
       channelName: 'OVL1',
       showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.OvlShowName ?? ''
     }
