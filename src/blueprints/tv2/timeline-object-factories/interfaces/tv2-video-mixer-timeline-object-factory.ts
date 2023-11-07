@@ -7,7 +7,7 @@ import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
 
 export interface Tv2VideoMixerTimelineObjectFactory {
   createProgramTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): TimelineObject
-  createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): TimelineObject
+  createCleanFeedTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): TimelineObject
   createLookaheadTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): TimelineObject
   createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): TimelineObject
   createDveBoxesTimelineObject(boxes: DveBoxProperties[], priority?: number): Tv2BlueprintTimelineObject

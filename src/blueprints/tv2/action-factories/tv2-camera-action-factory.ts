@@ -96,6 +96,7 @@ export class Tv2CameraActionFactory {
     const enable: TimelineEnable = { start: 0 }
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(`insertedProgram_${source._id}`, source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(`insertedCleanFeed_${source._id}`, source.SwitcherSource, enable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(`insertedLookahead_${source._id}`, source.SwitcherSource, enable),
     ]
   }
