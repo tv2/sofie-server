@@ -46,6 +46,7 @@ const PLANNED_DVE_TIMELINE_OBJECT_PRIORITY: number = 1
 
 const CAMERA_SOURCE_NAME: string = 'Camera'
 const LIVE_SOURCE_NAME: string = 'Live'
+const REPLAY_SOURCE_NAME: string = 'Replay'
 
 export class Tv2DveActionFactory {
 
@@ -208,20 +209,24 @@ export class Tv2DveActionFactory {
   private createInsertToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertSourceInputAction[] {
     const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesCam.slice(0, 5)
     const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesRM
+    const replaySources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesReplay
+    const replaySourcesWithoutVoiceOver: Tv2SourceMappingWithSound[] = replaySources.filter(replaySource => !/EPSIO/i.test(replaySource.SourceName))
 
     return [
       ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, CAMERA_SOURCE_NAME),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, liveSources, LIVE_SOURCE_NAME)
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, liveSources, LIVE_SOURCE_NAME),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySources, `${REPLAY_SOURCE_NAME} VO`, true),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySourcesWithoutVoiceOver, REPLAY_SOURCE_NAME, false)
     ]
   }
 
-  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string): Tv2DveInsertSourceInputAction[] {
+  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string, isVoiceOver: boolean = false): Tv2DveInsertSourceInputAction[] {
     const actions: Tv2DveInsertSourceInputAction[] = []
     for (let inputIndex = 0; inputIndex < NUMBER_OF_DVE_BOXES; inputIndex++) {
       const actionsForInput: Tv2DveInsertSourceInputAction[] = sources
         .map(source => {
 
-          const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source)
+          const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, isVoiceOver)
 
           return {
             id: `insert_${name}_${source.SourceName}_to_dve_input_${inputIndex}_action`,
