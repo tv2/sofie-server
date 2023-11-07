@@ -10,7 +10,7 @@ export interface CasparCgTemplateTimelineObject extends TimelineObject {
     data: CasparCgTemplateData
     useStopCommand: boolean
     mixer: {
-      opacity: number
+      opacity?: number
     }
   }
 }
