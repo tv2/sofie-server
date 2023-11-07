@@ -67,7 +67,7 @@ export class Tv2CameraActionFactory {
         sisyfosLayers: [],
         acceptsPersistedAudio: source.AcceptPersistAudio
         // TODO: Blueprints sets "isModifiedOrInsertedByAction" here which is used for getEndStateForPart and onTimelineGenerate.
-        // TODO: We should instead use something like Piece.isAdLib
+        // TODO: We should instead use something like Piece.isPlanned
       }
     }
 

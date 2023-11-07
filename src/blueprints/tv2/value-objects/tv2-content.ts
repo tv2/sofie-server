@@ -8,7 +8,7 @@ export interface Tv2Content {
   // ignoreAudioFormat?: boolean
 }
 
-export interface Tv2GraphicsContent extends Tv2Content {
+export interface Tv2FileContent extends Tv2Content {
   fileName: string
   // TODO: These values are included in Blueprints
   // path: string
