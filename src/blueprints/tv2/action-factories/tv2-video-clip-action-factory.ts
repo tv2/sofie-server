@@ -3,7 +3,6 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { PartActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
 import { PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -17,13 +16,13 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Media } from '../../../model/entities/media'
+import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 const VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX: string = 'videoClipAsNextAction'
-const DEFAULT_EXPECTED_DURATION_IN_MS: number = 1000
 
 const VIDEO_CLIP_LOOKAHEAD_ID: string = 'videoClipLookahead'
 const VIDEO_CLIP_PROGRAM_ID: string = 'videoClipProgram'
@@ -43,15 +42,15 @@ export class Tv2VideoClipActionFactory {
   }
 
   public getMutateActionMethods(action: Action): MutateActionMethods[] {
-    if (action.id.includes(VIDEO_CLIP_AS_NEXT_ACTION_ID_PREFIX)) {
-      return [{
-        type: MutateActionType.MEDIA,
-        getMediaId: () => action.name,
-        updateActionWithMedia: (action: Action, media: Media | undefined) => this.updateVideoClipAction(action, media)
-      }]
+    if (!this.isVideoClipAction(action)) {
+      return []
     }
 
-    return []
+    return [{
+      type: MutateActionType.MEDIA,
+      getMediaId: () => action.name,
+      updateActionWithMedia: (action: Action, media: Media | undefined) => this.updateVideoClipAction(action, media)
+    }]
   }
 
   private updateVideoClipAction(action: Action, media?: Media): Action {
@@ -105,6 +104,7 @@ export class Tv2VideoClipActionFactory {
   private createVideoClipPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): PieceInterface {
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.VIDEO_CLIP,
+      outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.isVoiceOver
@@ -119,7 +119,6 @@ export class Tv2VideoClipActionFactory {
       id: `videoClipActionPiece_${videoClipData.fileName}`,
       partId,
       name: videoClipData.name,
-      type: PieceType.VIDEO_CLIP,
       layer: Tv2SourceLayer.VIDEO_CLIP,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -159,7 +158,7 @@ export class Tv2VideoClipActionFactory {
       outTransition: {
         keepAliveDuration: 0
       },
-      expectedDuration: videoClipData.durationFromIngest > 0 ? videoClipData.durationFromIngest : DEFAULT_EXPECTED_DURATION_IN_MS,
+      expectedDuration: videoClipData.durationFromIngest > 0 ? videoClipData.durationFromIngest : undefined,
       disableNextInTransition: false
     }
   }

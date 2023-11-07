@@ -4,7 +4,6 @@ import { PartActionType, PieceActionType } from '../../../model/enums/action-typ
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { Part, PartInterface } from '../../../model/entities/part'
 import { DveBoxProperties, DveConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -37,6 +36,7 @@ import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-layers'
 import { Tv2FileContent } from '../value-objects/tv2-content'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 const NUMBER_OF_DVE_BOXES: number = 4
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
@@ -146,6 +146,7 @@ export class Tv2DveActionFactory {
 
       const metadata: Tv2PieceMetadata = {
         type: Tv2PieceType.SPLIT_SCREEN,
+        outputLayer: Tv2OutputLayer.PROGRAM,
         dve: {
           boxes,
           audioTimelineObjectsForBoxes: []
@@ -162,7 +163,7 @@ export class Tv2DveActionFactory {
           pieceInterfaces: [this.createDvePieceInterface(partId, dveConfiguration.name, metadata, dveLayoutTimelineObjects)]
         },
         metadata: {
-          contentType: Tv2ActionContentType.DVE,
+          contentType: Tv2ActionContentType.SPLIT_SCREEN,
           actionSubtype: Tv2ActionSubtype.DVE_LAYOUT,
         }
       }
@@ -196,7 +197,6 @@ export class Tv2DveActionFactory {
       id: `${partId}_piece`,
       partId,
       name,
-      type: PieceType.DVE,
       layer: Tv2SourceLayer.DVE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -254,7 +254,7 @@ export class Tv2DveActionFactory {
             type: PieceActionType.REPLACE_PIECE,
             data: {} as PieceInterface,
             metadata: {
-              contentType: Tv2ActionContentType.DVE,
+              contentType: Tv2ActionContentType.SPLIT_SCREEN,
               actionSubtype: Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT,
               inputIndex,
               videoMixerSource: source.SwitcherSource,
@@ -382,7 +382,7 @@ export class Tv2DveActionFactory {
         description: '',
         type: PartActionType.INSERT_PART_AS_NEXT,
         metadata: {
-          contentType: Tv2ActionContentType.DVE
+          contentType: Tv2ActionContentType.SPLIT_SCREEN
         },
         data: {
           partInterface: this.createPartInterface(partId, dveConfiguration),
@@ -416,7 +416,7 @@ export class Tv2DveActionFactory {
       description: 'Recalls the last planned DVE that has been on Air',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
-        contentType: Tv2ActionContentType.DVE,
+        contentType: Tv2ActionContentType.SPLIT_SCREEN,
         actionSubtype: Tv2ActionSubtype.RECALL_DVE,
       },
       data: {
@@ -458,7 +458,6 @@ export class Tv2DveActionFactory {
         id: `recall_last_dve_piece_${piece.id}`,
         partId: partInterface.id,
         name: piece.name,
-        type: piece.type,
         layer: piece.layer,
         pieceLifespan: piece.pieceLifespan,
         transitionType: piece.transitionType,
@@ -518,7 +517,7 @@ export class Tv2DveActionFactory {
       description: 'Insert last Video Clip in DVE input ${inputIndex}',
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
-        contentType: Tv2ActionContentType.DVE,
+        contentType: Tv2ActionContentType.SPLIT_SCREEN,
         actionSubtype: Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT,
         inputIndex,
         videoMixerSource: A_B_SOURCE_INPUT_PLACEHOLDER,

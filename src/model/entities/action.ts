@@ -1,7 +1,6 @@
 import { ActionType, PartActionType, PieceActionType } from '../enums/action-type'
 import { Part, PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
-import { PieceType } from '../enums/piece-type'
 import { Media } from './media'
 
 export interface Action {
@@ -56,13 +55,13 @@ export interface MutateActionWithHistoricPartMethods {
  * Since we don't control Ingest we can't create Actions that requires data from the Ingest Gateway.
  * So we are forced to find the 'Actions' that Core has created and use the data from that to create our own Actions.
  * This interface is so we can retrieve those 'Actions' from the database and send them to Blueprints.
- * The 'pieceType' is so Blueprints can distinguish what kind of Actions to make e.g. if the pieceType is PieceType.SERVER
- * then Blueprints knows to create ServerActions.
+ * The 'actionId' is used to determine the piece type, so Blueprints can distinguish what kind of Actions to make e.g.
+ * if the pieceType is PieceType.VIDEO_CLIP then Blueprints knows to create VideoClipActions.
  * The 'data' is the data that Core has saved and is needed by Blueprints to create the specific Action.
  * The 'data' is of type 'unknown' since the data used to create Actions are Blueprints specific. Blueprints will have
  * to map 'data' into whatever structure Blueprints needs.
  */
 export interface ActionManifest<Data = unknown> {
-  pieceType: PieceType
+  actionId: string
   data: Data
 }
