@@ -32,6 +32,7 @@ import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { AssetFolderHelper } from './helpers/asset-folder-helper'
+import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -45,7 +46,8 @@ export class Tv2BlueprintsFacade {
 
     const actionService: Tv2ActionService = new Tv2ActionService(
       new Tv2BlueprintConfigurationMapper(),
-      new Tv2CameraActionFactory(tv2AudioTimelineObjectFactory),
+      new Tv2CameraActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
+      new Tv2RemoteActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
       new Tv2TransitionEffectActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2CasparCgTimelineObjectFactory,

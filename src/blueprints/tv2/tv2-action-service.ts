@@ -16,6 +16,7 @@ import {
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import {
   DveBoxInput,
+  Tv2ActionManifestData,
   Tv2ActionManifestDataForDve,
   Tv2ActionManifestDataForVideoClip,
   Tv2ActionManifestDveSource,
@@ -23,16 +24,20 @@ import {
   Tv2VideoClipManifestData,
   TvActionManifestDveSourceType
 } from './value-objects/tv2-action-manifest-data'
-import { PieceType } from '../../model/enums/piece-type'
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
 import { Tv2Action } from './value-objects/tv2-action'
+import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
+import { Tv2PieceType } from './enums/tv2-piece-type'
+import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
+import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
     private readonly configurationMapper: Tv2BlueprintConfigurationMapper,
     private readonly cameraActionFactory: Tv2CameraActionFactory,
+    private readonly remoteActionFactory: Tv2RemoteActionFactory,
     private readonly transitionEffectActionFactory: Tv2TransitionEffectActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
@@ -54,7 +59,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     return []
   }
 
-  public generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[] {
+  public generateActions(configuration: Configuration, actionManifests: Tv2ActionManifest[]): Action[] {
     const blueprintConfiguration: Tv2BlueprintConfiguration = {
       studio: configuration.studio.blueprintConfiguration as Tv2StudioBlueprintConfiguration,
       showStyle: this.configurationMapper.mapShowStyleConfiguration(configuration.showStyle)
@@ -62,6 +67,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
 
     return [
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
+      ...this.remoteActionFactory.createRemoteActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
@@ -71,11 +77,11 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     ]
   }
 
-  private getVideoClipData(actionManifests: ActionManifest[]): Tv2VideoClipManifestData[] {
+  private getVideoClipData(actionManifests: ActionManifest<Tv2ActionManifestData>[]): Tv2VideoClipManifestData[] {
     return actionManifests
-      .filter(actionManifest => actionManifest.pieceType === PieceType.VIDEO_CLIP)
+      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestDataForVideoClip> => this.getPieceTypeFromActionManifest(actionManifest) === Tv2PieceType.VIDEO_CLIP)
       .map(actionManifest => {
-        const data: Tv2ActionManifestDataForVideoClip = actionManifest.data as Tv2ActionManifestDataForVideoClip
+        const data: Tv2ActionManifestDataForVideoClip = actionManifest.data
         return {
           name: data.partDefinition.storyName,
           fileName: data.partDefinition.fields.videoId,
@@ -86,9 +92,26 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       })
   }
 
+  private getPieceTypeFromActionManifest(actionManifest: ActionManifest): Tv2PieceType {
+    switch (actionManifest.actionId) {
+      case 'select_full_grafik': {
+        return Tv2PieceType.CAMERA
+      }
+      case 'select_server_clip': {
+        return Tv2PieceType.VIDEO_CLIP
+      }
+      case 'select_dve': {
+        return Tv2PieceType.SPLIT_SCREEN
+      }
+      default: {
+        throw new UnexpectedCaseException(`Unknown action manifest id: ${actionManifest.actionId}`)
+      }
+    }
+  }
+
   private getDveData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: ActionManifest[]): Tv2DveManifestData[] {
     return actionManifests
-      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestDataForDve> => actionManifest.pieceType === PieceType.DVE)
+      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestDataForDve> => this.getPieceTypeFromActionManifest(actionManifest) === Tv2PieceType.SPLIT_SCREEN)
       .map(actionManifest => {
         const data: Tv2ActionManifestDataForDve = actionManifest.data
         const sources: Map<DveBoxInput, Tv2SourceMappingWithSound> = this.getDveSourcesFromActionManifestData(data, blueprintConfiguration)

@@ -208,13 +208,12 @@ export class Part {
   // TODO: This implementation currently reflects how Core implemented it. It's in dire need of a refactor.
   public calculateTimings(previousPart?: Part): void {
     const maxPreRollDurationFromPieces: number = this.pieces
-    // Note: Core filters for !BlueprintPieceType.Normal and piece.enable.start !== 'now' - Will does Pieces ever have a PreRollDuration?
+    // Note: Core filters for !BlueprintPieceType.Normal and piece.enable.start !== 'now' - Will Pieces ever have a PreRollDuration?
       .reduce((preRollDuration: number, piece: Piece) => Math.max(preRollDuration, piece.preRollDuration ?? 0), 0)
 
     const maxPostRollDurationForPieces: number = this.pieces
       .filter((piece) => !!piece.postRollDuration && !piece.duration)
       .reduce((postRollDuration: number, piece: Piece) => Math.max(postRollDuration, piece.postRollDuration), 0)
-
     let inTransition: InTransition | undefined
     let allowTransition: boolean = false
 

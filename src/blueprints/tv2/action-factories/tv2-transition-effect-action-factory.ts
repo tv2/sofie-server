@@ -1,7 +1,6 @@
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -36,6 +35,9 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
 import { AssetFolderHelper } from '../helpers/asset-folder-helper'
 import { InTransition } from '../../../model/value-objects/in-transition'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
@@ -108,12 +110,11 @@ export class Tv2TransitionEffectActionFactory {
     return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
 
-  private createPieceInterface(effectName: string, durationFrames: number): PieceInterface {
+  private createPieceInterface(effectName: string, durationFrames: number): Tv2PieceInterface {
     return {
       id: `${effectName}TransitionActionPiece`,
       name: `${effectName} transition`,
       partId: '',
-      type: PieceType.TRANSITION,
       layer: Tv2SourceLayer.JINGLE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.IN_TRANSITION,
@@ -124,7 +125,11 @@ export class Tv2TransitionEffectActionFactory {
       preRollDuration: 0,
       tags: [],
       isUnsynced: false,
-      timelineObjects: []
+      timelineObjects: [],
+      metadata: {
+        type: Tv2PieceType.TRANSITION,
+        outputLayer: Tv2OutputLayer.SECONDARY
+      }
     }
   }
 
@@ -237,8 +242,8 @@ export class Tv2TransitionEffectActionFactory {
     const fileName: string = this.assetFolderHelper.joinAssetToFolder(breakerActionMetadata.breakerFolder, breakerActionMetadata.breaker.fileName)
 
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(`breaker_${breaker.id}_program`, videoMixerInputSource, videoMixerTimelineEnable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(`breaker_${breaker.id}_lookahead`, videoMixerInputSource, videoMixerTimelineEnable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
       this.casparCgTimelineObjectFactory.createBreakerTimelineObject(fileName),
       this.audioTimelineObjectFactory.createBreakerAudioTimelineObject()
