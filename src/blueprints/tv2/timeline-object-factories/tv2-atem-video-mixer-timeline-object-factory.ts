@@ -22,6 +22,8 @@ import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
 
+const ID_PREFIX: string = 'atem_'
+
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
 
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
@@ -65,9 +67,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return Tv2AtemLayer.DOWNSTREAM_KEYER
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createProgramTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
     return {
-      id: 'atem_program',
+      id: `${ID_PREFIX}${id}`,
       enable,
       priority: 1,
       layer: Tv2AtemLayer.PROGRAM,
@@ -82,9 +84,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createCleanFeedTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
     return {
-      id: 'atem_cleanFeed',
+      id: `${ID_PREFIX}${id}`,
       enable,
       priority: 1,
       layer: Tv2AtemLayer.CLEAN_FEED,
@@ -99,9 +101,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
+  public createLookaheadTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
     return {
-      id: 'atem_lookahead',
+      id: `${ID_PREFIX}${id}`,
       enable,
       priority: 0,
       layer: Tv2AtemLayer.LOOKAHEAD,
@@ -117,7 +119,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
 
   public createDveBoxesTimelineObject(boxes: DveBoxProperties[], priority: number = 1): AtemSuperSourceTimelineObject {
     return {
-      id: 'atem_dve_boxes',
+      id: `${ID_PREFIX}dve_boxes`,
       enable: {
         start: 0
       },
@@ -138,7 +140,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     const superSourceBorder: SuperSourceBorder = this.getSuperSourceBorder(layoutProperties)
 
     return {
-      id: 'atem_dve_properties',
+      id: `${ID_PREFIX}dve_properties`,
       enable: {
         start: 0
       },
