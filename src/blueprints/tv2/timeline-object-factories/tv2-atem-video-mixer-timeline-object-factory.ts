@@ -3,7 +3,6 @@ import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-config
 import {
   AtemAuxTimelineObject,
   AtemDownstreamKeyerTimelineObject,
-  AtemMe,
   AtemMeTimelineObject,
   AtemTransition,
   AtemTransitionSettings,
@@ -104,7 +103,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       })
   }
 
-  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMe): AtemMeTimelineObject {
+  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMeTimelineObject['content']['me']): AtemMeTimelineObject {
     return {
       id,
       enable,

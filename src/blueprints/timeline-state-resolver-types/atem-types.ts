@@ -6,15 +6,13 @@ export interface AtemMeTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
-    me: AtemMe
+    me: {
+      input?: number
+      transition?: AtemTransition,
+      transitionSettings?: AtemTransitionSettings
+      upstreamKeyers?: AtemUpstreamKeyer[]
+    }
   }
-}
-
-export interface AtemMe {
-  input?: number
-  transition?: AtemTransition,
-  transitionSettings?: AtemTransitionSettings
-  upstreamKeyers?: AtemUpstreamKeyer[]
 }
 
 export interface AtemAuxTimelineObject extends TimelineObject {
