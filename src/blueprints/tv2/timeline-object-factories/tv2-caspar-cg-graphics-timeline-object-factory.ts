@@ -12,7 +12,10 @@ import {
 import { Tv2GraphicsLayer } from '../value-objects/tv2-layers'
 import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
-import { Tv2GraphicsData } from '../value-objects/tv2-action-manifest-data'
+import {
+  Tv2FullscreenGraphicsManifestData,
+  Tv2OverlayGraphicsManifestData
+} from '../value-objects/tv2-action-manifest-data'
 
 export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   constructor(private readonly casparCgPathFixer: Tv2CasparCgPathFixer) {
@@ -54,9 +57,9 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
     )
   }
 
-  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): CasparCgTemplateTimelineObject {
+  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject {
     const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
-    const sceneChunks: string[] = graphicsData.name.split('/')
+    const sceneChunks: string[] = fullscreenGraphicsData.name.split('/')
     const sceneName: string = sceneChunks[sceneChunks.length - 1]
     const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, rawGraphicsFolder)
 
@@ -71,7 +74,7 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.TEMPLATE,
         templateType: 'html',
-        name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.HtmlPackageFolder),
+        name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
         data: this.createStillTemplateData(blueprintConfiguration, fileName),
         useStopCommand: false,
         mixer: {
@@ -116,7 +119,7 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
     }
   }
 
-  public createIdentGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): CasparCgTemplateTimelineObject {
+  public createIdentGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): CasparCgTemplateTimelineObject {
     return {
       id: 'ident',
       priority: 1,
@@ -124,20 +127,20 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
         start: 0
       },
       layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT,
-      content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, graphicsData, Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT)
+      content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, overlayGraphicsData, Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT)
     }
   }
 
   private createOverlayGraphicsTimelineObjectContent(
     blueprintConfiguration: Tv2BlueprintConfiguration,
-    graphicsData: Tv2GraphicsData,
+    graphicsData: Tv2OverlayGraphicsManifestData,
     graphicsLayer: Tv2GraphicsLayer
   ): CasparCgTemplateTimelineObject['content'] {
     return {
       deviceType: DeviceType.CASPAR_CG,
       type: CasparCgType.TEMPLATE,
       templateType: 'html',
-      name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.HtmlPackageFolder),
+      name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
       useStopCommand: false,
       mixer: {
         opacity: 100
@@ -158,7 +161,7 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
     }
   }
 
-  public createLowerThirdGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2GraphicsData): CasparCgTemplateTimelineObject {
+  public createLowerThirdGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): CasparCgTemplateTimelineObject {
     return {
       id: 'lowerThird',
       priority: 1,
@@ -166,7 +169,7 @@ export class Tv2CasparCgGraphicsTimelineObjectFactory extends Tv2BaseGraphicTime
         start: 0
       },
       layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER,
-      content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, graphicsData, Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER)
+      content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, overlayGraphicsData, Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER)
     }
   }
 }

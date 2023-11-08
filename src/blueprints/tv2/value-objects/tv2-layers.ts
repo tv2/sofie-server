@@ -14,6 +14,8 @@ export enum Tv2SourceLayer {
   TELEPHONE_GRAPHIC = 'studio0_graphicsTelefon',
   PILOT_GRAPHICS = 'studio0_pilot',
   PILOT_OVERLAY_GRAPHICS = 'studio0_pilotOverlay',
+  DVE = 'dve',
+  REMOTE = 'studio0_live',
   VIDEO_CLIP = 'studio0_selected_clip',
   SERVER_VOICE_OVER = 'studio0_selected_voiceover'
 }
@@ -25,6 +27,7 @@ export enum Tv2GraphicsLayer {
   GRAPHICS_WALL = 'graphic_wall',
   GRAPHICS_OVERLAY_IDENT = 'graphic_overlay_ident', // <= viz_layer_overlay_ident
   GRAPHICS_OVERLAY_LOWER = 'graphic_overlay_lower', // <= viz_layer_overlay_lower
+  GRAPHICS_LOCATORS = 'graphic_locators'
 }
 
 export enum Tv2AtemLayer {
@@ -32,11 +35,15 @@ export enum Tv2AtemLayer {
   CLEAN_FEED = 'atem_me_clean',
   LOOKAHEAD = 'atem_aux_lookahead',
   DOWNSTREAM_KEYER = 'atem_dsk',
-  CLEAN_UPSTREAM_KEYER = 'atem_clean_usk_full'
+  CLEAN_UPSTREAM_KEYER = 'atem_clean_usk_full',
+  DVE = 'atem_dve',
+  DVE_BOXES = 'atem_dve_boxes'
 }
 
 export enum Tv2CasparCgLayer {
   PLAYER_CLIP_PENDING = 'casparcg_player_clip_pending',
+  DVE_KEY = 'casparcg_dve_key',
+  DVE_FRAME = 'casparcg_dve_frame'
 }
 
 export enum Tv2VideoClipLayer {

@@ -2,7 +2,6 @@ import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Timeline } from '../../../model/entities/timeline'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { TimelineObject } from '../../../model/entities/timeline-object'
@@ -33,6 +32,7 @@ export interface MongoRundown extends MongoId {
   persistentState?: unknown
   activeCursor: MongoRundownCursor | undefined
   nextCursor: MongoRundownCursor | undefined
+  history: MongoPart[]
 }
 
 interface MongoRundownCursor {
@@ -158,6 +158,7 @@ export class MongoEntityConverter {
       segments,
       modifiedAt: mongoRundown.modified,
       persistentState: mongoRundown.persistentState,
+      history: this.convertParts(mongoRundown.history ?? []),
       alreadyActiveProperties
     })
   }
@@ -196,7 +197,8 @@ export class MongoEntityConverter {
       infinitePieceIds: rundown.getInfinitePieces().map(piece => piece.id),
       persistentState: rundown.getPersistentState(),
       activeCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getActiveCursor()),
-      nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor())
+      nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor()),
+      history: rundown.getHistory().map(part => this.convertToMongoPart(part))
     } as MongoRundown
   }
 
@@ -319,7 +321,6 @@ export class MongoEntityConverter {
       partId: mongoPiece.startPartId,
       name: mongoPiece.name,
       layer: mongoPiece.sourceLayerId,
-      type: PieceType.UNKNOWN,
       pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
       isPlanned: mongoPiece.isPlanned ?? true,
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,

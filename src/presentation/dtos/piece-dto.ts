@@ -7,8 +7,8 @@ export class PieceDto {
   public readonly start: number
   public readonly duration?: number
   public readonly layer: string
-  public readonly type: string
   public readonly isPlanned: boolean
+  public readonly metadata?: unknown
 
   constructor(piece: Piece) {
     this.id = piece.id
@@ -17,7 +17,7 @@ export class PieceDto {
     this.start = piece.getStart()
     this.duration = piece.duration
     this.layer = piece.layer
-    this.type = piece.type
     this.isPlanned = piece.isPlanned
+    this.metadata = piece.metadata
   }
 }

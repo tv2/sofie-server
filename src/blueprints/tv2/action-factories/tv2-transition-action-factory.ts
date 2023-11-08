@@ -1,7 +1,6 @@
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { Piece, PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
+import { Piece } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -10,6 +9,9 @@ import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2ActionContentType, Tv2TransitionAction } from '../value-objects/tv2-action'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 const FRAME_RATE: number = 25
 
@@ -29,24 +31,24 @@ export class Tv2TransitionActionFactory {
     return [MIX_TRANSITION_ID].includes(action.id)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods | undefined {
+  public getMutateActionMethods(action: Action): MutateActionMethods[] {
     switch (action.id) {
       case MIX_TRANSITION_ID: {
-        return {
-          type: MutateActionType.PLANNED_PIECE,
-          updateActionWithPlannedPieceData: (action: Action, plannedPiece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, plannedPiece),
-          plannedPiecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
-        }
+        return [{
+          type: MutateActionType.PIECE,
+          updateActionWithPiece: (action: Action, piece: Piece) => this.updateAtemMeInput(action as Tv2TransitionAction, piece),
+          piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
+        }]
       }
     }
+    return []
   }
 
   private createMixTransitionAction(): Tv2TransitionAction {
-    const pieceInterface: PieceInterface = {
+    const pieceInterface: Tv2PieceInterface = {
       id: 'mixTransitionActionPiece',
       name: 'Mix transition',
       partId: '',
-      type: PieceType.TRANSITION,
       layer: Tv2SourceLayer.JINGLE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.IN_TRANSITION,
@@ -57,7 +59,11 @@ export class Tv2TransitionActionFactory {
       preRollDuration: 0,
       tags: [],
       isUnsynced: false,
-      timelineObjects: []
+      timelineObjects: [],
+      metadata: {
+        type: Tv2PieceType.TRANSITION,
+        outputLayer: Tv2OutputLayer.SECONDARY,
+      }
     }
 
     return {
@@ -100,10 +106,10 @@ export class Tv2TransitionActionFactory {
     }
   }
 
-  private updateAtemMeInput(action: Tv2TransitionAction, plannedPiece: Piece): Tv2TransitionAction {
-    const timelineObject: TimelineObject | undefined = plannedPiece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
+  private updateAtemMeInput(action: Tv2TransitionAction, piece: Piece): Tv2TransitionAction {
+    const timelineObject: TimelineObject | undefined = piece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
     if (!timelineObject) {
-      console.log(`Can't update Atem Me Input. No TimelineObject for '${Tv2AtemLayer.PROGRAM}' found on Piece '${plannedPiece.id}'.`)
+      console.log(`Can't update Atem Me Input. No TimelineObject for '${Tv2AtemLayer.PROGRAM}' found on Piece '${piece.id}'.`)
       return action
     }
     const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject

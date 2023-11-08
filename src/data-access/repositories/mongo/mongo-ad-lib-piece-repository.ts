@@ -3,8 +3,6 @@ import { ActionManifestRepository } from '../interfaces/action-manifest-reposito
 import { ActionManifest } from '../../../model/entities/action'
 import { MongoEntityConverter } from './mongo-entity-converter'
 import { MongoDatabase } from './mongo-database'
-import { PieceType } from '../../../model/enums/piece-type'
-import { UnexpectedCaseException } from '../../../model/exceptions/unexpected-case-exception'
 
 const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
 
@@ -31,26 +29,11 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
 
   private mapToActionManifest(adLibPiece: AdLibPiece): ActionManifest {
     return {
-      pieceType: this.getPieceTypeFromAdLibPiece(adLibPiece),
+      actionId: adLibPiece.sourceLayerId,
       data: {
         name: adLibPiece.name,
-        expectedDuration: adLibPiece.expectedDuration ?? undefined
+        expectedDuration: adLibPiece.expectedDuration ?? undefined,
       },
-      pieceLayer: adLibPiece.sourceLayerId
-    }
-  }
-
-  private getPieceTypeFromAdLibPiece(adLibPiece: AdLibPiece): PieceType {
-    switch (adLibPiece.sourceLayerId) {
-      case 'studio0_graphicsLower':
-      case 'studio0_graphicsIdent':
-      case 'studio0_overlay':
-      case 'studio0_pilotOverlay':
-        return PieceType.GRAPHIC
-      case 'studio0_audio_bed':
-        return PieceType.AUDIO
-      default:
-        throw new UnexpectedCaseException(`Unknown sourceLayerId: ${adLibPiece.sourceLayerId}`)
     }
   }
 }

@@ -3,8 +3,6 @@ import { ActionManifest } from '../../../model/entities/action'
 import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoEntityConverter } from './mongo-entity-converter'
-import { PieceType } from '../../../model/enums/piece-type'
-import { UnexpectedCaseException } from '../../../model/exceptions/unexpected-case-exception'
 
 const AD_LIB_ACTIONS_COLLECTION: string = 'adLibActions'
 
@@ -30,25 +28,8 @@ export class MongoAdLibActionsRepository extends BaseMongoRepository implements 
 
   private mapToActionManifest(adLibAction: AdLibAction): ActionManifest {
     return {
-      pieceType: this.getPieceTypeFromAdLibAction(adLibAction),
+      actionId: adLibAction.actionId,
       data: adLibAction.userData
-    }
-  }
-
-  private getPieceTypeFromAdLibAction(adLibAction: AdLibAction): PieceType {
-    switch (adLibAction.actionId) {
-      case 'select_full_grafik': {
-        return PieceType.GRAPHIC
-      }
-      case 'select_server_clip': {
-        return PieceType.VIDEO_CLIP
-      }
-      case 'select_dve': {
-        return PieceType.DVE
-      }
-      default: {
-        throw new UnexpectedCaseException(`Unknown actionId: ${adLibAction.actionId}`)
-      }
     }
   }
 }

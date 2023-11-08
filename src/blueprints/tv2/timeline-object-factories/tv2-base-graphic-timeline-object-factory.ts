@@ -1,4 +1,4 @@
-import { Tv2GraphicsData } from '../value-objects/tv2-action-manifest-data'
+import { Tv2OverlayGraphicsManifestData } from '../value-objects/tv2-action-manifest-data'
 
 export abstract class Tv2BaseGraphicTimelineObjectFactory {
 
@@ -7,15 +7,15 @@ export abstract class Tv2BaseGraphicTimelineObjectFactory {
    * @remarks
    * For use with Graphics data generated from AdLibPieces.
    */
-  protected getTemplateName(graphicsData: Tv2GraphicsData): string {
-    return graphicsData.name.split('-')[0].trim()
+  protected getTemplateName(overlayGraphicsData: Tv2OverlayGraphicsManifestData): string {
+    return overlayGraphicsData.name.split('-')[0].trim()
   }
 
   /**
    * @remarks
    * For use with Graphics data generated from AdLibPieces.
    */
-  protected getDisplayText(graphicsData: Tv2GraphicsData): string {
-    return graphicsData.name.split('-').slice(1).join('-').trim()
+  protected getDisplayText(overlayGraphicsData: Tv2OverlayGraphicsManifestData): string {
+    return overlayGraphicsData.name.split('-').slice(1).join('-').trim()
   }
 }

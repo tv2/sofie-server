@@ -17,6 +17,7 @@ export interface CasparCgTemplateTimelineObject extends TimelineObject {
 
 export interface CasparCgTemplateData {
   display: string
+  partialUpdate: boolean
   slots: {
     '250_full'?: {
       payload: {
@@ -42,7 +43,6 @@ export interface CasparCgTemplateData {
       display: string
     }
   }
-  partialUpdate: boolean
 }
 
 
@@ -57,6 +57,9 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
     length?: number
     playing?: boolean
     noStarttime?: boolean // The typo is used by TSR... :(
+    mixer?: {
+      keyer?: boolean
+    }
   }
 }
 
