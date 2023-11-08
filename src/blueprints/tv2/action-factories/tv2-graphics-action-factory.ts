@@ -210,7 +210,7 @@ export class Tv2GraphicsActionFactory {
 
   private createVizFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
     const partId: string = 'fullGraphicsPart'
-    const fullGraphicPieceInterface: Tv2PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
+    const fullGraphicPieceInterface: Tv2PieceInterface = this.createVizFullGraphicsPieceInterface(partId, blueprintConfiguration, graphicsData)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
       partId,
@@ -248,7 +248,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData, partId: string): Tv2PieceInterface {
+  private createVizFullGraphicsPieceInterface(partId: string, blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): Tv2PieceInterface {
     return this.createGraphicsPieceInterface({
       id: 'fullGraphicPiece',
       partId,
@@ -318,18 +318,18 @@ export class Tv2GraphicsActionFactory {
         'Missing configuration of \'VizPilotGraphics.CleanFeedPrerollDuration\' in settings.'
       )
     }
-    const enable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer }
+    const videoMixerEnable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer }
     const sourceInput: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
     const upstreamEnable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration }
-    const downstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
+    const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
     const downstreamKeyerEnable: TimelineEnable = { start: 0 }
     const priority: number = 0
 
     return [
       this.vizTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, fullscreenGraphicsData),
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(GRAPHICS_PROGRAM_ID, sourceInput, enable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(GRAPHICS_CLEAN_FEED_ID, sourceInput, enable),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(GRAPHICS_LOOKAHEAD_ID, sourceInput, enable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(GRAPHICS_PROGRAM_ID, sourceInput, videoMixerEnable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(GRAPHICS_CLEAN_FEED_ID, sourceInput, videoMixerEnable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(GRAPHICS_LOOKAHEAD_ID, sourceInput, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(
         downstreamKeyer,
         true,
@@ -347,13 +347,12 @@ export class Tv2GraphicsActionFactory {
   private createCasparCgFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
     if (!blueprintConfiguration.studio.HTMLGraphics) {
       throw new MisconfigurationException(
-        'Missing configuration of \'HTMLGraphics\' in settings. ' +
-        'Make sure it exists, and contains a value for \'KeepAliveDuration\''
+        'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'KeepAliveDuration\''
       )
     }
 
     const partId: string = 'fullGraphicsPart'
-    const fullGraphicPiece: Tv2PieceInterface = this.createCasparCgFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
+    const fullGraphicPiece: Tv2PieceInterface = this.createCasparCgFullGraphicsPieceInterface(partId, blueprintConfiguration, graphicsData)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
       partId,
@@ -362,19 +361,16 @@ export class Tv2GraphicsActionFactory {
     )
   }
 
-  private createCasparCgFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData, partId: string): Tv2PieceInterface {
+  private createCasparCgFullGraphicsPieceInterface(partId: string, blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): Tv2PieceInterface {
     return this.createGraphicsPieceInterface({
       id: 'fullGraphicPiece',
       partId,
-      name: graphicsData.name,
+      name: fullscreenGraphicsData.name,
       preRollDuration: blueprintConfiguration.studio.CasparPrerollDuration,
-      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, graphicsData.name),
+      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, fullscreenGraphicsData.name),
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
-      content: this.createCasparCgFullGraphicsPieceContent(blueprintConfiguration, graphicsData),
-      timelineObjects: [
-        this.casparCgTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, graphicsData),
-        ...this.createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration)
-      ]
+      content: this.createCasparCgFullGraphicsPieceContent(blueprintConfiguration, fullscreenGraphicsData),
+      timelineObjects: this.createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration, fullscreenGraphicsData)
     })
   }
 
@@ -395,7 +391,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
+  private createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): TimelineObject[] {
     if (!blueprintConfiguration.studio.HTMLGraphics) {
       throw new MisconfigurationException(
         'Missing configuration of \'HTMLGraphics\' in settings. ' +
@@ -416,6 +412,7 @@ export class Tv2GraphicsActionFactory {
     }
 
     return [
+      this.casparCgTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, fullscreenGraphicsData),
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(GRAPHICS_PROGRAM_ID, sourceInput, enable, transition, transitionSettings),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(GRAPHICS_CLEAN_FEED_ID, sourceInput, enable, transition, transitionSettings),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(GRAPHICS_LOOKAHEAD_ID, sourceInput, enable),
