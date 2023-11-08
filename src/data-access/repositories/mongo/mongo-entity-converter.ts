@@ -19,6 +19,13 @@ import { Exception } from '../../../model/exceptions/exception'
 import { ErrorCode } from '../../../model/enums/error-code'
 import { ActionManifest } from '../../../model/entities/action'
 import { Media } from '../../../model/entities/media'
+import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
+import {
+  BackwardRundownTiming,
+  ForwardRundownTiming,
+  RundownTiming,
+  UnscheduledRundownTiming
+} from '../../../model/value-objects/rundown-timing'
 
 export interface MongoId {
   _id: string
@@ -34,12 +41,40 @@ export interface MongoRundown extends MongoId {
   activeCursor: MongoRundownCursor | undefined
   nextCursor: MongoRundownCursor | undefined
   history: MongoPart[]
+  timing?: MongoRundownTiming
 }
 
 interface MongoRundownCursor {
   partId: string
   segmentId: string
   owner: Owner
+}
+
+enum MongoRundownTimingType { // PlaylistTimingType from blueprints-integration
+  FORWARD = 'forward-time',
+  BACKWARD = 'back-time',
+  UNSCHEDULED = 'none',
+}
+
+type MongoRundownTiming = MongoForwardRundownTiming | MongoBackwardRundownTiming | MongoUnscheduledRundownTiming
+
+interface MongoForwardRundownTiming { // PlaylistTimingForwardTime from blueprints-integration
+  type: MongoRundownTimingType.FORWARD
+  expectedStart: number
+  expectedDuration?: number
+  expectedEnd?: number
+}
+
+interface MongoBackwardRundownTiming { // PlaylistTimingBackTime from blueprints-integration
+  type: MongoRundownTimingType.BACKWARD
+  expectedStart?: number
+  expectedDuration?: number
+  expectedEnd: number
+}
+
+interface MongoUnscheduledRundownTiming { // PlaylistTimingNone from blueprints-integration
+  type: MongoRundownTimingType.UNSCHEDULED
+  expectedDuration?: number
 }
 
 export interface MongoSegment extends MongoId {
@@ -165,6 +200,7 @@ export class MongoEntityConverter {
       modifiedAt: mongoRundown.modified,
       persistentState: mongoRundown.persistentState,
       history: this.convertParts(mongoRundown.history ?? []),
+      timing: mongoRundown.timing ? this.convertToRundownTiming(mongoRundown.timing) : this.createUnscheduledRundownTiming(),
       alreadyActiveProperties
     })
   }
@@ -192,6 +228,49 @@ export class MongoEntityConverter {
 
   private mapToInfinitePieceMap(infinitePieces: Piece[]): Map<string, Piece> {
     return new Map(infinitePieces.map(piece => [piece.layer, piece]))
+  }
+
+  private convertToRundownTiming(mongoRundownTiming: MongoRundownTiming): RundownTiming {
+    switch (mongoRundownTiming?.type) {
+      case MongoRundownTimingType.UNSCHEDULED:
+        return this.convertToUnscheduledRundownTiming(mongoRundownTiming)
+      case MongoRundownTimingType.FORWARD:
+        return this.convertToForwardRundownTiming(mongoRundownTiming)
+      case MongoRundownTimingType.BACKWARD:
+        return this.convertToBackwardRundownTiming(mongoRundownTiming)
+    }
+  }
+
+  private convertToUnscheduledRundownTiming(mongoUnscheduledRundownTiming: MongoUnscheduledRundownTiming): UnscheduledRundownTiming {
+    return {
+      type: RundownTimingType.UNSCHEDULED,
+      expectedDurationInMs: mongoUnscheduledRundownTiming.expectedDuration,
+    }
+  }
+
+  private convertToForwardRundownTiming(mongoForwardRundownTiming: MongoForwardRundownTiming): ForwardRundownTiming {
+    return {
+      type: RundownTimingType.FORWARD,
+      expectedStartEpochTime: mongoForwardRundownTiming.expectedStart,
+      expectedDurationInMs: mongoForwardRundownTiming.expectedDuration,
+      expectedEndEpochTime: mongoForwardRundownTiming.expectedEnd
+    }
+  }
+
+  private convertToBackwardRundownTiming(mongoBackwardRundownTiming: MongoBackwardRundownTiming): BackwardRundownTiming {
+    return {
+      type: RundownTimingType.BACKWARD,
+      expectedStartEpochTime: mongoBackwardRundownTiming.expectedStart,
+      expectedDurationInMs: mongoBackwardRundownTiming.expectedDuration,
+      expectedEndEpochTime: mongoBackwardRundownTiming.expectedEnd
+    }
+  }
+
+  private createUnscheduledRundownTiming(): UnscheduledRundownTiming {
+    return {
+      type: RundownTimingType.UNSCHEDULED,
+      expectedDurationInMs: 0,
+    }
   }
 
   public convertToMongoRundown(rundown: Rundown): MongoRundown {
@@ -224,7 +303,8 @@ export class MongoEntityConverter {
       mongoRundown._id,
       mongoRundown.name,
       mongoRundown.isActive ?? false,
-      mongoRundown.modified
+      mongoRundown.modified,
+      mongoRundown.timing ? this.convertToRundownTiming(mongoRundown.timing) : this.createUnscheduledRundownTiming(),
     )
   }
 
