@@ -21,6 +21,7 @@ import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { LastSegmentInRundown } from '../exceptions/last-segment-in-rundown'
 import { NoPartInHistoryException } from '../exceptions/no-part-in-history-exception'
 import { OnAirException } from '../exceptions/on-air-exception'
+import { RundownTiming } from '../value-objects/rundown-timing'
 
 export interface RundownInterface {
   id: string
@@ -32,6 +33,7 @@ export interface RundownInterface {
   modifiedAt: number
   persistentState?: RundownPersistentState
   history: Part[]
+  timing: RundownTiming
 
   alreadyActiveProperties?: RundownAlreadyActiveProperties
 }
@@ -62,7 +64,7 @@ export class Rundown extends BasicRundown {
   private history: Part[]
 
   constructor(rundown: RundownInterface) {
-    super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt)
+    super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt, rundown.timing)
     this.segments = rundown.segments ?? []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
