@@ -44,8 +44,8 @@ const GRAPHICS_LOOKAHEAD_ID: string = 'graphicsLookahead'
 
 export class Tv2GraphicsActionFactory {
   constructor(
-    private readonly vizGraphicsTimelineObjectFactory: Tv2VizTimelineObjectFactory,
-    private readonly casparCgGraphicsTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
+    private readonly vizTimelineObjectFactory: Tv2VizTimelineObjectFactory,
+    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly casparCgPathFixer: Tv2CasparCgPathFixer
@@ -71,7 +71,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Gfx All Out',
       duration,
       timelineObjects: [
-        this.vizGraphicsTimelineObjectFactory.createAllOutGraphicsTimelineObject(blueprintConfiguration, duration)
+        this.vizTimelineObjectFactory.createAllOutGraphicsTimelineObject(blueprintConfiguration, duration)
       ]
     })
     return {
@@ -92,7 +92,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Gfx Clear',
       duration,
       timelineObjects: [
-        this.vizGraphicsTimelineObjectFactory.createClearGraphicsTimelineObject(blueprintConfiguration, duration)
+        this.vizTimelineObjectFactory.createClearGraphicsTimelineObject(blueprintConfiguration, duration)
       ]
     })
     return {
@@ -113,7 +113,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Gfx continue',
       duration,
       timelineObjects: [
-        this.vizGraphicsTimelineObjectFactory.createContinueGraphicsTimelineObject(duration)
+        this.vizTimelineObjectFactory.createContinueGraphicsTimelineObject(duration)
       ]
     })
     return {
@@ -134,7 +134,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Theme Out',
       duration,
       timelineObjects: [
-        this.vizGraphicsTimelineObjectFactory.createThemeOutTimelineObject(
+        this.vizTimelineObjectFactory.createThemeOutTimelineObject(
           blueprintConfiguration,
           duration
         )
@@ -180,7 +180,7 @@ export class Tv2GraphicsActionFactory {
       name: 'Overlay Initialize',
       duration,
       timelineObjects: [
-        this.vizGraphicsTimelineObjectFactory.createOverlayInitializeTimelineObject(duration)
+        this.vizTimelineObjectFactory.createOverlayInitializeTimelineObject(duration)
       ]
     })
     return {
@@ -195,26 +195,18 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createFullscreenGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[]): Tv2PartAction[] {
-    let chosenMethod: (blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData) => Tv2PartAction
-    switch (blueprintConfiguration.studio.GraphicsType) {
-      case Tv2GraphicsType.HTML: {
-        chosenMethod = this.createCasparCgFullGraphicsActionFromGraphicsData.bind(this)
-        break
+    return fullscreenGraphicsData.map((data) => {
+      switch (blueprintConfiguration.studio.GraphicsType) {
+        case Tv2GraphicsType.HTML:
+          return this.createCasparCgFullscreenGraphicsAction(blueprintConfiguration, data)
+        case Tv2GraphicsType.VIZ:
+        default:
+          return this.createVizFullscreenGraphicsAction(blueprintConfiguration, data)
       }
-      case Tv2GraphicsType.VIZ:
-      default: {
-        chosenMethod = this.createVizFullGraphicsActionFromGraphicsData.bind(this)
-        break
-      }
-    }
-
-    return fullscreenGraphicsData.map((data) => chosenMethod(
-      blueprintConfiguration,
-      data
-    ))
+    })
   }
 
-  private createVizFullGraphicsActionFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
+  private createVizFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
     const partId: string = 'fullGraphicsPart'
     const fullGraphicPiece: Tv2PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
     return this.createFullGraphicsActionFromGraphicsData(
@@ -272,7 +264,7 @@ export class Tv2GraphicsActionFactory {
         path: `${graphicsData.vcpId}`,
       },
       timelineObjects: [
-        this.vizGraphicsTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, graphicsData),
+        this.vizTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         ...this.createVizFullPilotTimelineObjects(blueprintConfiguration),
       ]
     })
@@ -360,7 +352,7 @@ export class Tv2GraphicsActionFactory {
     ]
   }
 
-  private createCasparCgFullGraphicsActionFromGraphicsData(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
+  private createCasparCgFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
     if (!blueprintConfiguration.studio.HTMLGraphics) {
       throw new MisconfigurationException(
         'Missing configuration of \'HTMLGraphics\' in settings. ' +
@@ -388,7 +380,7 @@ export class Tv2GraphicsActionFactory {
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       content: this.createCasparCgFullGraphicsPieceContent(blueprintConfiguration, graphicsData),
       timelineObjects: [
-        this.casparCgGraphicsTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, graphicsData),
+        this.casparCgTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         ...this.createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration)
       ]
     })
@@ -456,8 +448,8 @@ export class Tv2GraphicsActionFactory {
   private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
     const chosenTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
-      ? this.casparCgGraphicsTimelineObjectFactory
-      : this.vizGraphicsTimelineObjectFactory
+      ? this.casparCgTimelineObjectFactory
+      : this.vizTimelineObjectFactory
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: '',
       name: graphicsData.name,
@@ -500,8 +492,8 @@ export class Tv2GraphicsActionFactory {
   private createLowerThirdGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
     const chosenTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
-      ? this.casparCgGraphicsTimelineObjectFactory
-      : this.vizGraphicsTimelineObjectFactory
+      ? this.casparCgTimelineObjectFactory
+      : this.vizTimelineObjectFactory
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: '',
       name: graphicsData.name,
