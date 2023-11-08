@@ -28,10 +28,12 @@ import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-act
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
+import { Tv2StringHashConverter } from './helpers/tv2-string-hash-converter'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
     const tv2CasparCgPathFixer: Tv2CasparCgPathFixer = new Tv2CasparCgPathFixer()
+    const tv2StringHasConverter: Tv2StringHashConverter = new Tv2StringHashConverter()
     const tv2SisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
     const tv2AudioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
     const tv2VizGraphicsTimelineObjectFactory: Tv2VizTimelineObjectFactory = new Tv2VizTimelineObjectFactory()
@@ -49,7 +51,8 @@ export class Tv2BlueprintsFacade {
         tv2CasparCgGraphicsTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
         tv2VideoMixerTimelineObjectFactory,
-        tv2CasparCgPathFixer
+        tv2CasparCgPathFixer,
+        tv2StringHasConverter
       ),
       new Tv2VideoClipActionFactory(
         tv2VideoMixerTimelineObjectFactory,
