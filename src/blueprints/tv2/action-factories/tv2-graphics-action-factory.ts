@@ -27,7 +27,6 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
   Tv2GraphicsTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-graphics-timeline-object-factory'
-import { createHash } from 'crypto'
 import { Tv2ActionContentType, Tv2PartAction, Tv2PieceAction } from '../value-objects/tv2-action'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
@@ -37,6 +36,7 @@ import {
   Tv2OverlayGraphicsManifestData
 } from '../value-objects/tv2-action-manifest-data'
 import { Tv2FileContent } from '../value-objects/tv2-content'
+import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
 
 const GRAPHICS_PROGRAM_ID: string = 'graphicsProgram'
 const GRAPHICS_CLEAN_FEED_ID: string = 'graphicsCleanFeed'
@@ -48,7 +48,8 @@ export class Tv2GraphicsActionFactory {
     private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly casparCgPathFixer: Tv2CasparCgPathFixer
+    private readonly casparCgPathFixer: Tv2CasparCgPathFixer,
+    private readonly stringHashConverter: Tv2StringHashConverter
   ) { }
 
   public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[], overlayGraphicsData: Tv2OverlayGraphicsManifestData[]): Action[] {
@@ -208,11 +209,11 @@ export class Tv2GraphicsActionFactory {
 
   private createVizFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
     const partId: string = 'fullGraphicsPart'
-    const fullGraphicPiece: Tv2PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
+    const fullGraphicPieceInterface: Tv2PieceInterface = this.createVizFullGraphicsPiece(blueprintConfiguration, graphicsData, partId)
     return this.createFullGraphicsActionFromGraphicsData(
       blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
       partId,
-      fullGraphicPiece,
+      fullGraphicPieceInterface,
       graphicsData
     )
   }
@@ -233,7 +234,7 @@ export class Tv2GraphicsActionFactory {
     })
 
     return {
-      id: `full_graphics_${this.getHashedValue(graphicsData.name)}`,
+      id: `full_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
       name: `Full Graphics - ${graphicsData.name}`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -244,11 +245,6 @@ export class Tv2GraphicsActionFactory {
         contentType: Tv2ActionContentType.GRAPHICS
       }
     }
-  }
-
-  // Todo: Figure out if it should be moved to a base class for all action factories
-  private getHashedValue(valueToBeHashed: string ): string {
-    return createHash('md5').update(valueToBeHashed).digest('hex')
   }
 
   private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData, partId: string): Tv2PieceInterface {
@@ -462,7 +458,7 @@ export class Tv2GraphicsActionFactory {
       ]
     })
     return {
-      id: `ident_${this.getHashedValue(graphicsData.name)}`,
+      id: `ident_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: graphicsData.name,
       data: pieceInterface,
@@ -507,7 +503,7 @@ export class Tv2GraphicsActionFactory {
     })
 
     return {
-      id: `lower_third_${this.getHashedValue(graphicsData.name)}`,
+      id: `lower_third_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: graphicsData.name,
       data: pieceInterface,
