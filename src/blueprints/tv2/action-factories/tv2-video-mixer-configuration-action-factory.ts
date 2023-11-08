@@ -9,7 +9,6 @@ import { PieceActionType } from '../../../model/enums/action-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
-import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 
@@ -30,9 +29,6 @@ export class Tv2VideoMixerConfigurationActionFactory {
 
   private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): Tv2PieceAction {
     const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
-    const enable: TimelineEnable = {
-      while: 1
-    }
     const priority: number = 10
     const pieceInterface: Tv2PieceInterface = this.createVideoSwitcherPieceInterface({
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
