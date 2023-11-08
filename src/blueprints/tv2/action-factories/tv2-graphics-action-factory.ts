@@ -377,8 +377,8 @@ export class Tv2GraphicsActionFactory {
   private createCasparCgFullGraphicsPieceContent(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2FileContent {
     const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
     const graphicsFolder: string = rawGraphicsFolder ? `${rawGraphicsFolder}\\` : ''
-    const sceneChunks: string[] = graphicsData.name.split('/')
-    const sceneName: string = sceneChunks[sceneChunks.length - 1]
+    const nameChunks: string[] = graphicsData.name.split('/')
+    const sceneName: string = nameChunks[nameChunks.length - 1]
     const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, rawGraphicsFolder)
 
     return {
@@ -394,8 +394,7 @@ export class Tv2GraphicsActionFactory {
   private createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): TimelineObject[] {
     if (!blueprintConfiguration.studio.HTMLGraphics) {
       throw new MisconfigurationException(
-        'Missing configuration of \'HTMLGraphics\' in settings. ' +
-        'Make sure it exists, and contains a value for \'TransitionSettings.wipeRate\' and  \'TransitionSettings.borderSoftness\''
+        'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'TransitionSettings.wipeRate\' and  \'TransitionSettings.borderSoftness\''
       )
     }
 
@@ -436,7 +435,7 @@ export class Tv2GraphicsActionFactory {
 
   private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
-    const chosenTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
+    const graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
       ? this.casparCgTimelineObjectFactory
       : this.vizTimelineObjectFactory
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
@@ -446,7 +445,7 @@ export class Tv2GraphicsActionFactory {
       duration: graphicsData.expectedDuration,
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(graphicsData)),
       timelineObjects: [
-        chosenTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
+        graphicsTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
       ]
     })
@@ -480,7 +479,7 @@ export class Tv2GraphicsActionFactory {
 
   private createLowerThirdGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
-    const chosenTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
+    const graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
       ? this.casparCgTimelineObjectFactory
       : this.vizTimelineObjectFactory
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
@@ -490,7 +489,7 @@ export class Tv2GraphicsActionFactory {
       duration: graphicsData.expectedDuration,
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(graphicsData)),
       timelineObjects: [
-        chosenTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
+        graphicsTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
       ]
     })
@@ -505,6 +504,4 @@ export class Tv2GraphicsActionFactory {
       }
     }
   }
-
-
 }
