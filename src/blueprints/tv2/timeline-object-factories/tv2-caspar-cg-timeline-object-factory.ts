@@ -61,8 +61,8 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
 
   public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject {
     const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
-    const sceneChunks: string[] = fullscreenGraphicsData.name.split('/')
-    const sceneName: string = sceneChunks[sceneChunks.length - 1]
+    const nameChunks: string[] = fullscreenGraphicsData.name.split('/')
+    const sceneName: string = nameChunks[nameChunks.length - 1]
     const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, rawGraphicsFolder)
 
     return {
@@ -77,7 +77,7 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
         type: CasparCgType.TEMPLATE,
         templateType: 'html',
         name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
-        data: this.createStillTemplateData(blueprintConfiguration, fileName),
+        data: this.createFullscreenTemplateData(blueprintConfiguration, fileName),
         useStopCommand: false,
         mixer: {
           opacity: 100
@@ -86,11 +86,10 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
     }
   }
 
-  private createStillTemplateData(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): CasparCgTemplateData {
+  private createFullscreenTemplateData(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): CasparCgTemplateData {
     if (!blueprintConfiguration.studio.HTMLGraphics) {
       throw new MisconfigurationException(
-        'Missing configuration of \'HTMLGraphics\' in settings. ' +
-        'Make sure it exists, and contains a value for \'GraphicURL\''
+        'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'GraphicURL\''
       )
     }
 

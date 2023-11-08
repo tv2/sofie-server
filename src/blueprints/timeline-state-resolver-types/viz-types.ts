@@ -51,8 +51,14 @@ export interface VizMseContinueTimelineObject extends TimelineObject {
 export interface VizMseClearGraphicsTimelineObjectContent {
   deviceType: DeviceType.VIZMSE
   type: VizType.CLEAR_ALL_ELEMENTS
-  channelsToSendCommands?: string[]
+  channelsToSendCommands?: VizChannelName[]
   showName: string
+}
+
+export enum VizChannelName {
+  OVERLAY = 'OVL1',
+  FULLSCREEN = 'FULL1',
+  WALL = 'WALL1'
 }
 
 export enum VizType {
