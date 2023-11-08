@@ -18,7 +18,7 @@ import {
   Tv2OverlayGraphicsManifestData
 } from '../value-objects/tv2-action-manifest-data'
 
-export class Tv2VizGraphicsTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
+export class Tv2VizTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
     return {
       id: '',
