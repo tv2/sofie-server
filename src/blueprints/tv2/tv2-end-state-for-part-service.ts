@@ -5,7 +5,7 @@ import { PartEndState } from '../../model/value-objects/part-end-state'
 import { Tv2PartEndState } from './value-objects/tv2-part-end-state'
 import { Tv2RundownPersistentState } from './value-objects/tv2-rundown-persistent-state'
 import { Tv2TallyTags } from './value-objects/tv2-tally-tags'
-import { Tv2GraphicsContent } from './value-objects/tv2-content'
+import { Tv2FileContent } from './value-objects/tv2-content'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
 import { Tv2SisyfosPersistenceMetadata } from './value-objects/tv2-metadata'
 
@@ -51,7 +51,7 @@ export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
         endState.isJingle = true
       }
       if (piece.tags.includes(Tv2TallyTags.FULL_IS_LIVE)) {
-        endState.fullFileName = (piece.content as Tv2GraphicsContent).fileName
+        endState.fullFileName = (piece.content as Tv2FileContent).fileName
       }
     }
 

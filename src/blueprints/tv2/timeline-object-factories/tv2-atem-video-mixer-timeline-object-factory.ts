@@ -4,22 +4,30 @@ import {
   AtemAuxTimelineObject,
   AtemDownstreamKeyerTimelineObject,
   AtemMeTimelineObject,
+  AtemSuperSourcePropertiesTimelineObject,
+  AtemSuperSourceTimelineObject,
   AtemTransition,
   AtemTransitionSettings,
-  AtemType
+  AtemType,
+  SuperSourceBorder,
+  SuperSourceProperties
 } from '../../timeline-state-resolver-types/atem-types'
 import { Tv2AtemLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { DveBoxProperties, DveLayoutProperties } from '../value-objects/tv2-show-style-blueprint-configuration'
+import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
+
+const ID_PREFIX: string = 'atem_'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean, enable: TimelineEnable, priority: number): AtemDownstreamKeyerTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
-      id: `downstreamKeyer${downstreamKeyerNumber}`,
+      id: `${ID_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
       enable,
       priority,
-      layer: `${Tv2AtemLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
+      layer: `${this.getDownstreamKeyerLayerPrefix()}_${downstreamKeyerNumber}`,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.DSK,
@@ -46,6 +54,10 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
    */
   private convertPercentageToAtemPercentageValue(percentage: number): number {
     return percentage * 10
+  }
+
+  private getDownstreamKeyerLayerPrefix(): string {
+    return Tv2AtemLayer.DOWNSTREAM_KEYER
   }
 
   public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMeTimelineObject {
@@ -79,9 +91,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
+  public createProgramTimelineObject(id: string, sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
     return this.createAtemMeTimelineObjectForLayer(
-      'atem_program',
+      `${ID_PREFIX}${id}`,
       Tv2AtemLayer.PROGRAM,
       enable,
       {
@@ -91,9 +103,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       })
   }
 
-  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
+  public createCleanFeedTimelineObject(id: string, sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
     return this.createAtemMeTimelineObjectForLayer(
-      'atem_cleanFeed',
+      `${ID_PREFIX}${id}`,
       Tv2AtemLayer.CLEAN_FEED,
       enable, 
       {
@@ -117,9 +129,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
+  public createLookaheadTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
     return {
-      id: 'atem_lookahead',
+      id: `${ID_PREFIX}${id}`,
       enable,
       priority: 0,
       layer: Tv2AtemLayer.LOOKAHEAD,
@@ -131,5 +143,75 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         }
       }
     }
+  }
+
+  public createDveBoxesTimelineObject(boxes: DveBoxProperties[], priority: number = 1): AtemSuperSourceTimelineObject {
+    return {
+      id: `${ID_PREFIX}dve_boxes`,
+      enable: {
+        start: 0
+      },
+      priority,
+      layer: Tv2AtemLayer.DVE_BOXES,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.SUPER_SOURCE,
+        ssrc: {
+          boxes
+        }
+      }
+    }
+  }
+
+  public createDvePropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, layoutProperties: DveLayoutProperties): AtemSuperSourcePropertiesTimelineObject {
+    const superSourceProperties: SuperSourceProperties = this.getSuperSourceProperties(layoutProperties)
+    const superSourceBorder: SuperSourceBorder = this.getSuperSourceBorder(layoutProperties)
+
+    return {
+      id: `${ID_PREFIX}dve_properties`,
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2AtemLayer.DVE,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.SUPER_SOURCE_PROPERTIES,
+        ssrcProps: {
+          artFillSource: configuration.studio.SwitcherSource.SplitArtFill,
+          artCutSource: configuration.studio.SwitcherSource.SplitArtKey,
+          artOption: 1,
+          ...superSourceProperties,
+          ...superSourceBorder
+        }
+      }
+    }
+  }
+
+  private getSuperSourceProperties(layoutProperties: DveLayoutProperties): SuperSourceProperties {
+    return layoutProperties.properties && !layoutProperties.properties.artPreMultiplied
+      ? {
+        artPreMultiplied: false,
+        artInvertKey: layoutProperties.properties.artInvertKey,
+        artClip: layoutProperties.properties.artClip * 10,
+        artGain: layoutProperties.properties.artGain * 10
+      }
+      : {
+        artPreMultiplied: true
+      }
+  }
+
+  private getSuperSourceBorder(layoutProperties: DveLayoutProperties): SuperSourceBorder {
+    return layoutProperties.border?.borderEnabled
+      ? {
+        ...layoutProperties.border
+      }
+      : {
+        borderEnabled: false
+      }
+  }
+
+  public getDveBoxesLayer(): string {
+    return Tv2AtemLayer.DVE_BOXES
   }
 }

@@ -9,7 +9,7 @@ export interface Tv2Content {
   // sourceDuration?: number
 }
 
-export interface Tv2GraphicsContent extends Tv2Content {
+export interface Tv2FileContent extends Tv2Content {
   fileName: string
   path: string
   mediaFlowIds?: string[]
