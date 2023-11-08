@@ -1,4 +1,4 @@
-export class Tv2CasparCgPathFixer {
+export class Tv2AssetPathHelper {
   public joinAssetToNetworkPath(
     networkPath: string,
     assetFile: string,

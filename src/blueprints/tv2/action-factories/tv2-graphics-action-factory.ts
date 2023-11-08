@@ -21,7 +21,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { TimelineObject } from '../../../model/entities/timeline-object'
-import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
+import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
@@ -49,7 +49,7 @@ export class Tv2GraphicsActionFactory {
     private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly casparCgPathFixer: Tv2CasparCgPathFixer,
+    private readonly casparCgPathFixer: Tv2AssetPathHelper,
     private readonly stringHashConverter: Tv2StringHashConverter
   ) { }
 
