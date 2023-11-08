@@ -22,7 +22,7 @@ import { Tv2AudioTimelineObjectFactory } from './timeline-object-factories/inter
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
-import { Tv2CasparCgPathFixer } from './helpers/tv2-caspar-cg-path-fixer'
+import { Tv2AssetPathHelper } from './helpers/tv2-asset-path-helper'
 import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
@@ -32,7 +32,7 @@ import { Tv2StringHashConverter } from './helpers/tv2-string-hash-converter'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
-    const tv2CasparCgPathFixer: Tv2CasparCgPathFixer = new Tv2CasparCgPathFixer()
+    const tv2CasparCgPathFixer: Tv2AssetPathHelper = new Tv2AssetPathHelper()
     const tv2StringHasConverter: Tv2StringHashConverter = new Tv2StringHashConverter()
     const tv2SisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
     const tv2AudioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()

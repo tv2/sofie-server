@@ -11,7 +11,7 @@ import {
   CasparCgType
 } from '../../timeline-state-resolver-types/caspar-cg-types'
 import { Tv2CasparCgLayer, Tv2GraphicsLayer } from '../value-objects/tv2-layers'
-import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
+import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 import {
   Tv2FullscreenGraphicsManifestData,
@@ -20,7 +20,7 @@ import {
 } from '../value-objects/tv2-action-manifest-data'
 
 export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
-  constructor(private readonly casparCgPathFixer: Tv2CasparCgPathFixer) {
+  constructor(private readonly casparCgPathFixer: Tv2AssetPathHelper) {
     super()
   }
 
