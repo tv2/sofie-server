@@ -28,6 +28,7 @@ import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
 import { Tv2Action } from './value-objects/tv2-action'
+import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
@@ -38,7 +39,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
     private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
     private readonly videoMixerActionFactory: Tv2VideoMixerConfigurationActionFactory,
-    private readonly dveActionFactory: Tv2DveActionFactory
+    private readonly dveActionFactory: Tv2DveActionFactory,
+    private readonly replayActionFactory: Tv2ReplayActionFactory
   ) {}
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -67,7 +69,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
       ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration),
-      ...this.dveActionFactory.createDveActions(blueprintConfiguration, this.getDveData(blueprintConfiguration, actionManifests))
+      ...this.dveActionFactory.createDveActions(blueprintConfiguration, this.getDveData(blueprintConfiguration, actionManifests)),
+      ...this.replayActionFactory.createReplayActions(blueprintConfiguration)
     ]
   }
 
