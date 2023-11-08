@@ -9,10 +9,9 @@ import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import {
+  Tv2Action,
   Tv2ActionContentType,
   Tv2ActionSubtype,
-  Tv2PartAction,
-  Tv2PieceAction,
   Tv2RecallLastRemoteAsNextAction,
   Tv2RemoteAction
 } from '../value-objects/tv2-action'
@@ -152,12 +151,11 @@ export class Tv2RemoteActionFactory {
   }
 
   public isRemoteAction(action: Action): action is Tv2RemoteAction {
-    // TODO: Use Tv2Action when available
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
+    const tv2Action: Tv2Action = action as Tv2Action
     return tv2Action.metadata.contentType === Tv2ActionContentType.REMOTE
   }
 
-  public getMutateActionMethods(action: Tv2PartAction): MutateActionMethods[] {
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
     switch (action.metadata.actionSubtype) {
       case Tv2ActionSubtype.RECALL_LAST_REMOTE:
         return this.getRecallLastRemoteMutateActions()
@@ -202,7 +200,7 @@ export class Tv2RemoteActionFactory {
     }
 
     const pieceInterfaces: PieceInterface[] = historicPart.getPieces().map(piece => ({
-      id: `ecall_last_remote_piece_${piece.id}`,
+      id: `recall_last_remote_piece_${piece.id}`,
       partId: partInterface.id,
       name: piece.name,
       layer: piece.layer,
