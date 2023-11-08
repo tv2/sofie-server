@@ -7,7 +7,7 @@ import {
 } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
-import { Tv2TransitionActionFactory } from './action-factories/tv2-transition-action-factory'
+import { Tv2TransitionEffectActionFactory } from './action-factories/tv2-transition-effect-action-factory'
 import { Tv2AudioActionFactory } from './action-factories/tv2-audio-action-factory'
 import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action-factory'
 import {
@@ -15,7 +15,8 @@ import {
 } from './action-factories/tv2-video-mixer-configuration-action-factory'
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import {
-  DveBoxInput, Tv2ActionManifestData,
+  DveBoxInput,
+  Tv2ActionManifestData,
   Tv2ActionManifestDataForDve,
   Tv2ActionManifestDataForVideoClip,
   Tv2ActionManifestDveSource,
@@ -26,6 +27,7 @@ import {
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
+import { Tv2Action } from './value-objects/tv2-action'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 import { Tv2PieceType } from './enums/tv2-piece-type'
 import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
@@ -36,7 +38,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly configurationMapper: Tv2BlueprintConfigurationMapper,
     private readonly cameraActionFactory: Tv2CameraActionFactory,
     private readonly remoteActionFactory: Tv2RemoteActionFactory,
-    private readonly transitionActionFactory: Tv2TransitionActionFactory,
+    private readonly transitionEffectActionFactory: Tv2TransitionEffectActionFactory,
     private readonly audioActionFactory: Tv2AudioActionFactory,
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
     private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
@@ -44,9 +46,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly dveActionFactory: Tv2DveActionFactory
   ) {}
 
-  public getMutateActionMethods(action: Action): MutateActionMethods[] {
-    if (this.transitionActionFactory.isTransitionAction(action)) {
-      return this.transitionActionFactory.getMutateActionMethods(action)
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
+    if (this.transitionEffectActionFactory.isTransitionEffectAction(action)) {
+      return this.transitionEffectActionFactory.getMutateActionMethods(action)
     }
     if (this.videoClipActionFactory.isVideoClipAction(action)) {
       return this.videoClipActionFactory.getMutateActionMethods(action)
@@ -70,7 +72,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
       ...this.remoteActionFactory.createRemoteActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
-      ...this.transitionActionFactory.createTransitionActions(),
+      ...this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
       ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration),

@@ -14,7 +14,7 @@ import {
   Tv2AtemVideoMixerTimelineObjectFactory
 } from './timeline-object-factories/tv2-atem-video-mixer-timeline-object-factory'
 import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
-import { Tv2TransitionActionFactory } from './action-factories/tv2-transition-action-factory'
+import { Tv2TransitionEffectActionFactory } from './action-factories/tv2-transition-effect-action-factory'
 import { Tv2AudioActionFactory } from './action-factories/tv2-audio-action-factory'
 import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action-factory'
 import {
@@ -31,6 +31,7 @@ import {
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import { AssetFolderHelper } from './helpers/asset-folder-helper'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 
 export class Tv2BlueprintsFacade {
@@ -41,11 +42,18 @@ export class Tv2BlueprintsFacade {
     const tv2VideoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
     const tv2CasparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory()
 
+    const assetFolderHelper: AssetFolderHelper = new AssetFolderHelper()
+
     const actionService: Tv2ActionService = new Tv2ActionService(
       new Tv2BlueprintConfigurationMapper(),
       new Tv2CameraActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
       new Tv2RemoteActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
-      new Tv2TransitionActionFactory(),
+      new Tv2TransitionEffectActionFactory(
+        tv2VideoMixerTimelineObjectFactory,
+        tv2CasparCgTimelineObjectFactory,
+        tv2AudioTimelineObjectFactory,
+        assetFolderHelper
+      ),
       new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory),
       new Tv2GraphicsActionFactory(tv2GraphicsTimelineObjectFactory),
       new Tv2VideoClipActionFactory(
@@ -57,7 +65,8 @@ export class Tv2BlueprintsFacade {
       new Tv2DveActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
-        tv2CasparCgTimelineObjectFactory
+        tv2CasparCgTimelineObjectFactory,
+        assetFolderHelper
       )
     )
 

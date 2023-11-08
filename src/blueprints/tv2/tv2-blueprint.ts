@@ -10,6 +10,7 @@ import { PartEndState } from '../../model/value-objects/part-end-state'
 import { Timeline } from '../../model/entities/timeline'
 import { Configuration } from '../../model/entities/configuration'
 import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
+import { Tv2Action } from './value-objects/tv2-action'
 
 export class Tv2Blueprint implements Blueprint {
   constructor(
@@ -50,7 +51,7 @@ export class Tv2Blueprint implements Blueprint {
     return this.actionsService.generateActions(configuration, actionManifests)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods[] {
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
     if (!this.actionsService.getMutateActionMethods) {
       return []
     }
