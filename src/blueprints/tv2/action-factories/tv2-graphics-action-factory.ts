@@ -41,6 +41,7 @@ import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
 const GRAPHICS_PROGRAM_ID: string = 'graphicsProgram'
 const GRAPHICS_CLEAN_FEED_ID: string = 'graphicsCleanFeed'
 const GRAPHICS_LOOKAHEAD_ID: string = 'graphicsLookahead'
+const PILOT_PREFIX: string = 'PILOT_'
 
 export class Tv2GraphicsActionFactory {
   constructor(
@@ -247,22 +248,19 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData, partId: string): Tv2PieceInterface {
+  private createVizFullGraphicsPiece(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData, partId: string): Tv2PieceInterface {
     return this.createGraphicsPieceInterface({
       id: 'fullGraphicPiece',
       partId,
-      name: graphicsData.name,
+      name: fullscreenGraphicsData.name,
       preRollDuration: blueprintConfiguration.studio.VizPilotGraphics.PrerollDuration,
-      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, graphicsData.name),
+      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, fullscreenGraphicsData.name),
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       content: {
-        fileName: `PILOT_${graphicsData.vcpId}`,
-        path: `${graphicsData.vcpId}`,
+        fileName: `${PILOT_PREFIX}${fullscreenGraphicsData.vcpId}`,
+        path: `${fullscreenGraphicsData.vcpId}`,
       },
-      timelineObjects: [
-        this.vizTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, graphicsData),
-        ...this.createVizFullPilotTimelineObjects(blueprintConfiguration),
-      ]
+      timelineObjects: this.createVizFullPilotTimelineObjects(blueprintConfiguration, fullscreenGraphicsData)
     })
   }
 
@@ -296,7 +294,7 @@ export class Tv2GraphicsActionFactory {
     if (
       !template ||
       (!template.outType || !template.outType.toString().length) ||
-      (template.outType !== 'B' && template.outType !== 'S' && template.outType !== 'O')
+      (template.outType !== 'S' && template.outType !== 'O')
     ) {
       return PieceLifespan.WITHIN_PART
     }
@@ -304,10 +302,8 @@ export class Tv2GraphicsActionFactory {
     return this.getPieceLifeSpanFromMode(template.outType)
   }
 
-  private getPieceLifeSpanFromMode(mode: 'B' | 'S' | 'O'): PieceLifespan {
+  private getPieceLifeSpanFromMode(mode: 'S' | 'O'): PieceLifespan {
     switch (mode) {
-      case 'B':
-        return PieceLifespan.WITHIN_PART
       case 'S':
         return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
       case 'O':
@@ -316,8 +312,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createVizFullPilotTimelineObjects(
-    blueprintConfiguration: Tv2BlueprintConfiguration
-  ): TimelineObject[] {
+    blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): TimelineObject[] {
     if (!blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration) {
       throw new MisconfigurationException(
         'Missing configuration of \'VizPilotGraphics.CleanFeedPrerollDuration\' in settings.'
@@ -331,6 +326,7 @@ export class Tv2GraphicsActionFactory {
     const priority: number = 0
 
     return [
+      this.vizTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, fullscreenGraphicsData),
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(GRAPHICS_PROGRAM_ID, sourceInput, enable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(GRAPHICS_CLEAN_FEED_ID, sourceInput, enable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(GRAPHICS_LOOKAHEAD_ID, sourceInput, enable),
