@@ -13,6 +13,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
+  Tv2Action,
   Tv2ActionContentType,
   Tv2ActionSubtype,
   Tv2DveAction,
@@ -20,8 +21,6 @@ import {
   Tv2DveInsertSourceInputAction,
   Tv2DveInsertSourceInputMetadata,
   Tv2DveLayoutAction,
-  Tv2PartAction,
-  Tv2PieceAction,
   Tv2RecallDveAction
 } from '../value-objects/tv2-action'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
@@ -36,10 +35,10 @@ import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-layers'
 import { Tv2FileContent } from '../value-objects/tv2-content'
+import { AssetFolderHelper } from '../helpers/asset-folder-helper'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 const NUMBER_OF_DVE_BOXES: number = 4
-const ATEM_SUPER_SOURCE_INDEX: number = 6000
 
 // The "Layout" priority must be lower than the "Insert" priority for the inserted sources to "persist" through a Take.
 const LAYOUT_TIMELINE_OBJECT_PRIORITY: number = 0.5
@@ -58,7 +57,8 @@ export class Tv2DveActionFactory {
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory
+    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
+    private readonly assetFolderHelper: AssetFolderHelper
   ) {}
 
 
@@ -72,9 +72,8 @@ export class Tv2DveActionFactory {
     ]
   }
 
-  public isDveAction(action: Action): boolean {
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
-    const actionSubtype: Tv2ActionSubtype | undefined = tv2Action.metadata.actionSubtype
+  public isDveAction(action: Tv2Action): boolean {
+    const actionSubtype: Tv2ActionSubtype | undefined = action.metadata.actionSubtype
     return actionSubtype !== undefined && [
       Tv2ActionSubtype.DVE_LAYOUT,
       Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT,
@@ -83,9 +82,8 @@ export class Tv2DveActionFactory {
     ].includes(actionSubtype)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods[] {
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
-    switch (tv2Action.metadata.actionSubtype) {
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
+    switch (action.metadata.actionSubtype) {
       case Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT: {
         return [{
           type: MutateActionType.PIECE,
@@ -133,15 +131,17 @@ export class Tv2DveActionFactory {
         start: 0
       }
 
+      const dveSource: number = this.videoMixerTimelineObjectFactory.getDveSourceInput()
+
       const dveLayoutTimelineObjects: TimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, LAYOUT_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(DVE_PROGRAM_ID, ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(DVE_CLEAN_FEED_ID, ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(DVE_LOOKAHEAD_ID, ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.casparCgTimelineObjectFactory.createCasparCgDveKeyTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveFrameTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveLocatorTimelineObject()
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(DVE_PROGRAM_ID, dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(DVE_CLEAN_FEED_ID, dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(DVE_LOOKAHEAD_ID, dveSource, timelineEnable),
+        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
+        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
+        this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject()
       ]
 
       const metadata: Tv2PieceMetadata = {
@@ -212,23 +212,6 @@ export class Tv2DveActionFactory {
     }
   }
 
-  // Copied from Blueprints // TODO: Use the helper class André is making.
-  private joinAssetToFolder(folder: string | undefined, assetFile: string): string {
-    if (!folder) {
-      return assetFile
-    }
-
-    // Replace every `\\` with `\`, then replace every `\` with `/`
-    const folderWithForwardSlashes = folder.replace(/\\\\/g, '\\').replace(/\\/g, '/')
-    const assetWithForwardSlashes = assetFile.replace(/\\\\/g, '\\').replace(/\\/g, '/')
-
-    // Remove trailing slash from folder and leading slash from asset
-    const folderWithoutTrailingSlashes = folderWithForwardSlashes.replace(/\/+$/, '')
-    const assetFileWithoutLeadingSlashes = assetWithForwardSlashes.replace(/^\/+/, '')
-
-    return `${folderWithoutTrailingSlashes}/${assetFileWithoutLeadingSlashes}`
-  }
-
   private createInsertToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertSourceInputAction[] {
     const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesCam.slice(0, 5)
     const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesRM
@@ -252,7 +235,9 @@ export class Tv2DveActionFactory {
             name: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
             description: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
             type: PieceActionType.REPLACE_PIECE,
-            data: {} as PieceInterface,
+            data: {
+              pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
+            },
             metadata: {
               contentType: Tv2ActionContentType.SPLIT_SCREEN,
               actionSubtype: Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT,
@@ -266,6 +251,10 @@ export class Tv2DveActionFactory {
       actions.push(...actionsForInput)
     }
     return actions
+  }
+
+  private createEmptyPieceInterfaceToBeUpdatedByMutateActions(): PieceInterface {
+    return {} as PieceInterface
   }
 
   private updateInsertToInputAction(action: Action, dvePieceFromRundown: Piece): Action {
@@ -311,7 +300,9 @@ export class Tv2DveActionFactory {
     }
 
     const dveAction: Tv2DveInsertSourceInputAction = action as Tv2DveInsertSourceInputAction
-    dveAction.data = this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, pieceMetadata, timelineObjects)
+    dveAction.data = {
+      pieceInterface: this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, pieceMetadata, timelineObjects)
+    }
     return dveAction
   }
 
@@ -364,15 +355,17 @@ export class Tv2DveActionFactory {
         start: 0
       }
 
+      const dveSource: number = this.videoMixerTimelineObjectFactory.getDveSourceInput()
+
       const dveTimelineObjects: TimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, PLANNED_DVE_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(DVE_PROGRAM_ID, ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(DVE_CLEAN_FEED_ID, ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(DVE_LOOKAHEAD_ID, ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.casparCgTimelineObjectFactory.createCasparCgDveKeyTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveFrameTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveLocatorTimelineObject(),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(DVE_PROGRAM_ID, dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(DVE_CLEAN_FEED_ID, dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(DVE_LOOKAHEAD_ID, dveSource, videoSwitcherTimelineEnable),
+        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
+        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
+        this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject(),
         ...audioTimelineObjects
       ]
 
@@ -528,7 +521,9 @@ export class Tv2DveActionFactory {
           isVoiceOver
         }
       },
-      data: {} as PieceInterface
+      data: {
+        pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
+      }
     }
   }
 

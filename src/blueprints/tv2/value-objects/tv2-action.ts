@@ -1,6 +1,8 @@
 import { PartAction, PieceAction } from '../../../model/entities/action'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
+import { Breaker, TransitionEffectType } from './tv2-show-style-blueprint-configuration'
+import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
 
 export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
@@ -20,6 +22,8 @@ export enum Tv2ActionSubtype {
   DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
   RECALL_LAST_REMOTE = 'RECALL_LAST_REMOTE',
 }
+
+export type Tv2Action = Tv2PartAction | Tv2PieceAction
 
 export interface Tv2PartAction extends PartAction {
   metadata: {
@@ -64,10 +68,37 @@ export interface Tv2RecallLastRemoteAsNextAction extends Tv2RemoteAction {
   }
 }
 
-export interface Tv2TransitionAction extends Tv2PieceAction {
-  metadata: {
-    contentType: Tv2ActionContentType.TRANSITION,
-  }
+export interface Tv2TransitionEffectAction extends Tv2PieceAction {
+  metadata: Tv2TransitionEffectActionMetadata
+}
+
+export type Tv2TransitionEffectActionMetadata = Tv2CutTransitionEffectActionMetadata | Tv2MixTransitionEffectActionMetadata | Tv2DipTransitionEffectActionMetadata | Tv2BreakerTransitionEffectActionMetadata
+
+export interface Tv2CutTransitionEffectActionMetadata {
+  contentType: Tv2ActionContentType.TRANSITION,
+  transitionEffectType: TransitionEffectType.CUT
+}
+
+export interface Tv2MixTransitionEffectActionMetadata {
+  contentType: Tv2ActionContentType.TRANSITION,
+  transitionEffectType: TransitionEffectType.MIX
+  durationInFrames: number
+}
+
+export interface Tv2DipTransitionEffectActionMetadata {
+  contentType: Tv2ActionContentType.TRANSITION,
+  transitionEffectType: TransitionEffectType.DIP
+  durationInFrames: number,
+  dipInput: number
+}
+
+export interface Tv2BreakerTransitionEffectActionMetadata {
+  contentType: Tv2ActionContentType.TRANSITION,
+  transitionEffectType: TransitionEffectType.BREAKER
+  casparCgPreRollDuration: number
+  downstreamKeyer: Tv2DownstreamKeyer
+  breakerFolder: string
+  breaker: Breaker
 }
 
 export interface Tv2AudioAction extends Tv2PieceAction {

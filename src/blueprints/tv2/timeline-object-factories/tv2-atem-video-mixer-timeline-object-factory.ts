@@ -16,6 +16,11 @@ import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { DveBoxProperties, DveLayoutProperties } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
+import { Piece } from '../../../model/entities/piece'
+import { TimelineObject } from '../../../model/entities/timeline-object'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
+
+const ATEM_SUPER_SOURCE_INDEX: number = 6000
 
 const ID_PREFIX: string = 'atem_'
 
@@ -26,7 +31,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return {
       id: '',
       enable: {
-        while: 1
+        start: 0
       },
       priority: 10,
       layer: `${this.getDownstreamKeyerLayerPrefix()}_${downstreamKeyerNumber}`,
@@ -180,5 +185,76 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
 
   public getDveBoxesLayer(): string {
     return Tv2AtemLayer.DVE_BOXES
+  }
+
+  public getDveSourceInput(): number {
+    return ATEM_SUPER_SOURCE_INDEX
+  }
+
+  public findProgramSourceInputFromPiece(piece: Piece): number | undefined {
+    const timelineObject: TimelineObject | undefined = piece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
+    if (!timelineObject) {
+      console.log(`Can't update Atem Me Input. No TimelineObject for '${Tv2AtemLayer.PROGRAM}' found on Piece '${piece.id}'.`)
+      return
+    }
+    const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
+    if (blueprintTimelineObject.content.deviceType !== DeviceType.ATEM || blueprintTimelineObject.content.type !== AtemType.ME) {
+      console.log('Can\'t update Atem Me Input. TimelineObject is not an Atem Me TimelineObject.')
+      return
+    }
+
+    const atemMeTimelineObject: AtemMeTimelineObject = blueprintTimelineObject as AtemMeTimelineObject
+    return  atemMeTimelineObject.content.me.input
+  }
+
+  public createCutTransitionEffectTimelineObject(sourceInput: number): AtemMeTimelineObject {
+    const meContent: AtemMeTimelineObject['content']['me'] = {
+      input: sourceInput,
+      transition: AtemTransition.CUT
+    }
+    return this.createTransitionEffectTimelineObject(meContent)
+  }
+
+  private createTransitionEffectTimelineObject(meContent: AtemMeTimelineObject['content']['me']): AtemMeTimelineObject {
+    return {
+      id: '',
+      enable: {
+        start: 0
+      },
+      layer: Tv2AtemLayer.PROGRAM,
+      priority: 10,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.ME,
+        me: meContent
+      }
+    }
+  }
+
+  public createMixTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number): AtemMeTimelineObject {
+    const meContent: AtemMeTimelineObject['content']['me'] = {
+      input: sourceInput,
+      transition: AtemTransition.MIX,
+      transitionSettings: {
+        mix: {
+          rate: durationInFrames
+        }
+      }
+    }
+    return this.createTransitionEffectTimelineObject(meContent)
+  }
+
+  public createDipTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number, dipInput: number): AtemMeTimelineObject {
+    const meContent: AtemMeTimelineObject['content']['me'] = {
+      input: sourceInput,
+      transition: AtemTransition.DIP,
+      transitionSettings: {
+        dip: {
+          rate: durationInFrames,
+          input: dipInput
+        }
+      }
+    }
+    return this.createTransitionEffectTimelineObject(meContent)
   }
 }

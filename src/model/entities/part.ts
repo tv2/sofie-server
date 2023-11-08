@@ -39,7 +39,6 @@ export class Part {
 
   public readonly expectedDuration?: number
 
-  public readonly inTransition: InTransition
   public readonly outTransition: OutTransition
 
   public readonly autoNext?: AutoNext
@@ -58,6 +57,8 @@ export class Part {
   private executedAt: number
   private playedDuration: number
   private timings?: PartTimings
+
+  private inTransition: InTransition
 
   /*
    * The EndState of the Part
@@ -155,6 +156,10 @@ export class Part {
     if (this.isPartOnAir) {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
+    }
+    const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === unPlannedPiece.layer)
+    if (indexOfExistingPieceOnLayer >= 0) {
+      this.pieces.splice(indexOfExistingPieceOnLayer, 1)
     }
     this.pieces.push(unPlannedPiece)
   }
@@ -295,5 +300,12 @@ export class Part {
 
   public getUnsyncedCopy(): Part {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
+  }
+
+  public updateInTransition(inTransition: InTransition): void {
+    this.inTransition = {
+      keepPreviousPartAliveDuration: Math.max(inTransition.keepPreviousPartAliveDuration, this.inTransition.keepPreviousPartAliveDuration),
+      delayPiecesDuration: Math.max(inTransition.delayPiecesDuration, this.inTransition.delayPiecesDuration)
+    }
   }
 }
