@@ -6,6 +6,7 @@ export enum PieceType {
   VIDEO_CLIP = 'VIDEO_CLIP',
   AUDIO = 'AUDIO',
   TRANSITION = 'TRANSITION',
-  DVE = 'DVE'
+  DVE = 'DVE',
+  REPLAY = 'REPLAY'
   // Add as needed
 }

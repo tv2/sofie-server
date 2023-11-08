@@ -7,6 +7,9 @@ export enum Tv2SourceLayer {
   AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs',
   DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
   DVE = 'dve',
+  REPLAY = 'studio0_local',
+  REPLAY_STUDIO_AUX = 'studio0_aux_studio_screen',
+  REPLAY_VIZ_AUX = 'studio0_aux_viz_full1',
 
   VIDEO_CLIP = 'studio0_selected_clip',
   SERVER_VOICE_OVER = 'studio0_selected_voiceover',
@@ -24,7 +27,12 @@ export enum Tv2AtemLayer {
   LOOKAHEAD = 'atem_aux_lookahead',
   DOWNSTREAM_KEYER = 'atem_dsk',
   DVE = 'atem_dve',
-  DVE_BOXES = 'atem_dve_boxes'
+  DVE_BOXES = 'atem_dve_boxes',
+}
+
+export enum Tv2VideoMixerLayer {
+  AR = 'aux_ar',
+  VIZ_OVL_AUX = 'aux_viz_ovl_in_1'
 }
 
 export enum Tv2CasparCgLayer {

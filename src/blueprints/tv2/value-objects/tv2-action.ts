@@ -15,6 +15,7 @@ export enum Tv2ActionContentType {
   DVE_LAYOUT = 'DVE_LAYOUT',
   DVE_INSERT_SOURCE_TO_INPUT = 'DVE_INSERT_SOURCE_TO_INPUT',
   DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
+  REPLAY = 'REPLAY',
   UNKNOWN = 'UNKNOWN'
 }
 
@@ -130,4 +131,16 @@ export interface Tv2DveInsertLastVideoClipInputAction extends Tv2PieceAction {
   metadata: {
     contentType: Tv2ActionContentType.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
   } & Tv2DveInsertSourceInputMetadata
+}
+
+export interface Tv2ReplayAction extends Tv2PartAction {
+  metadata: {
+    contentType: Tv2ActionContentType.REPLAY
+  }
+}
+
+export interface Tv2ReplayAuxAction extends Tv2PieceAction {
+  metadata: {
+    contentType: Tv2ActionContentType.REPLAY
+  }
 }
