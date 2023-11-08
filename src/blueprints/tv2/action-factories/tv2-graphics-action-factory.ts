@@ -322,7 +322,6 @@ export class Tv2GraphicsActionFactory {
     const sourceInput: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
     const upstreamEnable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration }
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
-    const downstreamKeyerEnable: TimelineEnable = { start: 0 }
     const priority: number = 0
 
     return [
@@ -330,12 +329,7 @@ export class Tv2GraphicsActionFactory {
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(GRAPHICS_PROGRAM_ID, sourceInput, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(GRAPHICS_CLEAN_FEED_ID, sourceInput, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(GRAPHICS_LOOKAHEAD_ID, sourceInput, videoMixerEnable),
-      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(
-        downstreamKeyer,
-        true,
-        downstreamKeyerEnable,
-        priority
-      ),
+      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, priority),
       this.videoMixerTimelineObjectFactory.createUpstreamKeyerTimelineObject(
         downstreamKeyer,
         upstreamEnable
@@ -446,7 +440,7 @@ export class Tv2GraphicsActionFactory {
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(graphicsData)),
       timelineObjects: [
         graphicsTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
-        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
+        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, 1)
       ]
     })
     return {
@@ -490,7 +484,7 @@ export class Tv2GraphicsActionFactory {
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(graphicsData)),
       timelineObjects: [
         graphicsTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
-        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, { start: 0 }, 1)
+        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, 1)
       ]
     })
 

@@ -21,11 +21,13 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 const ID_PREFIX: string = 'atem_'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
-  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean, enable: TimelineEnable, priority: number): AtemDownstreamKeyerTimelineObject {
+  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean, priority: number): AtemDownstreamKeyerTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
       id: `${ID_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
-      enable,
+      enable: {
+        while: 1
+      },
       priority,
       layer: `${this.getDownstreamKeyerLayerPrefix()}_${downstreamKeyerNumber}`,
       content: {
