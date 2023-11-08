@@ -12,18 +12,14 @@ import {
 import { PartInterface } from '../../../model/entities/part'
 import { AtemTransition, AtemTransitionSettings } from '../../timeline-state-resolver-types/atem-types'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
-import {
-  Tv2VizGraphicsTimelineObjectFactory
-} from '../timeline-object-factories/tv2-viz-graphics-timeline-object-factory'
+import { Tv2VizTimelineObjectFactory } from '../timeline-object-factories/tv2-viz-timeline-object-factory'
 import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
-import {
-  Tv2CasparCgGraphicsTimelineObjectFactory
-} from '../timeline-object-factories/tv2-caspar-cg-graphics-timeline-object-factory'
+import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2CasparCgPathFixer } from '../helpers/tv2-caspar-cg-path-fixer'
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
@@ -48,8 +44,8 @@ const GRAPHICS_LOOKAHEAD_ID: string = 'graphicsLookahead'
 
 export class Tv2GraphicsActionFactory {
   constructor(
-    private readonly vizGraphicsTimelineObjectFactory: Tv2VizGraphicsTimelineObjectFactory,
-    private readonly casparCgGraphicsTimelineObjectFactory: Tv2CasparCgGraphicsTimelineObjectFactory,
+    private readonly vizGraphicsTimelineObjectFactory: Tv2VizTimelineObjectFactory,
+    private readonly casparCgGraphicsTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly casparCgPathFixer: Tv2CasparCgPathFixer

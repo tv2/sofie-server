@@ -4,9 +4,7 @@ import { Tv2EndStateForPartService } from './tv2-end-state-for-part-service'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
 import { Tv2OnTimelineGenerateService } from './tv2-on-timeline-generate-service'
 import { Tv2ActionService } from './tv2-action-service'
-import {
-  Tv2VizGraphicsTimelineObjectFactory
-} from './timeline-object-factories/tv2-viz-graphics-timeline-object-factory'
+import { Tv2VizTimelineObjectFactory } from './timeline-object-factories/tv2-viz-timeline-object-factory'
 import {
   Tv2SisyfosAudioTimelineObjectFactory
 } from './timeline-object-factories/tv2-sisyfos-audio-timeline-object-factory'
@@ -25,13 +23,10 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2CasparCgPathFixer } from './helpers/tv2-caspar-cg-path-fixer'
-import {
-  Tv2CasparCgGraphicsTimelineObjectFactory
-} from './timeline-object-factories/tv2-caspar-cg-graphics-timeline-object-factory'
+import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
-import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 
 export class Tv2BlueprintsFacade {
@@ -39,10 +34,9 @@ export class Tv2BlueprintsFacade {
     const tv2CasparCgPathFixer: Tv2CasparCgPathFixer = new Tv2CasparCgPathFixer()
     const tv2SisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
     const tv2AudioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
-    const tv2VizGraphicsTimelineObjectFactory: Tv2VizGraphicsTimelineObjectFactory = new Tv2VizGraphicsTimelineObjectFactory()
-    const tv2CasparCgGraphicsTimelineObjectFactory: Tv2CasparCgGraphicsTimelineObjectFactory = new Tv2CasparCgGraphicsTimelineObjectFactory(tv2CasparCgPathFixer)
+    const tv2VizGraphicsTimelineObjectFactory: Tv2VizTimelineObjectFactory = new Tv2VizTimelineObjectFactory()
+    const tv2CasparCgGraphicsTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(tv2CasparCgPathFixer)
     const tv2VideoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
-    const tv2CasparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory()
 
     const actionService: Tv2ActionService = new Tv2ActionService(
       new Tv2BlueprintConfigurationMapper(),
@@ -60,13 +54,13 @@ export class Tv2BlueprintsFacade {
       new Tv2VideoClipActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
-        tv2CasparCgTimelineObjectFactory
+        tv2CasparCgGraphicsTimelineObjectFactory
       ),
       new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory),
       new Tv2DveActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
-        tv2CasparCgTimelineObjectFactory
+        tv2CasparCgGraphicsTimelineObjectFactory
       )
     )
 

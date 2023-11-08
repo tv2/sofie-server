@@ -1,5 +1,6 @@
 import { Tv2OverlayGraphicsManifestData } from '../value-objects/tv2-action-manifest-data'
 
+// Todo: move content to aptly named utility class
 export abstract class Tv2BaseGraphicTimelineObjectFactory {
 
   // Todo: merge with copy in 'Tv2GraphicsActionFactory'

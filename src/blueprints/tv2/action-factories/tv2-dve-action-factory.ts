@@ -33,10 +33,10 @@ import { DveBoxInput, Tv2DveManifestData, Tv2VideoClipManifestData } from '../va
 import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-operation-exception'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-layers'
 import { Tv2FileContent } from '../value-objects/tv2-content'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 
 const NUMBER_OF_DVE_BOXES: number = 4
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
