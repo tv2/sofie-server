@@ -49,10 +49,6 @@ const CAMERA_SOURCE_NAME: string = 'Camera'
 const LIVE_SOURCE_NAME: string = 'Live'
 const REPLAY_SOURCE_NAME: string = 'Replay'
 
-const DVE_LOOKAHEAD_ID: string = 'dveLookahead'
-const DVE_PROGRAM_ID: string = 'dveProgram'
-const DVE_CLEAN_FEED_ID: string = 'dveCleanFeed'
-
 export class Tv2DveActionFactory {
 
   constructor(
@@ -137,9 +133,9 @@ export class Tv2DveActionFactory {
       const dveLayoutTimelineObjects: TimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, LAYOUT_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(DVE_PROGRAM_ID, dveSource, timelineEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(DVE_CLEAN_FEED_ID, dveSource, timelineEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(DVE_LOOKAHEAD_ID, dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(dveSource, timelineEnable),
         this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
         this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
         this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject()
@@ -365,9 +361,9 @@ export class Tv2DveActionFactory {
       const dveTimelineObjects: TimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, PLANNED_DVE_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(DVE_PROGRAM_ID, dveSource, videoSwitcherTimelineEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(DVE_CLEAN_FEED_ID, dveSource, videoSwitcherTimelineEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(DVE_LOOKAHEAD_ID, dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(dveSource, videoSwitcherTimelineEnable),
         this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
         this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
         this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject(),

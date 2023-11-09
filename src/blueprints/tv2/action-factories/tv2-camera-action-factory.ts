@@ -92,9 +92,9 @@ export class Tv2CameraActionFactory {
   private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(`insertedProgram_${source._id}`, source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(`insertedCleanFeed_${source._id}`, source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(`insertedLookahead_${source._id}`, source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.SwitcherSource, enable),
     ]
   }
 
