@@ -2,7 +2,7 @@ import {
   Breaker,
   CutTransitionEffect,
   DipTransitionEffect,
-  DveConfiguration,
+  SplitScreenConfiguration,
   GraphicsDefault,
   GraphicsSetup,
   MixTransitionEffect,
@@ -68,7 +68,7 @@ export class Tv2BlueprintConfigurationMapper {
       graphicsDefault: this.mapGraphicsDefault(coreConfiguration.GfxDefaults),
       graphicsSetups: this.mapGraphicsSetups(coreConfiguration.GfxSetups),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
-      dveConfigurations: this.mapDveConfigurations(coreConfiguration.DVEStyles),
+      splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
       transitionEffectConfigurations: this.mapTransitionEffectConfigurations([
         ...coreConfiguration.Transitions.map(transition => transition.Transition),
         coreConfiguration.ShowstyleTransition
@@ -111,7 +111,7 @@ export class Tv2BlueprintConfigurationMapper {
     }
   }
 
-  private mapDveConfigurations(coreDveStyles: CoreDveStyle[]): DveConfiguration[] {
+  private mapSplitScreenConfigurations(coreDveStyles: CoreDveStyle[]): SplitScreenConfiguration[] {
     return coreDveStyles.map(dveStyle => {
       return {
         id: dveStyle._id,
