@@ -5,7 +5,6 @@ import { PartActionType, PieceActionType } from '../../../model/enums/action-typ
 import { PartInterface } from '../../../model/entities/part'
 import { PieceInterface } from '../../../model/entities/piece'
 import { Tv2ActionContentType, Tv2ReplayAction, Tv2ReplayAuxAction } from '../value-objects/tv2-action'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -139,7 +138,6 @@ export class Tv2ReplayActionFactory {
       id: `replayAction_${source.SourceName.replace(' ', '')}`,
       partId: parentPartId,
       name: `${source.SourceName}${isVoiceOver ? ' VO' : ''}`,
-      type: PieceType.REPLAY,
       layer: Tv2SourceLayer.REPLAY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -178,7 +176,6 @@ export class Tv2ReplayActionFactory {
       id: `insert_studio_aux_${trimmedName}_piece`,
       name: `${source.SourceName} Studio AUX`,
       partId: '',
-      type: PieceType.REPLAY,
       layer: Tv2SourceLayer.REPLAY_STUDIO_AUX,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
@@ -217,7 +214,6 @@ export class Tv2ReplayActionFactory {
       id: `insert_viz_aux_${trimmedName}_piece`,
       name: `${source.SourceName} Viz AUX`,
       partId: '',
-      type: PieceType.REPLAY,
       layer: Tv2SourceLayer.REPLAY_VIZ_AUX,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
