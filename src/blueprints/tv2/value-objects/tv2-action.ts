@@ -3,6 +3,7 @@ import { PartActionType, PieceActionType } from '../../../model/enums/action-typ
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Breaker, TransitionEffectType } from './tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
+import { Tv2AudioLevel } from '../enums/tv2-audio-level'
 
 export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
@@ -138,7 +139,7 @@ export type Tv2DveInsertSourceInputMetadata = {
   videoClip?: {
     timelineObjects: TimelineObject[]
     mediaPlayerSession: string
-    isVoiceOver: boolean
+    audioLevel: Tv2AudioLevel
   }
 }
 

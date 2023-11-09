@@ -1,5 +1,6 @@
 import { Tv2SourceMappingWithSound } from './tv2-studio-blueprint-configuration'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
+import { Tv2AudioLevel } from '../enums/tv2-audio-level'
 
 export type Tv2ActionManifestData = Tv2ActionManifestDataForVideoClip | Tv2ActionManifestDataForDve
 /**
@@ -59,7 +60,7 @@ export interface Tv2VideoClipManifestData {
   fileName: string // userData.partDefinition.videoId
   durationFromIngest: number // userData.duration
   adLibPix: boolean // userData.adLibPix // What does "adLibPix" mean?
-  isVoiceOver: boolean // userData.voLevels
+  audioLevel: Tv2AudioLevel // userData.voLevels
 }
 
 export interface Tv2DveManifestData {
