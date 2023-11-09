@@ -23,7 +23,8 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
 
   public async getActionManifests(): Promise<ActionManifest[]> {
     this.assertDatabaseConnection(this.getActionManifests.name)
-    const mongoAdLibPieces: AdLibPiece[] = await this.getCollection().find<AdLibPiece>({}).toArray()
+    // Todo: The filter is Tv2 specific. Remove filtering when we control ingest.
+    const mongoAdLibPieces: AdLibPiece[] = await this.getCollection().find<AdLibPiece>({uniquenessId: {$not: { $regex: '.*_commentator$'}}}).toArray()
     return mongoAdLibPieces.map(adLibPiece => this.mapToActionManifest(adLibPiece))
   }
 
@@ -33,6 +34,7 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
       data: {
         name: adLibPiece.name,
         expectedDuration: adLibPiece.expectedDuration ?? undefined,
+        sourceLayerId: adLibPiece.sourceLayerId
       },
     }
   }
