@@ -427,26 +427,26 @@ export class Tv2GraphicsActionFactory {
     )
   }
 
-  private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
+  private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
     const graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
       ? this.casparCgTimelineObjectFactory
       : this.vizTimelineObjectFactory
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: '',
-      name: graphicsData.name,
+      name: overlayGraphicsData.name,
       layer: Tv2SourceLayer.IDENT,
-      duration: graphicsData.expectedDuration,
-      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(graphicsData)),
+      duration: overlayGraphicsData.expectedDuration,
+      pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(overlayGraphicsData)),
       timelineObjects: [
-        graphicsTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, graphicsData),
+        graphicsTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, overlayGraphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, 1)
       ]
     })
     return {
-      id: `ident_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
+      id: `ident_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      name: graphicsData.name,
+      name: overlayGraphicsData.name,
       data: pieceInterface,
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS
