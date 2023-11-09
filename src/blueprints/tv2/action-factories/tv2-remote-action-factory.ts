@@ -169,7 +169,7 @@ export class Tv2RemoteActionFactory {
       {
         type: MutateActionType.HISTORIC_PART,
         updateActionWithPartData: this.updateInsertLastPlannedRemoteToInputAction.bind(this),
-        partPredicate: (part: Part) => this.doesPartContainAPlannedRemotePiece(part),
+        partPredicate: (part: Part) => part.isPlanned && this.doesPartContainARemotePiece(part),
       }
     ]
   }
@@ -226,8 +226,8 @@ export class Tv2RemoteActionFactory {
     }
   }
 
-  private doesPartContainAPlannedRemotePiece(part: Part): boolean {
-    return part.getPieces().some(piece => piece.isPlanned && this.isRemotePiece(piece))
+  private doesPartContainARemotePiece(part: Part): boolean {
+    return part.getPieces().some(piece => this.isRemotePiece(piece))
   }
 
   private isRemotePiece(piece: Piece): boolean {
