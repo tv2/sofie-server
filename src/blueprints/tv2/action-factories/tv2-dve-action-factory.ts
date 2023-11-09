@@ -37,6 +37,7 @@ import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-la
 import { Tv2FileContent } from '../value-objects/tv2-content'
 import { AssetFolderHelper } from '../helpers/asset-folder-helper'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2AudioLevel } from '../enums/tv2-audio-level'
 
 const NUMBER_OF_DVE_BOXES: number = 4
 
@@ -218,18 +219,18 @@ export class Tv2DveActionFactory {
     return [
       ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, CAMERA_SOURCE_NAME),
       ...this.createInsertToInputActionsForSources(blueprintConfiguration, liveSources, LIVE_SOURCE_NAME),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySources, `${REPLAY_SOURCE_NAME} VO`, true),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySourcesWithoutVoiceOver, REPLAY_SOURCE_NAME, false)
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySources, `${REPLAY_SOURCE_NAME} VO`, Tv2AudioLevel.VOICE_OVER),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySourcesWithoutVoiceOver, REPLAY_SOURCE_NAME, Tv2AudioLevel.FULL)
     ]
   }
 
-  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string, isVoiceOver: boolean = false): Tv2DveInsertSourceInputAction[] {
+  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string, audioLevel: Tv2AudioLevel = Tv2AudioLevel.FULL): Tv2DveInsertSourceInputAction[] {
     const actions: Tv2DveInsertSourceInputAction[] = []
     for (let inputIndex = 0; inputIndex < NUMBER_OF_DVE_BOXES; inputIndex++) {
       const actionsForInput: Tv2DveInsertSourceInputAction[] = sources
         .map(source => {
 
-          const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, isVoiceOver)
+          const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, audioLevel)
 
           return {
             id: `insert_${name}_${source.SourceName}_to_dve_input_${inputIndex}_action`,
@@ -492,22 +493,22 @@ export class Tv2DveActionFactory {
   private createInsertLastVideoClipToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertLastVideoClipInputAction[] {
     const actions: Tv2DveInsertLastVideoClipInputAction[] = []
     for (let inputIndex = 0; inputIndex < NUMBER_OF_DVE_BOXES; inputIndex++) {
-      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, false))
-      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, true))
+      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioLevel.FULL))
+      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioLevel.VOICE_OVER))
     }
 
     return actions
   }
 
-  private createInsertLastVideoClipToInputAction(blueprintConfiguration: Tv2BlueprintConfiguration, inputIndex: number, isVoiceOver: boolean): Tv2DveInsertLastVideoClipInputAction {
+  private createInsertLastVideoClipToInputAction(blueprintConfiguration: Tv2BlueprintConfiguration, inputIndex: number, audioLevel: Tv2AudioLevel): Tv2DveInsertLastVideoClipInputAction {
     const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(blueprintConfiguration, {
       fileName: inputIndex,
-      isVoiceOver
+      audioLevel: audioLevel
     } as unknown as Tv2VideoClipManifestData)
 
     return {
-      id: `insert_last_video_clip_to_dve_input_${inputIndex}${isVoiceOver ? '_vo' : ''}_action`,
-      name: `Insert last Video ${isVoiceOver ? ' Voice Over ' : ''} Clip in DVE input ${inputIndex}`,
+      id: `insert_last_video_clip_to_dve_input_${inputIndex}${audioLevel ? '_vo' : ''}_action`,
+      name: `Insert last Video ${audioLevel ? ' Voice Over ' : ''} Clip in DVE input ${inputIndex}`,
       description: 'Insert last Video Clip in DVE input ${inputIndex}',
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
@@ -519,7 +520,7 @@ export class Tv2DveActionFactory {
         videoClip: {
           mediaPlayerSession: '', // Will be found on mutate.
           timelineObjects: [],
-          isVoiceOver
+          audioLevel
         }
       },
       data: {
@@ -548,13 +549,13 @@ export class Tv2DveActionFactory {
 
     metadata.audioTimelineObjects = this.addMediaPlayerSessionToTimelineObjects(mediaPlayerSession, metadata.audioTimelineObjects)
 
-    const isVoiceOver: boolean = metadata.videoClip?.isVoiceOver ?? false
-    const videoClipTimelineObject: Tv2BlueprintTimelineObject = this.createVideoClipTimelineObjectForPieceWithMediaPlayerSession(pieceWithMediaPlayerSession, mediaPlayerSession, isVoiceOver)
+    const audioLevel: Tv2AudioLevel = metadata.videoClip?.audioLevel ?? Tv2AudioLevel.FULL
+    const videoClipTimelineObject: Tv2BlueprintTimelineObject = this.createVideoClipTimelineObjectForPieceWithMediaPlayerSession(pieceWithMediaPlayerSession, mediaPlayerSession, audioLevel)
 
     metadata.videoClip = {
       mediaPlayerSession,
       timelineObjects: [videoClipTimelineObject],
-      isVoiceOver
+      audioLevel
     }
 
     return action
@@ -568,15 +569,15 @@ export class Tv2DveActionFactory {
     return !!pieceMetadata.mediaPlayerSessions && pieceMetadata.mediaPlayerSessions.length > 0
   }
 
-  private createVideoClipTimelineObjectForPieceWithMediaPlayerSession(piece: Piece, mediaPlayerSession: string, isVoiceOver: boolean): Tv2BlueprintTimelineObject {
+  private createVideoClipTimelineObjectForPieceWithMediaPlayerSession(piece: Piece, mediaPlayerSession: string, audioLevel: Tv2AudioLevel): Tv2BlueprintTimelineObject {
     const fileContent: Tv2FileContent = piece.content as Tv2FileContent
 
     const videoClipData: Tv2VideoClipManifestData = {
       name: '',
       fileName: fileContent.fileName,
       durationFromIngest: 0,
-      adLibPix: isVoiceOver,
-      isVoiceOver
+      adLibPix: audioLevel === Tv2AudioLevel.VOICE_OVER,
+      audioLevel
     }
 
     const videoClipTimelineObject: Tv2BlueprintTimelineObject = this.casparCgTimelineObjectFactory.createVideoClipTimelineObject(videoClipData)

@@ -33,6 +33,7 @@ import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-fac
 import { Tv2PieceType } from './enums/tv2-piece-type'
 import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
 import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
+import { Tv2AudioLevel } from './enums/tv2-audio-level'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
@@ -90,7 +91,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
           fileName: data.partDefinition.fields.videoId,
           durationFromIngest: data.duration,
           adLibPix: data.adLibPix,
-          isVoiceOver: data.voLevels
+          audioLevel: data.voLevels ? Tv2AudioLevel.VOICE_OVER : Tv2AudioLevel.FULL
         }
       })
   }

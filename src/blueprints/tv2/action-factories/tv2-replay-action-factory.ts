@@ -18,6 +18,7 @@ import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { Tv2AudioLevel } from '../enums/tv2-audio-level'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -49,7 +50,7 @@ export class Tv2ReplayActionFactory {
     const trimmedName: string = source.SourceName.replace(' ', '')
     const partId: string = `${trimmedName}_VO_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.SourceName} VO`)
-    const pieceInterface: PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, true)
+    const pieceInterface: PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioLevel.VOICE_OVER)
 
     return {
       id: `insert_${trimmedName}_VO_as_next_part_action`,
@@ -72,7 +73,7 @@ export class Tv2ReplayActionFactory {
     const trimmedName: string = source.SourceName.replace(' ', '')
     const partId: string = `${trimmedName}_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.SourceName}`)
-    const pieceInterface: PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, false)
+    const pieceInterface: PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioLevel.FULL)
 
     return {
       id: `insert_${trimmedName}_as_next_part_action`,
@@ -113,7 +114,7 @@ export class Tv2ReplayActionFactory {
     }
   }
 
-  private createReplayForSourcePieceInterface(configuration: Tv2BlueprintConfiguration, parentPartId: string, source: Tv2SourceMappingWithSound, isVoiceOver: boolean): PieceInterface {
+  private createReplayForSourcePieceInterface(configuration: Tv2BlueprintConfiguration, parentPartId: string, source: Tv2SourceMappingWithSound, audioLevel: Tv2AudioLevel): PieceInterface {
     const videoMixerEnable: TimelineEnable = {
       start: 0
     }
@@ -122,22 +123,21 @@ export class Tv2ReplayActionFactory {
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.SwitcherSource, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.SwitcherSource, videoMixerEnable),
-      ...this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source, isVoiceOver)
+      ...this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source, audioLevel)
     ]
 
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.REPLAY,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
-        // sisyfosLayers: source.SisyfosLayers ?? [],
-        acceptsPersistedAudio: isVoiceOver
+        acceptsPersistedAudio: audioLevel == Tv2AudioLevel.VOICE_OVER
       }
     }
 
     return {
       id: `replayAction_${source.SourceName.replace(' ', '')}`,
       partId: parentPartId,
-      name: `${source.SourceName}${isVoiceOver ? ' VO' : ''}`,
+      name: `${source.SourceName}${audioLevel ? ' VO' : ''}`,
       layer: Tv2SourceLayer.REPLAY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -153,7 +153,6 @@ export class Tv2ReplayActionFactory {
     }
   }
 
-  // TODO: Verify behaviour of Action infinite Pieces.
   private createReplayStudioAuxAction(source: Tv2SourceMappingWithSound): Tv2ReplayAuxAction {
     const trimmedName: string = source.SourceName.replace(' ', '')
     return {

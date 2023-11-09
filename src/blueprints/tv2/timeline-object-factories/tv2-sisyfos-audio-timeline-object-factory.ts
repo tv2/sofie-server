@@ -2,6 +2,7 @@ import { Tv2AudioTimelineObjectFactory } from './interfaces/tv2-audio-timeline-o
 import {
   SisyfosChannelsTimelineObject,
   SisyfosChannelTimelineObject,
+  SisyfosFaderState,
   SisyfosTimelineObject,
   SisyfosType
 } from '../../timeline-state-resolver-types/sisyfos-types'
@@ -11,16 +12,11 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
-
-const enum SisyfosFaderState {
-  OFF = 0,
-  ON = 1,
-  VOICE_OVER = 2
-}
+import { Tv2AudioLevel } from '../enums/tv2-audio-level'
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
 
-  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, isVoiceOver?: boolean): SisyfosTimelineObject[] {
+  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, audioLevel?: Tv2AudioLevel): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
       return {
         id: `${source._id}_${this.generateRandomWholeNumber()}`,
@@ -31,7 +27,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
         content: {
           deviceType: DeviceType.SISYFOS,
           type: SisyfosType.CHANNEL,
-          isPgm: isVoiceOver ? SisyfosFaderState.VOICE_OVER: SisyfosFaderState.ON
+          isPgm: audioLevel === Tv2AudioLevel.VOICE_OVER ? SisyfosFaderState.VOICE_OVER: SisyfosFaderState.ON
         }
       }
     })
@@ -129,7 +125,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNEL,
-        isPgm: videoClipData.isVoiceOver ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
+        isPgm: videoClipData.audioLevel ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
       }
     }
 
@@ -137,7 +133,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       serverPendingTimelineObject
     ]
 
-    if (videoClipData.isVoiceOver) {
+    if (videoClipData.audioLevel) {
       sisyfosServerTimelineObjects.push(this.createStudioMicrophonesTimelineObject(configuration))
     }
 
