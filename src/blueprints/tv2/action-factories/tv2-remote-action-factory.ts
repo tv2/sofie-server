@@ -34,12 +34,12 @@ export class Tv2RemoteActionFactory {
 
   public createRemoteActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
     return [
-      ...this.createInsertInsertRemoteAsNextActions(blueprintConfiguration),
+      ...this.createInsertRemoteAsNextActions(blueprintConfiguration),
       this.createRecallLastRemoteAsNextAction(),
     ]
   }
 
-  private createInsertInsertRemoteAsNextActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
+  private createInsertRemoteAsNextActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
     return blueprintConfiguration.studio.SourcesRM
       .map(source => this.createInsertRemoteAsNextAction(blueprintConfiguration, source))
   }
