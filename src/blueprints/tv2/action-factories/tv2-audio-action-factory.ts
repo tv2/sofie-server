@@ -1,6 +1,4 @@
 import { Action } from '../../../model/entities/action'
-import { PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -11,6 +9,8 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 
@@ -28,7 +28,7 @@ export class Tv2AudioActionFactory {
   }
 
   private createFadePersistedAudioAction(): Tv2PieceAction {
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createAudioPieceInterface({
       id: 'fadePersistedAudioPiece',
       name: 'Fade Persisted Audio',
       metadata: this.createFadePersistedAudioMetadata()
@@ -49,6 +49,7 @@ export class Tv2AudioActionFactory {
   private createFadePersistedAudioMetadata(): Tv2PieceMetadata {
     return {
       type: Tv2PieceType.COMMAND,
+      outputLayer: Tv2OutputLayer.AUDIO,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: false,
@@ -58,7 +59,7 @@ export class Tv2AudioActionFactory {
   }
 
   private createStudioMicrophonesUpAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2AudioAction {
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createAudioPieceInterface({
       id: 'studioMicrophonesUpPiece',
       name: 'Studio Microphones Up',
       timelineObjects: [
@@ -78,11 +79,10 @@ export class Tv2AudioActionFactory {
     }
   }
 
-  private createAudioPieceInterface(pieceInterfaceWithRequiredValues: Pick<PieceInterface, 'id' | 'name'> & Partial<PieceInterface>): PieceInterface {
+  private createAudioPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>): Tv2PieceInterface {
     return {
       duration: 0,
       partId: '',
-      type: PieceType.AUDIO,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       layer: Tv2SourceLayer.AUDIO_ACTION_COMMAND,
@@ -93,12 +93,16 @@ export class Tv2AudioActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [],
+      metadata: {
+        type: Tv2PieceType.COMMAND,
+        outputLayer: Tv2OutputLayer.SECONDARY,
+      },
       ...pieceInterfaceWithRequiredValues
     }
   }
 
   private createStudioMicrophonesDownAction(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction {
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createAudioPieceInterface({
       id: 'studioMicrophonesDownPiece',
       name: 'Studio Microphones Down',
       timelineObjects: [
@@ -120,7 +124,7 @@ export class Tv2AudioActionFactory {
 
   private createStopAudioBedAction(): Tv2PieceAction {
     const duration: number = 1000
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createAudioPieceInterface({
       id: 'stopAudioBedPiece',
       name: 'Stop audio bed',
       layer: Tv2SourceLayer.AUDIO_BED,
@@ -145,7 +149,7 @@ export class Tv2AudioActionFactory {
 
   private createResynchronizeAudioAction(): Tv2PieceAction {
     const duration: number = 1000
-    const pieceInterface: PieceInterface = this.createAudioPieceInterface({
+    const pieceInterface: Tv2PieceInterface = this.createAudioPieceInterface({
       id: 'resynchronizeAudioPiece',
       name: 'Resynchronize Audio',
       duration,

@@ -1,4 +1,5 @@
 import { Tv2SourceMappingWithSound } from './tv2-studio-blueprint-configuration'
+import { Tv2PieceType } from '../enums/tv2-piece-type'
 
 export type Tv2ActionManifestData = Tv2ActionManifestDataForVideoClip | Tv2ActionManifestDataForDve
 /**
@@ -23,6 +24,7 @@ export interface Tv2ActionManifestDataForVideoClip {
  */
 export interface Tv2ActionManifestDataForDve {
   name: string
+  pieceType: Tv2PieceType
   config: {
     template: string,
     sources: {

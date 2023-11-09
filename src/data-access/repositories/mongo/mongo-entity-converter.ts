@@ -2,7 +2,6 @@ import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { Timeline } from '../../../model/entities/timeline'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { TimelineObject } from '../../../model/entities/timeline-object'
@@ -19,7 +18,6 @@ import { PartTimings } from '../../../model/value-objects/part-timings'
 import { Exception } from '../../../model/exceptions/exception'
 import { ErrorCode } from '../../../model/enums/error-code'
 import { ActionManifest } from '../../../model/entities/action'
-import { UnexpectedCaseException } from '../../../model/exceptions/unexpected-case-exception'
 import { Media } from '../../../model/entities/media'
 
 export interface MongoId {
@@ -329,7 +327,6 @@ export class MongoEntityConverter {
       partId: mongoPiece.startPartId,
       name: mongoPiece.name,
       layer: mongoPiece.sourceLayerId,
-      type: PieceType.UNKNOWN,
       pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
       isPlanned: mongoPiece.isPlanned ?? true,
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
@@ -519,25 +516,8 @@ export class MongoEntityConverter {
 
   public convertActionManifest(mongoActionManifest: MongoActionManifest): ActionManifest {
     return {
-      pieceType: this.getPieceTypeFromMongoActionManifest(mongoActionManifest),
-      data: mongoActionManifest.userData
-    }
-  }
-
-  private getPieceTypeFromMongoActionManifest(mongoActionManifest: MongoActionManifest): PieceType {
-    switch (mongoActionManifest.actionId) {
-      case 'select_full_grafik': {
-        return PieceType.CAMERA
-      }
-      case 'select_server_clip': {
-        return PieceType.VIDEO_CLIP
-      }
-      case 'select_dve': {
-        return PieceType.DVE
-      }
-      default: {
-        throw new UnexpectedCaseException(`Unknown MongoActionManifestId: ${mongoActionManifest.actionId}`)
-      }
+      actionId: mongoActionManifest.actionId,
+      data: mongoActionManifest.userData,
     }
   }
 

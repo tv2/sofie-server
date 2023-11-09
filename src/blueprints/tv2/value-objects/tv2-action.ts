@@ -6,16 +6,20 @@ import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
 
 export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
+  REMOTE = 'REMOTE',
   VIDEO_CLIP = 'VIDEO_CLIP',
   TRANSITION = 'TRANSITION',
   GRAPHICS = 'GRAPHICS',
   AUDIO = 'AUDIO',
-  DVE = 'DVE',
+  SPLIT_SCREEN = 'SPLIT_SCREEN',
+  UNKNOWN = 'UNKNOWN'
+}
+
+export enum Tv2ActionSubtype {
   RECALL_DVE = 'RECALL_DVE',
   DVE_LAYOUT = 'DVE_LAYOUT',
   DVE_INSERT_SOURCE_TO_INPUT = 'DVE_INSERT_SOURCE_TO_INPUT',
   DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
-  UNKNOWN = 'UNKNOWN'
 }
 
 export type Tv2Action = Tv2PartAction | Tv2PieceAction
@@ -23,12 +27,14 @@ export type Tv2Action = Tv2PartAction | Tv2PieceAction
 export interface Tv2PartAction extends PartAction {
   metadata: {
     contentType: Tv2ActionContentType
+    actionSubtype?: Tv2ActionSubtype
   }
 }
 
 export interface Tv2PieceAction extends PieceAction {
   metadata: {
     contentType: Tv2ActionContentType
+    actionSubtype?: Tv2ActionSubtype
   }
 }
 
@@ -44,6 +50,13 @@ export interface Tv2CameraAction extends Tv2PartAction {
   metadata: {
     contentType: Tv2ActionContentType.CAMERA,
     cameraNumber: string
+  }
+}
+
+export interface Tv2RemoteAction extends Tv2PartAction {
+  metadata: {
+    contentType: Tv2ActionContentType.REMOTE,
+    remoteNumber: string
   }
 }
 
@@ -89,28 +102,31 @@ export interface Tv2AudioAction extends Tv2PieceAction {
 export interface Tv2DveAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
-    contentType: Tv2ActionContentType.DVE
+    contentType: Tv2ActionContentType.SPLIT_SCREEN
   }
 }
 
 export interface Tv2RecallDveAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
-    contentType: Tv2ActionContentType.RECALL_DVE
+    contentType: Tv2ActionContentType.SPLIT_SCREEN,
+    actionSubtype: Tv2ActionSubtype.RECALL_DVE,
   }
 }
 
 export interface Tv2DveLayoutAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
-    contentType: Tv2ActionContentType.DVE_LAYOUT
+    contentType: Tv2ActionContentType.SPLIT_SCREEN,
+    actionSubtype: Tv2ActionSubtype.DVE_LAYOUT,
   }
 }
 
 export interface Tv2DveInsertSourceInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
-    contentType: Tv2ActionContentType.DVE_INSERT_SOURCE_TO_INPUT
+    contentType: Tv2ActionContentType.SPLIT_SCREEN,
+    actionSubtype: Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT
   } & Tv2DveInsertSourceInputMetadata
 }
 
@@ -128,6 +144,7 @@ export type Tv2DveInsertSourceInputMetadata = {
 export interface Tv2DveInsertLastVideoClipInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
-    contentType: Tv2ActionContentType.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
+    contentType: Tv2ActionContentType.SPLIT_SCREEN,
+    actionSubtype: Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
   } & Tv2DveInsertSourceInputMetadata
 }
