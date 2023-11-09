@@ -3,7 +3,6 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
-import { PieceInterface } from '../../../model/entities/piece'
 import { Tv2ActionContentType, Tv2ReplayAction, Tv2ReplayAuxAction } from '../value-objects/tv2-action'
 import { Tv2SourceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -19,6 +18,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -50,7 +50,7 @@ export class Tv2ReplayActionFactory {
     const noWhitespaceName: string = this.removeAllWhitespace(source.SourceName)
     const partId: string = `${noWhitespaceName}_VO_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.SourceName} VO`)
-    const pieceInterface: PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.VOICE_OVER)
+    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.VOICE_OVER)
 
     return {
       id: `insert_${noWhitespaceName}_VO_as_next_part_action`,
@@ -77,7 +77,7 @@ export class Tv2ReplayActionFactory {
     const noWhitespaceName: string = this.removeAllWhitespace(source.SourceName)
     const partId: string = `${noWhitespaceName}_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.SourceName}`)
-    const pieceInterface: PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.FULL)
+    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.FULL)
 
     return {
       id: `insert_${noWhitespaceName}_as_next_part_action`,
@@ -118,7 +118,7 @@ export class Tv2ReplayActionFactory {
     }
   }
 
-  private createReplayForSourcePieceInterface(configuration: Tv2BlueprintConfiguration, parentPartId: string, source: Tv2SourceMappingWithSound, audioMode: Tv2AudioMode): PieceInterface {
+  private createReplayForSourcePieceInterface(configuration: Tv2BlueprintConfiguration, parentPartId: string, source: Tv2SourceMappingWithSound, audioMode: Tv2AudioMode): Tv2PieceInterface {
     const videoMixerEnable: TimelineEnable = {
       start: 0
     }
@@ -172,7 +172,7 @@ export class Tv2ReplayActionFactory {
     }
   }
 
-  private createStudioAuxPieceInterface(source: Tv2SourceMappingWithSound): PieceInterface {
+  private createStudioAuxPieceInterface(source: Tv2SourceMappingWithSound): Tv2PieceInterface {
     const noWhitespaceName: string = this.removeAllWhitespace(source.SourceName)
     return {
       id: `insert_studio_aux_${noWhitespaceName}_piece`,
@@ -190,7 +190,10 @@ export class Tv2ReplayActionFactory {
       isUnsynced: false,
       timelineObjects: [
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.SwitcherSource, Tv2VideoMixerLayer.AR)
-      ]
+      ],
+      metadata: {
+        type: Tv2PieceType.REPLAY
+      }
     }
   }
 
@@ -210,7 +213,7 @@ export class Tv2ReplayActionFactory {
     }
   }
 
-  private createVizAuxPieceInterface(source: Tv2SourceMappingWithSound): PieceInterface {
+  private createVizAuxPieceInterface(source: Tv2SourceMappingWithSound): Tv2PieceInterface {
     const noWhitespaceName: string = this.removeAllWhitespace(source.SourceName)
     return {
       id: `insert_viz_aux_${noWhitespaceName}_piece`,
@@ -227,8 +230,11 @@ export class Tv2ReplayActionFactory {
       tags: [],
       isUnsynced: false,
       timelineObjects: [
-        this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.SwitcherSource, Tv2VideoMixerLayer.VIZ_OVL_AUX)
-      ]
+        this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.SwitcherSource, Tv2VideoMixerLayer.VIZ_OVERLAY_AUXILIARY)
+      ],
+      metadata: {
+        type: Tv2PieceType.REPLAY
+      }
     }
   }
 }

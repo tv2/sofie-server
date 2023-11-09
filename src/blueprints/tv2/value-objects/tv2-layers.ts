@@ -33,7 +33,7 @@ export enum Tv2AtemLayer {
 
 export enum Tv2VideoMixerLayer {
   AR = 'aux_ar',
-  VIZ_OVL_AUX = 'aux_viz_ovl_in_1'
+  VIZ_OVERLAY_AUXILIARY = 'aux_viz_ovl_in_1'
 }
 
 export enum Tv2CasparCgLayer {
