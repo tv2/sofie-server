@@ -211,7 +211,7 @@ export class Tv2GraphicsActionFactory {
   private createVizFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
     const partId: string = 'fullGraphicsPart'
     const fullGraphicPieceInterface: Tv2PieceInterface = this.createVizFullGraphicsPieceInterface(partId, blueprintConfiguration, graphicsData)
-    return this.createFullGraphicsActionFromGraphicsData(
+    return this.createFullGraphicsAction(
       blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
       partId,
       fullGraphicPieceInterface,
@@ -219,7 +219,7 @@ export class Tv2GraphicsActionFactory {
     )
   }
 
-  private createFullGraphicsActionFromGraphicsData(
+  private createFullGraphicsAction(
     keepPreviousPartAliveDuration: number,
     partId: string,
     pieceInterface: Tv2PieceInterface,
@@ -260,7 +260,11 @@ export class Tv2GraphicsActionFactory {
         fileName: `${PILOT_PREFIX}${fullscreenGraphicsData.vcpId}`,
         path: `${fullscreenGraphicsData.vcpId}`,
       },
-      timelineObjects: this.createVizFullPilotTimelineObjects(blueprintConfiguration, fullscreenGraphicsData)
+      timelineObjects: this.createVizFullPilotTimelineObjects(blueprintConfiguration, fullscreenGraphicsData),
+      metadata: {
+        type: Tv2PieceType.GRAPHICS,
+        outputLayer: Tv2OutputLayer.PROGRAM
+      }
     })
   }
 
@@ -347,7 +351,7 @@ export class Tv2GraphicsActionFactory {
 
     const partId: string = 'fullGraphicsPart'
     const fullGraphicPiece: Tv2PieceInterface = this.createCasparCgFullGraphicsPieceInterface(partId, blueprintConfiguration, graphicsData)
-    return this.createFullGraphicsActionFromGraphicsData(
+    return this.createFullGraphicsAction(
       blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
       partId,
       fullGraphicPiece,
@@ -364,7 +368,11 @@ export class Tv2GraphicsActionFactory {
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, fullscreenGraphicsData.name),
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       content: this.createCasparCgFullGraphicsPieceContent(blueprintConfiguration, fullscreenGraphicsData),
-      timelineObjects: this.createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration, fullscreenGraphicsData)
+      timelineObjects: this.createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration, fullscreenGraphicsData),
+      metadata: {
+        type: Tv2PieceType.GRAPHICS,
+        outputLayer: Tv2OutputLayer.PROGRAM
+      }
     })
   }
 
@@ -441,7 +449,11 @@ export class Tv2GraphicsActionFactory {
       timelineObjects: [
         graphicsTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, overlayGraphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, 1)
-      ]
+      ],
+      metadata: {
+        type: Tv2PieceType.OVERLAY_GRAPHICS,
+        outputLayer: Tv2OutputLayer.OVERLAY
+      }
     })
     return {
       id: `ident_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
@@ -485,7 +497,11 @@ export class Tv2GraphicsActionFactory {
       timelineObjects: [
         graphicsTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, 1)
-      ]
+      ],
+      metadata: {
+        type: Tv2PieceType.OVERLAY_GRAPHICS,
+        outputLayer: Tv2OutputLayer.OVERLAY
+      }
     })
 
     return {
