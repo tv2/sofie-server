@@ -12,11 +12,11 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
-import { Tv2AudioLevel } from '../enums/tv2-audio-level'
+import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
 
-  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, audioLevel?: Tv2AudioLevel): SisyfosTimelineObject[] {
+  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, audioMode?: Tv2AudioMode): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
       return {
         id: `${source._id}_${this.generateRandomWholeNumber()}`,
@@ -27,7 +27,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
         content: {
           deviceType: DeviceType.SISYFOS,
           type: SisyfosType.CHANNEL,
-          isPgm: audioLevel === Tv2AudioLevel.VOICE_OVER ? SisyfosFaderState.VOICE_OVER: SisyfosFaderState.ON
+          isPgm: audioMode === Tv2AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER: SisyfosFaderState.ON
         }
       }
     })
@@ -125,7 +125,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNEL,
-        isPgm: videoClipData.audioLevel ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
+        isPgm: videoClipData.audioMode ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
       }
     }
 
@@ -133,7 +133,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       serverPendingTimelineObject
     ]
 
-    if (videoClipData.audioLevel) {
+    if (videoClipData.audioMode) {
       sisyfosServerTimelineObjects.push(this.createStudioMicrophonesTimelineObject(configuration))
     }
 

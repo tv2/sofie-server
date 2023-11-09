@@ -20,7 +20,7 @@ import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/t
 import { Tv2Action, Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { Tv2AudioLevel } from '../enums/tv2-audio-level'
+import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -102,7 +102,7 @@ export class Tv2VideoClipActionFactory {
       outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
-        acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioLevel === Tv2AudioLevel.VOICE_OVER
+        acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioMode === Tv2AudioMode.VOICE_OVER
       }
     }
 
