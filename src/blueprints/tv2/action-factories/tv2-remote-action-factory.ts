@@ -12,7 +12,8 @@ import {
   Tv2Action,
   Tv2ActionContentType,
   Tv2ActionSubtype,
-  Tv2RecallLastRemoteAsNextAction,
+  Tv2PartAction,
+  Tv2RecallLastPlannedRemoteAsNextAction,
   Tv2RemoteAction
 } from '../value-objects/tv2-action'
 import {
@@ -32,10 +33,10 @@ export class Tv2RemoteActionFactory {
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
   ) {}
 
-  public createRemoteActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
+  public createRemoteActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PartAction[] {
     return [
       ...this.createInsertRemoteAsNextActions(blueprintConfiguration),
-      this.createRecallLastRemoteAsNextAction(),
+      this.createRecallLastPlannedRemoteAsNextAction(),
     ]
   }
 
@@ -132,16 +133,15 @@ export class Tv2RemoteActionFactory {
     }
   }
 
-  private createRecallLastRemoteAsNextAction(): Tv2RecallLastRemoteAsNextAction {
+  private createRecallLastPlannedRemoteAsNextAction(): Tv2RecallLastPlannedRemoteAsNextAction {
     return {
-      id: 'recall_last_remote_as_next_action',
+      id: 'recall_last_planned_remote_as_next_action',
       name: 'Recall last Live',
       description: 'Recalls the last live that has been on air.',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
         contentType: Tv2ActionContentType.REMOTE,
-        remoteNumber: '-1', // Is not used for this action.
-        actionSubtype: Tv2ActionSubtype.RECALL_LAST_REMOTE,
+        actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
       },
       data: {
         partInterface: {} as PartInterface, // Is determined when called.
@@ -150,37 +150,36 @@ export class Tv2RemoteActionFactory {
     }
   }
 
-  public isRemoteAction(action: Action): action is Tv2RemoteAction {
-    const tv2Action: Tv2Action = action as Tv2Action
-    return tv2Action.metadata.contentType === Tv2ActionContentType.REMOTE
+  public isRemoteAction(action: Tv2Action): action is Tv2RemoteAction {
+    return action.metadata.contentType === Tv2ActionContentType.REMOTE
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
     switch (action.metadata.actionSubtype) {
-      case Tv2ActionSubtype.RECALL_LAST_REMOTE:
-        return this.getRecallLastRemoteMutateActions()
+      case Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE:
+        return this.getRecallLastPlannedRemoteMutateActions()
 
       default:
         return []
     }
   }
 
-  private getRecallLastRemoteMutateActions(): MutateActionMethods[] {
+  private getRecallLastPlannedRemoteMutateActions(): MutateActionMethods[] {
     return [
       {
         type: MutateActionType.HISTORIC_PART,
-        updateActionWithPartData: this.updateInsertLastVideoClipToInputAction.bind(this),
-        partPredicate: (part: Part) => this.doesPartContainARemotePiece(part),
+        updateActionWithPartData: this.updateInsertLastPlannedRemoteToInputAction.bind(this),
+        partPredicate: (part: Part) => this.doesPartContainAPlannedRemotePiece(part),
       }
     ]
   }
 
-  private updateInsertLastVideoClipToInputAction(action: Action, historicPart: Part): Tv2RecallLastRemoteAsNextAction {
+  private updateInsertLastPlannedRemoteToInputAction(action: Action, historicPart: Part): Tv2RecallLastPlannedRemoteAsNextAction {
     const clonedPart: Part = historicPart.clone()
     clonedPart.reset()
 
     const partInterface: PartInterface = {
-      id: `recall_last_remote_part_${clonedPart.id}`,
+      id: `recall_last_planned_remote_part_${clonedPart.id}`,
       name: clonedPart.name,
       segmentId: '',
       rank: -1,
@@ -200,7 +199,7 @@ export class Tv2RemoteActionFactory {
     }
 
     const pieceInterfaces: PieceInterface[] = historicPart.getPieces().map(piece => ({
-      id: `recall_last_remote_piece_${piece.id}`,
+      id: `recall_last_planned_remote_piece_${piece.id}`,
       partId: partInterface.id,
       name: piece.name,
       layer: piece.layer,
@@ -217,9 +216,9 @@ export class Tv2RemoteActionFactory {
       timelineObjects: piece.timelineObjects,
     }))
 
-    const recallLastRemoteAction: Tv2RecallLastRemoteAsNextAction = action as Tv2RecallLastRemoteAsNextAction
+    const recallLastPlannedRemoteAction: Tv2RecallLastPlannedRemoteAsNextAction = action as Tv2RecallLastPlannedRemoteAsNextAction
     return {
-      ...recallLastRemoteAction,
+      ...recallLastPlannedRemoteAction,
       data: {
         partInterface,
         pieceInterfaces,
@@ -227,8 +226,8 @@ export class Tv2RemoteActionFactory {
     }
   }
 
-  private doesPartContainARemotePiece(part: Part): boolean {
-    return part.getPieces().some(this.isRemotePiece.bind(this))
+  private doesPartContainAPlannedRemotePiece(part: Part): boolean {
+    return part.getPieces().some(piece => piece.isPlanned && this.isRemotePiece(piece))
   }
 
   private isRemotePiece(piece: Piece): boolean {
