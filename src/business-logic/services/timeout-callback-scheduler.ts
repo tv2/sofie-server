@@ -1,5 +1,8 @@
 import { CallbackScheduler } from './interfaces/callback-scheduler'
 
+const EXECUTE_CALLBACK_DURATION_THRESHOLD_IN_MS: number = 1
+const SCHEDULE_RESOLUTION: number = 2
+
 export class TimeoutCallbackScheduler implements CallbackScheduler {
   private static instance: CallbackScheduler
 
@@ -17,22 +20,31 @@ export class TimeoutCallbackScheduler implements CallbackScheduler {
   }
 
   public start(epochTimeToExecuteCallback: number, callback: () => void): void {
-    const now: number = Date.now()
-    const timeoutDuration: number = epochTimeToExecuteCallback - now
-    if (timeoutDuration <= 0) {
+    if (epochTimeToExecuteCallback <= Date.now()) {
       console.log('### Skipping execution of callback. Point in time for execution is in the past!')
       return
     }
+    this.scheduleCallback(epochTimeToExecuteCallback, callback)
+  }
+
+  private scheduleCallback(epochTimeToExecuteCallback: number, callback: () => void): void {
+    const durationToExecuteCallbackInMs: number = epochTimeToExecuteCallback - Date.now()
+    if (durationToExecuteCallbackInMs < EXECUTE_CALLBACK_DURATION_THRESHOLD_IN_MS) {
+      callback()
+      return
+    }
+    const durationToNextSchedulingInMs: number = durationToExecuteCallbackInMs / SCHEDULE_RESOLUTION
     this.timeoutIdentifier = setTimeout(() => {
       this.timeoutIdentifier = undefined
-      callback()
-    }, timeoutDuration)
+      this.scheduleCallback(epochTimeToExecuteCallback, callback)
+    }, durationToNextSchedulingInMs)
   }
 
   public stop(): void {
-    if (this.timeoutIdentifier) {
-      clearTimeout(this.timeoutIdentifier)
-      this.timeoutIdentifier = undefined
+    if (!this.timeoutIdentifier) {
+      return
     }
+    clearTimeout(this.timeoutIdentifier)
+    this.timeoutIdentifier = undefined
   }
 }
