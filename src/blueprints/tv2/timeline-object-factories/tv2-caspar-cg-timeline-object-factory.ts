@@ -56,7 +56,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
     )
   }
 
-  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject {
+  public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject {
     const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
     const nameChunks: string[] = fullscreenGraphicsData.name.split('/')
     const sceneName: string = nameChunks[nameChunks.length - 1]
