@@ -31,7 +31,11 @@ export class ControllerFacade {
   }
 
   private static createActionController(): ActionController {
-    return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler())
+    return new ActionController(
+      ServiceFacade.createActionService(),
+      RepositoryFacade.createActionTriggerRepository(),
+      new ExpressErrorHandler()
+    )
   }
 
   private static createConfigurationController(): ConfigurationController {

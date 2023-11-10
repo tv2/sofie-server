@@ -35,6 +35,8 @@ import { ActionManifestRepository } from '../repositories/interfaces/action-mani
 import { MongoActionManifestRepository } from '../repositories/mongo/mongo-action-manifest-repository'
 import { MediaRepository } from '../repositories/interfaces/MediaRepository'
 import { MongoMediaRepository } from '../repositories/mongo/mongo-media-repository'
+import { ActionTriggerRepository } from '../repositories/interfaces/action-trigger-repository'
+import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action-trigger-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -130,5 +132,9 @@ export class RepositoryFacade {
 
   public static createMediaRepository(): MediaRepository {
     return new MongoMediaRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  public static createActionTriggerRepository(): ActionTriggerRepository {
+    return new MongoActionTriggerRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 }
