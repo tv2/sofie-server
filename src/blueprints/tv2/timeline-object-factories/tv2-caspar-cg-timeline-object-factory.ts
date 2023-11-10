@@ -1,7 +1,6 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { UnsupportedOperation } from '../../../model/exceptions/unsupported-operation'
-import { Tv2BaseGraphicTimelineObjectFactory } from './tv2-base-graphic-timeline-object-factory'
 import { Tv2GraphicsTimelineObjectFactory } from './interfaces/tv2-graphics-timeline-object-factory'
 import { DeviceType } from '../../../model/enums/device-type'
 import {
@@ -19,10 +18,8 @@ import {
   Tv2VideoClipManifestData
 } from '../value-objects/tv2-action-manifest-data'
 
-export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
-  constructor(private readonly casparCgPathFixer: Tv2AssetPathHelper) {
-    super()
-  }
+export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
+  constructor(private readonly casparCgPathFixer: Tv2AssetPathHelper) {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createAllOutGraphicsTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration, _duration: number): TimelineObject {
@@ -134,7 +131,7 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
 
   private createOverlayGraphicsTimelineObjectContent(
     blueprintConfiguration: Tv2BlueprintConfiguration,
-    graphicsData: Tv2OverlayGraphicsManifestData,
+    overlayGraphicsData: Tv2OverlayGraphicsManifestData,
     graphicsLayer: Tv2GraphicsLayer
   ): CasparCgTemplateTimelineObject['content'] {
     return {
@@ -153,8 +150,8 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
           [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(graphicsLayer)]: {
             display: 'program',
             payload: {
-              type: this.getTemplateName(graphicsData),
-              0: this.getDisplayText(graphicsData)
+              type: overlayGraphicsData.templateName,
+              0: overlayGraphicsData.displayText
             }
           }
         }
