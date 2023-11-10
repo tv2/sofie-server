@@ -388,11 +388,10 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createCasparCgFullGraphicsPieceContent(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2FileContent {
-    const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
-    const graphicsFolder: string = rawGraphicsFolder ? `${rawGraphicsFolder}\\` : ''
+    const graphicsFolder: string = blueprintConfiguration.studio.GraphicFolder ? `${blueprintConfiguration.studio.GraphicFolder}\\` : ''
     const nameChunks: string[] = graphicsData.name.split('/')
     const sceneName: string = nameChunks[nameChunks.length - 1]
-    const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, rawGraphicsFolder)
+    const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, blueprintConfiguration.studio.GraphicFolder)
 
     return {
       fileName,

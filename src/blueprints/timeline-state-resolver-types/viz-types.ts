@@ -1,7 +1,7 @@
 import { TimelineObject } from '../../model/entities/timeline-object'
 import { DeviceType } from '../../model/enums/device-type'
 
-export const enum VizMseTransitionType { // Taken directly from blueprint.
+export const enum VizMseTransitionType {
   DELAY = 0
 }
 
@@ -43,7 +43,7 @@ export interface VizMseContinueTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZMSE
     type: VizType.CONTINUE
-    direction: -1 | 1 | undefined // Taken directly from Blueprints.
+    direction: -1 | 1 | undefined
     reference: string
   }
 }
