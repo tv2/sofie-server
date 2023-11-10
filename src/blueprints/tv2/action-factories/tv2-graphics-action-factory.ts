@@ -270,7 +270,7 @@ export class Tv2GraphicsActionFactory {
         fileName: `${PILOT_PREFIX}${fullscreenGraphicsData.vcpId}`,
         path: `${fullscreenGraphicsData.vcpId}`,
       },
-      timelineObjects: this.createVizFullscreenPilotTimelineObjects(blueprintConfiguration, fullscreenGraphicsData),
+      timelineObjects: this.createVizFullscreenPilotGraphicsTimelineObjects(blueprintConfiguration, fullscreenGraphicsData),
       metadata: {
         type: Tv2PieceType.GRAPHICS,
         outputLayer: Tv2OutputLayer.PROGRAM
@@ -326,7 +326,7 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createVizFullscreenPilotTimelineObjects(
+  private createVizFullscreenPilotGraphicsTimelineObjects(
     blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): TimelineObject[] {
     if (!blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration) {
       throw new Tv2MisconfigurationException(
