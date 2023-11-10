@@ -20,12 +20,9 @@ import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/t
 import { Tv2Action, Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
-
-const VIDEO_CLIP_LOOKAHEAD_ID: string = 'videoClipLookahead'
-const VIDEO_CLIP_PROGRAM_ID: string = 'videoClipProgram'
-const VIDEO_CLIP_CLEAN_FEED_ID: string = 'videoClipCleanFeed'
 
 export class Tv2VideoClipActionFactory {
 
@@ -105,7 +102,7 @@ export class Tv2VideoClipActionFactory {
       outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
-        acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.isVoiceOver
+        acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioMode === Tv2AudioMode.VOICE_OVER
       }
     }
 
@@ -129,9 +126,9 @@ export class Tv2VideoClipActionFactory {
       postRollDuration: 0,
       tags: [],
       timelineObjects: [
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(VIDEO_CLIP_PROGRAM_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(VIDEO_CLIP_CLEAN_FEED_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(VIDEO_CLIP_LOOKAHEAD_ID, A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.casparCgTimelineObjectFactory.createVideoClipTimelineObject(videoClipData),
         ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
       ]

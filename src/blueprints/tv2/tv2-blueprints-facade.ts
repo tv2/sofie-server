@@ -33,6 +33,7 @@ import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configu
 import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { AssetFolderHelper } from './helpers/asset-folder-helper'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
+import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -67,7 +68,8 @@ export class Tv2BlueprintsFacade {
         tv2AudioTimelineObjectFactory,
         tv2CasparCgTimelineObjectFactory,
         assetFolderHelper
-      )
+      ),
+      new Tv2ReplayActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory)
     )
 
     return new Tv2Blueprint(
