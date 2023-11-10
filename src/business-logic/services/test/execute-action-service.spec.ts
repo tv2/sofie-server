@@ -128,7 +128,7 @@ describe(ExecuteActionService.name, () => {
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
         await testee.executeAction(action.id, 'rundownId')
 
-        verify(rundownServiceMock.insertPieceAsNext(anyString(), anyOfClass(Piece))).once()
+        verify(rundownServiceMock.insertPieceAsNext(anyString(), anyOfClass(Piece), anything())).once()
       })
 
       it('updates Piece id to be unique', async () => {
@@ -351,8 +351,10 @@ function createPieceAction(actionType: PieceActionType): PieceAction {
     name: 'someAction',
     type: actionType,
     data: {
-      id: 'pieceId'
-    } as PieceInterface
+      pieceInterface: {
+        id: 'pieceId'
+      } as PieceInterface
+    }
   }
 }
 

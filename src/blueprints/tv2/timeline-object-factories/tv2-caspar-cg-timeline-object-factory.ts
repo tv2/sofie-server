@@ -193,7 +193,7 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
     }
   }
 
-  public createCasparCgDveKeyTimelineObject(keyFilePath: string): CasparCgMediaTimelineObject {
+  public createDveKeyTimelineObject(keyFilePath: string): CasparCgMediaTimelineObject {
     return {
       id: 'casparCg_dve_key',
       enable: {
@@ -213,7 +213,7 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
     }
   }
 
-  public createCasparCgDveFrameTimelineObject(frameFilePath: string): CasparCgMediaTimelineObject {
+  public createDveFrameTimelineObject(frameFilePath: string): CasparCgMediaTimelineObject {
     return {
       id: 'casparCg_dve_frame',
       enable: {
@@ -230,7 +230,7 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
     }
   }
 
-  public createCasparCgDveLocatorTimelineObject(): CasparCgTemplateTimelineObject {
+  public createDveLocatorTimelineObject(): CasparCgTemplateTimelineObject {
     return {} as CasparCgTemplateTimelineObject
     // TODO: RKLI Should implement this
     // return {
@@ -245,5 +245,21 @@ export class Tv2CasparCgTimelineObjectFactory extends Tv2BaseGraphicTimelineObje
     //     type: CasparCgType.TEMPLATE
     //   }
     // }
+  }
+
+  public createBreakerTimelineObject(file: string): CasparCgMediaTimelineObject {
+    return {
+      id: 'casparCg_breaker',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2CasparCgLayer.BREAKER,
+      content: {
+        deviceType: DeviceType.CASPAR_CG,
+        type: CasparCgType.MEDIA,
+        file
+      }
+    }
   }
 }

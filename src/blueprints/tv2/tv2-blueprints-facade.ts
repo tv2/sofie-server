@@ -12,7 +12,7 @@ import {
   Tv2AtemVideoMixerTimelineObjectFactory
 } from './timeline-object-factories/tv2-atem-video-mixer-timeline-object-factory'
 import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
-import { Tv2TransitionActionFactory } from './action-factories/tv2-transition-action-factory'
+import { Tv2TransitionEffectActionFactory } from './action-factories/tv2-transition-effect-action-factory'
 import { Tv2AudioActionFactory } from './action-factories/tv2-audio-action-factory'
 import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action-factory'
 import {
@@ -23,47 +23,54 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2AssetPathHelper } from './helpers/tv2-asset-path-helper'
-import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 import { Tv2StringHashConverter } from './helpers/tv2-string-hash-converter'
+import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
-    const tv2CasparCgPathFixer: Tv2AssetPathHelper = new Tv2AssetPathHelper()
+    const assetPathHelper: Tv2AssetPathHelper = new Tv2AssetPathHelper()
     const tv2StringHasConverter: Tv2StringHashConverter = new Tv2StringHashConverter()
     const tv2SisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
+
     const tv2AudioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
     const tv2VizGraphicsTimelineObjectFactory: Tv2VizTimelineObjectFactory = new Tv2VizTimelineObjectFactory()
-    const tv2CasparCgGraphicsTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(tv2CasparCgPathFixer)
+    const tv2CasparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
     const tv2VideoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
 
     const actionService: Tv2ActionService = new Tv2ActionService(
       new Tv2BlueprintConfigurationMapper(),
       new Tv2CameraActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
       new Tv2RemoteActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
-      new Tv2TransitionActionFactory(),
+      new Tv2TransitionEffectActionFactory(
+        tv2VideoMixerTimelineObjectFactory,
+        tv2CasparCgTimelineObjectFactory,
+        tv2AudioTimelineObjectFactory,
+        assetPathHelper
+      ),
       new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory),
       new Tv2GraphicsActionFactory(
         tv2VizGraphicsTimelineObjectFactory,
-        tv2CasparCgGraphicsTimelineObjectFactory,
+        tv2CasparCgTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
         tv2VideoMixerTimelineObjectFactory,
-        tv2CasparCgPathFixer,
+        assetPathHelper,
         tv2StringHasConverter
       ),
       new Tv2VideoClipActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
-        tv2CasparCgGraphicsTimelineObjectFactory
+        tv2CasparCgTimelineObjectFactory
       ),
       new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory),
       new Tv2DveActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
-        tv2CasparCgGraphicsTimelineObjectFactory
+        tv2CasparCgTimelineObjectFactory,
+        assetPathHelper
       )
     )
 

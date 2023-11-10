@@ -7,7 +7,8 @@ export interface Tv2StudioBlueprintConfiguration {
   SwitcherSource: Tv2VideoMixerSources
   CasparPrerollDuration: number
   ServerPostrollDuration: number
-  DVEFolder?: string
+  DVEFolder?: string,
+  JingleFolder?: string
   GraphicsType: Tv2GraphicsType
   VizPilotGraphics: Tv2VizGraphics
   HTMLGraphics?: Tv2HtmlGraphics
@@ -62,6 +63,7 @@ export interface Tv2VideoMixerSources {
   SplitArtFill: number
   SplitArtKey: number
   DSK: Tv2DownstreamKeyer[]
+  Dip: number
 }
 
 export interface Tv2DownstreamKeyer {
