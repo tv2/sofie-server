@@ -166,9 +166,6 @@ export class EntityMockFactory {
     when(mockedPart.isNext()).thenReturn(partInterface.isNext ?? false)
     when(mockedPart.isOnAir()).thenReturn(partInterface.isOnAir ?? false)
     when(mockedPart.expectedDuration).thenReturn(partInterface.expectedDuration ?? 0)
-    when(mockedPart.inTransition).thenReturn(
-      partInterface.inTransition ?? { keepPreviousPartAliveDuration: 0, delayPiecesDuration: 0 }
-    )
     when(mockedPart.outTransition).thenReturn(partInterface.outTransition ?? { keepAliveDuration: 0 })
     when(mockedPart.autoNext).thenReturn(partInterface.autoNext ?? undefined)
     when(mockedPart.disableNextInTransition).thenReturn(partInterface.disableNextInTransition ?? false)

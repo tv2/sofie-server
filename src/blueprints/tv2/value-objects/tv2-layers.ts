@@ -31,7 +31,8 @@ export enum Tv2AtemLayer {
 export enum Tv2CasparCgLayer {
   PLAYER_CLIP_PENDING = 'casparcg_player_clip_pending',
   DVE_KEY = 'casparcg_dve_key',
-  DVE_FRAME = 'casparcg_dve_frame'
+  DVE_FRAME = 'casparcg_dve_frame',
+  BREAKER = 'casparcg_player_jingle'
 }
 
 export enum Tv2VideoClipLayer {
@@ -46,5 +47,6 @@ export enum Tv2SisyfosLayer {
   STUDIO_MICS = 'sisyfos_group_studio_mics',
   PERSISTED_LEVELS = 'sisyfos_persisted_levels',
   AUDIO_BED = 'sisyfos_source_audiobed',
-  RESYNCHRONIZE = 'sisyfos_resync'
+  RESYNCHRONIZE = 'sisyfos_resync',
+  BREAKER = 'sisyfos_source_jingle'
 }
