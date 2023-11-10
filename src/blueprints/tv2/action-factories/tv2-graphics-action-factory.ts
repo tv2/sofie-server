@@ -276,7 +276,7 @@ export class Tv2GraphicsActionFactory {
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },
-      isNext: true,
+      isNext: false,
       isOnAir: false,
       isPlanned: false,
       outTransition: {
