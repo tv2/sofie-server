@@ -49,7 +49,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
     return Math.floor(Math.random() * 10000)
   }
 
-  public createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
+  private createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
     const priority: number = configuration.studio.StudioMics ? 2 : 0
     const overridePriority: number = 2
     return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, overridePriority)
