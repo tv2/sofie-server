@@ -3,6 +3,8 @@ export interface Tv2ShowStyleBlueprintConfiguration {
   graphicsSetups: GraphicsSetup[]
   selectedGraphicsSetup: GraphicsSetup
   dveConfigurations: DveConfiguration[]
+  transitionEffectConfigurations: TransitionEffect[]
+  breakers: Breaker[]
 }
 
 export interface GraphicsDefault {
@@ -70,4 +72,43 @@ export interface DveBoxProperties {
   cropBottom: number
   cropLeft: number
   cropRight: number
+}
+
+export type TransitionEffect = CutTransitionEffect | MixTransitionEffect | DipTransitionEffect | BreakerTransitionEffect
+
+export interface CutTransitionEffect {
+  type: TransitionEffectType.CUT
+}
+
+export interface MixTransitionEffect {
+  type: TransitionEffectType.MIX
+  durationInFrames: number
+}
+
+export interface DipTransitionEffect {
+  type: TransitionEffectType.DIP
+  durationInFrames: number
+}
+
+export interface BreakerTransitionEffect {
+  type: TransitionEffectType.BREAKER
+  name: string
+}
+
+export enum TransitionEffectType {
+  CUT = 'CUT',
+  MIX = 'MIX',
+  DIP = 'DIP',
+  BREAKER = 'BREAKER'
+}
+
+export interface Breaker {
+  id: string
+  name: string,
+  fileName: string
+  durationInFrames: number
+  startAlpha: number
+  endAlpha: number
+  autoNext: boolean,
+  shouldLoadFirstFrame: boolean
 }

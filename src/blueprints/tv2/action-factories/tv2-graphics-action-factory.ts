@@ -39,7 +39,9 @@ export class Tv2GraphicsActionFactory {
       id: 'allOutGraphicsAction',
       name: 'Gfx All Out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -60,7 +62,9 @@ export class Tv2GraphicsActionFactory {
       id: 'clearGraphicsAction',
       name: 'Gfx Clear',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -81,7 +85,9 @@ export class Tv2GraphicsActionFactory {
       id: 'continueGraphicsAction',
       name: 'Gfx continue',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -105,7 +111,9 @@ export class Tv2GraphicsActionFactory {
       id: 'themeOutAction',
       name: 'Theme out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -148,7 +156,9 @@ export class Tv2GraphicsActionFactory {
       id: 'overlayInitializeAction',
       name: 'Overlay initialize',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
