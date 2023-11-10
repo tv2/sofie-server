@@ -100,6 +100,8 @@ export interface Tv2FullscreenGraphicsManifestData {
 export interface Tv2OverlayGraphicsManifestData {
   sourceLayerId: Tv2SourceLayer
   name: string,
+  templateName: string
+  displayText: string
   expectedDuration?: number
 }
 

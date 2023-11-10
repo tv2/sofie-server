@@ -12,7 +12,6 @@ import {
 import { Tv2GraphicsLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
-import { Tv2BaseGraphicTimelineObjectFactory } from './tv2-base-graphic-timeline-object-factory'
 import {
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData
@@ -25,7 +24,7 @@ enum ChannelName {
   WALL = 'WALL1'
 }
 
-export class Tv2VizTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
+export class Tv2VizTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
     return {
       id: '',
@@ -181,8 +180,8 @@ export class Tv2VizTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFac
     return {
       deviceType: DeviceType.VIZMSE,
       type: VizType.ELEMENT_INTERNAL,
-      templateName: this.getTemplateName(overlayGraphicsData),
-      templateData: [this.getDisplayText(overlayGraphicsData)],
+      templateName: overlayGraphicsData.templateName,
+      templateData: [overlayGraphicsData.displayText],
       channelName: ChannelName.OVERLAY,
       showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }

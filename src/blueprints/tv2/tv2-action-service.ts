@@ -101,9 +101,19 @@ export class Tv2ActionService implements BlueprintGenerateActions {
         return {
           name: data.name,
           sourceLayerId: data.sourceLayerId,
+          templateName: this.getTemplateName(data.name),
+          displayText: this.getDisplayText(data.name),
           expectedDuration: data.expectedDuration
         }
       })
+  }
+
+  protected getTemplateName(rawName: string): string {
+    return rawName.split('-')[0].trim()
+  }
+
+  protected getDisplayText(rawText: string): string {
+    return rawText.split('-').slice(1).join('-').trim()
   }
 
   private getVideoClipData(actionManifests: ActionManifest<Tv2ActionManifestData>[]): Tv2VideoClipManifestData[] {
