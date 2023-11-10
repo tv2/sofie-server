@@ -36,14 +36,16 @@ export class Tv2VideoMixerConfigurationActionFactory {
       layer: `${Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       timelineObjects: [
-        this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn, priority)
+        this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn)
       ]
     })
     return {
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Action`,
       name: `Downstream Keyer ${downstreamKeyerNumber} ${actionName}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.UNKNOWN
       }

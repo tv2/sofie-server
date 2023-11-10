@@ -80,7 +80,9 @@ export class Tv2GraphicsActionFactory {
       id: 'allOutGraphicsAction',
       name: 'Gfx All Out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -101,7 +103,9 @@ export class Tv2GraphicsActionFactory {
       id: 'clearGraphicsAction',
       name: 'Gfx Clear',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -122,7 +126,9 @@ export class Tv2GraphicsActionFactory {
       id: 'continueGraphicsAction',
       name: 'Gfx continue',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -146,7 +152,9 @@ export class Tv2GraphicsActionFactory {
       id: 'themeOutAction',
       name: 'Theme out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -189,7 +197,9 @@ export class Tv2GraphicsActionFactory {
       id: 'overlayInitializeAction',
       name: 'Overlay initialize',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
       },
@@ -328,14 +338,13 @@ export class Tv2GraphicsActionFactory {
     const sourceInput: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
     const upstreamEnable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration }
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
-    const priority: number = 0
 
     return [
       this.vizTimelineObjectFactory.createFullGraphicsTimelineObject(blueprintConfiguration, fullscreenGraphicsData),
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(GRAPHICS_PROGRAM_ID, sourceInput, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(GRAPHICS_CLEAN_FEED_ID, sourceInput, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(GRAPHICS_LOOKAHEAD_ID, sourceInput, videoMixerEnable),
-      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, priority),
+      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true),
       this.videoMixerTimelineObjectFactory.createUpstreamKeyerTimelineObject(
         downstreamKeyer,
         upstreamEnable
@@ -450,7 +459,7 @@ export class Tv2GraphicsActionFactory {
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(overlayGraphicsData)),
       timelineObjects: [
         graphicsTimelineObjectFactory.createIdentGraphicsTimelineObject(blueprintConfiguration, overlayGraphicsData),
-        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, 1)
+        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
       ],
       metadata: {
         type: Tv2PieceType.OVERLAY_GRAPHICS,
@@ -461,7 +470,9 @@ export class Tv2GraphicsActionFactory {
       id: `ident_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: overlayGraphicsData.name,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS
       }
@@ -498,7 +509,7 @@ export class Tv2GraphicsActionFactory {
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, this.getTemplateName(graphicsData)),
       timelineObjects: [
         graphicsTimelineObjectFactory.createLowerThirdGraphicsTimelineObject(blueprintConfiguration, graphicsData),
-        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true, 1)
+        this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
       ],
       metadata: {
         type: Tv2PieceType.OVERLAY_GRAPHICS,
@@ -510,7 +521,9 @@ export class Tv2GraphicsActionFactory {
       id: `lower_third_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: graphicsData.name,
-      data: pieceInterface,
+      data: {
+        pieceInterface
+      },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS
       }
