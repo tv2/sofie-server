@@ -123,7 +123,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsTimelineObjectFac
     }
   }
 
-  public createFullGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): VizMseElementPilotTimelineObject {
+  public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): VizMseElementPilotTimelineObject {
     return {
       id: 'full',
       enable: {
