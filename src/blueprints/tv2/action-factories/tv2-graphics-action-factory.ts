@@ -49,7 +49,7 @@ export class Tv2GraphicsActionFactory {
     private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly casparCgPathFixer: Tv2AssetPathHelper,
+    private readonly assetPathHelper: Tv2AssetPathHelper,
     private readonly stringHashConverter: Tv2StringHashConverter
   ) { }
 
@@ -390,11 +390,11 @@ export class Tv2GraphicsActionFactory {
     const graphicsFolder: string = blueprintConfiguration.studio.GraphicFolder ? `${blueprintConfiguration.studio.GraphicFolder}\\` : ''
     const nameChunks: string[] = graphicsData.name.split('/')
     const sceneName: string = nameChunks[nameChunks.length - 1]
-    const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, blueprintConfiguration.studio.GraphicFolder)
+    const filePath: string = this.assetPathHelper.joinAssetToFolder(sceneName, blueprintConfiguration.studio.GraphicFolder)
 
     return {
-      fileName,
-      path: this.casparCgPathFixer.joinAssetToNetworkPath(blueprintConfiguration.studio.GraphicNetworkBasePath, sceneName, blueprintConfiguration.studio.GraphicFileExtension, graphicsFolder),
+      fileName: filePath,
+      path: this.assetPathHelper.joinAssetToNetworkPath(blueprintConfiguration.studio.GraphicNetworkBasePath, sceneName, blueprintConfiguration.studio.GraphicFileExtension, graphicsFolder),
       mediaFlowIds: [blueprintConfiguration.studio.GraphicMediaFlowId],
       ignoreMediaObjectStatus: blueprintConfiguration.studio.GraphicIgnoreStatus,
       ignoreBlackFrames: true,
