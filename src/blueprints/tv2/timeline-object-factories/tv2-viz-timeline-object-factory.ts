@@ -1,7 +1,6 @@
 import { Tv2GraphicsTimelineObjectFactory } from './interfaces/tv2-graphics-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
-  VizChannelName,
   VizMseClearGraphicsTimelineObjectContent,
   VizMseContinueTimelineObject,
   VizMseElementInternalTimelineObject,
@@ -19,6 +18,12 @@ import {
   Tv2OverlayGraphicsManifestData
 } from '../value-objects/tv2-action-manifest-data'
 
+
+enum ChannelName {
+  OVERLAY = 'OVL1',
+  FULLSCREEN = 'FULL1',
+  WALL = 'WALL1'
+}
 
 export class Tv2VizTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
@@ -85,7 +90,7 @@ export class Tv2VizTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFac
     return {
       deviceType: DeviceType.VIZMSE,
       type: VizType.CLEAR_ALL_ELEMENTS,
-      channelsToSendCommands: [VizChannelName.OVERLAY, VizChannelName.FULLSCREEN, VizChannelName.WALL],
+      channelsToSendCommands: [ChannelName.OVERLAY, ChannelName.FULLSCREEN, ChannelName.WALL],
       showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }
   }
@@ -133,7 +138,7 @@ export class Tv2VizTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFac
         templateVcpId: fullscreenGraphicsData.vcpId,
         continueStep: -1,
         noAutoPreloading: false,
-        channelName: VizChannelName.FULLSCREEN,
+        channelName: ChannelName.FULLSCREEN,
         ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
       }
     }
@@ -178,7 +183,7 @@ export class Tv2VizTimelineObjectFactory extends Tv2BaseGraphicTimelineObjectFac
       type: VizType.ELEMENT_INTERNAL,
       templateName: this.getTemplateName(overlayGraphicsData),
       templateData: [this.getDisplayText(overlayGraphicsData)],
-      channelName: VizChannelName.OVERLAY,
+      channelName: ChannelName.OVERLAY,
       showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }
   }
