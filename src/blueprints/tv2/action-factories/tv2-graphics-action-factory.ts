@@ -43,6 +43,12 @@ const GRAPHICS_CLEAN_FEED_ID: string = 'graphicsCleanFeed'
 const GRAPHICS_LOOKAHEAD_ID: string = 'graphicsLookahead'
 const PILOT_PREFIX: string = 'PILOT_'
 
+enum TemplateOutType {
+  B = 'B',
+  S = 'S',
+  O = 'O',
+}
+
 export class Tv2GraphicsActionFactory {
   constructor(
     private readonly vizTimelineObjectFactory: Tv2VizTimelineObjectFactory,
@@ -207,15 +213,17 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createFullscreenGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[]): Tv2PartAction[] {
-    return fullscreenGraphicsData.map((data) => {
-      switch (blueprintConfiguration.studio.GraphicsType) {
-        case Tv2GraphicsType.HTML:
-          return this.createCasparCgFullscreenGraphicsAction(blueprintConfiguration, data)
-        case Tv2GraphicsType.VIZ:
-        default:
-          return this.createVizFullscreenGraphicsAction(blueprintConfiguration, data)
-      }
-    })
+    return fullscreenGraphicsData.map((data) => this.createFullscreenGraphicsActionFromBlueprintConfiguration(blueprintConfiguration, data))
+  }
+
+  private createFullscreenGraphicsActionFromBlueprintConfiguration(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
+    switch (blueprintConfiguration.studio.GraphicsType) {
+      case Tv2GraphicsType.HTML:
+        return this.createCasparCgFullscreenGraphicsAction(blueprintConfiguration, fullscreenGraphicsData)
+      case Tv2GraphicsType.VIZ:
+      default:
+        return this.createVizFullscreenGraphicsAction(blueprintConfiguration, fullscreenGraphicsData)
+    }
   }
 
   private createVizFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
@@ -233,11 +241,11 @@ export class Tv2GraphicsActionFactory {
     keepPreviousPartAliveDuration: number,
     partId: string,
     pieceInterface: Tv2PieceInterface,
-    graphicsData: Tv2FullscreenGraphicsManifestData
+    fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData
   ): Tv2PartAction {
     const partInterface: PartInterface = this.createGraphicsPartInterface({
       id: partId,
-      name: `Full ${graphicsData.name}`,
+      name: `Full ${fullscreenGraphicsData.name}`,
       inTransition: {
         keepPreviousPartAliveDuration,
         delayPiecesDuration: 0
@@ -245,8 +253,8 @@ export class Tv2GraphicsActionFactory {
     })
 
     return {
-      id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
-      name: `Fullscreen Graphics - ${graphicsData.name}`,
+      id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(fullscreenGraphicsData.name)}`,
+      name: `Fullscreen Graphics - ${fullscreenGraphicsData.name}`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -304,24 +312,29 @@ export class Tv2GraphicsActionFactory {
     const template: GraphicsTemplate | undefined = blueprintConfiguration.showStyle.graphicsTemplates.find(
       graphic => graphic.vizTemplate ? graphic.vizTemplate.toUpperCase() === templateName.toUpperCase() : false
     )
-
-    if (!template ||
-      (!template.outType || !template.outType.toString().length) ||
-      (template.outType !== 'S' && template.outType !== 'O')
-    ) {
-      return PieceLifespan.WITHIN_PART
-    }
-
-    return this.getPieceLifespanFromMode(template.outType)
+    const templateOutType: TemplateOutType = this.parseTemplateOutType(template?.outType ?? '')
+    return this.getPieceLifespanFromOutType(templateOutType)
   }
 
-  private getPieceLifespanFromMode(mode: 'B' | 'S' | 'O'): PieceLifespan {
-    switch (mode) {
-      case 'B':
-        return PieceLifespan.WITHIN_PART
+  private parseTemplateOutType(template: string): TemplateOutType {
+    switch (template) {
       case 'S':
-        return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
+        return TemplateOutType.S
       case 'O':
+        return TemplateOutType.O
+      case 'B':
+      default:
+        return TemplateOutType.B
+    }
+  }
+
+  private getPieceLifespanFromOutType(outType: TemplateOutType): PieceLifespan {
+    switch (outType) {
+      case TemplateOutType.B:
+        return PieceLifespan.WITHIN_PART
+      case TemplateOutType.S:
+        return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
+      case TemplateOutType.O:
         return PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE
     }
   }
