@@ -22,7 +22,6 @@ import {
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
-import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
   Tv2GraphicsTimelineObjectFactory
@@ -37,6 +36,7 @@ import {
 } from '../value-objects/tv2-action-manifest-data'
 import { Tv2FileContent } from '../value-objects/tv2-content'
 import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
+import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 
 const GRAPHICS_PROGRAM_ID: string = 'graphicsProgram'
 const GRAPHICS_CLEAN_FEED_ID: string = 'graphicsCleanFeed'
@@ -330,7 +330,7 @@ export class Tv2GraphicsActionFactory {
   private createVizFullPilotTimelineObjects(
     blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): TimelineObject[] {
     if (!blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration) {
-      throw new MisconfigurationException(
+      throw new Tv2MisconfigurationException(
         'Missing configuration of \'VizPilotGraphics.CleanFeedPrerollDuration\' in settings.'
       )
     }
@@ -355,7 +355,7 @@ export class Tv2GraphicsActionFactory {
 
   private createCasparCgFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
     if (!blueprintConfiguration.studio.HTMLGraphics) {
-      throw new MisconfigurationException(
+      throw new Tv2MisconfigurationException(
         'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'KeepAliveDuration\''
       )
     }
@@ -406,7 +406,7 @@ export class Tv2GraphicsActionFactory {
 
   private createCasparCgFullPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): TimelineObject[] {
     if (!blueprintConfiguration.studio.HTMLGraphics) {
-      throw new MisconfigurationException(
+      throw new Tv2MisconfigurationException(
         'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'TransitionSettings.wipeRate\' and  \'TransitionSettings.borderSoftness\''
       )
     }
