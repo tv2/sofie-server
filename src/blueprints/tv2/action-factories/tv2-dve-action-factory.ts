@@ -75,30 +75,30 @@ export class Tv2DveActionFactory {
   public isDveAction(action: Tv2Action): boolean {
     const actionSubtype: Tv2ActionSubtype | undefined = action.metadata.actionSubtype
     return actionSubtype !== undefined && [
-      Tv2ActionSubtype.DVE_LAYOUT,
-      Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT,
-      Tv2ActionSubtype.RECALL_DVE,
-      Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
+      Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
+      Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
+      Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
+      Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT
     ].includes(actionSubtype)
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
     switch (action.metadata.actionSubtype) {
-      case Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT: {
+      case Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT: {
         return [{
           type: MutateActionType.PIECE,
           updateActionWithPiece: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
           piecePredicate: (piece: Piece) => this.doesPieceHaveDveBoxesTimelineObject(piece)
         }]
       }
-      case Tv2ActionSubtype.RECALL_DVE: {
+      case Tv2ActionSubtype.RECALL_SPLIT_SCREEN: {
         return [{
           type: MutateActionType.HISTORIC_PART,
           updateActionWithPartData: (action: Action, historicPart: Part, presentPart: Part | undefined) => this.updateRecallLastDveAction(action, historicPart, presentPart),
           partPredicate: (part: Part) => this.recallLastDvePartPredicate(part)
         }]
       }
-      case Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT: {
+      case Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT: {
         return [
           {
             type: MutateActionType.HISTORIC_PART,
@@ -164,7 +164,7 @@ export class Tv2DveActionFactory {
         },
         metadata: {
           contentType: Tv2ActionContentType.SPLIT_SCREEN,
-          actionSubtype: Tv2ActionSubtype.DVE_LAYOUT,
+          actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
         }
       }
     })
@@ -240,7 +240,7 @@ export class Tv2DveActionFactory {
             },
             metadata: {
               contentType: Tv2ActionContentType.SPLIT_SCREEN,
-              actionSubtype: Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT,
+              actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
               inputIndex,
               videoMixerSource: source.SwitcherSource,
               audioTimelineObjects
@@ -410,7 +410,7 @@ export class Tv2DveActionFactory {
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
         contentType: Tv2ActionContentType.SPLIT_SCREEN,
-        actionSubtype: Tv2ActionSubtype.RECALL_DVE,
+        actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
       },
       data: {
         partInterface: {} as PartInterface,
@@ -511,7 +511,7 @@ export class Tv2DveActionFactory {
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
         contentType: Tv2ActionContentType.SPLIT_SCREEN,
-        actionSubtype: Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT,
+        actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT,
         inputIndex,
         videoMixerSource: A_B_SOURCE_INPUT_PLACEHOLDER,
         audioTimelineObjects,

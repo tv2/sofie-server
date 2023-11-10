@@ -16,10 +16,10 @@ export enum Tv2ActionContentType {
 }
 
 export enum Tv2ActionSubtype {
-  RECALL_DVE = 'RECALL_DVE',
-  DVE_LAYOUT = 'DVE_LAYOUT',
-  DVE_INSERT_SOURCE_TO_INPUT = 'DVE_INSERT_SOURCE_TO_INPUT',
-  DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
+  RECALL_SPLIT_SCREEN = 'RECALL_SPLIT_SCREEN',
+  SPLIT_SCREEN_LAYOUT = 'SPLIT_SCREEN_LAYOUT',
+  SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT = 'SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT',
+  SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
 }
 
 export type Tv2Action = Tv2PartAction | Tv2PieceAction
@@ -110,7 +110,7 @@ export interface Tv2RecallDveAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
-    actionSubtype: Tv2ActionSubtype.RECALL_DVE,
+    actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
   }
 }
 
@@ -118,7 +118,7 @@ export interface Tv2DveLayoutAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
-    actionSubtype: Tv2ActionSubtype.DVE_LAYOUT,
+    actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
   }
 }
 
@@ -126,7 +126,7 @@ export interface Tv2DveInsertSourceInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
-    actionSubtype: Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT
+    actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT
   } & Tv2DveInsertSourceInputMetadata
 }
 
@@ -145,6 +145,6 @@ export interface Tv2DveInsertLastVideoClipInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
-    actionSubtype: Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
+    actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT
   } & Tv2DveInsertSourceInputMetadata
 }

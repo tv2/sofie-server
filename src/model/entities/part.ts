@@ -48,6 +48,7 @@ export class Part {
   private rank: number
 
   private pieces: Piece[]
+  private replacedPlannedPieces: Piece[]
 
   private isPartOnAir: boolean
   private isPartNext: boolean
@@ -73,6 +74,7 @@ export class Part {
     this.rank = part.rank
     this.isPlanned = part.isPlanned
     this.pieces = part.pieces ?? []
+    this.replacedPlannedPieces = []
     this.isPartOnAir = part.isOnAir
     this.isPartNext = part.isNext
     this.expectedDuration = part.expectedDuration
@@ -165,13 +167,13 @@ export class Part {
   }
 
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
-    if (pieceToBeReplaced.isPlanned) {
-      throw new UnsupportedOperation(`Can't replace Piece ${pieceToBeReplaced.id}. Only unplanned Pieces are allowed to be replaced.`)
-    }
-
     const pieceIndex: number = this.pieces.findIndex(piece => piece.id === pieceToBeReplaced.id)
     if (pieceIndex < 0) {
       throw new UnsupportedOperation(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
+    }
+
+    if (pieceToBeReplaced.isPlanned) {
+      this.replacedPlannedPieces.push(pieceToBeReplaced)
     }
 
     newPiece.setPartId(this.id)
@@ -291,7 +293,11 @@ export class Part {
   public reset(): void {
     this.executedAt = 0
     this.playedDuration = 0
-    this.pieces = this.pieces.filter(piece => piece.isPlanned)
+    this.pieces = [
+      ...this.pieces.filter(piece => piece.isPlanned),
+      ...this.replacedPlannedPieces
+    ]
+    this.replacedPlannedPieces = []
   }
 
   public clone(): Part {
