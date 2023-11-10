@@ -9,8 +9,8 @@ export enum Tv2SourceLayer {
   DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
   DVE = 'dve',
   REPLAY = 'studio0_local',
-  REPLAY_STUDIO_AUX = 'studio0_aux_studio_screen',
-  REPLAY_VIZ_AUX = 'studio0_aux_viz_full1',
+  REPLAY_STUDIO_AUXILIARY = 'studio0_aux_studio_screen',
+  REPLAY_VIZ_AUXILIARY = 'studio0_aux_viz_full1',
 
   VIDEO_CLIP = 'studio0_selected_clip',
   SERVER_VOICE_OVER = 'studio0_selected_voiceover',
