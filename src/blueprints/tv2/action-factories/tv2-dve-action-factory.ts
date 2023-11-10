@@ -29,7 +29,6 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { DveBoxInput, Tv2DveManifestData, Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
-import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-operation-exception'
 import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-layers'
@@ -37,6 +36,7 @@ import { Tv2FileContent } from '../value-objects/tv2-content'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
+import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 
 const NUMBER_OF_DVE_BOXES: number = 4
 
@@ -322,7 +322,7 @@ export class Tv2DveActionFactory {
     return dveManifestData.map(data => {
       const dveConfiguration: DveConfiguration | undefined = blueprintConfiguration.showStyle.dveConfigurations.find(dveConfiguration => dveConfiguration.name.toLowerCase() === data.template.toLowerCase())
       if (!dveConfiguration) {
-        throw new MisconfigurationException(`No configured DVE found for planned DVE action ${data.name}`)
+        throw new Tv2MisconfigurationException(`No configured DVE found for planned DVE action ${data.name}`)
       }
 
       const partId: string = `plannedDveInsertActionPart_${dveConfiguration.name}`

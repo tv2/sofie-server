@@ -30,12 +30,12 @@ import {
 } from './value-objects/tv2-action-manifest-data'
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
-import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
 import { Tv2Action } from './value-objects/tv2-action'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 import { Tv2PieceType } from './enums/tv2-piece-type'
 import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
 import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
+import { Tv2MisconfigurationException } from './exceptions/tv2-misconfiguration-exception'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
@@ -190,7 +190,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     }
     const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.SourceName === dveSource.id)
     if (!source) {
-      throw new MisconfigurationException(`No Source Mapping found for DVE source ${dveSource.sourceType} ${dveSource.id}`)
+      throw new Tv2MisconfigurationException(`No Source Mapping found for DVE source ${dveSource.sourceType} ${dveSource.id}`)
     }
     return source
   }
