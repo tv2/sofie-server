@@ -303,11 +303,13 @@ export class Tv2GraphicsActionFactory {
       return PieceLifespan.WITHIN_PART
     }
 
-    return this.getPieceLifeSpanFromMode(template.outType)
+    return this.getPieceLifespanFromMode(template.outType)
   }
 
-  private getPieceLifeSpanFromMode(mode: 'S' | 'O'): PieceLifespan {
+  private getPieceLifespanFromMode(mode: 'B' | 'S' | 'O'): PieceLifespan {
     switch (mode) {
+      case 'B':
+        return PieceLifespan.WITHIN_PART
       case 'S':
         return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
       case 'O':
