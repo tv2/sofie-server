@@ -65,10 +65,5 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
 
 export enum CasparCgType {
   MEDIA = 'media',
-  IP = 'ip',
-  INPUT = 'input',
   TEMPLATE = 'template',
-  HTML_PAGE = 'htmlpage',
-  ROUTE = 'route',
-  RECORD = 'record'
 }
