@@ -433,15 +433,13 @@ export class Tv2GraphicsActionFactory {
   private getDownstreamKeyerMatchingRole(blueprintConfiguration: Tv2BlueprintConfiguration, role: Tv2DownstreamKeyerRole): Tv2DownstreamKeyer {
     return blueprintConfiguration.studio.SwitcherSource.DSK.find(
       downstreamKeyer => downstreamKeyer.Roles.some(
-        keyerRole => keyerRole === role)) ?? blueprintConfiguration.studio.SwitcherSource.DSK[0]
+        keyerRole => keyerRole === role)
+    ) ?? blueprintConfiguration.studio.SwitcherSource.DSK[0]
   }
 
   private createIdentGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData[]): Tv2PieceAction[] {
     const identData: Tv2OverlayGraphicsManifestData[] = graphicsData.filter(data => data.sourceLayerId === Tv2SourceLayer.IDENT)
-    return identData.map(data => this.createIdentGraphicsAction(
-      blueprintConfiguration,
-      data)
-    )
+    return identData.map(data => this.createIdentGraphicsAction(blueprintConfiguration, data))
   }
 
   private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
@@ -479,10 +477,7 @@ export class Tv2GraphicsActionFactory {
 
   private createLowerThirdActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData[]): Tv2PieceAction[] {
     const lowerThirdData: Tv2OverlayGraphicsManifestData[] = graphicsData.filter(data => data.sourceLayerId === Tv2SourceLayer.LOWER_THIRD)
-    return lowerThirdData.map((data) => this.createLowerThirdGraphicsAction(
-      blueprintConfiguration,
-      data
-    ))
+    return lowerThirdData.map((data) => this.createLowerThirdGraphicsAction(blueprintConfiguration, data))
   }
 
   private createLowerThirdGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
