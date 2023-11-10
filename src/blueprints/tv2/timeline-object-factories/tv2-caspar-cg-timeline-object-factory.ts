@@ -21,38 +21,38 @@ import {
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   constructor(private readonly casparCgPathFixer: Tv2AssetPathHelper) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createAllOutGraphicsTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration, _duration: number): TimelineObject {
+  public createAllOutGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject {
     throw new UnsupportedOperation(
-      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createAllOutGraphicsTimelineObject}'`
+      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createAllOutGraphicsTimelineObject}'. 
+      Was called with configuration: ${blueprintConfiguration} and duration: ${duration}`
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createClearGraphicsTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration, _duration: number): TimelineObject {
+  public createClearGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject {
     throw new UnsupportedOperation(
-      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createClearGraphicsTimelineObject}'`
+      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createClearGraphicsTimelineObject}'. 
+      Was called with configuration: ${blueprintConfiguration} and duration: ${duration}`
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createContinueGraphicsTimelineObject(_duration: number): TimelineObject {
+  public createContinueGraphicsTimelineObject(duration: number): TimelineObject {
     throw new UnsupportedOperation(
-      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createContinueGraphicsTimelineObject}'`
+      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createContinueGraphicsTimelineObject}'. 
+      Was called with duration: ${duration}`
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createOverlayInitializeTimelineObject(_duration: number): TimelineObject {
+  public createOverlayInitializeTimelineObject(duration: number): TimelineObject {
     throw new UnsupportedOperation(
-      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createOverlayInitializeTimelineObject}'`
+      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createOverlayInitializeTimelineObject}'. 
+      Was called with duration: ${duration}`
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createThemeOutTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration, _duration: number): TimelineObject {
+  public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject {
     throw new UnsupportedOperation(
-      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createThemeOutTimelineObject}'`
+      `'${Tv2CasparCgTimelineObjectFactory.name}' has no implementation for '${Tv2CasparCgTimelineObjectFactory.prototype.createThemeOutTimelineObject}'. 
+      Was called with configuration: ${blueprintConfiguration} and duration: ${duration}`
     )
   }
 
