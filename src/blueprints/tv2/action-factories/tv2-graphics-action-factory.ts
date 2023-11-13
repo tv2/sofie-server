@@ -252,6 +252,7 @@ export class Tv2GraphicsActionFactory {
     return {
       id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(fullscreenGraphicsData.name)}`,
       name: `Fullscreen Graphics - ${fullscreenGraphicsData.name}`,
+      rundownId: fullscreenGraphicsData.rundownId,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -474,8 +475,9 @@ export class Tv2GraphicsActionFactory {
     })
     return {
       id: `ident_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
-      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: overlayGraphicsData.name,
+      rundownId: overlayGraphicsData.rundownId,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface
       },
@@ -513,8 +515,9 @@ export class Tv2GraphicsActionFactory {
 
     return {
       id: `lower_third_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
-      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       name: overlayGraphicsData.name,
+      rundownId: overlayGraphicsData.rundownId,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface
       },
