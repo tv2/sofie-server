@@ -31,11 +31,13 @@ import {
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2Action } from './value-objects/tv2-action'
+import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 import { Tv2PieceType } from './enums/tv2-piece-type'
 import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
 import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
 import { Tv2MisconfigurationException } from './exceptions/tv2-misconfiguration-exception'
+import { Tv2AudioMode } from './enums/tv2-audio-mode'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
@@ -47,7 +49,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
     private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
     private readonly videoMixerActionFactory: Tv2VideoMixerConfigurationActionFactory,
-    private readonly dveActionFactory: Tv2DveActionFactory
+    private readonly dveActionFactory: Tv2DveActionFactory,
+    private readonly replayActionFactory: Tv2ReplayActionFactory
   ) {}
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -77,7 +80,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, this.getFullscreenGraphicsData(actionManifests), this.getOverlayGraphicsData(actionManifests)),
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
       ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration),
-      ...this.dveActionFactory.createDveActions(blueprintConfiguration, this.getDveData(blueprintConfiguration, actionManifests))
+      ...this.dveActionFactory.createDveActions(blueprintConfiguration, this.getDveData(blueprintConfiguration, actionManifests)),
+      ...this.replayActionFactory.createReplayActions(blueprintConfiguration)
     ]
   }
 
@@ -126,7 +130,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
           fileName: data.partDefinition.fields.videoId,
           durationFromIngest: data.duration,
           adLibPix: data.adLibPix,
-          isVoiceOver: data.voLevels
+          audioMode: data.voLevels ? Tv2AudioMode.VOICE_OVER : Tv2AudioMode.FULL
         }
       })
   }

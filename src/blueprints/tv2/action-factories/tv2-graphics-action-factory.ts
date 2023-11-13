@@ -21,7 +21,6 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { TimelineObject } from '../../../model/entities/timeline-object'
-import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
   Tv2GraphicsTimelineObjectFactory
@@ -37,10 +36,8 @@ import {
 import { Tv2FileContent } from '../value-objects/tv2-content'
 import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
+import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 
-const GRAPHICS_PROGRAM_ID: string = 'graphicsProgram'
-const GRAPHICS_CLEAN_FEED_ID: string = 'graphicsCleanFeed'
-const GRAPHICS_LOOKAHEAD_ID: string = 'graphicsLookahead'
 const PILOT_PREFIX: string = 'PILOT_'
 
 enum TemplateOutType {
@@ -353,9 +350,9 @@ export class Tv2GraphicsActionFactory {
 
     return [
       this.vizTimelineObjectFactory.createFullscreenGraphicsTimelineObject(blueprintConfiguration, fullscreenGraphicsData),
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(GRAPHICS_PROGRAM_ID, sourceInput, videoMixerEnable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(GRAPHICS_CLEAN_FEED_ID, sourceInput, videoMixerEnable),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(GRAPHICS_LOOKAHEAD_ID, sourceInput, videoMixerEnable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, videoMixerEnable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, videoMixerEnable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(sourceInput, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true),
       this.videoMixerTimelineObjectFactory.createUpstreamKeyerTimelineObject(
         downstreamKeyer,
@@ -436,9 +433,9 @@ export class Tv2GraphicsActionFactory {
 
     return [
       this.casparCgTimelineObjectFactory.createFullscreenGraphicsTimelineObject(blueprintConfiguration, fullscreenGraphicsData),
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(GRAPHICS_PROGRAM_ID, sourceInput, enable, transition, transitionSettings),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(GRAPHICS_CLEAN_FEED_ID, sourceInput, enable, transition, transitionSettings),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(GRAPHICS_LOOKAHEAD_ID, sourceInput, enable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable, transition, transitionSettings),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable, transition, transitionSettings),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(sourceInput, enable),
       this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration)
     ]
   }

@@ -65,8 +65,6 @@ export class Tv2CameraActionFactory {
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: source.AcceptPersistAudio
-        // TODO: Blueprints sets "isModifiedOrInsertedByAction" here which is used for getEndStateForPart and onTimelineGenerate.
-        // TODO: We should instead use something like Piece.isPlanned
       }
     }
 
@@ -94,9 +92,9 @@ export class Tv2CameraActionFactory {
   private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(`insertedProgram_${source._id}`, source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(`insertedCleanFeed_${source._id}`, source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(`insertedLookahead_${source._id}`, source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.SwitcherSource, enable),
     ]
   }
 

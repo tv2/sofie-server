@@ -1,7 +1,7 @@
 import { Tv2VideoMixerTimelineObjectFactory } from './interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import {
-  AtemAuxTimelineObject,
+  AtemAuxTimelineObject, AtemDownstreamKeyerTimelineObject,
   AtemMeTimelineObject,
   AtemSuperSourcePropertiesTimelineObject,
   AtemSuperSourceTimelineObject,
@@ -11,7 +11,7 @@ import {
   SuperSourceBorder,
   SuperSourceProperties
 } from '../../timeline-state-resolver-types/atem-types'
-import { Tv2AtemLayer } from '../value-objects/tv2-layers'
+import { Tv2AtemLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { DveBoxProperties, DveLayoutProperties } from '../value-objects/tv2-show-style-blueprint-configuration'
@@ -21,14 +21,14 @@ import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
-
-const ID_PREFIX: string = 'atem_'
+const ATEM_PREFIX: string = 'atem_'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
-  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): TimelineObject {
+
+  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
-      id: `${ID_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
+      id: `${ATEM_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
       enable: {
         start: 0
       },
@@ -51,7 +51,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
             }
           }
         }
-      },
+      }
     }
   }
 
@@ -69,7 +69,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMeTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
-      id: `upstreamKeyer${downstreamKeyerNumber}`,
+      id: `${ATEM_PREFIX}upstreamKeyer${downstreamKeyerNumber}`,
       enable,
       priority: 1,
       layer: Tv2AtemLayer.CLEAN_UPSTREAM_KEYER,
@@ -97,23 +97,11 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createProgramTimelineObject(id: string, sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
     return this.createAtemMeTimelineObjectForLayer(
-      `${ID_PREFIX}${id}`,
+      `${ATEM_PREFIX}program`,
       Tv2AtemLayer.PROGRAM,
       enable,
-      {
-        input: sourceInput,
-        transition,
-        transitionSettings
-      })
-  }
-
-  public createCleanFeedTimelineObject(id: string, sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
-    return this.createAtemMeTimelineObjectForLayer(
-      `${ID_PREFIX}${id}`,
-      Tv2AtemLayer.CLEAN_FEED,
-      enable, 
       {
         input: sourceInput,
         transition,
@@ -135,9 +123,21 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createLookaheadTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, transition: number = AtemTransition.CUT, transitionSettings?: AtemTransitionSettings): AtemMeTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer(
+      `${ATEM_PREFIX}clean_feed`,
+      Tv2AtemLayer.CLEAN_FEED,
+      enable,
+      {
+        input: sourceInput,
+        transition,
+        transitionSettings
+      })
+  }
+
+  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
     return {
-      id: `${ID_PREFIX}${id}`,
+      id: `${ATEM_PREFIX}lookahead`,
       enable,
       priority: 0,
       layer: Tv2AtemLayer.LOOKAHEAD,
@@ -153,7 +153,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
 
   public createDveBoxesTimelineObject(boxes: DveBoxProperties[], priority: number = 1): AtemSuperSourceTimelineObject {
     return {
-      id: `${ID_PREFIX}dve_boxes`,
+      id: `${ATEM_PREFIX}dve_boxes`,
       enable: {
         start: 0
       },
@@ -174,7 +174,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     const superSourceBorder: SuperSourceBorder = this.getSuperSourceBorder(layoutProperties)
 
     return {
-      id: `${ID_PREFIX}dve_properties`,
+      id: `${ATEM_PREFIX}dve_properties`,
       enable: {
         start: 0
       },
@@ -290,5 +290,23 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       }
     }
     return this.createTransitionEffectTimelineObject(meContent)
+  }
+
+  public createAuxTimelineObject(sourceInput: number, layer: Tv2VideoMixerLayer): AtemAuxTimelineObject {
+    return {
+      id: `${ATEM_PREFIX}${layer}_input_${sourceInput}_timelineObject`,
+      enable: {
+        start: 0
+      },
+      layer: `${ATEM_PREFIX}${layer}`,
+      priority: 1,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.AUX,
+        aux: {
+          input: sourceInput
+        }
+      }
+    }
   }
 }

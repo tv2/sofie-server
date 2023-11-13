@@ -1,6 +1,7 @@
 // The enum values in this file is taken from Blueprints and still has to match those values until we control ingest.
 export enum Tv2SourceLayer {
   CAMERA = 'studio0_camera',
+  REMOTE = 'studio0_live',
   JINGLE = 'studio0_jingle',
   AUDIO_BED = 'studio0_audio_bed',
   IDENT = 'studio0_graphicsIdent',
@@ -10,7 +11,9 @@ export enum Tv2SourceLayer {
   DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
   PILOT_GRAPHICS = 'studio0_pilot',
   DVE = 'dve',
-  REMOTE = 'studio0_live',
+  REPLAY = 'studio0_local',
+  REPLAY_STUDIO_AUXILIARY = 'studio0_aux_studio_screen',
+  REPLAY_VIZ_AUXILIARY = 'studio0_aux_viz_full1',
   VIDEO_CLIP = 'studio0_selected_clip',
 }
 
@@ -30,7 +33,12 @@ export enum Tv2AtemLayer {
   DOWNSTREAM_KEYER = 'atem_dsk',
   CLEAN_UPSTREAM_KEYER = 'atem_clean_usk_full',
   DVE = 'atem_dve',
-  DVE_BOXES = 'atem_dve_boxes'
+  DVE_BOXES = 'atem_dve_boxes',
+}
+
+export enum Tv2VideoMixerLayer {
+  AR = 'aux_ar',
+  VIZ_OVERLAY_AUXILIARY = 'aux_viz_ovl_in_1'
 }
 
 export enum Tv2CasparCgLayer {
