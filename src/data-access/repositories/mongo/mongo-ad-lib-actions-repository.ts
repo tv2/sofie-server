@@ -8,6 +8,7 @@ const AD_LIB_ACTIONS_COLLECTION: string = 'adLibActions'
 
 interface AdLibAction {
   actionId: string
+  rundownId: string
   userData: unknown
 }
 export class MongoAdLibActionsRepository extends BaseMongoRepository implements ActionManifestRepository {
@@ -20,15 +21,16 @@ export class MongoAdLibActionsRepository extends BaseMongoRepository implements 
     return AD_LIB_ACTIONS_COLLECTION
   }
 
-  public async getActionManifests(): Promise<ActionManifest[]> {
+  public async getActionManifests(rundownId: string): Promise<ActionManifest[]> {
     this.assertDatabaseConnection(this.getActionManifests.name)
-    const adLibActions: AdLibAction[] = await this.getCollection().find<AdLibAction>({}).toArray()
-    return adLibActions.map(adLibAction => this.mapToActionManifest(adLibAction))
+    const adLibActions: AdLibAction[] = await this.getCollection().find<AdLibAction>({rundownId: rundownId}).toArray()
+    return adLibActions.filter(action => action.rundownId === rundownId).map(adLibAction => this.mapToActionManifest(adLibAction))
   }
 
   private mapToActionManifest(adLibAction: AdLibAction): ActionManifest {
     return {
       actionId: adLibAction.actionId,
+      rundownId: adLibAction.rundownId,
       data: adLibAction.userData
     }
   }
