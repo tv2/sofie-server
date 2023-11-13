@@ -3,7 +3,7 @@ import { RundownTiming } from '../value-objects/rundown-timing'
 export class BasicRundown {
   public readonly id: string
   public readonly name: string
-  public readonly timing
+  public readonly timing: RundownTiming
   protected isRundownActive: boolean
   protected modifiedAt: number
 
