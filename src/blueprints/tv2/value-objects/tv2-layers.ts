@@ -40,7 +40,8 @@ export enum Tv2CasparCgLayer {
   PLAYER_CLIP_PENDING = 'casparcg_player_clip_pending',
   DVE_KEY = 'casparcg_dve_key',
   DVE_FRAME = 'casparcg_dve_frame',
-  BREAKER = 'casparcg_player_jingle'
+  BREAKER = 'casparcg_player_jingle',
+  AUDIO = 'casparcg_audio_lyd'
 }
 
 export enum Tv2VideoClipLayer {

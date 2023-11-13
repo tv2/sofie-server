@@ -1,6 +1,9 @@
 import {
   CasparCgMediaTimelineObject,
   CasparCgTemplateTimelineObject,
+  CasparCgTransitionDirection,
+  CasparCgTransitionEase,
+  CasparCgTransitionType,
   CasparCgType
 } from '../../timeline-state-resolver-types/caspar-cg-types'
 import { Tv2CasparCgLayer, Tv2GraphicsLayer } from '../value-objects/tv2-layers'
@@ -8,6 +11,7 @@ import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 
 export class Tv2CasparCgTimelineObjectFactory {
+
   public createVideoClipTimelineObject(videoClipData: Tv2VideoClipManifestData): CasparCgMediaTimelineObject {
     return {
       id: `casparCg_${videoClipData.fileName}`,
@@ -91,6 +95,31 @@ export class Tv2CasparCgTimelineObjectFactory {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
         file
+      }
+    }
+  }
+
+  public createFadeAudioBedTimelineObject(fadeDurationInMilliseconds: number): CasparCgMediaTimelineObject {
+    const file: string = 'empty'
+    return {
+      id: 'casparCg_fade_audio',
+      enable: {
+        start: 0
+      },
+      layer: Tv2CasparCgLayer.AUDIO,
+      priority: 1,
+      content: {
+        deviceType: DeviceType.CASPAR_CG,
+        type: CasparCgType.MEDIA,
+        file,
+        transitions: {
+          inTransition: {
+            type: CasparCgTransitionType.MIX,
+            easing: CasparCgTransitionEase.LINEAR,
+            direction: CasparCgTransitionDirection.LEFT,
+            duration: fadeDurationInMilliseconds
+          },
+        }
       }
     }
   }

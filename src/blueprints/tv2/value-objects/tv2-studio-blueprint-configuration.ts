@@ -6,10 +6,15 @@ export interface Tv2StudioBlueprintConfiguration {
   StudioMics: string[]
   ABMediaPlayers: Tv2MediaPlayer[]
   SwitcherSource: Tv2VideoMixerSources
-  CasparPrerollDuration: number,
+  CasparPrerollDuration: number
   ServerPostrollDuration: number
   DVEFolder?: string,
   JingleFolder?: string
+  AudioBedSettings: {
+    fadeIn: number,
+    fadeOut: number,
+    volume: number
+  }
 }
 
 export interface Tv2SourceMapping {

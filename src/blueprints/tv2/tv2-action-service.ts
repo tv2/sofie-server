@@ -59,6 +59,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.dveActionFactory.isDveAction(action)) {
       return this.dveActionFactory.getMutateActionMethods(action)
     }
+    if (this.audioActionFactory.isAudioAction(action)) {
+      return this.audioActionFactory.getMutateActionMethods(action)
+    }
     return []
   }
 
