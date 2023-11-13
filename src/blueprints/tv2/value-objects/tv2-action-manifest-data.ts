@@ -83,9 +83,11 @@ export interface Tv2VideoClipManifestData {
   durationFromIngest: number // userData.duration
   adLibPix: boolean // userData.adLibPix // What does "adLibPix" mean?
   audioMode: Tv2AudioMode // userData.voLevels
+  rundownId?: string
 }
 
 export interface Tv2DveManifestData {
+  rundownId: string
   name: string,
   template: string,
   sources: Map<DveBoxInput, Tv2SourceMappingWithSound>
@@ -94,11 +96,13 @@ export interface Tv2DveManifestData {
 export type Tv2GraphicsManifestData = Tv2FullscreenGraphicsManifestData | Tv2OverlayGraphicsManifestData
 
 export interface Tv2FullscreenGraphicsManifestData {
+  rundownId: string
   vcpId: number
   name: string,
 }
 
 export interface Tv2OverlayGraphicsManifestData {
+  rundownId: string
   sourceLayerId: Tv2SourceLayer
   name: string,
   templateName: string

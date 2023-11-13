@@ -91,6 +91,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       .map(actionManifest => {
         const data: Tv2ActionManifestDataForFullscreenGraphics = actionManifest.data
         return {
+          rundownId: actionManifest.rundownId,
           name: data.name,
           vcpId: data.vcpid,
         }
@@ -103,6 +104,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       .map(actionManifest => {
         const data: Tv2ActionManifestDataForOverlayGraphics = actionManifest.data
         return {
+          rundownId: actionManifest.rundownId,
           name: data.name,
           sourceLayerId: data.sourceLayerId,
           templateName: this.getTemplateName(data.name),
@@ -126,6 +128,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       .map(actionManifest => {
         const data: Tv2ActionManifestDataForVideoClip = actionManifest.data
         return {
+          rundownId: actionManifest.rundownId,
           name: data.partDefinition.storyName,
           fileName: data.partDefinition.fields.videoId,
           durationFromIngest: data.duration,
@@ -166,6 +169,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
         const data: Tv2ActionManifestDataForDve = actionManifest.data
         const sources: Map<DveBoxInput, Tv2SourceMappingWithSound> = this.getDveSourcesFromActionManifestData(data, blueprintConfiguration)
         return {
+          rundownId: actionManifest.rundownId,
           name: data.name,
           template: data.config.template,
           sources

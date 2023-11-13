@@ -81,6 +81,7 @@ export class Tv2VideoClipActionFactory {
     return {
       id: `videoClipAsNextAction_${videoClipData.fileName}`,
       name: videoClipData.name,
+      rundownId: videoClipData.rundownId,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface,
