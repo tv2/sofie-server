@@ -41,6 +41,7 @@ export class ExecuteActionService implements ActionService {
     const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests(rundownId)
     // TODO: The Actions should be generated on ingest. Move them once we control ingest.
     const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
+    await this.actionRepository.deleteRundownActions(rundownId)
     await this.actionRepository.saveActions(actions)
     return actions
   }
