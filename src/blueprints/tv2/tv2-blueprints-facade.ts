@@ -55,7 +55,7 @@ export class Tv2BlueprintsFacade {
         tv2AudioTimelineObjectFactory,
         assetFolderHelper
       ),
-      new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory),
+      new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory, tv2CasparCgTimelineObjectFactory),
       new Tv2GraphicsActionFactory(tv2GraphicsTimelineObjectFactory),
       new Tv2VideoClipActionFactory(
         tv2VideoMixerTimelineObjectFactory,

@@ -15,7 +15,30 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
     mixer?: {
       keyer?: boolean
     }
+    transitions?: {
+      inTransition?: TimelineTransition
+    }
   }
+}
+
+interface TimelineTransition {
+  type: CasparCgTransitionType
+  duration: number
+  easing: CasparCgTransitionEase
+  direction: CasparCgTransitionDirection
+}
+
+export enum CasparCgTransitionType {
+  MIX = 'MIX'
+}
+
+export enum CasparCgTransitionEase {
+  LINEAR = 'LINEAR',
+}
+
+export enum CasparCgTransitionDirection {
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT'
 }
 
 export interface CasparCgTemplateTimelineObject extends TimelineObject {
