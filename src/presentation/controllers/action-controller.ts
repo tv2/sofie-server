@@ -14,9 +14,10 @@ export class ActionController extends BaseController {
   }
 
   @GetRequest('/rundowns/:rundownId')
-  public async getActions(_reg: Request, res: Response): Promise<void> {
+  public async getActions(reg: Request, res: Response): Promise<void> {
     try {
-      const actions: Action[] = await this.actionService.getActions()
+      const rundownId: string = reg.params.rundownId
+      const actions: Action[] = await this.actionService.getActions(rundownId)
       res.send(actions.map(action => new ActionDto(action)))
     } catch (error) {
       this.httpErrorHandler.handleError(res, error as Exception)

@@ -8,6 +8,7 @@ const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
 
 interface AdLibPiece {
   sourceLayerId: string
+  rundownId: string
   name: string
   expectedDuration: number | null
 }
@@ -21,16 +22,19 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
     return AD_LIB_PIECES_COLLECTION
   }
 
-  public async getActionManifests(): Promise<ActionManifest[]> {
+  public async getActionManifests(rundownId: string): Promise<ActionManifest[]> {
     this.assertDatabaseConnection(this.getActionManifests.name)
     // Todo: The filter is Tv2 specific. Remove filtering when we control ingest.
-    const mongoAdLibPieces: AdLibPiece[] = await this.getCollection().find<AdLibPiece>({uniquenessId: {$not: { $regex: '.*_commentator$'}}}).toArray()
+    const mongoAdLibPieces: AdLibPiece[] = await this.getCollection().find<AdLibPiece>({
+      rundownId: rundownId, uniquenessId: {$not: { $regex: '.*_commentator$'}}
+    }).toArray()
     return mongoAdLibPieces.map(adLibPiece => this.mapToActionManifest(adLibPiece))
   }
 
   private mapToActionManifest(adLibPiece: AdLibPiece): ActionManifest {
     return {
       actionId: adLibPiece.sourceLayerId,
+      rundownId: adLibPiece.rundownId,
       data: {
         name: adLibPiece.name,
         expectedDuration: adLibPiece.expectedDuration ?? undefined,
