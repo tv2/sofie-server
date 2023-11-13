@@ -242,8 +242,8 @@ export class Tv2TransitionEffectActionFactory {
     const fileName: string = this.assetPathHelper.joinAssetToFolder(breakerActionMetadata.breakerFolder, breakerActionMetadata.breaker.fileName)
 
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(`breaker_${breaker.id}_program`, videoMixerInputSource, videoMixerTimelineEnable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(`breaker_${breaker.id}_lookahead`, videoMixerInputSource, videoMixerTimelineEnable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
       this.casparCgTimelineObjectFactory.createBreakerTimelineObject(fileName),
       this.audioTimelineObjectFactory.createBreakerAudioTimelineObject()

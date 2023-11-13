@@ -5,12 +5,13 @@ import { DveBoxProperties, DveLayoutProperties } from '../../value-objects/tv2-s
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
 import { Piece } from '../../../../model/entities/piece'
+import { Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
 
 export interface Tv2VideoMixerTimelineObjectFactory {
-  createProgramTimelineObject(id: string, sourceInput: number, enable: TimelineEnable, transition?: number, transitionSettings?: unknown): TimelineObject
-  createCleanFeedTimelineObject(id: string, sourceInput: number, enable: TimelineEnable, transition?: number, transitionSettings?: unknown): TimelineObject
-  createLookaheadTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): TimelineObject
-
+  createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, transition?: number, transitionSettings?: unknown): TimelineObject
+  createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, transition?: number, transitionSettings?: unknown): TimelineObject
+  createLookaheadTimelineObject( sourceInput: number, enable: TimelineEnable): TimelineObject
+  createAuxTimelineObject(sourceInput: number, layer: Tv2VideoMixerLayer): TimelineObject
   createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): TimelineObject
   createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): TimelineObject
   createDveBoxesTimelineObject(boxes: DveBoxProperties[], priority?: number): Tv2BlueprintTimelineObject
