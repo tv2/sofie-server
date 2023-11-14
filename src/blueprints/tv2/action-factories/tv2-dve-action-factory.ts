@@ -13,6 +13,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
+  Tv2Action,
   Tv2ActionContentType,
   Tv2ActionSubtype,
   Tv2DveAction,
@@ -20,8 +21,6 @@ import {
   Tv2DveInsertSourceInputAction,
   Tv2DveInsertSourceInputMetadata,
   Tv2DveLayoutAction,
-  Tv2PartAction,
-  Tv2PieceAction,
   Tv2RecallDveAction
 } from '../value-objects/tv2-action'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
@@ -36,10 +35,11 @@ import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-layers'
 import { Tv2FileContent } from '../value-objects/tv2-content'
+import { AssetFolderHelper } from '../helpers/asset-folder-helper'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 const NUMBER_OF_DVE_BOXES: number = 4
-const ATEM_SUPER_SOURCE_INDEX: number = 6000
 
 // The "Layout" priority must be lower than the "Insert" priority for the inserted sources to "persist" through a Take.
 const LAYOUT_TIMELINE_OBJECT_PRIORITY: number = 0.5
@@ -48,17 +48,15 @@ const PLANNED_DVE_TIMELINE_OBJECT_PRIORITY: number = 1
 
 const CAMERA_SOURCE_NAME: string = 'Camera'
 const LIVE_SOURCE_NAME: string = 'Live'
-
-const DVE_LOOKAHEAD_ID: string = 'dveLookahead'
-const DVE_PROGRAM_ID: string = 'dveProgram'
-const DVE_CLEAN_FEED_ID: string = 'dveCleanFeed'
+const REPLAY_SOURCE_NAME: string = 'Replay'
 
 export class Tv2DveActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory
+    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
+    private readonly assetFolderHelper: AssetFolderHelper
   ) {}
 
 
@@ -72,35 +70,33 @@ export class Tv2DveActionFactory {
     ]
   }
 
-  public isDveAction(action: Action): boolean {
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
-    const actionSubtype: Tv2ActionSubtype | undefined = tv2Action.metadata.actionSubtype
+  public isDveAction(action: Tv2Action): boolean {
+    const actionSubtype: Tv2ActionSubtype | undefined = action.metadata.actionSubtype
     return actionSubtype !== undefined && [
-      Tv2ActionSubtype.DVE_LAYOUT,
-      Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT,
-      Tv2ActionSubtype.RECALL_DVE,
-      Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
+      Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
+      Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
+      Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
+      Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT
     ].includes(actionSubtype)
   }
 
-  public getMutateActionMethods(action: Action): MutateActionMethods[] {
-    const tv2Action: Tv2PartAction | Tv2PieceAction = action as Tv2PartAction | Tv2PieceAction
-    switch (tv2Action.metadata.actionSubtype) {
-      case Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT: {
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
+    switch (action.metadata.actionSubtype) {
+      case Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT: {
         return [{
           type: MutateActionType.PIECE,
           updateActionWithPiece: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
           piecePredicate: (piece: Piece) => this.doesPieceHaveDveBoxesTimelineObject(piece)
         }]
       }
-      case Tv2ActionSubtype.RECALL_DVE: {
+      case Tv2ActionSubtype.RECALL_SPLIT_SCREEN: {
         return [{
           type: MutateActionType.HISTORIC_PART,
           updateActionWithPartData: (action: Action, historicPart: Part, presentPart: Part | undefined) => this.updateRecallLastDveAction(action, historicPart, presentPart),
           partPredicate: (part: Part) => this.recallLastDvePartPredicate(part)
         }]
       }
-      case Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT: {
+      case Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT: {
         return [
           {
             type: MutateActionType.HISTORIC_PART,
@@ -133,15 +129,17 @@ export class Tv2DveActionFactory {
         start: 0
       }
 
+      const dveSource: number = this.videoMixerTimelineObjectFactory.getDveSourceInput()
+
       const dveLayoutTimelineObjects: TimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, LAYOUT_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(DVE_PROGRAM_ID, ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(DVE_CLEAN_FEED_ID, ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(DVE_LOOKAHEAD_ID, ATEM_SUPER_SOURCE_INDEX, timelineEnable),
-        this.casparCgTimelineObjectFactory.createCasparCgDveKeyTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveFrameTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveLocatorTimelineObject()
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(dveSource, timelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(dveSource, timelineEnable),
+        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
+        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
+        this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject()
       ]
 
       const metadata: Tv2PieceMetadata = {
@@ -164,7 +162,7 @@ export class Tv2DveActionFactory {
         },
         metadata: {
           contentType: Tv2ActionContentType.SPLIT_SCREEN,
-          actionSubtype: Tv2ActionSubtype.DVE_LAYOUT,
+          actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
         }
       }
     })
@@ -213,50 +211,39 @@ export class Tv2DveActionFactory {
     }
   }
 
-  // Copied from Blueprints // TODO: Use the helper class André is making.
-  private joinAssetToFolder(folder: string | undefined, assetFile: string): string {
-    if (!folder) {
-      return assetFile
-    }
-
-    // Replace every `\\` with `\`, then replace every `\` with `/`
-    const folderWithForwardSlashes = folder.replace(/\\\\/g, '\\').replace(/\\/g, '/')
-    const assetWithForwardSlashes = assetFile.replace(/\\\\/g, '\\').replace(/\\/g, '/')
-
-    // Remove trailing slash from folder and leading slash from asset
-    const folderWithoutTrailingSlashes = folderWithForwardSlashes.replace(/\/+$/, '')
-    const assetFileWithoutLeadingSlashes = assetWithForwardSlashes.replace(/^\/+/, '')
-
-    return `${folderWithoutTrailingSlashes}/${assetFileWithoutLeadingSlashes}`
-  }
-
   private createInsertToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertSourceInputAction[] {
     const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesCam.slice(0, 5)
     const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesRM
+    const replaySources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesReplay
+    const replaySourcesWithoutVoiceOver: Tv2SourceMappingWithSound[] = replaySources.filter(replaySource => !/EPSIO/i.test(replaySource.SourceName))
 
     return [
       ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, CAMERA_SOURCE_NAME),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, liveSources, LIVE_SOURCE_NAME)
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, liveSources, LIVE_SOURCE_NAME),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySources, `${REPLAY_SOURCE_NAME} VO`, Tv2AudioMode.VOICE_OVER),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySourcesWithoutVoiceOver, REPLAY_SOURCE_NAME, Tv2AudioMode.FULL)
     ]
   }
 
-  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string): Tv2DveInsertSourceInputAction[] {
+  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string, audioMode: Tv2AudioMode = Tv2AudioMode.FULL): Tv2DveInsertSourceInputAction[] {
     const actions: Tv2DveInsertSourceInputAction[] = []
     for (let inputIndex = 0; inputIndex < NUMBER_OF_DVE_BOXES; inputIndex++) {
       const actionsForInput: Tv2DveInsertSourceInputAction[] = sources
         .map(source => {
 
-          const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source)
+          const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, audioMode)
 
           return {
             id: `insert_${name}_${source.SourceName}_to_dve_input_${inputIndex}_action`,
             name: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
             description: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
             type: PieceActionType.REPLACE_PIECE,
-            data: {} as PieceInterface,
+            data: {
+              pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
+            },
             metadata: {
               contentType: Tv2ActionContentType.SPLIT_SCREEN,
-              actionSubtype: Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT,
+              actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
               inputIndex,
               videoMixerSource: source.SwitcherSource,
               audioTimelineObjects
@@ -267,6 +254,10 @@ export class Tv2DveActionFactory {
       actions.push(...actionsForInput)
     }
     return actions
+  }
+
+  private createEmptyPieceInterfaceToBeUpdatedByMutateActions(): PieceInterface {
+    return {} as PieceInterface
   }
 
   private updateInsertToInputAction(action: Action, dvePieceFromRundown: Piece): Action {
@@ -312,7 +303,9 @@ export class Tv2DveActionFactory {
     }
 
     const dveAction: Tv2DveInsertSourceInputAction = action as Tv2DveInsertSourceInputAction
-    dveAction.data = this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, pieceMetadata, timelineObjects)
+    dveAction.data = {
+      pieceInterface: this.createDvePieceInterface(dvePieceFromRundown.getPartId(), dvePieceFromRundown.name, pieceMetadata, timelineObjects)
+    }
     return dveAction
   }
 
@@ -365,15 +358,17 @@ export class Tv2DveActionFactory {
         start: 0
       }
 
+      const dveSource: number = this.videoMixerTimelineObjectFactory.getDveSourceInput()
+
       const dveTimelineObjects: TimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createDveBoxesTimelineObject(boxes, PLANNED_DVE_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createDvePropertiesTimelineObject(blueprintConfiguration, dveConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(DVE_PROGRAM_ID, ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(DVE_CLEAN_FEED_ID, ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(DVE_LOOKAHEAD_ID, ATEM_SUPER_SOURCE_INDEX, videoSwitcherTimelineEnable),
-        this.casparCgTimelineObjectFactory.createCasparCgDveKeyTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveFrameTimelineObject(this.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
-        this.casparCgTimelineObjectFactory.createCasparCgDveLocatorTimelineObject(),
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(dveSource, videoSwitcherTimelineEnable),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(dveSource, videoSwitcherTimelineEnable),
+        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.key)),
+        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, dveConfiguration.frame)),
+        this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject(),
         ...audioTimelineObjects
       ]
 
@@ -418,7 +413,7 @@ export class Tv2DveActionFactory {
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
         contentType: Tv2ActionContentType.SPLIT_SCREEN,
-        actionSubtype: Tv2ActionSubtype.RECALL_DVE,
+        actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
       },
       data: {
         partInterface: {} as PartInterface,
@@ -500,37 +495,39 @@ export class Tv2DveActionFactory {
   private createInsertLastVideoClipToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertLastVideoClipInputAction[] {
     const actions: Tv2DveInsertLastVideoClipInputAction[] = []
     for (let inputIndex = 0; inputIndex < NUMBER_OF_DVE_BOXES; inputIndex++) {
-      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, false))
-      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, true))
+      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.FULL))
+      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.VOICE_OVER))
     }
 
     return actions
   }
 
-  private createInsertLastVideoClipToInputAction(blueprintConfiguration: Tv2BlueprintConfiguration, inputIndex: number, isVoiceOver: boolean): Tv2DveInsertLastVideoClipInputAction {
+  private createInsertLastVideoClipToInputAction(blueprintConfiguration: Tv2BlueprintConfiguration, inputIndex: number, audioMode: Tv2AudioMode): Tv2DveInsertLastVideoClipInputAction {
     const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(blueprintConfiguration, {
       fileName: inputIndex,
-      isVoiceOver
+      audioMode
     } as unknown as Tv2VideoClipManifestData)
 
     return {
-      id: `insert_last_video_clip_to_dve_input_${inputIndex}${isVoiceOver ? '_vo' : ''}_action`,
-      name: `Insert last Video ${isVoiceOver ? ' Voice Over ' : ''} Clip in DVE input ${inputIndex}`,
+      id: `insert_last_video_clip_to_dve_input_${inputIndex}${audioMode ? '_vo' : ''}_action`,
+      name: `Insert last Video ${audioMode ? ' Voice Over ' : ''} Clip in DVE input ${inputIndex}`,
       description: 'Insert last Video Clip in DVE input ${inputIndex}',
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
         contentType: Tv2ActionContentType.SPLIT_SCREEN,
-        actionSubtype: Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT,
+        actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT,
         inputIndex,
         videoMixerSource: A_B_SOURCE_INPUT_PLACEHOLDER,
         audioTimelineObjects,
         videoClip: {
           mediaPlayerSession: '', // Will be found on mutate.
           timelineObjects: [],
-          isVoiceOver
+          audioMode
         }
       },
-      data: {} as PieceInterface
+      data: {
+        pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
+      }
     }
   }
 
@@ -554,13 +551,13 @@ export class Tv2DveActionFactory {
 
     metadata.audioTimelineObjects = this.addMediaPlayerSessionToTimelineObjects(mediaPlayerSession, metadata.audioTimelineObjects)
 
-    const isVoiceOver: boolean = metadata.videoClip?.isVoiceOver ?? false
-    const videoClipTimelineObject: Tv2BlueprintTimelineObject = this.createVideoClipTimelineObjectForPieceWithMediaPlayerSession(pieceWithMediaPlayerSession, mediaPlayerSession, isVoiceOver)
+    const audioMode: Tv2AudioMode = metadata.videoClip?.audioMode ?? Tv2AudioMode.FULL
+    const videoClipTimelineObject: Tv2BlueprintTimelineObject = this.createVideoClipTimelineObjectForPieceWithMediaPlayerSession(pieceWithMediaPlayerSession, mediaPlayerSession, audioMode)
 
     metadata.videoClip = {
       mediaPlayerSession,
       timelineObjects: [videoClipTimelineObject],
-      isVoiceOver
+      audioMode
     }
 
     return action
@@ -574,15 +571,15 @@ export class Tv2DveActionFactory {
     return !!pieceMetadata.mediaPlayerSessions && pieceMetadata.mediaPlayerSessions.length > 0
   }
 
-  private createVideoClipTimelineObjectForPieceWithMediaPlayerSession(piece: Piece, mediaPlayerSession: string, isVoiceOver: boolean): Tv2BlueprintTimelineObject {
+  private createVideoClipTimelineObjectForPieceWithMediaPlayerSession(piece: Piece, mediaPlayerSession: string, audioMode: Tv2AudioMode): Tv2BlueprintTimelineObject {
     const fileContent: Tv2FileContent = piece.content as Tv2FileContent
 
     const videoClipData: Tv2VideoClipManifestData = {
       name: '',
       fileName: fileContent.fileName,
       durationFromIngest: 0,
-      adLibPix: isVoiceOver,
-      isVoiceOver
+      adLibPix: audioMode === Tv2AudioMode.VOICE_OVER,
+      audioMode
     }
 
     const videoClipTimelineObject: Tv2BlueprintTimelineObject = this.casparCgTimelineObjectFactory.createVideoClipTimelineObject(videoClipData)

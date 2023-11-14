@@ -2,6 +2,7 @@ import { ActionType, PartActionType, PieceActionType } from '../enums/action-typ
 import { Part, PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
 import { Media } from './media'
+import { InTransition } from '../value-objects/in-transition'
 
 export interface Action {
   id: string
@@ -22,7 +23,10 @@ export interface PartAction extends Action {
 
 export interface PieceAction extends Action {
   type: PieceActionType
-  data: PieceInterface
+  data: {
+    pieceInterface: PieceInterface,
+    partInTransition?: InTransition
+  }
 }
 
 export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods

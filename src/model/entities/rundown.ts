@@ -22,6 +22,7 @@ import { LastSegmentInRundown } from '../exceptions/last-segment-in-rundown'
 import { NoPartInHistoryException } from '../exceptions/no-part-in-history-exception'
 import { OnAirException } from '../exceptions/on-air-exception'
 import { RundownTiming } from '../value-objects/rundown-timing'
+import { InTransition } from '../value-objects/in-transition'
 
 export interface RundownInterface {
   id: string
@@ -644,10 +645,13 @@ export class Rundown extends BasicRundown {
     this.updateInfinitePieces()
   }
 
-  public insertPieceIntoNextPart(piece: Piece): void {
+  public insertPieceIntoNextPart(piece: Piece, partInTransition?: InTransition): void {
     this.assertActive(this.insertPieceIntoNextPart.name)
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
     this.nextCursor.part.insertPiece(piece)
+    if (partInTransition) {
+      this.nextCursor.part.updateInTransition(partInTransition)
+    }
   }
 
   public getActiveCursor(): RundownCursor | undefined {
