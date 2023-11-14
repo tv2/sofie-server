@@ -7,7 +7,7 @@ export enum Tv2SourceLayer {
   GRAPHICS_ACTION_COMMAND = 'studio0_adlib_graphic_cmd',
   AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs',
   DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
-  SPLIT_SCREEN = 'dve',
+  SPLIT_SCREEN = 'dve', // TODO: Change to split_screen when we control ingest.
   REPLAY = 'studio0_local',
   REPLAY_STUDIO_AUX = 'studio0_aux_studio_screen',
   REPLAY_VIZ_AUX = 'studio0_aux_viz_full1',

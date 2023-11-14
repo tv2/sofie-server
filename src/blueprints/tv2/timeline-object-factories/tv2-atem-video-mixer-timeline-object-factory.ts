@@ -118,7 +118,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
 
   public createSplitScreenBoxesTimelineObject(boxes: SplitScreenBoxProperties[], priority: number = 1): AtemSuperSourceTimelineObject {
     return {
-      id: `${ATEM_PREFIX}dve_boxes`,
+      id: `${ATEM_PREFIX}split_screen_boxes`,
       enable: {
         start: 0
       },
@@ -139,7 +139,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     const superSourceBorder: SuperSourceBorder = this.getSuperSourceBorder(layoutProperties)
 
     return {
-      id: `${ATEM_PREFIX}dve_properties`,
+      id: `${ATEM_PREFIX}split_screen_properties`,
       enable: {
         start: 0
       },
