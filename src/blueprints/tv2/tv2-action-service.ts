@@ -1,10 +1,7 @@
 import { BlueprintGenerateActions } from '../../model/value-objects/blueprint'
 import { Configuration } from '../../model/entities/configuration'
 import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
-import {
-  Tv2SourceMappingWithSound,
-  Tv2StudioBlueprintConfiguration
-} from './value-objects/tv2-studio-blueprint-configuration'
+import { Tv2SourceMappingWithSound } from './value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
 import { Tv2TransitionEffectActionFactory } from './action-factories/tv2-transition-effect-action-factory'
@@ -29,7 +26,6 @@ import {
   TvActionManifestDveSourceType
 } from './value-objects/tv2-action-manifest-data'
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
-import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2Action } from './value-objects/tv2-action'
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
@@ -38,10 +34,11 @@ import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
 import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
 import { Tv2MisconfigurationException } from './exceptions/tv2-misconfiguration-exception'
 import { Tv2AudioMode } from './enums/tv2-audio-mode'
+import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
-    private readonly configurationMapper: Tv2BlueprintConfigurationMapper,
+    private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly cameraActionFactory: Tv2CameraActionFactory,
     private readonly remoteActionFactory: Tv2RemoteActionFactory,
     private readonly transitionEffectActionFactory: Tv2TransitionEffectActionFactory,
@@ -67,10 +64,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   }
 
   public generateActions(configuration: Configuration, actionManifests: Tv2ActionManifest[]): Action[] {
-    const blueprintConfiguration: Tv2BlueprintConfiguration = {
-      studio: configuration.studio.blueprintConfiguration as Tv2StudioBlueprintConfiguration,
-      showStyle: this.configurationMapper.mapShowStyleConfiguration(configuration.showStyle)
-    }
+    const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration)
 
     return [
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
@@ -194,15 +188,15 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     let sources: Tv2SourceMappingWithSound[] = []
     switch (dveSource.sourceType) {
       case TvActionManifestDveSourceType.CAMERA: {
-        sources = blueprintConfiguration.studio.SourcesCam
+        sources = blueprintConfiguration.studio.cameraeSources
         break
       }
       case TvActionManifestDveSourceType.LIVE: {
-        sources = blueprintConfiguration.studio.SourcesRM
+        sources = blueprintConfiguration.studio.remoteSources
         break
       }
     }
-    const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.SourceName === dveSource.id)
+    const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.name === dveSource.id)
     if (!source) {
       throw new Tv2MisconfigurationException(`No Source Mapping found for DVE source ${dveSource.sourceType} ${dveSource.id}`)
     }

@@ -1,5 +1,6 @@
 import {
   Breaker,
+  BreakerTransitionEffect,
   CutTransitionEffect,
   DipTransitionEffect,
   DveConfiguration,
@@ -9,8 +10,7 @@ import {
   MixTransitionEffect,
   TransitionEffect,
   TransitionEffectType,
-  Tv2ShowStyleBlueprintConfiguration,
-  BreakerTransitionEffect
+  Tv2ShowStyleBlueprintConfiguration
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { ShowStyle } from '../../../model/entities/show-style'
 
@@ -70,7 +70,8 @@ interface CoreBreaker {
   LoadFirstFrame: boolean
 }
 
-export class Tv2BlueprintConfigurationMapper {
+export class Tv2ShowStyleBlueprintConfigurationMapper {
+
   public mapShowStyleConfiguration(showStyle: ShowStyle): Tv2ShowStyleBlueprintConfiguration {
     const coreConfiguration: CoreShowStyleBlueprintConfiguration = { ...(showStyle.blueprintConfiguration as CoreShowStyleBlueprintConfiguration) }
     return {

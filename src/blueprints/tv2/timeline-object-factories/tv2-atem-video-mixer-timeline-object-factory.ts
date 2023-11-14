@@ -26,7 +26,7 @@ const ATEM_PREFIX: string = 'atem_'
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
 
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
-    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
+    const downstreamKeyerNumber: number = downstreamKeyer.name + 1
     return {
       id: `${ATEM_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
       enable: {
@@ -40,12 +40,12 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         dsk: {
           onAir,
           sources: {
-            fillSource: downstreamKeyer.Fill,
-            cutSource: downstreamKeyer.Key
+            fillSource: downstreamKeyer.videoMixerFillSource,
+            cutSource: downstreamKeyer.videoMixerKeySource
           },
           properties: {
-            clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Clip),
-            gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Gain),
+            clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.videoMixerClip),
+            gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.videoMixerGain),
             mask: {
               enable: false
             }
@@ -67,7 +67,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   }
 
   public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMeTimelineObject {
-    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
+    const downstreamKeyerNumber: number = downstreamKeyer.name + 1
     return {
       id: `${ATEM_PREFIX}upstreamKeyer${downstreamKeyerNumber}`,
       enable,
@@ -79,16 +79,16 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         me: {
           upstreamKeyers: [
             {
-              upstreamKeyerId: downstreamKeyer.Number,
+              upstreamKeyerId: downstreamKeyer.name,
               onAir: true,
               mixEffectKeyType: 0,
               flyEnabled: false,
-              fillSource: downstreamKeyer.Fill,
-              cutSource: downstreamKeyer.Key,
+              fillSource: downstreamKeyer.videoMixerFillSource,
+              cutSource: downstreamKeyer.videoMixerKeySource,
               maskEnabled: false,
               lumaSettings: {
-                clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Clip),
-                gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Gain),
+                clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.videoMixerClip),
+                gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.videoMixerGain),
               }
             }
           ]
@@ -184,8 +184,8 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         deviceType: DeviceType.ATEM,
         type: AtemType.SUPER_SOURCE_PROPERTIES,
         ssrcProps: {
-          artFillSource: configuration.studio.SwitcherSource.SplitArtFill,
-          artCutSource: configuration.studio.SwitcherSource.SplitArtKey,
+          artFillSource: configuration.studio.videoMixerBasicConfiguration.splitScreenArtFillSource,
+          artCutSource: configuration.studio.videoMixerBasicConfiguration.splitScreenArtKeySource,
           artOption: 1,
           ...superSourceProperties,
           ...superSourceBorder

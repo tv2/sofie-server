@@ -57,7 +57,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
   }
 
   public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject {
-    const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
+    const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.graphicsFolder.name
     const nameChunks: string[] = fullscreenGraphicsData.name.split('/')
     const sceneName: string = nameChunks[nameChunks.length - 1]
     const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, rawGraphicsFolder)
@@ -84,13 +84,13 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
   }
 
   private createFullscreenTemplateData(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): CasparCgTemplateData {
-    if (!blueprintConfiguration.studio.HTMLGraphics) {
+    if (!blueprintConfiguration.studio.htmlGraphics) {
       throw new MisconfigurationException(
         'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'GraphicURL\''
       )
     }
 
-    const absoluteFilePath: string = `${blueprintConfiguration.studio.HTMLGraphics.GraphicURL}\\${fileName}${blueprintConfiguration.studio.GraphicFileExtension}`
+    const absoluteFilePath: string = `${blueprintConfiguration.studio.htmlGraphics.graphicsUrl}\\${fileName}${blueprintConfiguration.studio.graphicsFolder.fileExtension}`
     return {
       display: 'program',
       slots: {
@@ -229,7 +229,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
 
   public createDveLocatorTimelineObject(): CasparCgTemplateTimelineObject {
     return {} as CasparCgTemplateTimelineObject
-    // TODO: RKLI Should implement this
+    // TODO: SOF-1695 Should implement this
     // return {
     //   id: 'casparCg_locators',
     //   enable: {

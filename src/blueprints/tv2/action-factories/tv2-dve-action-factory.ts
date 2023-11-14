@@ -121,7 +121,7 @@ export class Tv2DveActionFactory {
       const boxes: DveBoxProperties[] = Object.entries(dveConfiguration.layoutProperties.boxes).map(([, box]) => {
         return {
           ...box,
-          source: blueprintConfiguration.studio.SwitcherSource.Default
+          source: blueprintConfiguration.studio.videoMixerBasicConfiguration.defaultVideoMixerSource
         }
       })
 
@@ -137,8 +137,8 @@ export class Tv2DveActionFactory {
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(dveSource, timelineEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(dveSource, timelineEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(dveSource, timelineEnable),
-        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(dveConfiguration.key, blueprintConfiguration.studio.DVEFolder)),
-        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(dveConfiguration.frame, blueprintConfiguration.studio.DVEFolder)),
+        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(dveConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
+        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(dveConfiguration.frame, blueprintConfiguration.studio.splitScreenFolder?.name)),
         this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject()
       ]
 
@@ -211,10 +211,10 @@ export class Tv2DveActionFactory {
   }
 
   private createInsertToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2DveInsertSourceInputAction[] {
-    const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesCam.slice(0, 5)
-    const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesRM
-    const replaySources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.SourcesReplay
-    const replaySourcesWithoutVoiceOver: Tv2SourceMappingWithSound[] = replaySources.filter(replaySource => !/EPSIO/i.test(replaySource.SourceName))
+    const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.cameraeSources.slice(0, 5)
+    const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.remoteSources
+    const replaySources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.replaySources
+    const replaySourcesWithoutVoiceOver: Tv2SourceMappingWithSound[] = replaySources.filter(replaySource => !/EPSIO/i.test(replaySource.name))
 
     return [
       ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, CAMERA_SOURCE_NAME),
@@ -233,9 +233,9 @@ export class Tv2DveActionFactory {
           const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, audioMode)
 
           return {
-            id: `insert_${name}_${source.SourceName}_to_dve_input_${inputIndex}_action`,
-            name: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
-            description: `Insert ${name} ${source.SourceName} in DVE input ${inputIndex}`,
+            id: `insert_${name}_${source.name}_to_dve_input_${inputIndex}_action`,
+            name: `Insert ${name} ${source.name} in DVE input ${inputIndex}`,
+            description: `Insert ${name} ${source.name} in DVE input ${inputIndex}`,
             type: PieceActionType.REPLACE_PIECE,
             data: {
               pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
@@ -244,7 +244,7 @@ export class Tv2DveActionFactory {
               contentType: Tv2ActionContentType.SPLIT_SCREEN,
               actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
               inputIndex,
-              videoMixerSource: source.SwitcherSource,
+              videoMixerSource: source.videoMixerSource,
               audioTimelineObjects
             }
           }
@@ -332,7 +332,7 @@ export class Tv2DveActionFactory {
       const boxes: DveBoxProperties[] = Object.entries(dveConfiguration.layoutProperties.boxes).map(([, box]) => {
         return {
           ...box,
-          source: blueprintConfiguration.studio.SwitcherSource.Default
+          source: blueprintConfiguration.studio.videoMixerBasicConfiguration.defaultVideoMixerSource
         }
       })
 
@@ -340,7 +340,7 @@ export class Tv2DveActionFactory {
       data.sources.forEach((source: Tv2SourceMappingWithSound, input: DveBoxInput) => {
         const dveInputIndex: number = this.mapDveBoxInputToNumber(input)
         audioTimelineObjectsForBoxes[dveInputIndex] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source)
-        boxes[dveInputIndex].source = source.SwitcherSource
+        boxes[dveInputIndex].source = source.videoMixerSource
       })
 
       const audioTimelineObjects: TimelineObject[] = Object.values(audioTimelineObjectsForBoxes).flat()
@@ -365,8 +365,8 @@ export class Tv2DveActionFactory {
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(dveSource, videoSwitcherTimelineEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(dveSource, videoSwitcherTimelineEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(dveSource, videoSwitcherTimelineEnable),
-        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(dveConfiguration.key, blueprintConfiguration.studio.DVEFolder)),
-        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(dveConfiguration.frame, blueprintConfiguration.studio.DVEFolder)),
+        this.casparCgTimelineObjectFactory.createDveKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(dveConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
+        this.casparCgTimelineObjectFactory.createDveFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(dveConfiguration.frame, blueprintConfiguration.studio.splitScreenFolder?.name)),
         this.casparCgTimelineObjectFactory.createDveLocatorTimelineObject(),
         ...audioTimelineObjects
       ]

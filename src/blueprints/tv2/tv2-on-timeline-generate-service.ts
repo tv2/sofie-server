@@ -8,7 +8,7 @@ import { Tv2PartEndState } from './value-objects/tv2-part-end-state'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
 import { UnsupportedOperation } from '../../model/exceptions/unsupported-operation'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from './value-objects/tv2-metadata'
-import { Tv2MediaPlayer, Tv2StudioBlueprintConfiguration } from './value-objects/tv2-studio-blueprint-configuration'
+import { Tv2MediaPlayer } from './value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../model/entities/timeline'
 import { DeviceType } from '../../model/enums/device-type'
 import {
@@ -20,16 +20,20 @@ import {
 import { A_B_SOURCE_INPUT_PLACEHOLDER, A_B_SOURCE_LAYERS } from './value-objects/tv2-a-b-source-layers'
 import { Configuration } from '../../model/entities/configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
-import { Tv2ShowStyleBlueprintConfiguration } from './value-objects/tv2-show-style-blueprint-configuration'
 import { SisyfosChannelsTimelineObject, SisyfosType } from '../timeline-state-resolver-types/sisyfos-types'
 import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
+import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
 
 export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate {
-  constructor(private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder) {}
+
+  constructor(
+    private readonly configurationMapper: Tv2ConfigurationMapper,
+    private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder
+  ) {}
 
   public onTimelineGenerate(
     configuration: Configuration,
@@ -38,10 +42,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     previousRundownPersistentState: RundownPersistentState | undefined,
     previousPart: Part | undefined,
   ): OnTimelineGenerateResult {
-    const blueprintConfiguration: Tv2BlueprintConfiguration = {
-      studio: configuration.studio.blueprintConfiguration as Tv2StudioBlueprintConfiguration,
-      showStyle: configuration.showStyle.blueprintConfiguration as Tv2ShowStyleBlueprintConfiguration
-    }
+    const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration)
 
     const rundownPersistentState: Tv2RundownPersistentState = (previousRundownPersistentState ?? this.getEmptyTv2RundownPersistentState()) as Tv2RundownPersistentState
     const newRundownPersistentState: Tv2RundownPersistentState = {
@@ -134,7 +135,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     }
 
     const mediaPlayerSessionsInUse: Tv2MediaPlayerSession[] = this.findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions, activeGroup)
-    const availableMediaPlayers: Tv2MediaPlayer[] = configuration.studio.ABMediaPlayers.filter(mediaPlayer => !mediaPlayerSessionsInUse.some(session => session.mediaPlayer._id === mediaPlayer._id))
+    const availableMediaPlayers: Tv2MediaPlayer[] = configuration.studio.mediaPlayers.filter(mediaPlayer => !mediaPlayerSessionsInUse.some(session => session.mediaPlayer.id === mediaPlayer.id))
 
     this.assignMediaPlayersForGroup(activeGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
     this.assignMediaPlayersForGroup(lookaheadGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
@@ -225,7 +226,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
   }
 
   private getCasparCgPlayerClipLayer(mediaPlayer: Tv2MediaPlayer): string {
-    return `casparcg_player_clip_${mediaPlayer.SourceName}`
+    return `casparcg_player_clip_${mediaPlayer.name}`
   }
 
 
@@ -255,7 +256,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       return
     }
     const atemMeTimelineObject: AtemMeTimelineObject = timelineObject as AtemMeTimelineObject
-    atemMeTimelineObject.content.me.input = mediaPlayer.SwitcherSource
+    atemMeTimelineObject.content.me.input = mediaPlayer.videoMixerSource
   }
 
   private updateAtemLookaheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
@@ -263,7 +264,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       return
     }
     const atemAuxTimelineObject: AtemAuxTimelineObject = timelineObject as AtemAuxTimelineObject
-    atemAuxTimelineObject.content.aux.input = mediaPlayer.SwitcherSource
+    atemAuxTimelineObject.content.aux.input = mediaPlayer.videoMixerSource
   }
 
   private updateAtemDveBoxesWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
@@ -276,7 +277,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       if (!box.source || box.source !== A_B_SOURCE_INPUT_PLACEHOLDER) {
         continue
       }
-      box.source = mediaPlayer.SwitcherSource
+      box.source = mediaPlayer.videoMixerSource
     }
   }
 
@@ -284,7 +285,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     if (timelineObject.content.deviceType !== DeviceType.SISYFOS) {
       return
     }
-    const targetLayer: string = mediaPlayer.SourceName === '1' ? A_B_SOURCE_LAYERS.sisyfos.playerA : A_B_SOURCE_LAYERS.sisyfos.playerB
+    const targetLayer: string = mediaPlayer.name === '1' ? A_B_SOURCE_LAYERS.sisyfos.playerA : A_B_SOURCE_LAYERS.sisyfos.playerB
     if (timelineObject.layer === A_B_SOURCE_LAYERS.sisyfos.clipPending) {
       timelineObject.layer = targetLayer
     }

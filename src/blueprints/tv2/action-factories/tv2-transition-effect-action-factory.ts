@@ -69,8 +69,8 @@ export class Tv2TransitionEffectActionFactory {
         }
         case TransitionEffectType.DIP: {
           return [
-            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration.studio.SwitcherSource.Dip),
-            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration.studio.SwitcherSource.Dip)
+            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource),
+            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource)
           ]
         }
         case TransitionEffectType.BREAKER: {
@@ -179,7 +179,7 @@ export class Tv2TransitionEffectActionFactory {
       throw new Tv2MisconfigurationException(`Can't create Transition Effect Action for ${transitionEffect.name}. ${transitionEffect.name} is missing in Configurations`)
     }
 
-    const breakerDsk: Tv2DownstreamKeyer | undefined = configuration.studio.SwitcherSource.DSK.find(dsk => dsk.Roles.includes(Tv2DownstreamKeyerRole.JINGLE))
+    const breakerDsk: Tv2DownstreamKeyer | undefined = configuration.studio.videoMixerBasicConfiguration.downstreamKeyers.find(dsk => dsk.roles.includes(Tv2DownstreamKeyerRole.JINGLE))
     if (!breakerDsk) {
       throw  new Tv2MisconfigurationException('Can\'t create Transition Effect Action. No DSK has been configured for Jingles.')
     }
@@ -188,9 +188,9 @@ export class Tv2TransitionEffectActionFactory {
     const metadata: Tv2BreakerTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.BREAKER,
-      casparCgPreRollDuration: configuration.studio.CasparPrerollDuration,
+      casparCgPreRollDuration: configuration.studio.casparCgPreRollDuration,
       downstreamKeyer: breakerDsk,
-      breakerFolder: configuration.studio.JingleFolder ?? '',
+      breakerFolder: configuration.studio.jingleFolder?.name ?? '',
       breaker
     }
     return this.createTransitionEffectAction(actionType, breaker.name, metadata, pieceInterface)
@@ -238,7 +238,7 @@ export class Tv2TransitionEffectActionFactory {
       duration: this.getTimeFromFrames(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
     }
 
-    const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.Fill
+    const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.videoMixerFillSource
     const fileName: string = this.assetPathHelper.joinAssetToFolder(breakerActionMetadata.breakerFolder, breakerActionMetadata.breaker.fileName)
 
     return [
