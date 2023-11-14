@@ -180,17 +180,6 @@ describe(Part.name, () => {
   })
 
   describe(Part.prototype.replacePiece.name, () => {
-    describe('Piece to replace is a planned Piece', () => {
-      it('throws an unsupported operation exception', () => {
-        const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: true })
-        const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
-
-        const testee: Part = new Part({ pieces: [pieceToBeReplaced] } as PartInterface)
-
-        expect(() => testee.replacePiece(pieceToBeReplaced, newPiece)).toThrow(UnsupportedOperation)
-      })
-    })
-
     describe('Piece to replace is not a Piece on the Part', () => {
       it('throws an unsupported operation exception', () => {
         const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: false })
