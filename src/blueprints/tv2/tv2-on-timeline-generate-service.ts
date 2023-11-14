@@ -214,7 +214,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       case DeviceType.ATEM: { // TODO: Fully implement VideoSwitcher composition strategy
         this.updateAtemProgramWithMediaPlayer(timelineObject, mediaPlayer)
         this.updateAtemLookaheadWithMediaPlayer(timelineObject, mediaPlayer)
-        this.updateAtemDveBoxesWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateAtemSplitScreenBoxesWithMediaPlayer(timelineObject, mediaPlayer)
         break
       }
       case DeviceType.SISYFOS: {
@@ -266,7 +266,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     atemAuxTimelineObject.content.aux.input = mediaPlayer.SwitcherSource
   }
 
-  private updateAtemDveBoxesWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+  private updateAtemSplitScreenBoxesWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
     if (timelineObject.content.deviceType !== DeviceType.ATEM || timelineObject.content.type !== AtemType.SUPER_SOURCE) {
       return
     }
