@@ -31,9 +31,15 @@ export enum SisyfosType {
 }
 
 export interface SisyfosChannelOptions {
-  isPgm?: 0 | 1 | 2;
+  isPgm?: SisyfosFaderState;
   faderLevel?: number;
   label?: string;
   visible?: boolean;
   fadeTime?: number;
+}
+
+export enum SisyfosFaderState {
+  OFF = 0,
+  ON = 1,
+  VOICE_OVER = 2
 }

@@ -11,18 +11,17 @@ import {
   SuperSourceBorder,
   SuperSourceProperties
 } from '../../timeline-state-resolver-types/atem-types'
-import { Tv2AtemLayer } from '../value-objects/tv2-layers'
+import { Tv2AtemLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
-import { DveBoxProperties, DveLayoutProperties } from '../value-objects/tv2-show-style-blueprint-configuration'
+import { SplitScreenBoxProperties, SplitScreenLayoutProperties } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Piece } from '../../../model/entities/piece'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
-
-const ID_PREFIX: string = 'atem_'
+const ATEM_PREFIX: string = 'atem_'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
 
@@ -67,9 +66,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return Tv2AtemLayer.DOWNSTREAM_KEYER
   }
 
-  public createProgramTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
     return {
-      id: `${ID_PREFIX}${id}`,
+      id: `${ATEM_PREFIX}program`,
       enable,
       priority: 1,
       layer: Tv2AtemLayer.PROGRAM,
@@ -84,9 +83,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createCleanFeedTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
     return {
-      id: `${ID_PREFIX}${id}`,
+      id: `${ATEM_PREFIX}clean_feed`,
       enable,
       priority: 1,
       layer: Tv2AtemLayer.CLEAN_FEED,
@@ -101,9 +100,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createLookaheadTimelineObject(id: string, sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
+  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
     return {
-      id: `${ID_PREFIX}${id}`,
+      id: `${ATEM_PREFIX}lookahead`,
       enable,
       priority: 0,
       layer: Tv2AtemLayer.LOOKAHEAD,
@@ -117,14 +116,14 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createDveBoxesTimelineObject(boxes: DveBoxProperties[], priority: number = 1): AtemSuperSourceTimelineObject {
+  public createSplitScreenBoxesTimelineObject(boxes: SplitScreenBoxProperties[], priority: number = 1): AtemSuperSourceTimelineObject {
     return {
-      id: `${ID_PREFIX}dve_boxes`,
+      id: `${ATEM_PREFIX}split_screen_boxes`,
       enable: {
         start: 0
       },
       priority,
-      layer: Tv2AtemLayer.DVE_BOXES,
+      layer: Tv2AtemLayer.SPLIT_SCREEN_BOXES,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.SUPER_SOURCE,
@@ -135,17 +134,17 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createDvePropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, layoutProperties: DveLayoutProperties): AtemSuperSourcePropertiesTimelineObject {
+  public createSplitScreenPropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, layoutProperties: SplitScreenLayoutProperties): AtemSuperSourcePropertiesTimelineObject {
     const superSourceProperties: SuperSourceProperties = this.getSuperSourceProperties(layoutProperties)
     const superSourceBorder: SuperSourceBorder = this.getSuperSourceBorder(layoutProperties)
 
     return {
-      id: `${ID_PREFIX}dve_properties`,
+      id: `${ATEM_PREFIX}split_screen_properties`,
       enable: {
         start: 0
       },
       priority: 1,
-      layer: Tv2AtemLayer.DVE,
+      layer: Tv2AtemLayer.SPLIT_SCREEN,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.SUPER_SOURCE_PROPERTIES,
@@ -160,7 +159,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  private getSuperSourceProperties(layoutProperties: DveLayoutProperties): SuperSourceProperties {
+  private getSuperSourceProperties(layoutProperties: SplitScreenLayoutProperties): SuperSourceProperties {
     return layoutProperties.properties && !layoutProperties.properties.artPreMultiplied
       ? {
         artPreMultiplied: false,
@@ -173,7 +172,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       }
   }
 
-  private getSuperSourceBorder(layoutProperties: DveLayoutProperties): SuperSourceBorder {
+  private getSuperSourceBorder(layoutProperties: SplitScreenLayoutProperties): SuperSourceBorder {
     return layoutProperties.border?.borderEnabled
       ? {
         ...layoutProperties.border
@@ -183,11 +182,11 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       }
   }
 
-  public getDveBoxesLayer(): string {
-    return Tv2AtemLayer.DVE_BOXES
+  public getSplitScreenBoxesLayer(): string {
+    return Tv2AtemLayer.SPLIT_SCREEN_BOXES
   }
 
-  public getDveSourceInput(): number {
+  public getSplitScreenSourceInput(): number {
     return ATEM_SUPER_SOURCE_INDEX
   }
 
@@ -256,5 +255,23 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       }
     }
     return this.createTransitionEffectTimelineObject(meContent)
+  }
+
+  public createAuxTimelineObject(sourceInput: number, layer: Tv2VideoMixerLayer): AtemAuxTimelineObject {
+    return {
+      id: `${ATEM_PREFIX}${layer}_input_${sourceInput}_timelineObject`,
+      enable: {
+        start: 0
+      },
+      layer: `${ATEM_PREFIX}${layer}`,
+      priority: 1,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.AUX,
+        aux: {
+          input: sourceInput
+        }
+      }
+    }
   }
 }

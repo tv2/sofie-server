@@ -3,6 +3,7 @@ import { PartActionType, PieceActionType } from '../../../model/enums/action-typ
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Breaker, TransitionEffectType } from './tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
+import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
@@ -12,14 +13,15 @@ export enum Tv2ActionContentType {
   GRAPHICS = 'GRAPHICS',
   AUDIO = 'AUDIO',
   SPLIT_SCREEN = 'SPLIT_SCREEN',
+  REPLAY = 'REPLAY',
   UNKNOWN = 'UNKNOWN'
 }
 
 export enum Tv2ActionSubtype {
-  RECALL_DVE = 'RECALL_DVE',
-  DVE_LAYOUT = 'DVE_LAYOUT',
-  DVE_INSERT_SOURCE_TO_INPUT = 'DVE_INSERT_SOURCE_TO_INPUT',
-  DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
+  RECALL_SPLIT_SCREEN = 'RECALL_SPLIT_SCREEN',
+  SPLIT_SCREEN_LAYOUT = 'SPLIT_SCREEN_LAYOUT',
+  SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT = 'SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT',
+  SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
   RECALL_LAST_PLANNED_REMOTE = 'RECALL_LAST_PLANNED_REMOTE',
 }
 
@@ -108,52 +110,64 @@ export interface Tv2AudioAction extends Tv2PieceAction {
   }
 }
 
-export interface Tv2DveAction extends Tv2PartAction {
+export interface Tv2SplitScreenAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN
   }
 }
 
-export interface Tv2RecallDveAction extends Tv2PartAction {
+export interface Tv2RecallSplitScreenAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
-    actionSubtype: Tv2ActionSubtype.RECALL_DVE,
+    actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
   }
 }
 
-export interface Tv2DveLayoutAction extends Tv2PartAction {
+export interface Tv2SplitScreenLayoutAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
-    actionSubtype: Tv2ActionSubtype.DVE_LAYOUT,
+    actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
   }
 }
 
-export interface Tv2DveInsertSourceInputAction extends Tv2PieceAction {
+export interface Tv2SplitScreenInsertSourceInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
-    actionSubtype: Tv2ActionSubtype.DVE_INSERT_SOURCE_TO_INPUT
-  } & Tv2DveInsertSourceInputMetadata
+    actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT
+  } & Tv2SplitScreenInsertSourceInputMetadata
 }
 
-export type Tv2DveInsertSourceInputMetadata = {
+export type Tv2SplitScreenInsertSourceInputMetadata = {
   inputIndex: number // zero-indexed
   videoMixerSource: number,
   audioTimelineObjects: TimelineObject[]
   videoClip?: {
     timelineObjects: TimelineObject[]
     mediaPlayerSession: string
-    isVoiceOver: boolean
+    audioMode: Tv2AudioMode
   }
 }
 
-export interface Tv2DveInsertLastVideoClipInputAction extends Tv2PieceAction {
+export interface Tv2SplitScreenInsertLastVideoClipInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
-    actionSubtype: Tv2ActionSubtype.DVE_INSERT_LAST_VIDEO_CLIP_TO_INPUT
-  } & Tv2DveInsertSourceInputMetadata
+    actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT
+  } & Tv2SplitScreenInsertSourceInputMetadata
+}
+
+export interface Tv2ReplayAction extends Tv2PartAction {
+  metadata: {
+    contentType: Tv2ActionContentType.REPLAY
+  }
+}
+
+export interface Tv2ReplayAuxAction extends Tv2PieceAction {
+  metadata: {
+    contentType: Tv2ActionContentType.REPLAY
+  }
 }

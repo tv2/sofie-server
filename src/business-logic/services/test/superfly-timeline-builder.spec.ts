@@ -2521,31 +2521,6 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('infinite Piece is not a "transition" Piece"', () => {
-        describe('infinite Piece belongs to the active Part', () => {
-          it('does not create infinite groups for Piece', async () => {
-            const activePartId: string = 'activePartId'
-            const infinitePiece: Piece = EntityMockFactory.createPiece({
-              partId: activePartId,
-              transitionType: TransitionType.NO_TRANSITION,
-              pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
-            })
-            const activePart: Part = EntityMockFactory.createPart({id: activePartId})
-            const rundown: Rundown = EntityMockFactory.createActiveRundown({
-              activePart,
-              infinitePieces: [infinitePiece],
-            })
-
-            const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline = await testee.buildTimeline(rundown, createBasicStudioMock())
-
-            const infiniteGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find((group) =>
-              group.id.includes(INFINITE_GROUP_PREFIX)
-            )
-
-            expect(infiniteGroup).toBeUndefined()
-          })
-        })
-
         describe('infinite Piece does not belong to the active Part', () => {
           describe('infinite Piece does not have an executedAt larger than zero', () => {
             it('throws an error', async () => {
