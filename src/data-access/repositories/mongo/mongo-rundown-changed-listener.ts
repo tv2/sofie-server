@@ -13,6 +13,12 @@ import { MongoEntityConverter, MongoRundown, MongoSegment } from './mongo-entity
 import { MongoDatabase } from './mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { RundownRepository } from '../interfaces/rundown-repository'
+import { TimelineObject } from '../../../model/entities/timeline-object'
+import { Piece } from '../../../model/entities/piece'
+import { Segment } from '../../../model/entities/segment'
+import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'
+import { PieceRepository } from '../interfaces/piece-repository'
+import { SegmentRepository } from '../interfaces/segment-repository'
 
 const RUNDOWN_COLLECTION_NAME: string = 'rundowns'
 
@@ -25,7 +31,10 @@ export class MongoRundownChangedListener extends BaseMongoRepository implements 
   constructor(
     mongoDatabase: MongoDatabase,
     mongoEntityConverter: MongoEntityConverter,
-    private readonly rundownRepository: RundownRepository
+    private readonly rundownRepository: RundownRepository,
+    private readonly rundownBaselineRepository: RundownBaselineRepository,
+    private readonly segmentRepository: SegmentRepository,
+    private readonly pieceRepository: PieceRepository
   ) {
     super(mongoDatabase,mongoEntityConverter)
     mongoDatabase.onConnect(RUNDOWN_COLLECTION_NAME, () => this.listenForChanges())
@@ -53,8 +62,14 @@ export class MongoRundownChangedListener extends BaseMongoRepository implements 
       }
       case MongoChangeEvent.REPLACE: {
         const replaceChange: ChangeStreamReplaceDocument<MongoRundown> = change as ChangeStreamReplaceDocument<MongoRundown>
-        const rundownId: string = replaceChange.documentKey._id
-        const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+        const mongoRundown: MongoRundown = replaceChange.fullDocument
+        const rundownId: string = mongoRundown._id
+        const baselineTimelineObjects: TimelineObject[] = await this.rundownBaselineRepository.getRundownBaseline(
+          rundownId
+        )
+        const infinitePieces: Piece[] = await this.pieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
+        const segments: Segment[] = await this.segmentRepository.getSegments(rundownId)
+        const rundown: Rundown = this.mongoEntityConverter.convertRundown(mongoRundown, segments, baselineTimelineObjects, infinitePieces)
         this.onUpdatedCallback(rundown)
         break
       }
