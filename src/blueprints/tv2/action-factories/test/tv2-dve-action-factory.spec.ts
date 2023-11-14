@@ -19,12 +19,12 @@ function createTestee(params?: {
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
   audioTimelineObjectFactory?: Tv2AudioTimelineObjectFactory,
   casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory,
-  asserPathHelper?: Tv2AssetPathHelper
+  assetPathHelper?: Tv2AssetPathHelper
 }): Tv2DveActionFactory {
   return new Tv2DveActionFactory(
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioTimelineObjectFactory>()),
     params?.casparCgTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory)),
-    params?.asserPathHelper ?? instance(mock(Tv2AssetPathHelper))
+    params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper))
   )
 }
