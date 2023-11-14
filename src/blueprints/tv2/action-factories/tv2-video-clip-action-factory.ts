@@ -56,7 +56,7 @@ export class Tv2VideoClipActionFactory {
     }
 
     videoClipAction.data.partInterface.expectedDuration = media?.duration
-      ? Math.max((media.duration * 1000) - videoClipAction.metadata.configuredVideoClipPostrollDuration, 0)
+      ? Math.max((media.duration * 1000) - videoClipAction.metadata.configuredVideoClipPostRollDuration, 0)
       : videoClipAction.data.partInterface.expectedDuration
 
     const mediaPlayerSession: string = `${action.id}_${Date.now()}`
@@ -91,7 +91,7 @@ export class Tv2VideoClipActionFactory {
       metadata: {
         contentType: Tv2ActionContentType.VIDEO_CLIP,
         fileName: videoClipData.fileName,
-        configuredVideoClipPostrollDuration: configuration.studio.ServerPostrollDuration
+        configuredVideoClipPostRollDuration: configuration.studio.serverPostRollDuration
       }
     }
   }
@@ -107,7 +107,7 @@ export class Tv2VideoClipActionFactory {
     }
 
     const videoMixerEnable: TimelineEnable = {
-      start: configuration.studio.CasparPrerollDuration
+      start: configuration.studio.casparCgPreRollDuration
     }
 
     return {
@@ -122,7 +122,7 @@ export class Tv2VideoClipActionFactory {
       isUnsynced: false,
       start: 0,
       duration: 0,
-      preRollDuration: configuration.studio.CasparPrerollDuration,
+      preRollDuration: configuration.studio.casparCgPreRollDuration,
       postRollDuration: 0,
       tags: [],
       timelineObjects: [

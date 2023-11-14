@@ -25,14 +25,20 @@ import {
 import { Tv2AssetPathHelper } from './helpers/tv2-asset-path-helper'
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
-import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
+import { Tv2ShowStyleBlueprintConfigurationMapper } from './helpers/tv2-show-style-blueprint-configuration-mapper'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 import { Tv2StringHashConverter } from './helpers/tv2-string-hash-converter'
 import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
+import { Tv2StudioBlueprintConfigurationMapper } from './helpers/tv2-studio-blueprint-configuration-mapper'
+import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
+    const configurationMapper: Tv2ConfigurationMapper = new Tv2ConfigurationMapper(
+      new Tv2StudioBlueprintConfigurationMapper(),
+      new Tv2ShowStyleBlueprintConfigurationMapper()
+    )
     const assetPathHelper: Tv2AssetPathHelper = new Tv2AssetPathHelper()
     const tv2StringHasConverter: Tv2StringHashConverter = new Tv2StringHashConverter()
     const tv2SisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
@@ -43,7 +49,7 @@ export class Tv2BlueprintsFacade {
     const tv2VideoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
 
     const actionService: Tv2ActionService = new Tv2ActionService(
-      new Tv2BlueprintConfigurationMapper(),
+      configurationMapper,
       new Tv2CameraActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
       new Tv2RemoteActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
       new Tv2TransitionEffectActionFactory(
@@ -78,7 +84,7 @@ export class Tv2BlueprintsFacade {
 
     return new Tv2Blueprint(
       new Tv2EndStateForPartService(tv2SisyfosPersistentLayerFinder),
-      new Tv2OnTimelineGenerateService(tv2SisyfosPersistentLayerFinder),
+      new Tv2OnTimelineGenerateService(configurationMapper, tv2SisyfosPersistentLayerFinder),
       actionService
     )
   }

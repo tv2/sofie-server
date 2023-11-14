@@ -24,11 +24,11 @@ export class Tv2VideoMixerConfigurationActionFactory {
   }
 
   private createDownstreamKeyerOffActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction[] {
-    return blueprintConfiguration.studio.SwitcherSource.DSK.map(config => this.createDownStreamKeyerAction(config, 'Off', false))
+    return blueprintConfiguration.studio.videoMixerBasicConfiguration.downstreamKeyers.map(config => this.createDownStreamKeyerAction(config, 'Off', false))
   }
 
   private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): Tv2PieceAction {
-    const downstreamKeyerNumber: string = String(downstreamKeyer.Number + 1)
+    const downstreamKeyerNumber: string = String(downstreamKeyer.name + 1)
     const pieceInterface: Tv2PieceInterface = this.createVideoSwitcherPieceInterface({
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
       name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
@@ -74,6 +74,6 @@ export class Tv2VideoMixerConfigurationActionFactory {
   }
 
   private createDownstreamKeyerOnActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PieceAction[] {
-    return blueprintConfiguration.studio.SwitcherSource.DSK.map(config => this.createDownStreamKeyerAction(config, 'On', true))
+    return blueprintConfiguration.studio.videoMixerBasicConfiguration.downstreamKeyers.map(config => this.createDownStreamKeyerAction(config, 'On', true))
   }
 }

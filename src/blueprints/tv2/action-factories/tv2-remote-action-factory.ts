@@ -26,18 +26,18 @@ export class Tv2RemoteActionFactory {
   ) {}
 
   public createRemoteActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
-    return blueprintConfiguration.studio.SourcesRM
+    return blueprintConfiguration.studio.remoteSources
       .map(source => this.createInsertRemoteAsNextAction(blueprintConfiguration, source))
   }
 
   private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
-    const partId: string = `remoteInsertActionPart_${remoteSource._id}`
+    const partId: string = `remoteInsertActionPart_${remoteSource.id}`
     const remotePieceInterface: PieceInterface = this.createRemotePiece(configuration, remoteSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
     return {
-      id: `remoteAsNextAction_${remoteSource._id}`,
-      name: `LIVE ${remoteSource.SourceName}`,
-      description: `Insert LIVE ${remoteSource.SourceName} as next.`,
+      id: `remoteAsNextAction_${remoteSource.id}`,
+      name: `LIVE ${remoteSource.name}`,
+      description: `Insert LIVE ${remoteSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -45,7 +45,7 @@ export class Tv2RemoteActionFactory {
       },
       metadata: {
         contentType: Tv2ActionContentType.REMOTE,
-        remoteNumber: remoteSource.SourceName,
+        remoteNumber: remoteSource.name,
       },
     }
   }
@@ -57,18 +57,16 @@ export class Tv2RemoteActionFactory {
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.REMOTE,
       sisyfosPersistMetaData: {
-        sisyfosLayers: source.SisyfosLayers,
-        wantsToPersistAudio: source.WantsToPersistAudio,
-        acceptsPersistedAudio: source.AcceptPersistAudio,
-        // TODO: Blueprints sets "isModifiedOrInsertedByAction" here which is used for getEndStateForPart and onTimelineGenerate.
-        // TODO: We should instead use something like Piece.isPlanned
+        sisyfosLayers: source.sisyfosLayers,
+        wantsToPersistAudio: source.wantsToPersistAudio,
+        acceptsPersistedAudio: source.acceptPersistAudio
       }
     }
 
     return {
-      id: `remoteAction_${source._id}`,
+      id: `remoteAction_${source.id}`,
       partId: parentPartId,
-      name: `LIVE ${source.SourceName}`,
+      name: `LIVE ${source.name}`,
       layer: Tv2SourceLayer.REMOTE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -89,16 +87,16 @@ export class Tv2RemoteActionFactory {
   private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, enable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.videoMixerSource, enable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.videoMixerSource, enable),
     ]
   }
 
   private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
     return {
       id: partId,
-      name: `Live Part ${source.SourceName}`,
+      name: `Live Part ${source.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,

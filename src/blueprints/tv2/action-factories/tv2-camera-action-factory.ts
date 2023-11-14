@@ -28,7 +28,7 @@ export class Tv2CameraActionFactory {
   ) {}
 
   public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
-    return blueprintConfiguration.studio.SourcesCam
+    return blueprintConfiguration.studio.cameraeSources
       .slice(0, 5)
       .flatMap(source => [
         this.createInsertCameraAsNextAction(blueprintConfiguration, source),
@@ -37,20 +37,20 @@ export class Tv2CameraActionFactory {
   }
 
   private createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
-    const partId: string = `cameraInsertActionPart_${cameraSource._id}`
+    const partId: string = `cameraInsertActionPart_${cameraSource.id}`
     const cameraPieceInterface: Tv2PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
-      id: `cameraAsNextAction_${cameraSource._id}`,
-      name: `KAM ${cameraSource.SourceName} PVW`,
-      description: `Insert Camera ${cameraSource.SourceName} as next.`,
+      id: `cameraAsNextAction_${cameraSource.id}`,
+      name: `KAM ${cameraSource.name} PVW`,
+      description: `Insert Camera ${cameraSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
       }, metadata: {
         contentType: Tv2ActionContentType.CAMERA,
-        cameraNumber: cameraSource.SourceName,
+        cameraNumber: cameraSource.name,
       },
     }
   }
@@ -64,14 +64,14 @@ export class Tv2CameraActionFactory {
       outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
-        acceptsPersistedAudio: source.AcceptPersistAudio
+        acceptsPersistedAudio: source.acceptPersistAudio
       }
     }
 
     return {
-      id: `cameraAction_${source._id}`,
+      id: `cameraAction_${source.id}`,
       partId: parentPartId,
-      name: `KAM ${source.SourceName}`,
+      name: `KAM ${source.name}`,
       layer: Tv2SourceLayer.CAMERA,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -92,16 +92,16 @@ export class Tv2CameraActionFactory {
   private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, enable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.videoMixerSource, enable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.videoMixerSource, enable),
     ]
   }
 
   private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
     return {
       id: partId,
-      name: `Camera Part ${source.SourceName}`,
+      name: `Camera Part ${source.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,
@@ -121,13 +121,13 @@ export class Tv2CameraActionFactory {
   }
 
   public createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
-    const partId: string = `cameraInsertAndTakeActionPart_${cameraSource._id}`
+    const partId: string = `cameraInsertAndTakeActionPart_${cameraSource.id}`
     const cameraPieceInterface: Tv2PieceInterface = this.createCameraPiece(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
-      id: `cameraAsOnAirAction_${cameraSource._id}`,
-      name: `KAM ${cameraSource.SourceName}`,
-      description: `Insert and Take Camera ${cameraSource.SourceName}.`,
+      id: `cameraAsOnAirAction_${cameraSource.id}`,
+      name: `KAM ${cameraSource.name}`,
+      description: `Insert and Take Camera ${cameraSource.name}.`,
       type: PartActionType.INSERT_PART_AS_ON_AIR,
       data: {
         partInterface: partInterface,
@@ -135,7 +135,7 @@ export class Tv2CameraActionFactory {
       },
       metadata: {
         contentType: Tv2ActionContentType.CAMERA,
-        cameraNumber: cameraSource.SourceName,
+        cameraNumber: cameraSource.name,
       },
     }
   }

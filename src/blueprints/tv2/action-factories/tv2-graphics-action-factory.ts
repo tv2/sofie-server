@@ -7,6 +7,7 @@ import { PartActionType, PieceActionType } from '../../../model/enums/action-typ
 import {
   Tv2DownstreamKeyer,
   Tv2DownstreamKeyerRole,
+  Tv2FolderConfiguration,
   Tv2GraphicsType
 } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PartInterface } from '../../../model/entities/part'
@@ -214,7 +215,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createFullscreenGraphicsActionFromBlueprintConfiguration(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
-    switch (blueprintConfiguration.studio.GraphicsType) {
+    switch (blueprintConfiguration.studio.selectedGraphicsType) {
       case Tv2GraphicsType.HTML:
         return this.createCasparCgFullscreenGraphicsAction(blueprintConfiguration, fullscreenGraphicsData)
       case Tv2GraphicsType.VIZ:
@@ -227,7 +228,7 @@ export class Tv2GraphicsActionFactory {
     const partId: string = 'fullscreenGraphicsPart'
     const fullscreenGraphicPieceInterface: Tv2PieceInterface = this.createVizFullscreenGraphicsPieceInterface(partId, blueprintConfiguration, graphicsData)
     return this.createFullscreenGraphicsAction(
-      blueprintConfiguration.studio.VizPilotGraphics.KeepAliveDuration,
+      blueprintConfiguration.studio.vizPilotGraphics.msKeepOldPartAliveBeforeTakingGraphics,
       partId,
       fullscreenGraphicPieceInterface,
       graphicsData
@@ -268,7 +269,7 @@ export class Tv2GraphicsActionFactory {
       id: 'fullscreenGraphicsPiece',
       partId,
       name: fullscreenGraphicsData.name,
-      preRollDuration: blueprintConfiguration.studio.VizPilotGraphics.PrerollDuration,
+      preRollDuration: blueprintConfiguration.studio.vizPilotGraphics.msPreRollBeforeTakingPilotGraphics,
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, fullscreenGraphicsData.name),
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       content: {
@@ -339,14 +340,14 @@ export class Tv2GraphicsActionFactory {
   private createVizFullscreenPilotGraphicsTimelineObjects(
     blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData
   ): TimelineObject[] {
-    if (!blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration) {
+    if (!blueprintConfiguration.studio.vizPilotGraphics.msBeforeShowingBeforeShowingOnCleanFeed) {
       throw new Tv2MisconfigurationException(
-        'Missing configuration of \'VizPilotGraphics.CleanFeedPrerollDuration\' in settings.'
+        'Missing configuration of \'VizPilotGraphics.msBeforeShowingBeforeShowingOnCleanFeed\' in settings.'
       )
     }
-    const videoMixerEnable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CutToMediaPlayer }
-    const sourceInput: number = blueprintConfiguration.studio.VizPilotGraphics.FullGraphicBackground
-    const upstreamEnable: TimelineEnable = { start: blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration }
+    const videoMixerEnable: TimelineEnable = { start: blueprintConfiguration.studio.vizPilotGraphics.msFromStartBeforeCuttingToBackgroundSource }
+    const sourceInput: number = blueprintConfiguration.studio.vizPilotGraphics.backgroundVideoSwitcherSource
+    const upstreamEnable: TimelineEnable = { start: blueprintConfiguration.studio.vizPilotGraphics.msBeforeShowingBeforeShowingOnCleanFeed }
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
 
     return [
@@ -364,7 +365,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createCasparCgFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
-    if (!blueprintConfiguration.studio.HTMLGraphics) {
+    if (!blueprintConfiguration.studio.htmlGraphics) {
       throw new Tv2MisconfigurationException(
         'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'KeepAliveDuration\''
       )
@@ -373,7 +374,7 @@ export class Tv2GraphicsActionFactory {
     const partId: string = 'fullscreenGraphicsPart'
     const fullscreenGraphicPiece: Tv2PieceInterface = this.createCasparCgFullscreenGraphicsPieceInterface(partId, blueprintConfiguration, graphicsData)
     return this.createFullscreenGraphicsAction(
-      blueprintConfiguration.studio.HTMLGraphics.KeepAliveDuration,
+      blueprintConfiguration.studio.htmlGraphics.msKeepOldPartAliveBeforeTakingGraphics,
       partId,
       fullscreenGraphicPiece,
       graphicsData
@@ -385,7 +386,7 @@ export class Tv2GraphicsActionFactory {
       id: 'fullscreenGraphicsPiece',
       partId,
       name: fullscreenGraphicsData.name,
-      preRollDuration: blueprintConfiguration.studio.CasparPrerollDuration,
+      preRollDuration: blueprintConfiguration.studio.casparCgPreRollDuration,
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, fullscreenGraphicsData.name),
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       content: this.createCasparCgFullscreenGraphicsPieceContent(blueprintConfiguration, fullscreenGraphicsData),
@@ -398,37 +399,38 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createCasparCgFullscreenGraphicsPieceContent(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2FileContent {
-    const graphicsFolder: string = blueprintConfiguration.studio.GraphicFolder ? `${blueprintConfiguration.studio.GraphicFolder}\\` : ''
+    const graphicsFolder: Tv2FolderConfiguration = blueprintConfiguration.studio.graphicsFolder
+    const graphicsFolderName: string = blueprintConfiguration.studio.graphicsFolder?.name ? `${graphicsFolder.name}\\` : ''
     const nameChunks: string[] = graphicsData.name.split('/')
     const sceneName: string = nameChunks[nameChunks.length - 1]
-    const filePath: string = this.assetPathHelper.joinAssetToFolder(sceneName, blueprintConfiguration.studio.GraphicFolder)
+    const filePath: string = this.assetPathHelper.joinAssetToFolder(sceneName, graphicsFolderName)
 
     return {
       fileName: filePath,
-      path: this.assetPathHelper.joinAssetToNetworkPath(blueprintConfiguration.studio.GraphicNetworkBasePath, sceneName, blueprintConfiguration.studio.GraphicFileExtension, graphicsFolder),
-      mediaFlowIds: [blueprintConfiguration.studio.GraphicMediaFlowId],
-      ignoreMediaObjectStatus: blueprintConfiguration.studio.GraphicIgnoreStatus,
+      path: this.assetPathHelper.joinAssetToNetworkPath(graphicsFolder.networkBasePath, sceneName, graphicsFolder.fileExtension, graphicsFolderName),
+      mediaFlowIds: [graphicsFolder.mediaFlowId],
+      ignoreMediaObjectStatus: graphicsFolder.ignoreMediaStatus,
       ignoreBlackFrames: true,
       ignoreFreezeFrame: true,
     }
   }
 
   private createCasparCgFullscreenPilotGraphicsTimelineObjects(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): TimelineObject[] {
-    if (!blueprintConfiguration.studio.HTMLGraphics) {
+    if (!blueprintConfiguration.studio.htmlGraphics) {
       throw new Tv2MisconfigurationException(
         'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'TransitionSettings.wipeRate\' and  \'TransitionSettings.borderSoftness\''
       )
     }
 
-    const enable: TimelineEnable = { start: blueprintConfiguration.studio.CasparPrerollDuration }
-    const sourceInput: number = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).Fill
+    const enable: TimelineEnable = { start: blueprintConfiguration.studio.casparCgPreRollDuration }
+    const sourceInput: number = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).videoMixerFillSource
     const transition: AtemTransition = AtemTransition.WIPE
     const transitionSettings: AtemTransitionSettings = {
       wipe: {
-        rate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
+        rate: blueprintConfiguration.studio.htmlGraphics.transitionSettings.wipeRate,
         pattern: 1,
         reverseDirection: true,
-        borderSoftness: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.borderSoftness
+        borderSoftness: blueprintConfiguration.studio.htmlGraphics.transitionSettings.borderSoftness
       }
     }
 
@@ -442,10 +444,9 @@ export class Tv2GraphicsActionFactory {
   }
 
   private getDownstreamKeyerMatchingRole(blueprintConfiguration: Tv2BlueprintConfiguration, role: Tv2DownstreamKeyerRole): Tv2DownstreamKeyer {
-    return blueprintConfiguration.studio.SwitcherSource.DSK.find(
-      downstreamKeyer => downstreamKeyer.Roles.some(
-        keyerRole => keyerRole === role)
-    ) ?? blueprintConfiguration.studio.SwitcherSource.DSK[0]
+    return blueprintConfiguration.studio.videoMixerBasicConfiguration.downstreamKeyers.find(
+      downstreamKeyer => downstreamKeyer.roles.some(keyerRole => keyerRole === role)
+    ) ?? blueprintConfiguration.studio.videoMixerBasicConfiguration.downstreamKeyers[0]
   }
 
   private createIdentGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData[]): Tv2PieceAction[] {
@@ -455,7 +456,7 @@ export class Tv2GraphicsActionFactory {
 
   private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
-    const graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
+    const graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.selectedGraphicsType === Tv2GraphicsType.HTML
       ? this.casparCgTimelineObjectFactory
       : this.vizTimelineObjectFactory
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
@@ -493,7 +494,7 @@ export class Tv2GraphicsActionFactory {
 
   private createLowerThirdGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
-    const graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.GraphicsType === Tv2GraphicsType.HTML
+    const graphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = blueprintConfiguration.studio.selectedGraphicsType === Tv2GraphicsType.HTML
       ? this.casparCgTimelineObjectFactory
       : this.vizTimelineObjectFactory
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
