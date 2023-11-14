@@ -17,6 +17,7 @@ export interface PartInterface {
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
+  isUntimed: boolean
   isUnsynced: boolean
   expectedDuration?: number
   executedAt?: number
@@ -53,6 +54,7 @@ export class Part {
   private isPartOnAir: boolean
   private isPartNext: boolean
 
+  private readonly isPartUntimed: boolean = false
   private isPartUnsynced: boolean = false
 
   private executedAt: number
@@ -88,6 +90,7 @@ export class Part {
     this.endState = part.endState
 
     this.timings = part.timings
+    this.isPartUntimed = part.isUntimed
     this.isPartUnsynced = part.isUnsynced
   }
 
@@ -117,6 +120,10 @@ export class Part {
     this.rank = this.rank - 1
     this.pieces.forEach(piece => piece.markAsUnsyncedWithUnsyncedPart())
     this.pieces = this.pieces.map(piece => piece.getUnsyncedCopy())
+  }
+
+  public isUntimed(): boolean {
+    return this.isPartUntimed
   }
 
   public isUnsynced(): boolean {

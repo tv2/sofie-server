@@ -241,4 +241,8 @@ export class Segment {
   public getUnsyncedCopy(): Segment {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
   }
+
+  public getIsSegmentUntimed(): boolean {
+    return !this.getParts().some(part => !part.isUntimed())
+  }
 }

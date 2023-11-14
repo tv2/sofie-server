@@ -97,6 +97,7 @@ export interface MongoPart extends MongoId {
   expectedDuration: number
   isOnAir: boolean
   isNext: boolean
+  untimed: boolean
   isUnsynced?: boolean
   inTransition?: {
     previousPartKeepaliveDuration: number
@@ -355,6 +356,7 @@ export class MongoEntityConverter {
       expectedDuration: mongoPart.expectedDuration,
       isOnAir: false,
       isNext: false,
+      isUntimed: mongoPart.untimed ?? false,
       isUnsynced: mongoPart.isUnsynced ?? false,
       pieces: [],
       inTransition: {
@@ -385,6 +387,7 @@ export class MongoEntityConverter {
       _rank: part.getRank(),
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
+      untimed: part.isUntimed(),
       isUnsynced: part.isUnsynced(),
       timings: this.getTimings(part),
       endState: part.getEndState(),
