@@ -110,7 +110,6 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
   private mapTv2GraphicsLayerToHtmlGraphicsSlot(layer: Tv2GraphicsLayer): string {
     switch (layer) {
       case Tv2GraphicsLayer.GRAPHICS_PILOT: return '250_full'
-      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_PILOT: return '260_overlay'
       case Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT: return '650_ident'
       case Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER: return '450_lowerThird'
       default: return ''
