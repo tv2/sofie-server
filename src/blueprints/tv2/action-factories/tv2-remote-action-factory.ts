@@ -188,6 +188,7 @@ export class Tv2RemoteActionFactory {
       isOnAir: false,
       isNext: false,
       isUnsynced: false,
+      isUntimed: false,
       inTransition: {
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0,
