@@ -20,7 +20,7 @@ const DIP_TRANSITION_EFFECT_REGEX: RegExp = /dip ?(\d+)/i
 interface CoreShowStyleBlueprintConfiguration {
   GfxDefaults: CoreGraphicsDefault[]
   GfxSetups: CoreGraphicsSetup[]
-  DVEStyles: CoreDveStyle[]
+  DVEStyles: CoreSplitScreenConfiguration[]
   BreakerConfig: CoreBreaker[]
   Transitions: { _id: string, Transition: string }[]
   ShowstyleTransition: string
@@ -40,7 +40,7 @@ interface CoreGraphicsSetup {
   FullShowName?: string
 }
 
-interface CoreDveStyle {
+interface CoreSplitScreenConfiguration {
   _id: string
   DVEName: string
   DVEInputs: string
@@ -111,16 +111,16 @@ export class Tv2BlueprintConfigurationMapper {
     }
   }
 
-  private mapSplitScreenConfigurations(coreDveStyles: CoreDveStyle[]): SplitScreenConfiguration[] {
-    return coreDveStyles.map(dveStyle => {
+  private mapSplitScreenConfigurations(coreSplitScreenConfigurations: CoreSplitScreenConfiguration[]): SplitScreenConfiguration[] {
+    return coreSplitScreenConfigurations.map(coreSplitScreenConfiguration => {
       return {
-        id: dveStyle._id,
-        name: dveStyle.DVEName,
-        inputs: dveStyle.DVEInputs,
-        layoutProperties: JSON.parse(dveStyle.DVEJSON),
-        graphicsTemplateJson: dveStyle.DVEGraphicsTemplateJSON,
-        key: dveStyle.DVEGraphicsKey,
-        frame: dveStyle.DVEGraphicsFrame
+        id: coreSplitScreenConfiguration._id,
+        name: coreSplitScreenConfiguration.DVEName,
+        inputs: coreSplitScreenConfiguration.DVEInputs,
+        layoutProperties: JSON.parse(coreSplitScreenConfiguration.DVEJSON),
+        graphicsTemplateJson: coreSplitScreenConfiguration.DVEGraphicsTemplateJSON,
+        key: coreSplitScreenConfiguration.DVEGraphicsKey,
+        frame: coreSplitScreenConfiguration.DVEGraphicsFrame
       }
     })
   }
