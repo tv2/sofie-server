@@ -470,7 +470,7 @@ export class MongoEntityConverter {
   public convertToMongoPiece(piece: Piece): MongoPiece {
     const enable: MongoPiece['enable'] = {
       start: piece.getStart(),
-      duration: piece.duration
+      ...(piece.duration ? { duration: piece.duration } : null)
     }
 
     return {
