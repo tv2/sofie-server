@@ -16,6 +16,9 @@ import { PartRepository } from '../../data-access/repositories/interfaces/part-r
 import { Segment } from '../../model/entities/segment'
 import { SegmentRepository } from '../../data-access/repositories/interfaces/segment-repository'
 import { PieceRepository } from '../../data-access/repositories/interfaces/piece-repository'
+import { InTransition } from '../../model/value-objects/in-transition'
+import { BasicRundown } from '../../model/entities/basic-rundown'
+import { AlreadyActivatedException } from '../../model/exceptions/already-activated-exception'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -31,6 +34,7 @@ export class RundownTimelineService implements RundownService {
   ) {}
 
   public async activateRundown(rundownId: string): Promise<void> {
+    await this.assertNoRundownIsActive()
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
     rundown.activate()
@@ -43,6 +47,13 @@ export class RundownTimelineService implements RundownService {
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.rundownRepository.saveRundown(rundown)
+  }
+
+  private async assertNoRundownIsActive(): Promise<void> {
+    const activeRundown: BasicRundown | undefined = (await this.rundownRepository.getBasicRundowns()).find(rundown => rundown.isActive())
+    if (activeRundown) {
+      throw new AlreadyActivatedException(`Unable to activate rundown, because the rundown ${activeRundown.name} is active. `)
+    }
   }
 
   private async buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
@@ -213,9 +224,9 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  public async insertPieceAsNext(rundownId: string, piece: Piece): Promise<void> {
+  public async insertPieceAsNext(rundownId: string, piece: Piece, partInTransition?: InTransition): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.insertPieceIntoNextPart(piece)
+    rundown.insertPieceIntoNextPart(piece, partInTransition)
 
     await this.buildAndPersistTimeline(rundown)
 

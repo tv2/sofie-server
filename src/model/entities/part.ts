@@ -40,7 +40,6 @@ export class Part {
 
   public readonly expectedDuration?: number
 
-  public readonly inTransition: InTransition
   public readonly outTransition: OutTransition
 
   public readonly autoNext?: AutoNext
@@ -50,6 +49,7 @@ export class Part {
   private rank: number
 
   private pieces: Piece[]
+  private replacedPlannedPieces: Piece[]
 
   private isPartOnAir: boolean
   private isPartNext: boolean
@@ -60,6 +60,8 @@ export class Part {
   private executedAt: number
   private playedDuration: number
   private timings?: PartTimings
+
+  private inTransition: InTransition
 
   /*
    * The EndState of the Part
@@ -74,6 +76,7 @@ export class Part {
     this.rank = part.rank
     this.isPlanned = part.isPlanned
     this.pieces = part.pieces ?? []
+    this.replacedPlannedPieces = []
     this.isPartOnAir = part.isOnAir
     this.isPartNext = part.isNext
     this.expectedDuration = part.expectedDuration
@@ -163,17 +166,21 @@ export class Part {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
     }
+    const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === unPlannedPiece.layer)
+    if (indexOfExistingPieceOnLayer >= 0) {
+      this.pieces.splice(indexOfExistingPieceOnLayer, 1)
+    }
     this.pieces.push(unPlannedPiece)
   }
 
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
-    if (pieceToBeReplaced.isPlanned) {
-      throw new UnsupportedOperation(`Can't replace Piece ${pieceToBeReplaced.id}. Only unplanned Pieces are allowed to be replaced.`)
-    }
-
     const pieceIndex: number = this.pieces.findIndex(piece => piece.id === pieceToBeReplaced.id)
     if (pieceIndex < 0) {
       throw new UnsupportedOperation(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
+    }
+
+    if (pieceToBeReplaced.isPlanned) {
+      this.replacedPlannedPieces.push(pieceToBeReplaced)
     }
 
     newPiece.setPartId(this.id)
@@ -293,7 +300,11 @@ export class Part {
   public reset(): void {
     this.executedAt = 0
     this.playedDuration = 0
-    this.pieces = this.pieces.filter(piece => piece.isPlanned)
+    this.pieces = [
+      ...this.pieces.filter(piece => piece.isPlanned),
+      ...this.replacedPlannedPieces
+    ]
+    this.replacedPlannedPieces = []
   }
 
   public clone(): Part {
@@ -302,5 +313,12 @@ export class Part {
 
   public getUnsyncedCopy(): Part {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
+  }
+
+  public updateInTransition(inTransition: InTransition): void {
+    this.inTransition = {
+      keepPreviousPartAliveDuration: Math.max(inTransition.keepPreviousPartAliveDuration, this.inTransition.keepPreviousPartAliveDuration),
+      delayPiecesDuration: Math.max(inTransition.delayPiecesDuration, this.inTransition.delayPiecesDuration)
+    }
   }
 }
