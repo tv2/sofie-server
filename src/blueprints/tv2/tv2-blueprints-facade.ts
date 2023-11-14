@@ -28,7 +28,7 @@ import {
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
-import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
+import { Tv2SplitScreenActionFactory } from './action-factories/tv2-split-screen-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { AssetFolderHelper } from './helpers/asset-folder-helper'
@@ -63,7 +63,7 @@ export class Tv2BlueprintsFacade {
         tv2CasparCgTimelineObjectFactory
       ),
       new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory),
-      new Tv2DveActionFactory(
+      new Tv2SplitScreenActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
         tv2CasparCgTimelineObjectFactory,
