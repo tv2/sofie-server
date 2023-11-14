@@ -10,7 +10,6 @@ import {
   Tv2GraphicsType
 } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PartInterface } from '../../../model/entities/part'
-import { AtemTransition, AtemTransitionSettings } from '../../timeline-state-resolver-types/atem-types'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2VizTimelineObjectFactory } from '../timeline-object-factories/tv2-viz-timeline-object-factory'
 import {
@@ -37,13 +36,14 @@ import { Tv2FileContent } from '../value-objects/tv2-content'
 import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
+import { VideoMixerTransition, VideoMixerTransitionSettings } from '../value-objects/tv2-video-mixer-transition'
 
 const PILOT_PREFIX: string = 'PILOT_'
 
 enum TemplateOutType {
-  B = 'B',
-  S = 'S',
-  O = 'O',
+  BACKGROUND = 'BACKGROUND',
+  STORY = 'STORY',
+  OPEN_END = 'OPEN_END',
 }
 
 export class Tv2GraphicsActionFactory {
@@ -316,22 +316,22 @@ export class Tv2GraphicsActionFactory {
   private parseTemplateOutType(template: string): TemplateOutType {
     switch (template) {
       case 'S':
-        return TemplateOutType.S
+        return TemplateOutType.STORY
       case 'O':
-        return TemplateOutType.O
+        return TemplateOutType.OPEN_END
       case 'B':
       default:
-        return TemplateOutType.B
+        return TemplateOutType.BACKGROUND
     }
   }
 
   private getPieceLifespanFromOutType(outType: TemplateOutType): PieceLifespan {
     switch (outType) {
-      case TemplateOutType.B:
+      case TemplateOutType.BACKGROUND:
         return PieceLifespan.WITHIN_PART
-      case TemplateOutType.S:
+      case TemplateOutType.STORY:
         return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
-      case TemplateOutType.O:
+      case TemplateOutType.OPEN_END:
         return PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE
     }
   }
@@ -422,20 +422,24 @@ export class Tv2GraphicsActionFactory {
 
     const enable: TimelineEnable = { start: blueprintConfiguration.studio.CasparPrerollDuration }
     const sourceInput: number = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).Fill
-    const transition: AtemTransition = AtemTransition.WIPE
-    const transitionSettings: AtemTransitionSettings = {
+    const transitionType: VideoMixerTransition = VideoMixerTransition.WIPE
+    const transitionSettings: VideoMixerTransitionSettings = {
       wipe: {
-        rate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
+        framerate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
         pattern: 1,
         reverseDirection: true,
         borderSoftness: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.borderSoftness
       }
     }
+    const transition: { type: VideoMixerTransition, settings: VideoMixerTransitionSettings } = {
+      type: transitionType,
+      settings: transitionSettings
+    }
 
     return [
       this.casparCgTimelineObjectFactory.createFullscreenGraphicsTimelineObject(blueprintConfiguration, fullscreenGraphicsData),
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable, transition, transitionSettings),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable, transition, transitionSettings),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable, transition),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable, transition),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(sourceInput, enable),
       this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration)
     ]
