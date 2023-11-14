@@ -2,7 +2,7 @@ import {
   Breaker,
   CutTransitionEffect,
   DipTransitionEffect,
-  DveConfiguration,
+  SplitScreenConfiguration,
   GraphicsDefault,
   GraphicsSetup,
   GraphicsTemplate,
@@ -22,7 +22,7 @@ interface CoreShowStyleBlueprintConfiguration {
   GfxDefaults: CoreGraphicsDefault[]
   GfxSetups: CoreGraphicsSetup[]
   GfxTemplates: CoreGraphicsTemplate[]
-  DVEStyles: CoreDveStyle[]
+  DVEStyles: CoreSplitScreenConfiguration[]
   BreakerConfig: CoreBreaker[]
   Transitions: { _id: string, Transition: string }[]
   ShowstyleTransition: string
@@ -49,7 +49,7 @@ interface CoreGraphicsTemplate {
   LayerMapping: string
 }
 
-interface CoreDveStyle {
+interface CoreSplitScreenConfiguration {
   _id: string
   DVEName: string
   DVEInputs: string
@@ -78,7 +78,7 @@ export class Tv2BlueprintConfigurationMapper {
       graphicsSetups: this.mapGraphicsSetups(coreConfiguration.GfxSetups),
       graphicsTemplates: this.mapGraphicsTemplates(coreConfiguration.GfxTemplates),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
-      dveConfigurations: this.mapDveConfigurations(coreConfiguration.DVEStyles),
+      splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
       transitionEffectConfigurations: this.mapTransitionEffectConfigurations([
         ...coreConfiguration.Transitions.map(transition => transition.Transition),
         coreConfiguration.ShowstyleTransition
@@ -132,16 +132,16 @@ export class Tv2BlueprintConfigurationMapper {
     }
   }
 
-  private mapDveConfigurations(coreDveStyles: CoreDveStyle[]): DveConfiguration[] {
-    return coreDveStyles.map(dveStyle => {
+  private mapSplitScreenConfigurations(coreSplitScreenConfigurations: CoreSplitScreenConfiguration[]): SplitScreenConfiguration[] {
+    return coreSplitScreenConfigurations.map(coreSplitScreenConfiguration => {
       return {
-        id: dveStyle._id,
-        name: dveStyle.DVEName,
-        inputs: dveStyle.DVEInputs,
-        layoutProperties: JSON.parse(dveStyle.DVEJSON),
-        graphicsTemplateJson: dveStyle.DVEGraphicsTemplateJSON,
-        key: dveStyle.DVEGraphicsKey,
-        frame: dveStyle.DVEGraphicsFrame
+        id: coreSplitScreenConfiguration._id,
+        name: coreSplitScreenConfiguration.DVEName,
+        inputs: coreSplitScreenConfiguration.DVEInputs,
+        layoutProperties: JSON.parse(coreSplitScreenConfiguration.DVEJSON),
+        graphicsTemplateJson: coreSplitScreenConfiguration.DVEGraphicsTemplateJSON,
+        key: coreSplitScreenConfiguration.DVEGraphicsKey,
+        frame: coreSplitScreenConfiguration.DVEGraphicsFrame
       }
     })
   }

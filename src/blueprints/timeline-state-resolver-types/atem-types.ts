@@ -164,7 +164,7 @@ export enum AtemTransition {
   MIX = 0,
   DIP = 1,
   WIPE = 2,
-  DVE = 3,
+  SPLIT_SCREEN = 3,
   STING = 4,
   CUT = 5,
   DUMMY = 6
