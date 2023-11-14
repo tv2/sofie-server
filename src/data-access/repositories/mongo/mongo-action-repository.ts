@@ -32,8 +32,8 @@ export class MongoActionRepository extends BaseMongoRepository implements Action
     )
   }
 
-  public async deleteRundownActions(rundownId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deleteRundownActions.name)
+  public async deleteActionsForRundown(rundownId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deleteActionsForRundown.name)
     const actionsDeleteResult: DeleteResult = await this.getCollection().deleteMany({ rundownId: rundownId })
 
     if (!actionsDeleteResult.acknowledged) {
