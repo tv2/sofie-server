@@ -338,7 +338,8 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createVizFullscreenPilotGraphicsTimelineObjects(
-    blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): TimelineObject[] {
+    blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData
+  ): TimelineObject[] {
     if (!blueprintConfiguration.studio.VizPilotGraphics.CleanFeedPrerollDuration) {
       throw new Tv2MisconfigurationException(
         'Missing configuration of \'VizPilotGraphics.CleanFeedPrerollDuration\' in settings.'
