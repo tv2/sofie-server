@@ -4,7 +4,7 @@ export interface Tv2ShowStyleBlueprintConfiguration {
   graphicsSetups: GraphicsSetup[]
   graphicsTemplates: GraphicsTemplate[]
   selectedGraphicsSetup: GraphicsSetup
-  dveConfigurations: DveConfiguration[]
+  splitScreenConfigurations: SplitScreenConfiguration[]
   transitionEffectConfigurations: TransitionEffect[]
   breakers: Breaker[]
 }
@@ -30,18 +30,18 @@ export interface GraphicsTemplate {
   layerMapping: string
 }
 
-export interface DveConfiguration {
+export interface SplitScreenConfiguration {
   id: string
   name: string
-  layoutProperties: DveLayoutProperties
+  layoutProperties: SplitScreenLayoutProperties
   graphicsTemplateJson: string
   key: string
   frame: string
 }
 
-export interface DveLayoutProperties {
+export interface SplitScreenLayoutProperties {
   boxes: {
-    [key: number]: DveBoxProperties
+    [key: number]: SplitScreenBoxProperties
   }
   index: number
   properties?: {
@@ -70,7 +70,7 @@ export interface DveLayoutProperties {
   }
 }
 
-export interface DveBoxProperties {
+export interface SplitScreenBoxProperties {
   enabled: boolean
   source: number
   x: number
