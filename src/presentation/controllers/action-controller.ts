@@ -14,9 +14,9 @@ export class ActionController extends BaseController {
   }
 
   @GetRequest('/rundowns/:rundownId')
-  public async getActions(reg: Request, res: Response): Promise<void> {
+  public async getActions(req: Request, res: Response): Promise<void> {
     try {
-      const rundownId: string = reg.params.rundownId
+      const rundownId: string = req.params.rundownId
       const actions: Action[] = await this.actionService.getActions(rundownId)
       res.send(actions.map(action => new ActionDto(action)))
     } catch (error) {
@@ -25,10 +25,10 @@ export class ActionController extends BaseController {
   }
 
   @PutRequest('/:actionId/rundowns/:rundownId')
-  public async executeAction(reg: Request, res: Response): Promise<void> {
+  public async executeAction(req: Request, res: Response): Promise<void> {
     try {
-      const actionId: string = reg.params.actionId
-      const rundownId: string = reg.params.rundownId
+      const actionId: string = req.params.actionId
+      const rundownId: string = req.params.rundownId
       await this.actionService.executeAction(actionId, rundownId)
       res.send(`Successfully executed action: ${actionId} on Rundown: ${rundownId}`)
     } catch (error) {
