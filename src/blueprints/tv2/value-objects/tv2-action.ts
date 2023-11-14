@@ -22,6 +22,7 @@ export enum Tv2ActionSubtype {
   SPLIT_SCREEN_LAYOUT = 'SPLIT_SCREEN_LAYOUT',
   SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT = 'SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT',
   SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
+  RECALL_LAST_PLANNED_REMOTE = 'RECALL_LAST_PLANNED_REMOTE',
 }
 
 export type Tv2Action = Tv2PartAction | Tv2PieceAction
@@ -59,6 +60,14 @@ export interface Tv2RemoteAction extends Tv2PartAction {
   metadata: {
     contentType: Tv2ActionContentType.REMOTE,
     remoteNumber: string
+  }
+}
+
+export interface Tv2RecallLastPlannedRemoteAsNextAction extends Tv2PartAction {
+  type: PartActionType.INSERT_PART_AS_NEXT,
+  metadata: {
+    contentType: Tv2ActionContentType.REMOTE,
+    actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
   }
 }
 
