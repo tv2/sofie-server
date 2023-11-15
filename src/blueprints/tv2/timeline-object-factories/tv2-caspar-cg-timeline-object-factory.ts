@@ -26,7 +26,7 @@ enum CasparCgSlot {
 }
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
-  constructor(private readonly casparCgPathFixer: Tv2AssetPathHelper) {}
+  constructor(private readonly assetPathHelper: Tv2AssetPathHelper) {}
 
   public createAllOutGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject {
     throw new UnsupportedOperation(
@@ -67,7 +67,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
     const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
     const nameChunks: string[] = fullscreenGraphicsData.name.split('/')
     const sceneName: string = nameChunks[nameChunks.length - 1]
-    const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, rawGraphicsFolder)
+    const fileName: string = this.assetPathHelper.joinAssetToFolder(sceneName, rawGraphicsFolder)
 
     return {
       id: 'full',
@@ -80,7 +80,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.TEMPLATE,
         templateType: 'html',
-        name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
+        name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
         data: this.createFullscreenTemplateData(blueprintConfiguration, fileName),
         useStopCommand: false,
         mixer: {
@@ -104,7 +104,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
         [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(Tv2GraphicsLayer.GRAPHICS_PILOT)]: {
           payload: {
             type: 'still',
-            url: encodeURI(this.casparCgPathFixer.replaceForwardSlashWithDoubleBackslash(absoluteFilePath)),
+            url: encodeURI(this.assetPathHelper.escapePath(this.assetPathHelper.convertUnixPathToWindowsPath(absoluteFilePath))),
             noAnimation: false
           },
           display: 'program',
@@ -144,7 +144,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
       deviceType: DeviceType.CASPAR_CG,
       type: CasparCgType.TEMPLATE,
       templateType: 'html',
-      name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
+      name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
       useStopCommand: false,
       mixer: {
         opacity: 100

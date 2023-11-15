@@ -1,62 +1,53 @@
 export class Tv2AssetPathHelper {
   public joinAssetToNetworkPath(
     networkPath: string,
-    assetFile: string,
+    assetFilePathWithoutExtension: string,
     extensionWithLeadingDot: string,
-    folder: string
+    folderPath: string
   ): string {
-    const folderWithForwardSlashes: string = this.replaceDoubleBackslashWithForwardSlash(folder)
-    const assetWithForwardSlashes: string = this.replaceDoubleBackslashWithForwardSlash(assetFile)
-    const networkPathWithForwardSlashes: string = networkPath[0] + this.replaceDoubleBackslashWithForwardSlash(networkPath.slice(1))
-
-    const folderWithoutLeadingTrailingSlashes = this.removeLeadingSlash(this.removeTrailingSlash(folderWithForwardSlashes))
-    const assetFileWithoutLeadingSlashes = this.removeLeadingSlash(assetWithForwardSlashes)
-    const networkPathWithoutTrailingSlashes = this.removeTrailingSlash(networkPathWithForwardSlashes)
-
     const extension = this.removeLeadingDot(extensionWithLeadingDot)
+    const assetFilePath: string = `${assetFilePathWithoutExtension}.${extension}`
+    return this.createWindowsPath(networkPath, folderPath, assetFilePath)
+  }
 
-    if (!folderWithoutLeadingTrailingSlashes) {
-      return this.convertToWindowsPath(`${networkPathWithoutTrailingSlashes}/${assetFileWithoutLeadingSlashes}.${extension}`)
+  public joinAssetToFolder(assetFilePath: string, folderPath?: string): string {
+    if (!folderPath) {
+      return assetFilePath
     }
-
-    return this.convertToWindowsPath(`${networkPathWithoutTrailingSlashes}/${folderWithoutLeadingTrailingSlashes}/${assetFileWithoutLeadingSlashes}.${extension}`)
+    return this.isWindowsPath(folderPath)
+      ? this.createWindowsPath(folderPath, assetFilePath)
+      : this.createUnixPath(folderPath, assetFilePath)
   }
 
-  public joinAssetToFolder(assetFile: string, folder?: string): string {
-    if (!folder) {
-      return assetFile
-    }
-
-    const folderWithForwardSlashes: string = this.replaceDoubleBackslashWithForwardSlash(folder)
-    const assetWithForwardSlashes: string = this.replaceDoubleBackslashWithForwardSlash(assetFile)
-
-    const folderWithoutTrailingSlashes: string = folderWithForwardSlashes.replace(/\/+$/, '')
-    const assetFileWithoutLeadingSlashes: string = assetWithForwardSlashes.replace(/^\/+/, '')
-
-    return `${folderWithoutTrailingSlashes}/${assetFileWithoutLeadingSlashes}`
+  private isWindowsPath(folder: string): boolean {
+    return folder.includes('\\')
   }
 
-  public replaceForwardSlashWithDoubleBackslash(str: string): string {
-    return this.convertToWindowsPath(str).replace(/\\/g, '\\\\')
+  private createUnixPath(...pathSegments: string[]): string {
+    return this.removeConsecutiveSlashesNotAtStartOfPath(pathSegments.map(pathSegment => this.normalizeSlashes(pathSegment)).join('/'))
   }
 
-  private removeTrailingSlash(str: string): string {
-    return str.replace(/\/+$/, '')
+  private createWindowsPath(...pathSegments: string[]): string {
+    return this.convertUnixPathToWindowsPath(this.createUnixPath(...pathSegments))
+  }
+
+  public convertUnixPathToWindowsPath(path: string): string {
+    return path.replaceAll('/', '\\')
+  }
+
+  public escapePath(path: string): string {
+    return path.replaceAll('\\', '\\\\')
+  }
+
+  private normalizeSlashes(pathSegment: string): string {
+    return pathSegment.replaceAll('\\', '/')
+  }
+
+  private removeConsecutiveSlashesNotAtStartOfPath(path: string): string {
+    return path.replace(/(?<!^)\/+/g, '/')
   }
 
   private removeLeadingDot(str: string): string {
     return str.replace(/^\./, '')
-  }
-
-  private removeLeadingSlash(str: string): string {
-    return str.replace(/^\/+/, '')
-  }
-
-  private replaceDoubleBackslashWithForwardSlash(str: string): string {
-    return str.replace(/\\\\/g, '\\').replace(/\\/g, '/')
-  }
-
-  private convertToWindowsPath(str: string): string {
-    return str.replace(/\//g, '\\')
   }
 }
