@@ -87,6 +87,7 @@ export interface MongoSegment extends MongoId {
   isUnsynced: boolean
   isNext: boolean
   budgetDuration?: number
+  executedAtEpochTime?: number
 }
 
 export interface MongoPart extends MongoId {
@@ -324,6 +325,7 @@ export class MongoEntityConverter {
       isUnsynced: mongoSegment.isUnsynced ?? false,
       parts: [],
       budgetDuration: mongoSegment.budgetDuration ?? undefined, // Ensure that null values are stripped
+      executedAtEpochTime: mongoSegment.executedAtEpochTime ?? undefined
     })
   }
 
@@ -343,6 +345,7 @@ export class MongoEntityConverter {
       isNext: segment.isNext(),
       isUnsynced: segment.isUnsynced(),
       budgetDuration: segment.budgetDuration,
+      executedAtEpochTime: segment.getExecutedAtEpochTime(),
     } as MongoSegment
   }
 

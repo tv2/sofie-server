@@ -10,6 +10,7 @@ export class SegmentDto {
   public readonly isUntimed: boolean
   public readonly isUnsynced: boolean
   public readonly budgetDuration?: number
+  public readonly executedAtEpochTime?: number
   public readonly parts: PartDto[]
 
   constructor(segment: Segment) {
@@ -21,6 +22,7 @@ export class SegmentDto {
     this.isUntimed = segment.getIsSegmentUntimed()
     this.isUnsynced = segment.isUnsynced()
     this.budgetDuration = segment.budgetDuration
+    this.executedAtEpochTime = segment.getExecutedAtEpochTime()
     this.parts = segment.getParts().map((part) => new PartDto(part))
   }
 }
