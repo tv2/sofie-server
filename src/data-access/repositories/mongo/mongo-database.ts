@@ -4,8 +4,10 @@ import { DatabaseNotConnectedException } from '../../../model/exceptions/databas
 import { MongoId } from './mongo-entity-converter'
 
 // TODO: Move to ENV variables
-const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
-const MONGO_DB_NAME: string = 'meteor'
+// const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
+// const MONGO_DB_NAME: string = 'meteor'
+const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:27017?directConnection=true'
+const MONGO_DB_NAME: string = 'sofie'
 
 export class MongoDatabase {
   private static instance: MongoDatabase
