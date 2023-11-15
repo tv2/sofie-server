@@ -1,7 +1,6 @@
-import { Tv2GraphicsTimelineObjectFactory } from './interfaces/tv2-graphics-timeline-object-factory'
+import { Tv2GraphicsElementTimelineObjectFactory } from './interfaces/tv2-graphics-element-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
-  VizMseClearGraphicsTimelineObjectContent,
   VizMseContinueTimelineObject,
   VizMseElementInternalTimelineObject,
   VizMseElementPilotTimelineObject,
@@ -16,21 +15,22 @@ import {
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData
 } from '../value-objects/tv2-action-manifest-data'
+import { Tv2GraphicsCommandTimelineObjectFactory } from './interfaces/tv2-graphics-command-timeline-object-factory'
 
-
-enum ChannelName {
+enum Engine {
   OVERLAY = 'OVL1',
   FULLSCREEN = 'FULL1',
   WALL = 'WALL1'
 }
 
-export class Tv2VizTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
-  public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): VizMseElementInternalTimelineObject {
+export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineObjectFactory, Tv2GraphicsElementTimelineObjectFactory {
+
+  public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): VizMseElementInternalTimelineObject {
     return {
       id: '',
       enable: {
         start: 0,
-        duration
+        duration: 3000
       },
       priority: 100,
       layer: Tv2GraphicsLayer.GRAPHICS_ACTIONS,
@@ -44,12 +44,12 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsTimelineObjectFac
     }
   }
 
-  public createOverlayInitializeTimelineObject(duration: number): VizMseLoadAllElementsTimelineObject {
+  public createOverlayInitializeTimelineObject(): VizMseLoadAllElementsTimelineObject {
     return {
       id: 'loadAllElements',
       enable: {
         start: 0,
-        duration
+        duration: 1000
       },
       priority: 100,
       layer: Tv2GraphicsLayer.GRAPHICS_ACTIONS,
@@ -60,12 +60,12 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsTimelineObjectFac
     }
   }
 
-  public createContinueGraphicsTimelineObject(duration: number): VizMseContinueTimelineObject {
+  public createContinueGraphicsTimelineObject(): VizMseContinueTimelineObject {
     return {
       id: '',
       enable: {
         start: 0,
-        duration
+        duration: 1000
       },
       priority: 100,
       layer: Tv2GraphicsLayer.GRAPHICS_ACTIONS,
@@ -78,48 +78,39 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsTimelineObjectFac
     }
   }
 
-  public createClearGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject {
-    return this.createBaseTimelineObjectWithContent(
-      duration,
-      this.createClearGraphicContent(blueprintConfiguration)
-    )
-  }
-
-  private createClearGraphicContent(blueprintConfiguration: Tv2BlueprintConfiguration): VizMseClearGraphicsTimelineObjectContent {
-    return {
-      deviceType: DeviceType.VIZMSE,
-      type: VizType.CLEAR_ALL_ELEMENTS,
-      channelsToSendCommands: [ChannelName.OVERLAY, ChannelName.FULLSCREEN, ChannelName.WALL],
-      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
-    }
-  }
-
-  private createBaseTimelineObjectWithContent(duration: number, content: VizMseClearGraphicsTimelineObjectContent): TimelineObject {
+  public createClearGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject {
     return {
       id: '',
       enable: {
         start: 0,
-        duration
+        duration: 1000
       },
       priority: 100,
       layer: Tv2GraphicsLayer.GRAPHICS_ACTIONS,
-      content: content
+      content: {
+        deviceType: DeviceType.VIZMSE,
+        type: VizType.CLEAR_ALL_ELEMENTS,
+        channelsToSendCommands: [Engine.OVERLAY, Engine.FULLSCREEN, Engine.WALL],
+        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
+      }
     }
   }
 
-  public createAllOutGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject {
-    return this.createBaseTimelineObjectWithContent(
-      duration,
-      this.createAllOutGraphicContent(blueprintConfiguration)
-    )
-  }
-
-  private createAllOutGraphicContent(blueprintConfiguration: Tv2BlueprintConfiguration): VizMseClearGraphicsTimelineObjectContent {
+  public createAllOutGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject {
     return {
-      deviceType: DeviceType.VIZMSE,
-      type: VizType.CLEAR_ALL_ELEMENTS,
-      channelsToSendCommands: undefined,
-      showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
+      id: '',
+      enable: {
+        start: 0,
+        duration: 3000
+      },
+      priority: 100,
+      layer: Tv2GraphicsLayer.GRAPHICS_ACTIONS,
+      content: {
+        deviceType: DeviceType.VIZMSE,
+        type: VizType.CLEAR_ALL_ELEMENTS,
+        channelsToSendCommands: undefined,
+        showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
+      }
     }
   }
 
@@ -137,7 +128,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsTimelineObjectFac
         templateVcpId: fullscreenGraphicsData.vcpId,
         continueStep: -1,
         noAutoPreloading: false,
-        channelName: ChannelName.FULLSCREEN,
+        channelName: Engine.FULLSCREEN,
         ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
       }
     }
@@ -182,7 +173,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsTimelineObjectFac
       type: VizType.ELEMENT_INTERNAL,
       templateName: overlayGraphicsData.templateName,
       templateData: [overlayGraphicsData.displayText],
-      channelName: ChannelName.OVERLAY,
+      channelName: Engine.OVERLAY,
       showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }
   }

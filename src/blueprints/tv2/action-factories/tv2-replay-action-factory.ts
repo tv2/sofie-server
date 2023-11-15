@@ -136,13 +136,13 @@ export class Tv2ReplayActionFactory {
       outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
-        acceptsPersistedAudio: audioMode == Tv2AudioMode.VOICE_OVER
+        acceptsPersistedAudio: audioMode === Tv2AudioMode.VOICE_OVER
       }
     }
     return {
       id: `replayAction_${this.removeAllWhitespace(source.name)}`,
       partId: parentPartId,
-      name: `${source.name}${audioMode ? ' VO' : ''}`,
+      name: `${source.name}${audioMode === Tv2AudioMode.VOICE_OVER ? ' VO' : ''}`,
       layer: Tv2SourceLayer.REPLAY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,

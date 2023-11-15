@@ -102,14 +102,14 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, transition?: {type: VideoMixerTransition, settings: VideoMixerTransitionSettings}): AtemMeTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, transition?: { type: VideoMixerTransition, settings: VideoMixerTransitionSettings }): AtemMeTimelineObject {
     return this.createAtemMeTimelineObjectForLayer(
       `${ATEM_PREFIX}program`,
       Tv2AtemLayer.PROGRAM,
       enable,
       {
         input: sourceInput,
-        transition: transition ? this.mapVideoMixerTransitionToAtemVersion(transition.type) : undefined,
+        transition: transition ? this.mapVideoMixerTransitionToAtemVersion(transition.type) : AtemTransition.CUT,
         transitionSettings: transition ? this.mapVideoMixerTransitionSettingsToAtemVersion(transition.settings) : undefined
       })
   }
