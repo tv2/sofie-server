@@ -135,10 +135,10 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   }
 
   private mapVideoMixerTransitionSettingsToAtemVersion(settings: VideoMixerTransitionSettings): AtemTransitionSettings {
-    if (settings.wipe && settings.wipe.framerate && settings.wipe.framerate < 0) {
-      settings.wipe.framerate = 0
-    } else if (settings.wipe && settings.wipe.framerate && settings.wipe.framerate > 250) {
-      settings.wipe.framerate = 250
+    if (settings.wipe && settings.wipe.frameRate && settings.wipe.frameRate < 1) {
+      settings.wipe.frameRate = 1
+    } else if (settings.wipe && settings.wipe.frameRate && settings.wipe.frameRate > 250) {
+      settings.wipe.frameRate = 250
     }
 
     return {
@@ -150,7 +150,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         input: settings.dip.input
       } : undefined,
       wipe: settings.wipe ? {
-        rate: settings.wipe.framerate,
+        rate: settings.wipe.frameRate,
         borderSoftness: settings.wipe.borderSoftness,
         pattern: settings.wipe.pattern,
         reverseDirection: settings.wipe.reverseDirection

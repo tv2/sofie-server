@@ -425,7 +425,7 @@ export class Tv2GraphicsActionFactory {
     const transitionType: VideoMixerTransition = VideoMixerTransition.WIPE
     const transitionSettings: VideoMixerTransitionSettings = {
       wipe: {
-        framerate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
+        frameRate: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.wipeRate,
         pattern: 1,
         reverseDirection: true,
         borderSoftness: blueprintConfiguration.studio.HTMLGraphics.TransitionSettings.borderSoftness
