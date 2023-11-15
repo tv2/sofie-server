@@ -32,6 +32,18 @@ import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 import { Tv2StudioBlueprintConfigurationMapper } from './helpers/tv2-studio-blueprint-configuration-mapper'
 import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
+import {
+  Tv2VideoClipTimelineObjectFactory
+} from './timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
+import {
+  Tv2GraphicsCommandTimelineObjectFactory
+} from './timeline-object-factories/interfaces/tv2-graphics-command-timeline-object-factory'
+import {
+  Tv2GraphicsElementTimelineObjectFactory
+} from './timeline-object-factories/interfaces/tv2-graphics-element-timeline-object-factory'
+import {
+  Tv2GraphicsSplitScreenTimelineObjectFactory
+} from './timeline-object-factories/interfaces/tv2-graphics-split-screen-timeline-object-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -44,9 +56,12 @@ export class Tv2BlueprintsFacade {
     const tv2SisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
 
     const tv2AudioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
-    const tv2VizGraphicsTimelineObjectFactory: Tv2VizTimelineObjectFactory = new Tv2VizTimelineObjectFactory()
-    const tv2CasparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
     const tv2VideoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
+
+    const tv2GraphicsCommandTimelineObjectFactory: Tv2GraphicsCommandTimelineObjectFactory = new Tv2VizTimelineObjectFactory()
+    const tv2GraphicsElementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory = new Tv2VizTimelineObjectFactory()
+    const tv2GraphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
+    const tv2VideoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
 
     const actionService: Tv2ActionService = new Tv2ActionService(
       configurationMapper,
@@ -54,14 +69,14 @@ export class Tv2BlueprintsFacade {
       new Tv2RemoteActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory),
       new Tv2TransitionEffectActionFactory(
         tv2VideoMixerTimelineObjectFactory,
-        tv2CasparCgTimelineObjectFactory,
+        tv2VideoClipTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
         assetPathHelper
       ),
       new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory),
       new Tv2GraphicsActionFactory(
-        tv2VizGraphicsTimelineObjectFactory,
-        tv2CasparCgTimelineObjectFactory,
+        tv2GraphicsCommandTimelineObjectFactory,
+        tv2GraphicsElementTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
         tv2VideoMixerTimelineObjectFactory,
         assetPathHelper,
@@ -70,13 +85,14 @@ export class Tv2BlueprintsFacade {
       new Tv2VideoClipActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
-        tv2CasparCgTimelineObjectFactory
+        tv2VideoClipTimelineObjectFactory
       ),
       new Tv2VideoMixerConfigurationActionFactory(tv2VideoMixerTimelineObjectFactory),
       new Tv2SplitScreenActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
-        tv2CasparCgTimelineObjectFactory,
+        tv2GraphicsSplitScreenTimelineObjectFactory,
+        tv2VideoClipTimelineObjectFactory,
         assetPathHelper
       ),
       new Tv2ReplayActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory)

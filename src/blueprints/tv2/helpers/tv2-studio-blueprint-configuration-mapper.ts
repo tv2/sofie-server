@@ -174,7 +174,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
         return Tv2DownstreamKeyerRole.FULL_GRAPHICS
       }
       case CoreDownstreamKeyerRole.OVERLAY_GRAPHICS: {
-        return Tv2DownstreamKeyerRole.JINGLE
+        return Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS
       }
       case CoreDownstreamKeyerRole.JINGLE: {
         return Tv2DownstreamKeyerRole.JINGLE
