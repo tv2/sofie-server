@@ -1,8 +1,8 @@
 import { DeviceType } from '../../model/enums/device-type'
-import { TimelineObject } from '../../model/entities/timeline-object'
+import { Tv2BlueprintTimelineObject } from '../tv2/value-objects/tv2-metadata'
 
 // These values are taken from TSR TODO: Find a better way for types.
-export interface AtemMeTimelineObject extends TimelineObject {
+export interface AtemMeTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
@@ -15,7 +15,7 @@ export interface AtemMeTimelineObject extends TimelineObject {
   }
 }
 
-export interface AtemAuxTimelineObject extends TimelineObject {
+export interface AtemAuxTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.AUX,
@@ -25,7 +25,7 @@ export interface AtemAuxTimelineObject extends TimelineObject {
   }
 }
 
-export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
+export interface AtemDownstreamKeyerTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.DSK,
@@ -60,7 +60,7 @@ export interface AtemUpstreamKeyer {
   }
 }
 
-export interface AtemSuperSourceTimelineObject extends TimelineObject {
+export interface AtemSuperSourceTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.SUPER_SOURCE,
@@ -90,7 +90,7 @@ export type AtemSuperSourceBox = {
   cropRight?: number;
 }
 
-export interface AtemSuperSourcePropertiesTimelineObject extends TimelineObject {
+export interface AtemSuperSourcePropertiesTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.SUPER_SOURCE_PROPERTIES,

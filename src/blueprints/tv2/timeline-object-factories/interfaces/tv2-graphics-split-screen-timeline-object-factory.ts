@@ -1,7 +1,7 @@
-import { TimelineObject } from '../../../../model/entities/timeline-object'
+import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
 
 export interface Tv2GraphicsSplitScreenTimelineObjectFactory {
-  createSplitScreenKeyTimelineObject(keyFilePath: string): TimelineObject
-  createSplitScreenFrameTimelineObject(frameFilePath: string): TimelineObject
-  createSplitScreenLocatorTimelineObject(): TimelineObject
+  createSplitScreenKeyTimelineObject(keyFilePath: string): Tv2BlueprintTimelineObject
+  createSplitScreenFrameTimelineObject(frameFilePath: string): Tv2BlueprintTimelineObject
+  createSplitScreenLocatorTimelineObject(): Tv2BlueprintTimelineObject
 }

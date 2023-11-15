@@ -1,13 +1,13 @@
-import { TimelineObject } from '../../model/entities/timeline-object'
 import { DeviceType } from '../../model/enums/device-type'
+import { Tv2BlueprintTimelineObject } from '../tv2/value-objects/tv2-metadata'
 
 export const enum VizMseTransitionType {
   DELAY = 0
 }
 
-export interface VizMseElementInternalTimelineObject extends TimelineObject {
+export interface VizMseElementInternalTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
-    deviceType: DeviceType.VIZMSE
+    deviceType: DeviceType.VIZ_MSE
     type: VizType.ELEMENT_INTERNAL
     templateName: string
     templateData: string[]
@@ -16,9 +16,9 @@ export interface VizMseElementInternalTimelineObject extends TimelineObject {
   }
 }
 
-export interface VizMseElementPilotTimelineObject extends TimelineObject {
+export interface VizMseElementPilotTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
-    deviceType: DeviceType.VIZMSE
+    deviceType: DeviceType.VIZ_MSE
     type: VizType.ELEMENT_PILOT
     templateVcpId: number
     continueStep: number
@@ -32,16 +32,16 @@ export interface VizMseElementPilotTimelineObject extends TimelineObject {
   }
 }
 
-export interface VizMseLoadAllElementsTimelineObject extends TimelineObject {
+export interface VizMseLoadAllElementsTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
-    deviceType: DeviceType.VIZMSE
+    deviceType: DeviceType.VIZ_MSE
     type: VizType.LOAD_ALL_ELEMENTS
   }
 }
 
-export interface VizMseContinueTimelineObject extends TimelineObject {
+export interface VizMseContinueTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
-    deviceType: DeviceType.VIZMSE
+    deviceType: DeviceType.VIZ_MSE
     type: VizType.CONTINUE
     direction: VizMseContinueDirection
     reference: string
@@ -53,11 +53,13 @@ export enum VizMseContinueDirection {
   FORWARD = 1
 }
 
-export interface VizMseClearGraphicsTimelineObjectContent {
-  deviceType: DeviceType.VIZMSE
-  type: VizType.CLEAR_ALL_ELEMENTS
-  channelsToSendCommands?: string[]
-  showName: string
+export interface VizMseClearGraphicsTimelineObject extends Tv2BlueprintTimelineObject {
+  content: {
+    deviceType: DeviceType.VIZ_MSE
+    type: VizType.CLEAR_ALL_ELEMENTS
+    channelsToSendCommands?: string[]
+    showName: string
+  }
 }
 
 export enum VizType {
