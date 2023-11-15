@@ -43,9 +43,14 @@ export interface VizMseContinueTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZMSE
     type: VizType.CONTINUE
-    direction: -1 | 1 | undefined
+    direction: VizMseContinueDirection
     reference: string
   }
+}
+
+export enum VizMseContinueDirection {
+  BACKWARD = -1,
+  FORWARD = 1
 }
 
 export interface VizMseClearGraphicsTimelineObjectContent {
@@ -54,8 +59,6 @@ export interface VizMseClearGraphicsTimelineObjectContent {
   channelsToSendCommands?: string[]
   showName: string
 }
-
-
 
 export enum VizType {
   ELEMENT_INTERNAL = 'element_internal',
