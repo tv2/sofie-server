@@ -17,8 +17,7 @@ export interface VideoMixerTransitionSettings {
     input: number
   },
   wipe?: {
-    /** 1 - 250 frames */
-    framerate?: number;
+    frameRate?: number;
     /** 0 - 17 */
     pattern?: number;
     /** 0 - 10000 */
