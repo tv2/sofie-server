@@ -7,9 +7,8 @@ import { Tv2ActionContentType, Tv2ReplayAction, Tv2ReplayAuxAction } from '../va
 import { Tv2SourceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { TimelineObject } from '../../../model/entities/timeline-object'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
@@ -124,7 +123,7 @@ export class Tv2ReplayActionFactory {
       start: 0
     }
 
-    const timelineObjects: TimelineObject[] = [
+    const timelineObjects: Tv2BlueprintTimelineObject[] = [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.videoMixerSource, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.videoMixerSource, videoMixerEnable),
