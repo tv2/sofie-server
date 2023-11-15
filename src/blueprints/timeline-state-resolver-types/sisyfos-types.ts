@@ -1,10 +1,10 @@
 import { DeviceType } from '../../model/enums/device-type'
-import { TimelineObject } from '../../model/entities/timeline-object'
+import { Tv2BlueprintTimelineObject } from '../tv2/value-objects/tv2-metadata'
 
 // These values are taken from TSR
 export type SisyfosTimelineObject = SisyfosChannelTimelineObject | SisyfosChannelsTimelineObject
 
-export interface SisyfosChannelTimelineObject extends TimelineObject {
+export interface SisyfosChannelTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
     deviceType: DeviceType.SISYFOS;
     type: SisyfosType.CHANNEL;
@@ -12,7 +12,7 @@ export interface SisyfosChannelTimelineObject extends TimelineObject {
   } & SisyfosChannelOptions;
 }
 
-export interface SisyfosChannelsTimelineObject extends TimelineObject {
+export interface SisyfosChannelsTimelineObject extends Tv2BlueprintTimelineObject {
   content: {
     deviceType: DeviceType.SISYFOS;
     type: SisyfosType.CHANNELS;

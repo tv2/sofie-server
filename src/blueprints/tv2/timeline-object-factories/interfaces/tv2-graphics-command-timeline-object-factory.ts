@@ -1,10 +1,10 @@
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
-import { TimelineObject } from '../../../../model/entities/timeline-object'
+import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
 
 export interface Tv2GraphicsCommandTimelineObjectFactory {
-  createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject
-  createOverlayInitializeTimelineObject(): TimelineObject
-  createContinueGraphicsTimelineObject(): TimelineObject
-  createClearGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject
-  createAllOutGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject
+  createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2BlueprintTimelineObject
+  createOverlayInitializeTimelineObject(): Tv2BlueprintTimelineObject
+  createContinueGraphicsTimelineObject(): Tv2BlueprintTimelineObject
+  createClearGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2BlueprintTimelineObject
+  createAllOutGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2BlueprintTimelineObject
 }
