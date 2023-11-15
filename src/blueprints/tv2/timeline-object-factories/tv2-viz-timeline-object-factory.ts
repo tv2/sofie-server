@@ -1,6 +1,7 @@
 import { Tv2GraphicsElementTimelineObjectFactory } from './interfaces/tv2-graphics-element-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import {
+  VizMseContinueDirection,
   VizMseContinueTimelineObject,
   VizMseElementInternalTimelineObject,
   VizMseElementPilotTimelineObject,
@@ -72,7 +73,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       content: {
         deviceType: DeviceType.VIZMSE,
         type: VizType.CONTINUE,
-        direction: 1,
+        direction: VizMseContinueDirection.FORWARD,
         reference: Tv2GraphicsLayer.GRAPHICS_PILOT
       }
     }
