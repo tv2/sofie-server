@@ -224,7 +224,7 @@ export class Tv2SplitScreenActionFactory {
   }
 
   private createInsertSplitScreenInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2SplitScreenInsertSourceInputAction[] {
-    const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.cameraeSources.slice(0, 5)
+    const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.cameraSources.slice(0, 5)
     const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.remoteSources
     const replaySources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.replaySources
     const replaySourcesWithoutVoiceOver: Tv2SourceMappingWithSound[] = replaySources.filter(replaySource => !/EPSIO/i.test(replaySource.name))

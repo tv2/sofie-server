@@ -191,7 +191,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     let sources: Tv2SourceMappingWithSound[] = []
     switch (splitScreenSource.sourceType) {
       case TvActionManifestSplitScreenSourceType.CAMERA: {
-        sources = blueprintConfiguration.studio.cameraeSources
+        sources = blueprintConfiguration.studio.cameraSources
         break
       }
       case TvActionManifestSplitScreenSourceType.LIVE: {
