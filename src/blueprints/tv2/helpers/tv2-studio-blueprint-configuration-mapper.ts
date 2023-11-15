@@ -38,7 +38,7 @@ interface CoreStudioBlueprintConfiguration {
 
   GraphicsType: Tv2GraphicsType
   VizPilotGraphics: CoreVizGraphics
-  HTMLGraphics: CoreHtmlGraphics
+  HTMLGraphics?: CoreHtmlGraphics
   PreventOverlayWithFull: boolean
 }
 
@@ -118,7 +118,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
       graphicsFolder: this.mapGraphicsFolder(coreConfiguration),
       selectedGraphicsType: coreConfiguration.GraphicsType,
       vizPilotGraphics: this.mapVizPilotGraphics(coreConfiguration.VizPilotGraphics),
-      htmlGraphics: this.mapHtmlGraphics(coreConfiguration.HTMLGraphics),
+      htmlGraphics: coreConfiguration.HTMLGraphics ? this.mapHtmlGraphics(coreConfiguration.HTMLGraphics) : undefined,
       preventOverlayWhileFullscreenGraphicsIsOnAir: coreConfiguration.PreventOverlayWithFull
     }
   }

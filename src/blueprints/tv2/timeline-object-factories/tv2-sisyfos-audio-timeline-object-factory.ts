@@ -124,7 +124,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNEL,
-        isPgm: videoClipData.audioMode ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
+        isPgm: videoClipData.audioMode === Tv2AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
       }
     }
 

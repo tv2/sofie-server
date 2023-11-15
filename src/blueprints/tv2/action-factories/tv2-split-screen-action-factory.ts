@@ -3,7 +3,10 @@ import { Action, MutateActionMethods, MutateActionType } from '../../../model/en
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { Part, PartInterface } from '../../../model/entities/part'
-import { SplitScreenBoxProperties, SplitScreenConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
+import {
+  SplitScreenBoxProperties,
+  SplitScreenConfiguration
+} from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -16,19 +19,23 @@ import {
   Tv2Action,
   Tv2ActionContentType,
   Tv2ActionSubtype,
+  Tv2RecallSplitScreenAction,
   Tv2SplitScreenAction,
   Tv2SplitScreenInsertLastVideoClipInputAction,
   Tv2SplitScreenInsertSourceInputAction,
   Tv2SplitScreenInsertSourceInputMetadata,
-  Tv2SplitScreenLayoutAction,
-  Tv2RecallSplitScreenAction
+  Tv2SplitScreenLayoutAction
 } from '../value-objects/tv2-action'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
-import { SplitScreenBoxInput, Tv2SplitScreenManifestData, Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
+import {
+  SplitScreenBoxInput,
+  Tv2SplitScreenManifestData,
+  Tv2VideoClipManifestData
+} from '../value-objects/tv2-action-manifest-data'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-operation-exception'
 import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-layers'
@@ -139,7 +146,7 @@ export class Tv2SplitScreenActionFactory {
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, timelineEnable),
         this.casparCgTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
         this.casparCgTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.frame, blueprintConfiguration.studio.splitScreenFolder?.name)),
-        this.casparCgTimelineObjectFactory.createSplitScreenLocatorTimelineObject()
+        // this.casparCgTimelineObjectFactory.createSplitScreenLocatorTimelineObject()
       ]
 
       const metadata: Tv2PieceMetadata = {
@@ -347,6 +354,7 @@ export class Tv2SplitScreenActionFactory {
 
       const metadata: Tv2PieceMetadata = {
         type: Tv2PieceType.SPLIT_SCREEN,
+        outputLayer: Tv2OutputLayer.PROGRAM,
         splitScreen: {
           boxes,
           audioTimelineObjectsForBoxes
@@ -367,7 +375,7 @@ export class Tv2SplitScreenActionFactory {
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
         this.casparCgTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
         this.casparCgTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.frame, blueprintConfiguration.studio.splitScreenFolder?.name)),
-        this.casparCgTimelineObjectFactory.createSplitScreenLocatorTimelineObject(),
+        // this.casparCgTimelineObjectFactory.createSplitScreenLocatorTimelineObject(),
         ...audioTimelineObjects
       ]
 
@@ -504,8 +512,8 @@ export class Tv2SplitScreenActionFactory {
     } as unknown as Tv2VideoClipManifestData)
 
     return {
-      id: `insert_last_video_clip_to_split_screen_input_${inputIndex}${audioMode ? '_vo' : ''}_action`,
-      name: `Insert last Video ${audioMode ? ' Voice Over ' : ''} Clip in DVE input ${inputIndex}`,
+      id: `insert_last_video_clip_to_split_screen_input_${inputIndex}${audioMode === Tv2AudioMode.VOICE_OVER ? '_vo' : ''}_action`,
+      name: `Insert last Video ${audioMode === Tv2AudioMode.VOICE_OVER ? ' Voice Over ' : ''} Clip in DVE input ${inputIndex}`,
       description: 'Insert last Video Clip in DVE input ${inputIndex}',
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
