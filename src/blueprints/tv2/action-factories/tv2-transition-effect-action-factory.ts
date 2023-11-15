@@ -1,10 +1,9 @@
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { Piece, PieceInterface } from '../../../model/entities/piece'
+import { Piece } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
-import { TimelineObject } from '../../../model/entities/timeline-object'
 import {
   Tv2Action,
   Tv2ActionContentType,
@@ -40,6 +39,7 @@ import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
@@ -104,7 +104,7 @@ export class Tv2TransitionEffectActionFactory {
 
   private createCutTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
     const effectName: string = 'Cut'
-    const pieceInterface: PieceInterface = this.createPieceInterface(effectName, 0)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, 0)
     const metadata: Tv2CutTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.CUT
@@ -139,7 +139,7 @@ export class Tv2TransitionEffectActionFactory {
     return (1000 / FRAME_RATE) * frames
   }
 
-  private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: PieceInterface): Tv2TransitionEffectAction {
+  private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: Tv2PieceInterface): Tv2TransitionEffectAction {
     return {
       id: `${effectName}_transition_action_${actionType.toString()}`,
       name: `${effectName}`,
@@ -154,7 +154,7 @@ export class Tv2TransitionEffectActionFactory {
 
   private createMixTransitionEffectAction(actionType: PieceActionType, transitionEffect: MixTransitionEffect): Tv2TransitionEffectAction {
     const effectName: string = `Mix${transitionEffect.durationInFrames}`
-    const pieceInterface: PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.MIX,
@@ -165,7 +165,7 @@ export class Tv2TransitionEffectActionFactory {
 
   private createDipTransitionEffectAction(actionType: PieceActionType, transitionEffect: DipTransitionEffect, configuredDipInput: number): Tv2TransitionEffectAction {
     const effectName: string = `Dip${transitionEffect.durationInFrames}`
-    const pieceInterface: PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.DIP,
@@ -186,7 +186,7 @@ export class Tv2TransitionEffectActionFactory {
       throw  new Tv2MisconfigurationException('Can\'t create Transition Effect Action. No DSK has been configured for Jingles.')
     }
 
-    const pieceInterface: PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
     const metadata: Tv2BreakerTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.BREAKER,
@@ -207,17 +207,17 @@ export class Tv2TransitionEffectActionFactory {
 
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
-        const cutTransitionTimelineObject: TimelineObject = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObject(sourceInput)
+        const cutTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObject(sourceInput)
         action.data.pieceInterface.timelineObjects.push(cutTransitionTimelineObject)
         break
       }
       case TransitionEffectType.MIX: {
-        const mixTransitionTimelineObject: TimelineObject = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames)
+        const mixTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames)
         action.data.pieceInterface.timelineObjects.push(mixTransitionTimelineObject)
         break
       }
       case TransitionEffectType.DIP: {
-        const dipTransitionTimelineObject: TimelineObject = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
+        const dipTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
         action.data.pieceInterface.timelineObjects.push(dipTransitionTimelineObject)
         break
       }
@@ -231,7 +231,7 @@ export class Tv2TransitionEffectActionFactory {
     return action
   }
 
-  private createTimelineObjectsForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): TimelineObject[] {
+  private createTimelineObjectsForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): Tv2BlueprintTimelineObject[] {
     const breaker: Breaker = breakerActionMetadata.breaker
     const casparCgPreRollDuration: number = breakerActionMetadata.casparCgPreRollDuration
 

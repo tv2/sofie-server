@@ -2,7 +2,6 @@ import { Action, MutateActionMethods, MutateActionType } from '../../../model/en
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { PartActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
-import { PieceInterface } from '../../../model/entities/piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -25,6 +24,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -102,7 +102,7 @@ export class Tv2VideoClipActionFactory {
     }
   }
 
-  private createVideoClipPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): PieceInterface {
+  private createVideoClipPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): Tv2PieceInterface {
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.VIDEO_CLIP,
       outputLayer: Tv2OutputLayer.PROGRAM,
