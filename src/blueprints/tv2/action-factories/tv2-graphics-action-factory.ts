@@ -40,12 +40,6 @@ import {
   Tv2GraphicsTimelineObjectFactoryFactory
 } from '../timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
 
-enum TemplateOutType {
-  BACKGROUND = 'BACKGROUND',
-  STORY = 'STORY',
-  OPEN_END = 'OPEN_END',
-}
-
 export class Tv2GraphicsActionFactory {
   constructor(
     private readonly graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory,
@@ -346,33 +340,9 @@ export class Tv2GraphicsActionFactory {
 
   private findPieceLifespan(blueprintConfiguration: Tv2BlueprintConfiguration, templateName: string): PieceLifespan {
     const template: GraphicsTemplate | undefined = blueprintConfiguration.showStyle.graphicsTemplates.find(
-      graphic => graphic.vizTemplate ? graphic.vizTemplate.toUpperCase() === templateName.toUpperCase() : false
+      graphic => graphic.name ? graphic.name.toUpperCase() === templateName.toUpperCase() : false
     )
-    const templateOutType: TemplateOutType = this.parseTemplateOutType(template?.outType ?? '')
-    return this.getPieceLifespanFromOutType(templateOutType)
-  }
-
-  private parseTemplateOutType(template: string): TemplateOutType {
-    switch (template) {
-      case 'S':
-        return TemplateOutType.STORY
-      case 'O':
-        return TemplateOutType.OPEN_END
-      case 'B':
-      default:
-        return TemplateOutType.BACKGROUND
-    }
-  }
-
-  private getPieceLifespanFromOutType(outType: TemplateOutType): PieceLifespan {
-    switch (outType) {
-      case TemplateOutType.BACKGROUND:
-        return PieceLifespan.WITHIN_PART
-      case TemplateOutType.STORY:
-        return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
-      case TemplateOutType.OPEN_END:
-        return PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE
-    }
+    return template?.lifespan ?? PieceLifespan.WITHIN_PART
   }
 
   private getDownstreamKeyerMatchingRole(blueprintConfiguration: Tv2BlueprintConfiguration, role: Tv2DownstreamKeyerRole): Tv2DownstreamKeyer {

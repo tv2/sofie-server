@@ -3,16 +3,17 @@ import {
   BreakerTransitionEffect,
   CutTransitionEffect,
   DipTransitionEffect,
-  SplitScreenConfiguration,
   GraphicsDefault,
   GraphicsSetup,
   GraphicsTemplate,
   MixTransitionEffect,
+  SplitScreenConfiguration,
   TransitionEffect,
   TransitionEffectType,
   Tv2ShowStyleBlueprintConfiguration
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { ShowStyle } from '../../../model/entities/show-style'
+import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
 const CUT_TRANSITION_EFFECT_REGEX: RegExp = /cut/i
 const MIX_TRANSITION_EFFECT_REGEX: RegExp = /mix ?(\d+)/i
@@ -43,10 +44,8 @@ interface CoreGraphicsSetup {
 }
 
 interface CoreGraphicsTemplate {
-  VizTemplate?: string
+  VizTemplate: string
   OutType?: string
-  INewsName?: string
-  LayerMapping: string
 }
 
 interface CoreSplitScreenConfiguration {
@@ -111,12 +110,22 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   private mapGraphicsTemplates(coreGraphicsTemplates: CoreGraphicsTemplate[]): GraphicsTemplate[] {
     return coreGraphicsTemplates.map(template => {
       return {
-        vizTemplate: template.VizTemplate,
-        outType: template.OutType,
-        iNewsName: template.INewsName,
-        layerMapping: template.LayerMapping,
+        name: template.VizTemplate,
+        lifespan: this.getLifespanFromTemplateOutType(template.OutType),
       }
     })
+  }
+
+  private getLifespanFromTemplateOutType(outType?: string): PieceLifespan {
+    switch (outType) {
+      case 'S':
+        return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
+      case 'O':
+        return PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE
+      case 'B':
+      default:
+        return PieceLifespan.WITHIN_PART
+    }
   }
 
   private findSelectedGraphicsSetup(coreGraphicsDefaults: CoreGraphicsDefault[], coreGraphicsSetups: CoreGraphicsSetup[]): GraphicsSetup {
