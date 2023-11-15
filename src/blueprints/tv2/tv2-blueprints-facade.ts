@@ -40,6 +40,7 @@ import {
 import {
   Tv2GraphicsTimelineObjectFactoryFactory
 } from './timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
+import { Tv2ActionManifestMapper } from './helpers/tv2-action-manifest-mapper'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -47,6 +48,7 @@ export class Tv2BlueprintsFacade {
       new Tv2StudioBlueprintConfigurationMapper(),
       new Tv2ShowStyleBlueprintConfigurationMapper()
     )
+    const actionManifestMapper: Tv2ActionManifestMapper = new Tv2ActionManifestMapper()
     const assetPathHelper: Tv2AssetPathHelper = new Tv2AssetPathHelper()
     const stringHasConverter: Tv2StringHashConverter = new Tv2StringHashConverter()
     const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
@@ -70,18 +72,21 @@ export class Tv2BlueprintsFacade {
       ),
       new Tv2AudioActionFactory(audioTimelineObjectFactory),
       new Tv2GraphicsActionFactory(
+        actionManifestMapper,
         graphicsTimelineObjectFactoryFactory,
         audioTimelineObjectFactory,
         videoMixerTimelineObjectFactory,
         stringHasConverter
       ),
       new Tv2VideoClipActionFactory(
+        actionManifestMapper,
         videoMixerTimelineObjectFactory,
         audioTimelineObjectFactory,
         videoClipTimelineObjectFactory
       ),
       new Tv2VideoMixerConfigurationActionFactory(videoMixerTimelineObjectFactory),
       new Tv2SplitScreenActionFactory(
+        actionManifestMapper,
         videoMixerTimelineObjectFactory,
         audioTimelineObjectFactory,
         graphicsSplitScreenTimelineObjectFactory,

@@ -50,6 +50,8 @@ import {
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
+import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
+import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 
@@ -65,6 +67,7 @@ const REPLAY_SOURCE_NAME: string = 'Replay'
 export class Tv2SplitScreenActionFactory {
 
   constructor(
+    private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory,
@@ -73,7 +76,8 @@ export class Tv2SplitScreenActionFactory {
   ) {}
 
 
-  public createSplitScreenActions(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenManifestData: Tv2SplitScreenManifestData[]): Action[] {
+  public createSplitScreenActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Action[] {
+    const splitScreenManifestData: Tv2SplitScreenManifestData[] = this.actionManifestMapper.mapToSplitScreenManifestData(blueprintConfiguration, actionManifests)
     return [
       ...this.createSplitScreenLayoutActions(blueprintConfiguration),
       ...this.createInsertSplitScreenInputActions(blueprintConfiguration),

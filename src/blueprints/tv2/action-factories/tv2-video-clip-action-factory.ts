@@ -23,12 +23,15 @@ import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
+import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
+import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
 export class Tv2VideoClipActionFactory {
 
   constructor(
+    private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
@@ -73,8 +76,9 @@ export class Tv2VideoClipActionFactory {
     return videoClipAction
   }
 
-  public createVideoClipActions(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData[]): Tv2VideoClipAction[] {
-    return videoClipData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
+  public createVideoClipActions(configuration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2VideoClipAction[] {
+    const videoClipManifestData: Tv2VideoClipManifestData[] = this.actionManifestMapper.mapToVideoClipManifestData(actionManifests)
+    return videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
   }
 
   private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): Tv2VideoClipAction {
