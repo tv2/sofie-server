@@ -27,7 +27,6 @@ export interface CasparCgTemplateData {
       }
       display: string
     }
-    '260_overlay'?: object
     '450_lowerThird'?: {
       payload: {
         type: string
