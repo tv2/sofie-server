@@ -15,7 +15,8 @@ import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import {
-  Tv2VideoMixerTimelineObjectFactory
+  Tv2VideoMixerTimelineObjectFactory,
+  VideoMixerWipeTransitionSettings
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
@@ -35,7 +36,6 @@ import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration
 import {
   Tv2GraphicsCommandTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-graphics-command-timeline-object-factory'
-import { VideoMixerTransition, VideoMixerTransitionSettings } from '../value-objects/tv2-video-mixer-transition'
 import {
   Tv2GraphicsTimelineObjectFactoryFactory
 } from '../timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
@@ -301,23 +301,14 @@ export class Tv2GraphicsActionFactory {
 
     const enable: TimelineEnable = { start: blueprintConfiguration.studio.casparCgPreRollDuration }
     const sourceInput: number = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).videoMixerFillSource
-    const transitionType: VideoMixerTransition = VideoMixerTransition.WIPE
-    const transitionSettings: VideoMixerTransitionSettings = {
-      wipe: {
-        frameRate: blueprintConfiguration.studio.htmlGraphics.transitionSettings.wipeRate,
-        pattern: 1,
-        reverseDirection: true,
-        borderSoftness: blueprintConfiguration.studio.htmlGraphics.transitionSettings.borderSoftness
-      }
-    }
-    const transition: { type: VideoMixerTransition, settings: VideoMixerTransitionSettings } = {
-      type: transitionType,
-      settings: transitionSettings
+    const transitionSettings: VideoMixerWipeTransitionSettings = {
+      frameRate: blueprintConfiguration.studio.htmlGraphics.transitionSettings.wipeRate,
+      borderSoftness: blueprintConfiguration.studio.htmlGraphics.transitionSettings.borderSoftness
     }
 
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable, transition),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable, transition),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObjectWithWipeTransition(sourceInput, enable, transitionSettings),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObjectWithWipeTransition(sourceInput, enable, transitionSettings),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(sourceInput, enable),
     ]
   }

@@ -7,10 +7,19 @@ export interface AtemMeTimelineObject extends Tv2BlueprintTimelineObject {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
     me: {
-      input?: number
-      transition?: AtemTransition,
+      input: number
+      transition: AtemTransition,
       transitionSettings?: AtemTransitionSettings
-      upstreamKeyers?: AtemUpstreamKeyer[]
+    }
+  }
+}
+
+export interface AtemMeUpstreamKeyersTimelineObject extends Tv2BlueprintTimelineObject {
+  content: {
+    deviceType: DeviceType.ATEM,
+    type: AtemType.ME
+    me: {
+      upstreamKeyers: AtemUpstreamKeyer[]
     }
   }
 }
@@ -182,10 +191,31 @@ export interface AtemTransitionSettings {
     /** 1 - 250 frames */
     rate?: number;
     /** 0 - 17 */
-    pattern?: number;
+    pattern?: AtemMeWipePattern;
     /** 0 - 10000 */
     borderSoftness?: number;
     reverseDirection?: boolean;
     //...
   }
+}
+
+export enum AtemMeWipePattern {
+  LEFT_TO_RIGHT_BAR = 0,
+  TOP_TO_BOTTOM_BAR = 1,
+  HORIZONTAL_BARN_DOOR = 2,
+  VERTICAL_BARN_DOOR = 3,
+  CORNERS_IN_FOUR_BOX = 4,
+  RECTANGLE_IRIS = 5,
+  DIAMOND_IRIS = 6,
+  CIRCLE_IRIS = 7,
+  TOP_LEFT_BOX = 8,
+  TOP_RIGHT_BOX = 9,
+  BOTTOM_RIGHT_BOX = 10,
+  BOTTOM_LEFT_BOX = 11,
+  TOP_CENTRE_BOX = 12,
+  RIGHT_CENTRE_BOX = 13,
+  BOTTOM_CENTRE_BOX = 14,
+  LEFT_CENTRE_BOX = 15,
+  TOP_LEFT_DIAGONAL = 16,
+  TOP_RIGHT_DIAGONAL = 17
 }
