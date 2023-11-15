@@ -8,11 +8,12 @@ import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-con
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
 import { Piece } from '../../../../model/entities/piece'
 import { Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
-import { VideoMixerTransition, VideoMixerTransitionSettings } from '../../value-objects/tv2-video-mixer-transition'
 
 export interface Tv2VideoMixerTimelineObjectFactory {
-  createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, transition?: {type: VideoMixerTransition, settings: VideoMixerTransitionSettings}): Tv2BlueprintTimelineObject
-  createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, transition?: {type: VideoMixerTransition, settings: VideoMixerTransitionSettings}): Tv2BlueprintTimelineObject
+  createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): Tv2BlueprintTimelineObject
+  createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): Tv2BlueprintTimelineObject
+  createProgramTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject
+  createCleanFeedTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject
   createLookaheadTimelineObject( sourceInput: number, enable: TimelineEnable): Tv2BlueprintTimelineObject
   createAuxTimelineObject(sourceInput: number, layer: Tv2VideoMixerLayer): Tv2BlueprintTimelineObject
   createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): Tv2BlueprintTimelineObject
@@ -25,4 +26,9 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   getSplitScreenBoxesLayer(): string
   getSplitScreenSourceInput(): number
   findProgramSourceInputFromPiece(piece: Piece): number | undefined
+}
+
+export interface VideoMixerWipeTransitionSettings {
+  frameRate: number
+  borderSoftness: number
 }
