@@ -72,7 +72,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(Tv2GraphicsLayer.GRAPHICS_PILOT)]: {
           payload: {
             type: 'still',
-            url: encodeURI(this.assetPathHelper.replaceForwardSlashWithDoubleBackslash(absoluteFilePath)),
+            url: encodeURI(this.assetPathHelper.escapePath(this.assetPathHelper.convertUnixPathToWindowsPath(absoluteFilePath))),
             noAnimation: false
           },
           display: 'program',
