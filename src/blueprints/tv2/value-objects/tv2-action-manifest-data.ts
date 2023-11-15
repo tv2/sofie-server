@@ -91,8 +91,6 @@ export interface Tv2SplitScreenManifestData {
   sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound>
 }
 
-export type Tv2GraphicsManifestData = Tv2FullscreenGraphicsManifestData | Tv2OverlayGraphicsManifestData
-
 export interface Tv2FullscreenGraphicsManifestData {
   vcpId: number
   name: string,

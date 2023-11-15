@@ -228,8 +228,8 @@ export class Tv2StudioBlueprintConfigurationMapper {
       msKeepOldPartAliveBeforeTakingGraphics: coreGraphics.KeepAliveDuration,
       graphicsUrl: coreGraphics.GraphicURL,
       transitionSettings: {
-        wipeRate: coreGraphics.TransitionSettings.wipeRate,
-        borderSoftness: coreGraphics.TransitionSettings.borderSoftness
+        wipeRate: coreGraphics.TransitionSettings ? coreGraphics.TransitionSettings.wipeRate : 0,
+        borderSoftness: coreGraphics.TransitionSettings ? coreGraphics.TransitionSettings.borderSoftness: 0
       }
     }
   }
