@@ -18,6 +18,13 @@ import {
   Tv2VideoClipManifestData
 } from '../value-objects/tv2-action-manifest-data'
 
+enum CasparCgSlot {
+  FULL_GRAPHICS = '250_full',
+  IDENT = '650_ident',
+  LOWER_THIRD = '450_lowerThird',
+  UNKNOWN = ''
+}
+
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
   constructor(private readonly casparCgPathFixer: Tv2AssetPathHelper) {}
 
@@ -107,13 +114,12 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
     }
   }
 
-  private mapTv2GraphicsLayerToHtmlGraphicsSlot(layer: Tv2GraphicsLayer): string {
+  private mapTv2GraphicsLayerToHtmlGraphicsSlot(layer: Tv2GraphicsLayer): CasparCgSlot {
     switch (layer) {
-      case Tv2GraphicsLayer.GRAPHICS_PILOT: return '250_full'
-      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_PILOT: return '260_overlay'
-      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT: return '650_ident'
-      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER: return '450_lowerThird'
-      default: return ''
+      case Tv2GraphicsLayer.GRAPHICS_PILOT: return CasparCgSlot.FULL_GRAPHICS
+      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT: return CasparCgSlot.IDENT
+      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER: return CasparCgSlot.LOWER_THIRD
+      default: return CasparCgSlot.UNKNOWN
     }
   }
 
