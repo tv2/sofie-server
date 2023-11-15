@@ -31,14 +31,14 @@ export class Tv2CasparCgTimelineObjectFactory {
     }
   }
 
-  public createDveKeyTimelineObject(keyFilePath: string): CasparCgMediaTimelineObject {
+  public createSplitScreenKeyTimelineObject(keyFilePath: string): CasparCgMediaTimelineObject {
     return {
-      id: 'casparCg_dve_key',
+      id: 'casparCg_split_screen_key',
       enable: {
         start: 0
       },
       priority: 1,
-      layer: Tv2CasparCgLayer.DVE_KEY,
+      layer: Tv2CasparCgLayer.SPLIT_SCREEN_KEY,
       content: {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
@@ -51,14 +51,14 @@ export class Tv2CasparCgTimelineObjectFactory {
     }
   }
 
-  public createDveFrameTimelineObject(frameFilePath: string): CasparCgMediaTimelineObject {
+  public createSplitScreenFrameTimelineObject(frameFilePath: string): CasparCgMediaTimelineObject {
     return {
-      id: 'casparCg_dve_frame',
+      id: 'casparCg_split_screen_frame',
       enable: {
         start: 0
       },
       priority: 1,
-      layer: Tv2CasparCgLayer.DVE_FRAME,
+      layer: Tv2CasparCgLayer.SPLIT_SCREEN_FRAME,
       content: {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
@@ -68,7 +68,7 @@ export class Tv2CasparCgTimelineObjectFactory {
     }
   }
 
-  public createDveLocatorTimelineObject(): CasparCgTemplateTimelineObject {
+  public createSplitScreenLocatorTimelineObject(): CasparCgTemplateTimelineObject {
     return {
       id: 'casparCg_locators',
       enable: {
