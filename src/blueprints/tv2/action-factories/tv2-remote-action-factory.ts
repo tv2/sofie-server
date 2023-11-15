@@ -26,6 +26,7 @@ import {
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 
 export class Tv2RemoteActionFactory {
   constructor(
@@ -47,7 +48,7 @@ export class Tv2RemoteActionFactory {
 
   private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
     const partId: string = `remoteInsertActionPart_${remoteSource.id}`
-    const remotePieceInterface: PieceInterface = this.createRemotePiece(configuration, remoteSource, partId)
+    const remotePieceInterface: Tv2PieceInterface = this.createRemotePieceInterface(configuration, remoteSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
     return {
       id: `remoteAsNextAction_${remoteSource.id}`,
@@ -65,7 +66,7 @@ export class Tv2RemoteActionFactory {
     }
   }
 
-  private createRemotePiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): PieceInterface {
+  private createRemotePieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2PieceInterface {
     const videoMixerTimelineObjects: TimelineObject[] = this.createVideoMixerTimelineObjects(source)
     const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 

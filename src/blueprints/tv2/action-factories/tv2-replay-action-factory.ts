@@ -19,6 +19,7 @@ import {
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
+import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -132,6 +133,7 @@ export class Tv2ReplayActionFactory {
 
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.REPLAY,
+      outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: audioMode == Tv2AudioMode.VOICE_OVER
@@ -192,7 +194,8 @@ export class Tv2ReplayActionFactory {
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.videoMixerSource, Tv2VideoMixerLayer.AR)
       ],
       metadata: {
-        type: Tv2PieceType.REPLAY
+        type: Tv2PieceType.REPLAY,
+        outputLayer: Tv2OutputLayer.AUXILIARY
       }
     }
   }
@@ -233,7 +236,8 @@ export class Tv2ReplayActionFactory {
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.videoMixerSource, Tv2VideoMixerLayer.VIZ_OVERLAY_AUXILIARY)
       ],
       metadata: {
-        type: Tv2PieceType.REPLAY
+        type: Tv2PieceType.REPLAY,
+        outputLayer: Tv2OutputLayer.AUXILIARY
       }
     }
   }

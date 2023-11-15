@@ -12,7 +12,7 @@ export interface Tv2StudioBlueprintConfiguration {
   graphicsFolder: Tv2FolderConfiguration
   selectedGraphicsType: Tv2GraphicsType
   vizPilotGraphics: Tv2VizPilotGraphics
-  htmlGraphics: Tv2HtmlGraphics
+  htmlGraphics?: Tv2HtmlGraphics
   preventOverlayWhileFullscreenGraphicsIsOnAir: boolean
 }
 

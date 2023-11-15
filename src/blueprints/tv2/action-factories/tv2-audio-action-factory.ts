@@ -142,7 +142,7 @@ export class Tv2AudioActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO,
+        contentType: Tv2ActionContentType.AUDIO
       },
     }
   }
