@@ -13,6 +13,7 @@ import {
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
+import { Tv2ActionManifestMapper } from '../../helpers/tv2-action-manifest-mapper'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   it('compiles', () => {
@@ -21,6 +22,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
 })
 
 function createTestee(params?: {
+  actionManifestMapper?: Tv2ActionManifestMapper,
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
   audioTimelineObjectFactory?: Tv2AudioTimelineObjectFactory,
   graphicsSplitScreenTimelineObjectFactory?: Tv2GraphicsSplitScreenTimelineObjectFactory,
@@ -28,6 +30,7 @@ function createTestee(params?: {
   assetPathHelper?: Tv2AssetPathHelper
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
+    params?.actionManifestMapper ?? instance(mock(Tv2ActionManifestMapper)),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioTimelineObjectFactory>()),
     params?.graphicsSplitScreenTimelineObjectFactory ?? instance(mock<Tv2GraphicsSplitScreenTimelineObjectFactory>()),

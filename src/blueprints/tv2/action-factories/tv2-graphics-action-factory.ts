@@ -39,18 +39,26 @@ import { VideoMixerTransition, VideoMixerTransitionSettings } from '../value-obj
 import {
   Tv2GraphicsTimelineObjectFactoryFactory
 } from '../timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
+import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
+import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 
 export class Tv2GraphicsActionFactory {
+
   constructor(
+    private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly stringHashConverter: Tv2StringHashConverter
   ) { }
 
-  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[], overlayGraphicsData: Tv2OverlayGraphicsManifestData[]): Action[] {
+  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Action[] {
     const commandTimelineObjectFactory: Tv2GraphicsCommandTimelineObjectFactory = this.graphicsTimelineObjectFactoryFactory.createGraphicsCommandTimelineObjectFactory(blueprintConfiguration)
     const elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory = this.graphicsTimelineObjectFactoryFactory.createGraphicsElementTimelineObjectFactory(blueprintConfiguration)
+
+    const fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[] = this.actionManifestMapper.mapToFullscreenGraphicsManifestData(actionManifests)
+    const overlayGraphicsData: Tv2OverlayGraphicsManifestData[] = this.actionManifestMapper.mapToOverlayGraphicsData(actionManifests)
+
 
     return [
       this.createThemeOutAction(blueprintConfiguration, commandTimelineObjectFactory),
