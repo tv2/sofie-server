@@ -1,5 +1,5 @@
 export interface Tv2StudioBlueprintConfiguration {
-  cameraeSources: Tv2SourceMappingWithSound[]
+  cameraSources: Tv2SourceMappingWithSound[]
   remoteSources: Tv2SourceMappingWithSound[]
   replaySources: Tv2SourceMappingWithSound[]
   studioMicrophones: string[]

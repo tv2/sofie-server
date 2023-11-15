@@ -105,7 +105,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
   public mapStudioConfiguration(studio: Studio): Tv2StudioBlueprintConfiguration {
     const coreConfiguration: CoreStudioBlueprintConfiguration = { ...(studio.blueprintConfiguration as CoreStudioBlueprintConfiguration) }
     return {
-      cameraeSources: this.mapSourcesWithSound(coreConfiguration.SourcesCam),
+      cameraSources: this.mapSourcesWithSound(coreConfiguration.SourcesCam),
       remoteSources: this.mapSourcesWithSound(coreConfiguration.SourcesRM),
       replaySources: this.mapSourcesWithSound(coreConfiguration.SourcesReplay),
       studioMicrophones: coreConfiguration.StudioMics,
