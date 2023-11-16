@@ -10,10 +10,10 @@ export enum VideoMixerTransition {
 
 export interface VideoMixerTransitionSettings {
   mix?: {
-    rate: number
+    frameRate: number
   }
   dip?: {
-    rate: number,
+    frameRate: number,
     input: number
   },
   wipe?: {

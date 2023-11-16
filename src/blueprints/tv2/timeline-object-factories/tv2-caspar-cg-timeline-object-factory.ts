@@ -22,7 +22,7 @@ enum CasparCgSlot {
   FULL_GRAPHICS = '250_full',
   IDENT = '650_ident',
   LOWER_THIRD = '450_lowerThird',
-  UNKNOWN = ''
+  UNKNOWN = 'UNKNOWN'
 }
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
