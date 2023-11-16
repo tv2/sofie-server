@@ -392,6 +392,7 @@ export class Tv2SplitScreenActionFactory {
       return {
         id: `plannedSplitScreenAsNextAction_${data.name.replace(/\s/g, '')}`,
         name: data.template,
+        rundownId: data.rundownId,
         description: '',
         type: PartActionType.INSERT_PART_AS_NEXT,
         metadata: {

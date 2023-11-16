@@ -4,4 +4,5 @@ import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
 export interface Tv2VideoClipTimelineObjectFactory {
   createVideoClipTimelineObject(videoClipData: Tv2VideoClipManifestData): Tv2BlueprintTimelineObject
   createBreakerTimelineObject(file: string): Tv2BlueprintTimelineObject
+  createFadeAudioBedTimelineObject(fadeDurationInMilliseconds: number): Tv2BlueprintTimelineObject
 }

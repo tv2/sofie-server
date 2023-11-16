@@ -33,6 +33,7 @@ export class Tv2ActionManifestMapper {
         const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
         return {
           name: data.name,
+          rundownId: actionManifest.rundownId,
           template: data.config.template,
           sources
         }
@@ -97,7 +98,8 @@ export class Tv2ActionManifestMapper {
         const data: Tv2ActionManifestFullscreenGraphicsData = actionManifest.data
         return {
           name: data.name,
-          vcpId: data.vcpid,
+          rundownId: actionManifest.rundownId,
+          vcpId: data.vcpid
         }
       })
   }
@@ -109,6 +111,7 @@ export class Tv2ActionManifestMapper {
         const data: Tv2ActionManifestOverlayGraphicsData = actionManifest.data
         return {
           name: data.name,
+          rundownId: actionManifest.rundownId,
           sourceLayerId: data.sourceLayerId,
           templateName: this.getTemplateName(data.name),
           displayText: this.getDisplayText(data.name),
