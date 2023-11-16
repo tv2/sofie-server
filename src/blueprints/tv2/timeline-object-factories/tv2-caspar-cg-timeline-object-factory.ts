@@ -18,8 +18,15 @@ import {
   Tv2VideoClipManifestData
 } from '../value-objects/tv2-action-manifest-data'
 
+enum CasparCgSlot {
+  FULL_GRAPHICS = '250_full',
+  IDENT = '650_ident',
+  LOWER_THIRD = '450_lowerThird',
+  UNKNOWN = 'UNKNOWN'
+}
+
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObjectFactory {
-  constructor(private readonly casparCgPathFixer: Tv2AssetPathHelper) {}
+  constructor(private readonly assetPathHelper: Tv2AssetPathHelper) {}
 
   public createAllOutGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, duration: number): TimelineObject {
     throw new UnsupportedOperation(
@@ -60,7 +67,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
     const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.GraphicFolder
     const nameChunks: string[] = fullscreenGraphicsData.name.split('/')
     const sceneName: string = nameChunks[nameChunks.length - 1]
-    const fileName: string = this.casparCgPathFixer.joinAssetToFolder(sceneName, rawGraphicsFolder)
+    const fileName: string = this.assetPathHelper.joinAssetToFolder(sceneName, rawGraphicsFolder)
 
     return {
       id: 'full',
@@ -73,7 +80,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.TEMPLATE,
         templateType: 'html',
-        name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
+        name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
         data: this.createFullscreenTemplateData(blueprintConfiguration, fileName),
         useStopCommand: false,
         mixer: {
@@ -97,7 +104,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
         [this.mapTv2GraphicsLayerToHtmlGraphicsSlot(Tv2GraphicsLayer.GRAPHICS_PILOT)]: {
           payload: {
             type: 'still',
-            url: encodeURI(this.casparCgPathFixer.replaceForwardSlashWithDoubleBackslash(absoluteFilePath)),
+            url: encodeURI(this.assetPathHelper.escapePath(this.assetPathHelper.convertUnixPathToWindowsPath(absoluteFilePath))),
             noAnimation: false
           },
           display: 'program',
@@ -107,13 +114,12 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
     }
   }
 
-  private mapTv2GraphicsLayerToHtmlGraphicsSlot(layer: Tv2GraphicsLayer): string {
+  private mapTv2GraphicsLayerToHtmlGraphicsSlot(layer: Tv2GraphicsLayer): CasparCgSlot {
     switch (layer) {
-      case Tv2GraphicsLayer.GRAPHICS_PILOT: return '250_full'
-      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_PILOT: return '260_overlay'
-      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT: return '650_ident'
-      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER: return '450_lowerThird'
-      default: return ''
+      case Tv2GraphicsLayer.GRAPHICS_PILOT: return CasparCgSlot.FULL_GRAPHICS
+      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT: return CasparCgSlot.IDENT
+      case Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER: return CasparCgSlot.LOWER_THIRD
+      default: return CasparCgSlot.UNKNOWN
     }
   }
 
@@ -138,7 +144,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
       deviceType: DeviceType.CASPAR_CG,
       type: CasparCgType.TEMPLATE,
       templateType: 'html',
-      name: this.casparCgPathFixer.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
+      name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
       useStopCommand: false,
       mixer: {
         opacity: 100
@@ -190,14 +196,14 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
     }
   }
 
-  public createDveKeyTimelineObject(keyFilePath: string): CasparCgMediaTimelineObject {
+  public createSplitScreenKeyTimelineObject(keyFilePath: string): CasparCgMediaTimelineObject {
     return {
-      id: 'casparCg_dve_key',
+      id: 'casparCg_split_screen_key',
       enable: {
         start: 0
       },
       priority: 1,
-      layer: Tv2CasparCgLayer.DVE_KEY,
+      layer: Tv2CasparCgLayer.SPLIT_SCREEN_KEY,
       content: {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
@@ -210,14 +216,14 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
     }
   }
 
-  public createDveFrameTimelineObject(frameFilePath: string): CasparCgMediaTimelineObject {
+  public createSplitScreenFrameTimelineObject(frameFilePath: string): CasparCgMediaTimelineObject {
     return {
-      id: 'casparCg_dve_frame',
+      id: 'casparCg_split_screen_frame',
       enable: {
         start: 0
       },
       priority: 1,
-      layer: Tv2CasparCgLayer.DVE_FRAME,
+      layer: Tv2CasparCgLayer.SPLIT_SCREEN_FRAME,
       content: {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
@@ -227,7 +233,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsTimelineObje
     }
   }
 
-  public createDveLocatorTimelineObject(): CasparCgTemplateTimelineObject {
+  public createSplitScreenLocatorTimelineObject(): CasparCgTemplateTimelineObject {
     return {} as CasparCgTemplateTimelineObject
     // TODO: RKLI Should implement this
     // return {
