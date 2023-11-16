@@ -33,7 +33,7 @@ export class Tv2AudioActionFactory {
 
   public isAudioAction(action: Tv2Action): boolean {
     const actionSubType: Tv2ActionSubtype | undefined = action.metadata.actionSubtype
-    return  actionSubType !== undefined && [Tv2ActionSubtype.FADE_AUDIO_BED].includes(actionSubType)
+    return actionSubType !== undefined && [Tv2ActionSubtype.FADE_AUDIO_BED].includes(actionSubType)
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {

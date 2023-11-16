@@ -15,6 +15,38 @@ export interface Tv2StudioBlueprintConfiguration {
     fadeOut: number,
     volume: number
   }
+  GraphicsType: Tv2GraphicsType
+  VizPilotGraphics: Tv2VizGraphics
+  HTMLGraphics?: Tv2HtmlGraphics
+  PreventOverlayWithFull: boolean
+  GraphicFolder?: string
+  GraphicFileExtension: string
+  GraphicMediaFlowId: string
+  GraphicIgnoreStatus: boolean
+  GraphicNetworkBasePath: string
+}
+
+export enum Tv2GraphicsType {
+  VIZ = 'VIZ',
+  HTML = 'HTML'
+}
+
+export interface Tv2VizGraphics {
+  CleanFeedPrerollDuration?: number
+  KeepAliveDuration: number
+  PrerollDuration: number
+  OutTransitionDuration: number
+  CutToMediaPlayer: number
+  FullGraphicBackground: number
+}
+
+export interface Tv2HtmlGraphics {
+  KeepAliveDuration: number
+  GraphicURL: string
+  TransitionSettings: {
+    wipeRate: number,
+    borderSoftness: number
+  }
 }
 
 export interface Tv2SourceMapping {

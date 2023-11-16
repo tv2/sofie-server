@@ -37,12 +37,12 @@ export class ExecuteActionService implements ActionService {
     private readonly blueprint: Blueprint
   ) {}
 
-  public async getActions(): Promise<Action[]> {
+  public async getActions(rundownId: string): Promise<Action[]> {
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    // TODO: Only fetch ActionManifest for a given Rundown
-    const actionManifest: ActionManifest[] = await this.actionManifestRepository.getActionManifests()
+    const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests(rundownId)
     // TODO: The Actions should be generated on ingest. Move them once we control ingest.
-    const actions: Action[] = this.blueprint.generateActions(configuration, actionManifest)
+    const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
+    await this.actionRepository.deleteActionsForRundown(rundownId)
     await this.actionRepository.saveActions(actions)
     return actions
   }

@@ -15,8 +15,9 @@ import { RundownRepository } from '../../../data-access/repositories/interfaces/
 import { Blueprint } from '../../../model/value-objects/blueprint'
 import { anyOfClass, anyString, anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
-import { ActionManifestRepository } from '../../../data-access/repositories/interfaces/action-manifest-repository'
+import { ActionManifestsRepository } from '../../../data-access/repositories/interfaces/action-manifests-repository'
 import { MediaRepository } from '../../../data-access/repositories/interfaces/MediaRepository'
+import { ActionManifestRepository } from '../../../data-access/repositories/interfaces/action-manifest-repository'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { Rundown } from '../../../model/entities/rundown'
 import { Owner } from '../../../model/enums/owner'
@@ -360,6 +361,7 @@ function createPieceAction(actionType: PieceActionType): PieceAction {
 
 function createTestee(
   params?: {
+    manifestRepository?: ActionManifestsRepository
     configurationRepository?: ConfigurationRepository,
     actionRepository?: ActionRepository,
     actionManifestRepository?: ActionManifestRepository,

@@ -29,14 +29,14 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { SplitScreenBoxInput, Tv2SplitScreenManifestData, Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
-import { MisconfigurationException } from '../../../model/exceptions/misconfiguration-exception'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2UnavailableOperationException } from '../exceptions/tv2-unavailable-operation-exception'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { A_B_SOURCE_INPUT_PLACEHOLDER } from '../value-objects/tv2-a-b-source-layers'
 import { Tv2FileContent } from '../value-objects/tv2-content'
-import { AssetFolderHelper } from '../helpers/asset-folder-helper'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
+import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
@@ -56,7 +56,7 @@ export class Tv2SplitScreenActionFactory {
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
-    private readonly assetFolderHelper: AssetFolderHelper
+    private readonly assetPathHelper: Tv2AssetPathHelper
   ) {}
 
 
@@ -137,8 +137,8 @@ export class Tv2SplitScreenActionFactory {
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(splitScreenSource, timelineEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(splitScreenSource, timelineEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, timelineEnable),
-        this.casparCgTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, splitScreenConfiguration.key)),
-        this.casparCgTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, splitScreenConfiguration.frame)),
+        this.casparCgTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.DVEFolder)),
+        this.casparCgTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.frame, blueprintConfiguration.studio.DVEFolder)),
         this.casparCgTimelineObjectFactory.createSplitScreenLocatorTimelineObject()
       ]
 
@@ -324,7 +324,7 @@ export class Tv2SplitScreenActionFactory {
     return splitScreenManifestData.map(data => {
       const splitScreenConfiguration: SplitScreenConfiguration | undefined = blueprintConfiguration.showStyle.splitScreenConfigurations.find(splitScreenConfiguration => splitScreenConfiguration.name.toLowerCase() === data.template.toLowerCase())
       if (!splitScreenConfiguration) {
-        throw new MisconfigurationException(`No configured split screen found for planned split screen action ${data.name}`)
+        throw new Tv2MisconfigurationException(`No configured split screen found for planned split screen action ${data.name}`)
       }
 
       const partId: string = `plannedSplitScreenInsertActionPart_${splitScreenConfiguration.name}`
@@ -365,8 +365,8 @@ export class Tv2SplitScreenActionFactory {
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
-        this.casparCgTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, splitScreenConfiguration.key)),
-        this.casparCgTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetFolderHelper.joinAssetToFolder(blueprintConfiguration.studio.DVEFolder, splitScreenConfiguration.frame)),
+        this.casparCgTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.DVEFolder)),
+        this.casparCgTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.frame, blueprintConfiguration.studio.DVEFolder)),
         this.casparCgTimelineObjectFactory.createSplitScreenLocatorTimelineObject(),
         ...audioTimelineObjects
       ]
@@ -374,6 +374,7 @@ export class Tv2SplitScreenActionFactory {
       return {
         id: `plannedSplitScreenAsNextAction_${data.name.replace(/\s/g, '')}`,
         name: data.template,
+        rundownId: data.rundownId,
         description: '',
         type: PartActionType.INSERT_PART_AS_NEXT,
         metadata: {
