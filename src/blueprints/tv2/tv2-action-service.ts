@@ -15,20 +15,20 @@ import {
 } from './action-factories/tv2-video-mixer-configuration-action-factory'
 import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import {
-  DveBoxInput,
+  SplitScreenBoxInput,
   Tv2ActionManifestData,
-  Tv2ActionManifestDataForDve,
+  Tv2ActionManifestDataForSplitScreen,
   Tv2ActionManifestDataForFullscreenGraphics,
   Tv2ActionManifestDataForOverlayGraphics,
   Tv2ActionManifestDataForVideoClip,
-  Tv2ActionManifestDveSource,
-  Tv2DveManifestData,
+  Tv2ActionManifestSplitScreenSource,
+  Tv2SplitScreenManifestData,
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData,
   Tv2VideoClipManifestData,
-  TvActionManifestDveSourceType
+  TvActionManifestSplitScreenSourceType
 } from './value-objects/tv2-action-manifest-data'
-import { Tv2DveActionFactory } from './action-factories/tv2-dve-action-factory'
+import { Tv2SplitScreenActionFactory } from './action-factories/tv2-split-screen-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
 import { Tv2Action } from './value-objects/tv2-action'
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
@@ -49,7 +49,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly graphicsActionFactory: Tv2GraphicsActionFactory,
     private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
     private readonly videoMixerActionFactory: Tv2VideoMixerConfigurationActionFactory,
-    private readonly dveActionFactory: Tv2DveActionFactory,
+    private readonly splitScreenActionFactory: Tv2SplitScreenActionFactory,
     private readonly replayActionFactory: Tv2ReplayActionFactory
   ) {}
 
@@ -60,8 +60,11 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.videoClipActionFactory.isVideoClipAction(action)) {
       return this.videoClipActionFactory.getMutateActionMethods(action)
     }
-    if (this.dveActionFactory.isDveAction(action)) {
-      return this.dveActionFactory.getMutateActionMethods(action)
+    if (this.splitScreenActionFactory.isSplitScreenAction(action)) {
+      return this.splitScreenActionFactory.getMutateActionMethods(action)
+    }
+    if(this.remoteActionFactory.isRemoteAction(action)) {
+      return this.remoteActionFactory.getMutateActionMethods(action)
     }
     return []
   }
@@ -80,7 +83,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, this.getFullscreenGraphicsData(actionManifests), this.getOverlayGraphicsData(actionManifests)),
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
       ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration),
-      ...this.dveActionFactory.createDveActions(blueprintConfiguration, this.getDveData(blueprintConfiguration, actionManifests)),
+      ...this.splitScreenActionFactory.createSplitScreenActions(blueprintConfiguration, this.getSplitScreenData(blueprintConfiguration, actionManifests)),
       ...this.replayActionFactory.createReplayActions(blueprintConfiguration)
     ]
   }
@@ -162,12 +165,12 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     }
   }
 
-  private getDveData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: ActionManifest[]): Tv2DveManifestData[] {
+  private getSplitScreenData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: ActionManifest[]): Tv2SplitScreenManifestData[] {
     return actionManifests
-      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestDataForDve> => this.getPieceTypeFromActionManifest(actionManifest) === Tv2PieceType.SPLIT_SCREEN)
+      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestDataForSplitScreen> => this.getPieceTypeFromActionManifest(actionManifest) === Tv2PieceType.SPLIT_SCREEN)
       .map(actionManifest => {
-        const data: Tv2ActionManifestDataForDve = actionManifest.data
-        const sources: Map<DveBoxInput, Tv2SourceMappingWithSound> = this.getDveSourcesFromActionManifestData(data, blueprintConfiguration)
+        const data: Tv2ActionManifestDataForSplitScreen = actionManifest.data
+        const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
         return {
           rundownId: actionManifest.rundownId,
           name: data.name,
@@ -177,38 +180,38 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       })
   }
 
-  private getDveSourcesFromActionManifestData(data: Tv2ActionManifestDataForDve, blueprintConfiguration: Tv2BlueprintConfiguration): Map<DveBoxInput, Tv2SourceMappingWithSound> {
-    const sources: Map<DveBoxInput, Tv2SourceMappingWithSound> = new Map()
+  private getSplitScreenSourcesFromActionManifestData(data: Tv2ActionManifestDataForSplitScreen, blueprintConfiguration: Tv2BlueprintConfiguration): Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> {
+    const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = new Map()
     if (data.config.sources.INP1) {
-      sources.set(DveBoxInput.INPUT_1, this.mapActionManifestDveSourceToSource(blueprintConfiguration, data.config.sources.INP1))
+      sources.set(SplitScreenBoxInput.INPUT_1, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.config.sources.INP1))
     }
     if (data.config.sources.INP2) {
-      sources.set(DveBoxInput.INPUT_2, this.mapActionManifestDveSourceToSource(blueprintConfiguration, data.config.sources.INP2))
+      sources.set(SplitScreenBoxInput.INPUT_2, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.config.sources.INP2))
     }
     if (data.config.sources.INP3) {
-      sources.set(DveBoxInput.INPUT_3, this.mapActionManifestDveSourceToSource(blueprintConfiguration, data.config.sources.INP3))
+      sources.set(SplitScreenBoxInput.INPUT_3, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.config.sources.INP3))
     }
     if (data.config.sources.INP4) {
-      sources.set(DveBoxInput.INPUT_4, this.mapActionManifestDveSourceToSource(blueprintConfiguration, data.config.sources.INP4))
+      sources.set(SplitScreenBoxInput.INPUT_4, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.config.sources.INP4))
     }
     return sources
   }
 
-  private mapActionManifestDveSourceToSource(blueprintConfiguration: Tv2BlueprintConfiguration, dveSource: Tv2ActionManifestDveSource): Tv2SourceMappingWithSound {
+  private mapActionManifestSplitScreenSourceToSource(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenSource: Tv2ActionManifestSplitScreenSource): Tv2SourceMappingWithSound {
     let sources: Tv2SourceMappingWithSound[] = []
-    switch (dveSource.sourceType) {
-      case TvActionManifestDveSourceType.CAMERA: {
+    switch (splitScreenSource.sourceType) {
+      case TvActionManifestSplitScreenSourceType.CAMERA: {
         sources = blueprintConfiguration.studio.SourcesCam
         break
       }
-      case TvActionManifestDveSourceType.LIVE: {
+      case TvActionManifestSplitScreenSourceType.LIVE: {
         sources = blueprintConfiguration.studio.SourcesRM
         break
       }
     }
-    const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.SourceName === dveSource.id)
+    const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.SourceName === splitScreenSource.id)
     if (!source) {
-      throw new Tv2MisconfigurationException(`No Source Mapping found for DVE source ${dveSource.sourceType} ${dveSource.id}`)
+      throw new Tv2MisconfigurationException(`No Source Mapping found for split screen source ${splitScreenSource.sourceType} ${splitScreenSource.id}`)
     }
     return source
   }
