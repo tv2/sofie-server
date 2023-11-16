@@ -4,9 +4,7 @@ import { Tv2EndStateForPartService } from './tv2-end-state-for-part-service'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
 import { Tv2OnTimelineGenerateService } from './tv2-on-timeline-generate-service'
 import { Tv2ActionService } from './tv2-action-service'
-import {
-  Tv2VizGraphicsTimelineObjectFactory
-} from './timeline-object-factories/tv2-viz-graphics-timeline-object-factory'
+import { Tv2VizTimelineObjectFactory } from './timeline-object-factories/tv2-viz-timeline-object-factory'
 import {
   Tv2SisyfosAudioTimelineObjectFactory
 } from './timeline-object-factories/tv2-sisyfos-audio-timeline-object-factory'
@@ -20,30 +18,29 @@ import { Tv2GraphicsActionFactory } from './action-factories/tv2-graphics-action
 import {
   Tv2VideoMixerConfigurationActionFactory
 } from './action-factories/tv2-video-mixer-configuration-action-factory'
-import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { Tv2AudioTimelineObjectFactory } from './timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
-import {
-  Tv2GraphicsTimelineObjectFactory
-} from './timeline-object-factories/interfaces/tv2-graphics-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from './timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
+import { Tv2AssetPathHelper } from './helpers/tv2-asset-path-helper'
+import { Tv2VideoClipActionFactory } from './action-factories/tv2-video-clip-action-factory'
 import { Tv2SplitScreenActionFactory } from './action-factories/tv2-split-screen-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
-import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
-import { AssetFolderHelper } from './helpers/asset-folder-helper'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
+import { Tv2StringHashConverter } from './helpers/tv2-string-hash-converter'
+import { Tv2CasparCgTimelineObjectFactory } from './timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
+    const assetPathHelper: Tv2AssetPathHelper = new Tv2AssetPathHelper()
+    const tv2StringHasConverter: Tv2StringHashConverter = new Tv2StringHashConverter()
     const tv2SisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
-    const tv2AudioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
-    const tv2GraphicsTimelineObjectFactory: Tv2GraphicsTimelineObjectFactory = new Tv2VizGraphicsTimelineObjectFactory()
-    const tv2VideoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
-    const tv2CasparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory()
 
-    const assetFolderHelper: AssetFolderHelper = new AssetFolderHelper()
+    const tv2AudioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
+    const tv2VizGraphicsTimelineObjectFactory: Tv2VizTimelineObjectFactory = new Tv2VizTimelineObjectFactory()
+    const tv2CasparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
+    const tv2VideoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
 
     const actionService: Tv2ActionService = new Tv2ActionService(
       new Tv2BlueprintConfigurationMapper(),
@@ -53,10 +50,17 @@ export class Tv2BlueprintsFacade {
         tv2VideoMixerTimelineObjectFactory,
         tv2CasparCgTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
-        assetFolderHelper
+        assetPathHelper
       ),
       new Tv2AudioActionFactory(tv2AudioTimelineObjectFactory),
-      new Tv2GraphicsActionFactory(tv2GraphicsTimelineObjectFactory),
+      new Tv2GraphicsActionFactory(
+        tv2VizGraphicsTimelineObjectFactory,
+        tv2CasparCgTimelineObjectFactory,
+        tv2AudioTimelineObjectFactory,
+        tv2VideoMixerTimelineObjectFactory,
+        assetPathHelper,
+        tv2StringHasConverter
+      ),
       new Tv2VideoClipActionFactory(
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
@@ -67,7 +71,7 @@ export class Tv2BlueprintsFacade {
         tv2VideoMixerTimelineObjectFactory,
         tv2AudioTimelineObjectFactory,
         tv2CasparCgTimelineObjectFactory,
-        assetFolderHelper
+        assetPathHelper
       ),
       new Tv2ReplayActionFactory(tv2VideoMixerTimelineObjectFactory, tv2AudioTimelineObjectFactory)
     )

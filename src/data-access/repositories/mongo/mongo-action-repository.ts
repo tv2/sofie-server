@@ -23,7 +23,7 @@ export class MongoActionRepository extends BaseMongoRepository implements Action
   public async saveActions(actions: Action[]): Promise<void> {
     await Promise.all(
       actions.map(action =>
-        this.getCollection().updateOne({ _id: action.id }, { $set: action }, { upsert: true })
+        this.getCollection().updateOne({ _id: action.id }, { $set: action }, { upsert: true, ignoreUndefined: true })
       )
     )
   }

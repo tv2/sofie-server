@@ -33,11 +33,11 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
-import { AssetFolderHelper } from '../helpers/asset-folder-helper'
 import { InTransition } from '../../../model/value-objects/in-transition'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
@@ -48,7 +48,7 @@ export class Tv2TransitionEffectActionFactory {
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly assetFolderHelper: AssetFolderHelper
+    private readonly assetPathHelper: Tv2AssetPathHelper
   ) {
   }
 
@@ -239,7 +239,7 @@ export class Tv2TransitionEffectActionFactory {
     }
 
     const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.Fill
-    const fileName: string = this.assetFolderHelper.joinAssetToFolder(breakerActionMetadata.breakerFolder, breakerActionMetadata.breaker.fileName)
+    const fileName: string = this.assetPathHelper.joinAssetToFolder(breakerActionMetadata.breakerFolder, breakerActionMetadata.breaker.fileName)
 
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),

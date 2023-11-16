@@ -16,10 +16,10 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Media } from '../../../model/entities/media'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2Action, Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1

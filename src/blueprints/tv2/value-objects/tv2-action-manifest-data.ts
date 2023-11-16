@@ -1,8 +1,9 @@
 import { Tv2SourceMappingWithSound } from './tv2-studio-blueprint-configuration'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
+import { Tv2SourceLayer } from './tv2-layers'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
-export type Tv2ActionManifestData = Tv2ActionManifestDataForVideoClip | Tv2ActionManifestDataForSplitScreen
+export type Tv2ActionManifestData = Tv2ActionManifestDataForVideoClip | Tv2ActionManifestDataForSplitScreen | Tv2ActionManifestDataForGraphics
 /**
  * This corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Video Clips.
  * The attributes need to match the attributes in the database
@@ -37,6 +38,27 @@ export interface Tv2ActionManifestDataForSplitScreen {
   }
 }
 
+export type Tv2ActionManifestDataForGraphics = Tv2ActionManifestDataForFullscreenGraphics | Tv2ActionManifestDataForOverlayGraphics
+
+/**
+ * This corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Fullscreen Graphics.
+ * The attributes need to match the attributes in the database.
+ */
+export interface Tv2ActionManifestDataForFullscreenGraphics {
+  vcpid: number
+  name: string,
+}
+
+/**
+ * This corresponds to the mapped fields from 'adLibPieces' collection in the database when dealing with Overlay Graphics.
+ * The attributes need to match the attributes in the database.
+ */
+export interface Tv2ActionManifestDataForOverlayGraphics {
+  sourceLayerId: Tv2SourceLayer
+  name: string,
+  expectedDuration?: number
+}
+
 export enum SplitScreenBoxInput {
   INPUT_1 = 'INP1',
   INPUT_2 = 'INP2',
@@ -68,3 +90,19 @@ export interface Tv2SplitScreenManifestData {
   template: string,
   sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound>
 }
+
+export type Tv2GraphicsManifestData = Tv2FullscreenGraphicsManifestData | Tv2OverlayGraphicsManifestData
+
+export interface Tv2FullscreenGraphicsManifestData {
+  vcpId: number
+  name: string,
+}
+
+export interface Tv2OverlayGraphicsManifestData {
+  sourceLayerId: Tv2SourceLayer
+  name: string,
+  templateName: string
+  displayText: string
+  expectedDuration?: number
+}
+

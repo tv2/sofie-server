@@ -1,6 +1,50 @@
 import { TimelineObject } from '../../model/entities/timeline-object'
 import { DeviceType } from '../../model/enums/device-type'
 
+export interface CasparCgTemplateTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.CASPAR_CG
+    type: CasparCgType.TEMPLATE
+    templateType: string
+    name: string
+    data: CasparCgTemplateData
+    useStopCommand: boolean
+    mixer: {
+      opacity?: number
+    }
+  }
+}
+
+export interface CasparCgTemplateData {
+  display: string
+  partialUpdate: boolean
+  slots: {
+    '250_full'?: {
+      payload: {
+        type: string
+        url: string,
+        noAnimation: boolean
+      }
+      display: string
+    }
+    '450_lowerThird'?: {
+      payload: {
+        type: string
+        0: string
+      }
+      display: string
+    }
+    '650_ident'?: {
+      payload: {
+        type: string
+        0: string
+      }
+      display: string
+    }
+  }
+}
+
+
 export interface CasparCgMediaTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.CASPAR_CG
@@ -18,20 +62,7 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
   }
 }
 
-export interface CasparCgTemplateTimelineObject extends TimelineObject {
-  content: {
-    deviceType: DeviceType.CASPAR_CG,
-    type: CasparCgType.TEMPLATE
-    // TODO: When CasparCgTimelineObjectFactory is implemented
-  }
-}
-
 export enum CasparCgType {
   MEDIA = 'media',
-  IP = 'ip',
-  INPUT = 'input',
   TEMPLATE = 'template',
-  HTML_PAGE = 'htmlpage',
-  ROUTE = 'route',
-  RECORD = 'record'
 }

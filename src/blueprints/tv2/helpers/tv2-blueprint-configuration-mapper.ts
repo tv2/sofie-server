@@ -5,6 +5,7 @@ import {
   SplitScreenConfiguration,
   GraphicsDefault,
   GraphicsSetup,
+  GraphicsTemplate,
   MixTransitionEffect,
   TransitionEffect,
   TransitionEffectType,
@@ -20,6 +21,7 @@ const DIP_TRANSITION_EFFECT_REGEX: RegExp = /dip ?(\d+)/i
 interface CoreShowStyleBlueprintConfiguration {
   GfxDefaults: CoreGraphicsDefault[]
   GfxSetups: CoreGraphicsSetup[]
+  GfxTemplates: CoreGraphicsTemplate[]
   DVEStyles: CoreSplitScreenConfiguration[]
   BreakerConfig: CoreBreaker[]
   Transitions: { _id: string, Transition: string }[]
@@ -38,6 +40,13 @@ interface CoreGraphicsSetup {
   HtmlPackageFolder: string
   OvlShowName?: string
   FullShowName?: string
+}
+
+interface CoreGraphicsTemplate {
+  VizTemplate?: string
+  OutType?: string
+  INewsName?: string
+  LayerMapping: string
 }
 
 interface CoreSplitScreenConfiguration {
@@ -67,6 +76,7 @@ export class Tv2BlueprintConfigurationMapper {
     return {
       graphicsDefault: this.mapGraphicsDefault(coreConfiguration.GfxDefaults),
       graphicsSetups: this.mapGraphicsSetups(coreConfiguration.GfxSetups),
+      graphicsTemplates: this.mapGraphicsTemplates(coreConfiguration.GfxTemplates),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
       splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
       transitionEffectConfigurations: this.mapTransitionEffectConfigurations([
@@ -93,6 +103,17 @@ export class Tv2BlueprintConfigurationMapper {
         htmlPackageFolder: setup.HtmlPackageFolder,
         overlayShowName: setup.OvlShowName,
         fullShowName: setup.FullShowName
+      }
+    })
+  }
+
+  private mapGraphicsTemplates(coreGraphicsTemplates: CoreGraphicsTemplate[]): GraphicsTemplate[] {
+    return coreGraphicsTemplates.map(template => {
+      return {
+        vizTemplate: template.VizTemplate,
+        outType: template.OutType,
+        iNewsName: template.INewsName,
+        layerMapping: template.LayerMapping,
       }
     })
   }
