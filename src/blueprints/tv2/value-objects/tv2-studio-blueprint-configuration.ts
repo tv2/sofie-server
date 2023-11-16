@@ -10,6 +10,11 @@ export interface Tv2StudioBlueprintConfiguration {
   ServerPostrollDuration: number
   DVEFolder?: string,
   JingleFolder?: string
+  AudioBedSettings: {
+    fadeIn: number,
+    fadeOut: number,
+    volume: number
+  }
   GraphicsType: Tv2GraphicsType
   VizPilotGraphics: Tv2VizGraphics
   HTMLGraphics?: Tv2HtmlGraphics
