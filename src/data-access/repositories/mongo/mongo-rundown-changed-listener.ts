@@ -64,9 +64,7 @@ export class MongoRundownChangedListener extends BaseMongoRepository implements 
         const replaceChange: ChangeStreamReplaceDocument<MongoRundown> = change as ChangeStreamReplaceDocument<MongoRundown>
         const mongoRundown: MongoRundown = replaceChange.fullDocument
         const rundownId: string = mongoRundown._id
-        const baselineTimelineObjects: TimelineObject[] = await this.rundownBaselineRepository.getRundownBaseline(
-          rundownId
-        )
+        const baselineTimelineObjects: TimelineObject[] = await this.rundownBaselineRepository.getRundownBaseline(rundownId)
         const infinitePieces: Piece[] = await this.pieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
         const segments: Segment[] = await this.segmentRepository.getSegments(rundownId)
         const rundown: Rundown = this.mongoEntityConverter.convertRundown(mongoRundown, segments, baselineTimelineObjects, infinitePieces)
