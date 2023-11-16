@@ -18,7 +18,7 @@ export class SegmentDto {
     this.name = segment.name
     this.isOnAir = segment.isOnAir()
     this.isNext = segment.isNext()
-    this.isUntimed = segment.getIsSegmentUntimed()
+    this.isUntimed = segment.isSegmentUntimed()
     this.isUnsynced = segment.isUnsynced()
     this.budgetDuration = segment.budgetDuration
     this.parts = segment.getParts().map((part) => new PartDto(part))
