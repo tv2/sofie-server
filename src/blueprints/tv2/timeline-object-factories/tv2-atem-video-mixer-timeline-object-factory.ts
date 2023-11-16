@@ -143,10 +143,10 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
 
     return {
       mix: settings.mix ? {
-        rate: settings.mix.rate,
+        rate: settings.mix.frameRate,
       } : undefined,
       dip: settings.dip ? {
-        rate: settings.dip.rate,
+        rate: settings.dip.frameRate,
         input: settings.dip.input
       } : undefined,
       wipe: settings.wipe ? {
