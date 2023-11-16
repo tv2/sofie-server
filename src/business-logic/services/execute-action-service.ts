@@ -4,6 +4,7 @@ import {
   ActionManifest,
   MutateActionMethods,
   MutateActionType,
+  MutateActionWithArgumentsMethods,
   MutateActionWithHistoricPartMethods,
   MutateActionWithMedia,
   MutateActionWithPieceMethods,
@@ -36,47 +37,47 @@ export class ExecuteActionService implements ActionService {
     private readonly blueprint: Blueprint
   ) {}
 
-  public async getActions(): Promise<Action[]> {
+  public async getActions(rundownId: string): Promise<Action[]> {
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    // TODO: Only fetch ActionManifest for a given Rundown
-    const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests()
+    const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests(rundownId)
     // TODO: The Actions should be generated on ingest. Move them once we control ingest.
     const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
+    await this.actionRepository.deleteActionsForRundown(rundownId)
     await this.actionRepository.saveActions(actions)
     return actions
   }
 
-  public async executeAction(actionId: string, rundownId: string): Promise<void> {
+  public async executeAction(actionId: string, rundownId: string, actionArguments?: unknown): Promise<void> {
     const action: Action = await this.actionRepository.getAction(actionId)
     switch (action.type) {
       case PartActionType.INSERT_PART_AS_ON_AIR: {
-        const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
+        const partAction: PartAction = (await this.mutateAction(action, rundownId, actionArguments)) as PartAction
         await this.insertPartAsOnAir(partAction, rundownId)
         break
       }
       case PartActionType.INSERT_PART_AS_NEXT: {
-        const partAction: PartAction = (await this.mutateAction(action, rundownId)) as PartAction
+        const partAction: PartAction = (await this.mutateAction(action, rundownId, actionArguments)) as PartAction
         await this.insertPartAsNext(partAction, rundownId)
         break
       }
       case PieceActionType.INSERT_PIECE_AS_ON_AIR: {
-        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId)) as PieceAction
+        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId, actionArguments)) as PieceAction
         await this.insertPieceAsOnAir(pieceAction, rundownId)
         break
       }
       case PieceActionType.INSERT_PIECE_AS_NEXT: {
-        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId)) as PieceAction
+        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId, actionArguments)) as PieceAction
         await this.insertPieceAsNext(pieceAction, rundownId)
         break
       }
       case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
-        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId)) as PieceAction
+        const pieceAction: PieceAction = (await this.mutateAction(action, rundownId, actionArguments)) as PieceAction
         await this.insertPieceAsNext(pieceAction, rundownId)
         await this.rundownService.takeNext(rundownId)
         break
       }
       case PieceActionType.REPLACE_PIECE: {
-        await this.replacePiece(action, rundownId)
+        await this.replacePiece(action, rundownId, actionArguments)
         break
       }
       default: {
@@ -85,7 +86,7 @@ export class ExecuteActionService implements ActionService {
     }
   }
 
-  private async mutateAction(action: Action, rundownId: string): Promise<Action> {
+  private async mutateAction(action: Action, rundownId: string, actionArguments: unknown): Promise<Action> {
     const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
     if (!mutateActionMethodsArray) {
       return action
@@ -93,13 +94,13 @@ export class ExecuteActionService implements ActionService {
 
     for (let i = 0; i < mutateActionMethodsArray.length; i++) {
       const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
-      action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId)
+      action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
     }
 
     return action
   }
 
-  private async executeMutateActionMethods(action: Action, mutateActionMethods: MutateActionMethods, rundownId: string): Promise<Action> {
+  private async executeMutateActionMethods(action: Action, mutateActionMethods: MutateActionMethods, rundownId: string, actionArguments: unknown): Promise<Action> {
     switch (mutateActionMethods.type) {
       case MutateActionType.PIECE: {
         return await this.mutateActionWithPieceFromNextPart(rundownId, mutateActionMethods, action)
@@ -109,6 +110,9 @@ export class ExecuteActionService implements ActionService {
       }
       case MutateActionType.HISTORIC_PART: {
         return this.mutateActionWithHistoricPart(rundownId, mutateActionMethods, action)
+      }
+      case MutateActionType.APPLY_ARGUMENTS: {
+        return this.mutateActionWithArgument(mutateActionMethods, action, actionArguments)
       }
       default: {
         return action
@@ -143,6 +147,10 @@ export class ExecuteActionService implements ActionService {
     const presentPart: Part | undefined = rundown.getPart(historicPart.id)
 
     return mutateActionMethods.updateActionWithPartData(action, historicPart, presentPart)
+  }
+
+  private mutateActionWithArgument(mutateActionsMethods: MutateActionWithArgumentsMethods, action: Action, actionArguments: unknown): Action {
+    return mutateActionsMethods.updateActionWithArguments(action, actionArguments)
   }
 
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
@@ -188,7 +196,7 @@ export class ExecuteActionService implements ActionService {
     await this.rundownService.insertPieceAsNext(rundownId, piece, pieceAction.data.partInTransition)
   }
 
-  private async replacePiece(action: Action, rundownId: string): Promise<void> {
+  private async replacePiece(action: Action, rundownId: string, actionArguments: unknown): Promise<void> {
     const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
 
     let pieceFromRundown: Piece | undefined
@@ -196,7 +204,7 @@ export class ExecuteActionService implements ActionService {
     for (let i = 0; i < mutateActionMethodsArray.length; i++) {
       const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
       if (mutateActionMethods.type !== MutateActionType.PIECE) {
-        action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId)
+        action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
         continue
       }
 

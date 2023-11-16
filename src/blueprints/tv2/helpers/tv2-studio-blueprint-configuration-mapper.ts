@@ -1,5 +1,6 @@
 import { Studio } from '../../../model/entities/studio'
 import {
+  AudioBedSettings,
   Tv2DownstreamKeyerRole, Tv2FolderConfiguration,
   Tv2GraphicsType, Tv2HtmlGraphics,
   Tv2SourceMapping,
@@ -40,6 +41,8 @@ interface CoreStudioBlueprintConfiguration {
   VizPilotGraphics: CoreVizGraphics
   HTMLGraphics?: CoreHtmlGraphics
   PreventOverlayWithFull: boolean
+
+  AudioBedSettings: CoreAudioBedSettings
 }
 
 interface CoreSourceMapping {
@@ -100,6 +103,12 @@ interface CoreHtmlGraphics {
   }
 }
 
+interface CoreAudioBedSettings {
+  fadeIn: number
+  fadeOut: number
+  volume: number
+}
+
 export class Tv2StudioBlueprintConfigurationMapper {
 
   public mapStudioConfiguration(studio: Studio): Tv2StudioBlueprintConfiguration {
@@ -119,7 +128,8 @@ export class Tv2StudioBlueprintConfigurationMapper {
       selectedGraphicsType: coreConfiguration.GraphicsType,
       vizPilotGraphics: this.mapVizPilotGraphics(coreConfiguration.VizPilotGraphics),
       htmlGraphics: coreConfiguration.HTMLGraphics ? this.mapHtmlGraphics(coreConfiguration.HTMLGraphics) : undefined,
-      preventOverlayWhileFullscreenGraphicsIsOnAir: coreConfiguration.PreventOverlayWithFull
+      preventOverlayWhileFullscreenGraphicsIsOnAir: coreConfiguration.PreventOverlayWithFull,
+      audioBedSettings: this.mapAudiBedSettings(coreConfiguration.AudioBedSettings)
     }
   }
 
@@ -231,6 +241,14 @@ export class Tv2StudioBlueprintConfigurationMapper {
         wipeRate: coreGraphics.TransitionSettings ? coreGraphics.TransitionSettings.wipeRate : 0,
         borderSoftness: coreGraphics.TransitionSettings ? coreGraphics.TransitionSettings.borderSoftness: 0
       }
+    }
+  }
+
+  private mapAudiBedSettings(coreAudioBed: CoreAudioBedSettings): AudioBedSettings {
+    return {
+      fadeInDurationFrames: coreAudioBed.fadeIn,
+      fadeOutDurationInFrames: coreAudioBed.fadeOut,
+      volume: coreAudioBed.volume
     }
   }
 }

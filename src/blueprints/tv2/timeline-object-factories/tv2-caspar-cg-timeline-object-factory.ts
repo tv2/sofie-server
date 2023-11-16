@@ -5,6 +5,9 @@ import {
   CasparCgMediaTimelineObject,
   CasparCgTemplateData,
   CasparCgTemplateTimelineObject,
+  CasparCgTransitionDirection,
+  CasparCgTransitionEase,
+  CasparCgTransitionType,
   CasparCgType
 } from '../../timeline-state-resolver-types/caspar-cg-types'
 import { Tv2CasparCgLayer, Tv2GraphicsLayer } from '../value-objects/tv2-layers'
@@ -24,7 +27,7 @@ enum CasparCgSlot {
   FULL_GRAPHICS = '250_full',
   IDENT = '650_ident',
   LOWER_THIRD = '450_lowerThird',
-  UNKNOWN = ''
+  UNKNOWN = 'UNKNOWN'
 }
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory {
@@ -230,6 +233,31 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
         file
+      }
+    }
+  }
+
+  public createFadeAudioBedTimelineObject(fadeDurationInMilliseconds: number): CasparCgMediaTimelineObject {
+    const file: string = 'empty'
+    return {
+      id: 'casparCg_fade_audio',
+      enable: {
+        start: 0
+      },
+      layer: Tv2CasparCgLayer.AUDIO,
+      priority: 1,
+      content: {
+        deviceType: DeviceType.CASPAR_CG,
+        type: CasparCgType.MEDIA,
+        file,
+        transitions: {
+          inTransition: {
+            type: CasparCgTransitionType.MIX,
+            easing: CasparCgTransitionEase.LINEAR,
+            direction: CasparCgTransitionDirection.LEFT,
+            duration: fadeDurationInMilliseconds
+          },
+        }
       }
     }
   }

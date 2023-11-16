@@ -9,6 +9,7 @@ const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
 
 interface AdLibPiece {
   sourceLayerId: string
+  rundownId: string
   name: string
   expectedDuration: number | null
 }
@@ -22,9 +23,12 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
     return AD_LIB_PIECES_COLLECTION
   }
 
-  public async getActionManifests(): Promise<ActionManifest[]> {
+  public async getActionManifests(rundownId: string): Promise<ActionManifest[]> {
     this.assertDatabaseConnection(this.getActionManifests.name)
-    const mongoAdLibPieces: AdLibPiece[] = await this.getCollection().find<AdLibPiece>(this.filterOutCommentatorManifests()).toArray()
+    const mongoAdLibPieces: AdLibPiece[] = await this.getCollection().find<AdLibPiece>({
+      rundownId: rundownId,
+      ...this.filterOutCommentatorManifests()
+    }).toArray()
     return mongoAdLibPieces.map(adLibPiece => this.mapToActionManifest(adLibPiece))
   }
 
@@ -36,6 +40,7 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
   private mapToActionManifest(adLibPiece: AdLibPiece): ActionManifest {
     return {
       actionId: adLibPiece.sourceLayerId,
+      rundownId: adLibPiece.rundownId,
       data: {
         name: adLibPiece.name,
         expectedDuration: adLibPiece.expectedDuration ?? undefined,

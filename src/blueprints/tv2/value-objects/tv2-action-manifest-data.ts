@@ -84,20 +84,24 @@ export interface Tv2VideoClipManifestData {
   durationFromIngest: number // userData.duration
   adLibPix: boolean // userData.adLibPix // What does "adLibPix" mean?
   audioMode: Tv2AudioMode // userData.voLevels
+  rundownId?: string
 }
 
 export interface Tv2SplitScreenManifestData {
+  rundownId: string
   name: string,
   template: string,
   sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound>
 }
 
 export interface Tv2FullscreenGraphicsManifestData {
+  rundownId: string
   vcpId: number
   name: string,
 }
 
 export interface Tv2OverlayGraphicsManifestData {
+  rundownId: string
   sourceLayerId: Tv2SourceLayer
   name: string,
   templateName: string

@@ -13,7 +13,8 @@ export interface Tv2StudioBlueprintConfiguration {
   selectedGraphicsType: Tv2GraphicsType
   vizPilotGraphics: Tv2VizPilotGraphics
   htmlGraphics?: Tv2HtmlGraphics
-  preventOverlayWhileFullscreenGraphicsIsOnAir: boolean
+  preventOverlayWhileFullscreenGraphicsIsOnAir: boolean,
+  audioBedSettings: AudioBedSettings
 }
 
 export interface Tv2FolderConfiguration {
@@ -85,6 +86,12 @@ export enum Tv2DownstreamKeyerRole {
   FULL_GRAPHICS = 'FULL_GRAPHICS',
   OVERLAY_GRAPHICS = 'OVERLAY_GRAPHICS',
   JINGLE = 'JINGLE'
+}
+
+export interface AudioBedSettings {
+  fadeInDurationFrames: number
+  fadeOutDurationInFrames: number
+  volume: number
 }
 
 
