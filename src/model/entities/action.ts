@@ -11,6 +11,10 @@ export interface Action {
   type: ActionType
   data: unknown
   metadata?: unknown
+  /**
+   * Undefined means the action is a general one. Having a value means the action is for that specific rundown.
+   * */
+  rundownId?: string
 }
 
 export interface PartAction extends Action {
@@ -67,5 +71,6 @@ export interface MutateActionWithHistoricPartMethods {
  */
 export interface ActionManifest<Data = unknown> {
   actionId: string
+  rundownId: string
   data: Data
 }
