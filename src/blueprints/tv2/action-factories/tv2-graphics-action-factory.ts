@@ -295,6 +295,7 @@ export class Tv2GraphicsActionFactory {
       isNext: false,
       isOnAir: false,
       isPlanned: false,
+      isUntimed: false,
       outTransition: {
         keepAliveDuration: 0
       },
