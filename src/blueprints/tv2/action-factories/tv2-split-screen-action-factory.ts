@@ -156,7 +156,7 @@ export class Tv2SplitScreenActionFactory {
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, timelineEnable),
         this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
         this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.frame, blueprintConfiguration.studio.splitScreenFolder?.name)),
-        // this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenLocatorTimelineObject()
+        this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenLocatorTimelineObject(blueprintConfiguration.showStyle.selectedGraphicsSetup, splitScreenConfiguration)
       ]
 
       const metadata: Tv2PieceMetadata = {
@@ -385,7 +385,7 @@ export class Tv2SplitScreenActionFactory {
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
         this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
         this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.frame, blueprintConfiguration.studio.splitScreenFolder?.name)),
-        // this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenLocatorTimelineObject(),
+        this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenLocatorTimelineObject(blueprintConfiguration.showStyle.selectedGraphicsSetup, splitScreenConfiguration, data.locatorLabels),
         ...audioTimelineObjects
       ]
 

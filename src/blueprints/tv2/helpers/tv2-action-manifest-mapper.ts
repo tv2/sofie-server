@@ -35,6 +35,7 @@ export class Tv2ActionManifestMapper {
           name: data.name,
           rundownId: actionManifest.rundownId,
           template: data.config.template,
+          locatorLabels: data.config.locatorLabels,
           sources
         }
       })
