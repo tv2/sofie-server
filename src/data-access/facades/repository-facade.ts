@@ -58,10 +58,7 @@ export class RepositoryFacade {
     return new MongoRundownChangedListener(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
-      RepositoryFacade.createRundownRepository(),
-      RepositoryFacade.createRundownBaselineRepository(),
-      RepositoryFacade.createSegmentRepository(),
-      RepositoryFacade.createPieceRepository()
+      RepositoryFacade.createRundownRepository()
     )
   }
 
