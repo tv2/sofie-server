@@ -22,6 +22,7 @@ import {
   Tv2GraphicsSplitScreenTimelineObjectFactory
 } from './interfaces/tv2-graphics-split-screen-timeline-object-factory'
 import { Tv2VideoClipTimelineObjectFactory } from './interfaces/tv2-video-clip-timeline-object-factory'
+import { GraphicsSetup, SplitScreenConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
 
 enum CasparCgSlot {
   FULL_GRAPHICS = '250_full',
@@ -29,6 +30,8 @@ enum CasparCgSlot {
   LOWER_THIRD = '450_lowerThird',
   UNKNOWN = 'UNKNOWN'
 }
+
+const HTML_GRAPHICS_INDEX_FILE: string = 'index'
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory {
 
@@ -204,21 +207,42 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
     }
   }
 
-  public createSplitScreenLocatorTimelineObject(): CasparCgTemplateTimelineObject {
-    return {} as CasparCgTemplateTimelineObject
-    // TODO: SOF-1695 Should implement this
-    // return {
-    //   id: 'casparCg_locators',
-    //   enable: {
-    //     start: 0
-    //   },
-    //   priority: 1,
-    //   layer: Tv2GraphicsLayer.GRAPHICS_LOCATORS,
-    //   content: {
-    //     deviceType: DeviceType.CASPAR_CG,
-    //     type: CasparCgType.TEMPLATE
-    //   }
-    // }
+  public createSplitScreenLocatorTimelineObject(graphicsSetup: GraphicsSetup, splitScreenConfiguration: SplitScreenConfiguration, locatorLabels?: string[]): CasparCgTemplateTimelineObject {
+    return {
+      id: 'casparCg_locators',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2GraphicsLayer.GRAPHICS_LOCATORS,
+      content: {
+        deviceType: DeviceType.CASPAR_CG,
+        type: CasparCgType.TEMPLATE,
+        templateType: 'html',
+        name: `${graphicsSetup.htmlPackageFolder}/${HTML_GRAPHICS_INDEX_FILE}`,
+        useStopCommand: false,
+        mixer: {
+          opacity: 100
+        },
+        data: {
+          display: 'program',
+          partialUpdate: true,
+          slots:
+            {
+              '850_dve': {
+                display: 'program',
+                payload: {
+                  type: 'locators',
+                  style: locatorLabels && locatorLabels.length > 0
+                    ? JSON.parse(splitScreenConfiguration.graphicsTemplateJson)
+                    : '',
+                  ...locatorLabels?.map((label): string => label)
+                }
+              }
+            }
+        }
+      }
+    }
   }
 
   public createBreakerTimelineObject(file: string): CasparCgMediaTimelineObject {
