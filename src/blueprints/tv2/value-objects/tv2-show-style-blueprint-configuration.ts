@@ -1,6 +1,8 @@
+
 export interface Tv2ShowStyleBlueprintConfiguration {
   graphicsDefault: GraphicsDefault
   graphicsSetups: GraphicsSetup[]
+  graphicsTemplates: GraphicsTemplate[]
   selectedGraphicsSetup: GraphicsSetup
   splitScreenConfigurations: SplitScreenConfiguration[]
   transitionEffectConfigurations: TransitionEffect[]
@@ -19,6 +21,13 @@ export interface GraphicsSetup {
   htmlPackageFolder: string
   overlayShowName?: string
   fullShowName?: string
+}
+
+export interface GraphicsTemplate {
+  vizTemplate?: string
+  outType?: string
+  iNewsName?: string
+  layerMapping: string
 }
 
 export interface SplitScreenConfiguration {

@@ -17,7 +17,6 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { PartTimings } from '../../../model/value-objects/part-timings'
 import { Exception } from '../../../model/exceptions/exception'
 import { ErrorCode } from '../../../model/enums/error-code'
-import { ActionManifest } from '../../../model/entities/action'
 import { Media } from '../../../model/entities/media'
 import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
 import {
@@ -166,11 +165,6 @@ interface MongoLayerMapping {
   lookaheadDepth: number
   // The maximum distance to search for lookahead
   lookaheadMaxSearchDistance: number
-}
-
-export interface MongoActionManifest {
-  actionId: string
-  userData: unknown
 }
 
 export interface MongoMedia {
@@ -594,13 +588,6 @@ export class MongoEntityConverter {
       name: mongoShowStyleVariant.name,
       showStyleBaseId: mongoShowStyleVariant.showStyleBaseId,
       blueprintConfiguration: mongoShowStyleVariant.blueprintConfig
-    }
-  }
-
-  public convertActionManifest(mongoActionManifest: MongoActionManifest): ActionManifest {
-    return {
-      actionId: mongoActionManifest.actionId,
-      data: mongoActionManifest.userData,
     }
   }
 

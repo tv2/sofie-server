@@ -23,6 +23,7 @@ export enum Tv2ActionSubtype {
   SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT = 'SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT',
   SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
   RECALL_LAST_PLANNED_REMOTE = 'RECALL_LAST_PLANNED_REMOTE',
+  FADE_AUDIO_BED = 'FADE_AUDIO_BED'
 }
 
 export type Tv2Action = Tv2PartAction | Tv2PieceAction
@@ -107,6 +108,14 @@ export interface Tv2BreakerTransitionEffectActionMetadata {
 export interface Tv2AudioAction extends Tv2PieceAction {
   metadata: {
     contentType: Tv2ActionContentType.AUDIO,
+  }
+}
+
+export interface Tv2FadeAudioBedAction extends Tv2PieceAction {
+  metadata: {
+    contentType: Tv2ActionContentType.AUDIO,
+    actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED,
+    defaultFadeDurationInFrames: number
   }
 }
 

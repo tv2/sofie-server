@@ -11,6 +11,10 @@ export interface Action {
   type: ActionType
   data: unknown
   metadata?: unknown
+  /**
+   * Undefined means the action is a general one. Having a value means the action is for that specific rundown.
+   * */
+  rundownId?: string
 }
 
 export interface PartAction extends Action {
@@ -29,12 +33,13 @@ export interface PieceAction extends Action {
   }
 }
 
-export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods
+export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods | MutateActionWithArgumentsMethods
 
 export enum MutateActionType {
   PIECE = 'PIECE',
   MEDIA = 'MEDIA',
-  HISTORIC_PART= 'HISTORIC_PART'
+  HISTORIC_PART= 'HISTORIC_PART',
+  APPLY_ARGUMENTS = 'APPLY_ARGUMENTS'
 }
 
 export interface MutateActionWithPieceMethods {
@@ -55,6 +60,11 @@ export interface MutateActionWithHistoricPartMethods {
   partPredicate: (part: Part) => boolean
 }
 
+export interface MutateActionWithArgumentsMethods {
+  type: MutateActionType.APPLY_ARGUMENTS,
+  updateActionWithArguments: (action: Action, actionArguments: unknown) => Action
+}
+
 /**
  * Since we don't control Ingest we can't create Actions that requires data from the Ingest Gateway.
  * So we are forced to find the 'Actions' that Core has created and use the data from that to create our own Actions.
@@ -67,5 +77,6 @@ export interface MutateActionWithHistoricPartMethods {
  */
 export interface ActionManifest<Data = unknown> {
   actionId: string
+  rundownId: string
   data: Data
 }
