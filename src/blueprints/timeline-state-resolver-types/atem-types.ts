@@ -7,9 +7,10 @@ export interface AtemMeTimelineObject extends TimelineObject {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
     me: {
-      input: number
-      transition: AtemTransition,
+      input?: number
+      transition?: AtemTransition,
       transitionSettings?: AtemTransitionSettings
+      upstreamKeyers?: AtemUpstreamKeyer[]
     }
   }
 }
@@ -42,6 +43,20 @@ export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
         }
       }
     }
+  }
+}
+
+export interface AtemUpstreamKeyer {
+  upstreamKeyerId: number,
+  onAir: boolean,
+  mixEffectKeyType: number,
+  flyEnabled: boolean,
+  fillSource: number,
+  cutSource: number,
+  maskEnabled: boolean,
+  lumaSettings: {
+    clip: number,
+    gain: number,
   }
 }
 
@@ -164,6 +179,13 @@ export interface AtemTransitionSettings {
     input: number
   },
   wipe?: {
+    /** 1 - 250 frames */
+    rate?: number;
+    /** 0 - 17 */
+    pattern?: number;
+    /** 0 - 10000 */
+    borderSoftness?: number;
+    reverseDirection?: boolean;
     //...
   }
 }

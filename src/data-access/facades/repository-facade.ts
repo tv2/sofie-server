@@ -32,9 +32,11 @@ import { Part } from '../../model/entities/part'
 import { Rundown } from '../../model/entities/rundown'
 import { MongoRundownChangedListener } from '../repositories/mongo/mongo-rundown-changed-listener'
 import { ActionManifestRepository } from '../repositories/interfaces/action-manifest-repository'
-import { MongoActionManifestRepository } from '../repositories/mongo/mongo-action-manifest-repository'
+import { MongoAdLibActionsRepository } from '../repositories/mongo/mongo-ad-lib-actions-repository'
 import { MediaRepository } from '../repositories/interfaces/MediaRepository'
 import { MongoMediaRepository } from '../repositories/mongo/mongo-media-repository'
+import { MongoAdLibPieceRepository } from '../repositories/mongo/mongo-ad-lib-piece-repository'
+import { MongoActionManifestRepository } from '../repositories/mongo/mongo-action-manifest-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -128,7 +130,15 @@ export class RepositoryFacade {
   }
 
   public static createActionManifestRepository(): ActionManifestRepository {
-    return new MongoActionManifestRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+    return new MongoActionManifestRepository([this.createAdLibActionRepository(), this.createAdLibPieceRepository()])
+  }
+
+  private static createAdLibActionRepository(): ActionManifestRepository {
+    return new MongoAdLibActionsRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  private static createAdLibPieceRepository(): ActionManifestRepository {
+    return new MongoAdLibPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
   }
 
   public static createMediaRepository(): MediaRepository {

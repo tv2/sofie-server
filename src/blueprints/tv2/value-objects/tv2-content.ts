@@ -1,18 +1,19 @@
 // These are taking from Blueprints BaseContent
+
 export interface Tv2Content {
+  ignoreMediaObjectStatus?: boolean
+  ignoreBlackFrames?: boolean
+  ignoreFreezeFrame?: boolean
   // TODO: These values are included in Blueprints
-  // sourceDuration?: number
-  // ignoreMediaObjectStatus?: boolean
-  // ignoreBlackFrames?: boolean
-  // ignoreFreezeFrame?: boolean
   // ignoreAudioFormat?: boolean
+  // sourceDuration?: number
 }
 
 export interface Tv2FileContent extends Tv2Content {
   fileName: string
+  path: string
+  mediaFlowIds?: string[]
   // TODO: These values are included in Blueprints
-  // path: string
-  // mediaFlowIds?: string[]
   // thumbnail?: string
   // templateData?: Record<string, any>
 }
