@@ -15,11 +15,6 @@
     "clean": "rimraf dist",
     "reset": "rimraf dist node_modules coverage *.log"
   },
-  "config": {
-    "mongodbMemoryServer": {
-      "expNet0Listen": true
-    }
-  },
   "devDependencies": {
     "@types/cors": "^2.8.14",
     "@types/express": "^4.17.17",
