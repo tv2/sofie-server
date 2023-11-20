@@ -1,7 +1,7 @@
 import { DeviceType } from '../../model/enums/device-type'
-import { Tv2BlueprintTimelineObject } from '../tv2/value-objects/tv2-metadata'
+import { TimelineObject } from '../../model/entities/timeline-object'
 
-export interface CasparCgTemplateTimelineObject extends Tv2BlueprintTimelineObject {
+export interface CasparCgTemplateTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.CASPAR_CG
     type: CasparCgType.TEMPLATE
@@ -45,7 +45,7 @@ export interface CasparCgTemplateData {
 }
 
 
-export interface CasparCgMediaTimelineObject extends Tv2BlueprintTimelineObject {
+export interface CasparCgMediaTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.CASPAR_CG
     type: CasparCgType.MEDIA
