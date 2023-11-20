@@ -128,8 +128,8 @@ export class Tv2StudioBlueprintConfigurationMapper {
       selectedGraphicsType: coreConfiguration.GraphicsType,
       vizPilotGraphics: this.mapVizPilotGraphics(coreConfiguration.VizPilotGraphics),
       htmlGraphics: coreConfiguration.HTMLGraphics ? this.mapHtmlGraphics(coreConfiguration.HTMLGraphics) : undefined,
-      preventOverlayWhileFullscreenGraphicsIsOnAir: coreConfiguration.PreventOverlayWithFull,
-      audioBedSettings: this.mapAudiBedSettings(coreConfiguration.AudioBedSettings)
+      shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: coreConfiguration.PreventOverlayWithFull,
+      audioBedSettings: this.mapAudioBedSettings(coreConfiguration.AudioBedSettings)
     }
   }
 
@@ -166,7 +166,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
       downstreamKeyers: coreVideoMixer.DSK.map(dsk => {
         return {
           id: dsk._id,
-          name: dsk.Number,
+          index: dsk.Number,
           videoMixerKeySource: dsk.Key,
           videoMixerFillSource: dsk.Fill,
           videoMixerClip: dsk.Clip,
@@ -244,7 +244,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
     }
   }
 
-  private mapAudiBedSettings(coreAudioBed: CoreAudioBedSettings): AudioBedSettings {
+  private mapAudioBedSettings(coreAudioBed: CoreAudioBedSettings): AudioBedSettings {
     return {
       fadeInDurationFrames: coreAudioBed.fadeIn,
       fadeOutDurationInFrames: coreAudioBed.fadeOut,
