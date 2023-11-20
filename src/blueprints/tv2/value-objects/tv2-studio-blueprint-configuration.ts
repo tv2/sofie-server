@@ -13,7 +13,7 @@ export interface Tv2StudioBlueprintConfiguration {
   selectedGraphicsType: Tv2GraphicsType
   vizPilotGraphics: Tv2VizPilotGraphics
   htmlGraphics?: Tv2HtmlGraphics
-  preventOverlayWhileFullscreenGraphicsIsOnAir: boolean,
+  shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: boolean,
   audioBedSettings: AudioBedSettings
 }
 
