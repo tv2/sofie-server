@@ -12,7 +12,7 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 
 const COLLECTION_NAME = 'parts'
 
-export function RunMongoPartRepositoryTests(testDatabase: MongoTestDatabase): void {
+export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoPartRepository.prototype.deletePartsForSegment.name, () => {
     it('deletes one part successfully', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)

@@ -12,7 +12,7 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 
 const COLLECTION_NAME: string = 'segments'
 
-export function RunMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase): void {
+export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoSegmentRepository.prototype.deleteSegmentsForRundown.name, () => {
     it('deletes one segment successfully', async () => {
       const db: Db = testDatabase.getDatabase()
