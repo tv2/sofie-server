@@ -11,19 +11,16 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 
 const COLLECTION_NAME = 'pieces'
 
-describe(MongoPieceRepository.name, () => {
-  const testDatabase: MongoTestDatabase = new MongoTestDatabase()
-  beforeEach(async () => testDatabase.setupDatabase())
-  afterEach(async () => testDatabase.teardownDatabase())
-
+export function MongoPieceRepositoryTests(testDatabase: MongoTestDatabase): void {
+  afterEach(() => testDatabase.teardownDatabase(COLLECTION_NAME))
   describe(MongoPieceRepository.prototype.deletePiecesForPart.name, () => {
     it('deletes one pieces successfully', async () => {
-      const db: Db = testDatabase.getDatabase()
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
       const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
       const piece: Piece = EntityMockFactory.createPiece({ partId })
-      await testDatabase.populateDatabaseWithPieces([mongoPiece])
+      await testDatabase.populateDatabaseWithPieces(COLLECTION_NAME, [mongoPiece])
 
       when(mongoConverter.convertPieces(anything())).thenReturn([piece])
       const testee: PieceRepository = createTestee({
@@ -36,7 +33,7 @@ describe(MongoPieceRepository.name, () => {
     })
 
     it('deletes multiple pieces successfully', async () => {
-      const db: Db = testDatabase.getDatabase()
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
       const mongoPieces: MongoPiece[] = [
@@ -47,7 +44,7 @@ describe(MongoPieceRepository.name, () => {
         EntityMockFactory.createPiece({ partId }),
         EntityMockFactory.createPiece({ partId }),
       ]
-      await testDatabase.populateDatabaseWithPieces(mongoPieces)
+      await testDatabase.populateDatabaseWithPieces(COLLECTION_NAME, mongoPieces)
 
       when(mongoConverter.convertPieces(anything())).thenReturn(pieces)
       const testee: PieceRepository = createTestee({ mongoConverter })
@@ -61,8 +58,8 @@ describe(MongoPieceRepository.name, () => {
       const nonExistingId: string = 'nonExistingId'
       const partId: string = 'somePartId'
       const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
-      await testDatabase.populateDatabaseWithPieces([mongoPiece])
-      const db: Db = testDatabase.getDatabase()
+      await testDatabase.populateDatabaseWithPieces(COLLECTION_NAME, [mongoPiece])
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
 
       const testee: PieceRepository = createTestee()
       await testee.deletePiecesForPart(nonExistingId)
@@ -75,7 +72,7 @@ describe(MongoPieceRepository.name, () => {
     it('gets zero pieces from database when no pieces for given partId exist', async () => {
       const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: 'somePartId'})]
       const nonExistingId: string = 'nonExistingId'
-      await testDatabase.populateDatabaseWithPieces(mongoPieces)
+      await testDatabase.populateDatabaseWithPieces(COLLECTION_NAME, mongoPieces)
 
       const testee: PieceRepository = createTestee()
 
@@ -87,7 +84,7 @@ describe(MongoPieceRepository.name, () => {
     it('returns one piece when partId is given', async () => {
       const partId: string = 'somePartId'
       const pieces: Piece[] = [EntityTestFactory.createPiece({ partId })]
-      const mongoConverter: MongoEntityConverter = await setupMongoConverter(pieces)
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(COLLECTION_NAME, pieces)
 
       const testee: PieceRepository = createTestee({ mongoConverter })
 
@@ -99,7 +96,7 @@ describe(MongoPieceRepository.name, () => {
     it('returns multiple pieces when partId is given', async () => {
       const partId: string = 'somePartId'
       const pieces: Piece[] = [EntityTestFactory.createPiece({ partId }), EntityTestFactory.createPiece({ partId })]
-      const mongoConverter: MongoEntityConverter = await setupMongoConverter(pieces)
+      const mongoConverter: MongoEntityConverter = await setupMongoConverter(COLLECTION_NAME, pieces)
 
       const testee: PieceRepository = createTestee({ mongoConverter })
 
@@ -117,14 +114,14 @@ describe(MongoPieceRepository.name, () => {
     } as MongoPiece
   }
 
-  async function setupMongoConverter(pieces: Piece[], mongoPieces?: MongoPiece[]): Promise<MongoEntityConverter> {
+  async function setupMongoConverter(databaseSeed: string, pieces: Piece[], mongoPieces?: MongoPiece[]): Promise<MongoEntityConverter> {
     const mongoEntityConverter: MongoEntityConverter = mock(MongoEntityConverter)
     if (!mongoPieces) {
       mongoPieces = pieces.map(piece => createMongoPiece({ startPartId: piece.getPartId() }))
     }
 
     when(mongoEntityConverter.convertPieces(anything())).thenReturn(pieces)
-    await testDatabase.populateDatabaseWithPieces(mongoPieces)
+    await testDatabase.populateDatabaseWithPieces(databaseSeed, mongoPieces)
     return mongoEntityConverter
   }
 
@@ -134,7 +131,7 @@ describe(MongoPieceRepository.name, () => {
   } = {}): MongoPieceRepository {
     const mongoDb: MongoDatabase = params.mongoDb ?? mock(MongoDatabase)
 
-    when(mongoDb.getCollection(COLLECTION_NAME)).thenReturn(testDatabase.getDatabase().collection(COLLECTION_NAME))
+    when(mongoDb.getCollection(COLLECTION_NAME)).thenReturn(testDatabase.getDatabase(COLLECTION_NAME).collection(COLLECTION_NAME))
 
     if (!params.mongoConverter) {
       params.mongoConverter = mock(MongoEntityConverter)
@@ -143,4 +140,4 @@ describe(MongoPieceRepository.name, () => {
 
     return new MongoPieceRepository(instance(mongoDb), instance(params.mongoConverter))
   }
-})
+}

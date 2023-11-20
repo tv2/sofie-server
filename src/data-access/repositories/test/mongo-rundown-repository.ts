@@ -15,19 +15,16 @@ import { PieceRepository } from '../interfaces/piece-repository'
 
 const COLLECTION_NAME: string = 'rundowns'
 
-describe(MongoRundownRepository.name, () => {
-  const testDatabase: MongoTestDatabase = new MongoTestDatabase()
-  beforeEach(async () => testDatabase.setupDatabase())
-  afterEach(async () => testDatabase.teardownDatabase())
-
+export function MongoRundownRepositoryTests(testDatabase: MongoTestDatabase): void {
+  afterEach(() => testDatabase.teardownDatabase(COLLECTION_NAME))
   describe(MongoRundownRepository.prototype.deleteRundown.name, () => {
     it('deletes active rundown successfully', async () => {
-      const db: Db = testDatabase.getDatabase()
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
       const rundownId: string = 'someRundownId'
       const mongoRundown: MongoRundown = createMongoRundown({
         _id: rundownId,
       })
-      await testDatabase.populateDatabaseWithActiveRundowns([mongoRundown])
+      await testDatabase.populateDatabaseWithActiveRundowns(COLLECTION_NAME,[mongoRundown])
       const testee: RundownRepository = createTestee()
 
       await expect(db.collection<MongoRundown>(COLLECTION_NAME).findOne({ _id: rundownId })).resolves.not.toBeNull()
@@ -36,12 +33,12 @@ describe(MongoRundownRepository.name, () => {
     })
 
     it('deletes inactive rundown successfully', async () => {
-      const db: Db = testDatabase.getDatabase()
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
       const rundownId: string = 'someRundownId'
       const mongoRundown: MongoRundown = createMongoRundown({
         _id: rundownId,
       })
-      await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
+      await testDatabase.populateDatabaseWithInactiveRundowns(COLLECTION_NAME,[mongoRundown])
       const testee: MongoRundownRepository = createTestee()
 
       await expect(db.collection<MongoRundown>(COLLECTION_NAME).findOne({ _id: rundownId })).resolves.not.toBeNull()
@@ -55,7 +52,7 @@ describe(MongoRundownRepository.name, () => {
       const mongoRundown: MongoRundown = createMongoRundown({
         _id: rundownId,
       })
-      await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
+      await testDatabase.populateDatabaseWithInactiveRundowns(COLLECTION_NAME,[mongoRundown])
       const testee: MongoRundownRepository = createTestee({
         segmentRepository: segmentRepository,
       })
@@ -69,8 +66,8 @@ describe(MongoRundownRepository.name, () => {
       const nonExistingId: string = 'nonExistingId'
       const rundownName: string = 'someName'
       const mongoRundown: MongoRundown = createMongoRundown({ name: rundownName })
-      await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
-      const db: Db = testDatabase.getDatabase()
+      await testDatabase.populateDatabaseWithInactiveRundowns(COLLECTION_NAME,[mongoRundown])
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
 
       const testee: MongoRundownRepository = createTestee()
       await testee.deleteRundown(nonExistingId)
@@ -86,8 +83,8 @@ describe(MongoRundownRepository.name, () => {
       const mongoRundown: MongoRundown = createMongoRundown({
         _id: rundownId,
       })
-      await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
-      const db: Db = testDatabase.getDatabase()
+      await testDatabase.populateDatabaseWithInactiveRundowns(COLLECTION_NAME,[mongoRundown])
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
       const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
       const spiedCollection = spy(collection)
 
@@ -114,11 +111,11 @@ describe(MongoRundownRepository.name, () => {
         id: inactiveMongoRundown._id,
         isRundownActive: true,
       })
-      await testDatabase.populateDatabaseWithInactiveRundowns([inactiveMongoRundown])
+      await testDatabase.populateDatabaseWithInactiveRundowns(COLLECTION_NAME,[inactiveMongoRundown])
 
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
-      const db: Db = testDatabase.getDatabase()
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
       const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
@@ -145,11 +142,11 @@ describe(MongoRundownRepository.name, () => {
         id: activeMongoRundown._id,
         isRundownActive: false,
       })
-      await testDatabase.populateDatabaseWithActiveRundowns([activeMongoRundown])
+      await testDatabase.populateDatabaseWithActiveRundowns(COLLECTION_NAME,[activeMongoRundown])
 
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
-      const db: Db = testDatabase.getDatabase()
+      const db: Db = testDatabase.getDatabase(COLLECTION_NAME)
       const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
@@ -175,7 +172,7 @@ describe(MongoRundownRepository.name, () => {
     it('throws exception, when nonexistent rundownId is given', async () => {
       const nonExistingId: string = 'nonExistingId'
       const mongoRundown: MongoRundown = createMongoRundown()
-      await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
+      await testDatabase.populateDatabaseWithInactiveRundowns(COLLECTION_NAME,[mongoRundown])
 
       const testee: MongoRundownRepository = createTestee()
 
@@ -225,7 +222,7 @@ describe(MongoRundownRepository.name, () => {
     }
 
     when(mongoEntityConverter.convertRundown(objectContaining(mongoRundown), anything(), anything(), anything())).thenReturn(rundown)
-    await testDatabase.populateDatabaseWithInactiveRundowns([mongoRundown])
+    await testDatabase.populateDatabaseWithInactiveRundowns(COLLECTION_NAME,[mongoRundown])
     return mongoEntityConverter
   }
 
@@ -241,7 +238,7 @@ describe(MongoRundownRepository.name, () => {
     if (!params.mongoDb) {
       params.mongoDb = mock(MongoDatabase)
       when(params.mongoDb!.getCollection(COLLECTION_NAME)).thenReturn(
-        testDatabase.getDatabase().collection(COLLECTION_NAME)
+        testDatabase.getDatabase(COLLECTION_NAME).collection(COLLECTION_NAME)
       )
     }
 
@@ -267,4 +264,4 @@ describe(MongoRundownRepository.name, () => {
       instance(params.pieceRepository)
     )
   }
-})
+}
