@@ -11,7 +11,7 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 
 const COLLECTION_NAME = 'pieces'
 
-export function MongoPieceRepositoryTests(testDatabase: MongoTestDatabase): void {
+export function RunMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoPieceRepository.prototype.deletePiecesForPart.name, () => {
     it('deletes one pieces successfully', async () => {
       const db: Db = testDatabase.getDatabase()
