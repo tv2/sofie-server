@@ -509,6 +509,16 @@ describe(Segment.name, () => {
       verify(mockedPart2.reset()).once()
       verify(mockedPart3.reset()).once()
     })
+
+    it('clears executed at epoch time', () => {
+      const executedAtEpochTime: number = 1234
+      const testee: Segment = new Segment({ executedAtEpochTime } as SegmentInterface)
+
+      expect(testee.getExecutedAtEpochTime()).toBe(executedAtEpochTime)
+      testee.reset()
+
+      expect(testee.getExecutedAtEpochTime()).toBeUndefined()
+    })
   })
 
   describe(Segment.prototype.insertPartAfterActivePart.name, () => {
