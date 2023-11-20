@@ -1,7 +1,6 @@
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { Db, MongoClient } from 'mongodb'
 import { MongoPart, MongoPiece, MongoRundown, MongoSegment } from '../mongo/mongo-entity-converter'
-import { createHash } from 'crypto'
 
 export class MongoTestDatabase {
   private mongoServer: MongoMemoryServer
@@ -26,26 +25,22 @@ export class MongoTestDatabase {
     }
   }
 
-  public async teardownDatabase(seed: string): Promise<void> {
-    await this.getDatabase(seed).dropDatabase()
+  public async teardownDatabase(): Promise<void> {
+    await this.getDatabase().dropDatabase()
   }
 
-  public getDatabase(seed: string): Db {
-    return this.client.db(this.getHashedValue(seed))
+  public getDatabase(): Db {
+    return this.client.db(this.mongoServer.instanceInfo!.dbName)
   }
 
-  private getHashedValue(valueToBeHashed: string ): string {
-    return createHash('md5').update(valueToBeHashed).digest('hex')
-  }
-
-  public async populateDatabaseWithActiveRundowns(seed: string, rundowns: MongoRundown[]): Promise<void> {
-    const db: Db = this.getDatabase(seed)
+  public async populateDatabaseWithActiveRundowns(rundowns: MongoRundown[]): Promise<void> {
+    const db: Db = this.getDatabase()
     const rundownsCollection = db.collection('rundowns')
     await Promise.all(rundowns.map(async (rundown) => rundownsCollection.insertOne(rundown as object)))
   }
 
-  public async populateDatabaseWithInactiveRundowns(seed: string, rundowns: MongoRundown[]): Promise<void> {
-    const db: Db = this.getDatabase(seed)
+  public async populateDatabaseWithInactiveRundowns(rundowns: MongoRundown[]): Promise<void> {
+    const db: Db = this.getDatabase()
     for (const rundown of rundowns) {
       await db.collection('rundowns').insertOne(rundown as object)
       await db.collection('rundownPlaylists').insertOne({
@@ -54,20 +49,20 @@ export class MongoTestDatabase {
     }
   }
 
-  public async populateDatabaseWithSegments(seed: string, segments: MongoSegment[]): Promise<void> {
-    const db: Db = this.getDatabase(seed)
+  public async populateDatabaseWithSegments(segments: MongoSegment[]): Promise<void> {
+    const db: Db = this.getDatabase()
     const segmentsCollection = db.collection('segments')
     await Promise.all(segments.map(async (segment) => segmentsCollection.insertOne(segment as object)))
   }
 
-  public async populateDatabaseWithParts(seed: string, parts: MongoPart[]): Promise<void> {
-    const db: Db = this.getDatabase(seed)
+  public async populateDatabaseWithParts(parts: MongoPart[]): Promise<void> {
+    const db: Db = this.getDatabase()
     const partsCollection = db.collection('parts')
     await Promise.all(parts.map(async (part) => partsCollection.insertOne(part as object)))
   }
 
-  public async populateDatabaseWithPieces(seed: string, pieces: MongoPiece[]): Promise<void> {
-    const db: Db = this.getDatabase(seed)
+  public async populateDatabaseWithPieces(pieces: MongoPiece[]): Promise<void> {
+    const db: Db = this.getDatabase()
     const piecesCollection = db.collection('pieces')
     await Promise.all(pieces.map(async (piece) => piecesCollection.insertOne(piece as object)))
   }
