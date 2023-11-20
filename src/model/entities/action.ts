@@ -33,12 +33,13 @@ export interface PieceAction extends Action {
   }
 }
 
-export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods
+export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods | MutateActionWithArgumentsMethods
 
 export enum MutateActionType {
   PIECE = 'PIECE',
   MEDIA = 'MEDIA',
-  HISTORIC_PART= 'HISTORIC_PART'
+  HISTORIC_PART= 'HISTORIC_PART',
+  APPLY_ARGUMENTS = 'APPLY_ARGUMENTS'
 }
 
 export interface MutateActionWithPieceMethods {
@@ -57,6 +58,11 @@ export interface MutateActionWithHistoricPartMethods {
   type: MutateActionType.HISTORIC_PART,
   updateActionWithPartData: (action: Action, historicPart: Part, presentPart: Part | undefined) => Action
   partPredicate: (part: Part) => boolean
+}
+
+export interface MutateActionWithArgumentsMethods {
+  type: MutateActionType.APPLY_ARGUMENTS,
+  updateActionWithArguments: (action: Action, actionArguments: unknown) => Action
 }
 
 /**
