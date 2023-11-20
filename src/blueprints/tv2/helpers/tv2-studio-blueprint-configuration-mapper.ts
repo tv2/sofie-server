@@ -166,7 +166,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
       downstreamKeyers: coreVideoMixer.DSK.map(dsk => {
         return {
           id: dsk._id,
-          name: dsk.Number,
+          index: dsk.Number,
           videoMixerKeySource: dsk.Key,
           videoMixerFillSource: dsk.Fill,
           videoMixerClip: dsk.Clip,
