@@ -1,11 +1,11 @@
 import { DeviceType } from '../../model/enums/device-type'
-import { Tv2BlueprintTimelineObject } from '../tv2/value-objects/tv2-metadata'
+import { TimelineObject } from '../../model/entities/timeline-object'
 
 export const enum VizMseTransitionType {
   DELAY = 0
 }
 
-export interface VizMseElementInternalTimelineObject extends Tv2BlueprintTimelineObject {
+export interface VizMseElementInternalTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZ_MSE
     type: VizType.ELEMENT_INTERNAL
@@ -16,7 +16,7 @@ export interface VizMseElementInternalTimelineObject extends Tv2BlueprintTimelin
   }
 }
 
-export interface VizMseElementPilotTimelineObject extends Tv2BlueprintTimelineObject {
+export interface VizMseElementPilotTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZ_MSE
     type: VizType.ELEMENT_PILOT
@@ -32,14 +32,14 @@ export interface VizMseElementPilotTimelineObject extends Tv2BlueprintTimelineOb
   }
 }
 
-export interface VizMseLoadAllElementsTimelineObject extends Tv2BlueprintTimelineObject {
+export interface VizMseLoadAllElementsTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZ_MSE
     type: VizType.LOAD_ALL_ELEMENTS
   }
 }
 
-export interface VizMseContinueTimelineObject extends Tv2BlueprintTimelineObject {
+export interface VizMseContinueTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZ_MSE
     type: VizType.CONTINUE
@@ -53,7 +53,7 @@ export enum VizMseContinueDirection {
   FORWARD = 1
 }
 
-export interface VizMseClearGraphicsTimelineObject extends Tv2BlueprintTimelineObject {
+export interface VizMseClearGraphicsTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZ_MSE
     type: VizType.CLEAR_ALL_ELEMENTS

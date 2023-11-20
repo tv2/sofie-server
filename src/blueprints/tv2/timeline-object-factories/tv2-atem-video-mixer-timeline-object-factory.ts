@@ -34,7 +34,7 @@ const ATEM_PREFIX: string = 'atem_'
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
 
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
-    const downstreamKeyerNumber: number = downstreamKeyer.name + 1
+    const downstreamKeyerNumber: number = downstreamKeyer.index + 1
     return {
       id: `${ATEM_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
       enable: {
@@ -75,7 +75,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   }
 
   public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMeUpstreamKeyersTimelineObject {
-    const downstreamKeyerNumber: number = downstreamKeyer.name + 1
+    const downstreamKeyerNumber: number = downstreamKeyer.index + 1
     return {
       id: `${ATEM_PREFIX}upstreamKeyer${downstreamKeyerNumber}`,
       enable,
@@ -87,7 +87,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         me: {
           upstreamKeyers: [
             {
-              upstreamKeyerId: downstreamKeyer.name,
+              upstreamKeyerId: downstreamKeyer.index,
               onAir: true,
               mixEffectKeyType: 0,
               flyEnabled: false,

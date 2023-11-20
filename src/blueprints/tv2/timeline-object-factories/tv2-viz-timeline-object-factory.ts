@@ -140,7 +140,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       delayTakeAfterOutTransition?: boolean
       outTransition?: VizMseElementPilotTimelineObject['content']['outTransition']
     } {
-    if (!blueprintConfiguration.studio.preventOverlayWhileFullscreenGraphicsIsOnAir) {
+    if (!blueprintConfiguration.studio.shouldPreventOverlayWhileFullscreenGraphicsIsOnAir) {
       return {}
     }
     return {
