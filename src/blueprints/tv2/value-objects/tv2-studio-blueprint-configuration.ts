@@ -73,7 +73,7 @@ export interface Tv2VideoMixerBasicConfiguration {
 
 export interface Tv2DownstreamKeyer {
   id: string // This id isn't really used
-  name: number // For some reason this is a number
+  index: number
   videoMixerKeySource: number
   videoMixerFillSource: number
   defaultOn: boolean

@@ -29,7 +29,7 @@ export class Tv2VideoMixerConfigurationActionFactory {
   }
 
   private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): Tv2PieceAction {
-    const downstreamKeyerNumber: string = String(downstreamKeyer.name + 1)
+    const downstreamKeyerNumber: string = String(downstreamKeyer.index + 1)
     const pieceInterface: Tv2PieceInterface = this.createVideoSwitcherPieceInterface({
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
       name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
