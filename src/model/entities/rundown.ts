@@ -338,6 +338,7 @@ export class Rundown extends BasicRundown {
     if (!this.nextCursor) {
       return
     }
+    this.setSegmentExecutedAtEpochTime(Date.now())
     this.activeCursor = this.nextCursor
     this.activeCursor.part.putOnAir()
     this.activeCursor.part.calculateTimings(this.previousPart)
@@ -348,6 +349,23 @@ export class Rundown extends BasicRundown {
     // We have to find the Segment in the Segments array, since the Segment on the active cursor does not share the same reference in memory.
     const segment: Segment | undefined = this.segments.find(segment => segment.id === this.activeCursor!.segment.id)
     segment?.removeUnsyncedParts()
+  }
+
+  private setSegmentExecutedAtEpochTime(executedAtEpochTime: number): void {
+    const onAirSegment: Segment | undefined = this.activeCursor?.segment
+    const nextSegment: Segment | undefined = this.nextCursor?.segment
+
+    if (onAirSegment?.id === nextSegment?.id) {
+      return
+    }
+
+    if (onAirSegment) {
+      onAirSegment.clearExecutedAtEpochTime()
+    }
+
+    if (nextSegment) {
+      nextSegment.setExecutedAtEpochTime(executedAtEpochTime)
+    }
   }
 
   private updateInfinitePieces(): void {
@@ -536,6 +554,7 @@ export class Rundown extends BasicRundown {
     if (oldSegment.isOnAir()) {
       segment.setParts(oldSegment.getParts())
       segment.putOnAir()
+      segment.setExecutedAtEpochTime(Date.now())
     }
 
     this.segments[segmentIndex] = segment
