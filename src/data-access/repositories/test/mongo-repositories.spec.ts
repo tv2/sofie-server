@@ -12,6 +12,7 @@ describe('Mongo Repositories', () => {
   const testDatabase: MongoTestDatabase = new MongoTestDatabase()
   beforeAll(async () => testDatabase.setupDatabaseConnection())
   afterAll(async () => testDatabase.teardownDatabaseConnection())
+  afterEach(() => testDatabase.teardownDatabase())
 
   describe(MongoRundownRepository.name, () => MongoRundownRepositoryTests(testDatabase))
   describe(MongoSegmentRepository.name, () => MongoSegmentRepositoryTests(testDatabase))
