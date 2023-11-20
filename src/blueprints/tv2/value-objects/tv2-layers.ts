@@ -4,21 +4,25 @@ export enum Tv2SourceLayer {
   REMOTE = 'studio0_live',
   JINGLE = 'studio0_jingle',
   AUDIO_BED = 'studio0_audio_bed',
+  IDENT = 'studio0_graphicsIdent',
+  LOWER_THIRD = 'studio0_graphicsLower',
   GRAPHICS_ACTION_COMMAND = 'studio0_adlib_graphic_cmd',
   AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs',
   DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.
+  PILOT_GRAPHICS = 'studio0_pilot',
   SPLIT_SCREEN = 'dve', // TODO: Change to split_screen when we control ingest.
   REPLAY = 'studio0_local',
   REPLAY_STUDIO_AUXILIARY = 'studio0_aux_studio_screen',
   REPLAY_VIZ_AUXILIARY = 'studio0_aux_viz_full1',
-
   VIDEO_CLIP = 'studio0_selected_clip',
-  SERVER_VOICE_OVER = 'studio0_selected_voiceover',
 }
 
 export enum Tv2GraphicsLayer {
   GRAPHICS_ACTIONS = 'graphic_adlibs',
   GRAPHICS_PILOT = 'graphic_pilot',
+  GRAPHICS_OVERLAY_PILOT = 'graphic_overlay_pilot',
+  GRAPHICS_OVERLAY_IDENT = 'graphic_overlay_ident', // <= viz_layer_overlay_ident
+  GRAPHICS_OVERLAY_LOWER = 'graphic_overlay_lower', // <= viz_layer_overlay_lower
   GRAPHICS_LOCATORS = 'graphic_locators'
 }
 
@@ -27,6 +31,7 @@ export enum Tv2AtemLayer {
   CLEAN_FEED = 'atem_me_clean',
   LOOKAHEAD = 'atem_aux_lookahead',
   DOWNSTREAM_KEYER = 'atem_dsk',
+  CLEAN_UPSTREAM_KEYER = 'atem_clean_usk_full',
   SPLIT_SCREEN = 'atem_dve',
   SPLIT_SCREEN_BOXES = 'atem_dve_boxes',
 }
@@ -40,7 +45,8 @@ export enum Tv2CasparCgLayer {
   PLAYER_CLIP_PENDING = 'casparcg_player_clip_pending',
   SPLIT_SCREEN_KEY = 'casparcg_dve_key',
   SPLIT_SCREEN_FRAME = 'casparcg_dve_frame',
-  BREAKER = 'casparcg_player_jingle'
+  BREAKER = 'casparcg_player_jingle',
+  AUDIO = 'casparcg_audio_lyd'
 }
 
 export enum Tv2VideoClipLayer {

@@ -19,7 +19,7 @@ export class SegmentDto {
     this.name = segment.name
     this.isOnAir = segment.isOnAir()
     this.isNext = segment.isNext()
-    this.isUntimed = segment.getIsSegmentUntimed()
+    this.isUntimed = segment.isSegmentUntimed()
     this.isUnsynced = segment.isUnsynced()
     this.expectedDurationInMs = segment.expectedDurationInMs
     this.executedAtEpochTime = segment.getExecutedAtEpochTime()

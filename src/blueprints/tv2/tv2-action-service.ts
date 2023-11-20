@@ -18,21 +18,25 @@ import {
   SplitScreenBoxInput,
   Tv2ActionManifestData,
   Tv2ActionManifestDataForSplitScreen,
+  Tv2ActionManifestDataForFullscreenGraphics,
+  Tv2ActionManifestDataForOverlayGraphics,
   Tv2ActionManifestDataForVideoClip,
   Tv2ActionManifestSplitScreenSource,
   Tv2SplitScreenManifestData,
+  Tv2FullscreenGraphicsManifestData,
+  Tv2OverlayGraphicsManifestData,
   Tv2VideoClipManifestData,
   TvActionManifestSplitScreenSourceType
 } from './value-objects/tv2-action-manifest-data'
 import { Tv2SplitScreenActionFactory } from './action-factories/tv2-split-screen-action-factory'
 import { Tv2BlueprintConfigurationMapper } from './helpers/tv2-blueprint-configuration-mapper'
-import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
 import { Tv2Action } from './value-objects/tv2-action'
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 import { Tv2PieceType } from './enums/tv2-piece-type'
 import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
 import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
+import { Tv2MisconfigurationException } from './exceptions/tv2-misconfiguration-exception'
 import { Tv2AudioMode } from './enums/tv2-audio-mode'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
@@ -62,6 +66,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if(this.remoteActionFactory.isRemoteAction(action)) {
       return this.remoteActionFactory.getMutateActionMethods(action)
     }
+    if (this.audioActionFactory.isAudioAction(action)) {
+      return this.audioActionFactory.getMutateActionMethods(action)
+    }
     return []
   }
 
@@ -76,12 +83,49 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.remoteActionFactory.createRemoteActions(blueprintConfiguration),
       ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
       ...this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration),
-      ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration),
+      ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, this.getFullscreenGraphicsData(actionManifests), this.getOverlayGraphicsData(actionManifests)),
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, this.getVideoClipData(actionManifests)),
       ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration),
       ...this.splitScreenActionFactory.createSplitScreenActions(blueprintConfiguration, this.getSplitScreenData(blueprintConfiguration, actionManifests)),
       ...this.replayActionFactory.createReplayActions(blueprintConfiguration)
     ]
+  }
+
+  private getFullscreenGraphicsData(actionManifests: ActionManifest[]): Tv2FullscreenGraphicsManifestData[] {
+    return actionManifests
+      .filter((actionManifest):actionManifest is ActionManifest<Tv2ActionManifestDataForFullscreenGraphics> => this.getPieceTypeFromActionManifest(actionManifest) === Tv2PieceType.GRAPHICS)
+      .map(actionManifest => {
+        const data: Tv2ActionManifestDataForFullscreenGraphics = actionManifest.data
+        return {
+          rundownId: actionManifest.rundownId,
+          name: data.name,
+          vcpId: data.vcpid,
+        }
+      })
+  }
+
+  private getOverlayGraphicsData(actionManifests: ActionManifest[]): Tv2OverlayGraphicsManifestData[] {
+    return actionManifests
+      .filter((actionManifest):actionManifest is ActionManifest<Tv2ActionManifestDataForOverlayGraphics> => this.getPieceTypeFromActionManifest(actionManifest) === Tv2PieceType.OVERLAY_GRAPHICS)
+      .map(actionManifest => {
+        const data: Tv2ActionManifestDataForOverlayGraphics = actionManifest.data
+        return {
+          rundownId: actionManifest.rundownId,
+          name: data.name,
+          sourceLayerId: data.sourceLayerId,
+          templateName: this.getTemplateName(data.name),
+          displayText: this.getDisplayText(data.name),
+          expectedDuration: data.expectedDuration
+        }
+      })
+  }
+
+  protected getTemplateName(rawName: string): string {
+    return rawName.split('-')[0].trim()
+  }
+
+  protected getDisplayText(rawText: string): string {
+    return rawText.split('-').slice(1).join('-').trim()
   }
 
   private getVideoClipData(actionManifests: ActionManifest<Tv2ActionManifestData>[]): Tv2VideoClipManifestData[] {
@@ -90,6 +134,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       .map(actionManifest => {
         const data: Tv2ActionManifestDataForVideoClip = actionManifest.data
         return {
+          rundownId: actionManifest.rundownId,
           name: data.partDefinition.storyName,
           fileName: data.partDefinition.fields.videoId,
           durationFromIngest: data.duration,
@@ -102,7 +147,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   private getPieceTypeFromActionManifest(actionManifest: ActionManifest): Tv2PieceType {
     switch (actionManifest.actionId) {
       case 'select_full_grafik': {
-        return Tv2PieceType.CAMERA
+        return Tv2PieceType.GRAPHICS
       }
       case 'select_server_clip': {
         return Tv2PieceType.VIDEO_CLIP
@@ -110,6 +155,13 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       case 'select_dve': {
         return Tv2PieceType.SPLIT_SCREEN
       }
+      case 'studio0_graphicsLower':
+      case 'studio0_graphicsIdent':
+      case 'studio0_overlay':
+      case 'studio0_pilotOverlay':
+        return Tv2PieceType.OVERLAY_GRAPHICS
+      case 'studio0_audio_bed':
+        return Tv2PieceType.AUDIO
       default: {
         throw new UnexpectedCaseException(`Unknown action manifest id: ${actionManifest.actionId}`)
       }
@@ -123,6 +175,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
         const data: Tv2ActionManifestDataForSplitScreen = actionManifest.data
         const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
         return {
+          rundownId: actionManifest.rundownId,
           name: data.name,
           template: data.config.template,
           sources
@@ -161,7 +214,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     }
     const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.SourceName === splitScreenSource.id)
     if (!source) {
-      throw new MisconfigurationException(`No Source Mapping found for split screen source ${splitScreenSource.sourceType} ${splitScreenSource.id}`)
+      throw new Tv2MisconfigurationException(`No Source Mapping found for split screen source ${splitScreenSource.sourceType} ${splitScreenSource.id}`)
     }
     return source
   }

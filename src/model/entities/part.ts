@@ -168,7 +168,12 @@ export class Part {
     }
     const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === unPlannedPiece.layer)
     if (indexOfExistingPieceOnLayer >= 0) {
-      this.pieces.splice(indexOfExistingPieceOnLayer, 1)
+      const piecesToBeRemoved: Piece[] = this.pieces.splice(indexOfExistingPieceOnLayer, 1)
+      piecesToBeRemoved.forEach(piece => {
+        if (piece.isPlanned) {
+          this.replacedPlannedPieces.push(piece)
+        }
+      })
     }
     this.pieces.push(unPlannedPiece)
   }
