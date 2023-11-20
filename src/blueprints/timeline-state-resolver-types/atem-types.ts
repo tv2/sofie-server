@@ -1,8 +1,7 @@
 import { DeviceType } from '../../model/enums/device-type'
-import { Tv2BlueprintTimelineObject } from '../tv2/value-objects/tv2-metadata'
+import { TimelineObject } from '../../model/entities/timeline-object'
 
-// These values are taken from TSR TODO: Find a better way for types.
-export interface AtemMeTimelineObject extends Tv2BlueprintTimelineObject {
+export interface AtemMeTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
@@ -14,7 +13,7 @@ export interface AtemMeTimelineObject extends Tv2BlueprintTimelineObject {
   }
 }
 
-export interface AtemMeUpstreamKeyersTimelineObject extends Tv2BlueprintTimelineObject {
+export interface AtemMeUpstreamKeyersTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
@@ -24,7 +23,7 @@ export interface AtemMeUpstreamKeyersTimelineObject extends Tv2BlueprintTimeline
   }
 }
 
-export interface AtemAuxTimelineObject extends Tv2BlueprintTimelineObject {
+export interface AtemAuxTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.AUX,
@@ -34,7 +33,7 @@ export interface AtemAuxTimelineObject extends Tv2BlueprintTimelineObject {
   }
 }
 
-export interface AtemDownstreamKeyerTimelineObject extends Tv2BlueprintTimelineObject {
+export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.DSK,
@@ -69,7 +68,7 @@ export interface AtemUpstreamKeyer {
   }
 }
 
-export interface AtemSuperSourceTimelineObject extends Tv2BlueprintTimelineObject {
+export interface AtemSuperSourceTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.SUPER_SOURCE,
@@ -99,7 +98,7 @@ export type AtemSuperSourceBox = {
   cropRight?: number;
 }
 
-export interface AtemSuperSourcePropertiesTimelineObject extends Tv2BlueprintTimelineObject {
+export interface AtemSuperSourcePropertiesTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.SUPER_SOURCE_PROPERTIES,
