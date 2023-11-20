@@ -16,7 +16,7 @@ export interface SegmentInterface {
   isNext: boolean
   isUnsynced: boolean
   executedAtEpochTime?: number
-  budgetDuration?: number
+  expectedDurationInMs?: number
 }
 
 export class Segment {
@@ -24,7 +24,7 @@ export class Segment {
   public readonly rundownId: string
   public name: string
   public rank: number
-  public budgetDuration?: number
+  public expectedDurationInMs?: number
 
   private isSegmentOnAir: boolean
   private isSegmentNext: boolean
@@ -41,7 +41,7 @@ export class Segment {
     this.isSegmentOnAir = segment.isOnAir
     this.isSegmentNext = segment.isNext
     this.isSegmentUnsynced = segment.isUnsynced
-    this.budgetDuration = segment.budgetDuration
+    this.expectedDurationInMs = segment.expectedDurationInMs
     this.executedAtEpochTime = segment.executedAtEpochTime
     this.setParts(segment.parts ?? [])
   }
