@@ -1,6 +1,10 @@
 import { TimelineObject } from '../../model/entities/timeline-object'
 import { DeviceType } from '../../model/enums/device-type'
 
+export const enum VizMseTransitionType {
+  DELAY = 0
+}
+
 export interface VizMseElementInternalTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZMSE
@@ -8,6 +12,23 @@ export interface VizMseElementInternalTimelineObject extends TimelineObject {
     templateName: string
     templateData: string[]
     showName: string
+    channelName?: string
+  }
+}
+
+export interface VizMseElementPilotTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.VIZMSE
+    type: VizType.ELEMENT_PILOT
+    templateVcpId: number
+    continueStep: number
+    noAutoPreloading: boolean
+    channelName: string
+    delayTakeAfterOutTransition?: boolean
+    outTransition?: {
+      type: VizMseTransitionType.DELAY
+      delay: number
+    }
   }
 }
 
@@ -22,7 +43,7 @@ export interface VizMseContinueTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.VIZMSE
     type: VizType.CONTINUE
-    direction: -1 | 1 | undefined // Taken directly from Blueprints.
+    direction: -1 | 1 | undefined
     reference: string
   }
 }
@@ -33,6 +54,8 @@ export interface VizMseClearGraphicsTimelineObjectContent {
   channelsToSendCommands?: string[]
   showName: string
 }
+
+
 
 export enum VizType {
   ELEMENT_INTERNAL = 'element_internal',

@@ -46,11 +46,11 @@ export class Tv2RemoteActionFactory {
   }
 
   private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
-    const partId: string = `remoteInsertActionPart_${remoteSource._id}`
+    const partId: string = `remoteInsertActionPart_${remoteSource.SourceName}`
     const remotePieceInterface: PieceInterface = this.createRemotePiece(configuration, remoteSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
     return {
-      id: `remoteAsNextAction_${remoteSource._id}`,
+      id: `remoteAsNextAction_${remoteSource.SourceName}`,
       name: `LIVE ${remoteSource.SourceName}`,
       description: `Insert LIVE ${remoteSource.SourceName} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,

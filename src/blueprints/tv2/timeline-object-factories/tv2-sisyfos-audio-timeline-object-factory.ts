@@ -15,7 +15,6 @@ import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
-
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, audioMode?: Tv2AudioMode): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
       return {

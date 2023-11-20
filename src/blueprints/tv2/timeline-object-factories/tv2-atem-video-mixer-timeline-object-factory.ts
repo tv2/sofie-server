@@ -7,6 +7,7 @@ import {
   AtemSuperSourcePropertiesTimelineObject,
   AtemSuperSourceTimelineObject,
   AtemTransition,
+  AtemTransitionSettings,
   AtemType,
   SuperSourceBorder,
   SuperSourceProperties
@@ -14,11 +15,15 @@ import {
 import { Tv2AtemLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
-import { SplitScreenBoxProperties, SplitScreenLayoutProperties } from '../value-objects/tv2-show-style-blueprint-configuration'
+import {
+  SplitScreenBoxProperties,
+  SplitScreenLayoutProperties
+} from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Piece } from '../../../model/entities/piece'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
+import { VideoMixerTransition, VideoMixerTransitionSettings } from '../value-objects/tv2-video-mixer-transition'
 
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
 const ATEM_PREFIX: string = 'atem_'
@@ -28,7 +33,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
-      id: '',
+      id: `${ATEM_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
       enable: {
         start: 0
       },
@@ -66,38 +71,117 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return Tv2AtemLayer.DOWNSTREAM_KEYER
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMeTimelineObject {
+    const downstreamKeyerNumber: number = downstreamKeyer.Number + 1
     return {
-      id: `${ATEM_PREFIX}program`,
+      id: `${ATEM_PREFIX}upstreamKeyer${downstreamKeyerNumber}`,
       enable,
       priority: 1,
-      layer: Tv2AtemLayer.PROGRAM,
+      layer: Tv2AtemLayer.CLEAN_UPSTREAM_KEYER,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.ME,
         me: {
-          input: sourceInput,
-          transition: AtemTransition.CUT
+          upstreamKeyers: [
+            {
+              upstreamKeyerId: downstreamKeyer.Number,
+              onAir: true,
+              mixEffectKeyType: 0,
+              flyEnabled: false,
+              fillSource: downstreamKeyer.Fill,
+              cutSource: downstreamKeyer.Key,
+              maskEnabled: false,
+              lumaSettings: {
+                clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Clip),
+                gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.Gain),
+              }
+            }
+          ]
         }
       }
     }
   }
 
-  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, transition?: {type: VideoMixerTransition, settings: VideoMixerTransitionSettings}): AtemMeTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer(
+      `${ATEM_PREFIX}program`,
+      Tv2AtemLayer.PROGRAM,
+      enable,
+      {
+        input: sourceInput,
+        transition: transition ? this.mapVideoMixerTransitionToAtemVersion(transition.type) : undefined,
+        transitionSettings: transition ? this.mapVideoMixerTransitionSettingsToAtemVersion(transition.settings) : undefined
+      })
+  }
+
+  private mapVideoMixerTransitionToAtemVersion(type: VideoMixerTransition): AtemTransition {
+    switch (type) {
+      case VideoMixerTransition.MIX:
+        return AtemTransition.MIX
+      case VideoMixerTransition.DIP:
+        return AtemTransition.DIP
+      case VideoMixerTransition.WIPE:
+        return AtemTransition.WIPE
+      case VideoMixerTransition.SPLIT_SCREEN:
+        return AtemTransition.SPLIT_SCREEN
+      case VideoMixerTransition.STING:
+        return AtemTransition.STING
+      case VideoMixerTransition.DUMMY:
+        return AtemTransition.DUMMY
+      case VideoMixerTransition.CUT:
+      default:
+        return AtemTransition.CUT
+    }
+  }
+
+  private mapVideoMixerTransitionSettingsToAtemVersion(settings: VideoMixerTransitionSettings): AtemTransitionSettings {
+    if (settings.wipe && settings.wipe.frameRate && settings.wipe.frameRate < 1) {
+      settings.wipe.frameRate = 1
+    } else if (settings.wipe && settings.wipe.frameRate && settings.wipe.frameRate > 250) {
+      settings.wipe.frameRate = 250
+    }
+
     return {
-      id: `${ATEM_PREFIX}clean_feed`,
+      mix: settings.mix ? {
+        rate: settings.mix.frameRate,
+      } : undefined,
+      dip: settings.dip ? {
+        rate: settings.dip.frameRate,
+        input: settings.dip.input
+      } : undefined,
+      wipe: settings.wipe ? {
+        rate: settings.wipe.frameRate,
+        borderSoftness: settings.wipe.borderSoftness,
+        pattern: settings.wipe.pattern,
+        reverseDirection: settings.wipe.reverseDirection
+      } : undefined
+    }
+  }
+
+  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMeTimelineObject['content']['me']): AtemMeTimelineObject {
+    return {
+      id,
       enable,
       priority: 1,
-      layer: Tv2AtemLayer.CLEAN_FEED,
+      layer,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.ME,
-        me: {
-          input: sourceInput,
-          transition: AtemTransition.CUT
-        }
+        me
       }
     }
+  }
+
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, transition?: {type: VideoMixerTransition, settings: VideoMixerTransitionSettings}): AtemMeTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer(
+      `${ATEM_PREFIX}clean_feed`,
+      Tv2AtemLayer.CLEAN_FEED,
+      enable,
+      {
+        input: sourceInput,
+        transition: transition ? this.mapVideoMixerTransitionToAtemVersion(transition.type) : undefined,
+        transitionSettings: transition ? this.mapVideoMixerTransitionSettingsToAtemVersion(transition.settings) : undefined
+      })
   }
 
   public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
