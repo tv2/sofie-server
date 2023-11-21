@@ -284,13 +284,13 @@ export class Tv2GraphicsActionFactory {
   private getPreRollDuration(blueprintConfiguration: Tv2BlueprintConfiguration): number {
     return this.isUsingHtmlGraphics(blueprintConfiguration)
       ? blueprintConfiguration.studio.casparCgPreRollDuration
-      : blueprintConfiguration.studio.vizPilotGraphics.msPreRollBeforeTakingPilotGraphics
+      : blueprintConfiguration.studio.vizPilotGraphics.preRollDurationInMs
   }
 
   private getKeepOldPartAliveDuration(blueprintConfiguration: Tv2BlueprintConfiguration): number {
     return this.isUsingHtmlGraphics(blueprintConfiguration)
       ? blueprintConfiguration.studio.htmlGraphics?.msKeepOldPartAliveBeforeTakingGraphics ?? 0
-      : blueprintConfiguration.studio.vizPilotGraphics.msKeepOldPartAliveBeforeTakingGraphics
+      : blueprintConfiguration.studio.vizPilotGraphics.keepPreviousPartAliveDurationInMs
   }
 
   private createVideoMixerTimelineObjectsForHtmlFullscreenGraphics(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
@@ -315,15 +315,15 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createVideoMixerTimelineObjectsForVizFullscreenGraphics(blueprintConfiguration: Tv2BlueprintConfiguration): TimelineObject[] {
-    if (!blueprintConfiguration.studio.vizPilotGraphics.msBeforeShowingBeforeShowingOnCleanFeed) {
+    if (!blueprintConfiguration.studio.vizPilotGraphics.preRollDurationInMsForCleanFeed) {
       throw new Tv2MisconfigurationException(
         'Missing configuration of \'VizPilotGraphics.msBeforeShowingBeforeShowingOnCleanFeed\' in settings.'
       )
     }
 
-    const videoMixerEnable: TimelineEnable = { start: blueprintConfiguration.studio.vizPilotGraphics.msFromStartBeforeCuttingToBackgroundSource }
-    const sourceInput: number = blueprintConfiguration.studio.vizPilotGraphics.backgroundVideoSwitcherSource
-    const upstreamEnable: TimelineEnable = { start: blueprintConfiguration.studio.vizPilotGraphics.msBeforeShowingBeforeShowingOnCleanFeed }
+    const videoMixerEnable: TimelineEnable = { start: blueprintConfiguration.studio.vizPilotGraphics.fullscreenGraphicsBackgroundStartOffsetInMs }
+    const sourceInput: number = blueprintConfiguration.studio.vizPilotGraphics.videoMixerSourceForFullscreenGraphicsBackground
+    const upstreamEnable: TimelineEnable = { start: blueprintConfiguration.studio.vizPilotGraphics.preRollDurationInMsForCleanFeed }
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS)
 
     return [
