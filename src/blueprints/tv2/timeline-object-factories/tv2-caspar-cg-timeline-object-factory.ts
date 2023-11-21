@@ -31,7 +31,7 @@ enum CasparCgSlot {
   UNKNOWN = 'UNKNOWN'
 }
 
-const HTML_GRAPHICS_INDEX_FILE: string = 'index'
+const HTML_GRAPHICS_INDEX_FILENAME: string = 'index'
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory {
 
@@ -219,7 +219,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.TEMPLATE,
         templateType: 'html',
-        name: `${graphicsSetup.htmlPackageFolder}/${HTML_GRAPHICS_INDEX_FILE}`,
+        name: `${graphicsSetup.htmlPackageFolder}/${HTML_GRAPHICS_INDEX_FILENAME}`,
         useStopCommand: false,
         mixer: {
           opacity: 100
@@ -236,7 +236,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
                   style: locatorLabels && locatorLabels.length > 0
                     ? JSON.parse(splitScreenConfiguration.graphicsTemplateJson)
                     : '',
-                  ...locatorLabels?.map((label): string => label)
+                  ...locatorLabels
                 }
               }
             }
