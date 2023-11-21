@@ -31,12 +31,12 @@ export enum Tv2GraphicsType {
 }
 
 export interface Tv2VizPilotGraphics {
-  msBeforeShowingBeforeShowingOnCleanFeed?: number
-  msKeepOldPartAliveBeforeTakingGraphics: number
-  msPreRollBeforeTakingPilotGraphics: number
-  msKeepPilotGraphicsAliveBeforeTakingNext: number
-  msFromStartBeforeCuttingToBackgroundSource: number
-  backgroundVideoSwitcherSource: number
+  preRollDurationInMsForCleanFeed?: number
+  keepPreviousPartAliveDurationInMs: number
+  preRollDurationInMs: number
+  outTransitionDurationInMs: number
+  fullscreenGraphicsBackgroundStartOffsetInMs: number
+  videoMixerSourceForFullscreenGraphicsBackground: number
 }
 
 export interface Tv2HtmlGraphics {

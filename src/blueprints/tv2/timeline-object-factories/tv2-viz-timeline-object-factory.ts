@@ -147,7 +147,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       delayTakeAfterOutTransition: true,
       outTransition: {
         type: VizMseTransitionType.DELAY,
-        delay: blueprintConfiguration.studio.vizPilotGraphics.msKeepPilotGraphicsAliveBeforeTakingNext
+        delay: blueprintConfiguration.studio.vizPilotGraphics.outTransitionDurationInMs
       }
     }
   }
