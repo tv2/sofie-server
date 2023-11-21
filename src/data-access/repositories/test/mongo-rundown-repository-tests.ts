@@ -15,11 +15,7 @@ import { PieceRepository } from '../interfaces/piece-repository'
 
 const COLLECTION_NAME: string = 'rundowns'
 
-describe(MongoRundownRepository.name, () => {
-  const testDatabase: MongoTestDatabase = new MongoTestDatabase()
-  beforeEach(async () => testDatabase.setupDatabase())
-  afterEach(async () => testDatabase.teardownDatabase())
-
+export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoRundownRepository.prototype.deleteRundown.name, () => {
     it('deletes active rundown successfully', async () => {
       const db: Db = testDatabase.getDatabase()
@@ -267,4 +263,4 @@ describe(MongoRundownRepository.name, () => {
       instance(params.pieceRepository)
     )
   }
-})
+}
