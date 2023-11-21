@@ -55,17 +55,11 @@ export class Segment {
 
   public putOnAir(): void {
     this.isSegmentOnAir = true
+    this.executedAtEpochTime ??= Date.now()
   }
 
   public takeOffAir(): void {
     this.isSegmentOnAir = false
-  }
-
-  public setExecutedAtEpochTime(executedAtEpochTime: number): void {
-    this.executedAtEpochTime ??= executedAtEpochTime
-  }
-
-  public clearExecutedAtEpochTime(): void {
     this.executedAtEpochTime = undefined
   }
 
@@ -224,7 +218,7 @@ export class Segment {
   public reset(): void {
     this.removeUnplannedParts()
     this.parts.forEach(part => part.reset())
-    this.clearExecutedAtEpochTime()
+    this.executedAtEpochTime = undefined
   }
 
   private removeUnplannedParts(): void {
