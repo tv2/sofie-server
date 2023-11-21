@@ -70,7 +70,7 @@ export class Tv2ReplayActionFactory {
   }
 
   private removeAllWhitespace(value: string): string {
-    return value.replace(' ', '')
+    return value.replaceAll(' ', '')
   }
 
   private createReplayActionWithoutVoiceOver(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): Tv2ReplayAction {
