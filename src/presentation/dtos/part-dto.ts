@@ -8,6 +8,7 @@ export class PartDto {
   public readonly name: string
   public readonly isOnAir: boolean
   public readonly isNext: boolean
+  public readonly isUntimed: boolean
   public readonly isUnsynced: boolean
   public readonly expectedDuration?: number
   public readonly executedAt: number
@@ -22,6 +23,7 @@ export class PartDto {
     this.name = part.name
     this.isOnAir = part.isOnAir()
     this.isNext = part.isNext()
+    this.isUntimed = part.isUntimed()
     this.isUnsynced = part.isUnsynced()
     this.expectedDuration = part.expectedDuration
     this.executedAt = part.getExecutedAt()
