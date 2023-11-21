@@ -37,7 +37,7 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     this.assertDatabaseConnection(this.getBasicRundowns.name)
     const basicRundowns: MongoRundown[] = (await this.getCollection()
       .find({})
-      .project({ _id: 1, name: 1, modified: 1, isActive: 1 })
+      .project({ _id: 1, name: 1, modified: 1, isActive: 1, timing: 1 })
       .toArray()) as unknown as MongoRundown[]
     return this.mongoEntityConverter.convertToBasicRundowns(basicRundowns)
   }

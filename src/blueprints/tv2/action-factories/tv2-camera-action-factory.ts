@@ -108,6 +108,7 @@ export class Tv2CameraActionFactory {
       isPlanned: false,
       isOnAir: false,
       isNext: false,
+      isUntimed: false,
       isUnsynced: false,
       inTransition: {
         keepPreviousPartAliveDuration: 0,
