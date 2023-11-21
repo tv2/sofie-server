@@ -178,6 +178,7 @@ export class Tv2SplitScreenActionFactory {
       isPlanned: false,
       isOnAir: false,
       isNext: false,
+      isUntimed: false,
       isUnsynced: false,
       inTransition: {
         keepPreviousPartAliveDuration: 0,
@@ -437,6 +438,7 @@ export class Tv2SplitScreenActionFactory {
       isPlanned: false,
       isOnAir: false,
       isNext: false,
+      isUntimed: false,
       isUnsynced: false,
       inTransition: {
         keepPreviousPartAliveDuration: 0,
