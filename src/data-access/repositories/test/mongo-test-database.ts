@@ -11,18 +11,22 @@ export class MongoTestDatabase {
     jest.setTimeout(15000)
   }
 
-  public async setupDatabase(): Promise<void> {
+  public async setupDatabaseServer(): Promise<void> {
     this.mongoServer = await MongoMemoryServer.create()
     this.client = await MongoClient.connect(this.mongoServer.getUri())
   }
 
-  public async teardownDatabase(): Promise<void> {
+  public async teardownDatabaseServer(): Promise<void> {
     if (this.client) {
       await this.client.close()
     }
     if (this.mongoServer) {
       await this.mongoServer.stop()
     }
+  }
+
+  public async dropDatabase(): Promise<void> {
+    await this.getDatabase().dropDatabase()
   }
 
   public getDatabase(): Db {

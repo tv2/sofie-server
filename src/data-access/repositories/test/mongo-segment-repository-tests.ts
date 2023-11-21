@@ -12,11 +12,7 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 
 const COLLECTION_NAME: string = 'segments'
 
-describe(MongoSegmentRepository.name, () => {
-  const testDatabase: MongoTestDatabase = new MongoTestDatabase()
-  beforeEach(async () => testDatabase.setupDatabase())
-  afterEach(async () => testDatabase.teardownDatabase())
-
+export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoSegmentRepository.prototype.deleteSegmentsForRundown.name, () => {
     it('deletes one segment successfully', async () => {
       const db: Db = testDatabase.getDatabase()
@@ -359,4 +355,4 @@ describe(MongoSegmentRepository.name, () => {
 
     return new MongoSegmentRepository(instance(params.mongoDb!), instance(params.mongoConverter), instance(params.partRepository))
   }
-})
+}
