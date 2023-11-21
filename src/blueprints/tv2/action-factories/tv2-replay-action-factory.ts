@@ -107,6 +107,7 @@ export class Tv2ReplayActionFactory {
       isOnAir: false,
       isNext: false,
       isUnsynced: false,
+      isUntimed: false,
       inTransition: {
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
