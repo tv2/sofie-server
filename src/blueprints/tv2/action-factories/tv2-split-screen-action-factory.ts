@@ -531,7 +531,7 @@ export class Tv2SplitScreenActionFactory {
     return {
       id: `insert_last_video_clip_to_split_screen_input_${inputIndex}${audioMode === Tv2AudioMode.VOICE_OVER ? '_vo' : ''}_action`,
       name: `Insert last Video ${audioMode === Tv2AudioMode.VOICE_OVER ? 'Voice Over ' : ''}Clip in DVE input ${inputIndex}`,
-      description: 'Insert last Video Clip in DVE input ${inputIndex}',
+      description: `Insert last Video Clip in DVE input ${inputIndex}`,
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
         contentType: Tv2ActionContentType.SPLIT_SCREEN,
