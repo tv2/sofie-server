@@ -14,6 +14,7 @@ import { Tv2SisyfosPersistenceMetadata } from './value-objects/tv2-metadata'
  Minimal effort has been put into refactoring it - only to the extent that it works with the new data model of SofieServer.
  */
 export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
+
   constructor(private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder) {}
 
   public getEndStateForPart(

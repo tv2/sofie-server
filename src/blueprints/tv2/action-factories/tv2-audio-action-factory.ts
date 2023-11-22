@@ -15,12 +15,13 @@ import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
-import { TimelineObject } from '../../../model/entities/timeline-object'
+import {
+  Tv2VideoClipTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 
 const FRAME_RATE: number = 25
 
@@ -28,7 +29,7 @@ export class Tv2AudioActionFactory {
 
   constructor(
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory
+    private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
   ) { }
 
   public isAudioAction(action: Tv2Action): boolean {
@@ -173,7 +174,7 @@ export class Tv2AudioActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO,
+        contentType: Tv2ActionContentType.AUDIO
       },
     }
   }
@@ -216,7 +217,7 @@ export class Tv2AudioActionFactory {
       metadata: {
         contentType: Tv2ActionContentType.AUDIO,
         actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED,
-        defaultFadeDurationInFrames: blueprintConfiguration.studio.AudioBedSettings.fadeOut
+        defaultFadeDurationInFrames: blueprintConfiguration.studio.audioBedSettings.fadeOutDurationInFrames
       }
     }
   }
@@ -225,7 +226,7 @@ export class Tv2AudioActionFactory {
     const audioAction: Tv2FadeAudioBedAction = action as Tv2FadeAudioBedAction
 
     const fadeDurationInMilliseconds: number =  this.getTimeFromFrames(this.isInteger(fadeDurationInFrames) ? fadeDurationInFrames : audioAction.metadata.defaultFadeDurationInFrames)
-    const fadeAudioBedTimelineObject: TimelineObject = this.casparCgTimelineObjectFactory.createFadeAudioBedTimelineObject(fadeDurationInMilliseconds)
+    const fadeAudioBedTimelineObject: Tv2BlueprintTimelineObject = this.videoClipTimelineObjectFactory.createFadeAudioBedTimelineObject(fadeDurationInMilliseconds)
 
     audioAction.data.pieceInterface.timelineObjects.push(fadeAudioBedTimelineObject)
     audioAction.data.pieceInterface.duration = fadeDurationInMilliseconds

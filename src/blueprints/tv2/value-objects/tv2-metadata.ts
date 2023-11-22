@@ -33,7 +33,7 @@ export interface Tv2PieceMetadata {
   sisyfosPersistMetaData?: Tv2SisyfosPersistenceMetadata // Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
   splitScreen?: {
     boxes: SplitScreenBoxProperties[],
-    audioTimelineObjectsForBoxes: { [inputIndex: number]: TimelineObject[] }
+    audioTimelineObjectsForBoxes: { [inputIndex: number]: Tv2BlueprintTimelineObject[] }
   }
   mediaPlayerSessions?: string[]
 }

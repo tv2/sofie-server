@@ -1,9 +1,9 @@
 import { PartAction, PieceAction } from '../../../model/entities/action'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
-import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Breaker, TransitionEffectType } from './tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
+import { Tv2BlueprintTimelineObject } from './tv2-metadata'
 
 export enum Tv2ActionContentType {
   CAMERA = 'CAMERA',
@@ -46,7 +46,7 @@ export interface Tv2VideoClipAction extends Tv2PartAction {
   metadata: {
     contentType: Tv2ActionContentType.VIDEO_CLIP,
     fileName: string
-    configuredVideoClipPostrollDuration: number
+    configuredVideoClipPostRollDuration: number
   }
 }
 
@@ -153,9 +153,9 @@ export interface Tv2SplitScreenInsertSourceInputAction extends Tv2PieceAction {
 export type Tv2SplitScreenInsertSourceInputMetadata = {
   inputIndex: number // zero-indexed
   videoMixerSource: number,
-  audioTimelineObjects: TimelineObject[]
+  audioTimelineObjects: Tv2BlueprintTimelineObject[]
   videoClip?: {
-    timelineObjects: TimelineObject[]
+    timelineObjects: Tv2BlueprintTimelineObject[]
     mediaPlayerSession: string
     audioMode: Tv2AudioMode
   }
