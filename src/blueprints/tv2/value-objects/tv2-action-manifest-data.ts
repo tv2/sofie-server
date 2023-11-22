@@ -3,12 +3,15 @@ import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2SourceLayer } from './tv2-layers'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
-export type Tv2ActionManifestData = Tv2ActionManifestDataForVideoClip | Tv2ActionManifestDataForSplitScreen | Tv2ActionManifestDataForGraphics
+export type Tv2ActionManifestData = Tv2ActionManifestVideoClipData
+| Tv2ActionManifestSplitScreenData
+| Tv2ActionManifestFullscreenGraphicsData
+| Tv2ActionManifestOverlayGraphicsData
 /**
  * This corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Video Clips.
  * The attributes need to match the attributes in the database
  */
-export interface Tv2ActionManifestDataForVideoClip {
+export interface Tv2ActionManifestVideoClipData {
   adLibPix: boolean
   voLevels: boolean
   duration: number
@@ -24,7 +27,7 @@ export interface Tv2ActionManifestDataForVideoClip {
  * This corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with split screens.
  * The attributes need to match the attributes in the database.
  */
-export interface Tv2ActionManifestDataForSplitScreen {
+export interface Tv2ActionManifestSplitScreenData {
   name: string
   pieceType: Tv2PieceType
   config: {
@@ -38,13 +41,11 @@ export interface Tv2ActionManifestDataForSplitScreen {
   }
 }
 
-export type Tv2ActionManifestDataForGraphics = Tv2ActionManifestDataForFullscreenGraphics | Tv2ActionManifestDataForOverlayGraphics
-
 /**
  * This corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Fullscreen Graphics.
  * The attributes need to match the attributes in the database.
  */
-export interface Tv2ActionManifestDataForFullscreenGraphics {
+export interface Tv2ActionManifestFullscreenGraphicsData {
   vcpid: number
   name: string,
 }
@@ -53,7 +54,7 @@ export interface Tv2ActionManifestDataForFullscreenGraphics {
  * This corresponds to the mapped fields from 'adLibPieces' collection in the database when dealing with Overlay Graphics.
  * The attributes need to match the attributes in the database.
  */
-export interface Tv2ActionManifestDataForOverlayGraphics {
+export interface Tv2ActionManifestOverlayGraphicsData {
   sourceLayerId: Tv2SourceLayer
   name: string,
   expectedDuration?: number
@@ -92,8 +93,6 @@ export interface Tv2SplitScreenManifestData {
   template: string,
   sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound>
 }
-
-export type Tv2GraphicsManifestData = Tv2FullscreenGraphicsManifestData | Tv2OverlayGraphicsManifestData
 
 export interface Tv2FullscreenGraphicsManifestData {
   rundownId: string

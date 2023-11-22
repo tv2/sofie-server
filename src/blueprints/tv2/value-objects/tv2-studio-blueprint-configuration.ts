@@ -1,29 +1,28 @@
-// These names must match what Blueprints calls them. TODO: Change to something more sensible when we control settings.
 export interface Tv2StudioBlueprintConfiguration {
-  SourcesCam: Tv2SourceMappingWithSound[] // Cameras
-  SourcesRM: Tv2SourceMappingWithSound[] // Lives
-  SourcesReplay: Tv2SourceMappingWithSound[] // Replays
-  StudioMics: string[]
-  ABMediaPlayers: Tv2MediaPlayer[]
-  SwitcherSource: Tv2VideoMixerSources
-  CasparPrerollDuration: number
-  ServerPostrollDuration: number
-  DVEFolder?: string,
-  JingleFolder?: string
-  AudioBedSettings: {
-    fadeIn: number,
-    fadeOut: number,
-    volume: number
-  }
-  GraphicsType: Tv2GraphicsType
-  VizPilotGraphics: Tv2VizGraphics
-  HTMLGraphics?: Tv2HtmlGraphics
-  PreventOverlayWithFull: boolean
-  GraphicFolder?: string
-  GraphicFileExtension: string
-  GraphicMediaFlowId: string
-  GraphicIgnoreStatus: boolean
-  GraphicNetworkBasePath: string
+  cameraSources: Tv2SourceMappingWithSound[]
+  remoteSources: Tv2SourceMappingWithSound[]
+  replaySources: Tv2SourceMappingWithSound[]
+  studioMicrophones: string[]
+  mediaPlayers: Tv2MediaPlayer[]
+  videoMixerBasicConfiguration: Tv2VideoMixerBasicConfiguration
+  casparCgPreRollDuration: number
+  serverPostRollDuration: number
+  splitScreenFolder?: Tv2FolderConfiguration
+  jingleFolder?: Tv2FolderConfiguration
+  graphicsFolder: Tv2FolderConfiguration
+  selectedGraphicsType: Tv2GraphicsType
+  vizPilotGraphics: Tv2VizPilotGraphics
+  htmlGraphics?: Tv2HtmlGraphics
+  shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: boolean,
+  audioBedSettings: AudioBedSettings
+}
+
+export interface Tv2FolderConfiguration {
+  name?: string
+  networkBasePath: string
+  fileExtension: string
+  mediaFlowId: string
+  ignoreMediaStatus: boolean
 }
 
 export enum Tv2GraphicsType {
@@ -31,62 +30,68 @@ export enum Tv2GraphicsType {
   HTML = 'HTML'
 }
 
-export interface Tv2VizGraphics {
-  CleanFeedPrerollDuration?: number
-  KeepAliveDuration: number
-  PrerollDuration: number
-  OutTransitionDuration: number
-  CutToMediaPlayer: number
-  FullGraphicBackground: number
+export interface Tv2VizPilotGraphics {
+  preRollDurationInMsForCleanFeed?: number
+  keepPreviousPartAliveDurationInMs: number
+  preRollDurationInMs: number
+  outTransitionDurationInMs: number
+  fullscreenGraphicsBackgroundStartOffsetInMs: number
+  videoMixerSourceForFullscreenGraphicsBackground: number
 }
 
 export interface Tv2HtmlGraphics {
-  KeepAliveDuration: number
-  GraphicURL: string
-  TransitionSettings: {
+  msKeepOldPartAliveBeforeTakingGraphics: number
+  graphicsUrl: string
+  transitionSettings: {
     wipeRate: number,
     borderSoftness: number
   }
 }
 
 export interface Tv2SourceMapping {
-  _id: string
-  SourceName: string
-  SwitcherSource: number
+  id: string
+  name: string
+  videoMixerSource: number
 }
 
 export interface Tv2MediaPlayer extends Tv2SourceMapping { }
 
 export interface Tv2SourceMappingWithSound extends Tv2SourceMapping {
-  SisyfosLayers: string[]
-  StudioMics: boolean
-  WantsToPersistAudio?: boolean
-  AcceptPersistAudio?: boolean
+  sisyfosLayers: string[]
+  studioMicrophones: boolean
+  wantsToPersistAudio?: boolean
+  acceptPersistAudio?: boolean
 }
 
-export interface Tv2VideoMixerSources {
-  Default: number
-  SplitArtFill: number
-  SplitArtKey: number
-  DSK: Tv2DownstreamKeyer[]
-  Dip: number
+export interface Tv2VideoMixerBasicConfiguration {
+  defaultVideoMixerSource: number
+  splitScreenArtFillSource: number
+  splitScreenArtKeySource: number
+  downstreamKeyers: Tv2DownstreamKeyer[]
+  dipVideoMixerSource: number
 }
 
 export interface Tv2DownstreamKeyer {
-  _id: string
-  Number: number
-  Key: number
-  Fill: number
-  DefaultOn: boolean
-  Roles: Tv2DownstreamKeyerRole[]
-  Clip: number,
-  Gain: number
+  id: string // This id isn't really used
+  index: number
+  videoMixerKeySource: number
+  videoMixerFillSource: number
+  defaultOn: boolean
+  roles: Tv2DownstreamKeyerRole[]
+  videoMixerClip: number,
+  videoMixerGain: number
 }
 
 export enum Tv2DownstreamKeyerRole {
-  FULL_GRAPHICS = 'full_graphics',
-  OVERLAY_GRAPHICS = 'overlay_graphics',
-  JINGLE = 'jingle'
+  FULL_GRAPHICS = 'FULL_GRAPHICS',
+  OVERLAY_GRAPHICS = 'OVERLAY_GRAPHICS',
+  JINGLE = 'JINGLE'
+}
+
+export interface AudioBedSettings {
+  fadeInDurationFrames: number
+  fadeOutDurationInFrames: number
+  volume: number
 }
 
 

@@ -1,10 +1,9 @@
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { Piece, PieceInterface } from '../../../model/entities/piece'
+import { Piece } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
-import { TimelineObject } from '../../../model/entities/timeline-object'
 import {
   Tv2Action,
   Tv2ActionContentType,
@@ -27,7 +26,6 @@ import {
   TransitionEffectType
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import {
   Tv2AudioTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
@@ -38,6 +36,10 @@ import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
+import {
+  Tv2VideoClipTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
@@ -46,7 +48,7 @@ export class Tv2TransitionEffectActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory,
+    private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper
   ) {
@@ -69,8 +71,8 @@ export class Tv2TransitionEffectActionFactory {
         }
         case TransitionEffectType.DIP: {
           return [
-            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration.studio.SwitcherSource.Dip),
-            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration.studio.SwitcherSource.Dip)
+            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource),
+            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource)
           ]
         }
         case TransitionEffectType.BREAKER: {
@@ -102,7 +104,7 @@ export class Tv2TransitionEffectActionFactory {
 
   private createCutTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
     const effectName: string = 'Cut'
-    const pieceInterface: PieceInterface = this.createPieceInterface(effectName, 0)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, 0)
     const metadata: Tv2CutTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.CUT
@@ -137,7 +139,7 @@ export class Tv2TransitionEffectActionFactory {
     return (1000 / FRAME_RATE) * frames
   }
 
-  private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: PieceInterface): Tv2TransitionEffectAction {
+  private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: Tv2PieceInterface): Tv2TransitionEffectAction {
     return {
       id: `${effectName}_transition_action_${actionType.toString()}`,
       name: `${effectName}`,
@@ -152,7 +154,7 @@ export class Tv2TransitionEffectActionFactory {
 
   private createMixTransitionEffectAction(actionType: PieceActionType, transitionEffect: MixTransitionEffect): Tv2TransitionEffectAction {
     const effectName: string = `Mix${transitionEffect.durationInFrames}`
-    const pieceInterface: PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.MIX,
@@ -163,7 +165,7 @@ export class Tv2TransitionEffectActionFactory {
 
   private createDipTransitionEffectAction(actionType: PieceActionType, transitionEffect: DipTransitionEffect, configuredDipInput: number): Tv2TransitionEffectAction {
     const effectName: string = `Dip${transitionEffect.durationInFrames}`
-    const pieceInterface: PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.DIP,
@@ -179,18 +181,18 @@ export class Tv2TransitionEffectActionFactory {
       throw new Tv2MisconfigurationException(`Can't create Transition Effect Action for ${transitionEffect.name}. ${transitionEffect.name} is missing in Configurations`)
     }
 
-    const breakerDsk: Tv2DownstreamKeyer | undefined = configuration.studio.SwitcherSource.DSK.find(dsk => dsk.Roles.includes(Tv2DownstreamKeyerRole.JINGLE))
+    const breakerDsk: Tv2DownstreamKeyer | undefined = configuration.studio.videoMixerBasicConfiguration.downstreamKeyers.find(dsk => dsk.roles.includes(Tv2DownstreamKeyerRole.JINGLE))
     if (!breakerDsk) {
       throw  new Tv2MisconfigurationException('Can\'t create Transition Effect Action. No DSK has been configured for Jingles.')
     }
 
-    const pieceInterface: PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
     const metadata: Tv2BreakerTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.BREAKER,
-      casparCgPreRollDuration: configuration.studio.CasparPrerollDuration,
+      casparCgPreRollDuration: configuration.studio.casparCgPreRollDuration,
       downstreamKeyer: breakerDsk,
-      breakerFolder: configuration.studio.JingleFolder ?? '',
+      breakerFolder: configuration.studio.jingleFolder?.name ?? '',
       breaker
     }
     return this.createTransitionEffectAction(actionType, breaker.name, metadata, pieceInterface)
@@ -205,17 +207,17 @@ export class Tv2TransitionEffectActionFactory {
 
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
-        const cutTransitionTimelineObject: TimelineObject = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObject(sourceInput)
+        const cutTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObject(sourceInput)
         action.data.pieceInterface.timelineObjects.push(cutTransitionTimelineObject)
         break
       }
       case TransitionEffectType.MIX: {
-        const mixTransitionTimelineObject: TimelineObject = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames)
+        const mixTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames)
         action.data.pieceInterface.timelineObjects.push(mixTransitionTimelineObject)
         break
       }
       case TransitionEffectType.DIP: {
-        const dipTransitionTimelineObject: TimelineObject = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
+        const dipTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
         action.data.pieceInterface.timelineObjects.push(dipTransitionTimelineObject)
         break
       }
@@ -229,7 +231,7 @@ export class Tv2TransitionEffectActionFactory {
     return action
   }
 
-  private createTimelineObjectsForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): TimelineObject[] {
+  private createTimelineObjectsForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): Tv2BlueprintTimelineObject[] {
     const breaker: Breaker = breakerActionMetadata.breaker
     const casparCgPreRollDuration: number = breakerActionMetadata.casparCgPreRollDuration
 
@@ -238,14 +240,14 @@ export class Tv2TransitionEffectActionFactory {
       duration: this.getTimeFromFrames(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
     }
 
-    const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.Fill
-    const fileName: string = this.assetPathHelper.joinAssetToFolder(breakerActionMetadata.breakerFolder, breakerActionMetadata.breaker.fileName)
+    const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.videoMixerFillSource
+    const fileName: string = this.assetPathHelper.joinAssetToFolder(breakerActionMetadata.breaker.fileName, breakerActionMetadata.breakerFolder)
 
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
-      this.casparCgTimelineObjectFactory.createBreakerTimelineObject(fileName),
+      this.videoClipTimelineObjectFactory.createBreakerTimelineObject(fileName),
       this.audioTimelineObjectFactory.createBreakerAudioTimelineObject()
     ]
   }

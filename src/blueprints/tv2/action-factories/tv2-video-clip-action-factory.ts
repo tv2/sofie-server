@@ -2,7 +2,6 @@ import { Action, MutateActionMethods, MutateActionType } from '../../../model/en
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { PartActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
-import { PieceInterface } from '../../../model/entities/piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -19,17 +18,23 @@ import { Media } from '../../../model/entities/media'
 import { Tv2Action, Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
+import {
+  Tv2VideoClipTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
+import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
+import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
 export class Tv2VideoClipActionFactory {
 
   constructor(
+    private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly casparCgTimelineObjectFactory: Tv2CasparCgTimelineObjectFactory
+    private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
   ) {
   }
 
@@ -56,7 +61,7 @@ export class Tv2VideoClipActionFactory {
     }
 
     videoClipAction.data.partInterface.expectedDuration = media?.duration
-      ? Math.max((media.duration * 1000) - videoClipAction.metadata.configuredVideoClipPostrollDuration, 0)
+      ? Math.max((media.duration * 1000) - videoClipAction.metadata.configuredVideoClipPostRollDuration, 0)
       : videoClipAction.data.partInterface.expectedDuration
 
     const mediaPlayerSession: string = `${action.id}_${Date.now()}`
@@ -71,8 +76,9 @@ export class Tv2VideoClipActionFactory {
     return videoClipAction
   }
 
-  public createVideoClipActions(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData[]): Tv2VideoClipAction[] {
-    return videoClipData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
+  public createVideoClipActions(configuration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2VideoClipAction[] {
+    const videoClipManifestData: Tv2VideoClipManifestData[] = this.actionManifestMapper.mapToVideoClipManifestData(actionManifests)
+    return videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
   }
 
   private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): Tv2VideoClipAction {
@@ -92,12 +98,12 @@ export class Tv2VideoClipActionFactory {
       metadata: {
         contentType: Tv2ActionContentType.VIDEO_CLIP,
         fileName: videoClipData.fileName,
-        configuredVideoClipPostrollDuration: configuration.studio.ServerPostrollDuration
+        configuredVideoClipPostRollDuration: configuration.studio.serverPostRollDuration
       }
     }
   }
 
-  private createVideoClipPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): PieceInterface {
+  private createVideoClipPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): Tv2PieceInterface {
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.VIDEO_CLIP,
       outputLayer: Tv2OutputLayer.PROGRAM,
@@ -108,7 +114,7 @@ export class Tv2VideoClipActionFactory {
     }
 
     const videoMixerEnable: TimelineEnable = {
-      start: configuration.studio.CasparPrerollDuration
+      start: configuration.studio.casparCgPreRollDuration
     }
 
     return {
@@ -123,14 +129,14 @@ export class Tv2VideoClipActionFactory {
       isUnsynced: false,
       start: 0,
       duration: 0,
-      preRollDuration: configuration.studio.CasparPrerollDuration,
+      preRollDuration: configuration.studio.casparCgPreRollDuration,
       postRollDuration: 0,
       tags: [],
       timelineObjects: [
         this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
-        this.casparCgTimelineObjectFactory.createVideoClipTimelineObject(videoClipData),
+        this.videoClipTimelineObjectFactory.createVideoClipTimelineObject(videoClipData),
         ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
       ]
     }

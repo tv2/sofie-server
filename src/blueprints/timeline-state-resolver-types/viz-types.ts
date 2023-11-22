@@ -1,5 +1,5 @@
-import { TimelineObject } from '../../model/entities/timeline-object'
 import { DeviceType } from '../../model/enums/device-type'
+import { TimelineObject } from '../../model/entities/timeline-object'
 
 export const enum VizMseTransitionType {
   DELAY = 0
@@ -7,7 +7,7 @@ export const enum VizMseTransitionType {
 
 export interface VizMseElementInternalTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.VIZMSE
+    deviceType: DeviceType.VIZ_MSE
     type: VizType.ELEMENT_INTERNAL
     templateName: string
     templateData: string[]
@@ -18,7 +18,7 @@ export interface VizMseElementInternalTimelineObject extends TimelineObject {
 
 export interface VizMseElementPilotTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.VIZMSE
+    deviceType: DeviceType.VIZ_MSE
     type: VizType.ELEMENT_PILOT
     templateVcpId: number
     continueStep: number
@@ -34,28 +34,33 @@ export interface VizMseElementPilotTimelineObject extends TimelineObject {
 
 export interface VizMseLoadAllElementsTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.VIZMSE
+    deviceType: DeviceType.VIZ_MSE
     type: VizType.LOAD_ALL_ELEMENTS
   }
 }
 
 export interface VizMseContinueTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.VIZMSE
+    deviceType: DeviceType.VIZ_MSE
     type: VizType.CONTINUE
-    direction: -1 | 1 | undefined
+    direction: VizMseContinueDirection
     reference: string
   }
 }
 
-export interface VizMseClearGraphicsTimelineObjectContent {
-  deviceType: DeviceType.VIZMSE
-  type: VizType.CLEAR_ALL_ELEMENTS
-  channelsToSendCommands?: string[]
-  showName: string
+export enum VizMseContinueDirection {
+  BACKWARD = -1,
+  FORWARD = 1
 }
 
-
+export interface VizMseClearGraphicsTimelineObject extends TimelineObject {
+  content: {
+    deviceType: DeviceType.VIZ_MSE
+    type: VizType.CLEAR_ALL_ELEMENTS
+    channelsToSendCommands?: string[]
+    showName: string
+  }
+}
 
 export enum VizType {
   ELEMENT_INTERNAL = 'element_internal',

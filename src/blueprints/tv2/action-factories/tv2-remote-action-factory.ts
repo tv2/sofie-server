@@ -1,10 +1,9 @@
-import { Piece, PieceInterface } from '../../../model/entities/piece'
+import { Piece } from '../../../model/entities/piece'
 import { Part, PartInterface } from '../../../model/entities/part'
 import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
-import { TimelineObject } from '../../../model/entities/timeline-object'
-import { Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -26,12 +25,28 @@ import {
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 
 export class Tv2RemoteActionFactory {
+
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
   ) {}
+
+  public isRemoteAction(action: Tv2Action): action is Tv2RemoteAction {
+    return action.metadata.contentType === Tv2ActionContentType.REMOTE
+  }
+
+  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
+    switch (action.metadata.actionSubtype) {
+      case Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE:
+        return this.getRecallLastPlannedRemoteMutateActions()
+
+      default:
+        return []
+    }
+  }
 
   public createRemoteActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PartAction[] {
     return [
@@ -41,18 +56,18 @@ export class Tv2RemoteActionFactory {
   }
 
   private createInsertRemoteAsNextActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
-    return blueprintConfiguration.studio.SourcesRM
+    return blueprintConfiguration.studio.remoteSources
       .map(source => this.createInsertRemoteAsNextAction(blueprintConfiguration, source))
   }
 
   private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
-    const partId: string = `remoteInsertActionPart_${remoteSource.SourceName}`
-    const remotePieceInterface: PieceInterface = this.createRemotePiece(configuration, remoteSource, partId)
+    const partId: string = `remoteInsertActionPart_${remoteSource.name}`
+    const remotePieceInterface: Tv2PieceInterface = this.createRemotePieceInterface(configuration, remoteSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
     return {
-      id: `remoteAsNextAction_${remoteSource.SourceName}`,
-      name: `LIVE ${remoteSource.SourceName}`,
-      description: `Insert LIVE ${remoteSource.SourceName} as next.`,
+      id: `remoteAsNextAction_${remoteSource.name}`,
+      name: `LIVE ${remoteSource.name}`,
+      description: `Insert LIVE ${remoteSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -60,31 +75,29 @@ export class Tv2RemoteActionFactory {
       },
       metadata: {
         contentType: Tv2ActionContentType.REMOTE,
-        remoteNumber: remoteSource.SourceName,
+        remoteNumber: remoteSource.name,
       },
     }
   }
 
-  private createRemotePiece(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): PieceInterface {
-    const videoMixerTimelineObjects: TimelineObject[] = this.createVideoMixerTimelineObjects(source)
-    const audioTimelineObjects: TimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
+  private createRemotePieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2PieceInterface {
+    const videoMixerTimelineObjects: Tv2BlueprintTimelineObject[] = this.createVideoMixerTimelineObjects(source)
+    const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.REMOTE,
       outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
-        sisyfosLayers: source.SisyfosLayers,
-        wantsToPersistAudio: source.WantsToPersistAudio,
-        acceptsPersistedAudio: source.AcceptPersistAudio,
-        // TODO: Blueprints sets "isModifiedOrInsertedByAction" here which is used for getEndStateForPart and onTimelineGenerate.
-        // TODO: We should instead use something like Piece.isPlanned
+        sisyfosLayers: source.sisyfosLayers,
+        wantsToPersistAudio: source.wantsToPersistAudio,
+        acceptsPersistedAudio: source.acceptPersistAudio
       }
     }
 
     return {
-      id: `remoteAction_${source._id}`,
+      id: `remoteAction_${source.id}`,
       partId: parentPartId,
-      name: `LIVE ${source.SourceName}`,
+      name: `LIVE ${source.name}`,
       layer: Tv2SourceLayer.REMOTE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -102,19 +115,19 @@ export class Tv2RemoteActionFactory {
     }
   }
 
-  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): TimelineObject[] {
+  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): Tv2BlueprintTimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.SwitcherSource, enable),
-      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.SwitcherSource, enable),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, enable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.videoMixerSource, enable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.videoMixerSource, enable),
     ]
   }
 
   private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
     return {
       id: partId,
-      name: `Live Part ${source.SourceName}`,
+      name: `Live Part ${source.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,
@@ -146,22 +159,8 @@ export class Tv2RemoteActionFactory {
       },
       data: {
         partInterface: {} as PartInterface, // Is determined when called.
-        pieceInterfaces: [] as PieceInterface[], // Is determined when called.
+        pieceInterfaces: [] as Tv2PieceInterface[], // Is determined when called.
       }
-    }
-  }
-
-  public isRemoteAction(action: Tv2Action): action is Tv2RemoteAction {
-    return action.metadata.contentType === Tv2ActionContentType.REMOTE
-  }
-
-  public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
-    switch (action.metadata.actionSubtype) {
-      case Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE:
-        return this.getRecallLastPlannedRemoteMutateActions()
-
-      default:
-        return []
     }
   }
 
@@ -200,7 +199,7 @@ export class Tv2RemoteActionFactory {
       pieces: [],
     }
 
-    const pieceInterfaces: PieceInterface[] = historicPart.getPieces().map(piece => ({
+    const pieceInterfaces: Tv2PieceInterface[] = historicPart.getPieces().map(piece => ({
       id: `recall_last_planned_remote_piece_${piece.id}`,
       partId: partInterface.id,
       name: piece.name,
@@ -212,7 +211,7 @@ export class Tv2RemoteActionFactory {
       duration: piece.duration,
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
-      metadata: piece.metadata,
+      metadata: piece.metadata as Tv2PieceMetadata,
       tags: [],
       isUnsynced: false,
       timelineObjects: piece.timelineObjects,

@@ -1,3 +1,4 @@
+import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
 export interface Tv2ShowStyleBlueprintConfiguration {
   graphicsDefault: GraphicsDefault
@@ -24,10 +25,8 @@ export interface GraphicsSetup {
 }
 
 export interface GraphicsTemplate {
-  vizTemplate?: string
-  outType?: string
-  iNewsName?: string
-  layerMapping: string
+  name: string
+  lifespan: PieceLifespan
 }
 
 export interface SplitScreenConfiguration {

@@ -16,9 +16,9 @@ import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, audioMode?: Tv2AudioMode): SisyfosTimelineObject[] {
-    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.SisyfosLayers.map(sisyfosLayer => {
+    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.sisyfosLayers.map(sisyfosLayer => {
       return {
-        id: `${source._id}_${this.generateRandomWholeNumber()}`,
+        id: `${source.id}_${this.generateRandomWholeNumber()}`,
         enable: {
           start: 0
         },
@@ -31,7 +31,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       }
     })
 
-    if (!source.StudioMics) {
+    if (!source.studioMicrophones) {
       return sisyfosChannelTimelineObjects
     }
 
@@ -46,7 +46,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
   }
 
   private createStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration): SisyfosChannelsTimelineObject {
-    const priority: number = configuration.studio.StudioMics ? 2 : 0
+    const priority: number = configuration.studio.studioMicrophones ? 2 : 0
     const overridePriority: number = 2
     return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, overridePriority)
   }
@@ -72,7 +72,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNELS,
-        channels: configuration.studio.StudioMics.map(studioMicrophoneLayer => ({
+        channels: configuration.studio.studioMicrophones.map(studioMicrophoneLayer => ({
           mappedLayer: studioMicrophoneLayer,
           isPgm: sisyfosFaderState
         })),
@@ -124,7 +124,7 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNEL,
-        isPgm: videoClipData.audioMode ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
+        isPgm: videoClipData.audioMode === Tv2AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
       }
     }
 
