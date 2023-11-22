@@ -18,7 +18,7 @@ import {
 } from '../value-objects/tv2-action-manifest-data'
 import { Tv2GraphicsCommandTimelineObjectFactory } from './interfaces/tv2-graphics-command-timeline-object-factory'
 
-enum Engine {
+enum EngineName {
   OVERLAY = 'OVL1',
   FULLSCREEN = 'FULL1',
   WALL = 'WALL1'
@@ -91,7 +91,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       content: {
         deviceType: DeviceType.VIZ_MSE,
         type: VizType.CLEAR_ALL_ELEMENTS,
-        channelsToSendCommands: [Engine.OVERLAY, Engine.FULLSCREEN, Engine.WALL],
+        channelsToSendCommands: [EngineName.OVERLAY, EngineName.FULLSCREEN, EngineName.WALL],
         showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
       }
     }
@@ -128,7 +128,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
         templateVcpId: fullscreenGraphicsData.vcpId,
         continueStep: -1,
         noAutoPreloading: false,
-        channelName: Engine.FULLSCREEN,
+        channelName: EngineName.FULLSCREEN,
         ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
       }
     }
@@ -147,7 +147,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       delayTakeAfterOutTransition: true,
       outTransition: {
         type: VizMseTransitionType.DELAY,
-        delay: blueprintConfiguration.studio.vizPilotGraphics.msKeepPilotGraphicsAliveBeforeTakingNext
+        delay: blueprintConfiguration.studio.vizPilotGraphics.outTransitionDurationInMs
       }
     }
   }
@@ -173,7 +173,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       type: VizType.ELEMENT_INTERNAL,
       templateName: overlayGraphicsData.templateName,
       templateData: [overlayGraphicsData.displayText],
-      channelName: Engine.OVERLAY,
+      channelName: EngineName.OVERLAY,
       showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }
   }

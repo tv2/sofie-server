@@ -11,11 +11,7 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 
 const COLLECTION_NAME = 'pieces'
 
-describe(MongoPieceRepository.name, () => {
-  const testDatabase: MongoTestDatabase = new MongoTestDatabase()
-  beforeEach(async () => testDatabase.setupDatabase())
-  afterEach(async () => testDatabase.teardownDatabase())
-
+export function runMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoPieceRepository.prototype.deletePiecesForPart.name, () => {
     it('deletes one pieces successfully', async () => {
       const db: Db = testDatabase.getDatabase()
@@ -143,4 +139,4 @@ describe(MongoPieceRepository.name, () => {
 
     return new MongoPieceRepository(instance(mongoDb), instance(params.mongoConverter))
   }
-})
+}

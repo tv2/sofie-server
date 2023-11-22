@@ -224,12 +224,12 @@ export class Tv2StudioBlueprintConfigurationMapper {
 
   private mapVizPilotGraphics(coreGraphics: CoreVizGraphics): Tv2VizPilotGraphics {
     return {
-      msBeforeShowingBeforeShowingOnCleanFeed: coreGraphics.CleanFeedPrerollDuration,
-      msKeepOldPartAliveBeforeTakingGraphics: coreGraphics.KeepAliveDuration,
-      msPreRollBeforeTakingPilotGraphics: coreGraphics.PrerollDuration,
-      msKeepPilotGraphicsAliveBeforeTakingNext: coreGraphics.OutTransitionDuration,
-      msFromStartBeforeCuttingToBackgroundSource: coreGraphics.CutToMediaPlayer,
-      backgroundVideoSwitcherSource: coreGraphics.FullGraphicBackground
+      preRollDurationInMsForCleanFeed: coreGraphics.CleanFeedPrerollDuration,
+      keepPreviousPartAliveDurationInMs: coreGraphics.KeepAliveDuration,
+      preRollDurationInMs: coreGraphics.PrerollDuration,
+      outTransitionDurationInMs: coreGraphics.OutTransitionDuration,
+      fullscreenGraphicsBackgroundStartOffsetInMs: coreGraphics.CutToMediaPlayer,
+      videoMixerSourceForFullscreenGraphicsBackground: coreGraphics.FullGraphicBackground
     }
   }
 

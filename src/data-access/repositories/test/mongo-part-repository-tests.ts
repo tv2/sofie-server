@@ -12,11 +12,7 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 
 const COLLECTION_NAME = 'parts'
 
-describe(MongoPartRepository.name, () => {
-  const testDatabase: MongoTestDatabase = new MongoTestDatabase()
-  beforeEach(async () => testDatabase.setupDatabase())
-  afterEach(async () => testDatabase.teardownDatabase())
-
+export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoPartRepository.prototype.deletePartsForSegment.name, () => {
     it('deletes one part successfully', async () => {
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
@@ -286,7 +282,6 @@ describe(MongoPartRepository.name, () => {
 
       verify(pieceRepository.getPieces(anyString())).times(parts.length)
     })
-
   })
 
   function createMongoPart(mongoPartInterface?: Partial<MongoPart>): MongoPart {
@@ -330,4 +325,4 @@ describe(MongoPartRepository.name, () => {
 
     return new MongoPartRepository(instance(params.mongoDb!), instance(params.mongoConverter), instance(pieceRepository))
   }
-})
+}
