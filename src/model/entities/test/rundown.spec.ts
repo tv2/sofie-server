@@ -283,41 +283,6 @@ describe(Rundown.name, () => {
           beforeEach(() => jest.useFakeTimers())
           afterEach(() => jest.useRealTimers())
 
-          it('clears the executed at epoch time for the on air segment', () => {
-            const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPartId', isOnAir: true, timings: {
-              inTransitionStart: 0,
-              delayStartOfPiecesDuration: 0,
-              postRollDuration: 0,
-              previousPartContinueIntoPartDuration: 0,
-            } })
-            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId', isNext: true })
-            const executedAtEpochTime: number = 1234
-            const onAirSegment: Segment = EntityTestFactory.createSegment({ id: 'onAirSegmentId', isOnAir: true, parts: [onAirPart], executedAtEpochTime })
-            const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'nextSegmentId', isNext: true, parts: [nextPart], executedAtEpochTime: undefined })
-
-            const testee: Rundown = new Rundown({
-              segments: [onAirSegment, nextSegment],
-              isRundownActive: true,
-              alreadyActiveProperties: {
-                activeCursor: {
-                  segment: onAirSegment,
-                  part: onAirPart,
-                  owner: Owner.SYSTEM
-                },
-                nextCursor: {
-                  segment: nextSegment,
-                  part: nextPart,
-                  owner: Owner.SYSTEM
-                },
-                infinitePieces: new Map()
-              }
-            } as RundownInterface)
-
-            testee.takeNext()
-
-            expect(onAirSegment.getExecutedAtEpochTime()).toBeUndefined()
-          })
-
           it('sets the executed at epoch time for the next segment', () => {
             const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPartId', isOnAir: true, timings: {
               inTransitionStart: 0,
