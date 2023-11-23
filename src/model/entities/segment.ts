@@ -5,6 +5,8 @@ import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import { OnAirException } from '../exceptions/on-air-exception'
+import { OffAirException } from '../exceptions/off-air-exception'
 
 export interface SegmentInterface {
   id: string
@@ -54,13 +56,27 @@ export class Segment {
   }
 
   public putOnAir(): void {
+    this.assertOffAir()
     this.isSegmentOnAir = true
-    this.executedAtEpochTime ??= Date.now()
+    this.executedAtEpochTime = Date.now()
+  }
+
+  private assertOffAir(): void {
+    if (this.isSegmentOnAir) {
+      throw new OffAirException(`Expected segment '${this.name}' with id '${this.id}' to be off air.`)
+    }
   }
 
   public takeOffAir(): void {
+    this.assertOnAir()
     this.isSegmentOnAir = false
     this.executedAtEpochTime = undefined
+  }
+
+  private assertOnAir(): void {
+    if (!this.isSegmentOnAir) {
+      throw new OnAirException(`Expected segment '${this.name}' with id '${this.id}' to be on air.`)
+    }
   }
 
   public getExecutedAtEpochTime(): number | undefined {

@@ -193,7 +193,7 @@ export class Rundown extends BasicRundown {
     this.deactivateActivePartAndSegment()
     this.unmarkNextSegment()
     this.unmarkNextPart()
-    this.segments.forEach(segment => segment.takeOffAir())
+    this.segments.filter(segment => segment.isOnAir()).forEach(segment => segment.takeOffAir())
     this.nextCursor = undefined
     this.infinitePieces = new Map()
     this.isRundownActive = false
@@ -325,9 +325,11 @@ export class Rundown extends BasicRundown {
   }
 
   private takeNextCursor(): void {
+    const isLeavingOnAirSegment: boolean = this.activeCursor?.segment.id !== this.nextCursor?.segment.id
+
     if (this.activeCursor) {
       this.activeCursor.part.takeOffAir()
-      if (this.activeCursor.segment.id !== this.nextCursor?.segment.id) {
+      if (isLeavingOnAirSegment) {
         this.activeCursor.segment.takeOffAir()
       }
       if (this.activeCursor.segment.isUnsynced()) {
@@ -343,7 +345,9 @@ export class Rundown extends BasicRundown {
     this.activeCursor = this.nextCursor
     this.activeCursor.part.putOnAir()
     this.activeCursor.part.calculateTimings(this.previousPart)
-    this.activeCursor.segment.putOnAir()
+    if (isLeavingOnAirSegment) {
+      this.activeCursor.segment.putOnAir()
+    }
   }
 
   private removeUnsyncedPartsFromActiveSegment(): void {
