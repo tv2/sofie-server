@@ -60,7 +60,6 @@ export class Segment {
 
   public takeOffAir(): void {
     this.isSegmentOnAir = false
-    this.executedAtEpochTime = undefined
   }
 
   public getExecutedAtEpochTime(): number | undefined {
