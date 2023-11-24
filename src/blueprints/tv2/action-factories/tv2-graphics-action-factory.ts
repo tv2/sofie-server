@@ -227,7 +227,7 @@ export class Tv2GraphicsActionFactory {
 
   private createFullscreenGraphicsPartInterface(graphicsData: Tv2FullscreenGraphicsManifestData, blueprintConfiguration: Tv2BlueprintConfiguration): PartInterface {
     return {
-      id: `fullscreenGraphicsPart_${graphicsData.name}`,
+      id: `fullscreenGraphicsPart_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
       name: `Full ${graphicsData.name}`,
       segmentId: '',
       inTransition: {
