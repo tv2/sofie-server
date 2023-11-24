@@ -327,7 +327,9 @@ export class Rundown extends BasicRundown {
   private takeNextCursor(): void {
     if (this.activeCursor) {
       this.activeCursor.part.takeOffAir()
-      this.activeCursor.segment.takeOffAir()
+      if (this.activeCursor.segment.id !== this.nextCursor?.segment.id) {
+        this.activeCursor.segment.takeOffAir()
+      }
       if (this.activeCursor.segment.isUnsynced()) {
         // The unsynced Segment is not using the same reference in memory as the activeCursor.segment, so we need to update it in the Segments array.
         const unsyncedSegment: Segment | undefined = this.segments.find(segment => segment.id === this.activeCursor?.segment.id)

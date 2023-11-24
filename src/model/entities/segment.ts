@@ -15,7 +15,8 @@ export interface SegmentInterface {
   isOnAir: boolean
   isNext: boolean
   isUnsynced: boolean
-  budgetDuration?: number
+  executedAtEpochTime?: number
+  expectedDurationInMs?: number
 }
 
 export class Segment {
@@ -23,11 +24,12 @@ export class Segment {
   public readonly rundownId: string
   public name: string
   public rank: number
-  public budgetDuration?: number
+  public expectedDurationInMs?: number
 
   private isSegmentOnAir: boolean
   private isSegmentNext: boolean
   private isSegmentUnsynced: boolean = false
+  private executedAtEpochTime?: number
 
   private parts: Part[]
 
@@ -39,7 +41,8 @@ export class Segment {
     this.isSegmentOnAir = segment.isOnAir
     this.isSegmentNext = segment.isNext
     this.isSegmentUnsynced = segment.isUnsynced
-    this.budgetDuration = segment.budgetDuration
+    this.expectedDurationInMs = segment.expectedDurationInMs
+    this.executedAtEpochTime = segment.executedAtEpochTime
     this.setParts(segment.parts ?? [])
   }
 
@@ -52,10 +55,15 @@ export class Segment {
 
   public putOnAir(): void {
     this.isSegmentOnAir = true
+    this.executedAtEpochTime ??= Date.now()
   }
 
   public takeOffAir(): void {
     this.isSegmentOnAir = false
+  }
+
+  public getExecutedAtEpochTime(): number | undefined {
+    return this.executedAtEpochTime
   }
 
   public removeUnsyncedParts(): void {
@@ -209,6 +217,7 @@ export class Segment {
   public reset(): void {
     this.removeUnplannedParts()
     this.parts.forEach(part => part.reset())
+    this.executedAtEpochTime = undefined
   }
 
   private removeUnplannedParts(): void {
