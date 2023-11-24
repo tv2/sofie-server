@@ -232,7 +232,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
                   type: 'locators',
                   style: locatorLabels && locatorLabels.length > 0
                     ? JSON.parse(splitScreenConfiguration.graphicsTemplateJson)
-                    : '',
+                    : {},
                   ...locatorLabels
                 }
               }
