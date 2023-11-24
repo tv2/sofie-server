@@ -260,7 +260,7 @@ export class Tv2GraphicsActionFactory {
       : this.createVideoMixerTimelineObjectsForVizFullscreenGraphics(blueprintConfiguration)
 
     return this.createGraphicsPieceInterface({
-      id: `fullscreenGraphicsPiece_${graphicsData.name}`,
+      id: `fullscreenGraphicsPiece_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
       partId: partInterface.id,
       name: graphicsData.name,
       preRollDuration: this.getPreRollDuration(blueprintConfiguration),
@@ -360,7 +360,7 @@ export class Tv2GraphicsActionFactory {
   private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
-      id: '',
+      id: `${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}_piece`,
       name: overlayGraphicsData.name,
       layer: Tv2SourceLayer.IDENT,
       duration: overlayGraphicsData.expectedDuration,
@@ -396,7 +396,7 @@ export class Tv2GraphicsActionFactory {
   private createLowerThirdGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
-      id: '',
+      id: `${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}_piece`,
       name: overlayGraphicsData.name,
       layer: Tv2SourceLayer.LOWER_THIRD,
       duration: overlayGraphicsData.expectedDuration,

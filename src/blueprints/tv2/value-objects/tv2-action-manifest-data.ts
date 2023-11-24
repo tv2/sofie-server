@@ -31,7 +31,8 @@ export interface Tv2ActionManifestSplitScreenData {
   name: string
   pieceType: Tv2PieceType
   config: {
-    template: string,
+    template: string
+    labels: string[]
     sources: {
       [SplitScreenBoxInput.INPUT_1]?: Tv2ActionManifestSplitScreenSource,
       [SplitScreenBoxInput.INPUT_2]?: Tv2ActionManifestSplitScreenSource,
@@ -89,21 +90,22 @@ export interface Tv2VideoClipManifestData {
 
 export interface Tv2SplitScreenManifestData {
   rundownId: string
-  name: string,
-  template: string,
+  name: string
+  template: string
+  locatorLabels: string[]
   sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound>
 }
 
 export interface Tv2FullscreenGraphicsManifestData {
   rundownId: string
   vcpId: number
-  name: string,
+  name: string
 }
 
 export interface Tv2OverlayGraphicsManifestData {
   rundownId: string
   sourceLayerId: Tv2SourceLayer
-  name: string,
+  name: string
   templateName: string
   displayText: string
   expectedDuration?: number

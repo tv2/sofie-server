@@ -20,26 +20,33 @@ export interface CasparCgTemplateData {
   partialUpdate: boolean
   slots: {
     '250_full'?: {
+      display: string
       payload: {
         type: string
         url: string,
         noAnimation: boolean
       }
-      display: string
     }
     '450_lowerThird'?: {
+      display: string
       payload: {
         type: string
         0: string
       }
-      display: string
     }
     '650_ident'?: {
+      display: string
       payload: {
         type: string
         0: string
       }
+    },
+    '850_dve'?: {
       display: string
+      payload: {
+        type: string
+        style: string
+      }
     }
   }
 }
