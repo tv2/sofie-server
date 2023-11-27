@@ -61,7 +61,7 @@ export class IngestedEntityToEntityMapper {
       isOnAir: false,
       isNext: false,
       isUnsynced: false,
-      budgetDuration: ingestedSegment.budgetDuration,
+      expectedDurationInMs: ingestedSegment.budgetDuration,
       parts: [],
     })
   }
@@ -75,7 +75,8 @@ export class IngestedEntityToEntityMapper {
       isOnAir: segmentToBeUpdated.isOnAir(),
       isNext: segmentToBeUpdated.isNext(),
       isUnsynced: false, // Updated are never unsynced since Core removes and adds new Segments instead of updating them
-      budgetDuration: ingestedSegment.budgetDuration,
+      expectedDurationInMs: ingestedSegment.budgetDuration,
+      executedAtEpochTime: segmentToBeUpdated.getExecutedAtEpochTime(),
       parts: segmentToBeUpdated.getParts(),
     })
   }
