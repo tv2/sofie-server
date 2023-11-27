@@ -32,7 +32,7 @@ export interface Tv2ActionManifestSplitScreenData {
   pieceType: Tv2PieceType
   config: {
     template: string
-    locatorLabels: string[]
+    labels: string[]
     sources: {
       [SplitScreenBoxInput.INPUT_1]?: Tv2ActionManifestSplitScreenSource,
       [SplitScreenBoxInput.INPUT_2]?: Tv2ActionManifestSplitScreenSource,
