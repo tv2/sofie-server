@@ -2,7 +2,6 @@ import { ActionManifestRepository } from '../interfaces/action-manifest-reposito
 import { ActionManifest } from '../../../model/entities/action'
 import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
-import { MongoEntityConverter } from './mongo-entity-converter'
 
 const AD_LIB_ACTIONS_COLLECTION: string = 'adLibActions'
 
@@ -13,8 +12,8 @@ interface AdLibAction {
 }
 export class MongoAdLibActionsRepository extends BaseMongoRepository implements ActionManifestRepository {
 
-  constructor(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter) {
-    super(mongoDatabase, mongoEntityConverter)
+  constructor(mongoDatabase: MongoDatabase) {
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {

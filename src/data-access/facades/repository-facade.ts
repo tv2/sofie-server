@@ -1,7 +1,7 @@
 import { RundownRepository } from '../repositories/interfaces/rundown-repository'
 import { MongoRundownRepository } from '../repositories/mongo/mongo-rundown-repository'
 import { MongoDatabase } from '../repositories/mongo/mongo-database'
-import { MongoEntityConverter } from '../repositories/mongo/mongo-entity-converter'
+import { MongoIngestedEntityConverter } from '../repositories/mongo/mongo-ingested-entity-converter'
 import { SegmentRepository } from '../repositories/interfaces/segment-repository'
 import { MongoSegmentRepository } from '../repositories/mongo/mongo-segment-repository'
 import { PartRepository } from '../repositories/interfaces/part-repository'
@@ -25,77 +25,115 @@ import { MongoShowStyleVariantRepository } from '../repositories/mongo/mongo-sho
 import { ActionRepository } from '../repositories/interfaces/action-repository'
 import { MongoActionRepository } from '../repositories/mongo/mongo-action-repository'
 import { DataChangedListener } from '../repositories/interfaces/data-changed-listener'
-import { MongoSegmentChangedListener } from '../repositories/mongo/mongo-segment-changed-listener'
-import { MongoPartChangedListener } from '../repositories/mongo/mongo-part-changed-listener'
-import { Segment } from '../../model/entities/segment'
-import { Part } from '../../model/entities/part'
-import { Rundown } from '../../model/entities/rundown'
-import { MongoRundownChangedListener } from '../repositories/mongo/mongo-rundown-changed-listener'
+import { MongoIngestedSegmentChangedListener } from '../repositories/mongo/mongo-ingested-segment-changed-listener'
+import { MongoIngestedPartChangedListener } from '../repositories/mongo/mongo-ingested-part-changed-listener'
+import { MongoIngestedRundownChangedListener } from '../repositories/mongo/mongo-ingested-rundown-changed-listener'
 import { ActionManifestRepository } from '../repositories/interfaces/action-manifest-repository'
 import { MongoAdLibActionsRepository } from '../repositories/mongo/mongo-ad-lib-actions-repository'
 import { MediaRepository } from '../repositories/interfaces/MediaRepository'
 import { MongoMediaRepository } from '../repositories/mongo/mongo-media-repository'
 import { MongoAdLibPieceRepository } from '../repositories/mongo/mongo-ad-lib-piece-repository'
 import { MongoActionManifestRepository } from '../repositories/mongo/mongo-action-manifest-repository'
+import { IngestedRundownRepository } from '../repositories/interfaces/ingested-rundown-repository'
+import { IngestedPieceRepository } from '../repositories/interfaces/ingested-piece-repository'
+import { MongoIngestedPieceRepository } from '../repositories/mongo/mongo-ingested-piece-repository'
+import { IngestedPartRepository } from '../repositories/interfaces/ingested-part-repository'
+import { MongoIngestedPartRepository } from '../repositories/mongo/mongo-ingested-part-repository'
+import { IngestedSegmentRepository } from '../repositories/interfaces/ingested-segment-repository'
+import { MongoIngestedSegmentRepository } from '../repositories/mongo/mongo-ingested-segment-repository'
+import { MongoIngestedRundownRepository } from '../repositories/mongo/mongo-ingested-rundown-repository'
+import { MongoEntityConverter } from '../repositories/mongo/mongo-entity-converter'
+import { IngestedRundown } from '../../model/entities/ingested-rundown'
+import { IngestedPart } from '../../model/entities/ingested-part'
+import { IngestedSegment } from '../../model/entities/ingested-segment'
+import { CachedSegmentRepository } from '../repositories/cache/cached-segment-repository'
+import { CachedPartRepository } from '../repositories/cache/cached-part-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
     const mongoRundownRepository: RundownRepository = new MongoRundownRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
-      RepositoryFacade.createRundownBaselineRepository(),
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPieceRepository()
     )
     return CachedRundownRepository.getInstance(mongoRundownRepository)
   }
 
-  public static createRundownBaselineRepository(): RundownBaselineRepository {
-    return new MongoRundownBaselineRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
-  }
-
-  public static createRundownChangeListener(): DataChangedListener<Rundown> {
-    return new MongoRundownChangedListener(
+  public static createIngestedRundownRepository(): IngestedRundownRepository {
+    return new MongoIngestedRundownRepository(
       MongoDatabase.getInstance(),
-      new MongoEntityConverter(),
-      RepositoryFacade.createRundownRepository()
+      new MongoIngestedEntityConverter(),
+      RepositoryFacade.createRundownBaselineRepository(),
+      RepositoryFacade.createIngestedSegmentRepository()
     )
   }
 
+  public static createIngestedRundownChangeListener(): DataChangedListener<IngestedRundown> {
+    return new MongoIngestedRundownChangedListener(
+      MongoDatabase.getInstance(),
+      RepositoryFacade.createIngestedRundownRepository()
+    )
+  }
+
+  public static createRundownBaselineRepository(): RundownBaselineRepository {
+    return new MongoRundownBaselineRepository(MongoDatabase.getInstance())
+  }
+
   public static createSegmentRepository(): SegmentRepository {
-    return new MongoSegmentRepository(
+    const mongoSegmentRepository: SegmentRepository = new MongoSegmentRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
       RepositoryFacade.createPartRepository()
     )
+    return CachedSegmentRepository.getInstance(mongoSegmentRepository)
   }
 
-  public static createSegmentChangedListener(): DataChangedListener<Segment> {
-    return new MongoSegmentChangedListener(
+  public static createIngestedSegmentRepository(): IngestedSegmentRepository {
+    return new MongoIngestedSegmentRepository(
       MongoDatabase.getInstance(),
-      new MongoEntityConverter(),
-      RepositoryFacade.createSegmentRepository()
+      new MongoIngestedEntityConverter(),
+      RepositoryFacade.createIngestedPartRepository()
+    )
+  }
+
+  public static createIngestedSegmentChangedListener(): DataChangedListener<IngestedSegment> {
+    return new MongoIngestedSegmentChangedListener(
+      MongoDatabase.getInstance(),
+      RepositoryFacade.createIngestedSegmentRepository()
     )
   }
 
   public static createPartRepository(): PartRepository {
-    return new MongoPartRepository(
+    const mongoPartRepository: PartRepository = new MongoPartRepository(
       MongoDatabase.getInstance(),
       new MongoEntityConverter(),
       RepositoryFacade.createPieceRepository()
     )
+    return CachedPartRepository.getInstance(mongoPartRepository)
   }
 
-  public static createPartChangedListener(): DataChangedListener<Part> {
-    return new MongoPartChangedListener(
+  public static createIngestedPartRepository(): IngestedPartRepository {
+    return new MongoIngestedPartRepository(
       MongoDatabase.getInstance(),
-      new MongoEntityConverter(),
-      RepositoryFacade.createPartRepository()
+      new MongoIngestedEntityConverter(),
+      RepositoryFacade.createIngestedPieceRepository()
+    )
+  }
+
+  public static createIngestedPartChangedListener(): DataChangedListener<IngestedPart> {
+    return new MongoIngestedPartChangedListener(
+      MongoDatabase.getInstance(),
+      RepositoryFacade.createIngestedPartRepository()
     )
   }
 
   public static createPieceRepository(): PieceRepository {
     return new MongoPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+  }
+
+  public static createIngestedPieceRepository(): IngestedPieceRepository {
+    return new MongoIngestedPieceRepository(MongoDatabase.getInstance(), new MongoIngestedEntityConverter())
   }
 
   public static createTimelineRepository(): TimelineRepository {
@@ -119,7 +157,7 @@ export class RepositoryFacade {
   }
 
   public static createActionRepository(): ActionRepository {
-    return new MongoActionRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+    return new MongoActionRepository(MongoDatabase.getInstance())
   }
 
   public static createShowStyleVariantRepository(): ShowStyleVariantRepository {
@@ -131,11 +169,11 @@ export class RepositoryFacade {
   }
 
   private static createAdLibActionRepository(): ActionManifestRepository {
-    return new MongoAdLibActionsRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+    return new MongoAdLibActionsRepository(MongoDatabase.getInstance())
   }
 
   private static createAdLibPieceRepository(): ActionManifestRepository {
-    return new MongoAdLibPieceRepository(MongoDatabase.getInstance(), new MongoEntityConverter())
+    return new MongoAdLibPieceRepository(MongoDatabase.getInstance())
   }
 
   public static createMediaRepository(): MediaRepository {

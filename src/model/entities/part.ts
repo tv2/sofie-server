@@ -6,10 +6,13 @@ import { InTransition } from '../value-objects/in-transition'
 import { OutTransition } from '../value-objects/out-transition'
 import { AutoNext } from '../value-objects/auto-next'
 import { PartEndState } from '../value-objects/part-end-state'
+import { IngestedPart } from './ingested-part'
+import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface PartInterface {
   id: string
+  rundownId: string
   segmentId: string
   name: string
   rank: number
@@ -31,10 +34,13 @@ export interface PartInterface {
 
   timings?: PartTimings
   endState?: PartEndState
+
+  defaultPart?: IngestedPart
 }
 
 export class Part {
   public readonly id: string
+  public readonly rundownId: string
   public readonly name: string
   public readonly isPlanned: boolean = true
 
@@ -69,8 +75,15 @@ export class Part {
    */
   private endState?: PartEndState
 
+  public readonly defaultPart?: IngestedPart
+
   constructor(part: PartInterface) {
+    if (part.isPlanned && !part.defaultPart) {
+      throw new UnsupportedOperation(`Found planned Part ${part.id} without a default Part. Planned Parts must have default Parts!`)
+    }
+
     this.id = part.id
+    this.rundownId = part.rundownId
     this.segmentId = part.segmentId
     this.name = part.name
     this.rank = part.rank
@@ -95,6 +108,8 @@ export class Part {
     this.timings = part.timings
     this.isPartUntimed = part.isUntimed
     this.isPartUnsynced = part.isUnsynced
+
+    this.defaultPart = part.defaultPart
   }
 
   public putOnAir(): void {
@@ -302,13 +317,30 @@ export class Part {
     this.endState = endState
   }
 
+  public getInTransition(): InTransition {
+    return this.inTransition
+  }
+
   public reset(): void {
+    if (!this.defaultPart) {
+      return
+    }
+
     this.executedAt = 0
     this.playedDuration = 0
+    this.inTransition = this.defaultPart.inTransition
+    this.timings = this.defaultPart.timings
+    this.endState = undefined
+
     this.pieces = [
       ...this.pieces.filter(piece => piece.isPlanned),
       ...this.replacedPlannedPieces
-    ]
+    ].filter(piece => this.defaultPart!.ingestedPieces.some(ingestPiece => ingestPiece.id === piece.id))
+      .map(piece => {
+        const ingestedPiece: IngestedPiece = this.defaultPart!.ingestedPieces.find(ingestPiece => ingestPiece.id === piece.id)!
+        piece.resetFromIngestedPiece(ingestedPiece)
+        return piece
+      })
     this.replacedPlannedPieces = []
   }
 
