@@ -15,42 +15,55 @@ export interface CasparCgTemplateTimelineObject extends TimelineObject {
   }
 }
 
+// TODO: Move this to TV2 blueprints and split up the slots up into separate interfaces with a enumerated payload type.
 export interface CasparCgTemplateData {
-  display: string
+  display: CasparCgTemplateDisplayMode
   partialUpdate: boolean
   slots: {
-    '250_full'?: {
-      display: string
+    [CasparCgTemplateSlotType.FULLSCREEN_GRAPHICS]?: {
+      display: CasparCgTemplateDisplayMode
       payload: {
-        type: string
+        type: 'still'
         url: string,
         noAnimation: boolean
       }
     }
-    '450_lowerThird'?: {
-      display: string
+    [CasparCgTemplateSlotType.LOWER_THIRD]?: {
+      display: CasparCgTemplateDisplayMode
       payload: {
         type: string
         0: string
       }
     }
-    '650_ident'?: {
-      display: string
+    [CasparCgTemplateSlotType.IDENT]?: {
+      display: CasparCgTemplateDisplayMode
       payload: {
         type: string
         0: string
       }
-    },
-    '850_dve'?: {
-      display: string
+    }
+    [CasparCgTemplateSlotType.SPLIT_SCREEN]?: {
+      display: CasparCgTemplateDisplayMode
       payload: {
-        type: string
-        style: string
+        type: 'locators'
+        style: object
       }
     }
   }
 }
 
+export enum CasparCgTemplateSlotType {
+  FULLSCREEN_GRAPHICS = '250_full',
+  LOWER_THIRD = '450_lowerThird',
+  IDENT = '650_ident',
+  SPLIT_SCREEN = '850_dve',
+}
+
+export enum CasparCgTemplateDisplayMode {
+  PROGRAM = 'program',
+  PREVIEW = 'preview',
+  HIDDEN = 'hidden',
+}
 
 export interface CasparCgMediaTimelineObject extends TimelineObject {
   content: {
