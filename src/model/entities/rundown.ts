@@ -66,10 +66,11 @@ export class Rundown extends BasicRundown {
 
   constructor(rundown: RundownInterface) {
     super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt, rundown.timing)
-    this.segments = rundown.segments ?? []
+    this.segments = rundown.segments ? rundown.segments.sort(this.compareSegments) : []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
     this.history = rundown.history ?? []
+    this.persistentState = rundown.persistentState
 
     if (rundown.alreadyActiveProperties) {
       if (!rundown.isRundownActive) {
@@ -328,12 +329,7 @@ export class Rundown extends BasicRundown {
     if (this.activeCursor) {
       this.activeCursor.part.takeOffAir()
       this.activeCursor.segment.takeOffAir()
-      if (this.activeCursor.segment.isUnsynced()) {
-        // The unsynced Segment is not using the same reference in memory as the activeCursor.segment, so we need to update it in the Segments array.
-        const unsyncedSegment: Segment | undefined = this.segments.find(segment => segment.id === this.activeCursor?.segment.id)
-        unsyncedSegment?.takeOffAir()
-      }
-      this.removeUnsyncedPartsFromActiveSegment()
+      this.activeCursor.segment.removeUnsyncedParts()
     }
     if (!this.nextCursor) {
       return
@@ -342,12 +338,6 @@ export class Rundown extends BasicRundown {
     this.activeCursor.part.putOnAir()
     this.activeCursor.part.calculateTimings(this.previousPart)
     this.activeCursor.segment.putOnAir()
-  }
-
-  private removeUnsyncedPartsFromActiveSegment(): void {
-    // We have to find the Segment in the Segments array, since the Segment on the active cursor does not share the same reference in memory.
-    const segment: Segment | undefined = this.segments.find(segment => segment.id === this.activeCursor!.segment.id)
-    segment?.removeUnsyncedParts()
   }
 
   private updateInfinitePieces(): void {
@@ -514,11 +504,22 @@ export class Rundown extends BasicRundown {
     }
 
     const nextCursorSegment: Segment | undefined = this.segments.find(segment => segment.id === this.nextCursor?.segment.id)
-    const doesNextCursorPartExistInPartsForNextSegment: boolean | undefined = nextCursorSegment?.getParts().some(part => part.id === this.nextCursor?.part.id)
+    const isNextSegmentSameObjectReferenceAsNextCursorSegment: boolean = nextCursorSegment === this.nextCursor?.segment
+    if (nextCursorSegment && !isNextSegmentSameObjectReferenceAsNextCursorSegment) {
+      this.nextCursor = this.createCursor(this.nextCursor, { segment: nextCursorSegment })
+    }
+
+    const nextCursorPart: Part | undefined = nextCursorSegment?.getParts().find(part => part.id === this.nextCursor?.part.id)
+    const isNextPartSameObjectReferenceAsNextCursorPart: boolean = nextCursorPart === this.nextCursor?.part
+    if (nextCursorPart && !isNextPartSameObjectReferenceAsNextCursorPart) {
+      nextCursorPart.setAsNext()
+      this.nextCursor = this.createCursor(this.nextCursor, { part: nextCursorPart })
+    }
+
     if (this.nextCursor
       && this.nextCursor.owner === Owner.EXTERNAL
       && nextCursorSegment
-      && doesNextCursorPartExistInPartsForNextSegment
+      && nextCursorPart
     ) {
       return
     }
@@ -536,6 +537,7 @@ export class Rundown extends BasicRundown {
     if (oldSegment.isOnAir()) {
       segment.setParts(oldSegment.getParts())
       segment.putOnAir()
+      this.activeCursor = this.createCursor(this.activeCursor, { segment })
     }
 
     this.segments[segmentIndex] = segment
@@ -544,19 +546,32 @@ export class Rundown extends BasicRundown {
     this.updateNextCursor()
   }
 
-  public removeSegment(segmentId: string): void {
-    const segment: Segment | undefined = this.segments.find(s => s.id === segmentId)
-    if (!segment) {
+  public removeUnsyncedSegment(unsyncedSegment: Segment): void {
+    if (unsyncedSegment.isOnAir()) {
+      throw new UnsupportedOperation('Trying to remove an unsynced from the Rundown while it is still on Air')
+    }
+    this.segments = this.segments.filter(segment => segment.id !== unsyncedSegment.id)
+  }
+
+  /**
+   * Removes the Segment belonging to IngestSegmentId.
+   * Returns the removed Segment or undefined if the Segment doesn't exist on the Rundown
+   * If the Segment is currently OnAir, the Segment is still removed, but an "unsynced copy" is created of the Segment and added to the Rundown in its place.
+   */
+  public removeSegment(segmentId: string): Segment | undefined {
+    const segmentToRemove: Segment | undefined = this.segments.find(segment => !segment.isUnsynced() && segment.id === segmentId)
+    if (!segmentToRemove) {
       return
     }
 
-    if (segment.isOnAir()) {
-      this.unsyncSegment(segment)
+    if (segmentToRemove.isOnAir()) {
+      this.unsyncSegment(segmentToRemove)
     }
 
-    this.segments = this.segments.filter(s => s.id !== segmentId)
+    this.segments = this.segments.filter(segment => segment.id !== segmentToRemove.id)
 
     this.updateNextCursor()
+    return segmentToRemove
   }
 
   private unsyncSegment(segmentToUnsync: Segment): void {
@@ -593,15 +608,17 @@ export class Rundown extends BasicRundown {
     this.updateNextCursor()
   }
 
-  public removePartFromSegment(partId: string): void {
+  public removePartFromSegment(partId: string): Part | undefined {
     const segment: Segment | undefined = this.segments.find(segment => segment.getParts().some(part => part.id === partId))
     if (!segment) {
       throw new NotFoundException(`Unable to find Segment for Part ${partId} in Rundown ${this.id}`)
     }
-    segment.removePart(partId)
+    const removedPart: Part | undefined = segment.removePart(partId)
 
     this.markInfinitePiecesFromPartUnsynced(partId)
     this.updateNextCursor()
+
+    return removedPart
   }
 
   private markInfinitePiecesFromPartUnsynced(partId: string): void {
@@ -614,6 +631,10 @@ export class Rundown extends BasicRundown {
 
   public getInfinitePieces(): Piece[] {
     return Array.from(this.infinitePieces.values())
+  }
+
+  public getInfinitePiecesMap(): Map<string, Piece> {
+    return this.infinitePieces
   }
 
   public reset(): void {

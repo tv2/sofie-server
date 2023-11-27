@@ -2,7 +2,6 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { ActionRepository } from '../interfaces/action-repository'
 import { Action } from '../../../model/entities/action'
 import { MongoDatabase } from './mongo-database'
-import { MongoEntityConverter } from './mongo-entity-converter'
 import { DeleteResult } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 
@@ -10,8 +9,8 @@ const COLLECTION_NAME: string = 'actions'
 
 export class MongoActionRepository extends BaseMongoRepository implements ActionRepository {
 
-  constructor(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter) {
-    super(mongoDatabase, mongoEntityConverter)
+  constructor(mongoDatabase: MongoDatabase) {
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {

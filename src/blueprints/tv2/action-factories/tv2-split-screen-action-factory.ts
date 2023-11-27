@@ -188,6 +188,7 @@ export class Tv2SplitScreenActionFactory {
   private createPartInterface(partId: string, splitScreenConfiguration: SplitScreenConfiguration): PartInterface {
     return {
       id: partId,
+      rundownId: '',
       name: splitScreenConfiguration.name,
       segmentId: '',
       pieces: [],
@@ -454,6 +455,7 @@ export class Tv2SplitScreenActionFactory {
     clonedPart.reset()
     const partInterface: PartInterface = {
       id: `recall_last_planned_split_screen_part_${clonedPart.id}`,
+      rundownId: '',
       name: clonedPart.name,
       segmentId: '',
       rank: -1,
@@ -476,6 +478,8 @@ export class Tv2SplitScreenActionFactory {
     const pieceInterfaces: Tv2PieceInterface[] = historicPart.getPieces().map(piece => {
       return {
         id: `recall_last_split_screen_piece_${piece.id}`,
+        ingestedPieceId: '',
+        ingestedPartId: '',
         partId: partInterface.id,
         name: piece.name,
         layer: piece.layer,

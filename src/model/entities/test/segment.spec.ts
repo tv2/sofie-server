@@ -514,7 +514,7 @@ describe(Segment.name, () => {
   describe(Segment.prototype.insertPartAfterActivePart.name, () => {
     it('is not the Segment with the active Part - throws exception', () => {
       const randomNotActivePart: Part = new Part({ isOnAir: false } as PartInterface)
-      const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: true } as PartInterface)
+      const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: true, defaultPart: {} } as PartInterface)
 
       const testee: Segment = new Segment({ parts: [randomNotActivePart] } as SegmentInterface)
 
@@ -568,7 +568,7 @@ describe(Segment.name, () => {
       describe('the Part after the active Part is a planned Part', () => {
         it('inserts the unplanned Part after the active Part and before the planned Part', () => {
           const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-          const plannedPartAfterActivePart: Part = new Part({ id: 'plannedPartId', isOnAir: false, isPlanned: true } as PartInterface)
+          const plannedPartAfterActivePart: Part = new Part({ id: 'plannedPartId', isOnAir: false, isPlanned: true, defaultPart: {} } as PartInterface)
           const partToBeInserted: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
 
           const testee: Segment = new Segment({ parts: [randomActivePart, plannedPartAfterActivePart] } as SegmentInterface)

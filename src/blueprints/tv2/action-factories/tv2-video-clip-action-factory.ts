@@ -145,6 +145,7 @@ export class Tv2VideoClipActionFactory {
   private createPartInterface(partId: string, videoClipData: Tv2VideoClipManifestData): PartInterface {
     return {
       id: partId,
+      rundownId: '',
       name: videoClipData.name,
       segmentId: '',
       pieces: [],

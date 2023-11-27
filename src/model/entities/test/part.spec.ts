@@ -75,7 +75,7 @@ describe(Part.name, () => {
 
   describe(Part.prototype.reset.name, () => {
     it('has an executedAt value of 0 after being reset', () => {
-      const testee: Part = new Part({ executedAt: 123456789 } as PartInterface)
+      const testee: Part = new Part({ executedAt: 123456789, defaultPart: {} } as PartInterface)
 
       testee.reset()
 
@@ -84,7 +84,7 @@ describe(Part.name, () => {
     })
 
     it('has a playedDuration value of 0 after being reset', () => {
-      const testee: Part = new Part({ playedDuration: 5023 } as PartInterface)
+      const testee: Part = new Part({ playedDuration: 5023, defaultPart: {} } as PartInterface)
 
       testee.reset()
 
@@ -100,7 +100,12 @@ describe(Part.name, () => {
 
       const testee: Part = new Part({ pieces: [
         plannedPieceOne, plannedPieceTwo, unPlannedPieceOne, unPlannedPieceTwo
-      ] } as PartInterface)
+      ], defaultPart: {
+        ingestedPieces: [
+          { id: plannedPieceOne.id },
+          { id: plannedPieceTwo.id }
+        ]
+      } } as PartInterface)
 
       expect(testee.getPieces()).toContain(unPlannedPieceOne)
       expect(testee.getPieces()).toContain(unPlannedPieceTwo)
@@ -117,7 +122,7 @@ describe(Part.name, () => {
   describe(Part.prototype.setSegmentId.name, () => {
     describe('Part is planned', () => {
       it('throws an error', () => {
-        const testee: Part = new Part({ isPlanned: true } as PartInterface)
+        const testee: Part = new Part({ isPlanned: true, defaultPart: {} } as PartInterface)
         expect(() => testee.setSegmentId('someSegmentId')).toThrow()
       })
     })
