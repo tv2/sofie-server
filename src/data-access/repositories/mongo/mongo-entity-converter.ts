@@ -61,6 +61,7 @@ export interface MongoSegment extends MongoId {
   isNext: boolean
   isUnsynced: boolean
   budgetDuration?: number
+  executedAtEpochTime?: number
 }
 
 export interface MongoPart extends MongoId {
@@ -269,7 +270,8 @@ export class MongoEntityConverter {
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
       isUnsynced: segment.isUnsynced(),
-      budgetDuration: segment.budgetDuration,
+      budgetDuration: segment.expectedDurationInMs,
+      executedAtEpochTime: segment.getExecutedAtEpochTime(),
     }
   }
 
