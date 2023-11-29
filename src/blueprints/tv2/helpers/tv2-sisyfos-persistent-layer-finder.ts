@@ -53,8 +53,8 @@ export class Tv2SisyfosPersistentLayerFinder {
   }
 
   private isPiecePlaying(piece: Piece, partExecutedAt: number, time: number): boolean{
-    const hasPieceStoppedPlaying: boolean = piece.duration
-      ? piece.getStart() + piece.duration + partExecutedAt <= time
+    const hasPieceStoppedPlaying: boolean = piece.getDuration()
+      ? piece.getStart() + piece.getDuration()! + partExecutedAt <= time
       : false
     return !hasPieceStoppedPlaying
   }

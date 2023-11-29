@@ -347,7 +347,7 @@ export class MongoEntityConverter {
       pieceLifespan: piece.pieceLifespan,
       isPlanned: piece.isPlanned,
       start: piece.getStart(),
-      duration: piece.duration,
+      duration: piece.getDuration(),
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
       executedAt: piece.getExecutedAt(),

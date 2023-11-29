@@ -317,7 +317,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   child.id.includes(PIECE_CONTROL_INFIX)
                 )!
 
-                expect(controlObject.enable.duration).toBe(piece.duration)
+                expect(controlObject.enable.duration).toBe(piece.getDuration())
               })
             })
 
@@ -510,7 +510,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   child.id.includes(PIECE_CONTROL_INFIX)
                 )!
 
-                expect(controlObject.enable.duration).toBe(piece.duration)
+                expect(controlObject.enable.duration).toBe(piece.getDuration())
               })
             })
 
@@ -1423,7 +1423,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                     child.id.includes(PIECE_CONTROL_INFIX)
                   )!
 
-                  expect(controlGroup.enable.duration).toBe(piece.duration)
+                  expect(controlGroup.enable.duration).toBe(piece.getDuration())
                 })
               })
 
@@ -1642,7 +1642,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                     child.id.includes(PIECE_CONTROL_INFIX)
                   )!
 
-                  expect(controlObject.enable.duration).toBe(piece.duration)
+                  expect(controlObject.enable.duration).toBe(piece.getDuration())
                 })
               })
 

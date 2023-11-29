@@ -241,7 +241,7 @@ export class Part {
       .reduce((preRollDuration: number, piece: Piece) => Math.max(preRollDuration, piece.preRollDuration ?? 0), 0)
 
     const maxPostRollDurationForPieces: number = this.pieces
-      .filter((piece) => !!piece.postRollDuration && !piece.duration)
+      .filter((piece) => !!piece.postRollDuration && !piece.getDuration())
       .reduce((postRollDuration: number, piece: Piece) => Math.max(postRollDuration, piece.postRollDuration), 0)
     let inTransition: InTransition | undefined
     let allowTransition: boolean = false

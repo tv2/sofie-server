@@ -212,7 +212,7 @@ export class Tv2RemoteActionFactory {
       transitionType: piece.transitionType,
       isPlanned: false,
       start: piece.getStart(),
-      duration: piece.duration,
+      duration: piece.getDuration(),
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
       metadata: piece.metadata as Tv2PieceMetadata,

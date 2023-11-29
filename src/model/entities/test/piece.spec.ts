@@ -4,32 +4,16 @@ import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 
 describe(Piece.name, () => {
   describe(Piece.prototype.setExecutedAt.name, () => {
-    describe('piece is not an infinite Piece', () => {
-      it('does not set executedAt', () => {
-        const testee: Piece = new Piece({
-          pieceLifespan: PieceLifespan.WITHIN_PART,
-        } as PieceInterface)
-        const executedAtBefore: number = testee.getExecutedAt()
+    it('updates executedAt', () => {
+      const testee: Piece = new Piece({
+        pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+      } as PieceInterface)
 
-        testee.setExecutedAt(Date.now())
+      const now: number = Date.now()
+      testee.setExecutedAt(now)
 
-        const executedAtAfter: number = testee.getExecutedAt()
-        expect(executedAtAfter).toEqual(executedAtBefore)
-      })
-    })
-
-    describe('piece is an infinite Piece', () => {
-      it('updates executedAt', () => {
-        const testee: Piece = new Piece({
-          pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
-        } as PieceInterface)
-
-        const now: number = Date.now()
-        testee.setExecutedAt(now)
-
-        const result: number = testee.getExecutedAt()
-        expect(result).toEqual(now)
-      })
+      const result: number = testee.getExecutedAt()
+      expect(result).toEqual(now)
     })
   })
 
