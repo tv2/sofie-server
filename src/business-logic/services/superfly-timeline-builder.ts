@@ -198,7 +198,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     const startOffset: number = piece.getStart()
     return {
       start: partCalculatedTimings.inTransitionStart + startOffset,
-      duration: piece.duration,
+      duration: piece.getDuration(),
     }
   }
 
@@ -225,9 +225,9 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     parentGroup: TimelineObjectGroup
   ): TimelineEnable | undefined {
     const duration: string | number | undefined =
-        partCalculatedTimings.postRollDuration && !piece.duration
+        partCalculatedTimings.postRollDuration && !piece.getDuration()
           ? `#${parentGroup.id} - ${partCalculatedTimings.postRollDuration}`
-          : piece.duration
+          : piece.getDuration()
 
     return {
       start: piece.getStart() + partCalculatedTimings.delayStartOfPiecesDuration,

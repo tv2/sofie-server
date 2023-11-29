@@ -88,7 +88,7 @@ describe(ExecuteActionService.name, () => {
         const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
         await testee.executeAction(action.id, 'rundownId')
 
-        verify(rundownServiceMock.insertPieceAsOnAir(anyString(), anyOfClass(Piece))).once()
+        verify(rundownServiceMock.insertPieceAsOnAir(anyString(), anyOfClass(Piece), anything())).once()
       })
 
       it('updates Piece id to be unique', async () => {

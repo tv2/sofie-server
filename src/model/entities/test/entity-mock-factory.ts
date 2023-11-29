@@ -213,7 +213,7 @@ export class EntityMockFactory {
     when(mockedPiece.layer).thenReturn(pieceInterface.layer ?? 'layer')
     when(mockedPiece.isPlanned).thenReturn(pieceInterface.isPlanned ?? true)
     when(mockedPiece.getStart()).thenReturn(pieceInterface.start ?? 0)
-    when(mockedPiece.duration).thenReturn(pieceInterface.duration ?? 0)
+    when(mockedPiece.getDuration()).thenReturn(pieceInterface.duration ?? 0)
     when(mockedPiece.pieceLifespan).thenReturn(pieceInterface.pieceLifespan ?? PieceLifespan.WITHIN_PART)
     when(mockedPiece.timelineObjects).thenReturn(pieceInterface.timelineObjects ?? [])
     when(mockedPiece.preRollDuration).thenReturn(pieceInterface.preRollDuration ?? 0)

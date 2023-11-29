@@ -32,7 +32,6 @@ export class Piece {
   public readonly layer: string
   public readonly pieceLifespan: PieceLifespan
   public readonly isPlanned: boolean = true
-  public readonly duration?: number
   public readonly preRollDuration: number
   public readonly postRollDuration: number
   public readonly transitionType: TransitionType
@@ -44,6 +43,7 @@ export class Piece {
 
   private partId: string
   private start: number
+  private duration?: number
   private executedAt: number
   private isUnsyncedPiece: boolean = false
 
@@ -71,6 +71,7 @@ export class Piece {
 
   public resetFromIngestedPiece(ingestedPiece: IngestedPiece): void {
     this.start = ingestedPiece.start
+    this.duration = ingestedPiece.duration
     if (this.pieceLifespan === PieceLifespan.WITHIN_PART) {
       // Infinite Pieces might still be OnAir when their Part is resat, so we can't reset their "executedAt" here.
       this.executedAt = 0
@@ -78,11 +79,6 @@ export class Piece {
   }
 
   public setExecutedAt(executedAt: number): void {
-    if (this.pieceLifespan === PieceLifespan.WITHIN_PART) {
-      // Only care about executedAt for infinite Pieces
-      // since Pieces within Part always needs to be "executed" when the Part is taken.
-      return
-    }
     this.executedAt = executedAt
   }
 
@@ -92,6 +88,10 @@ export class Piece {
 
   public getExecutedAt(): number {
     return this.executedAt
+  }
+
+  public stop(): void {
+    this.duration = Date.now() - this.executedAt
   }
 
   public markAsUnsyncedWithUnsyncedPart(): void {
@@ -129,6 +129,10 @@ export class Piece {
 
   public getStart(): number {
     return this.start
+  }
+
+  public getDuration(): number | undefined {
+    return this.duration
   }
 
   public getUnsyncedCopy(): Piece {

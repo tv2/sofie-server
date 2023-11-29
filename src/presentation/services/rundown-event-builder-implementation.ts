@@ -75,12 +75,12 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
     }
   }
 
-  public buildInfiniteRundownPieceAddedEvent(rundown: Rundown, infinitePiece: Piece): RundownInfinitePieceAddedEvent {
+  public buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePieceAddedEvent {
     return {
-      type: RundownEventType.INFINITE_PIECE_ADDED,
+      type: RundownEventType.INFINITE_PIECES_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      infinitePiece: new PieceDto(infinitePiece),
+      infinitePieces: rundown.getInfinitePieces().map(piece => new PieceDto(piece))
     }
   }
 
