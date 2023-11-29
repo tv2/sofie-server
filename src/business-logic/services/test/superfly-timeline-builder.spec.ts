@@ -462,9 +462,10 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('active Part has a delayStartOfPiecesDuration', () => {
-              it('sets the TimelineEnable.start to Piece.start + delayStartOfPiecesDuration', async () => {
+              it('sets the TimelineEnable.start for planned piece to Piece.start + delayStartOfPiecesDuration', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   transitionType: TransitionType.NO_TRANSITION,
+                  isPlanned: true,
                   start: 10,
                 })
                 const activePart: Part = EntityMockFactory.createPart(
@@ -487,6 +488,32 @@ describe(SuperflyTimelineBuilder.name, () => {
                   piece.getStart() + activePart.getTimings().delayStartOfPiecesDuration
                 )
               })
+
+              it('sets the TimelineEnable.start for unplanned piece to Piece.start', async () => {
+                const piece: Piece = EntityMockFactory.createPiece({
+                  transitionType: TransitionType.NO_TRANSITION,
+                  isPlanned: false,
+                  start: 10,
+                })
+                const activePart: Part = EntityMockFactory.createPart(
+                  {pieces: [piece]},
+                  {partTimings: {delayStartOfPiecesDuration: 50}}
+                )
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+
+                const testee: TimelineBuilder = createTestee()
+                const timeline: Timeline = await testee.buildTimeline(rundown, createBasicStudioMock())
+
+                const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find((group) =>
+                  group.id.includes(ACTIVE_GROUP_PREFIX)
+                )!
+                const controlObject: TimelineObject = activeGroup.children.find((child) =>
+                  child.id.includes(PIECE_CONTROL_INFIX)
+                )!
+
+                expect(controlObject.enable.start).toBe(piece.getStart())
+              })
+
             })
 
             describe('Piece has a duration', () => {
