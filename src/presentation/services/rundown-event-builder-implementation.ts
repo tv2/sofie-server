@@ -26,8 +26,8 @@ import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
 import { IngestEventType, RundownEventType } from '../enums/rundown-event-type'
 import { SegmentDto } from '../dtos/segment-dto'
-import { RundownDto } from '../dtos/rundown-dto'
 import { Segment } from '../../model/entities/segment'
+import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 
 export class RundownEventBuilderImplementation implements RundownEventBuilder {
 
@@ -118,7 +118,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.RUNDOWN_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      rundown: new RundownDto(rundown)
+      basicRundown: new BasicRundownDto(rundown)
     }
   }
 
@@ -127,7 +127,7 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       type: IngestEventType.RUNDOWN_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      rundown: new RundownDto(rundown)
+      basicRundown: new BasicRundownDto(rundown)
     }
   }
 
