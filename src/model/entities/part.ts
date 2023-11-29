@@ -332,7 +332,11 @@ export class Part {
     this.timings = this.defaultPart.timings
     this.endState = undefined
 
-    this.pieces = [
+    this.resetPieces()
+  }
+
+  private resetPieces(): void {
+    this.pieces =  [
       ...this.pieces.filter(piece => piece.isPlanned),
       ...this.replacedPlannedPieces
     ].filter(piece => this.defaultPart!.ingestedPieces.some(ingestPiece => ingestPiece.id === piece.id))
