@@ -1,10 +1,12 @@
 import { RundownEventListener } from '../interfaces/rundown-event-listener'
 import {
-  PartCreatedEvent, PartDeletedEvent,
+  PartCreatedEvent,
+  PartDeletedEvent,
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
-  PartTakenEvent, PartUpdatedEvent,
+  PartTakenEvent,
+  PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
@@ -14,12 +16,12 @@ import {
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
-  SegmentCreatedEvent, SegmentDeletedEvent,
+  SegmentCreatedEvent,
+  SegmentDeletedEvent,
   SegmentUpdatedEvent
 } from '../value-objects/rundown-event'
 import { RundownEventEmitter } from '../../business-logic/services/interfaces/rundown-event-emitter'
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
-import { EventBuilderFacade } from '../facades/event-builder-facade'
 import { Rundown } from '../../model/entities/rundown'
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
@@ -28,21 +30,19 @@ import { Segment } from '../../model/entities/segment'
 export class RundownEventService implements RundownEventEmitter, RundownEventListener {
   private static instance: RundownEventService
 
-  public static getInstance(): RundownEventService {
+  public static getInstance(rundownEventBuilder: RundownEventBuilder): RundownEventService {
     if (!this.instance) {
-      this.instance = new RundownEventService(EventBuilderFacade.createRundownEventBuilder())
+      this.instance = new RundownEventService(rundownEventBuilder)
     }
     return this.instance
   }
 
   private readonly callbacks: ((rundownEvent: RundownEvent) => void)[] = []
 
-  private constructor(private readonly rundownEventBuilder: RundownEventBuilder) {
-    return
-  }
+  private constructor(private readonly rundownEventBuilder: RundownEventBuilder) { }
 
   private emitRundownEvent(rundownEvent: RundownEvent): void {
-    this.callbacks.forEach((cb) => cb(rundownEvent))
+    this.callbacks.forEach(callback => callback(rundownEvent))
   }
 
   public emitActivateEvent(rundown: Rundown): void {
