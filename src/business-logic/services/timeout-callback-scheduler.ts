@@ -1,4 +1,5 @@
 import { CallbackScheduler } from './interfaces/callback-scheduler'
+import { LoggerService } from '../../model/services/logger-service'
 
 const EXECUTE_CALLBACK_DURATION_THRESHOLD_IN_MS: number = 1
 const SCHEDULE_RESOLUTION: number = 2
@@ -6,22 +7,21 @@ const SCHEDULE_RESOLUTION: number = 2
 export class TimeoutCallbackScheduler implements CallbackScheduler {
   private static instance: CallbackScheduler
 
-  public static getInstance(): CallbackScheduler {
+  public static getInstance(loggerService: LoggerService): CallbackScheduler {
     if (!this.instance) {
-      this.instance = new TimeoutCallbackScheduler()
+      this.instance = new TimeoutCallbackScheduler(loggerService)
     }
     return this.instance
   }
-
   private timeoutIdentifier?: NodeJS.Timeout
 
-  private constructor() {
-    return
+  private constructor(private readonly loggerService: LoggerService) {
+    this.loggerService.tag(TimeoutCallbackScheduler.name)
   }
 
   public start(epochTimeToExecuteCallback: number, callback: () => void): void {
     if (epochTimeToExecuteCallback <= Date.now()) {
-      console.log('### Skipping execution of callback. Point in time for execution is in the past!')
+      this.loggerService.warn('Skipping execution of callback. Point in time for execution is in the past!')
       return
     }
     this.scheduleCallback(epochTimeToExecuteCallback, callback)

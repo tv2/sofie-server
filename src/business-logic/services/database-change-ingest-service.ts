@@ -17,6 +17,7 @@ import { NotFoundException } from '../../model/exceptions/not-found-exception'
 import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { BasicRundown } from '../../model/entities/basic-rundown'
+import { LoggerService } from '../../model/services/logger-service'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
@@ -33,6 +34,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     timelineBuilder: TimelineBuilder,
     eventEmitter: RundownEventEmitter,
     ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
+    loggerService: LoggerService,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>
@@ -47,6 +49,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
         timelineBuilder,
         eventEmitter,
         ingestedEntityToEntityMapper,
+        loggerService,
         rundownChangeListener,
         segmentChangedListener,
         partChangedListener
@@ -71,10 +74,13 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     private readonly timelineBuilder: TimelineBuilder,
     private readonly eventEmitter: RundownEventEmitter,
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
+    private readonly loggerService: LoggerService,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>
   ) {
+    this.loggerService.tag(DatabaseChangeIngestService.name)
+
     this.listenForRundownChanges(rundownChangeListener)
     this.listenForSegmentChanges(segmentChangedListener)
     this.listenForPartChanges(partChangedListener)
@@ -235,7 +241,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
     this.isExecutingEvent = true
     eventCallback()
-      .catch(error => console.error('Error when executing Ingest event:', error))
+      .catch(error => this.loggerService.data(error).error('Error when executing Ingest event:'))
       .finally(() => {
         this.isExecutingEvent = false
         void this.buildRundowns()
@@ -269,7 +275,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
           // The Rundown has been deleted from the database
           continue
         }
-        console.log('Error when trying to build Rundowns for bulk', exception)
+        this.loggerService.data(exception).error('Error when trying to build Rundowns for bulk')
       }
     }
     this.rundownIdsToBuild.clear()
