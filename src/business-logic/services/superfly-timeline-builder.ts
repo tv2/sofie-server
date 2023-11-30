@@ -230,7 +230,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           : piece.duration
 
     return {
-      start: piece.getStart() + partCalculatedTimings.delayStartOfPiecesDuration,
+      start: piece.getStart() + (piece.isPlanned ? partCalculatedTimings.delayStartOfPiecesDuration : 0),
       duration: duration === 0 ? undefined : duration,
     }
   }
