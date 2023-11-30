@@ -13,6 +13,7 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
 import { IngestedPart } from '../../../model/entities/ingested-part'
+import { LoggerService } from '../../../model/services/logger-service'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest changed this to "ingestedParts"
 
@@ -24,9 +25,11 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository implem
 
   constructor(
     mongoDatabase: MongoDatabase,
-    private readonly partRepository: IngestedPartRepository
+    private readonly partRepository: IngestedPartRepository,
+    private readonly loggerService: LoggerService
   ) {
     super(mongoDatabase)
+    this.loggerService.tag(MongoIngestedPartChangedListener.name)
     mongoDatabase.onConnect(INGESTED_PART_COLLECTION_NAME, () => this.listenForChanges())
   }
 
@@ -34,7 +37,7 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository implem
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedPart>) => void this.onChange(change))
-    console.debug('### Listening for Part collection changes...')
+    this.loggerService.debug('Listening for Part collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoIngestedPart>): Promise<void> {
