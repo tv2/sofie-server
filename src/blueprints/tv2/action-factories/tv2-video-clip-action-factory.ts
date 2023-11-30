@@ -25,6 +25,7 @@ import {
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
+import { Tv2LoggerService } from '../tv2-logger-service'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -32,10 +33,12 @@ export class Tv2VideoClipActionFactory {
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
+    private readonly loggerService: Tv2LoggerService,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
   ) {
+    this.loggerService.tag(Tv2VideoClipActionFactory.name)
   }
 
   public isVideoClipAction(action: Tv2Action): boolean {
@@ -56,7 +59,7 @@ export class Tv2VideoClipActionFactory {
   private updateVideoClipAction(action: Action, media?: Media): Action {
     const videoClipAction: Tv2VideoClipAction = action as Tv2VideoClipAction
     if (videoClipAction.metadata.contentType !== Tv2ActionContentType.VIDEO_CLIP) {
-      console.error('Can\'t update VideoClipAction. Action is not a VideoClipAction')
+      this.loggerService.warn('Can\'t update VideoClipAction. Action is not a VideoClipAction')
       return action
     }
 

@@ -40,6 +40,7 @@ import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
+import { Tv2LoggerService } from '../tv2-logger-service'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
@@ -50,8 +51,10 @@ export class Tv2TransitionEffectActionFactory {
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly loggerService: Tv2LoggerService,
     private readonly assetPathHelper: Tv2AssetPathHelper
   ) {
+    loggerService.tag(Tv2TransitionEffectActionFactory.name)
   }
 
   public createTransitionEffectActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
@@ -201,7 +204,7 @@ export class Tv2TransitionEffectActionFactory {
   private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, piece: Piece): Tv2TransitionEffectAction {
     const sourceInput: number | undefined = this.videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(piece)
     if (!sourceInput) {
-      console.log('Can\'t find a Program SourceInput to put the Transition Effect on')
+      this.loggerService.warn('Can\'t find a Program SourceInput to put the Transition Effect on')
       return action
     }
 
