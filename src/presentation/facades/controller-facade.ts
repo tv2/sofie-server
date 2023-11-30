@@ -6,6 +6,7 @@ import { BaseController } from '../controllers/base-controller'
 import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
+import { ActionTriggerController } from '../controllers/action-trigger-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -13,6 +14,7 @@ export class ControllerFacade {
       this.createRundownController(),
       this.createTimelineController(),
       this.createActionController(),
+      this.createActionTriggerController(),
       this.createConfigurationController(),
     ]
   }
@@ -32,6 +34,13 @@ export class ControllerFacade {
 
   private static createActionController(): ActionController {
     return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler())
+  }
+
+  private static createActionTriggerController(): ActionTriggerController {
+    return new ActionTriggerController(
+      ServiceFacade.createActionTriggerService(),
+      new ExpressErrorHandler()
+    )
   }
 
   private static createConfigurationController(): ConfigurationController {

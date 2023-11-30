@@ -2,22 +2,30 @@ import WebSocket, { WebSocketServer } from 'ws'
 import express from 'express'
 import * as http from 'http'
 import { RundownEvent } from '../value-objects/rundown-event'
-import { RundownEventServer } from './interfaces/rundown-event-server'
+import { EventServer } from './interfaces/event-server'
 import { RundownEventListener } from '../interfaces/rundown-event-listener'
+import { ActionTriggerEventListener } from '../interfaces/action-trigger-event-listener'
+import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
 
-export class RundownWebSocketEventServer implements RundownEventServer {
-  private static instance: RundownEventServer
+export class WebSocketEventServer implements EventServer {
+  private static instance: EventServer
 
-  public static getInstance(rundownEventListener: RundownEventListener): RundownEventServer {
+  public static getInstance(
+    rundownEventListener: RundownEventListener,
+    actionTriggerEventListener: ActionTriggerEventListener
+  ): EventServer {
     if (!this.instance) {
-      this.instance = new RundownWebSocketEventServer(rundownEventListener)
+      this.instance = new WebSocketEventServer(rundownEventListener, actionTriggerEventListener)
     }
     return this.instance
   }
 
   private webSocketServer?: WebSocket.Server
 
-  private constructor(private readonly rundownEventListener: RundownEventListener) {}
+  private constructor(
+    private readonly rundownEventListener: RundownEventListener,
+    private readonly actionTriggerEventListener: ActionTriggerEventListener
+  ) {}
 
   public startServer(port: number): void {
     if (this.webSocketServer) {
@@ -60,6 +68,9 @@ export class RundownWebSocketEventServer implements RundownEventServer {
   private addListenerForWebSocket(webSocket: WebSocket): void {
     this.rundownEventListener.listenToRundownEvents((rundownEvent: RundownEvent) => {
       webSocket.send(JSON.stringify(rundownEvent))
+    })
+    this.actionTriggerEventListener.listenToActionTriggerEvents((actionTriggerEvent: ActionTriggerEvent) => {
+      webSocket.send(JSON.stringify(actionTriggerEvent))
     })
   }
 
