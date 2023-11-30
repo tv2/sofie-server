@@ -24,5 +24,5 @@ export interface RundownEventEmitter {
 
   emitPartCreated(rundown: Rundown, part: Part): void
   emitPartUpdated(rundown: Rundown, part: Part): void
-  emitPartDeleted(rundown: Rundown, partId: string): void
+  emitPartDeleted(rundown: Rundown, segmentId: string, partId: string): void
 }

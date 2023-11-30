@@ -184,12 +184,13 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
     }
   }
 
-  public buildPartDeletedEvent(rundown: Rundown, partId: string): PartDeletedEvent {
+  public buildPartDeletedEvent(rundown: Rundown, segmentId: string, partId: string): PartDeletedEvent {
     return {
       type: IngestEventType.PART_DELETED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      partId
+      segmentId,
+      partId,
     }
   }
 }

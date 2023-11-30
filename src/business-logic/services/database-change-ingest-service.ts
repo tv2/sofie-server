@@ -374,7 +374,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
     const removedPart: Part | undefined = rundown.removePartFromSegment(partId)
     if (removedPart && !removedPart.isUnsynced()) {
-      this.eventEmitter.emitPartDeleted(rundown, removedPart.id)
+      this.eventEmitter.emitPartDeleted(rundown, removedPart.getSegmentId(), removedPart.id)
       await this.partRepository.delete(removedPart.id)
     }
     await this.persistRundown(rundown)
