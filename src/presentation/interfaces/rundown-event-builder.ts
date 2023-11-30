@@ -44,5 +44,5 @@ export interface RundownEventBuilder {
 
   buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent
   buildPartUpdatedEvent(rundown: Rundown, part: Part): PartUpdatedEvent
-  buildPartDeletedEvent(rundown: Rundown, partId: string): PartDeletedEvent
+  buildPartDeletedEvent(rundown: Rundown, segmentId: string, partId: string): PartDeletedEvent
 }

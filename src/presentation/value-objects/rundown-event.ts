@@ -96,5 +96,6 @@ export interface PartUpdatedEvent extends RundownEvent {
 
 export interface PartDeletedEvent extends RundownEvent {
   type: IngestEventType.PART_DELETED
+  segmentId: string
   partId: string
 }

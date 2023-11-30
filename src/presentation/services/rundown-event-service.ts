@@ -122,8 +122,8 @@ export class RundownEventService implements RundownEventEmitter, RundownEventLis
     const event: PartUpdatedEvent = this.rundownEventBuilder.buildPartUpdatedEvent(rundown, part)
     this.emitRundownEvent(event)
   }
-  public emitPartDeleted(rundown: Rundown, partId: string): void {
-    const event: PartDeletedEvent = this.rundownEventBuilder.buildPartDeletedEvent(rundown, partId)
+  public emitPartDeleted(rundown: Rundown, segmentId: string, partId: string): void {
+    const event: PartDeletedEvent = this.rundownEventBuilder.buildPartDeletedEvent(rundown, segmentId, partId)
     this.emitRundownEvent(event)
   }
 
