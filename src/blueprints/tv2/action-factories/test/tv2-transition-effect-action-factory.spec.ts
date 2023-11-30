@@ -8,6 +8,7 @@ import {
 } from '../../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
 import { instance, mock } from '@typestrong/ts-mockito'
 import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
+import { Tv2LoggerService } from '../../tv2-logger-service'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   it('compiles', () => {
@@ -19,12 +20,14 @@ function createTestee(params?: {
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
   casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory,
   audioTimelineObjectFactory?: Tv2AudioTimelineObjectFactory,
-  assetPathHelper?: Tv2AssetPathHelper
+  assetPathHelper?: Tv2AssetPathHelper,
+  loggerService?: Tv2LoggerService
 }): Tv2TransitionEffectActionFactory {
   return new Tv2TransitionEffectActionFactory(
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.casparCgTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory)),
     params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioTimelineObjectFactory>()),
+    params?.loggerService ?? instance(mock(Tv2LoggerService)),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper))
   )
 }
