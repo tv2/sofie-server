@@ -13,6 +13,7 @@ import { MongoDatabase } from './mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedRundownRepository } from '../interfaces/ingested-rundown-repository'
 import { IngestedRundown } from '../../../model/entities/ingested-rundown'
+import { LoggerService } from '../../../model/services/logger-service'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest changed this to "ingestedRundowns"
 
@@ -24,9 +25,11 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
 
   constructor(
     mongoDatabase: MongoDatabase,
-    private readonly ingestedRundownRepository: IngestedRundownRepository
+    private readonly ingestedRundownRepository: IngestedRundownRepository,
+    private readonly loggerService: LoggerService
   ) {
     super(mongoDatabase)
+    this.loggerService.tag(MongoIngestedRundownChangedListener.name)
     mongoDatabase.onConnect(INGESTED_RUNDOWN_COLLECTION_NAME, () => this.listenForChanges())
   }
 
@@ -38,7 +41,7 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedRundown>) => void this.onChange(change))
-    console.debug('### Listening for Rundown collection changes...')
+    this.loggerService.debug('Listening for Rundown collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoIngestedRundown>): Promise<void> {
