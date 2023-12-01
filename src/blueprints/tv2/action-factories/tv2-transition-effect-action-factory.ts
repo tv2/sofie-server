@@ -40,21 +40,23 @@ import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
+import { Tv2ConsoleLogger } from '../tv2-console-logger'
 import { Tv2Logger } from '../tv2-logger'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
 
 export class Tv2TransitionEffectActionFactory {
+  private readonly logger: Tv2Logger
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly logger: Tv2Logger,
-    private readonly assetPathHelper: Tv2AssetPathHelper
+    private readonly assetPathHelper: Tv2AssetPathHelper,
+    logger: Tv2ConsoleLogger
   ) {
-    logger.tag(Tv2TransitionEffectActionFactory.name)
+    this.logger = logger.tag(Tv2TransitionEffectActionFactory.name)
   }
 
   public createTransitionEffectActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {

@@ -41,7 +41,7 @@ import {
   Tv2GraphicsTimelineObjectFactoryFactory
 } from './timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
 import { Tv2ActionManifestMapper } from './helpers/tv2-action-manifest-mapper'
-import { Tv2Logger } from './tv2-logger'
+import { Tv2ConsoleLogger } from './tv2-console-logger'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -55,7 +55,7 @@ export class Tv2BlueprintsFacade {
     const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
 
     const audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
-    const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory(Tv2Logger.getInstance())
+    const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory(Tv2ConsoleLogger.getInstance())
 
     const graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory = new Tv2GraphicsTimelineObjectFactoryFactory(assetPathHelper)
     const graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
@@ -69,8 +69,8 @@ export class Tv2BlueprintsFacade {
         videoMixerTimelineObjectFactory,
         videoClipTimelineObjectFactory,
         audioTimelineObjectFactory,
-        Tv2Logger.getInstance(),
-        assetPathHelper
+        assetPathHelper,
+        Tv2ConsoleLogger.getInstance()
       ),
       new Tv2AudioActionFactory(audioTimelineObjectFactory, videoClipTimelineObjectFactory),
       new Tv2GraphicsActionFactory(
@@ -82,10 +82,10 @@ export class Tv2BlueprintsFacade {
       ),
       new Tv2VideoClipActionFactory(
         actionManifestMapper,
-        Tv2Logger.getInstance(),
         videoMixerTimelineObjectFactory,
-        audioTimelineObjectFactory,
-        videoClipTimelineObjectFactory
+        audioTimelineObjectFactory, 
+        videoClipTimelineObjectFactory,
+        Tv2ConsoleLogger.getInstance()
       ),
       new Tv2VideoMixerConfigurationActionFactory(videoMixerTimelineObjectFactory),
       new Tv2SplitScreenActionFactory(
