@@ -21,7 +21,7 @@ export class MongoIngestedPieceRepository extends BaseMongoRepository implements
     const mongoPieces: MongoIngestedPiece[] = (await this.getCollection()
       .find<MongoIngestedPiece>({ startPartId: partId })
       .toArray())
-    return this.mongoEntityConverter.convertIngestedPieces(mongoPieces)
+    return this.mongoEntityConverter.convertToIngestedPieces(mongoPieces)
   }
 
   public async deleteIngestedPiecesForRundown(rundownId: string): Promise<void> {
