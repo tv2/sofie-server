@@ -27,15 +27,17 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { Piece } from '../../../model/entities/piece'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
+import { Tv2ConsoleLogger } from '../tv2-console-logger'
 import { Tv2Logger } from '../tv2-logger'
 
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
 const ATEM_PREFIX: string = 'atem_'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
+  private readonly logger: Tv2Logger
 
-  constructor(private readonly logger: Tv2Logger) {
-    this.logger.tag(Tv2AtemVideoMixerTimelineObjectFactory.name)
+  constructor(logger: Tv2ConsoleLogger) {
+    this.logger = logger.tag(Tv2AtemVideoMixerTimelineObjectFactory.name)
   }
 
   public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): AtemDownstreamKeyerTimelineObject {

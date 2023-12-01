@@ -25,20 +25,22 @@ import {
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
+import { Tv2ConsoleLogger } from '../tv2-console-logger'
 import { Tv2Logger } from '../tv2-logger'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
 export class Tv2VideoClipActionFactory {
+  private readonly logger: Tv2Logger
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
-    private readonly logger: Tv2Logger,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
-    private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
+    private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
+    logger: Tv2ConsoleLogger
   ) {
-    this.logger.tag(Tv2VideoClipActionFactory.name)
+    this.logger = logger.tag(Tv2VideoClipActionFactory.name)
   }
 
   public isVideoClipAction(action: Tv2Action): boolean {
