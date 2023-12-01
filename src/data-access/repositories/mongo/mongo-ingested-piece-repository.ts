@@ -26,6 +26,6 @@ export class MongoIngestedPieceRepository extends BaseMongoRepository implements
 
   public async deleteIngestedPiecesForRundown(rundownId: string): Promise<void> {
     this.assertDatabaseConnection(this.deleteIngestedPiecesForRundown.name)
-    await this.getCollection().deleteMany({ startRundownId: rundownId})
+    await this.getCollection().deleteMany({ startRundownId: rundownId })
   }
 }

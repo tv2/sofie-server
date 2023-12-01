@@ -37,12 +37,12 @@ export class MongoIngestedPartRepository extends BaseMongoRepository implements 
 
   public async getIngestedParts(segmentId: string): Promise<IngestedPart[]> {
     this.assertDatabaseConnection(this.getIngestedParts.name)
-    const mongoParts: MongoIngestedPart[] = (await this.getCollection()
+    const mongoIngestedParts: MongoIngestedPart[] = await this.getCollection()
       .find<MongoIngestedPart>({ segmentId: segmentId })
-      .toArray())
-    const parts: IngestedPart[] = this.mongoIngestedEntityConverter.convertToIngestedParts(mongoParts)
+      .toArray()
+    const ingestedParts: IngestedPart[] = this.mongoIngestedEntityConverter.convertToIngestedParts(mongoIngestedParts)
     return Promise.all(
-      parts.map(async (ingestedPart) => {
+      ingestedParts.map(async (ingestedPart) => {
         ingestedPart.ingestedPieces = (await this.ingestedPieceRepository.getIngestedPieces(ingestedPart.id))
         return ingestedPart
       })

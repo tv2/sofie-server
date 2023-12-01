@@ -5,20 +5,21 @@ import { PartTimings } from '../value-objects/part-timings'
 import { IngestedPiece } from './ingested-piece'
 
 export interface IngestedPart {
-  id: string
-  segmentId: string
-  rundownId: string
-  name: string
-  rank: number
+  readonly id: string
+  readonly segmentId: string
+  readonly rundownId: string
+  readonly name: string
+  readonly rank: number
+  readonly expectedDuration?: number
+
+  readonly inTransition: InTransition
+  readonly outTransition: OutTransition
+
+  readonly autoNext?: AutoNext
+  readonly disableNextInTransition: boolean
+
+  readonly isUntimed: boolean
+  readonly timings?: PartTimings
+
   ingestedPieces: IngestedPiece[]
-  expectedDuration?: number
-
-  inTransition: InTransition
-  outTransition: OutTransition
-
-  autoNext?: AutoNext
-  disableNextInTransition: boolean
-
-  isUntimed: boolean
-  timings?: PartTimings
 }
