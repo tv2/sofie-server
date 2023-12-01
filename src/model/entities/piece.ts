@@ -72,7 +72,7 @@ export class Piece {
   public resetFromIngestedPiece(ingestedPiece: IngestedPiece): void {
     this.start = ingestedPiece.start
     if (this.pieceLifespan === PieceLifespan.WITHIN_PART) {
-      // Infinite Pieces might still be OnAir when their Part is resat, so we can't reset their "executedAt" here.
+      // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
       this.executedAt = 0
     }
   }
