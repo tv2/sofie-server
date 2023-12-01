@@ -1,7 +1,7 @@
 import { TimelineObject } from './timeline-object'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { TransitionType } from '../enums/transition-type'
-import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
@@ -115,14 +115,14 @@ export class Piece {
 
   public setPartId(partId: string): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperation(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
+      throw new UnsupportedOperationException(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
     }
     this.partId = partId
   }
 
   public setStart(startTimestamp: number): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperation(`Trying to set the start of a planned Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
+      throw new UnsupportedOperationException(`Trying to set the start of a planned Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
     }
     this.start = startTimestamp
   }

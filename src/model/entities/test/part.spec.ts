@@ -5,7 +5,7 @@ import { Piece, PieceInterface } from '../piece'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { instance, verify } from '@typestrong/ts-mockito'
 import { EntityTestFactory } from './entity-test-factory'
-import { UnsupportedOperation } from '../../exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../../exceptions/unsupported-operation-exception'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -192,7 +192,7 @@ describe(Part.name, () => {
 
         const testee: Part = new Part({ } as PartInterface)
 
-        expect(() => testee.replacePiece(pieceToBeReplaced, newPiece)).toThrow(UnsupportedOperation)
+        expect(() => testee.replacePiece(pieceToBeReplaced, newPiece)).toThrow(UnsupportedOperationException)
       })
     })
 

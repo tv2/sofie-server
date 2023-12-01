@@ -7,7 +7,7 @@ import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { DeleteResult } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { UnsupportedOperation } from '../../../model/exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { Piece } from '../../../model/entities/piece'
 import { Segment } from '../../../model/entities/segment'
@@ -54,7 +54,7 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
   }
 
   public getRundownBySegmentId(ingestedSegmentId: string): Promise<Rundown> {
-    throw new UnsupportedOperation(`${MongoRundownRepository.name} does not support getting a Rundown from an Ingested Segment id. Trying to find Rundown with Segment id: ${ingestedSegmentId}`)
+    throw new UnsupportedOperationException(`${MongoRundownRepository.name} does not support getting a Rundown from an Ingested Segment id. Trying to find Rundown with Segment id: ${ingestedSegmentId}`)
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {

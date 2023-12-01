@@ -1,7 +1,7 @@
 import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { PartTimings } from '../value-objects/part-timings'
-import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
 import { InTransition } from '../value-objects/in-transition'
 import { OutTransition } from '../value-objects/out-transition'
 import { AutoNext } from '../value-objects/auto-next'
@@ -169,7 +169,7 @@ export class Part {
 
   public insertPiece(unPlannedPiece: Piece): void {
     if (unPlannedPiece.isPlanned) {
-      throw new UnsupportedOperation(`Trying to insert a planned Piece ${unPlannedPiece.id} to Part ${this.id}.`)
+      throw new UnsupportedOperationException(`Trying to insert a planned Piece ${unPlannedPiece.id} to Part ${this.id}.`)
     }
     unPlannedPiece.setPartId(this.id)
     if (this.isPartOnAir) {
@@ -191,7 +191,7 @@ export class Part {
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
     const pieceIndex: number = this.pieces.findIndex(piece => piece.id === pieceToBeReplaced.id)
     if (pieceIndex < 0) {
-      throw new UnsupportedOperation(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
+      throw new UnsupportedOperationException(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
     }
 
     if (pieceToBeReplaced.isPlanned) {
@@ -224,7 +224,7 @@ export class Part {
 
   public setSegmentId(segmentId: string): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperation(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
+      throw new UnsupportedOperationException(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
     }
     this.segmentId = segmentId
   }
@@ -299,7 +299,7 @@ export class Part {
 
   public getTimings(): PartTimings {
     if (!this.timings) {
-      throw new UnsupportedOperation(`No Timings has been calculated for Part: ${this.id}`)
+      throw new UnsupportedOperationException(`No Timings has been calculated for Part: ${this.id}`)
     }
     return this.timings
   }
