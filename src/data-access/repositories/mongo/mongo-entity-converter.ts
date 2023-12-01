@@ -25,7 +25,7 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
-import { LoggerService } from '../../../model/services/logger-service'
+import { Logger } from '../../../logger'
 
 export interface MongoId {
   _id: string
@@ -157,7 +157,7 @@ export interface MongoMedia {
 
 export class MongoEntityConverter {
 
-  constructor(private readonly loggerService: LoggerService) {
+  constructor(private readonly loggerService: Logger) {
     this.loggerService.tag(MongoEntityConverter.name)
   }
 

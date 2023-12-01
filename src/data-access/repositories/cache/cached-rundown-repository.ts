@@ -2,12 +2,12 @@ import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { LoggerService } from '../../../model/services/logger-service'
+import { Logger } from '../../../logger'
 
 export class CachedRundownRepository implements RundownRepository {
   private static instance: RundownRepository
 
-  public static getInstance(rundownRepository: RundownRepository, loggerService: LoggerService): RundownRepository {
+  public static getInstance(rundownRepository: RundownRepository, loggerService: Logger): RundownRepository {
     if (!this.instance) {
       this.instance = new CachedRundownRepository(rundownRepository, loggerService)
     }
@@ -16,7 +16,7 @@ export class CachedRundownRepository implements RundownRepository {
 
   private readonly cachedRundowns: Map<string, Rundown> = new Map()
 
-  constructor(private readonly rundownRepository: RundownRepository, private readonly loggerService: LoggerService) {
+  constructor(private readonly rundownRepository: RundownRepository, private readonly loggerService: Logger) {
     this.loggerService.tag(CachedRundownRepository.name)
   }
 
