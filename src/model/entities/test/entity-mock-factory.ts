@@ -132,7 +132,8 @@ export class EntityMockFactory {
     misc?: {
       partTimings?: Partial<PartTimings>
       executedAt?: number
-      piecesWithLifespanFilters?: Piece[]
+      piecesWithLifespanFilters?: Piece[],
+      isPlanned?: boolean
     }
   ): Part {
     const mockedPart: Part = this.createPartMock(partInterface, misc)
@@ -144,7 +145,8 @@ export class EntityMockFactory {
     misc?: {
       partTimings?: Partial<PartTimings>
       executedAt?: number
-      piecesWithLifespanFilters?: Piece[]
+      piecesWithLifespanFilters?: Piece[],
+      isPlanned?: boolean
     }
   ): Part {
     const mockedPart: Part = mock(Part)
@@ -171,7 +173,7 @@ export class EntityMockFactory {
     when(mockedPart.disableNextInTransition).thenReturn(partInterface.disableNextInTransition ?? false)
 
     when(mockedPart.getExecutedAt()).thenReturn(misc.executedAt ?? 0)
-    when(mockedPart.isPlanned).thenReturn(partInterface.isPlanned ?? true)
+    when(mockedPart.isPlanned).thenReturn(misc?.isPlanned ?? true)
 
     when(mockedPart.getPieces()).thenReturn(partInterface.pieces ?? [])
     when(mockedPart.getPiecesWithLifespan(anything())).thenReturn(misc.piecesWithLifespanFilters ?? [])

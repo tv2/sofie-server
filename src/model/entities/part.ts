@@ -16,7 +16,6 @@ export interface PartInterface {
   segmentId: string
   name: string
   rank: number
-  isPlanned: boolean
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
@@ -35,7 +34,7 @@ export interface PartInterface {
   timings?: PartTimings
   endState?: PartEndState
 
-  defaultPart?: IngestedPart
+  ingestedPart?: IngestedPart
 }
 
 export class Part {
@@ -78,16 +77,12 @@ export class Part {
   public readonly defaultPart?: IngestedPart
 
   constructor(part: PartInterface) {
-    if (part.isPlanned && !part.defaultPart) {
-      throw new UnsupportedOperation(`Found planned Part ${part.id} without a default Part. Planned Parts must have default Parts!`)
-    }
-
     this.id = part.id
     this.rundownId = part.rundownId
     this.segmentId = part.segmentId
     this.name = part.name
     this.rank = part.rank
-    this.isPlanned = part.isPlanned
+    this.isPlanned = !!part.ingestedPart
     this.pieces = part.pieces ?? []
     this.replacedPlannedPieces = []
     this.isPartOnAir = part.isOnAir
@@ -109,7 +104,7 @@ export class Part {
     this.isPartUntimed = part.isUntimed
     this.isPartUnsynced = part.isUnsynced
 
-    this.defaultPart = part.defaultPart
+    this.defaultPart = part.ingestedPart
   }
 
   public putOnAir(): void {

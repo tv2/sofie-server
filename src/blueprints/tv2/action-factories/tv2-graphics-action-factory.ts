@@ -240,7 +240,6 @@ export class Tv2GraphicsActionFactory {
       },
       isNext: false,
       isOnAir: false,
-      isPlanned: false,
       isUntimed: false,
       pieces: [],
       rank: 0,
