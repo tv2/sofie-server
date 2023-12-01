@@ -2,22 +2,24 @@ import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { ConsoleLogger } from '../../../console-logger'
 import { Logger } from '../../../logger'
 
 export class CachedRundownRepository implements RundownRepository {
   private static instance: RundownRepository
 
-  public static getInstance(rundownRepository: RundownRepository, logger: Logger): RundownRepository {
+  public static getInstance(rundownRepository: RundownRepository, logger: ConsoleLogger): RundownRepository {
     if (!this.instance) {
       this.instance = new CachedRundownRepository(rundownRepository, logger)
     }
     return this.instance
   }
 
+  private readonly logger: Logger
   private readonly cachedRundowns: Map<string, Rundown> = new Map()
 
-  constructor(private readonly rundownRepository: RundownRepository, private readonly logger: Logger) {
-    this.logger.tag(CachedRundownRepository.name)
+  constructor(private readonly rundownRepository: RundownRepository, logger: ConsoleLogger) {
+    this.logger = logger.tag(CachedRundownRepository.name)
   }
 
   public async getRundown(rundownId: string): Promise<Rundown> {

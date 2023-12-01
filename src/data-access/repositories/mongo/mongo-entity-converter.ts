@@ -25,6 +25,7 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
+import { ConsoleLogger } from '../../../console-logger'
 import { Logger } from '../../../logger'
 
 export interface MongoId {
@@ -157,8 +158,10 @@ export interface MongoMedia {
 
 export class MongoEntityConverter {
 
-  constructor(private readonly logger: Logger) {
-    this.logger.tag(MongoEntityConverter.name)
+  private readonly logger: Logger
+
+  constructor(logger: ConsoleLogger) {
+    this.logger = logger.tag(MongoEntityConverter.name)
   }
 
   public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {

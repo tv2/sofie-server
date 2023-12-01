@@ -48,7 +48,7 @@ import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
 import { CachedSegmentRepository } from '../repositories/cache/cached-segment-repository'
 import { CachedPartRepository } from '../repositories/cache/cached-part-repository'
-import { Logger } from '../../logger'
+import { ConsoleLogger } from '../../console-logger'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -58,15 +58,15 @@ export class RepositoryFacade {
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPieceRepository()
     )
-    return CachedRundownRepository.getInstance(mongoRundownRepository, Logger.getInstance())
+    return CachedRundownRepository.getInstance(mongoRundownRepository, ConsoleLogger.getInstance())
   }
 
   private static createMongoEntityConverter(): MongoEntityConverter {
-    return new MongoEntityConverter(Logger.getInstance())
+    return new MongoEntityConverter(ConsoleLogger.getInstance())
   }
 
   private static getMongoDatabaseInstance(): MongoDatabase {
-    return MongoDatabase.getInstance(Logger.getInstance())
+    return MongoDatabase.getInstance(ConsoleLogger.getInstance())
   }
 
   public static createIngestedRundownRepository(): IngestedRundownRepository {
@@ -82,7 +82,7 @@ export class RepositoryFacade {
     return new MongoIngestedRundownChangedListener(
       RepositoryFacade.getMongoDatabaseInstance(),
       RepositoryFacade.createIngestedRundownRepository(),
-      Logger.getInstance()
+      ConsoleLogger.getInstance()
     )
   }
 
@@ -111,7 +111,7 @@ export class RepositoryFacade {
     return new MongoIngestedSegmentChangedListener(
       RepositoryFacade.getMongoDatabaseInstance(),
       RepositoryFacade.createIngestedSegmentRepository(),
-      Logger.getInstance()
+      ConsoleLogger.getInstance()
     )
   }
 
@@ -136,7 +136,7 @@ export class RepositoryFacade {
     return new MongoIngestedPartChangedListener(
       RepositoryFacade.getMongoDatabaseInstance(),
       RepositoryFacade.createIngestedPartRepository(),
-      Logger.getInstance()
+      ConsoleLogger.getInstance()
     )
   }
 
