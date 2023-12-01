@@ -9,22 +9,22 @@ import { Logger } from '../../logger'
 export class RundownWebSocketEventServer implements RundownEventServer {
   private static instance: RundownEventServer
 
-  public static getInstance(rundownEventListener: RundownEventListener, loggerService: Logger): RundownEventServer {
+  public static getInstance(rundownEventListener: RundownEventListener, logger: Logger): RundownEventServer {
     if (!this.instance) {
-      this.instance = new RundownWebSocketEventServer(rundownEventListener, loggerService)
+      this.instance = new RundownWebSocketEventServer(rundownEventListener, logger)
     }
     return this.instance
   }
 
   private webSocketServer?: WebSocket.Server
 
-  private constructor(private readonly rundownEventListener: RundownEventListener, private readonly loggerService: Logger) {
-    this.loggerService.tag(RundownWebSocketEventServer.name)
+  private constructor(private readonly rundownEventListener: RundownEventListener, private readonly logger: Logger) {
+    this.logger.tag(RundownWebSocketEventServer.name)
   }
 
   public startServer(port: number): void {
     if (this.webSocketServer) {
-      this.loggerService.info('Server is already started')
+      this.logger.info('Server is already started')
       return
     }
     this.setupWebSocketServer(port)
@@ -38,12 +38,12 @@ export class RundownWebSocketEventServer implements RundownEventServer {
     this.webSocketServer = this.createWebSocketServer(port)
 
     this.webSocketServer.on('connection', (webSocket: WebSocket) => {
-      this.loggerService.info('WebSocket successfully registered to Server')
+      this.logger.info('WebSocket successfully registered to Server')
       this.addListenerForWebSocket(webSocket)
     })
 
     this.webSocketServer.on('close', () => {
-      this.loggerService.info('Websocket Server has closed')
+      this.logger.info('Websocket Server has closed')
       this.webSocketServer = undefined
     })
   }
@@ -54,7 +54,7 @@ export class RundownWebSocketEventServer implements RundownEventServer {
     const webSocketServer = new WebSocketServer({ server })
 
     server.listen(port, () => {
-      this.loggerService.info(`WebSocketServer started on port: ${port}`)
+      this.logger.info(`WebSocketServer started on port: ${port}`)
     })
 
     return webSocketServer
@@ -68,10 +68,10 @@ export class RundownWebSocketEventServer implements RundownEventServer {
 
   public killServer(): void {
     if (!this.webSocketServer) {
-      this.loggerService.info('Websocket Server is already dead')
+      this.logger.info('Websocket Server is already dead')
       return
     }
-    this.loggerService.info('Killing Websocket Server')
+    this.logger.info('Killing Websocket Server')
     this.webSocketServer.close()
   }
 }

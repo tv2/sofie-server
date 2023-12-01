@@ -18,14 +18,14 @@ describe(Tv2VideoClipActionFactory.name, () => {
 
 function createTestee(params?: {
   actionManifestMapper?: Tv2ActionManifestMapper,
-  loggerService?: Tv2Logger,
+  logger?: Tv2Logger,
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
   audioTimelineObjectFactory?: Tv2AudioTimelineObjectFactory,
   casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory
 }): Tv2VideoClipActionFactory {
   return new Tv2VideoClipActionFactory(
     params?.actionManifestMapper ?? instance(mock(Tv2ActionManifestMapper)),
-    params?.loggerService ?? instance(mock(Tv2Logger)),
+    params?.logger ?? instance(mock(Tv2Logger)),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioTimelineObjectFactory>()),
     params?.casparCgTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory))

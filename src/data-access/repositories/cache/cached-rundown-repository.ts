@@ -7,22 +7,22 @@ import { Logger } from '../../../logger'
 export class CachedRundownRepository implements RundownRepository {
   private static instance: RundownRepository
 
-  public static getInstance(rundownRepository: RundownRepository, loggerService: Logger): RundownRepository {
+  public static getInstance(rundownRepository: RundownRepository, logger: Logger): RundownRepository {
     if (!this.instance) {
-      this.instance = new CachedRundownRepository(rundownRepository, loggerService)
+      this.instance = new CachedRundownRepository(rundownRepository, logger)
     }
     return this.instance
   }
 
   private readonly cachedRundowns: Map<string, Rundown> = new Map()
 
-  constructor(private readonly rundownRepository: RundownRepository, private readonly loggerService: Logger) {
-    this.loggerService.tag(CachedRundownRepository.name)
+  constructor(private readonly rundownRepository: RundownRepository, private readonly logger: Logger) {
+    this.logger.tag(CachedRundownRepository.name)
   }
 
   public async getRundown(rundownId: string): Promise<Rundown> {
     if (!this.cachedRundowns.has(rundownId)) {
-      this.loggerService.info(`Rundown with id: "${rundownId}" not found in cache. Loading rundown from database...`)
+      this.logger.info(`Rundown with id: "${rundownId}" not found in cache. Loading rundown from database...`)
       const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
       this.cachedRundowns.set(rundownId, rundown)
     }

@@ -26,10 +26,10 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
-    private readonly loggerService: Logger
+    private readonly logger: Logger
   ) {
     super(mongoDatabase)
-    this.loggerService.tag(MongoIngestedRundownChangedListener.name)
+    this.logger.tag(MongoIngestedRundownChangedListener.name)
     mongoDatabase.onConnect(INGESTED_RUNDOWN_COLLECTION_NAME, () => this.listenForChanges())
   }
 
@@ -41,7 +41,7 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedRundown>) => void this.onChange(change))
-    this.loggerService.debug('Listening for Rundown collection changes...')
+    this.logger.debug('Listening for Rundown collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoIngestedRundown>): Promise<void> {

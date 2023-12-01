@@ -26,10 +26,10 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository imp
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly ingestedSegmentRepository: IngestedSegmentRepository,
-    private readonly loggerService: Logger
+    private readonly logger: Logger
   ) {
     super(mongoDatabase)
-    this.loggerService.tag(MongoIngestedSegmentChangedListener.name)
+    this.logger.tag(MongoIngestedSegmentChangedListener.name)
     mongoDatabase.onConnect(INGESTED_SEGMENT_COLLECTION_NAME, () => this.listenForChanges())
   }
 
@@ -37,7 +37,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository imp
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedSegment>) => void this.onChange(change))
-    this.loggerService.debug('Listening for Segment collection changes...')
+    this.logger.debug('Listening for Segment collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoIngestedSegment>): Promise<void> {

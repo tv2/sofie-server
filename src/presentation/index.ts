@@ -50,9 +50,9 @@ function startSofieServer(): void {
 
 function attachExpressServerToPort(port: number): void {
   new SofieServer().server.listen(port, () => {
-    const loggerService: Logger = Logger.getInstance()
-    loggerService.tag('index')
-    return loggerService.info(`Express is listening at http://localhost:${port}`)
+    const logger: Logger = Logger.getInstance()
+    logger.tag('index')
+    return logger.info(`Express is listening at http://localhost:${port}`)
   })
 }
 
