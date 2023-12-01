@@ -1,4 +1,4 @@
-  import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { PartActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
