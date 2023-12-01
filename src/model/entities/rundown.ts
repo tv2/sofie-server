@@ -66,7 +66,7 @@ export class Rundown extends BasicRundown {
 
   constructor(rundown: RundownInterface) {
     super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt, rundown.timing)
-    this.segments = rundown.segments ? rundown.segments.sort(this.compareSegments) : []
+    this.segments = rundown.segments ? [...rundown.segments].flat().sort(this.compareSegments) : []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
     this.history = rundown.history ?? []
@@ -548,7 +548,7 @@ export class Rundown extends BasicRundown {
 
   public removeUnsyncedSegment(unsyncedSegment: Segment): void {
     if (unsyncedSegment.isOnAir()) {
-      throw new UnsupportedOperationException('Trying to remove an unsynced from the Rundown while it is still on Air')
+      throw new UnsupportedOperationException(`Trying to remove an unsynced Segment ${unsyncedSegment.id} from the Rundown while it is still on Air`)
     }
     this.segments = this.segments.filter(segment => segment.id !== unsyncedSegment.id)
   }
