@@ -3,18 +3,15 @@ import { Piece } from '../../model/entities/piece'
 import { IngestedPart } from '../../model/entities/ingested-part'
 import { Part } from '../../model/entities/part'
 import { PartTimings } from '../../model/value-objects/part-timings'
-import { Exception } from '../../model/exceptions/exception'
-import { ErrorCode } from '../../model/enums/error-code'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
 import { Segment } from '../../model/entities/segment'
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { Rundown, RundownAlreadyActiveProperties } from '../../model/entities/rundown'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 
 export class IngestedEntityToEntityMapper {
 
-  constructor() { }
-
-  public fromIngestedRundown(ingestedRundown: IngestedRundown): Rundown {
+  public convertIngestedRundownToRundown(ingestedRundown: IngestedRundown): Rundown {
     return new Rundown({
       id: ingestedRundown.id,
       name: ingestedRundown.name,
@@ -38,21 +35,18 @@ export class IngestedEntityToEntityMapper {
       : undefined
 
     return new Rundown({
+      ...ingestedRundown,
       id: rundownToUpdate.id,
-      name: ingestedRundown.name,
       isRundownActive: rundownToUpdate.isActive(),
-      showStyleVariantId: ingestedRundown.showStyleVariantId,
-      baselineTimelineObjects: ingestedRundown.baselineTimelineObjects,
       history: rundownToUpdate.getHistory(),
-      modifiedAt: ingestedRundown.modifiedAt,
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),
       segments: rundownToUpdate.getSegments(),
-      alreadyActiveProperties: alreadyActiveProperties
+      alreadyActiveProperties
     })
   }
 
-  public fromIngestedSegment(ingestedSegment: IngestedSegment): Segment {
+  public convertIngestedSegmentToSegment(ingestedSegment: IngestedSegment): Segment {
     return new Segment({
       id: ingestedSegment.id,
       rundownId: ingestedSegment.rundownId,
@@ -68,10 +62,8 @@ export class IngestedEntityToEntityMapper {
 
   public updateSegmentWithIngestedSegment(segmentToBeUpdated: Segment, ingestedSegment: IngestedSegment): Segment {
     return new Segment({
+      ...ingestedSegment,
       id: segmentToBeUpdated.id,
-      rundownId: segmentToBeUpdated.rundownId,
-      name: ingestedSegment.name,
-      rank: ingestedSegment.rank,
       isOnAir: segmentToBeUpdated.isOnAir(),
       isNext: segmentToBeUpdated.isNext(),
       isUnsynced: false, // Updated are never unsynced since Core removes and adds new Segments instead of updating them
@@ -82,7 +74,7 @@ export class IngestedEntityToEntityMapper {
   }
 
 
-  public fromIngestedPart(ingestedPart: IngestedPart): Part {
+  public convertIngestedPartToPart(ingestedPart: IngestedPart): Part {
     return new Part({
       id: ingestedPart.id,
       rundownId: ingestedPart.rundownId,
@@ -93,7 +85,7 @@ export class IngestedEntityToEntityMapper {
       isNext: false,
       isUnsynced: false,
       isUntimed: ingestedPart.isUntimed,
-      pieces: ingestedPart.ingestedPieces.map((ingestedPiece: IngestedPiece) => this.fromIngestedPiece(ingestedPiece)),
+      pieces: ingestedPart.ingestedPieces.map((ingestedPiece: IngestedPiece) => this.convertIngestedPieceToPiece(ingestedPiece)),
       expectedDuration: ingestedPart.expectedDuration,
       inTransition: ingestedPart.inTransition,
       outTransition: ingestedPart.outTransition,
@@ -114,21 +106,15 @@ export class IngestedEntityToEntityMapper {
       })
 
     return new Part({
+      ...ingestedPart,
       id: partToBeUpdated.id,
-      rundownId: ingestedPart.rundownId,
       segmentId: partToBeUpdated.getSegmentId(),
       name: ingestedPart.name,
       rank: ingestedPart.rank,
       isOnAir: partToBeUpdated.isOnAir(),
       isNext: false, // The Rundown always updates its own NextCursor, so we don't need to remember that value
       isUnsynced: false, // Updated are never unsynced since Core removes and adds new Parts instead of updating them
-      isUntimed: ingestedPart.isUntimed,
       pieces: updatedPieces,
-      expectedDuration: ingestedPart.expectedDuration,
-      inTransition: ingestedPart.inTransition,
-      outTransition: ingestedPart.outTransition,
-      autoNext: ingestedPart.autoNext,
-      disableNextInTransition: ingestedPart.disableNextInTransition,
       executedAt: partToBeUpdated.getExecutedAt(),
       playedDuration: partToBeUpdated.getPlayedDuration(),
       endState: partToBeUpdated.getEndState(),
@@ -139,15 +125,15 @@ export class IngestedEntityToEntityMapper {
 
   private getPartTimings(part: Part): PartTimings | undefined {
     try {
-      return  part.getTimings()
+      return part.getTimings()
     } catch (error) {
-      if ((error as Exception).errorCode !== ErrorCode.UNSUPPORTED_OPERATION) {
+      if (!(error instanceof UnsupportedOperationException)) {
         throw error
       }
     }
   }
 
-  public fromIngestedPiece(ingestedPiece: IngestedPiece): Piece {
+  private convertIngestedPieceToPiece(ingestedPiece: IngestedPiece): Piece {
     return new Piece({
       id: ingestedPiece.id,
       partId: ingestedPiece.partId,

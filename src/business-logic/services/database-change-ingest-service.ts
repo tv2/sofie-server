@@ -149,8 +149,8 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     ingestedRundown.ingestedSegments.forEach(ingestedSegment => {
       const segmentOnRundown: Segment | undefined = rundown.getSegments().find(segment => segment.id === ingestedSegment.id)
       if (!segmentOnRundown) {
-        const newSegment: Segment = this.ingestedEntityToEntityMapper.fromIngestedSegment(ingestedSegment)
-        const parts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart))
+        const newSegment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
+        const parts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart))
         newSegment.setParts(parts)
         rundown.addSegment(newSegment)
         return
@@ -161,7 +161,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
         const updateParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => {
           const partOnSegment: Part | undefined = segmentOnRundown.getParts().find(part => part.id === ingestedPart.id)
           if (!partOnSegment) {
-            return this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart)
+            return this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart)
           }
           return this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(partOnSegment, ingestedPart)
         })
@@ -173,7 +173,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
       const updateParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => {
         const partOnSegment: Part | undefined = segmentOnRundown.getParts().find(part => part.id === ingestedPart.id)
         if (!partOnSegment) {
-          return this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart)
+          return this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart)
         }
 
         if (partOnSegment.isOnAir()) {
@@ -202,13 +202,13 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
   private createNewRundownFromIngestedRundown(ingestedRundown: IngestedRundown): Rundown {
     const segments: Segment[] = ingestedRundown.ingestedSegments.map(ingestedSegment => {
-      const parts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart))
-      const segment: Segment = this.ingestedEntityToEntityMapper.fromIngestedSegment(ingestedSegment)
+      const parts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart))
+      const segment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
       segment.setParts(parts)
       return segment
     })
 
-    const newRundown: Rundown = this.ingestedEntityToEntityMapper.fromIngestedRundown(ingestedRundown) // No Segments
+    const newRundown: Rundown = this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(ingestedRundown) // No Segments
     segments.forEach(segment => newRundown.addSegment(segment))
 
     return newRundown
@@ -289,7 +289,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
   }
 
   private async createRundown(ingestedRundown: IngestedRundown): Promise<void> {
-    const rundown: Rundown = this.ingestedEntityToEntityMapper.fromIngestedRundown(ingestedRundown)
+    const rundown: Rundown = this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(ingestedRundown)
     this.eventEmitter.emitRundownCreated(rundown)
     await this.persistRundown(rundown)
   }
@@ -310,7 +310,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
   private async createSegment(ingestedSegment: IngestedSegment): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedSegment.rundownId)
-    const segment: Segment = this.ingestedEntityToEntityMapper.fromIngestedSegment(ingestedSegment)
+    const segment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
 
     rundown.addSegment(segment)
 
@@ -349,7 +349,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
   private async createPart(ingestedPart: IngestedPart): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedPart.rundownId)
-    const part: Part = this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart)
+    const part: Part = this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart)
 
     rundown.addPart(part)
 
