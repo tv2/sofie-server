@@ -33,12 +33,12 @@ export class Tv2VideoClipActionFactory {
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
-    private readonly loggerService: Tv2Logger,
+    private readonly logger: Tv2Logger,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
   ) {
-    this.loggerService.tag(Tv2VideoClipActionFactory.name)
+    this.logger.tag(Tv2VideoClipActionFactory.name)
   }
 
   public isVideoClipAction(action: Tv2Action): boolean {
@@ -59,7 +59,7 @@ export class Tv2VideoClipActionFactory {
   private updateVideoClipAction(action: Action, media?: Media): Action {
     const videoClipAction: Tv2VideoClipAction = action as Tv2VideoClipAction
     if (videoClipAction.metadata.contentType !== Tv2ActionContentType.VIDEO_CLIP) {
-      this.loggerService.warn('Can\'t update VideoClipAction. Action is not a VideoClipAction')
+      this.logger.warn('Can\'t update VideoClipAction. Action is not a VideoClipAction')
       return action
     }
 

@@ -6,12 +6,12 @@ import { HttpErrorHandler } from './interfaces/http-error-handler'
 import { Logger } from '../logger'
 
 export class ExpressErrorHandler implements HttpErrorHandler {
-  constructor(private readonly loggerService: Logger) {
-    this.loggerService.tag(ExpressErrorHandler.name)
+  constructor(private readonly logger: Logger) {
+    this.logger.tag(ExpressErrorHandler.name)
   }
 
   public handleError(response: Response, exception: Exception): void {
-    this.loggerService.data(exception.stack).error(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
+    this.logger.data(exception.stack).error(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
 
     response.status(this.getStatusCode(exception.errorCode)).send(`${exception.errorCode} - ${exception.message}`)
   }

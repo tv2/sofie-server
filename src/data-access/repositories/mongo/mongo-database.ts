@@ -11,9 +11,9 @@ const MONGO_DB_NAME: string = 'meteor'
 export class MongoDatabase {
   private static instance: MongoDatabase
 
-  public static getInstance(loggerService: Logger): MongoDatabase {
+  public static getInstance(logger: Logger): MongoDatabase {
     if (!this.instance) {
-      this.instance = new MongoDatabase(loggerService)
+      this.instance = new MongoDatabase(logger)
     }
     return this.instance
   }
@@ -23,15 +23,15 @@ export class MongoDatabase {
 
   private readonly onConnectCallbacks: Map<string, () => void> = new Map()
 
-  private constructor(private readonly loggerService: Logger) {
-    this.loggerService.tag(MongoDatabase.name)
+  private constructor(private readonly logger: Logger) {
+    this.logger.tag(MongoDatabase.name)
     this.connectToDatabase()
-      .catch((reason) => this.loggerService.data(reason).error('Failed connecting to mongo database.'))
+      .catch((reason) => this.logger.data(reason).error('Failed connecting to mongo database.'))
   }
 
   private async connectToDatabase(): Promise<void> {
     if (this.db) {
-      this.loggerService.info('Already connected to database. Skipping reconnection...')
+      this.logger.info('Already connected to database. Skipping reconnection...')
       return
     }
 
@@ -39,7 +39,7 @@ export class MongoDatabase {
     await this.client.connect()
 
     this.db = this.client.db(MONGO_DB_NAME)
-    this.loggerService.info(`Connected to database: ${this.db.databaseName}`)
+    this.logger.info(`Connected to database: ${this.db.databaseName}`)
 
     this.onConnectCallbacks.forEach(callback => callback())
   }

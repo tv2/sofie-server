@@ -157,8 +157,8 @@ export interface MongoMedia {
 
 export class MongoEntityConverter {
 
-  constructor(private readonly loggerService: Logger) {
-    this.loggerService.tag(MongoEntityConverter.name)
+  constructor(private readonly logger: Logger) {
+    this.logger.tag(MongoEntityConverter.name)
   }
 
   public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {
@@ -408,7 +408,7 @@ export class MongoEntityConverter {
         return LookaheadMode.WHEN_CLEAR
       }
       default: {
-        this.loggerService.warn(`Found unknown number for LookAhead: ${lookAheadNumber}`)
+        this.logger.warn(`Found unknown number for LookAhead: ${lookAheadNumber}`)
         // TODO: Throw error. Currently we have some misconfiguration that uses an outdated lookAhead mode
         // throw new UnsupportedOperation(`Found unknown number for LookAhead: ${lookAheadNumber}`)
         return LookaheadMode.NONE

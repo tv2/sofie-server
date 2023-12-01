@@ -7,21 +7,21 @@ const SCHEDULE_RESOLUTION: number = 2
 export class TimeoutCallbackScheduler implements CallbackScheduler {
   private static instance: CallbackScheduler
 
-  public static getInstance(loggerService: Logger): CallbackScheduler {
+  public static getInstance(logger: Logger): CallbackScheduler {
     if (!this.instance) {
-      this.instance = new TimeoutCallbackScheduler(loggerService)
+      this.instance = new TimeoutCallbackScheduler(logger)
     }
     return this.instance
   }
   private timeoutIdentifier?: NodeJS.Timeout
 
-  private constructor(private readonly loggerService: Logger) {
-    this.loggerService.tag(TimeoutCallbackScheduler.name)
+  private constructor(private readonly logger: Logger) {
+    this.logger.tag(TimeoutCallbackScheduler.name)
   }
 
   public start(epochTimeToExecuteCallback: number, callback: () => void): void {
     if (epochTimeToExecuteCallback <= Date.now()) {
-      this.loggerService.warn('Skipping execution of callback. Point in time for execution is in the past!')
+      this.logger.warn('Skipping execution of callback. Point in time for execution is in the past!')
       return
     }
     this.scheduleCallback(epochTimeToExecuteCallback, callback)

@@ -26,10 +26,10 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository implem
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly partRepository: IngestedPartRepository,
-    private readonly loggerService: Logger
+    private readonly logger: Logger
   ) {
     super(mongoDatabase)
-    this.loggerService.tag(MongoIngestedPartChangedListener.name)
+    this.logger.tag(MongoIngestedPartChangedListener.name)
     mongoDatabase.onConnect(INGESTED_PART_COLLECTION_NAME, () => this.listenForChanges())
   }
 
@@ -37,7 +37,7 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository implem
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedPart>) => void this.onChange(change))
-    this.loggerService.debug('Listening for Part collection changes...')
+    this.logger.debug('Listening for Part collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoIngestedPart>): Promise<void> {
