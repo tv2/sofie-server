@@ -31,7 +31,7 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository implemen
   }
 
   private async populateIngestedRundown(mongoIngestedRundown: MongoIngestedRundown): Promise<IngestedRundown> {
-    const ingestedRundown: IngestedRundown = this.mongoIngestedEntityConverter.convertRundown(mongoIngestedRundown)
+    const ingestedRundown: IngestedRundown = this.mongoIngestedEntityConverter.convertToIngestedRundown(mongoIngestedRundown)
 
     ingestedRundown.ingestedSegments = await this.ingestedSegmentRepository.getIngestedSegments(ingestedRundown.id)
     ingestedRundown.baselineTimelineObjects = await this.rundownBaselineRepository.getRundownBaseline(
@@ -48,7 +48,7 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository implemen
     if (!mongoRundown) {
       throw new NotFoundException(`No Rundown found for ingestRundownId: ${rundownId}`)
     }
-    const ingestedRundown: IngestedRundown = this.mongoIngestedEntityConverter.convertRundown(mongoRundown)
+    const ingestedRundown: IngestedRundown = this.mongoIngestedEntityConverter.convertToIngestedRundown(mongoRundown)
 
     ingestedRundown.ingestedSegments = await this.ingestedSegmentRepository.getIngestedSegments(rundownId)
     ingestedRundown.baselineTimelineObjects = await this.rundownBaselineRepository.getRundownBaseline(

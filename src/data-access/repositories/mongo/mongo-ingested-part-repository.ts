@@ -30,7 +30,7 @@ export class MongoIngestedPartRepository extends BaseMongoRepository implements 
     if (!mongoIngestedPart) {
       throw new NotFoundException(`No Part found for partId: ${partId}`)
     }
-    const ingestedPart: IngestedPart = this.mongoIngestedEntityConverter.convertIngestedPart(mongoIngestedPart)
+    const ingestedPart: IngestedPart = this.mongoIngestedEntityConverter.convertToIngestedPart(mongoIngestedPart)
     ingestedPart.ingestedPieces = await this.ingestedPieceRepository.getIngestedPieces(ingestedPart.id)
     return ingestedPart
   }
@@ -40,7 +40,7 @@ export class MongoIngestedPartRepository extends BaseMongoRepository implements 
     const mongoParts: MongoIngestedPart[] = (await this.getCollection()
       .find<MongoIngestedPart>({ segmentId: segmentId })
       .toArray())
-    const parts: IngestedPart[] = this.mongoIngestedEntityConverter.convertIngestedParts(mongoParts)
+    const parts: IngestedPart[] = this.mongoIngestedEntityConverter.convertToIngestedParts(mongoParts)
     return Promise.all(
       parts.map(async (ingestedPart) => {
         ingestedPart.ingestedPieces = (await this.ingestedPieceRepository.getIngestedPieces(ingestedPart.id))
