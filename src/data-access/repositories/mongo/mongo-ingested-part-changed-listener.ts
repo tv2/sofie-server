@@ -13,12 +13,14 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
 import { IngestedPart } from '../../../model/entities/ingested-part'
+import { ConsoleLogger } from '../../../console-logger'
 import { Logger } from '../../../logger'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest changed this to "ingestedParts"
 
 export class MongoIngestedPartChangedListener extends BaseMongoRepository implements DataChangedListener<IngestedPart> {
 
+  private readonly logger: Logger
   private onCreatedCallback: (part: IngestedPart) => void
   private onUpdatedCallback: (part: IngestedPart) => void
   private onDeletedCallback: (partId: string) => void
@@ -26,10 +28,10 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository implem
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly partRepository: IngestedPartRepository,
-    private readonly logger: Logger
+    logger: ConsoleLogger
   ) {
     super(mongoDatabase)
-    this.logger.tag(MongoIngestedPartChangedListener.name)
+    this.logger = logger.tag(MongoIngestedPartChangedListener.name)
     mongoDatabase.onConnect(INGESTED_PART_COLLECTION_NAME, () => this.listenForChanges())
   }
 

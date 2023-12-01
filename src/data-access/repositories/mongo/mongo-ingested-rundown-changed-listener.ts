@@ -13,12 +13,14 @@ import { MongoDatabase } from './mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedRundownRepository } from '../interfaces/ingested-rundown-repository'
 import { IngestedRundown } from '../../../model/entities/ingested-rundown'
+import { ConsoleLogger } from '../../../console-logger'
 import { Logger } from '../../../logger'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest changed this to "ingestedRundowns"
 
 export class MongoIngestedRundownChangedListener extends BaseMongoRepository implements DataChangedListener<IngestedRundown> {
 
+  private readonly logger: Logger
   private onCreatedCallback: (rundown: IngestedRundown) => void
   private onUpdatedCallback: (rundown: IngestedRundown) => void
   private onDeletedCallback: (rundownId: string) => void
@@ -26,10 +28,10 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
-    private readonly logger: Logger
+    logger: ConsoleLogger
   ) {
     super(mongoDatabase)
-    this.logger.tag(MongoIngestedRundownChangedListener.name)
+    this.logger = logger.tag(MongoIngestedRundownChangedListener.name)
     mongoDatabase.onConnect(INGESTED_RUNDOWN_COLLECTION_NAME, () => this.listenForChanges())
   }
 

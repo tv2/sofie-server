@@ -13,12 +13,14 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedSegment } from '../../../model/entities/ingested-segment'
 import { IngestedSegmentRepository } from '../interfaces/ingested-segment-repository'
+import { ConsoleLogger } from '../../../console-logger'
 import { Logger } from '../../../logger'
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest changed this to "ingestedSegments"
 
 export class MongoIngestedSegmentChangedListener extends BaseMongoRepository implements DataChangedListener<IngestedSegment> {
 
+  private readonly logger: Logger
   private onCreatedCallback: (segment: IngestedSegment) => void
   private onUpdatedCallback: (segment: IngestedSegment) => void
   private onDeletedCallback: (segmentId: string) => void
@@ -26,10 +28,10 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository imp
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly ingestedSegmentRepository: IngestedSegmentRepository,
-    private readonly logger: Logger
+    logger: ConsoleLogger
   ) {
     super(mongoDatabase)
-    this.logger.tag(MongoIngestedSegmentChangedListener.name)
+    this.logger = logger.tag(MongoIngestedSegmentChangedListener.name)
     mongoDatabase.onConnect(INGESTED_SEGMENT_COLLECTION_NAME, () => this.listenForChanges())
   }
 

@@ -6,7 +6,7 @@ import { BaseController } from '../controllers/base-controller'
 import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
-import { Logger } from '../../logger'
+import { ConsoleLogger } from '../../console-logger'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -23,23 +23,23 @@ export class ControllerFacade {
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       ServiceFacade.createIngestService(),
-      new ExpressErrorHandler(Logger.getInstance())
+      new ExpressErrorHandler(ConsoleLogger.getInstance())
     )
   }
 
   private static createTimelineController(): TimelineController {
-    return new TimelineController(RepositoryFacade.createTimelineRepository(), new ExpressErrorHandler(Logger.getInstance()))
+    return new TimelineController(RepositoryFacade.createTimelineRepository(), new ExpressErrorHandler(ConsoleLogger.getInstance()))
   }
 
   private static createActionController(): ActionController {
-    return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler(Logger.getInstance()))
+    return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler(ConsoleLogger.getInstance()))
   }
 
   private static createConfigurationController(): ConfigurationController {
     return new ConfigurationController(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
-      new ExpressErrorHandler(Logger.getInstance())
+      new ExpressErrorHandler(ConsoleLogger.getInstance())
     )
   }
 }
