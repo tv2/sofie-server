@@ -27,14 +27,14 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { Piece } from '../../../model/entities/piece'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
-import { Tv2LoggerService } from '../tv2-logger-service'
+import { Tv2Logger } from '../tv2-logger'
 
 const ATEM_SUPER_SOURCE_INDEX: number = 6000
 const ATEM_PREFIX: string = 'atem_'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
 
-  constructor(private readonly loggerService: Tv2LoggerService) {
+  constructor(private readonly loggerService: Tv2Logger) {
     this.loggerService.tag(Tv2AtemVideoMixerTimelineObjectFactory.name)
   }
 
