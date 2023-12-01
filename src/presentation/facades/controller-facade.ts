@@ -6,7 +6,7 @@ import { BaseController } from '../controllers/base-controller'
 import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
-import { LoggerService } from '../../model/services/logger-service'
+import { Logger } from '../../logger'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -23,23 +23,23 @@ export class ControllerFacade {
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       ServiceFacade.createIngestService(),
-      new ExpressErrorHandler(new LoggerService())
+      new ExpressErrorHandler(Logger.getInstance())
     )
   }
 
   private static createTimelineController(): TimelineController {
-    return new TimelineController(RepositoryFacade.createTimelineRepository(), new ExpressErrorHandler(new LoggerService()))
+    return new TimelineController(RepositoryFacade.createTimelineRepository(), new ExpressErrorHandler(Logger.getInstance()))
   }
 
   private static createActionController(): ActionController {
-    return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler(new LoggerService()))
+    return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler(Logger.getInstance()))
   }
 
   private static createConfigurationController(): ConfigurationController {
     return new ConfigurationController(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
-      new ExpressErrorHandler(new LoggerService())
+      new ExpressErrorHandler(Logger.getInstance())
     )
   }
 }

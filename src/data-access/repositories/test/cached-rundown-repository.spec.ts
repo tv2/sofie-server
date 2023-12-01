@@ -2,7 +2,7 @@ import { CachedRundownRepository } from '../cache/cached-rundown-repository'
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown, RundownInterface } from '../../../model/entities/rundown'
-import { LoggerService } from '../../../model/services/logger-service'
+import { Logger } from '../../../logger'
 
 describe('cached-rundown-repository', () => {
   describe('getRundown', () => {
@@ -14,7 +14,7 @@ describe('cached-rundown-repository', () => {
 
       when(mockRepo.getRundown(randomRundownId)).thenReturn(Promise.resolve(randomRundown))
 
-      const testee: CachedRundownRepository = new CachedRundownRepository(instance(mockRepo), instance(mock(LoggerService)))
+      const testee: CachedRundownRepository = new CachedRundownRepository(instance(mockRepo), instance(mock(Logger)))
 
       const result: Rundown = await testee.getRundown(randomRundownId)
       expect(result).toBe(randomRundown)
@@ -28,7 +28,7 @@ describe('cached-rundown-repository', () => {
 
       when(mockRepo.getRundown(randomRundownId)).thenReturn(Promise.resolve(randomRundown))
 
-      const testee: CachedRundownRepository = new CachedRundownRepository(instance(mockRepo), instance(mock(LoggerService)))
+      const testee: CachedRundownRepository = new CachedRundownRepository(instance(mockRepo), instance(mock(Logger)))
 
       await testee.getRundown(randomRundownId)
       await testee.getRundown(randomRundownId)

@@ -1,5 +1,5 @@
 import { CallbackScheduler } from './interfaces/callback-scheduler'
-import { LoggerService } from '../../model/services/logger-service'
+import { Logger } from '../../logger'
 
 const EXECUTE_CALLBACK_DURATION_THRESHOLD_IN_MS: number = 1
 const SCHEDULE_RESOLUTION: number = 2
@@ -7,7 +7,7 @@ const SCHEDULE_RESOLUTION: number = 2
 export class TimeoutCallbackScheduler implements CallbackScheduler {
   private static instance: CallbackScheduler
 
-  public static getInstance(loggerService: LoggerService): CallbackScheduler {
+  public static getInstance(loggerService: Logger): CallbackScheduler {
     if (!this.instance) {
       this.instance = new TimeoutCallbackScheduler(loggerService)
     }
@@ -15,7 +15,7 @@ export class TimeoutCallbackScheduler implements CallbackScheduler {
   }
   private timeoutIdentifier?: NodeJS.Timeout
 
-  private constructor(private readonly loggerService: LoggerService) {
+  private constructor(private readonly loggerService: Logger) {
     this.loggerService.tag(TimeoutCallbackScheduler.name)
   }
 

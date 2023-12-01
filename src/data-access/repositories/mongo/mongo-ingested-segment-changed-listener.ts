@@ -13,7 +13,7 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedSegment } from '../../../model/entities/ingested-segment'
 import { IngestedSegmentRepository } from '../interfaces/ingested-segment-repository'
-import { LoggerService } from '../../../model/services/logger-service'
+import { Logger } from '../../../logger'
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest changed this to "ingestedSegments"
 
@@ -26,7 +26,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository imp
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly ingestedSegmentRepository: IngestedSegmentRepository,
-    private readonly loggerService: LoggerService
+    private readonly loggerService: Logger
   ) {
     super(mongoDatabase)
     this.loggerService.tag(MongoIngestedSegmentChangedListener.name)

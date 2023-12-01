@@ -17,7 +17,7 @@ import { NotFoundException } from '../../model/exceptions/not-found-exception'
 import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { BasicRundown } from '../../model/entities/basic-rundown'
-import { LoggerService } from '../../model/services/logger-service'
+import { Logger } from '../../logger'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
@@ -34,7 +34,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     timelineBuilder: TimelineBuilder,
     eventEmitter: RundownEventEmitter,
     ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
-    loggerService: LoggerService,
+    loggerService: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>
@@ -74,7 +74,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     private readonly timelineBuilder: TimelineBuilder,
     private readonly eventEmitter: RundownEventEmitter,
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
-    private readonly loggerService: LoggerService,
+    private readonly loggerService: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>

@@ -4,12 +4,12 @@ import * as http from 'http'
 import { RundownEvent } from '../value-objects/rundown-event'
 import { RundownEventServer } from './interfaces/rundown-event-server'
 import { RundownEventListener } from '../interfaces/rundown-event-listener'
-import { LoggerService } from '../../model/services/logger-service'
+import { Logger } from '../../logger'
 
 export class RundownWebSocketEventServer implements RundownEventServer {
   private static instance: RundownEventServer
 
-  public static getInstance(rundownEventListener: RundownEventListener, loggerService: LoggerService): RundownEventServer {
+  public static getInstance(rundownEventListener: RundownEventListener, loggerService: Logger): RundownEventServer {
     if (!this.instance) {
       this.instance = new RundownWebSocketEventServer(rundownEventListener, loggerService)
     }
@@ -18,7 +18,7 @@ export class RundownWebSocketEventServer implements RundownEventServer {
 
   private webSocketServer?: WebSocket.Server
 
-  private constructor(private readonly rundownEventListener: RundownEventListener, private readonly loggerService: LoggerService) {
+  private constructor(private readonly rundownEventListener: RundownEventListener, private readonly loggerService: Logger) {
     this.loggerService.tag(RundownWebSocketEventServer.name)
   }
 

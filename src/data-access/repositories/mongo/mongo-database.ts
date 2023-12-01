@@ -2,7 +2,7 @@ import * as mongodb from 'mongodb'
 import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
 import { MongoId } from './mongo-entity-converter'
-import { LoggerService } from '../../../model/services/logger-service'
+import { Logger } from '../../../logger'
 
 // TODO: Move to ENV variables
 const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
@@ -11,7 +11,7 @@ const MONGO_DB_NAME: string = 'meteor'
 export class MongoDatabase {
   private static instance: MongoDatabase
 
-  public static getInstance(loggerService: LoggerService): MongoDatabase {
+  public static getInstance(loggerService: Logger): MongoDatabase {
     if (!this.instance) {
       this.instance = new MongoDatabase(loggerService)
     }
@@ -23,7 +23,7 @@ export class MongoDatabase {
 
   private readonly onConnectCallbacks: Map<string, () => void> = new Map()
 
-  private constructor(private readonly loggerService: LoggerService) {
+  private constructor(private readonly loggerService: Logger) {
     this.loggerService.tag(MongoDatabase.name)
     this.connectToDatabase()
       .catch((reason) => this.loggerService.data(reason).error('Failed connecting to mongo database.'))

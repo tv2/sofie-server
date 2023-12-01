@@ -4,7 +4,7 @@ import { BaseController } from './controllers/base-controller'
 import { ControllerFacade } from './facades/controller-facade'
 import { RundownEventServerFacade } from './facades/rundown-event-server-facade'
 import { ServiceFacade } from '../business-logic/facades/service-facade'
-import { LoggerService } from '../model/services/logger-service'
+import { Logger } from '../logger'
 
 export * from './controllers/rundown-controller'
 
@@ -50,7 +50,7 @@ function startSofieServer(): void {
 
 function attachExpressServerToPort(port: number): void {
   new SofieServer().server.listen(port, () => {
-    const loggerService: LoggerService = new LoggerService()
+    const loggerService: Logger = Logger.getInstance()
     loggerService.tag('index')
     return loggerService.info(`Express is listening at http://localhost:${port}`)
   })
