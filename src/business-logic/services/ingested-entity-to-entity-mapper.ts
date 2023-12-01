@@ -89,7 +89,6 @@ export class IngestedEntityToEntityMapper {
       segmentId: ingestedPart.segmentId,
       name: ingestedPart.name,
       rank: ingestedPart.rank,
-      isPlanned: true,
       isOnAir: false,
       isNext: false,
       isUnsynced: false,
@@ -100,7 +99,7 @@ export class IngestedEntityToEntityMapper {
       outTransition: ingestedPart.outTransition,
       autoNext: ingestedPart.autoNext,
       disableNextInTransition: ingestedPart.disableNextInTransition,
-      defaultPart: ingestedPart
+      ingestedPart
     })
   }
 
@@ -120,7 +119,6 @@ export class IngestedEntityToEntityMapper {
       segmentId: partToBeUpdated.getSegmentId(),
       name: ingestedPart.name,
       rank: ingestedPart.rank,
-      isPlanned: partToBeUpdated.isPlanned,
       isOnAir: partToBeUpdated.isOnAir(),
       isNext: false, // The Rundown always updates its own NextCursor, so we don't need to remember that value
       isUnsynced: false, // Updated are never unsynced since Core removes and adds new Parts instead of updating them
@@ -135,7 +133,7 @@ export class IngestedEntityToEntityMapper {
       playedDuration: partToBeUpdated.getPlayedDuration(),
       endState: partToBeUpdated.getEndState(),
       timings: this.getPartTimings(partToBeUpdated),
-      defaultPart: ingestedPart
+      ingestedPart
     })
   }
 
