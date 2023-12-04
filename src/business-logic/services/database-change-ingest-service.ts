@@ -106,7 +106,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     await this.deleteRundownsNotPresentInIngestedRundowns(ingestedRundowns)
 
     await Promise.all(ingestedRundowns.map(async (ingestedRundown) => {
-      const oldRundown: Rundown | undefined = await this.fetchOldRundown(ingestedRundown.id)
+      const oldRundown: Rundown | undefined = await this.fetchRundown(ingestedRundown.id)
 
       // If the Rundown isn't active, we can simply just "re-ingest" it into our database collection as a fresh Rundown.
       const updatedRundown: Rundown = oldRundown?.isActive()
@@ -131,7 +131,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     }
   }
 
-  private async fetchOldRundown(rundownId: string): Promise<Rundown | undefined> {
+  private async fetchRundown(rundownId: string): Promise<Rundown | undefined> {
     try {
       return await this.rundownRepository.getRundown(rundownId)
     } catch (exception) {
