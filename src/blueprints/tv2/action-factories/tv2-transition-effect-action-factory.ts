@@ -40,7 +40,6 @@ import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
-import { Tv2ConsoleLogger } from '../tv2-console-logger'
 import { Tv2Logger } from '../tv2-logger'
 
 const FRAME_RATE: number = 25
@@ -54,7 +53,7 @@ export class Tv2TransitionEffectActionFactory {
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper,
-    logger: Tv2ConsoleLogger
+    logger: Tv2Logger
   ) {
     this.logger = logger.tag(Tv2TransitionEffectActionFactory.name)
   }
