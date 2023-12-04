@@ -13,7 +13,6 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
 import { IngestedPart } from '../../../model/entities/ingested-part'
-import { ConsoleLogger } from '../../../console-logger'
 import { Logger } from '../../../logger'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest changed this to "ingestedParts"
@@ -28,7 +27,7 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository implem
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly partRepository: IngestedPartRepository,
-    logger: ConsoleLogger
+    logger: Logger
   ) {
     super(mongoDatabase)
     this.logger = logger.tag(MongoIngestedPartChangedListener.name)
