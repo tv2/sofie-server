@@ -13,7 +13,6 @@ import { MongoDatabase } from './mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedRundownRepository } from '../interfaces/ingested-rundown-repository'
 import { IngestedRundown } from '../../../model/entities/ingested-rundown'
-import { ConsoleLogger } from '../../../console-logger'
 import { Logger } from '../../../logger'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest changed this to "ingestedRundowns"
@@ -28,7 +27,7 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
-    logger: ConsoleLogger
+    logger: Logger
   ) {
     super(mongoDatabase)
     this.logger = logger.tag(MongoIngestedRundownChangedListener.name)

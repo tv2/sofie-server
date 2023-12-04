@@ -25,7 +25,6 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
-import { ConsoleLogger } from '../../../console-logger'
 import { Logger } from '../../../logger'
 
 export interface MongoId {
@@ -160,7 +159,7 @@ export class MongoEntityConverter {
 
   private readonly logger: Logger
 
-  constructor(logger: ConsoleLogger) {
+  constructor(logger: Logger) {
     this.logger = logger.tag(MongoEntityConverter.name)
   }
 

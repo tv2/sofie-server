@@ -3,14 +3,13 @@ import { Exception } from '../model/exceptions/exception'
 import { ErrorCode } from '../model/enums/error-code'
 import { HttpStatusCode } from './http-status-code'
 import { HttpErrorHandler } from './interfaces/http-error-handler'
-import { ConsoleLogger } from '../console-logger'
 import { Logger } from '../logger'
 
 export class ExpressErrorHandler implements HttpErrorHandler {
 
   private readonly logger: Logger
 
-  constructor(logger: ConsoleLogger) {
+  constructor(logger: Logger) {
     this.logger = logger.tag(ExpressErrorHandler.name)
   }
 
