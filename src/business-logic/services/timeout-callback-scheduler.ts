@@ -13,7 +13,7 @@ export class TimeoutCallbackScheduler implements CallbackScheduler {
     }
     return this.instance
   }
-  
+
   private readonly logger: Logger
   private timeoutIdentifier?: NodeJS.Timeout
 
@@ -23,7 +23,7 @@ export class TimeoutCallbackScheduler implements CallbackScheduler {
 
   public start(epochTimeToExecuteCallback: number, callback: () => void): void {
     if (epochTimeToExecuteCallback <= Date.now()) {
-      this.logger.warn('Skipping execution of callback. Point in time for execution is in the past!')
+      this.logger.data({ epochDateToBeExecutedAt: new Date(epochTimeToExecuteCallback) }).warn('Skipping execution of callback. Point in time for execution is in the past!')
       return
     }
     this.scheduleCallback(epochTimeToExecuteCallback, callback)
