@@ -13,6 +13,7 @@ export class TimeoutCallbackScheduler implements CallbackScheduler {
     }
     return this.instance
   }
+  
   private readonly logger: Logger
   private timeoutIdentifier?: NodeJS.Timeout
 
