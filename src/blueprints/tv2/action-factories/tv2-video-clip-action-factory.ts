@@ -60,7 +60,7 @@ export class Tv2VideoClipActionFactory {
   private updateVideoClipAction(action: Action, media?: Media): Action {
     const videoClipAction: Tv2VideoClipAction = action as Tv2VideoClipAction
     if (videoClipAction.metadata.contentType !== Tv2ActionContentType.VIDEO_CLIP) {
-      this.logger.warn('Can\'t update VideoClipAction. Action is not a VideoClipAction')
+      this.logger.data({ action, media }).warn('Can\'t update VideoClipAction. Action is not a VideoClipAction')
       return action
     }
 
