@@ -30,9 +30,10 @@ export class MongoIngestedSegmentRepository extends BaseMongoRepository implemen
     if (!mongoSegment) {
       throw new NotFoundException(`No Segment found for segmentId: ${segmentId}`)
     }
-    const ingestedSegment: IngestedSegment = this.mongoIngestedEntityConverter.convertToIngestedSegment(mongoSegment)
-    ingestedSegment.ingestedParts = await this.ingestedPartRepository.getIngestedParts(ingestedSegment.id)
-    return ingestedSegment
+    return {
+      ...this.mongoIngestedEntityConverter.convertToIngestedSegment(mongoSegment),
+      ingestedParts: await this.ingestedPartRepository.getIngestedParts(mongoSegment._id)
+    }
   }
 
   public async getIngestedSegments(rundownId: string): Promise<IngestedSegment[]> {
@@ -43,8 +44,10 @@ export class MongoIngestedSegmentRepository extends BaseMongoRepository implemen
     const ingestedSegments: IngestedSegment[] = this.mongoIngestedEntityConverter.convertToIngestedSegments(mongoSegments)
     return Promise.all(
       ingestedSegments.map(async (segment) => {
-        segment.ingestedParts = (await this.ingestedPartRepository.getIngestedParts(segment.id))
-        return segment
+        return {
+          ...segment,
+          ingestedParts: await this.ingestedPartRepository.getIngestedParts(segment.id)
+        }
       })
     )
   }
