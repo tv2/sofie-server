@@ -8,7 +8,6 @@ export interface IngestedRundown {
   readonly showStyleVariantId: string
   readonly modifiedAt: number
   readonly timings: RundownTiming
-
-  ingestedSegments: IngestedSegment[]
-  baselineTimelineObjects: TimelineObject[]
+  readonly ingestedSegments: IngestedSegment[]
+  readonly baselineTimelineObjects: TimelineObject[]
 }
