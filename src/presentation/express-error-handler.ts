@@ -3,17 +3,17 @@ import { Exception } from '../model/exceptions/exception'
 import { ErrorCode } from '../model/enums/error-code'
 import { HttpStatusCode } from './http-status-code'
 import { HttpErrorHandler } from './interfaces/http-error-handler'
+import { HttpResponseFormatter } from './interfaces/http-response-formatter'
 
 export class ExpressErrorHandler implements HttpErrorHandler {
+
+  constructor(private readonly responseFormatter: HttpResponseFormatter) {
+  }
   public handleError(response: Response, exception: Exception): void {
     console.log(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
     console.log(exception.stack)
 
-    response.status(this.getStatusCode(exception.errorCode)).send({
-      status: 'error',
-      code: exception.errorCode,
-      message: exception.message,
-    })
+    response.status(this.getStatusCode(exception.errorCode)).send(this.responseFormatter.buildErrorResponse(exception.message, exception.errorCode))
   }
 
   private getStatusCode(errorCode: ErrorCode): number {
