@@ -16,8 +16,8 @@ export class MongoIngestedPieceRepository extends BaseMongoRepository implements
     return INGESTED_PIECE_COLLECTION_NAME
   }
 
-  public async getIngestedPieces(partId: string): Promise<IngestedPiece[]> {
-    this.assertDatabaseConnection(this.getIngestedPieces.name)
+  public async getIngestedPiecesByPart(partId: string): Promise<IngestedPiece[]> {
+    this.assertDatabaseConnection(this.getIngestedPiecesByPart.name)
     const mongoPieces: MongoIngestedPiece[] = (await this.getCollection()
       .find<MongoIngestedPiece>({ startPartId: partId })
       .toArray())
