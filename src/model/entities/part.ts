@@ -74,7 +74,7 @@ export class Part {
    */
   private endState?: PartEndState
 
-  public readonly defaultPart?: IngestedPart
+  public readonly ingestedPart?: IngestedPart
 
   constructor(part: PartInterface) {
     this.id = part.id
@@ -104,7 +104,7 @@ export class Part {
     this.isPartUntimed = part.isUntimed
     this.isPartUnsynced = part.isUnsynced
 
-    this.defaultPart = part.ingestedPart
+    this.ingestedPart = part.ingestedPart
   }
 
   public putOnAir(): void {
@@ -317,14 +317,14 @@ export class Part {
   }
 
   public reset(): void {
-    if (!this.defaultPart) {
+    if (!this.ingestedPart) {
       return
     }
 
     this.executedAt = 0
     this.playedDuration = 0
-    this.inTransition = this.defaultPart.inTransition
-    this.timings = this.defaultPart.timings
+    this.inTransition = this.ingestedPart.inTransition
+    this.timings = this.ingestedPart.timings
     this.endState = undefined
 
     this.resetPieces()
@@ -334,9 +334,9 @@ export class Part {
     this.pieces =  [
       ...this.pieces.filter(piece => piece.isPlanned),
       ...this.replacedPlannedPieces
-    ].filter(piece => this.defaultPart!.ingestedPieces.some(ingestPiece => ingestPiece.id === piece.id))
+    ].filter(piece => this.ingestedPart!.ingestedPieces.some(ingestPiece => ingestPiece.id === piece.id))
       .map(piece => {
-        const ingestedPiece: IngestedPiece = this.defaultPart!.ingestedPieces.find(ingestPiece => ingestPiece.id === piece.id)!
+        const ingestedPiece: IngestedPiece = this.ingestedPart!.ingestedPieces.find(ingestPiece => ingestPiece.id === piece.id)!
         piece.resetFromIngestedPiece(ingestedPiece)
         return piece
       })
