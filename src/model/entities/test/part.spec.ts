@@ -6,6 +6,8 @@ import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { instance, verify } from '@typestrong/ts-mockito'
 import { EntityTestFactory } from './entity-test-factory'
 import { UnsupportedOperationException } from '../../exceptions/unsupported-operation-exception'
+import { IngestedPiece } from '../ingested-piece'
+import { IngestedPart } from '../ingested-part'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -102,10 +104,10 @@ describe(Part.name, () => {
         plannedPieceOne, plannedPieceTwo, unPlannedPieceOne, unPlannedPieceTwo
       ], ingestedPart: {
         ingestedPieces: [
-          { id: plannedPieceOne.id },
-          { id: plannedPieceTwo.id }
-        ]
-      } } as PartInterface)
+          createShallowIngestedPiece(plannedPieceOne.id),
+          createShallowIngestedPiece(plannedPieceTwo.id)
+        ] as Readonly<IngestedPiece[]>
+      } as IngestedPart } as PartInterface)
 
       expect(testee.getPieces()).toContain(unPlannedPieceOne)
       expect(testee.getPieces()).toContain(unPlannedPieceTwo)
@@ -2342,3 +2344,9 @@ describe(Part.name, () => {
     })
   })
 })
+
+function createShallowIngestedPiece(id: string): IngestedPiece {
+  return {
+    id
+  } as IngestedPiece
+}
