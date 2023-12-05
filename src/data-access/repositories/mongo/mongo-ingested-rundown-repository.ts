@@ -33,7 +33,7 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository implemen
   private async populateIngestedRundown(mongoIngestedRundown: MongoIngestedRundown): Promise<IngestedRundown> {
     return {
       ...this.mongoIngestedEntityConverter.convertToIngestedRundown(mongoIngestedRundown),
-      ingestedSegments: await this.ingestedSegmentRepository.getIngestedSegments(mongoIngestedRundown._id),
+      ingestedSegments: await this.ingestedSegmentRepository.getIngestedSegmentsByRundown(mongoIngestedRundown._id),
       baselineTimelineObjects: await this.rundownBaselineRepository.getRundownBaseline(mongoIngestedRundown._id)
 
     }
@@ -50,7 +50,7 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository implemen
 
     return {
       ...this.mongoIngestedEntityConverter.convertToIngestedRundown(mongoRundown),
-      ingestedSegments: await this.ingestedSegmentRepository.getIngestedSegments(rundownId),
+      ingestedSegments: await this.ingestedSegmentRepository.getIngestedSegmentsByRundown(rundownId),
       baselineTimelineObjects: await this.rundownBaselineRepository.getRundownBaseline(rundownId)
     }
   }
