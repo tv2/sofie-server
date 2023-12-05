@@ -21,5 +21,5 @@ export interface IngestedPart {
   readonly isUntimed: boolean
   readonly timings?: PartTimings
 
-  readonly ingestedPieces: IngestedPiece[]
+  readonly ingestedPieces: Readonly<IngestedPiece[]>
 }

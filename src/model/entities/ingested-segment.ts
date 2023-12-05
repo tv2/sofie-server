@@ -6,5 +6,5 @@ export interface IngestedSegment {
   readonly name: string
   readonly rank: number
   readonly budgetDuration?: number
-  readonly ingestedParts: IngestedPart[]
+  readonly ingestedParts: Readonly<IngestedPart[]>
 }
