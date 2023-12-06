@@ -1,5 +1,5 @@
-import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
-import { Rundown } from '../../model/entities/rundown'
+import {RundownEventBuilder} from '../interfaces/rundown-event-builder'
+import {Rundown} from '../../model/entities/rundown'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
@@ -7,6 +7,7 @@ import {
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
   PartTakenEvent,
+  PartUnsyncedEvent,
   PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
@@ -18,16 +19,17 @@ import {
   RundownUpdatedEvent,
   SegmentCreatedEvent,
   SegmentDeletedEvent,
+  SegmentUnsyncedEvent,
   SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
-import { Piece } from '../../model/entities/piece'
-import { Part } from '../../model/entities/part'
-import { PartDto } from '../dtos/part-dto'
-import { PieceDto } from '../dtos/piece-dto'
-import { IngestEventType, RundownEventType } from '../enums/rundown-event-type'
-import { SegmentDto } from '../dtos/segment-dto'
-import { Segment } from '../../model/entities/segment'
-import { BasicRundownDto } from '../dtos/basic-rundown-dto'
+import {Piece} from '../../model/entities/piece'
+import {Part} from '../../model/entities/part'
+import {PartDto} from '../dtos/part-dto'
+import {PieceDto} from '../dtos/piece-dto'
+import {IngestEventType, RundownEventType} from '../enums/rundown-event-type'
+import {SegmentDto} from '../dtos/segment-dto'
+import {Segment} from '../../model/entities/segment'
+import {BasicRundownDto} from '../dtos/basic-rundown-dto'
 
 export class RundownEventBuilderImplementation implements RundownEventBuilder {
 
@@ -166,6 +168,16 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
     }
   }
 
+  public buildSegmentUnsyncedEvent(rundown: Rundown, unsyncedSegment: Segment, originalSegmentId: string): SegmentUnsyncedEvent {
+    return {
+      type: IngestEventType.SEGMENT_UNSYNCED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      unsyncedSegment: new SegmentDto(unsyncedSegment),
+      originalSegmentId: originalSegmentId
+    }
+  }
+
   public buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent {
     return {
       type: IngestEventType.PART_CREATED,
@@ -191,6 +203,15 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       rundownId: rundown.id,
       segmentId,
       partId,
+    }
+  }
+
+  public buildPartUnsyncedEvent(rundown: Rundown, part: Part): PartUnsyncedEvent {
+    return {
+      type: IngestEventType.PART_UNSYNCED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      part: new PartDto(part)
     }
   }
 }

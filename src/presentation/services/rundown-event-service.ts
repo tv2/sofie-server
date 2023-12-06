@@ -4,7 +4,7 @@ import {
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
-  PartTakenEvent, PartUpdatedEvent,
+  PartTakenEvent, PartUnsyncedEvent, PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
@@ -14,7 +14,7 @@ import {
   RundownInfinitePieceAddedEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
-  SegmentCreatedEvent, SegmentDeletedEvent,
+  SegmentCreatedEvent, SegmentDeletedEvent, SegmentUnsyncedEvent,
   SegmentUpdatedEvent
 } from '../value-objects/rundown-event'
 import { RundownEventEmitter } from '../../business-logic/services/interfaces/rundown-event-emitter'
@@ -114,6 +114,10 @@ export class RundownEventService implements RundownEventEmitter, RundownEventLis
     const event: SegmentDeletedEvent = this.rundownEventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
     this.emitRundownEvent(event)
   }
+  public emitSegmentUnsynced(rundown: Rundown, unsyncedSegment: Segment, originalSegmentId: string): void {
+    const event: SegmentUnsyncedEvent = this.rundownEventBuilder.buildSegmentUnsyncedEvent(rundown, unsyncedSegment, originalSegmentId)
+    this.emitRundownEvent(event)
+  }
   public emitPartCreated(rundown: Rundown, part: Part): void {
     const event: PartCreatedEvent = this.rundownEventBuilder.buildPartCreatedEvent(rundown, part)
     this.emitRundownEvent(event)
@@ -126,7 +130,10 @@ export class RundownEventService implements RundownEventEmitter, RundownEventLis
     const event: PartDeletedEvent = this.rundownEventBuilder.buildPartDeletedEvent(rundown, segmentId, partId)
     this.emitRundownEvent(event)
   }
-
+  public emitPartUnsynced(rundown: Rundown, part: Part): void {
+    const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, part)
+    this.emitRundownEvent(event)
+  }
   public listenToRundownEvents(onRundownEventCallback: (rundownEvent: RundownEvent) => void): void {
     this.callbacks.push(onRundownEventCallback)
   }

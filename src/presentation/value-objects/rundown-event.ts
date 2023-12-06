@@ -84,6 +84,12 @@ export interface SegmentDeletedEvent extends RundownEvent {
   segmentId: string
 }
 
+export interface SegmentUnsyncedEvent extends RundownEvent {
+  type: IngestEventType.SEGMENT_UNSYNCED
+  unsyncedSegment: SegmentDto
+  originalSegmentId: string
+}
+
 export interface PartCreatedEvent extends RundownEvent {
   type: IngestEventType.PART_CREATED
   part: PartDto
@@ -98,4 +104,9 @@ export interface PartDeletedEvent extends RundownEvent {
   type: IngestEventType.PART_DELETED
   segmentId: string
   partId: string
+}
+
+export interface PartUnsyncedEvent extends RundownEvent {
+  type: IngestEventType.PART_UNSYNCED
+  part: PartDto
 }
