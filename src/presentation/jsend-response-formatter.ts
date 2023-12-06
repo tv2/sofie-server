@@ -23,6 +23,4 @@ export class JsendResponseFormatter implements HttpResponseFormatter{
       data: data ? data : null
     }
   }
-
-
 }
