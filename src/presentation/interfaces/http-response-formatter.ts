@@ -1,7 +1,7 @@
 import { ErrorCode } from '../../model/enums/error-code'
 
 export interface HttpResponseFormatter {
-  buildSuccessResponse(data: object): object
-  buildFailResponse(data: object): object
-  buildErrorResponse(message: string, errorCode: ErrorCode): object
+  formatSuccessResponse(data?: object): object
+  formatFailResponse(data?: object): object
+  formatErrorResponse(message: string, errorCode: ErrorCode): object
 }
