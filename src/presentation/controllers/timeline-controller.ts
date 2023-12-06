@@ -11,7 +11,7 @@ export class TimelineController extends BaseController {
   constructor(
     private readonly timelineRepository: TimelineRepository,
     private readonly httpErrorHandler: HttpErrorHandler,
-    private readonly responseFormatter: HttpResponseFormatter
+    private readonly httpResponseFormatter: HttpResponseFormatter
   ) {
     super()
   }
@@ -20,7 +20,7 @@ export class TimelineController extends BaseController {
   public async getTimeline(_req: Request, res: Response): Promise<void> {
     try {
       const timeline: Timeline = await this.timelineRepository.getTimeline()
-      res.send(this.responseFormatter.formatSuccessResponse(timeline))
+      res.send(this.httpResponseFormatter.formatSuccessResponse(timeline))
     } catch (error) {
       this.httpErrorHandler.handleError(res, error as Exception)
     }

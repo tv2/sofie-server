@@ -7,13 +7,13 @@ import { HttpResponseFormatter } from './interfaces/http-response-formatter'
 
 export class ExpressErrorHandler implements HttpErrorHandler {
 
-  constructor(private readonly responseFormatter: HttpResponseFormatter) {
+  constructor(private readonly httpResponseFormatter: HttpResponseFormatter) {
   }
   public handleError(response: Response, exception: Exception): void {
     console.log(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
     console.log(exception.stack)
 
-    response.status(this.getStatusCode(exception.errorCode)).send(this.responseFormatter.formatErrorResponse(exception.message, exception.errorCode))
+    response.status(this.getStatusCode(exception.errorCode)).send(this.httpResponseFormatter.formatErrorResponse(exception.message, exception.errorCode))
   }
 
   private getStatusCode(errorCode: ErrorCode): number {
