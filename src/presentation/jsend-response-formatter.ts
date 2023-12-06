@@ -2,7 +2,7 @@ import { HttpResponseFormatter } from './interfaces/http-response-formatter'
 import { ErrorCode } from '../model/enums/error-code'
 
 export class JsendResponseFormatter implements HttpResponseFormatter{
-  public buildErrorResponse(message: string, errorCode: ErrorCode): object {
+  public formatErrorResponse(message: string, errorCode: ErrorCode): object {
     return {
       status: 'error',
       code: errorCode,
@@ -10,17 +10,17 @@ export class JsendResponseFormatter implements HttpResponseFormatter{
     }
   }
 
-  public buildFailResponse(data: object): object {
+  public formatFailResponse(data?: object): object {
     return {
       status: 'fail',
-      data
+      data: data ? data : null
     }
   }
 
-  public  buildSuccessResponse(data: object): object {
+  public  formatSuccessResponse(data?: object): object {
     return {
       status: 'success',
-      data
+      data: data ? data : null
     }
   }
 

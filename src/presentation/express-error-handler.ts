@@ -13,7 +13,7 @@ export class ExpressErrorHandler implements HttpErrorHandler {
     console.log(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
     console.log(exception.stack)
 
-    response.status(this.getStatusCode(exception.errorCode)).send(this.responseFormatter.buildErrorResponse(exception.message, exception.errorCode))
+    response.status(this.getStatusCode(exception.errorCode)).send(this.responseFormatter.formatErrorResponse(exception.message, exception.errorCode))
   }
 
   private getStatusCode(errorCode: ErrorCode): number {
