@@ -559,22 +559,23 @@ export class Rundown extends BasicRundown {
    * If the Segment is currently OnAir, the Segment is still removed, but an "unsynced copy" is created of the Segment and added to the Rundown in its place.
    */
   public removeSegment(segmentId: string): Segment | undefined {
-    const segmentToRemove: Segment | undefined = this.segments.find(segment => !segment.isUnsynced() && segment.id === segmentId)
+    let segmentToRemove: Segment | undefined = this.segments.find(segment => !segment.isUnsynced() && segment.id === segmentId)
     if (!segmentToRemove) {
       return
     }
 
+    // TODO: Is it okay that i moved filtering up here? Otherwise we crash since we are looking for the unsynced segment id that has yet to exist.
+    // We know that 'segmentToRemove' is not undefined at this point
+    this.segments = this.segments.filter(segment => segment.id !== segmentToRemove!.id)
     if (segmentToRemove.isOnAir()) {
-      this.unsyncSegment(segmentToRemove)
+      segmentToRemove = this.unsyncSegment(segmentToRemove)
     }
-
-    this.segments = this.segments.filter(segment => segment.id !== segmentToRemove.id)
 
     this.updateNextCursor()
     return segmentToRemove
   }
 
-  private unsyncSegment(segmentToUnsync: Segment): void {
+  private unsyncSegment(segmentToUnsync: Segment): Segment {
     segmentToUnsync.markAsUnsynced()
     const unsyncedSegment: Segment = segmentToUnsync.getUnsyncedCopy()
     const unsyncedPart: Part | undefined = unsyncedSegment.getParts().find(part => part.isOnAir())
@@ -584,6 +585,7 @@ export class Rundown extends BasicRundown {
     this.activeCursor = this.createCursor(this.activeCursor, { segment: unsyncedSegment, part:  unsyncedPart })
     this.segments.push(unsyncedSegment)
     this.segments.sort(this.compareSegments)
+    return unsyncedSegment
   }
 
   public getSegments(): Segment[] {
