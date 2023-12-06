@@ -17,12 +17,12 @@ export class TimelineController extends BaseController {
   }
 
   @GetRequest()
-  public async getTimeline(_req: Request, res: Response): Promise<void> {
+  public async getTimeline(_request: Request, response: Response): Promise<void> {
     try {
       const timeline: Timeline = await this.timelineRepository.getTimeline()
-      res.send(this.httpResponseFormatter.formatSuccessResponse(timeline))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(timeline))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 }

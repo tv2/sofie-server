@@ -20,26 +20,26 @@ export class ConfigurationController extends BaseController {
   }
 
   @GetRequest('/blueprints')
-  public async getBlueprintConfiguration(_req: Request, res: Response): Promise<void> {
+  public async getBlueprintConfiguration(_request: Request, response: Response): Promise<void> {
     try {
       const configuration: Configuration = await this.configurationRepository.getConfiguration()
-      res.send(this.httpResponseFormatter.formatSuccessResponse({
+      response.send(this.httpResponseFormatter.formatSuccessResponse({
         showStyleConfiguration: configuration.showStyle.blueprintConfiguration,
         studioConfiguration: configuration.studio.blueprintConfiguration
       }))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @GetRequest('/rundowns/:rundownId')
-  public async getShowStyleVariant(req: Request, res: Response): Promise<void> {
+  public async getShowStyleVariant(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
+      const rundownId: string = request.params.rundownId
       const showStyleVariant: ShowStyleVariant = await this.showStyleVariantRepository.getShowStyleVariant(rundownId)
-      res.send(this.httpResponseFormatter.formatSuccessResponse({ showStyleVariant }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse({ showStyleVariant }))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
