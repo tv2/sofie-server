@@ -17,9 +17,9 @@ import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
 import { HttpService } from '../services/interfaces/http-service'
 import { GotHttpService } from '../services/got-http-service'
 import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-entity-mapper'
-import { ConsoleLogger } from '../../console-logger'
 import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
 import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
+import { LoggerFacade } from '../../logger-facade'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -32,7 +32,7 @@ export class ServiceFacade {
       RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
-      TimeoutCallbackScheduler.getInstance(ConsoleLogger.getInstance()),
+      TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint()
     )
   }
@@ -75,7 +75,7 @@ export class ServiceFacade {
       ServiceFacade.createTimelineBuilder(),
       EventEmitterFacade.createRundownEventEmitter(),
       new IngestedEntityToEntityMapper(),
-      ConsoleLogger.getInstance(),
+      LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
       RepositoryFacade.createIngestedPartChangedListener()

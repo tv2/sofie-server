@@ -48,11 +48,11 @@ import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
 import { CachedSegmentRepository } from '../repositories/cache/cached-segment-repository'
 import { CachedPartRepository } from '../repositories/cache/cached-part-repository'
-import { ConsoleLogger } from '../../console-logger'
 import { ActionTriggerRepository } from '../repositories/interfaces/action-trigger-repository'
 import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action-trigger-repository'
 import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
 import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
+import { LoggerFacade } from '../../logger-facade'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -62,15 +62,15 @@ export class RepositoryFacade {
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPieceRepository()
     )
-    return CachedRundownRepository.getInstance(mongoRundownRepository, ConsoleLogger.getInstance())
+    return CachedRundownRepository.getInstance(mongoRundownRepository, LoggerFacade.createLogger())
   }
 
   private static createMongoEntityConverter(): MongoEntityConverter {
-    return new MongoEntityConverter(ConsoleLogger.getInstance())
+    return new MongoEntityConverter(LoggerFacade.createLogger())
   }
 
   private static getMongoDatabaseInstance(): MongoDatabase {
-    return MongoDatabase.getInstance(ConsoleLogger.getInstance())
+    return MongoDatabase.getInstance(LoggerFacade.createLogger())
   }
 
   public static createIngestedRundownRepository(): IngestedRundownRepository {
@@ -86,7 +86,7 @@ export class RepositoryFacade {
     return new MongoIngestedRundownChangedListener(
       RepositoryFacade.getMongoDatabaseInstance(),
       RepositoryFacade.createIngestedRundownRepository(),
-      ConsoleLogger.getInstance()
+      LoggerFacade.createLogger()
     )
   }
 
@@ -115,7 +115,7 @@ export class RepositoryFacade {
     return new MongoIngestedSegmentChangedListener(
       RepositoryFacade.getMongoDatabaseInstance(),
       RepositoryFacade.createIngestedSegmentRepository(),
-      ConsoleLogger.getInstance()
+      LoggerFacade.createLogger()
     )
   }
 
@@ -140,7 +140,7 @@ export class RepositoryFacade {
     return new MongoIngestedPartChangedListener(
       RepositoryFacade.getMongoDatabaseInstance(),
       RepositoryFacade.createIngestedPartRepository(),
-      ConsoleLogger.getInstance()
+      LoggerFacade.createLogger()
     )
   }
 

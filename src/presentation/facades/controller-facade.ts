@@ -6,8 +6,8 @@ import { BaseController } from '../controllers/base-controller'
 import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
-import { ConsoleLogger } from '../../console-logger'
 import { ActionTriggerController } from '../controllers/action-trigger-controller'
+import { LoggerFacade } from '../../logger-facade'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -25,22 +25,26 @@ export class ControllerFacade {
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       ServiceFacade.createIngestService(),
-      new ExpressErrorHandler(ConsoleLogger.getInstance())
+      ControllerFacade.createExpressErrorHandler()
     )
   }
 
+  private static createExpressErrorHandler(): ExpressErrorHandler {
+    return new ExpressErrorHandler(LoggerFacade.createLogger())
+  }
+
   private static createTimelineController(): TimelineController {
-    return new TimelineController(RepositoryFacade.createTimelineRepository(), new ExpressErrorHandler(ConsoleLogger.getInstance()))
+    return new TimelineController(RepositoryFacade.createTimelineRepository(), ControllerFacade.createExpressErrorHandler())
   }
 
   private static createActionController(): ActionController {
-    return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler(ConsoleLogger.getInstance()))
+    return new ActionController(ServiceFacade.createActionService(), ControllerFacade.createExpressErrorHandler())
   }
 
   private static createActionTriggerController(): ActionTriggerController {
     return new ActionTriggerController(
       ServiceFacade.createActionTriggerService(),
-      new ExpressErrorHandler(ConsoleLogger.getInstance())
+      ControllerFacade.createExpressErrorHandler()
     )
   }
 
@@ -48,7 +52,7 @@ export class ControllerFacade {
     return new ConfigurationController(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
-      new ExpressErrorHandler(ConsoleLogger.getInstance())
+      ControllerFacade.createExpressErrorHandler()
     )
   }
 }
