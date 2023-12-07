@@ -42,6 +42,15 @@ import {
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 
+const TV2_GRAPHICS_LAYERS: Tv2SourceLayer[] = [
+  Tv2SourceLayer.GRAPHICS_IDENT,
+  Tv2SourceLayer.GRAPHICS_TOP,
+  Tv2SourceLayer.GRAPHICS_LOWER_THIRD,
+  Tv2SourceLayer.GRAPHICS_HEADLINE,
+  Tv2SourceLayer.GRAPHICS_TEMA,
+  Tv2SourceLayer.GRAPHICS_TELEPHONE
+]
+
 export class Tv2GraphicsActionFactory {
 
   constructor(
@@ -174,7 +183,8 @@ export class Tv2GraphicsActionFactory {
       name: 'Gfx Clear',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
-        pieceInterface
+        pieceInterface,
+        layersToStopPiecesOn: TV2_GRAPHICS_LAYERS
       },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
@@ -182,13 +192,15 @@ export class Tv2GraphicsActionFactory {
     }
   }
 
-  private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, commandTimelineObjectFactory: Tv2GraphicsCommandTimelineObjectFactory): Tv2PieceAction {
+  private createAllOutGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsCommandTimelineObjectFactory: Tv2GraphicsCommandTimelineObjectFactory): Tv2PieceAction {
     const duration: number = 3000
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: 'allOutGraphicsPiece',
       name: 'Gfx All Out',
       duration,
-      timelineObjects: [commandTimelineObjectFactory.createAllOutGraphicsTimelineObject(blueprintConfiguration)]
+      timelineObjects: [
+        graphicsCommandTimelineObjectFactory.createAllOutGraphicsTimelineObject(blueprintConfiguration)
+      ]
     })
 
     return {
@@ -196,7 +208,8 @@ export class Tv2GraphicsActionFactory {
       name: 'Gfx All Out',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
-        pieceInterface
+        pieceInterface,
+        layersToStopPiecesOn: TV2_GRAPHICS_LAYERS
       },
       metadata: {
         contentType: Tv2ActionContentType.GRAPHICS,
@@ -353,7 +366,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createIdentGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2OverlayGraphicsManifestData[]): Tv2PieceAction[] {
-    const identData: Tv2OverlayGraphicsManifestData[] = graphicsData.filter(data => data.sourceLayerId === Tv2SourceLayer.IDENT)
+    const identData: Tv2OverlayGraphicsManifestData[] = graphicsData.filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_IDENT)
     return identData.map(data => this.createIdentGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
   }
 
@@ -362,7 +375,7 @@ export class Tv2GraphicsActionFactory {
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: `${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}_piece`,
       name: overlayGraphicsData.name,
-      layer: Tv2SourceLayer.IDENT,
+      layer: Tv2SourceLayer.GRAPHICS_IDENT,
       duration: overlayGraphicsData.expectedDuration,
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, overlayGraphicsData.templateName),
       timelineObjects: [
@@ -389,7 +402,7 @@ export class Tv2GraphicsActionFactory {
   }
 
   private createLowerThirdActions(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2OverlayGraphicsManifestData[]): Tv2PieceAction[] {
-    const lowerThirdData: Tv2OverlayGraphicsManifestData[] = graphicsData.filter(data => data.sourceLayerId === Tv2SourceLayer.LOWER_THIRD)
+    const lowerThirdData: Tv2OverlayGraphicsManifestData[] = graphicsData.filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_LOWER_THIRD)
     return lowerThirdData.map((data) => this.createLowerThirdGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
   }
 
@@ -398,7 +411,7 @@ export class Tv2GraphicsActionFactory {
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: `${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}_piece`,
       name: overlayGraphicsData.name,
-      layer: Tv2SourceLayer.LOWER_THIRD,
+      layer: Tv2SourceLayer.GRAPHICS_LOWER_THIRD,
       duration: overlayGraphicsData.expectedDuration,
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, overlayGraphicsData.templateName),
       timelineObjects: [

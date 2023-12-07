@@ -485,7 +485,7 @@ export class Tv2SplitScreenActionFactory {
         transitionType: piece.transitionType,
         isPlanned: false,
         start: piece.getStart(),
-        duration: piece.duration,
+        duration: piece.getDuration(),
         preRollDuration: piece.preRollDuration,
         postRollDuration: piece.postRollDuration,
         metadata: piece.metadata as Tv2PieceMetadata,

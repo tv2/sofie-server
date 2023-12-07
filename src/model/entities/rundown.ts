@@ -87,6 +87,8 @@ export class Rundown extends BasicRundown {
       throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated')
     }
     this.resetSegments()
+    this.resetHistory()
+    this.infinitePieces = new Map()
     this.isRundownActive = true
 
     const firstSegment: Segment = this.findFirstSegment()
@@ -98,8 +100,6 @@ export class Rundown extends BasicRundown {
       segment: firstSegment,
       owner: Owner.SYSTEM
     }
-
-    this.resetHistory()
   }
 
   private resetHistory(): void {
@@ -656,6 +656,16 @@ export class Rundown extends BasicRundown {
 
     this.activeCursor.segment.insertPartAfterActivePart(part)
     this.setNext(this.activeCursor.segment.id, part.id)
+  }
+
+  public stopActivePiecesOnLayers(layers: string[]): void {
+    this.assertActive(this.stopActivePiecesOnLayers.name)
+    const piecesToStop: Piece[] = [
+      ...this.getActiveCursor()?.part.getPieces().filter(piece => layers.includes(piece.layer)) ?? [],
+      ...layers.map(layer => this.infinitePieces.get(layer)).filter((piece): piece is Piece => !!piece)
+    ]
+
+    piecesToStop.forEach(piece => piece.stop())
   }
 
   public insertPieceIntoActivePart(piece: Piece): void {

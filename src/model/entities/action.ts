@@ -28,8 +28,9 @@ export interface PartAction extends Action {
 export interface PieceAction extends Action {
   type: PieceActionType
   data: {
-    pieceInterface: PieceInterface,
+    pieceInterface: PieceInterface
     partInTransition?: InTransition
+    layersToStopPiecesOn?: string[]
   }
 }
 
