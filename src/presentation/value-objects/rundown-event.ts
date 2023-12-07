@@ -2,8 +2,8 @@ import { EventType, IngestEventType, RundownEventType } from '../enums/rundown-e
 import { TypedEvent } from './typed-event'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
-import { RundownDto } from '../dtos/rundown-dto'
 import { SegmentDto } from '../dtos/segment-dto'
+import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 
 export interface RundownEvent extends TypedEvent {
   type: EventType
@@ -57,12 +57,12 @@ export interface RundownInfinitePieceAddedEvent extends RundownEvent {
 
 export interface RundownCreatedEvent extends RundownEvent {
   type: IngestEventType.RUNDOWN_CREATED,
-  rundown: RundownDto
+  basicRundown: BasicRundownDto
 }
 
 export interface RundownUpdatedEvent extends RundownEvent {
   type: IngestEventType.RUNDOWN_UPDATED,
-  rundown: RundownDto
+  basicRundown: BasicRundownDto
 }
 
 export interface RundownDeletedEvent extends RundownEvent {

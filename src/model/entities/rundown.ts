@@ -14,7 +14,7 @@ import { ExhaustiveCaseChecker } from '../../business-logic/exhaustive-case-chec
 import { TimelineObject } from './timeline-object'
 import { LastPartInRundownException } from '../exceptions/last-part-in-rundown-exception'
 import { RundownPersistentState } from '../value-objects/rundown-persistent-state'
-import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
 import { RundownCursor } from '../value-objects/rundown-cursor'
 import { Owner } from '../enums/owner'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
@@ -66,7 +66,7 @@ export class Rundown extends BasicRundown {
 
   constructor(rundown: RundownInterface) {
     super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt, rundown.timing)
-    this.segments = rundown.segments ? rundown.segments.sort(this.compareSegments) : []
+    this.segments = rundown.segments ? [...rundown.segments].sort(this.compareSegments) : []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
     this.history = rundown.history ?? []
@@ -225,7 +225,7 @@ export class Rundown extends BasicRundown {
 
   private assertNotUndefined<T>(value: T, nameOfType: string): asserts value is NonNullable<T> {
     if (!value) {
-      throw new UnsupportedOperation(`Trying to fetch ${nameOfType} of Rundown before ${nameOfType} has been set`)
+      throw new UnsupportedOperationException(`Trying to fetch ${nameOfType} of Rundown before ${nameOfType} has been set`)
     }
   }
 
@@ -548,7 +548,7 @@ export class Rundown extends BasicRundown {
 
   public removeUnsyncedSegment(unsyncedSegment: Segment): void {
     if (unsyncedSegment.isOnAir()) {
-      throw new UnsupportedOperation('Trying to remove an unsynced from the Rundown while it is still on Air')
+      throw new UnsupportedOperationException(`Trying to remove an unsynced Segment ${unsyncedSegment.id} from the Rundown while it is still on Air`)
     }
     this.segments = this.segments.filter(segment => segment.id !== unsyncedSegment.id)
   }
@@ -705,7 +705,7 @@ export class Rundown extends BasicRundown {
       return
     }
 
-    throw new UnsupportedOperation(`Can't replace Piece on Rundown ${this.id}. Piece ${pieceToBeReplaced.id} is neither on the active or next Part.`)
+    throw new UnsupportedOperationException(`Can't replace Piece on Rundown ${this.id}. Piece ${pieceToBeReplaced.id} is neither on the active or next Part.`)
   }
 
   public getHistory(): Part[] {

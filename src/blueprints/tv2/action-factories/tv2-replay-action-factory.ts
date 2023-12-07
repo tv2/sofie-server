@@ -104,7 +104,6 @@ export class Tv2ReplayActionFactory {
       segmentId: '',
       pieces: [],
       rank: -1,
-      isPlanned: false,
       isOnAir: false,
       isNext: false,
       isUnsynced: false,
