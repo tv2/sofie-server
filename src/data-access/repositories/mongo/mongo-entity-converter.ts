@@ -25,7 +25,7 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
-import { Logger } from '../../../logger'
+import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 
 export interface MongoId {
   _id: string
@@ -156,12 +156,6 @@ export interface MongoMedia {
 }
 
 export class MongoEntityConverter {
-
-  private readonly logger: Logger
-
-  constructor(logger: Logger) {
-    this.logger = logger.tag(MongoEntityConverter.name)
-  }
 
   public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {
     const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = mongoRundown.isActive
@@ -410,10 +404,7 @@ export class MongoEntityConverter {
         return LookaheadMode.WHEN_CLEAR
       }
       default: {
-        this.logger.warn(`Found unknown number for LookAhead: ${lookAheadNumber}`)
-        // TODO: Throw error. Currently we have some misconfiguration that uses an outdated lookAhead mode
-        // throw new UnsupportedOperation(`Found unknown number for LookAhead: ${lookAheadNumber}`)
-        return LookaheadMode.NONE
+        throw new UnsupportedOperationException(`Found unknown number for LookAhead: ${lookAheadNumber}`)
       }
     }
   }
