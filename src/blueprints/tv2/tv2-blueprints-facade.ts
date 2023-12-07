@@ -85,7 +85,6 @@ export class Tv2BlueprintsFacade {
         videoMixerTimelineObjectFactory,
         audioTimelineObjectFactory, 
         videoClipTimelineObjectFactory,
-        Tv2LoggerFacade.createLogger()
       ),
       new Tv2VideoMixerConfigurationActionFactory(videoMixerTimelineObjectFactory),
       new Tv2SplitScreenActionFactory(
