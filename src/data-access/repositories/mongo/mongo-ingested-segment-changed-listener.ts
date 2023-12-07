@@ -42,7 +42,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository imp
       case MongoChangeEvent.INSERT: {
         const insertChange: ChangeStreamInsertDocument<MongoIngestedSegment> = change as ChangeStreamInsertDocument<MongoIngestedSegment>
         const ingestedSegmentId: string = insertChange.fullDocument._id
-        const ingestedSegment: IngestedSegment = await this.ingestedSegmentRepository.getIngestedSegmentRundown(ingestedSegmentId)
+        const ingestedSegment: IngestedSegment = await this.ingestedSegmentRepository.getIngestedSegment(ingestedSegmentId)
         this.onCreatedCallback(ingestedSegment)
         break
       }
@@ -55,7 +55,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository imp
       case MongoChangeEvent.REPLACE: {
         const replaceChange: ChangeStreamReplaceDocument<MongoIngestedSegment> = change as ChangeStreamReplaceDocument<MongoIngestedSegment>
         const ingestedSegmentId: string = replaceChange.fullDocument._id
-        const ingestedSegment: IngestedSegment = await this.ingestedSegmentRepository.getIngestedSegmentRundown(ingestedSegmentId)
+        const ingestedSegment: IngestedSegment = await this.ingestedSegmentRepository.getIngestedSegment(ingestedSegmentId)
         this.onUpdatedCallback(ingestedSegment)
         break
       }
