@@ -154,17 +154,21 @@ export class Segment {
     this.parts.sort(this.compareParts)
   }
 
-  public removePart(partId: string): void {
+  /**
+   * Returns the removed Part or undefined if the Part doesn't exist on the Segment
+   */
+  public removePart(partId: string): Part | undefined {
     const partToDelete: Part | undefined = this.parts.find(part => part.id === partId)
     if (!partToDelete) {
-      return
+      return undefined
     }
 
     if (partToDelete.isOnAir()) {
       partToDelete.markAsUnsynced()
-      return
+      return partToDelete
     }
-    this.parts = this.parts.filter(p => p.id !== partId)
+    this.parts = this.parts.filter(part => part.id !== partId)
+    return partToDelete
   }
 
   public getParts(): Part[] {

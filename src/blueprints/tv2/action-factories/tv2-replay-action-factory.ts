@@ -99,11 +99,11 @@ export class Tv2ReplayActionFactory {
   private createPartInterface(partId: string, name: string): PartInterface {
     return {
       id: partId,
+      rundownId: '',
       name,
       segmentId: '',
       pieces: [],
       rank: -1,
-      isPlanned: false,
       isOnAir: false,
       isNext: false,
       isUnsynced: false,

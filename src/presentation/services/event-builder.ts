@@ -24,12 +24,20 @@ import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
-import { IngestEventType, RundownEventType } from '../enums/rundown-event-type'
+import { ActionTriggerEventType, IngestEventType, RundownEventType } from '../enums/rundown-event-type'
 import { SegmentDto } from '../dtos/segment-dto'
 import { Segment } from '../../model/entities/segment'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
+import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
+import { ActionTrigger } from '../../model/entities/action-trigger'
+import {
+  ActionTriggerCreatedEvent,
+  ActionTriggerDeletedEvent,
+  ActionTriggerUpdatedEvent
+} from '../value-objects/action-trigger-event'
+import { ActionTriggerDto } from '../dtos/action-trigger-dto'
 
-export class RundownEventBuilderImplementation implements RundownEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder {
 
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
@@ -75,12 +83,12 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
     }
   }
 
-  public buildInfiniteRundownPieceAddedEvent(rundown: Rundown, infinitePiece: Piece): RundownInfinitePieceAddedEvent {
+  public buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePieceAddedEvent {
     return {
-      type: RundownEventType.INFINITE_PIECE_ADDED,
+      type: RundownEventType.INFINITE_PIECES_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      infinitePiece: new PieceDto(infinitePiece),
+      infinitePieces: rundown.getInfinitePieces().map(piece => new PieceDto(piece))
     }
   }
 
@@ -190,6 +198,30 @@ export class RundownEventBuilderImplementation implements RundownEventBuilder {
       timestamp: Date.now(),
       rundownId: rundown.id,
       partId
+    }
+  }
+
+  public buildActionTriggerCreatedEvent(actionTrigger: ActionTrigger): ActionTriggerCreatedEvent {
+    return {
+      type: ActionTriggerEventType.ACTION_TRIGGER_CREATED,
+      timestamp: Date.now(),
+      actionTrigger: new ActionTriggerDto(actionTrigger)
+    }
+  }
+
+  public buildActionTriggerUpdatedEvent(actionTrigger: ActionTrigger): ActionTriggerUpdatedEvent {
+    return {
+      type: ActionTriggerEventType.ACTION_TRIGGER_UPDATED,
+      timestamp: Date.now(),
+      actionTrigger: new ActionTriggerDto(actionTrigger)
+    }
+  }
+
+  public buildActionTriggerDeletedEvent(actionTriggerId: string): ActionTriggerDeletedEvent {
+    return {
+      type: ActionTriggerEventType.ACTION_TRIGGER_DELETED,
+      timestamp: Date.now(),
+      actionTriggerId
     }
   }
 }

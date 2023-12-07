@@ -100,11 +100,11 @@ export class Tv2CameraActionFactory {
   private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
     return {
       id: partId,
+      rundownId: '',
       name: `Camera Part ${source.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,
-      isPlanned: false,
       isOnAir: false,
       isNext: false,
       isUntimed: false,

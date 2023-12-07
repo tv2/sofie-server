@@ -5,7 +5,9 @@ import { Piece, PieceInterface } from '../piece'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { instance, verify } from '@typestrong/ts-mockito'
 import { EntityTestFactory } from './entity-test-factory'
-import { UnsupportedOperation } from '../../exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../../exceptions/unsupported-operation-exception'
+import { IngestedPiece } from '../ingested-piece'
+import { IngestedPart } from '../ingested-part'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -75,7 +77,7 @@ describe(Part.name, () => {
 
   describe(Part.prototype.reset.name, () => {
     it('has an executedAt value of 0 after being reset', () => {
-      const testee: Part = new Part({ executedAt: 123456789 } as PartInterface)
+      const testee: Part = new Part({ executedAt: 123456789, ingestedPart: {} } as PartInterface)
 
       testee.reset()
 
@@ -84,7 +86,7 @@ describe(Part.name, () => {
     })
 
     it('has a playedDuration value of 0 after being reset', () => {
-      const testee: Part = new Part({ playedDuration: 5023 } as PartInterface)
+      const testee: Part = new Part({ playedDuration: 5023, ingestedPart: {} } as PartInterface)
 
       testee.reset()
 
@@ -100,7 +102,12 @@ describe(Part.name, () => {
 
       const testee: Part = new Part({ pieces: [
         plannedPieceOne, plannedPieceTwo, unPlannedPieceOne, unPlannedPieceTwo
-      ] } as PartInterface)
+      ], ingestedPart: {
+        ingestedPieces: [
+          createShallowIngestedPiece(plannedPieceOne.id),
+          createShallowIngestedPiece(plannedPieceTwo.id)
+        ] as Readonly<IngestedPiece[]>
+      } as IngestedPart } as PartInterface)
 
       expect(testee.getPieces()).toContain(unPlannedPieceOne)
       expect(testee.getPieces()).toContain(unPlannedPieceTwo)
@@ -117,7 +124,7 @@ describe(Part.name, () => {
   describe(Part.prototype.setSegmentId.name, () => {
     describe('Part is planned', () => {
       it('throws an error', () => {
-        const testee: Part = new Part({ isPlanned: true } as PartInterface)
+        const testee: Part = new Part({ ingestedPart: {} } as PartInterface)
         expect(() => testee.setSegmentId('someSegmentId')).toThrow()
       })
     })
@@ -125,7 +132,7 @@ describe(Part.name, () => {
     describe('Part is unplanned', () => {
       it('updates the Segment id', () => {
         const segmentId: string = 'segmentId'
-        const testee: Part = new Part({ segmentId: '', isPlanned: false } as PartInterface)
+        const testee: Part = new Part({ segmentId: '', ingestedPart: undefined } as PartInterface)
 
         expect(testee.getSegmentId()).not.toBe(segmentId)
         testee.setSegmentId(segmentId)
@@ -187,7 +194,7 @@ describe(Part.name, () => {
 
         const testee: Part = new Part({ } as PartInterface)
 
-        expect(() => testee.replacePiece(pieceToBeReplaced, newPiece)).toThrow(UnsupportedOperation)
+        expect(() => testee.replacePiece(pieceToBeReplaced, newPiece)).toThrow(UnsupportedOperationException)
       })
     })
 
@@ -2337,3 +2344,9 @@ describe(Part.name, () => {
     })
   })
 })
+
+function createShallowIngestedPiece(id: string): IngestedPiece {
+  return {
+    id
+  } as IngestedPiece
+}

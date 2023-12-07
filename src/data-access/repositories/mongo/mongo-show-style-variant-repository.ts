@@ -1,21 +1,22 @@
 import { ShowStyleVariantRepository } from '../interfaces/show-style-variant-repository'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
-import { MongoEntityConverter, MongoShowStyleVariant } from './mongo-entity-converter'
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Rundown } from '../../../model/entities/rundown'
+import { MongoEntityConverter, MongoShowStyleVariant } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'showStyleVariants'
 
 export class MongoShowStyleVariantRepository extends BaseMongoRepository implements ShowStyleVariantRepository{
+
   constructor(
     mongoDatabase: MongoDatabase,
-    mongoEntityConverter: MongoEntityConverter,
+    private readonly mongoEntityConverter: MongoEntityConverter,
     private readonly rundownRepository: RundownRepository
   ) {
-    super(mongoDatabase, mongoEntityConverter)
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {

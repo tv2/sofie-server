@@ -1,7 +1,6 @@
-import { MongoPartRepository } from '../mongo/mongo-part-repository'
+import { MongoPartRepository, PART_COLLECTION_NAME } from '../mongo/mongo-part-repository'
 import { Part } from '../../../model/entities/part'
 import { Collection, Db } from 'mongodb'
-import { MongoEntityConverter, MongoId, MongoPart } from '../mongo/mongo-entity-converter'
 import { PartRepository } from '../interfaces/part-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
 import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
@@ -9,8 +8,15 @@ import { MongoTestDatabase } from './mongo-test-database'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
+import { MongoEntityConverter, MongoId, MongoPart } from '../mongo/mongo-entity-converter'
 
-const COLLECTION_NAME = 'parts'
+const COLLECTION_NAME: string = PART_COLLECTION_NAME
+
+describe('', () => {
+  it('', () => {
+    // Necessary test to circumvent that the tests are run as an exported function
+  })
+})
 
 export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoPartRepository.prototype.deletePartsForSegment.name, () => {
@@ -19,10 +25,10 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       const segmentId: string = 'someSegmentId'
       const part: MongoPart = createMongoPart({ segmentId: segmentId })
       const entityPart: Part = EntityMockFactory.createPart({ segmentId: segmentId })
-      await testDatabase.populateDatabaseWithParts([part])
+      await testDatabase.populateCollection(COLLECTION_NAME, [part])
       const db: Db = testDatabase.getDatabase()
 
-      when(mongoConverter.convertParts(anything())).thenReturn([entityPart])
+      when(mongoConverter.convertToParts(anything())).thenReturn([entityPart])
       const testee: PartRepository = createTestee({
         mongoConverter: mongoConverter,
       })
@@ -44,9 +50,9 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
         EntityMockFactory.createPart({ segmentId: segmentId }),
         EntityMockFactory.createPart({ segmentId: segmentId }),
       ]
-      await testDatabase.populateDatabaseWithParts(mongoParts)
+      await testDatabase.populateCollection(COLLECTION_NAME, mongoParts)
 
-      when(mongoConverter.convertParts(anything())).thenReturn(parts)
+      when(mongoConverter.convertToParts(anything())).thenReturn(parts)
       const testee: PartRepository = createTestee({
         mongoConverter: mongoConverter,
       })
@@ -68,9 +74,9 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
         EntityMockFactory.createPart({ segmentId: segmentId }),
         EntityMockFactory.createPart({ segmentId: segmentId }),
       ]
-      await testDatabase.populateDatabaseWithParts(mongoParts)
+      await testDatabase.populateCollection(COLLECTION_NAME, mongoParts)
 
-      when(mongoConverter.convertParts(anything())).thenReturn(parts)
+      when(mongoConverter.convertToParts(anything())).thenReturn(parts)
       when(pieceRepository.getPieces(anything())).thenResolve([])
       const testee: PartRepository = createTestee({
         mongoConverter: mongoConverter,
@@ -85,7 +91,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
     it('does not deletes any pieces, when nonexistent segmentId is given', async () => {
       const nonExistingId: string = 'nonExistingId'
       const mongoPart: MongoPart = createMongoPart({})
-      await testDatabase.populateDatabaseWithParts([mongoPart])
+      await testDatabase.populateCollection(COLLECTION_NAME, [mongoPart])
       const db = testDatabase.getDatabase()
 
       const testee = createTestee()
@@ -101,12 +107,12 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       const segmentId: string = 'someSegmentId'
       const mongoPart: MongoPart = createMongoPart({ segmentId: segmentId })
       const part: Part = EntityMockFactory.createPart({ segmentId: segmentId })
-      await testDatabase.populateDatabaseWithParts([mongoPart])
+      await testDatabase.populateCollection(COLLECTION_NAME, [mongoPart])
       const db: Db = testDatabase.getDatabase()
       const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
       const spiedCollection = spy(collection)
 
-      when(mongoConverter.convertParts(anything())).thenReturn([part])
+      when(mongoConverter.convertToParts(anything())).thenReturn([part])
       when(pieceRepository.getPieces(anything())).thenResolve([])
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       const testee: PartRepository = createTestee({
@@ -126,7 +132,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       const inactiveMongoPart: MongoPart = createMongoPart({ _id: 'randomId', isOnAir: false })
       const onAirPart: Part = EntityMockFactory.createPart({ id: inactiveMongoPart._id, isOnAir: true })
 
-      await testDatabase.populateDatabaseWithParts([inactiveMongoPart])
+      await testDatabase.populateCollection(COLLECTION_NAME, [inactiveMongoPart])
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
@@ -154,7 +160,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       const onAirMongoPart: MongoPart = createMongoPart({ _id: 'randomId', isOnAir: true })
       const inactivePart: Part = EntityMockFactory.createPart({ id: onAirMongoPart._id, isOnAir: false })
 
-      await testDatabase.populateDatabaseWithParts([onAirMongoPart])
+      await testDatabase.populateCollection(COLLECTION_NAME, [onAirMongoPart])
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
@@ -182,7 +188,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       const nonQueuedMongoPart: MongoPart = createMongoPart({ _id: 'randomId', isNext: false })
       const nextPart: Part = EntityMockFactory.createPart({ id: nonQueuedMongoPart._id, isNext: true })
 
-      await testDatabase.populateDatabaseWithParts([nonQueuedMongoPart])
+      await testDatabase.populateCollection(COLLECTION_NAME, [nonQueuedMongoPart])
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
@@ -210,7 +216,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       const nextMongoPart: MongoPart = createMongoPart({ _id: 'randomId', isNext: true })
       const nonQueuedPart: Part = EntityMockFactory.createPart({ id: nextMongoPart._id, isNext: false })
 
-      await testDatabase.populateDatabaseWithParts([nextMongoPart])
+      await testDatabase.populateCollection(COLLECTION_NAME, [nextMongoPart])
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
@@ -236,7 +242,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
     it('gets zero parts from database when no parts for given segmentId exist', async () => {
       const mongoParts: MongoPart[] = [createMongoPart({ segmentId: 'someSegmentId' })]
       const nonExistingId: string = 'nonExistingId'
-      await testDatabase.populateDatabaseWithParts(mongoParts)
+      await testDatabase.populateCollection(COLLECTION_NAME, mongoParts)
 
       const testee: PartRepository = createTestee()
 
@@ -287,8 +293,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
   function createMongoPart(mongoPartInterface?: Partial<MongoPart>): MongoPart {
     return {
       _id: mongoPartInterface?._id ?? 'id' + Math.random(),
-      title: mongoPartInterface?.title ?? 'partTitle',
-      _rank: mongoPartInterface?._rank ?? Math.random() * 100,
+      rank: mongoPartInterface?.rank ?? Math.random() * 100,
       segmentId: mongoPartInterface?.segmentId ?? 'segmentId' + Math.floor(Math.random() * 10),
     } as MongoPart
   }
@@ -299,8 +304,8 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       mongoParts = parts.map(part => createMongoPart({ segmentId: part.getSegmentId() }))
     }
 
-    when(mongoEntityConverter.convertParts(anything())).thenReturn(parts)
-    await testDatabase.populateDatabaseWithParts(mongoParts)
+    when(mongoEntityConverter.convertToParts(anything())).thenReturn(parts)
+    await testDatabase.populateCollection(COLLECTION_NAME, mongoParts)
     return mongoEntityConverter
   }
 
@@ -320,7 +325,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
 
     if (!params.mongoConverter) {
       params.mongoConverter = mock(MongoEntityConverter)
-      when(params.mongoConverter.convertParts(anything())).thenReturn([])
+      when(params.mongoConverter.convertToParts(anything())).thenReturn([])
     }
 
     return new MongoPartRepository(instance(params.mongoDb!), instance(params.mongoConverter), instance(pieceRepository))

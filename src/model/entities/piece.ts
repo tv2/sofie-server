@@ -1,7 +1,8 @@
 import { TimelineObject } from './timeline-object'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { TransitionType } from '../enums/transition-type'
-import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
+import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface PieceInterface {
@@ -27,22 +28,22 @@ export interface PieceInterface {
 
 export class Piece {
   public readonly id: string
-  public name: string
-  public layer: string
-  public pieceLifespan: PieceLifespan
-  public isPlanned: boolean = true
-  public duration?: number
-  public preRollDuration: number
-  public postRollDuration: number
-  public transitionType: TransitionType
-  public timelineObjects: TimelineObject[]
+  public readonly name: string
+  public readonly layer: string
+  public readonly pieceLifespan: PieceLifespan
+  public readonly isPlanned: boolean = true
+  public readonly preRollDuration: number
+  public readonly postRollDuration: number
+  public readonly transitionType: TransitionType
+  public readonly timelineObjects: TimelineObject[]
 
   public readonly metadata?: unknown
-  public content?: unknown
-  public tags: string[]
+  public readonly content?: unknown
+  public readonly tags: string[]
 
   private partId: string
   private start: number
+  private duration?: number
   private executedAt: number
   private isUnsyncedPiece: boolean = false
 
@@ -68,12 +69,16 @@ export class Piece {
     this.setExecutedAt(piece.executedAt ?? 0)
   }
 
-  public setExecutedAt(executedAt: number): void {
+  public resetFromIngestedPiece(ingestedPiece: IngestedPiece): void {
+    this.start = ingestedPiece.start
+    this.duration = ingestedPiece.duration
     if (this.pieceLifespan === PieceLifespan.WITHIN_PART) {
-      // Only care about executedAt for infinite Pieces
-      // since Pieces within Part always needs to be "executed" when the Part is taken.
-      return
+      // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
+      this.executedAt = 0
     }
+  }
+
+  public setExecutedAt(executedAt: number): void {
     this.executedAt = executedAt
   }
 
@@ -83,6 +88,10 @@ export class Piece {
 
   public getExecutedAt(): number {
     return this.executedAt
+  }
+
+  public stop(): void {
+    this.duration = Date.now() - this.executedAt
   }
 
   public markAsUnsyncedWithUnsyncedPart(): void {
@@ -106,20 +115,24 @@ export class Piece {
 
   public setPartId(partId: string): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperation(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
+      throw new UnsupportedOperationException(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
     }
     this.partId = partId
   }
 
   public setStart(startTimestamp: number): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperation(`Trying to set the start of a planned Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
+      throw new UnsupportedOperationException(`Trying to set the start of a planned Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
     }
     this.start = startTimestamp
   }
 
   public getStart(): number {
     return this.start
+  }
+
+  public getDuration(): number | undefined {
+    return this.duration
   }
 
   public getUnsyncedCopy(): Piece {
