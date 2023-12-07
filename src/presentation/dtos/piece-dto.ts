@@ -15,7 +15,7 @@ export class PieceDto {
     this.partId = piece.getPartId()
     this.name = piece.name
     this.start = piece.getStart()
-    this.duration = piece.duration
+    this.duration = piece.getDuration()
     this.layer = piece.layer
     this.isPlanned = piece.isPlanned
     this.metadata = piece.metadata

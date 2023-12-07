@@ -88,7 +88,7 @@ export interface MongoPart extends MongoId {
   timings?: PartTimings
   endState?: PartEndState
 
-  defaultPart?: IngestedPart
+  ingestedPart?: IngestedPart
 }
 
 export interface MongoPiece extends MongoId {
@@ -313,7 +313,7 @@ export class MongoEntityConverter {
       timings: this.getPartTimings(part),
       endState: part.getEndState(),
 
-      defaultPart: part.defaultPart
+      ingestedPart: part.ingestedPart
     }
   }
 
@@ -347,7 +347,7 @@ export class MongoEntityConverter {
       pieceLifespan: piece.pieceLifespan,
       isPlanned: piece.isPlanned,
       start: piece.getStart(),
-      duration: piece.duration,
+      duration: piece.getDuration(),
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
       executedAt: piece.getExecutedAt(),

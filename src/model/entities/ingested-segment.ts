@@ -1,10 +1,10 @@
 import { IngestedPart } from './ingested-part'
 
 export interface IngestedSegment {
-  id: string
-  rundownId: string
-  name: string
-  rank: number
-  ingestedParts: IngestedPart[]
-  budgetDuration?: number
+  readonly id: string
+  readonly rundownId: string
+  readonly name: string
+  readonly rank: number
+  readonly budgetDuration?: number
+  readonly ingestedParts: Readonly<IngestedPart[]>
 }

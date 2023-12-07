@@ -12,7 +12,7 @@ import { TimelineEnable } from '../../model/entities/timeline-enable'
 import { TransitionType } from '../../model/enums/transition-type'
 import { PartTimings } from '../../model/value-objects/part-timings'
 import { PieceLifespan } from '../../model/enums/piece-lifespan'
-import { UnsupportedOperation } from '../../model/exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { ExhaustiveCaseChecker } from '../exhaustive-case-checker'
 import { ObjectCloner } from './interfaces/object-cloner'
 import { Studio } from '../../model/entities/studio'
@@ -133,7 +133,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     }
 
     if (pieceEnable.start === 'now') {
-      throw new UnsupportedOperation(
+      throw new UnsupportedOperationException(
         `Found an enable.start="now" for control for Piece: '${piece.id}'`
       )
     }
@@ -198,7 +198,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     const startOffset: number = piece.getStart()
     return {
       start: partCalculatedTimings.inTransitionStart + startOffset,
-      duration: piece.duration,
+      duration: piece.getDuration(),
     }
   }
 
@@ -225,12 +225,12 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     parentGroup: TimelineObjectGroup
   ): TimelineEnable | undefined {
     const duration: string | number | undefined =
-        partCalculatedTimings.postRollDuration && !piece.duration
+        partCalculatedTimings.postRollDuration && !piece.getDuration()
           ? `#${parentGroup.id} - ${partCalculatedTimings.postRollDuration}`
-          : piece.duration
+          : piece.getDuration()
 
     return {
-      start: piece.getStart() + partCalculatedTimings.delayStartOfPiecesDuration,
+      start: piece.getStart() + (piece.isPlanned ? partCalculatedTimings.delayStartOfPiecesDuration : 0),
       duration: duration === 0 ? undefined : duration,
     }
   }
@@ -446,7 +446,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     }
 
     if (previousPart.getExecutedAt() <= 0) {
-      throw new UnsupportedOperation(
+      throw new UnsupportedOperationException(
         `Previous Part: ${previousPart.name} does not have a valid "executedAt" - something went wrong when setting the previous Part.`
       )
     }
@@ -483,7 +483,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       .filter(piece => piece.getPartId() !== activePart.id)
       .forEach(piece => {
         if (!piece.getExecutedAt()) {
-          throw new UnsupportedOperation(
+          throw new UnsupportedOperationException(
             `Found infinite Piece: ${piece.id} without an "executedAt". Infinite Pieces must have an "executedAt"! ${piece.pieceLifespan}`
           )
         }

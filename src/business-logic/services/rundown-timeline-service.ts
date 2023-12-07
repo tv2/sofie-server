@@ -44,8 +44,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    this.emitAddInfinitePieces(rundown, [])
-
+    this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     this.rundownEventEmitter.emitActivateEvent(rundown)
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
@@ -104,7 +103,6 @@ export class RundownTimelineService implements RundownService {
     this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const infinitePiecesBefore: Piece[] = rundown.getInfinitePieces()
 
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
@@ -113,10 +111,7 @@ export class RundownTimelineService implements RundownService {
 
     this.startAutoNext(timeline, rundownId)
 
-    this.emitAddInfinitePieces(rundown, infinitePiecesBefore)
-    // TODO: Emit if any infinite Pieces no longer exist e.g. we had a Segment infinite Piece and we changed Segment
-    // TODO: Should we just emit a list of current infinite Pieces? That would be easy, but it then we would potentially emit the same pieces over and over again.
-
+    this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     this.rundownEventEmitter.emitTakeEvent(rundown)
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
@@ -163,13 +158,6 @@ export class RundownTimelineService implements RundownService {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
     }
-  }
-
-  private emitAddInfinitePieces(rundown: Rundown, infinitePiecesBefore: Piece[]): void {
-    const infinitePiecesAfter: Piece[] = rundown.getInfinitePieces()
-    infinitePiecesAfter
-      .filter((piece) => !infinitePiecesBefore.includes(piece))
-      .forEach((piece) => this.rundownEventEmitter.emitInfiniteRundownPieceAddedEvent(rundown, piece))
   }
 
   public async setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
@@ -232,15 +220,17 @@ export class RundownTimelineService implements RundownService {
     await this.saveRundown(rundown)
   }
 
-  public async insertPieceAsOnAir(rundownId: string, piece: Piece): Promise<void> {
+  public async insertPieceAsOnAir(rundownId: string, piece: Piece, layersToStopPiecesOn: string[] = []): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+
+    rundown.stopActivePiecesOnLayers(layersToStopPiecesOn)
     rundown.insertPieceIntoActivePart(piece)
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
     await this.buildAndPersistTimeline(rundown)
 
-    const segmentId: string = rundown.getActiveSegment().id
-    this.rundownEventEmitter.emitPieceInsertedEvent(rundown, segmentId, piece)
+    this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getActivePart())
 
     await this.saveRundown(rundown)
   }

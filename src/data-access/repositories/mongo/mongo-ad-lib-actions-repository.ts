@@ -10,6 +10,7 @@ interface AdLibAction {
   rundownId: string
   userData: unknown
 }
+
 export class MongoAdLibActionsRepository extends BaseMongoRepository implements ActionManifestRepository {
 
   constructor(mongoDatabase: MongoDatabase) {
