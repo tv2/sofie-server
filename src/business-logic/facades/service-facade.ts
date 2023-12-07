@@ -18,6 +18,8 @@ import { HttpService } from '../services/interfaces/http-service'
 import { GotHttpService } from '../services/got-http-service'
 import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-entity-mapper'
 import { ConsoleLogger } from '../../console-logger'
+import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
+import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -53,6 +55,13 @@ export class ServiceFacade {
       RepositoryFacade.createMediaRepository(),
       ServiceFacade.createRundownService(),
       BlueprintsFacade.createBlueprint()
+    )
+  }
+
+  public static createActionTriggerService(): ActionTriggerService {
+    return new ActionTriggerServiceImplementation(
+      EventEmitterFacade.createActionTriggerEventEmitter(),
+      RepositoryFacade.createActionTriggerRepository()
     )
   }
 

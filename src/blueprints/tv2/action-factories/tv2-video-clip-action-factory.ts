@@ -154,7 +154,6 @@ export class Tv2VideoClipActionFactory {
       segmentId: '',
       pieces: [],
       rank: -1,
-      isPlanned: false,
       isOnAir: false,
       isNext: false,
       isUntimed: false,

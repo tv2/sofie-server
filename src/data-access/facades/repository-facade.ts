@@ -49,6 +49,10 @@ import { IngestedSegment } from '../../model/entities/ingested-segment'
 import { CachedSegmentRepository } from '../repositories/cache/cached-segment-repository'
 import { CachedPartRepository } from '../repositories/cache/cached-part-repository'
 import { ConsoleLogger } from '../../console-logger'
+import { ActionTriggerRepository } from '../repositories/interfaces/action-trigger-repository'
+import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action-trigger-repository'
+import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
+import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -172,6 +176,10 @@ export class RepositoryFacade {
     return new MongoActionRepository(RepositoryFacade.getMongoDatabaseInstance())
   }
 
+  public static createActionTriggerRepository(): ActionTriggerRepository {
+    return new MongoActionTriggerRepository(RepositoryFacade.getMongoDatabaseInstance(), this.createUuidGenerator())
+  }
+
   public static createShowStyleVariantRepository(): ShowStyleVariantRepository {
     return new MongoShowStyleVariantRepository(RepositoryFacade.getMongoDatabaseInstance(), RepositoryFacade.createMongoEntityConverter(), this.createRundownRepository())
   }
@@ -190,5 +198,9 @@ export class RepositoryFacade {
 
   public static createMediaRepository(): MediaRepository {
     return new MongoMediaRepository(RepositoryFacade.getMongoDatabaseInstance(), RepositoryFacade.createMongoEntityConverter())
+  }
+
+  private static createUuidGenerator(): UuidGenerator {
+    return new CryptoUuidGenerator()
   }
 }

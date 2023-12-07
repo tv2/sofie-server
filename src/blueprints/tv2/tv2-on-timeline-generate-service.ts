@@ -6,7 +6,7 @@ import { Tv2MediaPlayerSession, Tv2RundownPersistentState } from './value-object
 import { TimelineObject, TimelineObjectGroup } from '../../model/entities/timeline-object'
 import { Tv2PartEndState } from './value-objects/tv2-part-end-state'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
-import { UnsupportedOperation } from '../../model/exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from './value-objects/tv2-metadata'
 import { Tv2MediaPlayer } from './value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../model/entities/timeline'
@@ -75,7 +75,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       (timelineObject) => timelineObject.id.includes('active_group_')
     )
     if (!activeTimelineObjectGroup) {
-      throw new UnsupportedOperation('No active group found. This should not be possible')
+      throw new UnsupportedOperationException('No active group found. This should not be possible')
     }
     activeTimelineObjectGroup.children.push(sisyfosPersistedLevelsTimelineObject)
   }
@@ -131,7 +131,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     const activeGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(ACTIVE_GROUP_PREFIX))
     const lookaheadGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(LOOKAHEAD_GROUP_ID))
     if (!activeGroup || !lookaheadGroup) {
-      throw new UnsupportedOperation('No Active or Lookahead Group found. This shouldn\'t be possible!')
+      throw new UnsupportedOperationException('No Active or Lookahead Group found. This shouldn\'t be possible!')
     }
 
     const mediaPlayerSessionsInUse: Tv2MediaPlayerSession[] = this.findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions, activeGroup)

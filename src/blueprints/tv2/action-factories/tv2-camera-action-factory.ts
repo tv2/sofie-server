@@ -105,7 +105,6 @@ export class Tv2CameraActionFactory {
       segmentId: '',
       pieces: [],
       rank: -1,
-      isPlanned: false,
       isOnAir: false,
       isNext: false,
       isUntimed: false,

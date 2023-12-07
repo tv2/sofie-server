@@ -3,17 +3,17 @@ import { TransitionType } from '../enums/transition-type'
 import { TimelineObject } from './timeline-object'
 
 export interface IngestedPiece {
-  id: string
-  partId: string
-  name: string
-  layer: string
-  pieceLifespan: PieceLifespan
-  start: number
-  duration?: number
-  preRollDuration: number
-  postRollDuration: number
-  transitionType: TransitionType
-  timelineObjects: TimelineObject[]
-  metadata?: unknown
-  content?: unknown
+  readonly id: string
+  readonly partId: string
+  readonly name: string
+  readonly layer: string
+  readonly pieceLifespan: PieceLifespan
+  readonly start: number
+  readonly duration?: number
+  readonly preRollDuration: number
+  readonly postRollDuration: number
+  readonly transitionType: TransitionType
+  readonly timelineObjects: TimelineObject[]
+  readonly metadata?: unknown
+  readonly content?: unknown
 }
