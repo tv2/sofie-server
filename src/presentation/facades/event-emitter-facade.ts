@@ -1,10 +1,10 @@
-import { RundownEventListener } from '../interfaces/rundown-event-listener'
+import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 import { RundownEventService } from '../services/rundown-event-service'
 import { RundownEventEmitter } from '../../business-logic/services/interfaces/rundown-event-emitter'
 import { EventBuilderFacade } from './event-builder-facade'
 import { ActionTriggerEventEmitter } from '../../business-logic/services/interfaces/action-trigger-event-emitter'
 import { ActionTriggerEventService } from '../services/action-trigger-event-service'
-import { ActionTriggerEventListener } from '../interfaces/action-trigger-event-listener'
+import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
 
 export class EventEmitterFacade {
 
@@ -12,7 +12,7 @@ export class EventEmitterFacade {
     return RundownEventService.getInstance(EventBuilderFacade.createRundownEventBuilder())
   }
 
-  public static createRundownEventListener(): RundownEventListener {
+  public static createRundownEventObserver(): RundownEventObserver {
     return RundownEventService.getInstance(EventBuilderFacade.createRundownEventBuilder())
   }
 
@@ -20,7 +20,7 @@ export class EventEmitterFacade {
     return ActionTriggerEventService.getInstance(EventBuilderFacade.createActionTriggerEventBuilder())
   }
 
-  public static createActionTriggerEventListener(): ActionTriggerEventListener {
+  public static createActionTriggerEventObserver(): ActionTriggerEventObserver {
     return ActionTriggerEventService.getInstance(EventBuilderFacade.createActionTriggerEventBuilder())
   }
 }

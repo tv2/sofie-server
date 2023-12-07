@@ -1,5 +1,5 @@
 import { ActionTriggerEventEmitter } from '../../business-logic/services/interfaces/action-trigger-event-emitter'
-import { ActionTriggerEventListener } from '../interfaces/action-trigger-event-listener'
+import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
 import { ActionTrigger } from '../../model/entities/action-trigger'
 import {
   ActionTriggerCreatedEvent, ActionTriggerDeletedEvent,
@@ -8,7 +8,7 @@ import {
 } from '../value-objects/action-trigger-event'
 import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
 
-export class ActionTriggerEventService implements ActionTriggerEventEmitter, ActionTriggerEventListener {
+export class ActionTriggerEventService implements ActionTriggerEventEmitter, ActionTriggerEventObserver {
   private static instance: ActionTriggerEventService
 
   public static getInstance(actionTriggerEventBuilder: ActionTriggerEventBuilder): ActionTriggerEventService {
@@ -41,7 +41,7 @@ export class ActionTriggerEventService implements ActionTriggerEventEmitter, Act
     this.emitActionTriggerEvent(event)
   }
 
-  public listenToActionTriggerEvents(onActionTriggerEventCallback: (actionTriggerEvent: ActionTriggerEvent) => void): void {
+  public subscribeToActionTriggerEvents(onActionTriggerEventCallback: (actionTriggerEvent: ActionTriggerEvent) => void): void {
     this.callbacks.push(onActionTriggerEventCallback)
   }
 }

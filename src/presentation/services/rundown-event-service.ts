@@ -1,4 +1,4 @@
-import { RundownEventListener } from '../interfaces/rundown-event-listener'
+import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
@@ -27,7 +27,7 @@ import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 import { Segment } from '../../model/entities/segment'
 
-export class RundownEventService implements RundownEventEmitter, RundownEventListener {
+export class RundownEventService implements RundownEventEmitter, RundownEventObserver {
   private static instance: RundownEventService
 
   public static getInstance(rundownEventBuilder: RundownEventBuilder): RundownEventService {
@@ -127,7 +127,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventLis
     this.emitRundownEvent(event)
   }
 
-  public listenToRundownEvents(onRundownEventCallback: (rundownEvent: RundownEvent) => void): void {
+  public subscribeToRundownEvents(onRundownEventCallback: (rundownEvent: RundownEvent) => void): void {
     this.callbacks.push(onRundownEventCallback)
   }
 }

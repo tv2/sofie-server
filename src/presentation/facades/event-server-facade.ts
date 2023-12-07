@@ -4,6 +4,6 @@ import { EventEmitterFacade } from './event-emitter-facade'
 
 export class EventServerFacade {
   public static createEventServer(): EventServer {
-    return WebSocketEventServer.getInstance(EventEmitterFacade.createRundownEventListener(), EventEmitterFacade.createActionTriggerEventListener())
+    return WebSocketEventServer.getInstance(EventEmitterFacade.createRundownEventObserver(), EventEmitterFacade.createActionTriggerEventObserver())
   }
 }
