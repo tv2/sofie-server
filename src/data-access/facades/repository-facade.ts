@@ -66,7 +66,7 @@ export class RepositoryFacade {
   }
 
   private static createMongoEntityConverter(): MongoEntityConverter {
-    return new MongoEntityConverter(LoggerFacade.createLogger())
+    return new MongoEntityConverter()
   }
 
   private static getMongoDatabaseInstance(): MongoDatabase {
