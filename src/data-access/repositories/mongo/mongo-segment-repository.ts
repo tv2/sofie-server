@@ -1,23 +1,24 @@
 import { SegmentRepository } from '../interfaces/segment-repository'
 import { Segment } from '../../../model/entities/segment'
 import { MongoDatabase } from './mongo-database'
-import { MongoEntityConverter, MongoSegment } from './mongo-entity-converter'
+import { MongoIngestedSegment } from './mongo-ingested-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { PartRepository } from '../interfaces/part-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { DeleteResult } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Part } from '../../../model/entities/part'
+import { MongoEntityConverter, MongoSegment } from './mongo-entity-converter'
 
-const SEGMENT_COLLECTION_NAME: string = 'segments'
+export const SEGMENT_COLLECTION_NAME: string = 'executedSegments' // TODO: Once we control ingest rename to "segments".
 
 export class MongoSegmentRepository extends BaseMongoRepository implements SegmentRepository {
   constructor(
     mongoDatabase: MongoDatabase,
-    mongoEntityConverter: MongoEntityConverter,
+    private readonly mongoEntityConverter: MongoEntityConverter,
     private readonly partRepository: PartRepository
   ) {
-    super(mongoDatabase, mongoEntityConverter)
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {
@@ -30,20 +31,20 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
       _id: segmentId
     })
     if (!mongoSegment) {
-      throw new NotFoundException(`No Segment found for segmentId: ${segmentId}`)
+      throw new NotFoundException(`No Segment found for SegmentId ${segmentId}`)
     }
-    const segment: Segment = this.mongoEntityConverter.convertSegment(mongoSegment)
+    const segment: Segment = this.mongoEntityConverter.convertToSegment(mongoSegment)
     const parts: Part[] = await this.partRepository.getParts(segment.id)
     segment.setParts(parts)
     return segment
   }
 
-  public async getSegments(rundownId: string, filters?: Partial<MongoSegment>): Promise<Segment[]> {
+  public async getSegments(rundownId: string, filters?: Partial<MongoIngestedSegment>): Promise<Segment[]> {
     this.assertDatabaseConnection(this.getSegments.name)
     const mongoSegments: MongoSegment[] = (await this.getCollection()
       .find<MongoSegment>({ ...filters, rundownId: rundownId })
       .toArray())
-    const segments: Segment[] = this.mongoEntityConverter.convertSegments(mongoSegments)
+    const segments: Segment[] = this.mongoEntityConverter.convertToSegments(mongoSegments)
     return Promise.all(
       segments.map(async (segment) => {
         segment.setParts(await this.partRepository.getParts(segment.id))
@@ -57,9 +58,14 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
     await this.getCollection().updateOne(
       { _id: mongoSegment._id },
       { $set: mongoSegment },
-      { upsert: segment.isUnsynced() }
+      { upsert: true, ignoreUndefined: true }
     )
     await Promise.all(segment.getParts().map(part => this.partRepository.savePart(part)))
+  }
+
+  public async delete(segmentId: string): Promise<void> {
+    await this.partRepository.deletePartsForSegment(segmentId)
+    await this.getCollection().deleteMany({ _id: segmentId })
   }
 
   public async deleteSegmentsForRundown(rundownId: string): Promise<void> {

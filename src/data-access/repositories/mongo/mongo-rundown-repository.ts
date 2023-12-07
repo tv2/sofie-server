@@ -1,6 +1,5 @@
 import { Rundown } from '../../../model/entities/rundown'
 import { RundownRepository } from '../interfaces/rundown-repository'
-import { MongoEntityConverter, MongoRundown } from './mongo-entity-converter'
 import { MongoDatabase } from './mongo-database'
 import { SegmentRepository } from '../interfaces/segment-repository'
 import { BaseMongoRepository } from './base-mongo-repository'
@@ -8,25 +7,23 @@ import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { DeleteResult } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'
-import { TimelineObject } from '../../../model/entities/timeline-object'
-import { UnsupportedOperation } from '../../../model/exceptions/unsupported-operation'
-import { Segment } from '../../../model/entities/segment'
+import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { Piece } from '../../../model/entities/piece'
+import { Segment } from '../../../model/entities/segment'
+import { MongoEntityConverter, MongoRundown } from './mongo-entity-converter'
 
-const RUNDOWN_COLLECTION_NAME: string = 'rundowns'
+export const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
 export class MongoRundownRepository extends BaseMongoRepository implements RundownRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,
-    mongoEntityConverter: MongoEntityConverter,
-    private readonly rundownBaselineRepository: RundownBaselineRepository,
+    private readonly mongoEntityConverter: MongoEntityConverter,
     private readonly segmentRepository: SegmentRepository,
     private readonly pieceRepository: PieceRepository
   ) {
-    super(mongoDatabase, mongoEntityConverter)
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {
@@ -37,7 +34,7 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
     this.assertDatabaseConnection(this.getBasicRundowns.name)
     const basicRundowns: MongoRundown[] = (await this.getCollection()
       .find({})
-      .project({ _id: 1, name: 1, modified: 1, isActive: 1, timing: 1 })
+      .project({ _id: 1, name: 1, modifiedAt: 1, isActive: 1, timing: 1 })
       .toArray()) as unknown as MongoRundown[]
     return this.mongoEntityConverter.convertToBasicRundowns(basicRundowns)
   }
@@ -45,36 +42,27 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
   public async getRundown(rundownId: string): Promise<Rundown> {
     this.assertDatabaseConnection(this.getRundown.name)
     const mongoRundown: MongoRundown | null = await this.getCollection().findOne<MongoRundown>({
-      _id: rundownId,
+      _id: rundownId
     })
     if (!mongoRundown) {
-      throw new NotFoundException(`No Rundown found for rundownId: ${rundownId}`)
+      throw new NotFoundException(`No Rundown found in database for RundownId ${rundownId}`)
     }
 
-    const baselineTimelineObjects: TimelineObject[] = await this.rundownBaselineRepository.getRundownBaseline(
-      rundownId
-    )
     const infinitePieces: Piece[] = await this.pieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
-    const segments: Segment[] = await this.segmentRepository.getSegments(rundownId)
-    return this.mongoEntityConverter.convertRundown(mongoRundown, segments, baselineTimelineObjects, infinitePieces)
+    const segments: Segment[] = await this.segmentRepository.getSegments(mongoRundown._id)
+    return this.mongoEntityConverter.convertToRundown(mongoRundown, segments, infinitePieces)
   }
 
-  public getRundownBySegmentId(segmentId: string): Promise<Rundown> {
-    throw new UnsupportedOperation(`${MongoRundownRepository.name} does not support getting a Rundown from a Segment id. Trying to find Rundown with Segment id: ${segmentId}`)
-  }
-
-  public getRundownByPartId(partId: string): Promise<Rundown> {
-    throw new UnsupportedOperation(`${MongoRundownRepository.name} does not support getting a Rundown from a Part id. Trying to find Rundown with Part id: ${partId}`)
+  public getRundownBySegmentId(ingestedSegmentId: string): Promise<Rundown> {
+    throw new UnsupportedOperationException(`${MongoRundownRepository.name} does not support getting a Rundown from an Ingested Segment id. Trying to find Rundown with Segment id: ${ingestedSegmentId}`)
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {
     const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
-    await this.getCollection().updateOne({ _id: rundown.id }, { $set: mongoRundown })
+    await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
 
-    const unsyncedInfinitePieces: Piece[] = rundown.getInfinitePieces().filter(piece => piece.isUnsynced())
     await Promise.all([
       ...rundown.getSegments().map(segment => this.segmentRepository.saveSegment(segment)),
-      ...unsyncedInfinitePieces.map(piece => this.pieceRepository.savePiece(piece))
     ])
   }
 

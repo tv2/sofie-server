@@ -1,7 +1,8 @@
 import { TimelineObject } from './timeline-object'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { TransitionType } from '../enums/transition-type'
-import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
+import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface PieceInterface {
@@ -27,19 +28,19 @@ export interface PieceInterface {
 
 export class Piece {
   public readonly id: string
-  public name: string
-  public layer: string
-  public pieceLifespan: PieceLifespan
-  public isPlanned: boolean = true
-  public duration?: number
-  public preRollDuration: number
-  public postRollDuration: number
-  public transitionType: TransitionType
-  public timelineObjects: TimelineObject[]
+  public readonly name: string
+  public readonly layer: string
+  public readonly pieceLifespan: PieceLifespan
+  public readonly isPlanned: boolean = true
+  public readonly duration?: number
+  public readonly preRollDuration: number
+  public readonly postRollDuration: number
+  public readonly transitionType: TransitionType
+  public readonly timelineObjects: TimelineObject[]
 
   public readonly metadata?: unknown
-  public content?: unknown
-  public tags: string[]
+  public readonly content?: unknown
+  public readonly tags: string[]
 
   private partId: string
   private start: number
@@ -66,6 +67,14 @@ export class Piece {
     this.isUnsyncedPiece = piece.isUnsynced
 
     this.setExecutedAt(piece.executedAt ?? 0)
+  }
+
+  public resetFromIngestedPiece(ingestedPiece: IngestedPiece): void {
+    this.start = ingestedPiece.start
+    if (this.pieceLifespan === PieceLifespan.WITHIN_PART) {
+      // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
+      this.executedAt = 0
+    }
   }
 
   public setExecutedAt(executedAt: number): void {
@@ -106,14 +115,14 @@ export class Piece {
 
   public setPartId(partId: string): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperation(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
+      throw new UnsupportedOperationException(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
     }
     this.partId = partId
   }
 
   public setStart(startTimestamp: number): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperation(`Trying to set the start of a planned Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
+      throw new UnsupportedOperationException(`Trying to set the start of a planned Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
     }
     this.start = startTimestamp
   }

@@ -1,19 +1,21 @@
 import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { PartTimings } from '../value-objects/part-timings'
-import { UnsupportedOperation } from '../exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
 import { InTransition } from '../value-objects/in-transition'
 import { OutTransition } from '../value-objects/out-transition'
 import { AutoNext } from '../value-objects/auto-next'
 import { PartEndState } from '../value-objects/part-end-state'
+import { IngestedPart } from './ingested-part'
+import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 
 export interface PartInterface {
   id: string
+  rundownId: string
   segmentId: string
   name: string
   rank: number
-  isPlanned: boolean
   pieces: Piece[]
   isOnAir: boolean
   isNext: boolean
@@ -31,10 +33,13 @@ export interface PartInterface {
 
   timings?: PartTimings
   endState?: PartEndState
+
+  ingestedPart?: IngestedPart
 }
 
 export class Part {
   public readonly id: string
+  public readonly rundownId: string
   public readonly name: string
   public readonly isPlanned: boolean = true
 
@@ -69,12 +74,15 @@ export class Part {
    */
   private endState?: PartEndState
 
+  public readonly ingestedPart?: IngestedPart
+
   constructor(part: PartInterface) {
     this.id = part.id
+    this.rundownId = part.rundownId
     this.segmentId = part.segmentId
     this.name = part.name
     this.rank = part.rank
-    this.isPlanned = part.isPlanned
+    this.isPlanned = !!part.ingestedPart
     this.pieces = part.pieces ?? []
     this.replacedPlannedPieces = []
     this.isPartOnAir = part.isOnAir
@@ -95,6 +103,8 @@ export class Part {
     this.timings = part.timings
     this.isPartUntimed = part.isUntimed
     this.isPartUnsynced = part.isUnsynced
+
+    this.ingestedPart = part.ingestedPart
   }
 
   public putOnAir(): void {
@@ -159,7 +169,7 @@ export class Part {
 
   public insertPiece(unPlannedPiece: Piece): void {
     if (unPlannedPiece.isPlanned) {
-      throw new UnsupportedOperation(`Trying to insert a planned Piece ${unPlannedPiece.id} to Part ${this.id}.`)
+      throw new UnsupportedOperationException(`Trying to insert a planned Piece ${unPlannedPiece.id} to Part ${this.id}.`)
     }
     unPlannedPiece.setPartId(this.id)
     if (this.isPartOnAir) {
@@ -181,7 +191,7 @@ export class Part {
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
     const pieceIndex: number = this.pieces.findIndex(piece => piece.id === pieceToBeReplaced.id)
     if (pieceIndex < 0) {
-      throw new UnsupportedOperation(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
+      throw new UnsupportedOperationException(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
     }
 
     if (pieceToBeReplaced.isPlanned) {
@@ -214,7 +224,7 @@ export class Part {
 
   public setSegmentId(segmentId: string): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperation(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
+      throw new UnsupportedOperationException(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
     }
     this.segmentId = segmentId
   }
@@ -289,7 +299,7 @@ export class Part {
 
   public getTimings(): PartTimings {
     if (!this.timings) {
-      throw new UnsupportedOperation(`No Timings has been calculated for Part: ${this.id}`)
+      throw new UnsupportedOperationException(`No Timings has been calculated for Part: ${this.id}`)
     }
     return this.timings
   }
@@ -302,13 +312,34 @@ export class Part {
     this.endState = endState
   }
 
+  public getInTransition(): InTransition {
+    return this.inTransition
+  }
+
   public reset(): void {
+    if (!this.ingestedPart) {
+      return
+    }
+
     this.executedAt = 0
     this.playedDuration = 0
-    this.pieces = [
+    this.inTransition = this.ingestedPart.inTransition
+    this.timings = this.ingestedPart.timings
+    this.endState = undefined
+
+    this.resetPieces()
+  }
+
+  private resetPieces(): void {
+    this.pieces =  [
       ...this.pieces.filter(piece => piece.isPlanned),
       ...this.replacedPlannedPieces
-    ]
+    ].filter(piece => this.ingestedPart!.ingestedPieces.some(ingestPiece => ingestPiece.id === piece.id))
+      .map(piece => {
+        const ingestedPiece: IngestedPiece = this.ingestedPart!.ingestedPieces.find(ingestPiece => ingestPiece.id === piece.id)!
+        piece.resetFromIngestedPiece(ingestedPiece)
+        return piece
+      })
     this.replacedPlannedPieces = []
   }
 
