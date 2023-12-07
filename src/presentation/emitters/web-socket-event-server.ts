@@ -2,22 +2,30 @@ import WebSocket, { WebSocketServer } from 'ws'
 import express from 'express'
 import * as http from 'http'
 import { RundownEvent } from '../value-objects/rundown-event'
-import { RundownEventServer } from './interfaces/rundown-event-server'
-import { RundownEventListener } from '../interfaces/rundown-event-listener'
+import { EventServer } from './interfaces/event-server'
+import { RundownEventObserver } from '../interfaces/rundown-event-observer'
+import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
+import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
 
-export class RundownWebSocketEventServer implements RundownEventServer {
-  private static instance: RundownEventServer
+export class WebSocketEventServer implements EventServer {
+  private static instance: EventServer
 
-  public static getInstance(rundownEventListener: RundownEventListener): RundownEventServer {
+  public static getInstance(
+    rundownEventObserver: RundownEventObserver,
+    actionTriggerEventObserver: ActionTriggerEventObserver
+  ): EventServer {
     if (!this.instance) {
-      this.instance = new RundownWebSocketEventServer(rundownEventListener)
+      this.instance = new WebSocketEventServer(rundownEventObserver, actionTriggerEventObserver)
     }
     return this.instance
   }
 
   private webSocketServer?: WebSocket.Server
 
-  private constructor(private readonly rundownEventListener: RundownEventListener) {}
+  private constructor(
+    private readonly rundownEventObserver: RundownEventObserver,
+    private readonly actionTriggerEventObserver: ActionTriggerEventObserver
+  ) {}
 
   public startServer(port: number): void {
     if (this.webSocketServer) {
@@ -36,7 +44,7 @@ export class RundownWebSocketEventServer implements RundownEventServer {
 
     this.webSocketServer.on('connection', (webSocket: WebSocket) => {
       console.log('### WebSocket successfully registered to Server')
-      this.addListenerForWebSocket(webSocket)
+      this.addObserversForWebSocket(webSocket)
     })
 
     this.webSocketServer.on('close', () => {
@@ -57,9 +65,12 @@ export class RundownWebSocketEventServer implements RundownEventServer {
     return webSocketServer
   }
 
-  private addListenerForWebSocket(webSocket: WebSocket): void {
-    this.rundownEventListener.listenToRundownEvents((rundownEvent: RundownEvent) => {
+  private addObserversForWebSocket(webSocket: WebSocket): void {
+    this.rundownEventObserver.subscribeToRundownEvents((rundownEvent: RundownEvent) => {
       webSocket.send(JSON.stringify(rundownEvent))
+    })
+    this.actionTriggerEventObserver.subscribeToActionTriggerEvents((actionTriggerEvent: ActionTriggerEvent) => {
+      webSocket.send(JSON.stringify(actionTriggerEvent))
     })
   }
 

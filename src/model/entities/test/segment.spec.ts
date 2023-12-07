@@ -524,7 +524,7 @@ describe(Segment.name, () => {
   describe(Segment.prototype.insertPartAfterActivePart.name, () => {
     it('is not the Segment with the active Part - throws exception', () => {
       const randomNotActivePart: Part = new Part({ isOnAir: false } as PartInterface)
-      const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: true, defaultPart: {} } as PartInterface)
+      const unplannedPart: Part = new Part({ id: 'unplannedPartId', ingestedPart: undefined } as PartInterface)
 
       const testee: Segment = new Segment({ parts: [randomNotActivePart] } as SegmentInterface)
 
@@ -533,7 +533,7 @@ describe(Segment.name, () => {
 
     it('updates the SegmentId of the Part', () => {
       const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-      const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
+      const unplannedPart: Part = new Part({ id: 'unplannedPartId', ingestedPart: undefined } as PartInterface)
 
       const testee: Segment = new Segment({ id: 'segmentId', parts: [randomActivePart] } as SegmentInterface)
 
@@ -545,7 +545,7 @@ describe(Segment.name, () => {
     describe('the active Part is the last Part of the Segment', () => {
       it('inserts the Part as the last entry of the Parts array', () => {
         const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-        const unplannedPart: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
+        const unplannedPart: Part = new Part({ id: 'unplannedPartId', ingestedPart: undefined, segmentId: '' } as PartInterface)
 
         const testee: Segment = new Segment({ parts: [randomActivePart] } as SegmentInterface)
 
@@ -560,8 +560,8 @@ describe(Segment.name, () => {
       describe('the Part after the active Part is an unplanned Part', () => {
         it('replaces the "old" unplanned Part', () => {
           const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-          const unplannedPartAfterActivePart: Part = new Part({ id: 'oldUnplannedPartId', isOnAir: false, isPlanned: false } as PartInterface)
-          const unplannedPartToBeInserted: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
+          const unplannedPartAfterActivePart: Part = new Part({ id: 'oldUnplannedPartId', isOnAir: false, ingestedPart: undefined } as PartInterface)
+          const unplannedPartToBeInserted: Part = new Part({ id: 'unplannedPartId', ingestedPart: undefined, segmentId: '' } as PartInterface)
 
           const testee: Segment = new Segment({ parts: [randomActivePart, unplannedPartAfterActivePart] } as SegmentInterface)
 
@@ -578,8 +578,8 @@ describe(Segment.name, () => {
       describe('the Part after the active Part is a planned Part', () => {
         it('inserts the unplanned Part after the active Part and before the planned Part', () => {
           const randomActivePart: Part = new Part({ isOnAir: true } as PartInterface)
-          const plannedPartAfterActivePart: Part = new Part({ id: 'plannedPartId', isOnAir: false, isPlanned: true, defaultPart: {} } as PartInterface)
-          const partToBeInserted: Part = new Part({ id: 'unplannedPartId', isPlanned: false, segmentId: '' } as PartInterface)
+          const plannedPartAfterActivePart: Part = new Part({ id: 'plannedPartId', isOnAir: false, ingestedPart: {} } as PartInterface)
+          const partToBeInserted: Part = new Part({ id: 'unplannedPartId', ingestedPart: undefined, segmentId: '' } as PartInterface)
 
           const testee: Segment = new Segment({ parts: [randomActivePart, plannedPartAfterActivePart] } as SegmentInterface)
 
