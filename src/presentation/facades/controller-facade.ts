@@ -41,7 +41,8 @@ export class ControllerFacade {
   private static createActionTriggerController(): ActionTriggerController {
     return new ActionTriggerController(
       ServiceFacade.createActionTriggerService(),
-      new ExpressErrorHandler(new JsendResponseFormatter())
+      new ExpressErrorHandler(new JsendResponseFormatter()),
+      new JsendResponseFormatter()
     )
   }
 
