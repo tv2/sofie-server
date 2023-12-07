@@ -2,22 +2,22 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { PartRepository } from '../interfaces/part-repository'
 import { Part } from '../../../model/entities/part'
 import { MongoDatabase } from './mongo-database'
-import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { DeleteResult } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Piece } from '../../../model/entities/piece'
+import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 
-const PART_COLLECTION_NAME: string = 'parts'
+export const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
 
 export class MongoPartRepository extends BaseMongoRepository implements PartRepository {
   constructor(
     mongoDatabase: MongoDatabase,
-    mongoEntityConverter: MongoEntityConverter,
+    private readonly mongoEntityConverter: MongoEntityConverter,
     private readonly pieceRepository: PieceRepository
   ) {
-    super(mongoDatabase, mongoEntityConverter)
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {
@@ -30,9 +30,9 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
       _id: partId
     })
     if (!mongoPart) {
-      throw new NotFoundException(`No Part found for partId: ${partId}`)
+      throw new NotFoundException(`No Part found for PartId ${partId}`)
     }
-    const part: Part = this.mongoEntityConverter.convertPart(mongoPart)
+    const part: Part = this.mongoEntityConverter.convertToPart(mongoPart)
     const pieces: Piece[] = await this.pieceRepository.getPieces(part.id)
     part.setPieces(pieces)
     return part
@@ -43,7 +43,7 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
     const mongoParts: MongoPart[] = (await this.getCollection()
       .find<MongoPart>({ ...filters, segmentId: segmentId })
       .toArray())
-    const parts: Part[] = this.mongoEntityConverter.convertParts(mongoParts)
+    const parts: Part[] = this.mongoEntityConverter.convertToParts(mongoParts)
     return Promise.all(
       parts.map(async (part) => {
         part.setPieces(await this.pieceRepository.getPieces(part.id))
@@ -57,9 +57,15 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
     await this.getCollection().updateOne(
       { _id: mongoPart._id },
       { $set: mongoPart },
-      { upsert: part.isUnsynced() } // Only upsert unsynced Parts. If we upsert all Parts we run into race conditions with deleted Parts.
+      { upsert: true, ignoreUndefined: true }
     )
     await Promise.all(part.getPieces().map(piece => this.pieceRepository.savePiece(piece)))
+  }
+
+  public async delete(partId: string): Promise<void> {
+    this.assertDatabaseConnection(this.delete.name)
+    await this.pieceRepository.deletePiecesForPart(partId)
+    await this.getCollection().deleteMany({ _id: partId })
   }
 
   public async deletePartsForSegment(segmentId: string): Promise<void> {
@@ -97,6 +103,17 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
     this.assertDatabaseConnection(this.deleteAllUnsyncedParts.name)
     await this.getCollection().deleteMany({
       isUnsynced: true
+    })
+  }
+
+  /*
+  * NOTE: This will delete ALL unplanned Parts in the database. Should only be used on deactivate or activate Rundown.
+  * NOTE: This will NOT delete the associated Pieces.
+  */
+  public async deleteAllUnplannedParts(): Promise<void> {
+    this.assertDatabaseConnection(this.deleteAllUnplannedParts.name)
+    await this.getCollection().deleteMany({
+      isPlanned: false
     })
   }
 }

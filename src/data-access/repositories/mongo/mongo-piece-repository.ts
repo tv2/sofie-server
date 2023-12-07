@@ -1,16 +1,18 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { Piece } from '../../../model/entities/piece'
-import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
 import { MongoDatabase } from './mongo-database'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { DeleteResult } from 'mongodb'
+import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
+import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
-const PIECE_COLLECTION_NAME: string = 'pieces'
+export const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
 export class MongoPieceRepository extends BaseMongoRepository implements PieceRepository {
-  constructor(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter) {
-    super(mongoDatabase, mongoEntityConverter)
+
+  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {
@@ -20,9 +22,9 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
   public async getPieces(partId: string): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPieces.name)
     const mongoPieces: MongoPiece[] = (await this.getCollection()
-      .find<MongoPiece>({ startPartId: partId })
+      .find<MongoPiece>({ partId: partId })
       .toArray())
-    return this.mongoEntityConverter.convertPieces(mongoPieces)
+    return this.mongoEntityConverter.convertToPieces(mongoPieces)
   }
 
   public async getPiecesFromIds(pieceIds: string[] = []): Promise<Piece[]> {
@@ -32,7 +34,7 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
         _id: { $in: pieceIds }
       }
     ).toArray()
-    return this.mongoEntityConverter.convertPieces(mongoPieces)
+    return this.mongoEntityConverter.convertToPieces(mongoPieces)
   }
 
   public async savePiece(piece: Piece): Promise<void> {
@@ -41,13 +43,13 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
     await this.getCollection().updateOne(
       { _id: mongoPiece._id },
       { $set: mongoPiece },
-      { upsert: piece.isUnsynced() }
+      { upsert: true, ignoreUndefined: true }
     )
   }
 
   public async deletePiecesForPart(partId: string): Promise<void> {
     this.assertDatabaseConnection(this.deletePiecesForPart.name)
-    const piecesDeletionResult: DeleteResult = await this.getCollection().deleteMany({ startPartId: partId })
+    const piecesDeletionResult: DeleteResult = await this.getCollection().deleteMany({ partId: partId })
 
     if (!piecesDeletionResult.acknowledged) {
       throw new DeletionFailedException(`Deletion of pieces was not acknowledged, for partId: ${partId}`)
@@ -59,7 +61,7 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
     await this.getCollection().deleteMany({
       _id: { $nin: infinitePieceIdsOnRundowns },
       isUnsynced: true,
-      lifespan: { $ne: this.getPieceLifespanWithinPartMongoValue() }
+      lifespan: { $ne: PieceLifespan.WITHIN_PART }
     })
   }
 
@@ -78,12 +80,6 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
     return mongoIds.map(mongoId => mongoId._id)
   }
 
-  private getPieceLifespanWithinPartMongoValue(): string {
-    // 'part-only' is Cores way of saying PieceType.WITHIN_PART, and it's the value in the database.
-    // TODO: Change to our value when we control ingest.
-    return 'part-only'
-  }
-
   /*
   * NOTE: This will delete ALL unsynced Pieces in the database. Should only be used on deactivate or activate Rundown.
   */
@@ -91,6 +87,16 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
     this.assertDatabaseConnection(this.deleteAllUnsyncedPieces.name)
     await this.getCollection().deleteMany({
       isUnsynced: true
+    })
+  }
+
+  /*
+  * NOTE: This will delete ALL unplanned Pieces in the database. Should only be used on deactivate or activate Rundown.
+  */
+  public async deleteAllUnplannedPieces(): Promise<void> {
+    this.assertDatabaseConnection(this.deleteAllUnsyncedPieces.name)
+    await this.getCollection().deleteMany({
+      isPlanned: false
     })
   }
 }

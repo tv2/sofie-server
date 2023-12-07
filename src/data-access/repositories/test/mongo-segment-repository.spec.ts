@@ -1,6 +1,5 @@
-import { MongoSegmentRepository } from '../mongo/mongo-segment-repository'
+import { MongoSegmentRepository, SEGMENT_COLLECTION_NAME } from '../mongo/mongo-segment-repository'
 import { MongoDatabase } from '../mongo/mongo-database'
-import { MongoEntityConverter, MongoId, MongoSegment } from '../mongo/mongo-entity-converter'
 import { Collection, Db } from 'mongodb'
 import { anyString, anything, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { PartRepository } from '../interfaces/part-repository'
@@ -9,8 +8,15 @@ import { Segment } from '../../../model/entities/segment'
 import { MongoTestDatabase } from './mongo-test-database'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
+import { MongoEntityConverter, MongoId, MongoSegment } from '../mongo/mongo-entity-converter'
 
-const COLLECTION_NAME: string = 'segments'
+const COLLECTION_NAME: string = SEGMENT_COLLECTION_NAME
+
+describe('', () => {
+  it('', () => {
+    // Necessary test to circumvent that the tests are run as an exported function
+  })
+})
 
 export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoSegmentRepository.prototype.deleteSegmentsForRundown.name, () => {
@@ -20,9 +26,9 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
       const rundownId: string = 'someRundownId'
       const mongoSegment: MongoSegment = createMongoSegment({ rundownId: rundownId })
       const segment: Segment = EntityMockFactory.createSegment({ rundownId: rundownId })
-      await testDatabase.populateDatabaseWithSegments([mongoSegment])
+      await testDatabase.populateCollection(COLLECTION_NAME, [mongoSegment])
 
-      when(mongoConverter.convertSegments(anything())).thenReturn([segment])
+      when(mongoConverter.convertToSegments(anything())).thenReturn([segment])
       const testee: SegmentRepository = createTestee({
         mongoConverter: mongoConverter,
       })
@@ -46,10 +52,10 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
         EntityMockFactory.createSegment({ rundownId: rundownId }),
         EntityMockFactory.createSegment({ rundownId: rundownId }),
       ]
-      await testDatabase.populateDatabaseWithSegments(mongoSegments)
+      await testDatabase.populateCollection(COLLECTION_NAME, mongoSegments)
       const db: Db = testDatabase.getDatabase()
 
-      when(mongoConverter.convertSegments(anything())).thenReturn(segments)
+      when(mongoConverter.convertToSegments(anything())).thenReturn(segments)
       when(partRepository.getParts(anything())).thenResolve([])
       const testee: SegmentRepository = createTestee({
         mongoConverter: mongoConverter,
@@ -73,9 +79,9 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
         EntityMockFactory.createSegment({ rundownId: rundownId }),
         EntityMockFactory.createSegment({ rundownId: rundownId }),
       ]
-      await testDatabase.populateDatabaseWithSegments(mongoSegments)
+      await testDatabase.populateCollection(COLLECTION_NAME, mongoSegments)
 
-      when(mongoConverter.convertSegments(anything())).thenReturn(segments)
+      when(mongoConverter.convertToSegments(anything())).thenReturn(segments)
       when(partRepository.getParts(anything())).thenResolve([])
       const testee: SegmentRepository = createTestee({
         mongoConverter: mongoConverter,
@@ -91,7 +97,7 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
       const db: Db = testDatabase.getDatabase()
       const nonExistingId: string = 'nonExistingId'
       const mongoSegment: MongoSegment = createMongoSegment({})
-      await testDatabase.populateDatabaseWithSegments([mongoSegment])
+      await testDatabase.populateCollection(COLLECTION_NAME, [mongoSegment])
 
       const testee: SegmentRepository = createTestee()
       await testee.deleteSegmentsForRundown(nonExistingId)
@@ -107,11 +113,11 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
       const rundownId: string = 'someRundownId'
       const mongoSegment: MongoSegment = createMongoSegment({ rundownId: rundownId })
       const segment: Segment = EntityMockFactory.createSegment({ rundownId: rundownId })
-      await testDatabase.populateDatabaseWithSegments([mongoSegment])
+      await testDatabase.populateCollection(COLLECTION_NAME, [mongoSegment])
       const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
       const spiedCollection = spy(collection)
 
-      when(mongoConverter.convertSegments(anything())).thenReturn([segment])
+      when(mongoConverter.convertToSegments(anything())).thenReturn([segment])
       when(partRepository.getParts(anything())).thenResolve([])
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       const testee: SegmentRepository = createTestee({
@@ -132,7 +138,7 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
     it('gets zero segments from database when no segments for given rundownId exist', async () => {
       const mongoSegments: MongoSegment[] = [createMongoSegment({rundownId: 'someRundownId'})]
       const nonExistingId: string = 'nonExistingId'
-      await testDatabase.populateDatabaseWithSegments(mongoSegments)
+      await testDatabase.populateCollection(COLLECTION_NAME, mongoSegments)
 
       const testee: SegmentRepository = createTestee()
 
@@ -190,7 +196,7 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
         isOnAir: true,
       })
 
-      await testDatabase.populateDatabaseWithSegments([inactiveMongoSegment])
+      await testDatabase.populateCollection(COLLECTION_NAME, [inactiveMongoSegment])
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
@@ -222,7 +228,7 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
         isOnAir: false,
       })
 
-      await testDatabase.populateDatabaseWithSegments([onAirMongoSegment])
+      await testDatabase.populateCollection(COLLECTION_NAME, [onAirMongoSegment])
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
@@ -254,7 +260,7 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
         isNext: true,
       })
 
-      await testDatabase.populateDatabaseWithSegments([nonQueuedMongoSegment])
+      await testDatabase.populateCollection(COLLECTION_NAME, [nonQueuedMongoSegment])
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
@@ -286,7 +292,7 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
         isNext: false,
       })
 
-      await testDatabase.populateDatabaseWithSegments([nextMongoSegment])
+      await testDatabase.populateCollection(COLLECTION_NAME, [nextMongoSegment])
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const mongoDb: MongoDatabase = mock(MongoDatabase)
       const db: Db = testDatabase.getDatabase()
@@ -326,8 +332,8 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
       mongoSegments = segments.map(segment => createMongoSegment({rundownId: segment.rundownId}))
     }
 
-    when(mongoEntityConverter.convertSegments(anything())).thenReturn(segments)
-    await testDatabase.populateDatabaseWithSegments(mongoSegments)
+    when(mongoEntityConverter.convertToSegments(anything())).thenReturn(segments)
+    await testDatabase.populateCollection(COLLECTION_NAME, mongoSegments)
     return mongoEntityConverter
   }
 
@@ -350,7 +356,7 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
 
     if (!params.mongoConverter) {
       params.mongoConverter = mock(MongoEntityConverter)
-      when(params.mongoConverter.convertSegments(anything())).thenReturn([])
+      when(params.mongoConverter.convertToSegments(anything())).thenReturn([])
     }
 
     return new MongoSegmentRepository(instance(params.mongoDb!), instance(params.mongoConverter), instance(params.partRepository))

@@ -12,15 +12,17 @@ import { EventEmitterFacade } from '../../presentation/facades/event-emitter-fac
 import { IngestChangeService } from '../services/interfaces/ingest-change-service'
 import { DatabaseChangeIngestService } from '../services/database-change-ingest-service'
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
-import {IngestService} from '../services/interfaces/ingest-service'
-import {Tv2INewsIngestService} from '../services/tv2-inews-ingest-service'
-import {HttpService} from '../services/interfaces/http-service'
-import {GotHttpService} from '../services/got-http-service'
+import { IngestService } from '../services/interfaces/ingest-service'
+import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
+import { HttpService } from '../services/interfaces/http-service'
+import { GotHttpService } from '../services/got-http-service'
+import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-entity-mapper'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
     return new RundownTimelineService(
       EventEmitterFacade.createRundownEventEmitter(),
+      RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPartRepository(),
@@ -55,13 +57,17 @@ export class ServiceFacade {
 
   public static createIngestChangeService(): IngestChangeService {
     return DatabaseChangeIngestService.getInstance(
+      RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createSegmentRepository(),
+      RepositoryFacade.createPartRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       EventEmitterFacade.createRundownEventEmitter(),
-      RepositoryFacade.createRundownChangeListener(),
-      RepositoryFacade.createSegmentChangedListener(),
-      RepositoryFacade.createPartChangedListener()
+      new IngestedEntityToEntityMapper(),
+      RepositoryFacade.createIngestedRundownChangeListener(),
+      RepositoryFacade.createIngestedSegmentChangedListener(),
+      RepositoryFacade.createIngestedPartChangedListener()
     )
   }
 

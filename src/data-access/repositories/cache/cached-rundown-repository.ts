@@ -36,16 +36,6 @@ export class CachedRundownRepository implements RundownRepository {
     throw new NotFoundException(`No Rundown found with a Segment for Segment id: ${segmentId}`)
   }
 
-  public getRundownByPartId(partId: string): Promise<Rundown> {
-    for (const rundown of this.cachedRundowns.values()) {
-      const rundownHasPart: boolean = rundown.getSegments().some(segment => segment.getParts().some(part => part.id === partId))
-      if (rundownHasPart) {
-        return Promise.resolve(rundown)
-      }
-    }
-    throw new NotFoundException(`No Rundown found with a Part for Part id: ${partId}`)
-  }
-
   public async getBasicRundowns(): Promise<BasicRundown[]> {
     return await this.rundownRepository.getBasicRundowns()
   }

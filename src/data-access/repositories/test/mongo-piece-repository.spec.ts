@@ -1,6 +1,5 @@
-import { MongoPieceRepository } from '../mongo/mongo-piece-repository'
+import { MongoPieceRepository, PIECE_COLLECTION_NAME } from '../mongo/mongo-piece-repository'
 import { MongoTestDatabase } from './mongo-test-database'
-import { MongoEntityConverter, MongoPiece } from '../mongo/mongo-entity-converter'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Db } from 'mongodb'
 import { PieceRepository } from '../interfaces/piece-repository'
@@ -8,8 +7,15 @@ import { MongoDatabase } from '../mongo/mongo-database'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Piece } from '../../../model/entities/piece'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
+import { MongoEntityConverter, MongoPiece } from '../mongo/mongo-entity-converter'
 
-const COLLECTION_NAME = 'pieces'
+const COLLECTION_NAME: string = PIECE_COLLECTION_NAME
+
+describe('', () => {
+  it('', () => {
+    // Necessary test to circumvent that the tests are run as an exported function
+  })
+})
 
 export function runMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): void {
   describe(MongoPieceRepository.prototype.deletePiecesForPart.name, () => {
@@ -17,11 +23,11 @@ export function runMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): v
       const db: Db = testDatabase.getDatabase()
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
-      const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
+      const mongoPiece: MongoPiece = createMongoPiece({ partId })
       const piece: Piece = EntityMockFactory.createPiece({ partId })
-      await testDatabase.populateDatabaseWithPieces([mongoPiece])
+      await testDatabase.populateCollection(COLLECTION_NAME, [mongoPiece])
 
-      when(mongoConverter.convertPieces(anything())).thenReturn([piece])
+      when(mongoConverter.convertToPieces(anything())).thenReturn([piece])
       const testee: PieceRepository = createTestee({
         mongoConverter: mongoConverter,
       })
@@ -36,16 +42,16 @@ export function runMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): v
       const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
       const partId: string = 'somePartId'
       const mongoPieces: MongoPiece[] = [
-        createMongoPiece({ startPartId: partId }),
-        createMongoPiece({ startPartId: partId }),
+        createMongoPiece({ partId }),
+        createMongoPiece({ partId }),
       ]
       const pieces: Piece[] = [
         EntityMockFactory.createPiece({ partId }),
         EntityMockFactory.createPiece({ partId }),
       ]
-      await testDatabase.populateDatabaseWithPieces(mongoPieces)
+      await testDatabase.populateCollection(COLLECTION_NAME, mongoPieces)
 
-      when(mongoConverter.convertPieces(anything())).thenReturn(pieces)
+      when(mongoConverter.convertToPieces(anything())).thenReturn(pieces)
       const testee: PieceRepository = createTestee({ mongoConverter })
 
       await testee.deletePiecesForPart(partId)
@@ -56,8 +62,8 @@ export function runMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): v
     it('does not deletes any pieces, when nonexistent partId is given', async () => {
       const nonExistingId: string = 'nonExistingId'
       const partId: string = 'somePartId'
-      const mongoPiece: MongoPiece = createMongoPiece({ startPartId: partId })
-      await testDatabase.populateDatabaseWithPieces([mongoPiece])
+      const mongoPiece: MongoPiece = createMongoPiece({ partId })
+      await testDatabase.populateCollection(COLLECTION_NAME, [mongoPiece])
       const db: Db = testDatabase.getDatabase()
 
       const testee: PieceRepository = createTestee()
@@ -69,9 +75,9 @@ export function runMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): v
 
   describe(MongoPieceRepository.prototype.getPieces.name, () => {
     it('gets zero pieces from database when no pieces for given partId exist', async () => {
-      const mongoPieces: MongoPiece[] = [createMongoPiece({startPartId: 'somePartId'})]
+      const mongoPieces: MongoPiece[] = [createMongoPiece({ partId: 'somePartId' })]
       const nonExistingId: string = 'nonExistingId'
-      await testDatabase.populateDatabaseWithPieces(mongoPieces)
+      await testDatabase.populateCollection(COLLECTION_NAME, mongoPieces)
 
       const testee: PieceRepository = createTestee()
 
@@ -109,18 +115,18 @@ export function runMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): v
     return {
       _id: params._id ?? 'id' + Math.random(),
       name: params.name ?? 'name' + Math.random(),
-      startPartId: params.startPartId ?? 'partId' + Math.floor(Math.random() * 10),
+      partId: params.partId ?? 'partId' + Math.floor(Math.random() * 10),
     } as MongoPiece
   }
 
   async function setupMongoConverter(pieces: Piece[], mongoPieces?: MongoPiece[]): Promise<MongoEntityConverter> {
     const mongoEntityConverter: MongoEntityConverter = mock(MongoEntityConverter)
     if (!mongoPieces) {
-      mongoPieces = pieces.map(piece => createMongoPiece({ startPartId: piece.getPartId() }))
+      mongoPieces = pieces.map(piece => createMongoPiece({ partId: piece.getPartId() }))
     }
 
-    when(mongoEntityConverter.convertPieces(anything())).thenReturn(pieces)
-    await testDatabase.populateDatabaseWithPieces(mongoPieces)
+    when(mongoEntityConverter.convertToPieces(anything())).thenReturn(pieces)
+    await testDatabase.populateCollection(COLLECTION_NAME, mongoPieces)
     return mongoEntityConverter
   }
 
@@ -134,7 +140,7 @@ export function runMongoPieceRepositoryTests(testDatabase: MongoTestDatabase): v
 
     if (!params.mongoConverter) {
       params.mongoConverter = mock(MongoEntityConverter)
-      when(params.mongoConverter.convertPieces(anything())).thenReturn([])
+      when(params.mongoConverter.convertToPieces(anything())).thenReturn([])
     }
 
     return new MongoPieceRepository(instance(mongoDb), instance(params.mongoConverter))

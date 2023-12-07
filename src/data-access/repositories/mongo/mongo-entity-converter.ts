@@ -1,30 +1,30 @@
-import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities/rundown'
-import { Segment } from '../../../model/entities/segment'
-import { Part } from '../../../model/entities/part'
-import { Piece } from '../../../model/entities/piece'
-import { Timeline } from '../../../model/entities/timeline'
-import { BasicRundown } from '../../../model/entities/basic-rundown'
+import { Owner } from '../../../model/enums/owner'
+import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { TransitionType } from '../../../model/enums/transition-type'
 import { TimelineObject } from '../../../model/entities/timeline-object'
+import { InTransition } from '../../../model/value-objects/in-transition'
+import { OutTransition } from '../../../model/value-objects/out-transition'
+import { AutoNext } from '../../../model/value-objects/auto-next'
+import { PartTimings } from '../../../model/value-objects/part-timings'
+import { PartEndState } from '../../../model/value-objects/part-end-state'
+import { RundownPersistentState } from '../../../model/value-objects/rundown-persistent-state'
+import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
+import { Piece } from '../../../model/entities/piece'
+import { Part } from '../../../model/entities/part'
+import { Segment } from '../../../model/entities/segment'
+import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities/rundown'
+import { BasicRundown } from '../../../model/entities/basic-rundown'
+import { Exception } from '../../../model/exceptions/exception'
+import { ErrorCode } from '../../../model/enums/error-code'
+import { Timeline } from '../../../model/entities/timeline'
 import { Studio } from '../../../model/entities/studio'
 import { StudioLayer } from '../../../model/value-objects/studio-layer'
 import { LookaheadMode } from '../../../model/enums/lookahead-mode'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { TransitionType } from '../../../model/enums/transition-type'
 import { ShowStyle } from '../../../model/entities/show-style'
-import { Owner } from '../../../model/enums/owner'
-import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
 import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
-import { PartTimings } from '../../../model/value-objects/part-timings'
-import { Exception } from '../../../model/exceptions/exception'
-import { ErrorCode } from '../../../model/enums/error-code'
 import { Media } from '../../../model/entities/media'
-import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
-import {
-  BackwardRundownTiming,
-  ForwardRundownTiming,
-  RundownTiming,
-  UnscheduledRundownTiming
-} from '../../../model/value-objects/rundown-timing'
+import { RundownTiming } from '../../../model/value-objects/rundown-timing'
+import { IngestedPart } from '../../../model/entities/ingested-part'
 
 export interface MongoId {
   _id: string
@@ -33,14 +33,17 @@ export interface MongoId {
 export interface MongoRundown extends MongoId {
   name: string
   showStyleVariantId: string
-  modified: number
-  isActive?: boolean // TODO: Remove optionality when we have control over data structure.
+  segmentIds: string[]
+  isActive: boolean
+  baselineTimelineObjects: TimelineObject[]
+  modifiedAt: number
+
+  persistentState?: RundownPersistentState
   infinitePieceIds: string[]
-  persistentState?: unknown
   activeCursor: MongoRundownCursor | undefined
   nextCursor: MongoRundownCursor | undefined
   history: MongoPart[]
-  timing?: MongoRundownTiming
+  timing: RundownTiming
 }
 
 interface MongoRundownCursor {
@@ -49,88 +52,62 @@ interface MongoRundownCursor {
   owner: Owner
 }
 
-enum MongoRundownTimingType { // PlaylistTimingType from blueprints-integration
-  FORWARD = 'forward-time',
-  BACKWARD = 'back-time',
-  UNSCHEDULED = 'none',
-}
-
-type MongoRundownTiming = MongoForwardRundownTiming | MongoBackwardRundownTiming | MongoUnscheduledRundownTiming
-
-interface MongoForwardRundownTiming { // PlaylistTimingForwardTime from blueprints-integration
-  type: MongoRundownTimingType.FORWARD
-  expectedStart: number
-  expectedDuration?: number
-  expectedEnd?: number
-}
-
-interface MongoBackwardRundownTiming { // PlaylistTimingBackTime from blueprints-integration
-  type: MongoRundownTimingType.BACKWARD
-  expectedStart?: number
-  expectedDuration?: number
-  expectedEnd: number
-}
-
-interface MongoUnscheduledRundownTiming { // PlaylistTimingNone from blueprints-integration
-  type: MongoRundownTimingType.UNSCHEDULED
-  expectedDuration?: number
-}
-
 export interface MongoSegment extends MongoId {
-  name: string
-  _rank: number
   rundownId: string
-  externalId: string
-  isHidden: boolean
+  name: string
+  rank: number
+  partIds: string[]
   isOnAir: boolean
-  isUnsynced: boolean
   isNext: boolean
+  isUnsynced: boolean
   budgetDuration?: number
   executedAtEpochTime?: number
 }
 
 export interface MongoPart extends MongoId {
+  rundownId: string
   segmentId: string
-  title: string
-  _rank: number
+  name: string
+  rank: number
   isPlanned: boolean
-  expectedDuration: number
+  pieceIds: string[]
   isOnAir: boolean
   isNext: boolean
-  untimed: boolean
-  isUnsynced?: boolean
-  inTransition?: {
-    previousPartKeepaliveDuration: number
-    partContentDelayDuration: number
-  }
-  outTransition?: {
-    duration: number
-  }
-  autoNext: boolean
-  autoNextOverlap: number
+  isUntimed: boolean
+  isUnsynced: boolean
+  expectedDuration?: number
+  executedAt?: number
+  playedDuration?: number
+
+  inTransition: InTransition
+  outTransition: OutTransition
+
+  autoNext?: AutoNext
   disableNextInTransition: boolean
+
   timings?: PartTimings
-  endState?: unknown
+  endState?: PartEndState
+
+  ingestedPart?: IngestedPart
 }
 
 export interface MongoPiece extends MongoId {
-  startPartId: string
+  partId: string
   name: string
-  sourceLayerId: string
-  enable: {
-    start: number | string
-    duration?: number
-  }
-  prerollDuration: number
-  postrollDuration: number
-  executedAt: number
-  timelineObjectsString: string
-  lifespan: string
-  pieceType: string
-  isPlanned?: boolean
-  metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
+  layer: string
+  pieceLifespan: PieceLifespan
+  isPlanned: boolean
+  start: number
+  duration?: number
+  preRollDuration: number
+  postRollDuration: number
+  executedAt?: number
+  transitionType: TransitionType
+  timelineObjects: TimelineObject[]
+
+  metadata?: unknown
   content?: unknown
-  tags?: string[]
+  tags: string[]
   isUnsynced: boolean
 }
 
@@ -178,7 +155,8 @@ export interface MongoMedia {
 }
 
 export class MongoEntityConverter {
-  public convertRundown(mongoRundown: MongoRundown, segments: Segment[], baselineTimelineObjects?: TimelineObject[], infinitePieces?: Piece[]): Rundown {
+
+  public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {
     const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = mongoRundown.isActive
       ? {
         activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
@@ -191,12 +169,12 @@ export class MongoEntityConverter {
       name: mongoRundown.name,
       showStyleVariantId: mongoRundown.showStyleVariantId,
       isRundownActive: mongoRundown.isActive ?? false,
-      baselineTimelineObjects: baselineTimelineObjects ?? [],
+      baselineTimelineObjects: mongoRundown.baselineTimelineObjects,
       segments,
-      modifiedAt: mongoRundown.modified,
+      modifiedAt: mongoRundown.modifiedAt,
       persistentState: mongoRundown.persistentState,
-      history: this.convertParts(mongoRundown.history ?? []),
-      timing: mongoRundown.timing ? this.convertToRundownTiming(mongoRundown.timing) : this.createUnscheduledRundownTiming(),
+      history: this.convertToParts(mongoRundown.history ?? []),
+      timing: mongoRundown.timing,
       alreadyActiveProperties
     })
   }
@@ -226,61 +204,23 @@ export class MongoEntityConverter {
     return new Map(infinitePieces.map(piece => [piece.layer, piece]))
   }
 
-  private convertToRundownTiming(mongoRundownTiming: MongoRundownTiming): RundownTiming {
-    switch (mongoRundownTiming?.type) {
-      case MongoRundownTimingType.UNSCHEDULED:
-        return this.convertToUnscheduledRundownTiming(mongoRundownTiming)
-      case MongoRundownTimingType.FORWARD:
-        return this.convertToForwardRundownTiming(mongoRundownTiming)
-      case MongoRundownTimingType.BACKWARD:
-        return this.convertToBackwardRundownTiming(mongoRundownTiming)
-    }
-  }
-
-  private convertToUnscheduledRundownTiming(mongoUnscheduledRundownTiming: MongoUnscheduledRundownTiming): UnscheduledRundownTiming {
-    return {
-      type: RundownTimingType.UNSCHEDULED,
-      expectedDurationInMs: mongoUnscheduledRundownTiming.expectedDuration,
-    }
-  }
-
-  private convertToForwardRundownTiming(mongoForwardRundownTiming: MongoForwardRundownTiming): ForwardRundownTiming {
-    return {
-      type: RundownTimingType.FORWARD,
-      expectedStartEpochTime: mongoForwardRundownTiming.expectedStart,
-      expectedDurationInMs: mongoForwardRundownTiming.expectedDuration,
-      expectedEndEpochTime: mongoForwardRundownTiming.expectedEnd
-    }
-  }
-
-  private convertToBackwardRundownTiming(mongoBackwardRundownTiming: MongoBackwardRundownTiming): BackwardRundownTiming {
-    return {
-      type: RundownTimingType.BACKWARD,
-      expectedStartEpochTime: mongoBackwardRundownTiming.expectedStart,
-      expectedDurationInMs: mongoBackwardRundownTiming.expectedDuration,
-      expectedEndEpochTime: mongoBackwardRundownTiming.expectedEnd
-    }
-  }
-
-  private createUnscheduledRundownTiming(): UnscheduledRundownTiming {
-    return {
-      type: RundownTimingType.UNSCHEDULED,
-      expectedDurationInMs: 0,
-    }
-  }
-
   public convertToMongoRundown(rundown: Rundown): MongoRundown {
     return {
       _id: rundown.id,
       name: rundown.name,
       showStyleVariantId: rundown.getShowStyleVariantId(),
-      isActive: rundown.isActive(),
-      infinitePieceIds: rundown.getInfinitePieces().map(piece => piece.id),
+      segmentIds: rundown.getSegments().map(segment => segment.id),
+      baselineTimelineObjects: rundown.getBaseline(),
+      modifiedAt: rundown.getLastTimeModified(),
+
       persistentState: rundown.getPersistentState(),
+      infinitePieceIds: rundown.getInfinitePieces().map(piece => piece.id),
       activeCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getActiveCursor()),
       nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor()),
-      history: rundown.getHistory().map(part => this.convertToMongoPart(part))
-    } as MongoRundown
+      history: rundown.getHistory().map(part => this.convertToMongoPart(part)),
+      isActive: rundown.isActive(),
+      timing: rundown.timing
+    }
   }
 
   public convertRundownCursorToMongoRundownCursor(cursor: RundownCursor | undefined): MongoRundownCursor | undefined {
@@ -299,8 +239,8 @@ export class MongoEntityConverter {
       mongoRundown._id,
       mongoRundown.name,
       mongoRundown.isActive ?? false,
-      mongoRundown.modified,
-      mongoRundown.timing ? this.convertToRundownTiming(mongoRundown.timing) : this.createUnscheduledRundownTiming(),
+      mongoRundown.modifiedAt,
+      mongoRundown.timing
     )
   }
 
@@ -308,90 +248,76 @@ export class MongoEntityConverter {
     return mongoRundowns.map(this.convertToBasicRundown.bind(this))
   }
 
-  public convertSegment(mongoSegment: MongoSegment): Segment {
+  public convertToSegment(mongoSegment: MongoSegment): Segment {
     return new Segment({
+      ...mongoSegment,
       id: mongoSegment._id,
-      rundownId: mongoSegment.rundownId,
-      name: mongoSegment.name,
-      rank: mongoSegment._rank,
-      isOnAir: mongoSegment.isOnAir ?? false,
-      isNext: mongoSegment.isNext ?? false,
-      isUnsynced: mongoSegment.isUnsynced ?? false,
-      parts: [],
-      expectedDurationInMs: mongoSegment.budgetDuration ?? undefined, // Ensure that null values are stripped
-      executedAtEpochTime: mongoSegment.executedAtEpochTime ?? undefined
+      parts: []
     })
   }
 
-  public convertSegments(mongoSegments: MongoSegment[]): Segment[] {
-    return mongoSegments
-      .filter((segment) => !segment.isHidden || (segment.isHidden && segment.isUnsynced))
-      .map(this.convertSegment.bind(this))
+  public convertToSegments(mongoSegments: MongoSegment[]): Segment[] {
+    return mongoSegments.map(this.convertToSegment)
   }
 
   public convertToMongoSegment(segment: Segment): MongoSegment {
     return {
       _id: segment.id,
-      name: segment.name,
       rundownId: segment.rundownId,
-      _rank: segment.rank,
+      name: segment.name,
+      rank: segment.rank,
+      partIds: segment.getParts().map(part => part.id),
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
       isUnsynced: segment.isUnsynced(),
       budgetDuration: segment.expectedDurationInMs,
       executedAtEpochTime: segment.getExecutedAtEpochTime(),
-    } as MongoSegment
+    }
   }
 
-  public convertPart(mongoPart: MongoPart): Part {
+  public convertToPart(mongoPart: MongoPart): Part {
     return new Part({
+      ...mongoPart,
       id: mongoPart._id,
-      segmentId: mongoPart.segmentId,
-      name: mongoPart.title,
-      rank: mongoPart._rank,
-      isPlanned: mongoPart.isPlanned ?? true,
-      expectedDuration: mongoPart.expectedDuration,
-      isOnAir: false,
-      isNext: false,
-      isUntimed: mongoPart.untimed ?? false,
-      isUnsynced: mongoPart.isUnsynced ?? false,
-      pieces: [],
-      inTransition: {
-        keepPreviousPartAliveDuration: mongoPart.inTransition?.previousPartKeepaliveDuration ?? 0,
-        delayPiecesDuration: mongoPart.inTransition?.partContentDelayDuration ?? 0,
-      },
-      outTransition: {
-        keepAliveDuration: mongoPart.outTransition?.duration ?? 0,
-      },
-      autoNext: mongoPart.autoNext ? { overlap: mongoPart.autoNextOverlap } : undefined,
-      disableNextInTransition: mongoPart.disableNextInTransition,
-      timings: mongoPart.timings,
-      endState: mongoPart.endState,
+      pieces: []
     })
   }
 
-  public convertParts(mongoParts: MongoPart[]): Part[] {
-    return mongoParts.map(this.convertPart.bind(this))
+  public convertToParts(mongoParts: MongoPart[]): Part[] {
+    return mongoParts.map(this.convertToPart)
   }
 
   public convertToMongoPart(part: Part): MongoPart {
     return {
       _id: part.id,
-      isPlanned: part.isPlanned,
-      expectedDuration: part.expectedDuration,
-      title: part.name,
+      rundownId: part.rundownId,
       segmentId: part.getSegmentId(),
-      _rank: part.getRank(),
+      name: part.name,
+      rank: part.getRank(),
+      isPlanned: part.isPlanned,
+      pieceIds: part.getPieces().map(piece => piece.id),
       isOnAir: part.isOnAir(),
       isNext: part.isNext(),
-      untimed: part.isUntimed(),
+      isUntimed: part.isUntimed(),
       isUnsynced: part.isUnsynced(),
-      timings: this.getTimings(part),
+      expectedDuration: part.expectedDuration,
+      executedAt: part.getExecutedAt(),
+      playedDuration: part.getPlayedDuration(),
+
+      inTransition: part.getInTransition(),
+      outTransition: part.outTransition,
+
+      autoNext: part.autoNext,
+      disableNextInTransition: part.disableNextInTransition,
+
+      timings: this.getPartTimings(part),
       endState: part.getEndState(),
-    } as MongoPart
+
+      ingestedPart: part.ingestedPart
+    }
   }
 
-  private getTimings(part: Part): PartTimings | undefined {
+  private getPartTimings(part: Part): PartTimings | undefined {
     try {
       return  part.getTimings()
     } catch (error) {
@@ -401,129 +327,36 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertPiece(mongoPiece: MongoPiece): Piece {
+  public convertToPiece(mongoPiece: MongoPiece): Piece {
     return new Piece({
-      id: mongoPiece._id,
-      partId: mongoPiece.startPartId,
-      name: mongoPiece.name,
-      layer: mongoPiece.sourceLayerId,
-      pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
-      isPlanned: mongoPiece.isPlanned ?? true,
-      start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
-      duration: mongoPiece.enable.duration ?? undefined,
-      preRollDuration: mongoPiece.prerollDuration,
-      postRollDuration: mongoPiece.prerollDuration,
-      executedAt: mongoPiece.executedAt,
-      transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
-      timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
-      metadata: mongoPiece.metaData,
-      content: mongoPiece.content,
-      tags: mongoPiece.tags ?? [],
-      isUnsynced: mongoPiece.isUnsynced
+      ...mongoPiece,
+      id: mongoPiece._id
     })
   }
 
-  private mapMongoPieceLifeSpan(mongoPieceLifeSpan: string): PieceLifespan {
-    switch (mongoPieceLifeSpan) {
-      case 'showstyle-end':
-      case 'rundown-change': {
-        return PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE
-      }
-      case 'rundown-end': {
-        return PieceLifespan.SPANNING_UNTIL_RUNDOWN_END
-      }
-      case 'segment-change': {
-        return PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE
-      }
-      case 'segment-end': {
-        return PieceLifespan.SPANNING_UNTIL_SEGMENT_END
-      }
-      case 'rundown-change-segment-lookback': {
-        return PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN
-      }
-      case 'part-only':
-      default: {
-        return PieceLifespan.WITHIN_PART
-      }
-    }
-  }
-
-  private mapMongoPieceTypeToTransitionType(type: string): TransitionType {
-    switch (type) {
-      case 'in-transition':
-        return TransitionType.IN_TRANSITION
-      case 'out-transition':
-        return TransitionType.OUT_TRANSITION
-      case 'normal':
-      default:
-        return TransitionType.NO_TRANSITION
-    }
-  }
-
-  public convertPieces(mongoPieces: MongoPiece[]): Piece[] {
-    return mongoPieces.map((mongoPiece) => this.convertPiece(mongoPiece))
+  public convertToPieces(mongoPieces: MongoPiece[]): Piece[] {
+    return mongoPieces.map(this.convertToPiece)
   }
 
   public convertToMongoPiece(piece: Piece): MongoPiece {
-    const enable: MongoPiece['enable'] = {
-      start: piece.getStart(),
-      ...(piece.duration ? { duration: piece.duration } : null)
-    }
-
     return {
       _id: piece.id,
+      partId: piece.getPartId(),
       name: piece.name,
-      startPartId: piece.getPartId(),
-      sourceLayerId: piece.layer,
-      lifespan: this.mapPieceLifespanToMongoPieceLifespan(piece.pieceLifespan),
+      layer: piece.layer,
+      pieceLifespan: piece.pieceLifespan,
       isPlanned: piece.isPlanned,
-      enable,
-      prerollDuration: piece.preRollDuration,
-      postrollDuration: piece.postRollDuration,
+      start: piece.getStart(),
+      duration: piece.duration,
+      preRollDuration: piece.preRollDuration,
+      postRollDuration: piece.postRollDuration,
       executedAt: piece.getExecutedAt(),
-      pieceType: this.mapTransitionTypeToMongoTransitionType(piece.transitionType),
-      timelineObjectsString: JSON.stringify(piece.timelineObjects),
-      metaData: piece.metadata,
+      transitionType: piece.transitionType,
+      timelineObjects: piece.timelineObjects,
+      metadata: piece.metadata,
       content: piece.content,
-      tags: piece.tags,
-      isUnsynced: piece.isUnsynced()
-    }
-  }
-
-  private mapPieceLifespanToMongoPieceLifespan(lifespan: PieceLifespan): string {
-    switch (lifespan) {
-      case PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE: {
-        return 'rundown-change'
-      }
-      case PieceLifespan.SPANNING_UNTIL_RUNDOWN_END: {
-        return 'rundown-end'
-      }
-      case PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE: {
-        return 'segment-change'
-      }
-      case PieceLifespan.SPANNING_UNTIL_SEGMENT_END: {
-        return 'segment-end'
-      }
-      case PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN: {
-        return 'rundown-change-segment-lookback'
-      }
-      case PieceLifespan.WITHIN_PART:
-      default: {
-        return 'part-only'
-      }
-    }
-  }
-
-  private mapTransitionTypeToMongoTransitionType(transitionType: TransitionType): string {
-    switch (transitionType) {
-      case TransitionType.IN_TRANSITION: {
-        return 'in-transition'
-      }
-      case TransitionType.OUT_TRANSITION:
-        return 'out-transition'
-      case TransitionType.NO_TRANSITION:
-      default:
-        return 'normal'
+      isUnsynced: piece.isUnsynced(),
+      tags: piece.tags
     }
   }
 
@@ -551,8 +384,7 @@ export class MongoEntityConverter {
         name: mapping,
         lookaheadMode: this.mapLookaheadNumberToEnum(mongoStudio.mappings[mapping].lookahead),
         amountOfLookaheadObjectsToFind: mongoStudio.mappings[mapping].lookaheadDepth ?? defaultNumberOfObjects,
-        maximumLookaheadSearchDistance:
-            mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookaheadDistance,
+        maximumLookaheadSearchDistance: mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookaheadDistance,
       })
     }
     return { layers, blueprintConfiguration: mongoStudio.blueprintConfig }

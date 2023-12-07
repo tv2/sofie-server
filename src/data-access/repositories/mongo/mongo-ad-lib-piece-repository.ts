@@ -1,9 +1,9 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { ActionManifestRepository } from '../interfaces/action-manifest-repository'
 import { ActionManifest } from '../../../model/entities/action'
-import { MongoEntityConverter, MongoId } from './mongo-entity-converter'
 import { MongoDatabase } from './mongo-database'
 import { Filter } from 'mongodb'
+import { MongoId } from './mongo-entity-converter'
 
 const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
 
@@ -15,8 +15,9 @@ interface AdLibPiece {
 }
 
 export class MongoAdLibPieceRepository extends BaseMongoRepository implements ActionManifestRepository {
-  constructor(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter) {
-    super(mongoDatabase, mongoEntityConverter)
+
+  constructor(mongoDatabase: MongoDatabase) {
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {
