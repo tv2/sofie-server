@@ -5,7 +5,7 @@ import { MongoId } from './mongo-entity-converter'
 import { Logger } from '../../../logger'
 
 // TODO: Move to ENV variables
-const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:3001'
+const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
 const MONGO_DB_NAME: string = 'meteor'
 
 export class MongoDatabase {
