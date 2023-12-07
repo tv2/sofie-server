@@ -25,23 +25,35 @@ export class ControllerFacade {
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       ServiceFacade.createIngestService(),
-      new ExpressErrorHandler(new JsendResponseFormatter()),
+      ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
   }
 
+  private static createExpressErrorHandler(): ExpressErrorHandler {
+    return new ExpressErrorHandler(new JsendResponseFormatter())
+  }
+
   private static createTimelineController(): TimelineController {
-    return new TimelineController(RepositoryFacade.createTimelineRepository(), new ExpressErrorHandler(new JsendResponseFormatter()), new JsendResponseFormatter())
+    return new TimelineController(
+      RepositoryFacade.createTimelineRepository(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
+    )
   }
 
   private static createActionController(): ActionController {
-    return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler(new JsendResponseFormatter()), new JsendResponseFormatter())
+    return new ActionController(
+      ServiceFacade.createActionService(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
+    )
   }
 
   private static createActionTriggerController(): ActionTriggerController {
     return new ActionTriggerController(
       ServiceFacade.createActionTriggerService(),
-      new ExpressErrorHandler(new JsendResponseFormatter()),
+      ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
   }
@@ -50,7 +62,7 @@ export class ControllerFacade {
     return new ConfigurationController(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
-      new ExpressErrorHandler(new JsendResponseFormatter()),
+      ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
   }
