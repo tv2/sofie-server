@@ -25,22 +25,18 @@ import {
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2Logger } from '../tv2-logger'
+import { Tv2IncorrectActionException } from '../exceptions/tv2-incorrect-action-exception'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
 export class Tv2VideoClipActionFactory {
-  private readonly logger: Tv2Logger
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
-    logger: Tv2Logger
-  ) {
-    this.logger = logger.tag(Tv2VideoClipActionFactory.name)
-  }
+  ) { }
 
   public isVideoClipAction(action: Tv2Action): boolean {
     return [Tv2ActionContentType.VIDEO_CLIP].includes(action.metadata.contentType)
@@ -60,9 +56,7 @@ export class Tv2VideoClipActionFactory {
   private updateVideoClipAction(action: Action, media?: Media): Action {
     const videoClipAction: Tv2VideoClipAction = action as Tv2VideoClipAction
     if (videoClipAction.metadata.contentType !== Tv2ActionContentType.VIDEO_CLIP) {
-      // Todo: Throw error instead of logging
-      this.logger.data({ action }).warn('Can\'t update VideoClipAction. Action is not a VideoClipAction')
-      return action
+      throw new Tv2IncorrectActionException('Can\'t update VideoClipAction. Action is not a VideoClipAction')
     }
 
     videoClipAction.data.partInterface.expectedDuration = media?.duration
