@@ -16,16 +16,16 @@ export class MongoIngestedPieceRepository extends BaseMongoRepository implements
     return INGESTED_PIECE_COLLECTION_NAME
   }
 
-  public async getIngestedPieces(partId: string): Promise<IngestedPiece[]> {
-    this.assertDatabaseConnection(this.getIngestedPieces.name)
+  public async getIngestedPiecesForPart(partId: string): Promise<IngestedPiece[]> {
+    this.assertDatabaseConnection(this.getIngestedPiecesForPart.name)
     const mongoPieces: MongoIngestedPiece[] = (await this.getCollection()
       .find<MongoIngestedPiece>({ startPartId: partId })
       .toArray())
-    return this.mongoEntityConverter.convertIngestedPieces(mongoPieces)
+    return this.mongoEntityConverter.convertToIngestedPieces(mongoPieces)
   }
 
   public async deleteIngestedPiecesForRundown(rundownId: string): Promise<void> {
     this.assertDatabaseConnection(this.deleteIngestedPiecesForRundown.name)
-    await this.getCollection().deleteMany({ startRundownId: rundownId})
+    await this.getCollection().deleteMany({ startRundownId: rundownId })
   }
 }

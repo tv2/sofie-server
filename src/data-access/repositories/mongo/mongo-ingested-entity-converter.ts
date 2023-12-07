@@ -105,7 +105,7 @@ export interface MongoIngestedPiece extends MongoId {
 
 export class MongoIngestedEntityConverter {
 
-  public convertRundown(mongoRundown: MongoIngestedRundown): IngestedRundown {
+  public convertToIngestedRundown(mongoRundown: MongoIngestedRundown): IngestedRundown {
     return {
       id: mongoRundown._id,
       name: mongoRundown.name,
@@ -153,7 +153,7 @@ export class MongoIngestedEntityConverter {
     }
   }
 
-  public convertIngestedSegment(mongoSegment: MongoIngestedSegment): IngestedSegment {
+  public convertToIngestedSegment(mongoSegment: MongoIngestedSegment): IngestedSegment {
     return {
       id: mongoSegment._id,
       rundownId: mongoSegment.rundownId,
@@ -164,13 +164,13 @@ export class MongoIngestedEntityConverter {
     }
   }
 
-  public convertIngestedSegments(mongoSegments: MongoIngestedSegment[]): IngestedSegment[] {
+  public convertToIngestedSegments(mongoSegments: MongoIngestedSegment[]): IngestedSegment[] {
     return mongoSegments
       .filter((segment) => !segment.isHidden)
-      .map(this.convertIngestedSegment)
+      .map(this.convertToIngestedSegment)
   }
 
-  public convertIngestedPart(mongoPart: MongoIngestedPart): IngestedPart {
+  public convertToIngestedPart(mongoPart: MongoIngestedPart): IngestedPart {
     return {
       id: mongoPart._id,
       segmentId: mongoPart.segmentId,
@@ -193,17 +193,17 @@ export class MongoIngestedEntityConverter {
     }
   }
 
-  public convertIngestedParts(mongoParts: MongoIngestedPart[]): IngestedPart[] {
-    return mongoParts.map(this.convertIngestedPart)
+  public convertToIngestedParts(mongoParts: MongoIngestedPart[]): IngestedPart[] {
+    return mongoParts.map(this.convertToIngestedPart)
   }
 
-  public convertIngestedPiece(mongoPiece: MongoIngestedPiece): IngestedPiece {
+  public convertToIngestedPiece(mongoPiece: MongoIngestedPiece): IngestedPiece {
     return {
       id: mongoPiece._id,
       partId: mongoPiece.startPartId,
       name: mongoPiece.name,
       layer: mongoPiece.sourceLayerId,
-      pieceLifespan: this.mapMongoPieceLifeSpan(mongoPiece.lifespan),
+      pieceLifespan: this.mapMongoPieceLifespanToPieceLifespan(mongoPiece.lifespan),
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
       duration: mongoPiece.enable.duration ?? undefined,
       preRollDuration: mongoPiece.prerollDuration,
@@ -215,8 +215,8 @@ export class MongoIngestedEntityConverter {
     }
   }
 
-  private mapMongoPieceLifeSpan(mongoPieceLifeSpan: string): PieceLifespan {
-    switch (mongoPieceLifeSpan) {
+  private mapMongoPieceLifespanToPieceLifespan(mongoPieceLifespan: string): PieceLifespan {
+    switch (mongoPieceLifespan) {
       case 'showstyle-end':
       case 'rundown-change': {
         return PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE
@@ -252,7 +252,7 @@ export class MongoIngestedEntityConverter {
     }
   }
 
-  public convertIngestedPieces(mongoPieces: MongoIngestedPiece[]): IngestedPiece[] {
-    return mongoPieces.map((mongoPiece) => this.convertIngestedPiece(mongoPiece))
+  public convertToIngestedPieces(mongoPieces: MongoIngestedPiece[]): IngestedPiece[] {
+    return mongoPieces.map((mongoPiece) => this.convertToIngestedPiece(mongoPiece))
   }
 }
