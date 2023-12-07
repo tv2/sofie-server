@@ -28,7 +28,7 @@ export class RundownController extends BaseController {
   public async getBasicRundowns(_request: Request, response: Response): Promise<void> {
     try {
       const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns()
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ basicRundowns: basicRundowns.map((basicRundown) => new BasicRundownDto(basicRundown)) }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(basicRundowns.map(basicRundown => new BasicRundownDto(basicRundown))))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -39,7 +39,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ rundown: new RundownDto(rundown)}))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(new RundownDto(rundown)))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -50,7 +50,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.rundownService.activateRundown(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Rundown "${rundownId}" successfully activated` }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully activated`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -61,7 +61,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.rundownService.deactivateRundown(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Rundown "${rundownId}" successfully deactivated` }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully deactivated` ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -72,7 +72,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.rundownService.takeNext(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Rundown "${rundownId}" successfully took next` }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully took next`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -85,7 +85,7 @@ export class RundownController extends BaseController {
       const segmentId: string = request.params.segmentId
       const partId: string = request.params.partId
       await this.rundownService.setNext(rundownId, segmentId, partId, Owner.EXTERNAL)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Part "${partId}" is now set as next` }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Part "${partId}" is now set as next`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -96,7 +96,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.rundownService.resetRundown(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Rundown "${rundownId}" has been reset` }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" has been reset` ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -107,7 +107,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.ingestService.reloadIngestData(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Reingested rundown data for ${rundownId}` }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Reingested rundown data for ${rundownId}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -118,7 +118,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.rundownService.deleteRundown(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Rundown "${rundownId}" has been deleted` }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" has been deleted` ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }

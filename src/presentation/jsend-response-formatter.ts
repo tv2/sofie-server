@@ -17,21 +17,21 @@ export class JsendResponseFormatter implements HttpResponseFormatter{
     }
   }
 
-  public formatFailResponse(data?: object): object {
+  public formatErrorResponseFromException(exception: Exception): object {
+    return this.formatErrorResponse(exception.message, exception.errorCode)
+  }
+
+  public formatFailResponse(data?: unknown): object {
     return {
       status: JSendStatus.FAIL,
       data: data ?? null
     }
   }
 
-  public  formatSuccessResponse(data?: object): object {
+  public formatSuccessResponse(data?: unknown): object {
     return {
       status: JSendStatus.SUCCESS,
       data: data ?? null
     }
-  }
-
-  public formatErrorResponseFromException(exception: Exception): object {
-    return this.formatErrorResponse(exception.message, exception.errorCode)
   }
 }

@@ -37,7 +37,7 @@ export class ConfigurationController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       const showStyleVariant: ShowStyleVariant = await this.showStyleVariantRepository.getShowStyleVariant(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ showStyleVariant }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(showStyleVariant))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
