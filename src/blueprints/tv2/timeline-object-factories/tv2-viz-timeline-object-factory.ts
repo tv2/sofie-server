@@ -130,7 +130,8 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
         noAutoPreloading: false,
         channelName: EngineName.FULLSCREEN,
         ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
-      }
+      },
+      classes: ['full'] // Due to how Idents are ingested by Blueprints, if this is omitted VCPs will disappear when being taken from an Ident.
     }
   }
 
