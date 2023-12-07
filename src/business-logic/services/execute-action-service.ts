@@ -182,7 +182,7 @@ export class ExecuteActionService implements ActionService {
   private async insertPieceAsOnAir(pieceAction: PieceAction, rundownId: string): Promise<void> {
     const piece: Piece = this.createPieceFromAction(pieceAction)
     piece.setExecutedAt(Date.now())
-    await this.rundownService.insertPieceAsOnAir(rundownId, piece)
+    await this.rundownService.insertPieceAsOnAir(rundownId, piece, pieceAction.data.layersToStopPiecesOn)
   }
 
   private createPieceFromAction(pieceAction: PieceAction): Piece {

@@ -32,7 +32,7 @@ export interface RundownEventBuilder {
   buildPartInsertedAsOnAirEvent(rundown: Rundown, part: Part): PartInsertedAsOnAirEvent
   buildPartInsertedAsNextEvent(rundown: Rundown, part: Part): PartInsertedAsNextEvent
   buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent
-  buildInfiniteRundownPieceAddedEvent(rundown: Rundown, infinitePiece: Piece): RundownInfinitePieceAddedEvent
+  buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePieceAddedEvent
 
   buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent
   buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent
