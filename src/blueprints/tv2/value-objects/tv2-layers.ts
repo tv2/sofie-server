@@ -4,8 +4,14 @@ export enum Tv2SourceLayer {
   REMOTE = 'studio0_live',
   JINGLE = 'studio0_jingle',
   AUDIO_BED = 'studio0_audio_bed',
-  IDENT = 'studio0_graphicsIdent',
-  LOWER_THIRD = 'studio0_graphicsLower',
+
+  GRAPHICS_IDENT = 'studio0_graphicsIdent',
+  GRAPHICS_LOWER_THIRD = 'studio0_graphicsLower',
+  GRAPHICS_TOP = 'studio0_graphicsTop',
+  GRAPHICS_HEADLINE = 'studio0_graphicsHeadline',
+  GRAPHICS_TEMA = 'studio0_graphicsTema',
+  GRAPHICS_TELEPHONE = 'studio0_graphicsTelefon',
+
   GRAPHICS_ACTION_COMMAND = 'studio0_adlib_graphic_cmd',
   AUDIO_ACTION_COMMAND = 'studio0_sisyfos_adlibs',
   DOWNSTREAM_KEYER_ACTION_COMMAND = 'studio0_dsk', // Original one from Blueprint includes the number of the DSK, followed by '_cmd'.

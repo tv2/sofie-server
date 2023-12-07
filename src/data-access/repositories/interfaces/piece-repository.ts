@@ -7,4 +7,5 @@ export interface PieceRepository {
   deletePiecesForPart(partId: string): Promise<void>
   deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void>
   deleteAllUnsyncedPieces(): Promise<void>
+  deleteAllUnplannedPieces(): Promise<void>
 }

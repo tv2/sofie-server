@@ -127,11 +127,11 @@ export class Tv2RemoteActionFactory {
   private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
     return {
       id: partId,
+      rundownId: '',
       name: `Live Part ${source.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,
-      isPlanned: false,
       isOnAir: false,
       isNext: false,
       isUntimed: false,
@@ -180,10 +180,10 @@ export class Tv2RemoteActionFactory {
 
     const partInterface: PartInterface = {
       id: `recall_last_planned_remote_part_${clonedPart.id}`,
+      rundownId: '',
       name: clonedPart.name,
       segmentId: '',
       rank: -1,
-      isPlanned: false,
       isOnAir: false,
       isNext: false,
       isUnsynced: false,
@@ -201,6 +201,8 @@ export class Tv2RemoteActionFactory {
 
     const pieceInterfaces: Tv2PieceInterface[] = historicPart.getPieces().map(piece => ({
       id: `recall_last_planned_remote_piece_${piece.id}`,
+      ingestedPieceId: '',
+      ingestedPartId: '',
       partId: partInterface.id,
       name: piece.name,
       layer: piece.layer,
@@ -208,7 +210,7 @@ export class Tv2RemoteActionFactory {
       transitionType: piece.transitionType,
       isPlanned: false,
       start: piece.getStart(),
-      duration: piece.duration,
+      duration: piece.getDuration(),
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
       metadata: piece.metadata as Tv2PieceMetadata,

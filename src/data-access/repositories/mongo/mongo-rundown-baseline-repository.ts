@@ -2,7 +2,6 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { MongoDatabase } from './mongo-database'
-import { MongoEntityConverter } from './mongo-entity-converter'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const COLLECTION_NAME: string = 'rundownBaselineObjs'
@@ -12,8 +11,9 @@ interface TimelineObjectsString {
 }
 
 export class MongoRundownBaselineRepository extends BaseMongoRepository implements RundownBaselineRepository {
-  constructor(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter) {
-    super(mongoDatabase, mongoEntityConverter)
+
+  constructor(mongoDatabase: MongoDatabase) {
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {

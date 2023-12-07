@@ -1,4 +1,4 @@
-export type EventType = RundownEventType | IngestEventType
+export type EventType = RundownEventType | IngestEventType | ActionTriggerEventType
 
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
@@ -9,7 +9,7 @@ export enum RundownEventType {
   PART_INSERTED_AS_ON_AIR = 'PART_INSERTED_AS_ON_AIR',
   PART_INSERTED_AS_NEXT = 'PART_INSERTED_AS_NEXT',
   PIECE_INSERTED = 'PIECE_INSERTED',
-  INFINITE_PIECE_ADDED = 'INFINITE_PIECE_ADDED'
+  INFINITE_PIECES_UPDATED = 'INFINITE_PIECES_UPDATED'
 }
 
 export enum IngestEventType {
@@ -22,4 +22,10 @@ export enum IngestEventType {
   PART_CREATED = 'PART_CREATED',
   PART_UPDATED = 'PART_UPDATED',
   PART_DELETED = 'PART_DELETED'
+}
+
+export enum ActionTriggerEventType {
+  ACTION_TRIGGER_CREATED = 'ACTION_TRIGGER_CREATED',
+  ACTION_TRIGGER_UPDATED = 'ACTION_TRIGGER_UPDATED',
+  ACTION_TRIGGER_DELETED = 'ACTION_TRIGGER_DELETED'
 }

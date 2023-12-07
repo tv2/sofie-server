@@ -13,20 +13,23 @@ import { PartRepository } from '../../../data-access/repositories/interfaces/par
 import { SegmentRepository } from '../../../data-access/repositories/interfaces/segment-repository'
 import { PieceRepository } from '../../../data-access/repositories/interfaces/piece-repository'
 import { AlreadyActivatedException } from '../../../model/exceptions/already-activated-exception'
+import { IngestedRundownRepository } from '../../../data-access/repositories/interfaces/ingested-rundown-repository'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
     it('deletes a rundown, when it receives a valid RundownId', async () => {
+      const mockIngestedRundownRepository: IngestedRundownRepository = mock<IngestedRundownRepository>()
+
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
       const rundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: false })
 
       when(mockRundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
-      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
+      const testee: RundownTimelineService = createTestee({ ingestedRundownRepository: instance(mockIngestedRundownRepository), rundownRepository: instance(mockRundownRepository) })
 
       await testee.deleteRundown(rundown.id)
 
-      verify(mockRundownRepository.deleteRundown(rundown.id)).once()
+      verify(mockIngestedRundownRepository.deleteIngestedRundown(rundown.id)).once()
     })
 
     it('emits a rundown deleted event, when it receives a valid RundownId', async () => {
@@ -78,6 +81,7 @@ describe(RundownTimelineService.name, () => {
 
 function createTestee(params: {
   rundownEventEmitter?: RundownEventEmitter
+  ingestedRundownRepository?: IngestedRundownRepository
   rundownRepository?: RundownRepository
   segmentRepository?: SegmentRepository
   partRepository?: PartRepository
@@ -89,6 +93,7 @@ function createTestee(params: {
 }): RundownTimelineService {
   return new RundownTimelineService(
     params.rundownEventEmitter ?? instance(mock<RundownEventEmitter>()),
+    params.ingestedRundownRepository ?? instance(mock<IngestedRundownRepository>()),
     params.rundownRepository ?? instance(mock<RundownRepository>()),
     params.segmentRepository ?? instance(mock<SegmentRepository>()),
     params.partRepository ?? instance(mock<PartRepository>()),

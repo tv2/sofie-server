@@ -2,14 +2,15 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { ShowStyleRepository } from '../interfaces/show-style-repository'
 import { ShowStyle } from '../../../model/entities/show-style'
 import { MongoDatabase } from './mongo-database'
-import { MongoEntityConverter, MongoShowStyle } from './mongo-entity-converter'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { MongoEntityConverter, MongoShowStyle } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'showStyleBases'
 
 export class MongoShowStyleRepository extends BaseMongoRepository implements ShowStyleRepository {
-  constructor(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter) {
-    super(mongoDatabase, mongoEntityConverter)
+
+  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+    super(mongoDatabase)
   }
 
   protected getCollectionName(): string {

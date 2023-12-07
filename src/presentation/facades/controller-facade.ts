@@ -7,6 +7,7 @@ import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
 import { JsendResponseFormatter } from '../jsend-response-formatter'
+import { ActionTriggerController } from '../controllers/action-trigger-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -14,6 +15,7 @@ export class ControllerFacade {
       this.createRundownController(),
       this.createTimelineController(),
       this.createActionController(),
+      this.createActionTriggerController(),
       this.createConfigurationController(),
     ]
   }
@@ -34,6 +36,13 @@ export class ControllerFacade {
 
   private static createActionController(): ActionController {
     return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler(new JsendResponseFormatter()), new JsendResponseFormatter())
+  }
+
+  private static createActionTriggerController(): ActionTriggerController {
+    return new ActionTriggerController(
+      ServiceFacade.createActionTriggerService(),
+      new ExpressErrorHandler(new JsendResponseFormatter())
+    )
   }
 
   private static createConfigurationController(): ConfigurationController {
