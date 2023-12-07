@@ -22,7 +22,7 @@ export class ActionTriggerController extends BaseController {
   public async getActionTriggers(_request: Request, response: Response): Promise<void> {
     try {
       const actionTriggers: ActionTrigger[] = await this.actionTriggerService.getActionTriggers()
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ actionTriggers: actionTriggers.map(actionTrigger => new ActionTriggerDto(actionTrigger)) }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(actionTriggers.map(actionTrigger => new ActionTriggerDto(actionTrigger))))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -38,7 +38,7 @@ export class ActionTriggerController extends BaseController {
         data: actionTriggerDto.data
       }
       await this.actionTriggerService.createActionTrigger(actionTrigger)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Successfully created ActionTrigger for Action ${actionTrigger.actionId}` }))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created ActionTrigger for Action ${actionTrigger.actionId}` ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -54,7 +54,7 @@ export class ActionTriggerController extends BaseController {
         data: actionTriggerDto.data
       }
       await this.actionTriggerService.updateActionTrigger(actionTrigger)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Successfully updated ActionTrigger ${actionTrigger.id}`}))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully updated ActionTrigger ${actionTrigger.id}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -65,7 +65,7 @@ export class ActionTriggerController extends BaseController {
     try {
       const actionTriggerId: string = request.params.actionTriggerId
       await this.actionTriggerService.deleteActionTrigger(actionTriggerId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: `Successfully deleted ActionTrigger ${actionTriggerId}`}))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully deleted ActionTrigger ${actionTriggerId}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
