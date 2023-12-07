@@ -32,12 +32,12 @@ export class MongoIngestedPartRepository extends BaseMongoRepository implements 
     }
     return {
       ...this.mongoIngestedEntityConverter.convertToIngestedPart(mongoIngestedPart),
-      ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesByPart(mongoIngestedPart._id)
+      ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesForPart(mongoIngestedPart._id)
     }
   }
 
-  public async getIngestedPartsBySegment(segmentId: string): Promise<IngestedPart[]> {
-    this.assertDatabaseConnection(this.getIngestedPartsBySegment.name)
+  public async getIngestedPartsForSegment(segmentId: string): Promise<IngestedPart[]> {
+    this.assertDatabaseConnection(this.getIngestedPartsForSegment.name)
     const mongoIngestedParts: MongoIngestedPart[] = await this.getCollection()
       .find<MongoIngestedPart>({ segmentId: segmentId })
       .toArray()
@@ -46,7 +46,7 @@ export class MongoIngestedPartRepository extends BaseMongoRepository implements 
       ingestedParts.map(async (ingestedPart) => {
         return {
           ...ingestedPart,
-          ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesByPart(ingestedPart.id)
+          ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesForPart(ingestedPart.id)
         }
       })
     )
