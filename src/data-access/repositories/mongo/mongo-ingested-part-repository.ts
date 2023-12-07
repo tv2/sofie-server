@@ -30,21 +30,24 @@ export class MongoIngestedPartRepository extends BaseMongoRepository implements 
     if (!mongoIngestedPart) {
       throw new NotFoundException(`No Part found for partId: ${partId}`)
     }
-    const ingestedPart: IngestedPart = this.mongoIngestedEntityConverter.convertIngestedPart(mongoIngestedPart)
-    ingestedPart.ingestedPieces = await this.ingestedPieceRepository.getIngestedPieces(ingestedPart.id)
-    return ingestedPart
+    return {
+      ...this.mongoIngestedEntityConverter.convertToIngestedPart(mongoIngestedPart),
+      ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesForPart(mongoIngestedPart._id)
+    }
   }
 
-  public async getIngestedParts(segmentId: string): Promise<IngestedPart[]> {
-    this.assertDatabaseConnection(this.getIngestedParts.name)
-    const mongoParts: MongoIngestedPart[] = (await this.getCollection()
+  public async getIngestedPartsForSegment(segmentId: string): Promise<IngestedPart[]> {
+    this.assertDatabaseConnection(this.getIngestedPartsForSegment.name)
+    const mongoIngestedParts: MongoIngestedPart[] = await this.getCollection()
       .find<MongoIngestedPart>({ segmentId: segmentId })
-      .toArray())
-    const parts: IngestedPart[] = this.mongoIngestedEntityConverter.convertIngestedParts(mongoParts)
+      .toArray()
+    const ingestedParts: IngestedPart[] = this.mongoIngestedEntityConverter.convertToIngestedParts(mongoIngestedParts)
     return Promise.all(
-      parts.map(async (ingestedPart) => {
-        ingestedPart.ingestedPieces = (await this.ingestedPieceRepository.getIngestedPieces(ingestedPart.id))
-        return ingestedPart
+      ingestedParts.map(async (ingestedPart) => {
+        return {
+          ...ingestedPart,
+          ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesForPart(ingestedPart.id)
+        }
       })
     )
   }

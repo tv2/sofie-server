@@ -55,6 +55,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     return this.instance
   }
 
+  // Event Queue Priority: The lower the number, the higher the priority
   private readonly eventPriorityQueue: Record<number, (() => Promise<void>)[]> = { }
   private isExecutingEvent: boolean = false
   private lastBulkExecutionStartTimestamp: number = 0
@@ -79,7 +80,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     this.listenForSegmentChanges(segmentChangedListener)
     this.listenForPartChanges(partChangedListener)
 
-    this.enqueueEvent(0, () => this.syncDataWithIngestedData())
+    this.enqueueEvent(0, () => this.synchronizeEntitiesWithIngestedEntities())
   }
 
   private listenForRundownChanges(rundownChangeListener: DataChangedListener<IngestedRundown>): void {
@@ -100,23 +101,15 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     partChangedListener.onDeleted(partId => this.enqueueEvent(7, () => this.deletePart(partId)))
   }
 
-  private async syncDataWithIngestedData(): Promise<void> {
+  private async synchronizeEntitiesWithIngestedEntities(): Promise<void> {
     const ingestedRundowns: IngestedRundown[] = await this.ingestedRundownRepository.getIngestedRundowns()
     await this.deleteRundownsNotPresentInIngestedRundowns(ingestedRundowns)
 
     await Promise.all(ingestedRundowns.map(async (ingestedRundown) => {
-      let oldRundown: Rundown | undefined
-      try {
-        oldRundown = await this.rundownRepository.getRundown(ingestedRundown.id)
-      } catch (exception) {
-        if (!(exception instanceof NotFoundException)) {
-          throw exception
-        }
-        // The Rundown doesn't exist in the database which means it's a brand new Rundown.
-      }
+      const oldRundown: Rundown | undefined = await this.fetchRundown(ingestedRundown.id)
 
       // If the Rundown isn't active, we can simply just "re-ingest" it into our database collection as a fresh Rundown.
-      const updatedRundown: Rundown = oldRundown && oldRundown.isActive()
+      const updatedRundown: Rundown = oldRundown?.isActive()
         ? this.updateActiveRundownFromIngestedRundown(ingestedRundown, oldRundown)
         : this.createNewRundownFromIngestedRundown(ingestedRundown)
 
@@ -129,14 +122,23 @@ export class DatabaseChangeIngestService implements IngestChangeService {
   private async deleteRundownsNotPresentInIngestedRundowns(ingestedRundowns: IngestedRundown[]): Promise<void> {
     const ingestedRundownsIds: string[] = ingestedRundowns.map(ingestedRundown => ingestedRundown.id)
     const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns()
-    const rundownIds: string[] = basicRundowns.map(basicRundown => basicRundown.id)
 
-    for (const rundownId of rundownIds) {
-      // Delete all Rundowns that has been deleted and therefore no longer exists in the IngestedRundowns.
-      if (!ingestedRundownsIds.includes(rundownId)) {
-        await this.rundownRepository.deleteRundown(rundownId)
-        this.eventEmitter.emitRundownDeleted(rundownId)
+    for (const basicRundown of basicRundowns) {
+      if (!ingestedRundownsIds.includes(basicRundown.id)) {
+        await this.rundownRepository.deleteRundown(basicRundown.id)
+        this.eventEmitter.emitRundownDeleted(basicRundown.id)
       }
+    }
+  }
+
+  private async fetchRundown(rundownId: string): Promise<Rundown | undefined> {
+    try {
+      return await this.rundownRepository.getRundown(rundownId)
+    } catch (exception) {
+      if (!(exception instanceof NotFoundException)) {
+        throw exception
+      }
+      // The Rundown doesn't exist in the database which means it's a brand new Rundown.
     }
   }
 
@@ -145,43 +147,21 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     const segmentsToBeDeleted: Segment[] = rundown.getSegments().filter(segment => !ingestedSegmentIds.includes(segment.id))
     segmentsToBeDeleted.forEach(segment => rundown.removeSegment(segment.id))
 
-
     ingestedRundown.ingestedSegments.forEach(ingestedSegment => {
       const segmentOnRundown: Segment | undefined = rundown.getSegments().find(segment => segment.id === ingestedSegment.id)
       if (!segmentOnRundown) {
-        const newSegment: Segment = this.ingestedEntityToEntityMapper.fromIngestedSegment(ingestedSegment)
-        const parts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart))
-        newSegment.setParts(parts)
+        const newSegment: Segment = this.createNewSegmentFromIngestedSegment(ingestedSegment)
         rundown.addSegment(newSegment)
         return
       }
 
       if (!segmentOnRundown.isOnAir()) {
-        const updatedSegment: Segment = this.ingestedEntityToEntityMapper.updateSegmentWithIngestedSegment(segmentOnRundown, ingestedSegment)
-        const updateParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => {
-          const partOnSegment: Part | undefined = segmentOnRundown.getParts().find(part => part.id === ingestedPart.id)
-          if (!partOnSegment) {
-            return this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart)
-          }
-          return this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(partOnSegment, ingestedPart)
-        })
-        updatedSegment.setParts(updateParts)
+        const updatedSegment: Segment = this.updateSegmentFromIngestedSegment(segmentOnRundown, ingestedSegment)
         rundown.updateSegment(updatedSegment)
         return
       }
 
-      const updateParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => {
-        const partOnSegment: Part | undefined = segmentOnRundown.getParts().find(part => part.id === ingestedPart.id)
-        if (!partOnSegment) {
-          return this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart)
-        }
-
-        if (partOnSegment.isOnAir()) {
-          // Don't do anything. The Part is already on the Segment. If we map to a new Part, we get a new object reference and would need to update the ActiveCursor too.
-          return partOnSegment
-        }
-        return this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(partOnSegment, ingestedPart)
-      })
+      const updateParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.getUpdatedPartFromIngestedPart(segmentOnRundown, ingestedPart))
 
       const ingestedPartIds: string[] = ingestedSegment.ingestedParts.map(ingestedPart => ingestedPart.id)
       const onAirPartToBeDeleted: Part | undefined = segmentOnRundown.getParts().find(part => part.isOnAir() && !ingestedPartIds.includes(part.id))
@@ -200,15 +180,48 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     return this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(rundown, ingestedRundown)
   }
 
+  private createNewSegmentFromIngestedSegment(ingestedSegment: IngestedSegment): Segment {
+    const newSegment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
+    const parts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart))
+    newSegment.setParts(parts)
+    return newSegment
+  }
+
+  private updateSegmentFromIngestedSegment(segmentOnRundown: Segment, ingestedSegment: IngestedSegment): Segment {
+    const updatedSegment: Segment = this.ingestedEntityToEntityMapper.updateSegmentWithIngestedSegment(segmentOnRundown, ingestedSegment)
+    const updateParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => {
+      const partOnSegment: Part | undefined = segmentOnRundown.getParts().find(part => part.id === ingestedPart.id)
+      if (!partOnSegment) {
+        return this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart)
+      }
+      return this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(partOnSegment, ingestedPart)
+    })
+    updatedSegment.setParts(updateParts)
+    return updatedSegment
+  }
+
+  private getUpdatedPartFromIngestedPart(segmentOnRundown: Segment, ingestedPart: IngestedPart): Part {
+    const partOnSegment: Part | undefined = segmentOnRundown.getParts().find(part => part.id === ingestedPart.id)
+    if (!partOnSegment) {
+      return this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart)
+    }
+
+    if (partOnSegment.isOnAir()) {
+      // Don't do anything. The Part is already on the Segment. If we map to a new Part, we get a new object reference and would need to update the ActiveCursor too.
+      return partOnSegment
+    }
+    return this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(partOnSegment, ingestedPart)
+  }
+
   private createNewRundownFromIngestedRundown(ingestedRundown: IngestedRundown): Rundown {
     const segments: Segment[] = ingestedRundown.ingestedSegments.map(ingestedSegment => {
-      const parts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart))
-      const segment: Segment = this.ingestedEntityToEntityMapper.fromIngestedSegment(ingestedSegment)
+      const parts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart))
+      const segment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
       segment.setParts(parts)
       return segment
     })
 
-    const newRundown: Rundown = this.ingestedEntityToEntityMapper.fromIngestedRundown(ingestedRundown) // No Segments
+    const newRundown: Rundown = this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(ingestedRundown) // No Segments
     segments.forEach(segment => newRundown.addSegment(segment))
 
     return newRundown
@@ -245,7 +258,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
   private getEventToExecute(): (() => Promise<void>) | undefined {
     const events: (() => Promise<void>)[] | undefined = Object.entries(this.eventPriorityQueue)
-      .sort(([a], [b]) => Number.parseInt(a) - Number.parseInt(b))
+      .sort(([priorityA], [priorityB]) => Number.parseInt(priorityA) - Number.parseInt(priorityB))
       .find(([, events]) => events.length > 0)?.[1]
 
     return events?.shift()
@@ -289,7 +302,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
   }
 
   private async createRundown(ingestedRundown: IngestedRundown): Promise<void> {
-    const rundown: Rundown = this.ingestedEntityToEntityMapper.fromIngestedRundown(ingestedRundown)
+    const rundown: Rundown = this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(ingestedRundown)
     this.eventEmitter.emitRundownCreated(rundown)
     await this.persistRundown(rundown)
   }
@@ -310,7 +323,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
   private async createSegment(ingestedSegment: IngestedSegment): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedSegment.rundownId)
-    const segment: Segment = this.ingestedEntityToEntityMapper.fromIngestedSegment(ingestedSegment)
+    const segment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
 
     rundown.addSegment(segment)
 
@@ -349,7 +362,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
   private async createPart(ingestedPart: IngestedPart): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedPart.rundownId)
-    const part: Part = this.ingestedEntityToEntityMapper.fromIngestedPart(ingestedPart)
+    const part: Part = this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart)
 
     rundown.addPart(part)
 

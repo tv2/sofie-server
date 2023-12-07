@@ -2,7 +2,7 @@ import cors from 'cors'
 import express, { Express, Router } from 'express'
 import { BaseController } from './controllers/base-controller'
 import { ControllerFacade } from './facades/controller-facade'
-import { RundownEventServerFacade } from './facades/rundown-event-server-facade'
+import { EventServerFacade } from './facades/event-server-facade'
 import { ServiceFacade } from '../business-logic/facades/service-facade'
 
 export * from './controllers/rundown-controller'
@@ -54,7 +54,7 @@ function attachExpressServerToPort(port: number): void {
 }
 
 function startRundownEventServer(): void {
-  RundownEventServerFacade.createRundownEventServer().startServer(RUNDOWN_EVENT_SERVER_PORT)
+  EventServerFacade.createEventServer().startServer(RUNDOWN_EVENT_SERVER_PORT)
 }
 
 function startSystemServices(): void {

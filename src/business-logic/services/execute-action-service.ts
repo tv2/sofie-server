@@ -16,7 +16,7 @@ import { ConfigurationRepository } from '../../data-access/repositories/interfac
 import { Configuration } from '../../model/entities/configuration'
 import { ActionRepository } from '../../data-access/repositories/interfaces/action-repository'
 import { PartActionType, PieceActionType } from '../../model/enums/action-type'
-import { UnsupportedOperation } from '../../model/exceptions/unsupported-operation'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { RundownService } from './interfaces/rundown-service'
 import { Part, PartInterface } from '../../model/entities/part'
 import { Piece, PieceInterface } from '../../model/entities/piece'
@@ -81,7 +81,7 @@ export class ExecuteActionService implements ActionService {
         break
       }
       default: {
-        throw new UnsupportedOperation(`ActionType ${action.type} is not yet supported/implemented`)
+        throw new UnsupportedOperationException(`ActionType ${action.type} is not yet supported/implemented`)
       }
     }
   }
