@@ -1,5 +1,5 @@
 import { CallbackScheduler } from './interfaces/callback-scheduler'
-import { Logger } from '../../logger'
+import { Logger } from '../../logger/logger'
 
 const EXECUTE_CALLBACK_DURATION_THRESHOLD_IN_MS: number = 1
 const SCHEDULE_RESOLUTION: number = 2

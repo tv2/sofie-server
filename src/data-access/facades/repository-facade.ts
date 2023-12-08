@@ -52,7 +52,7 @@ import { ActionTriggerRepository } from '../repositories/interfaces/action-trigg
 import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action-trigger-repository'
 import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
 import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
-import { LoggerFacade } from '../../logger-facade'
+import { LoggerFacade } from '../../logger/logger-facade'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {

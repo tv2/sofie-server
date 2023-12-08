@@ -19,7 +19,7 @@ import { GotHttpService } from '../services/got-http-service'
 import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-entity-mapper'
 import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
 import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
-import { LoggerFacade } from '../../logger-facade'
+import { LoggerFacade } from '../../logger/logger-facade'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {

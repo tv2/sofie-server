@@ -7,7 +7,7 @@ import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
 import { ActionTriggerController } from '../controllers/action-trigger-controller'
-import { LoggerFacade } from '../../logger-facade'
+import { LoggerFacade } from '../../logger/logger-facade'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {

@@ -6,7 +6,7 @@ import { EventServer } from './interfaces/event-server'
 import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
 import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
-import { Logger } from '../../logger'
+import { Logger } from '../../logger/logger'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer

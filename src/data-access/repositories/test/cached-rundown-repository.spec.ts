@@ -2,7 +2,7 @@ import { CachedRundownRepository } from '../cache/cached-rundown-repository'
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown, RundownInterface } from '../../../model/entities/rundown'
-import { Logger } from '../../../logger'
+import { Logger } from '../../../logger/logger'
 
 describe(CachedRundownRepository.name, () => {
   describe(CachedRundownRepository.prototype.getRundown.name, () => {
