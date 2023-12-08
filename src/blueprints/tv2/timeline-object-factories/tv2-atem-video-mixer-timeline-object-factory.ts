@@ -276,12 +276,12 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   public findProgramSourceInputFromPiece(piece: Piece): number | undefined {
     const timelineObject: TimelineObject | undefined = piece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
     if (!timelineObject) {
-      this.logger.data({ piece }).warn(`Can't update Atem Me Input. No TimelineObject for '${Tv2AtemLayer.PROGRAM}' found on Piece '${piece.id}'.`)
+      this.logger.data({ piece }).warn(`Unable to update the ATEM ME input, since no timeline object was found on the layer '${Tv2AtemLayer.PROGRAM}' on the piece with id '${piece.id}'.`)
       return
     }
     const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
     if (blueprintTimelineObject.content.deviceType !== DeviceType.ATEM || blueprintTimelineObject.content.type !== AtemType.ME) {
-      this.logger.data({ piece }).warn('Can\'t update Atem Me Input. TimelineObject is not an Atem Me TimelineObject.')
+      this.logger.data({ piece, timelineObject }).warn('Unable to update ATEM ME input, since the timeline object is not targeting an ATEM ME.')
       return
     }
 
