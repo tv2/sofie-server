@@ -17,7 +17,7 @@ import { NotFoundException } from '../../model/exceptions/not-found-exception'
 import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { BasicRundown } from '../../model/entities/basic-rundown'
-import { Logger } from '../../logger'
+import { Logger } from '../../logger/logger'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 

@@ -13,7 +13,7 @@ import { MongoDatabase } from './mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedRundownRepository } from '../interfaces/ingested-rundown-repository'
 import { IngestedRundown } from '../../../model/entities/ingested-rundown'
-import { Logger } from '../../../logger'
+import { Logger } from '../../../logger/logger'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest changed this to "ingestedRundowns"
 

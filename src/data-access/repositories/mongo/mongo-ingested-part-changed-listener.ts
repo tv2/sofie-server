@@ -13,7 +13,7 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
 import { IngestedPart } from '../../../model/entities/ingested-part'
-import { Logger } from '../../../logger'
+import { Logger } from '../../../logger/logger'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest changed this to "ingestedParts"
 

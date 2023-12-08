@@ -2,7 +2,7 @@ import { RundownRepository } from '../interfaces/rundown-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { Logger } from '../../../logger'
+import { Logger } from '../../../logger/logger'
 
 export class CachedRundownRepository implements RundownRepository {
   private static instance: RundownRepository

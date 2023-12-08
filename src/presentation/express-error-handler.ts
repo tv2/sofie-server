@@ -3,7 +3,7 @@ import { Exception } from '../model/exceptions/exception'
 import { ErrorCode } from '../model/enums/error-code'
 import { HttpStatusCode } from './http-status-code'
 import { HttpErrorHandler } from './interfaces/http-error-handler'
-import { Logger } from '../logger'
+import { Logger } from '../logger/logger'
 
 export class ExpressErrorHandler implements HttpErrorHandler {
 

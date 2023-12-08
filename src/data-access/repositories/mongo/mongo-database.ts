@@ -2,7 +2,7 @@ import * as mongodb from 'mongodb'
 import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
 import { MongoId } from './mongo-entity-converter'
-import { Logger } from '../../../logger'
+import { Logger } from '../../../logger/logger'
 
 // TODO: Move to ENV variables
 const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
