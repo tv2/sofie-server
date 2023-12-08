@@ -7,7 +7,7 @@ const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://loca
 const MONGO_DB_NAME: string = getMongoDatabaseName()
 
 function getMongoDatabaseName(): string {
-  const mongoUrlPattern: RegExp = /^mongodb:\/\/\w+(:\d+)?\/(?<databaseName>[^\/]+)/i
+  const mongoUrlPattern: RegExp = /^mongodb:\/\/\w+(:\d+)?\/(?<databaseName>[^/]+)/i
   return mongoUrlPattern.exec(MONGO_CONNECTION_STRING)?.groups?.databaseName ?? 'meteor'
 }
 
