@@ -14,7 +14,7 @@ export class ExpressErrorHandler implements HttpErrorHandler {
   }
 
   public handleError(response: Response, exception: Exception): void {
-    this.logger.data(exception.stack).error(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
+    this.logger.data(exception).error(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
 
     response.status(this.getStatusCode(exception.errorCode)).send(`${exception.errorCode} - ${exception.message}`)
   }

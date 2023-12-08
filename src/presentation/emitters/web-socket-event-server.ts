@@ -49,12 +49,12 @@ export class WebSocketEventServer implements EventServer {
     this.webSocketServer = this.createWebSocketServer(port)
 
     this.webSocketServer.on('connection', (webSocket: WebSocket) => {
-      this.logger.info('WebSocket successfully registered to Server')
+      this.logger.info('WebSocket successfully registered to server')
       this.addObserversForWebSocket(webSocket)
     })
 
     this.webSocketServer.on('close', () => {
-      this.logger.info('Websocket Server has closed')
+      this.logger.info('WebSocket server has closed')
       this.webSocketServer = undefined
     })
   }
@@ -65,7 +65,7 @@ export class WebSocketEventServer implements EventServer {
     const webSocketServer = new WebSocketServer({ server })
 
     server.listen(port, () => {
-      this.logger.info(`WebSocketServer started on port: ${port}`)
+      this.logger.info(`WebSocket server started on port: ${port}`)
     })
 
     return webSocketServer
@@ -80,12 +80,12 @@ export class WebSocketEventServer implements EventServer {
     })
   }
 
-  public killServer(): void {
+  public stopServer(): void {
     if (!this.webSocketServer) {
-      this.logger.info('Websocket Server is already dead')
+      this.logger.info('WebSocket server is already dead')
       return
     }
-    this.logger.info('Killing Websocket Server')
+    this.logger.info('Killing WebSocket server')
     this.webSocketServer.close()
   }
 }
