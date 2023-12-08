@@ -25,7 +25,7 @@ import {
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2IncorrectActionException } from '../exceptions/tv2-incorrect-action-exception'
+import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -56,7 +56,7 @@ export class Tv2VideoClipActionFactory {
   private updateVideoClipAction(action: Action, media?: Media): Action {
     const videoClipAction: Tv2VideoClipAction = action as Tv2VideoClipAction
     if (videoClipAction.metadata.contentType !== Tv2ActionContentType.VIDEO_CLIP) {
-      throw new Tv2IncorrectActionException('Can\'t update VideoClipAction. Action is not a VideoClipAction')
+      throw new Tv2UnexpectedActionException(`Expected action with id '${videoClipAction.id}' to have a video clip content type instead of '${videoClipAction.metadata.contentType}'.`)
     }
 
     videoClipAction.data.partInterface.expectedDuration = media?.duration
