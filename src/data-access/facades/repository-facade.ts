@@ -58,15 +58,11 @@ export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
     const mongoRundownRepository: RundownRepository = new MongoRundownRepository(
       RepositoryFacade.getMongoDatabaseInstance(),
-      RepositoryFacade.createMongoEntityConverter(),
+      new MongoEntityConverter(),
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPieceRepository()
     )
     return CachedRundownRepository.getInstance(mongoRundownRepository, LoggerFacade.createLogger())
-  }
-
-  private static createMongoEntityConverter(): MongoEntityConverter {
-    return new MongoEntityConverter()
   }
 
   private static getMongoDatabaseInstance(): MongoDatabase {
@@ -97,7 +93,7 @@ export class RepositoryFacade {
   public static createSegmentRepository(): SegmentRepository {
     const mongoSegmentRepository: SegmentRepository = new MongoSegmentRepository(
       RepositoryFacade.getMongoDatabaseInstance(),
-      RepositoryFacade.createMongoEntityConverter(),
+      new MongoEntityConverter(),
       RepositoryFacade.createPartRepository()
     )
     return CachedSegmentRepository.getInstance(mongoSegmentRepository)
@@ -122,7 +118,7 @@ export class RepositoryFacade {
   public static createPartRepository(): PartRepository {
     const mongoPartRepository: PartRepository = new MongoPartRepository(
       RepositoryFacade.getMongoDatabaseInstance(),
-      RepositoryFacade.createMongoEntityConverter(),
+      new MongoEntityConverter(),
       RepositoryFacade.createPieceRepository()
     )
     return CachedPartRepository.getInstance(mongoPartRepository)
@@ -145,7 +141,7 @@ export class RepositoryFacade {
   }
 
   public static createPieceRepository(): PieceRepository {
-    return new MongoPieceRepository(RepositoryFacade.getMongoDatabaseInstance(), RepositoryFacade.createMongoEntityConverter())
+    return new MongoPieceRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
   public static createIngestedPieceRepository(): IngestedPieceRepository {
@@ -153,7 +149,7 @@ export class RepositoryFacade {
   }
 
   public static createTimelineRepository(): TimelineRepository {
-    return new MongoTimelineRepository(RepositoryFacade.getMongoDatabaseInstance(), RepositoryFacade.createMongoEntityConverter())
+    return new MongoTimelineRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
   public static createConfigurationRepository(): ConfigurationRepository {
@@ -165,11 +161,11 @@ export class RepositoryFacade {
   }
 
   private static createStudioRepository(): StudioRepository {
-    return new MongoStudioRepository(RepositoryFacade.getMongoDatabaseInstance(), RepositoryFacade.createMongoEntityConverter())
+    return new MongoStudioRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
   private static createShowStyleRepository(): ShowStyleRepository {
-    return new MongoShowStyleRepository(RepositoryFacade.getMongoDatabaseInstance(), RepositoryFacade.createMongoEntityConverter())
+    return new MongoShowStyleRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
   public static createActionRepository(): ActionRepository {
@@ -181,7 +177,7 @@ export class RepositoryFacade {
   }
 
   public static createShowStyleVariantRepository(): ShowStyleVariantRepository {
-    return new MongoShowStyleVariantRepository(RepositoryFacade.getMongoDatabaseInstance(), RepositoryFacade.createMongoEntityConverter(), this.createRundownRepository())
+    return new MongoShowStyleVariantRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter(), this.createRundownRepository())
   }
 
   public static createActionManifestRepository(): ActionManifestRepository {
@@ -197,7 +193,7 @@ export class RepositoryFacade {
   }
 
   public static createMediaRepository(): MediaRepository {
-    return new MongoMediaRepository(RepositoryFacade.getMongoDatabaseInstance(), RepositoryFacade.createMongoEntityConverter())
+    return new MongoMediaRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
   private static createUuidGenerator(): UuidGenerator {
