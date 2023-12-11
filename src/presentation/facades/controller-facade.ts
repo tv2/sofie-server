@@ -7,6 +7,7 @@ import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
 import { ActionTriggerController } from '../controllers/action-trigger-controller'
+import { LoggerFacade } from '../../logger/logger-facade'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -24,22 +25,26 @@ export class ControllerFacade {
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       ServiceFacade.createIngestService(),
-      new ExpressErrorHandler()
+      ControllerFacade.createExpressErrorHandler()
     )
   }
 
+  private static createExpressErrorHandler(): ExpressErrorHandler {
+    return new ExpressErrorHandler(LoggerFacade.createLogger())
+  }
+
   private static createTimelineController(): TimelineController {
-    return new TimelineController(RepositoryFacade.createTimelineRepository(), new ExpressErrorHandler())
+    return new TimelineController(RepositoryFacade.createTimelineRepository(), ControllerFacade.createExpressErrorHandler())
   }
 
   private static createActionController(): ActionController {
-    return new ActionController(ServiceFacade.createActionService(), new ExpressErrorHandler())
+    return new ActionController(ServiceFacade.createActionService(), ControllerFacade.createExpressErrorHandler())
   }
 
   private static createActionTriggerController(): ActionTriggerController {
     return new ActionTriggerController(
       ServiceFacade.createActionTriggerService(),
-      new ExpressErrorHandler()
+      ControllerFacade.createExpressErrorHandler()
     )
   }
 
@@ -47,7 +52,7 @@ export class ControllerFacade {
     return new ConfigurationController(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
-      new ExpressErrorHandler()
+      ControllerFacade.createExpressErrorHandler()
     )
   }
 }
