@@ -50,7 +50,7 @@ export interface PieceInsertedEvent extends PartEvent {
   piece: PieceDto
 }
 
-export interface RundownInfinitePieceAddedEvent extends RundownEvent {
+export interface RundownInfinitePiecesUpdatedEvent extends RundownEvent {
   type: RundownEventType.INFINITE_PIECES_UPDATED,
   infinitePieces: PieceDto[]
 }
