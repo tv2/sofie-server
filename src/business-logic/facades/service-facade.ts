@@ -19,6 +19,7 @@ import { GotHttpService } from '../services/got-http-service'
 import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-entity-mapper'
 import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
 import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
+import { LoggerFacade } from '../../logger/logger-facade'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -31,7 +32,7 @@ export class ServiceFacade {
       RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
-      TimeoutCallbackScheduler.getInstance(),
+      TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint()
     )
   }
@@ -74,6 +75,7 @@ export class ServiceFacade {
       ServiceFacade.createTimelineBuilder(),
       EventEmitterFacade.createRundownEventEmitter(),
       new IngestedEntityToEntityMapper(),
+      LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
       RepositoryFacade.createIngestedPartChangedListener()

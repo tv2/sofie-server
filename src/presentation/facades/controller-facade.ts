@@ -8,6 +8,7 @@ import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
 import { JsendResponseFormatter } from '../jsend-response-formatter'
 import { ActionTriggerController } from '../controllers/action-trigger-controller'
+import { LoggerFacade } from '../../logger/logger-facade'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -31,7 +32,7 @@ export class ControllerFacade {
   }
 
   private static createExpressErrorHandler(): ExpressErrorHandler {
-    return new ExpressErrorHandler(new JsendResponseFormatter())
+    return new ExpressErrorHandler(new JsendResponseFormatter(), LoggerFacade.createLogger())
   }
 
   private static createTimelineController(): TimelineController {

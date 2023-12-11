@@ -13,20 +13,24 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedSegment } from '../../../model/entities/ingested-segment'
 import { IngestedSegmentRepository } from '../interfaces/ingested-segment-repository'
+import { Logger } from '../../../logger/logger'
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest changed this to "ingestedSegments"
 
 export class MongoIngestedSegmentChangedListener extends BaseMongoRepository implements DataChangedListener<IngestedSegment> {
 
+  private readonly logger: Logger
   private onCreatedCallback: (segment: IngestedSegment) => void
   private onUpdatedCallback: (segment: IngestedSegment) => void
   private onDeletedCallback: (segmentId: string) => void
 
   constructor(
     mongoDatabase: MongoDatabase,
-    private readonly ingestedSegmentRepository: IngestedSegmentRepository
+    private readonly ingestedSegmentRepository: IngestedSegmentRepository,
+    logger: Logger
   ) {
     super(mongoDatabase)
+    this.logger = logger.tag(MongoIngestedSegmentChangedListener.name)
     mongoDatabase.onConnect(INGESTED_SEGMENT_COLLECTION_NAME, () => this.listenForChanges())
   }
 
@@ -34,7 +38,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository imp
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedSegment>) => void this.onChange(change))
-    console.debug('### Listening for Segment collection changes...')
+    this.logger.debug('Listening for Segment collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoIngestedSegment>): Promise<void> {
