@@ -13,7 +13,7 @@
     "lint-fix": "eslint --fix --ext .ts .",
     "validate": "yarn audit --level moderate --groups dependencies",
     "clean": "rimraf dist",
-    "reset": "rimraf --glob *.log && rimraf dist node_modules coverage"
+    "reset": "rimraf --glob dist node_modules coverage *.log"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",
