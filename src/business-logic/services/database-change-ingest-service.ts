@@ -354,8 +354,9 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     if (removedSegment) {
       if (!removedSegment.isUnsynced()) {
         this.eventEmitter.emitSegmentDeleted(rundown, removedSegment.id)
+      } else {
+        this.eventEmitter.emitSegmentUnsynced(rundown, removedSegment, segmentId)
       }
-      this.eventEmitter.emitSegmentUnsynced(rundown, removedSegment, segmentId)
       await this.segmentRepository.delete(removedSegment.id)
     }
     await this.persistRundown(rundown)
@@ -390,8 +391,9 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     if (removedPart) {
       if (!removedPart.isUnsynced()) {
         this.eventEmitter.emitPartDeleted(rundown, removedPart.getSegmentId(), removedPart.id)
+      } else {
+        this.eventEmitter.emitPartUnsynced(rundown, removedPart)
       }
-      this.eventEmitter.emitPartUnsynced(rundown, removedPart)
       await this.partRepository.delete(removedPart.id)
     }
     await this.persistRundown(rundown)
