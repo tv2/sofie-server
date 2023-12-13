@@ -128,12 +128,11 @@ export class Part {
     this.markAsUnsynced()
   }
 
-  public markAsUnsynced(): Part {
+  public markAsUnsynced(): void {
     this.isPartUnsynced = true
     this.rank = this.rank - 1
     this.pieces.forEach(piece => piece.markAsUnsyncedWithUnsyncedPart())
     this.pieces = this.pieces.map(piece => piece.getUnsyncedCopy())
-    return this
   }
 
   public isUntimed(): boolean {
