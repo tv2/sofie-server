@@ -6,6 +6,7 @@ import { BaseController } from '../controllers/base-controller'
 import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
+import { JsendResponseFormatter } from '../jsend-response-formatter'
 import { ActionTriggerController } from '../controllers/action-trigger-controller'
 import { LoggerFacade } from '../../logger/logger-facade'
 
@@ -25,26 +26,36 @@ export class ControllerFacade {
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       ServiceFacade.createIngestService(),
-      ControllerFacade.createExpressErrorHandler()
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
     )
   }
 
   private static createExpressErrorHandler(): ExpressErrorHandler {
-    return new ExpressErrorHandler(LoggerFacade.createLogger())
+    return new ExpressErrorHandler(new JsendResponseFormatter(), LoggerFacade.createLogger())
   }
 
   private static createTimelineController(): TimelineController {
-    return new TimelineController(RepositoryFacade.createTimelineRepository(), ControllerFacade.createExpressErrorHandler())
+    return new TimelineController(
+      RepositoryFacade.createTimelineRepository(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
+    )
   }
 
   private static createActionController(): ActionController {
-    return new ActionController(ServiceFacade.createActionService(), ControllerFacade.createExpressErrorHandler())
+    return new ActionController(
+      ServiceFacade.createActionService(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
+    )
   }
 
   private static createActionTriggerController(): ActionTriggerController {
     return new ActionTriggerController(
       ServiceFacade.createActionTriggerService(),
-      ControllerFacade.createExpressErrorHandler()
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
     )
   }
 
@@ -52,7 +63,8 @@ export class ControllerFacade {
     return new ConfigurationController(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
-      ControllerFacade.createExpressErrorHandler()
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
     )
   }
 }
