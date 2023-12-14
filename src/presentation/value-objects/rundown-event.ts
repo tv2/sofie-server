@@ -58,7 +58,6 @@ export interface RundownInfinitePieceAddedEvent extends RundownEvent {
 
 export interface RundownCreatedEvent extends RundownEvent {
   type: IngestEventType.RUNDOWN_CREATED
-  basicRundown: BasicRundownDto
   rundown: RundownDto
 }
 
