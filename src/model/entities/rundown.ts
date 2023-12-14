@@ -564,14 +564,12 @@ export class Rundown extends BasicRundown {
       return
     }
 
-    // We know that 'segmentToRemove' is not undefined at this point
     this.segments = this.segments.filter(segment => segment.id !== segmentId)
 
     if (segmentToRemove.isOnAir()) {
       const unsyncedSegment: Segment = this.unsyncSegment(segmentToRemove)
       this.updateNextCursor()
       return unsyncedSegment
-
     }
 
     this.updateNextCursor()

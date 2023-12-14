@@ -129,7 +129,6 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.RUNDOWN_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      basicRundown: new BasicRundownDto(rundown),
       rundown: new RundownDto(rundown)
     }
   }
