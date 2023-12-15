@@ -1,4 +1,4 @@
-import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import { Action, ActionArgumentType, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -218,6 +218,11 @@ export class Tv2AudioActionFactory {
         contentType: Tv2ActionContentType.AUDIO,
         actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED,
         defaultFadeDurationInFrames: blueprintConfiguration.studio.audioBedSettings.fadeOutDurationInFrames
+      },
+      argument: {
+        name: 'Fade duration',
+        description: 'The duration of the fade in frames',
+        type: ActionArgumentType.NUMBER
       }
     }
   }
