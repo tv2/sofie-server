@@ -2,6 +2,7 @@ import * as mongodb from 'mongodb'
 import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
 import { MongoId } from './mongo-entity-converter'
+import { Logger } from '../../../logger/logger'
 
 const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
 const MONGO_DB_NAME: string = getMongoDatabaseName()
@@ -14,26 +15,28 @@ function getMongoDatabaseName(): string {
 export class MongoDatabase {
   private static instance: MongoDatabase
 
-  public static getInstance(): MongoDatabase {
+  public static getInstance(logger: Logger): MongoDatabase {
     if (!this.instance) {
-      this.instance = new MongoDatabase()
+      this.instance = new MongoDatabase(logger)
     }
     return this.instance
   }
 
+  private readonly logger: Logger
   private client: mongodb.MongoClient
   private db: mongodb.Db
 
   private readonly onConnectCallbacks: Map<string, () => void> = new Map()
 
-  private constructor() {
+  private constructor(logger: Logger) {
+    this.logger = logger.tag(MongoDatabase.name)
     this.connectToDatabase()
-      .catch((reason) => console.error('Failed connecting to mongo database.', reason))
+      .catch((reason) => this.logger.data(reason).error('Failed connecting to mongo database.'))
   }
 
   private async connectToDatabase(): Promise<void> {
     if (this.db) {
-      console.log('### Already connected to database. Skipping reconnection...')
+      this.logger.info('Already connected to database. Skipping reconnection...')
       return
     }
 
@@ -41,7 +44,7 @@ export class MongoDatabase {
     await this.client.connect()
 
     this.db = this.client.db(MONGO_DB_NAME)
-    console.log(`### Connected to database: ${this.db.databaseName}`)
+    this.logger.info(`Connected to database: ${this.db.databaseName}`)
 
     this.onConnectCallbacks.forEach(callback => callback())
   }
