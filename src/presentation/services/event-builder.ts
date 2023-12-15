@@ -38,6 +38,7 @@ import {
   ActionTriggerUpdatedEvent
 } from '../value-objects/action-trigger-event'
 import { ActionTriggerDto } from '../dtos/action-trigger-dto'
+import {RundownDto} from '../dtos/rundown-dto'
 
 export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder {
 
@@ -128,7 +129,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.RUNDOWN_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      basicRundown: new BasicRundownDto(rundown)
+      rundown: new RundownDto(rundown)
     }
   }
 
