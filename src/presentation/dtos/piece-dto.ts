@@ -1,4 +1,5 @@
-import { Piece } from '../../model/entities/piece'
+import {Piece} from '../../model/entities/piece'
+import {PieceAvailabilityStatus} from '../../model/enums/piece-availability-status'
 
 export class PieceDto {
   public readonly id: string
@@ -9,6 +10,7 @@ export class PieceDto {
   public readonly layer: string
   public readonly isPlanned: boolean
   public readonly metadata?: unknown
+  public readonly availabilityStatus?: PieceAvailabilityStatus
 
   constructor(piece: Piece) {
     this.id = piece.id
@@ -19,5 +21,6 @@ export class PieceDto {
     this.layer = piece.layer
     this.isPlanned = piece.isPlanned
     this.metadata = piece.metadata
+    this.availabilityStatus = piece.getAvailabilityStatus()
   }
 }

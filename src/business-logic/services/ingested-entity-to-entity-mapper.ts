@@ -8,6 +8,7 @@ import { Segment } from '../../model/entities/segment'
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { Rundown, RundownAlreadyActiveProperties } from '../../model/entities/rundown'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import {PieceAvailabilityStatus} from '../../model/enums/piece-availability-status'
 
 export class IngestedEntityToEntityMapper {
 
@@ -149,10 +150,31 @@ export class IngestedEntityToEntityMapper {
       timelineObjects: ingestedPiece.timelineObjects,
       metadata: ingestedPiece.metadata,
       content: ingestedPiece.content,
+      availabilityStatus: this.mapStatusNumberToAvailabilityStatus(ingestedPiece.status),
       tags: [],
       isUnsynced: false
     })
   }
+
+  private mapStatusNumberToAvailabilityStatus(status?: number): PieceAvailabilityStatus {
+    switch (status) {
+      case -1:
+        return PieceAvailabilityStatus.UNKNOWN
+      case 0:
+        return PieceAvailabilityStatus.OK
+      case 10:
+        return PieceAvailabilityStatus.SOURCE_HAS_ISSUES
+      case 20:
+        return PieceAvailabilityStatus.SOURCE_BROKEN
+      case 30:
+        return PieceAvailabilityStatus.SOURCE_MISSING
+      case 40:
+        return PieceAvailabilityStatus.SOURCE_NOT_SET
+      default:
+        return PieceAvailabilityStatus.UNKNOWN
+    }
+  }
+
 
   private updatePieceWithIngestedPiece(pieceToBeUpdated: Piece, ingestedPiece: IngestedPiece): Piece {
     return new Piece({
@@ -170,6 +192,7 @@ export class IngestedEntityToEntityMapper {
       timelineObjects: ingestedPiece.timelineObjects,
       metadata: ingestedPiece.metadata,
       content: ingestedPiece.content,
+      availabilityStatus: this.mapStatusNumberToAvailabilityStatus(ingestedPiece.status),
       tags: pieceToBeUpdated.tags,
       isUnsynced: pieceToBeUpdated.isUnsynced(),
       executedAt: pieceToBeUpdated.getExecutedAt()

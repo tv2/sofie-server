@@ -1,30 +1,31 @@
-import { Owner } from '../../../model/enums/owner'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { TransitionType } from '../../../model/enums/transition-type'
-import { TimelineObject } from '../../../model/entities/timeline-object'
-import { InTransition } from '../../../model/value-objects/in-transition'
-import { OutTransition } from '../../../model/value-objects/out-transition'
-import { AutoNext } from '../../../model/value-objects/auto-next'
-import { PartTimings } from '../../../model/value-objects/part-timings'
-import { PartEndState } from '../../../model/value-objects/part-end-state'
-import { RundownPersistentState } from '../../../model/value-objects/rundown-persistent-state'
-import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
-import { Piece } from '../../../model/entities/piece'
-import { Part } from '../../../model/entities/part'
-import { Segment } from '../../../model/entities/segment'
-import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities/rundown'
-import { BasicRundown } from '../../../model/entities/basic-rundown'
-import { Exception } from '../../../model/exceptions/exception'
-import { ErrorCode } from '../../../model/enums/error-code'
-import { Timeline } from '../../../model/entities/timeline'
-import { Studio } from '../../../model/entities/studio'
-import { StudioLayer } from '../../../model/value-objects/studio-layer'
-import { LookaheadMode } from '../../../model/enums/lookahead-mode'
-import { ShowStyle } from '../../../model/entities/show-style'
-import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
-import { Media } from '../../../model/entities/media'
-import { RundownTiming } from '../../../model/value-objects/rundown-timing'
-import { IngestedPart } from '../../../model/entities/ingested-part'
+import {Owner} from '../../../model/enums/owner'
+import {PieceLifespan} from '../../../model/enums/piece-lifespan'
+import {TransitionType} from '../../../model/enums/transition-type'
+import {TimelineObject} from '../../../model/entities/timeline-object'
+import {InTransition} from '../../../model/value-objects/in-transition'
+import {OutTransition} from '../../../model/value-objects/out-transition'
+import {AutoNext} from '../../../model/value-objects/auto-next'
+import {PartTimings} from '../../../model/value-objects/part-timings'
+import {PartEndState} from '../../../model/value-objects/part-end-state'
+import {RundownPersistentState} from '../../../model/value-objects/rundown-persistent-state'
+import {RundownCursor} from '../../../model/value-objects/rundown-cursor'
+import {Piece} from '../../../model/entities/piece'
+import {Part} from '../../../model/entities/part'
+import {Segment} from '../../../model/entities/segment'
+import {Rundown, RundownAlreadyActiveProperties} from '../../../model/entities/rundown'
+import {BasicRundown} from '../../../model/entities/basic-rundown'
+import {Exception} from '../../../model/exceptions/exception'
+import {ErrorCode} from '../../../model/enums/error-code'
+import {Timeline} from '../../../model/entities/timeline'
+import {Studio} from '../../../model/entities/studio'
+import {StudioLayer} from '../../../model/value-objects/studio-layer'
+import {LookaheadMode} from '../../../model/enums/lookahead-mode'
+import {ShowStyle} from '../../../model/entities/show-style'
+import {ShowStyleVariant} from '../../../model/entities/show-style-variant'
+import {Media} from '../../../model/entities/media'
+import {RundownTiming} from '../../../model/value-objects/rundown-timing'
+import {IngestedPart} from '../../../model/entities/ingested-part'
+import {PieceAvailabilityStatus} from '../../../model/enums/piece-availability-status'
 
 export interface MongoId {
   _id: string
@@ -104,6 +105,7 @@ export interface MongoPiece extends MongoId {
   executedAt?: number
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
+  availabilityStatus: PieceAvailabilityStatus
 
   metadata?: unknown
   content?: unknown
@@ -356,7 +358,8 @@ export class MongoEntityConverter {
       metadata: piece.metadata,
       content: piece.content,
       isUnsynced: piece.isUnsynced(),
-      tags: piece.tags
+      tags: piece.tags,
+      availabilityStatus: piece.availabilityStatus ?? PieceAvailabilityStatus.UNKNOWN,
     }
   }
 

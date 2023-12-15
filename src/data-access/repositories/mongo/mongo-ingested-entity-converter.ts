@@ -99,6 +99,7 @@ export interface MongoIngestedPiece extends MongoId {
   isPlanned?: boolean
   metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
   content?: unknown
+  status: number
   tags?: string[]
   isUnsynced: boolean
 }
@@ -210,6 +211,7 @@ export class MongoIngestedEntityConverter {
       postRollDuration: mongoPiece.prerollDuration,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
+      status: mongoPiece.status,
       metadata: mongoPiece.metaData,
       content: mongoPiece.content,
     }

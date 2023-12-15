@@ -4,6 +4,7 @@ import { TransitionType } from '../enums/transition-type'
 import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import {PieceAvailabilityStatus} from '../enums/piece-availability-status'
 
 export interface PieceInterface {
   id: string
@@ -19,6 +20,7 @@ export interface PieceInterface {
   executedAt?: number
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
+  availabilityStatus?: PieceAvailabilityStatus
 
   metadata?: unknown
   content?: unknown
@@ -36,6 +38,7 @@ export class Piece {
   public readonly postRollDuration: number
   public readonly transitionType: TransitionType
   public readonly timelineObjects: TimelineObject[]
+  public readonly availabilityStatus?: PieceAvailabilityStatus
 
   public readonly metadata?: unknown
   public readonly content?: unknown
@@ -65,6 +68,7 @@ export class Piece {
     this.content = piece.content
     this.tags = piece.tags
     this.isUnsyncedPiece = piece.isUnsynced
+    this.availabilityStatus = piece.availabilityStatus
 
     this.setExecutedAt(piece.executedAt ?? 0)
   }
@@ -138,5 +142,9 @@ export class Piece {
   public getUnsyncedCopy(): Piece {
     const unsyncedId: string = this.id.endsWith(UNSYNCED_ID_POSTFIX) ? this.id : `${this.id}${UNSYNCED_ID_POSTFIX}`
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: unsyncedId})
+  }
+
+  public getAvailabilityStatus(): PieceAvailabilityStatus | undefined {
+    return this.availabilityStatus
   }
 }

@@ -16,4 +16,5 @@ export interface IngestedPiece {
   readonly timelineObjects: TimelineObject[]
   readonly metadata?: unknown
   readonly content?: unknown
+  readonly status: number
 }
