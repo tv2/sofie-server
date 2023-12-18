@@ -20,6 +20,7 @@ import { InTransition } from '../../model/value-objects/in-transition'
 import { BasicRundown } from '../../model/entities/basic-rundown'
 import { AlreadyActivatedException } from '../../model/exceptions/already-activated-exception'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
+import { isDeepStrictEqual } from 'util'
 
 export class RundownTimelineService implements RundownService {
 
@@ -39,12 +40,14 @@ export class RundownTimelineService implements RundownService {
   public async activateRundown(rundownId: string): Promise<void> {
     await this.assertNoRundownIsActive()
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-
+    const snapBefore = rundown.getInfinitePiecesMap()
     rundown.activate()
 
     await this.buildAndPersistTimeline(rundown)
-
-    this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    const snapAfter = rundown.getInfinitePiecesMap()
+    if (isDeepStrictEqual(snapBefore, snapAfter)) {
+      this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    }
     this.rundownEventEmitter.emitActivateEvent(rundown)
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
@@ -103,7 +106,7 @@ export class RundownTimelineService implements RundownService {
     this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-
+    const snapBefore = rundown.getInfinitePiecesMap()
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
@@ -111,7 +114,10 @@ export class RundownTimelineService implements RundownService {
 
     this.startAutoNext(timeline, rundownId)
 
-    this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    const snapAfter = rundown.getInfinitePiecesMap()
+    if (isDeepStrictEqual(snapBefore, snapAfter)) {
+      this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    }
     this.rundownEventEmitter.emitTakeEvent(rundown)
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
@@ -222,14 +228,17 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPieceAsOnAir(rundownId: string, piece: Piece, layersToStopPiecesOn: string[] = []): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-
+    const snapBefore = rundown.getInfinitePiecesMap()
     rundown.stopActivePiecesOnLayers(layersToStopPiecesOn)
     rundown.insertPieceIntoActivePart(piece)
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
     await this.buildAndPersistTimeline(rundown)
 
-    this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    const snapAfter = rundown.getInfinitePiecesMap()
+    if (isDeepStrictEqual(snapBefore, snapAfter)) {
+      this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    }
     this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getActivePart())
 
     await this.saveRundown(rundown)
