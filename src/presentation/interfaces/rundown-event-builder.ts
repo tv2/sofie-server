@@ -12,7 +12,7 @@ import {
   RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
-  RundownInfinitePieceAddedEvent,
+  RundownInfinitePiecesUpdatedEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
   SegmentCreatedEvent,
@@ -32,7 +32,7 @@ export interface RundownEventBuilder {
   buildPartInsertedAsOnAirEvent(rundown: Rundown, part: Part): PartInsertedAsOnAirEvent
   buildPartInsertedAsNextEvent(rundown: Rundown, part: Part): PartInsertedAsNextEvent
   buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent
-  buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePieceAddedEvent
+  buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePiecesUpdatedEvent
 
   buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent
   buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent
