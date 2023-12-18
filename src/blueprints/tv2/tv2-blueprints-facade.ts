@@ -41,6 +41,7 @@ import {
   Tv2GraphicsTimelineObjectFactoryFactory
 } from './timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
 import { Tv2ActionManifestMapper } from './helpers/tv2-action-manifest-mapper'
+import { Tv2LoggerFacade } from './tv2-logger-facade'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -54,7 +55,7 @@ export class Tv2BlueprintsFacade {
     const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
 
     const audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
-    const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory()
+    const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory(Tv2LoggerFacade.createLogger())
 
     const graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory = new Tv2GraphicsTimelineObjectFactoryFactory(assetPathHelper)
     const graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
@@ -68,7 +69,8 @@ export class Tv2BlueprintsFacade {
         videoMixerTimelineObjectFactory,
         videoClipTimelineObjectFactory,
         audioTimelineObjectFactory,
-        assetPathHelper
+        assetPathHelper,
+        Tv2LoggerFacade.createLogger()
       ),
       new Tv2AudioActionFactory(audioTimelineObjectFactory, videoClipTimelineObjectFactory),
       new Tv2GraphicsActionFactory(
@@ -81,8 +83,8 @@ export class Tv2BlueprintsFacade {
       new Tv2VideoClipActionFactory(
         actionManifestMapper,
         videoMixerTimelineObjectFactory,
-        audioTimelineObjectFactory,
-        videoClipTimelineObjectFactory
+        audioTimelineObjectFactory, 
+        videoClipTimelineObjectFactory,
       ),
       new Tv2VideoMixerConfigurationActionFactory(videoMixerTimelineObjectFactory),
       new Tv2SplitScreenActionFactory(

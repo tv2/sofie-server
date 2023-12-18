@@ -559,16 +559,17 @@ export class Rundown extends BasicRundown {
    * If the Segment is currently OnAir, the Segment is still removed, but an "unsynced copy" is created of the Segment and added to the Rundown in its place.
    */
   public removeSegment(segmentId: string): Segment | undefined {
-    let segmentToRemove: Segment | undefined = this.segments.find(segment => !segment.isUnsynced() && segment.id === segmentId)
+    const segmentToRemove: Segment | undefined = this.segments.find(segment => !segment.isUnsynced() && segment.id === segmentId)
     if (!segmentToRemove) {
       return
     }
 
-    // TODO: Is it okay that i moved filtering up here? Otherwise we crash since we are looking for the unsynced segment id that has yet to exist.
-    // We know that 'segmentToRemove' is not undefined at this point
-    this.segments = this.segments.filter(segment => segment.id !== segmentToRemove!.id)
+    this.segments = this.segments.filter(segment => segment.id !== segmentId)
+
     if (segmentToRemove.isOnAir()) {
-      segmentToRemove = this.unsyncSegment(segmentToRemove)
+      const unsyncedSegment: Segment = this.unsyncSegment(segmentToRemove)
+      this.updateNextCursor()
+      return unsyncedSegment
     }
 
     this.updateNextCursor()
