@@ -14,7 +14,7 @@ import {
   RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
-  RundownInfinitePieceAddedEvent,
+  RundownInfinitePiecesUpdatedEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
   SegmentCreatedEvent,
@@ -86,7 +86,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     }
   }
 
-  public buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePieceAddedEvent {
+  public buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePiecesUpdatedEvent {
     return {
       type: RundownEventType.INFINITE_PIECES_UPDATED,
       timestamp: Date.now(),
