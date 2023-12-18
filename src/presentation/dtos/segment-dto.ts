@@ -9,6 +9,7 @@ export class SegmentDto {
   public readonly isNext: boolean
   public readonly isUntimed: boolean
   public readonly isUnsynced: boolean
+  public readonly rank: number
   public readonly expectedDurationInMs?: number
   public readonly executedAtEpochTime?: number
   public readonly parts: PartDto[]
@@ -21,6 +22,7 @@ export class SegmentDto {
     this.isNext = segment.isNext()
     this.isUntimed = segment.isSegmentUntimed()
     this.isUnsynced = segment.isUnsynced()
+    this.rank = segment.rank
     this.expectedDurationInMs = segment.expectedDurationInMs
     this.executedAtEpochTime = segment.getExecutedAtEpochTime()
     this.parts = segment.getParts().map((part) => new PartDto(part))

@@ -564,17 +564,19 @@ export class Rundown extends BasicRundown {
       return
     }
 
-    if (segmentToRemove.isOnAir()) {
-      this.unsyncSegment(segmentToRemove)
-    }
+    this.segments = this.segments.filter(segment => segment.id !== segmentId)
 
-    this.segments = this.segments.filter(segment => segment.id !== segmentToRemove.id)
+    if (segmentToRemove.isOnAir()) {
+      const unsyncedSegment: Segment = this.unsyncSegment(segmentToRemove)
+      this.updateNextCursor()
+      return unsyncedSegment
+    }
 
     this.updateNextCursor()
     return segmentToRemove
   }
 
-  private unsyncSegment(segmentToUnsync: Segment): void {
+  private unsyncSegment(segmentToUnsync: Segment): Segment {
     segmentToUnsync.markAsUnsynced()
     const unsyncedSegment: Segment = segmentToUnsync.getUnsyncedCopy()
     const unsyncedPart: Part | undefined = unsyncedSegment.getParts().find(part => part.isOnAir())
@@ -584,6 +586,7 @@ export class Rundown extends BasicRundown {
     this.activeCursor = this.createCursor(this.activeCursor, { segment: unsyncedSegment, part:  unsyncedPart })
     this.segments.push(unsyncedSegment)
     this.segments.sort(this.compareSegments)
+    return unsyncedSegment
   }
 
   public getSegments(): Segment[] {

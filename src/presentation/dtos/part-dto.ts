@@ -6,6 +6,7 @@ export class PartDto {
   public readonly id: string
   public readonly segmentId: string
   public readonly name: string
+  public readonly rank: number
   public readonly isOnAir: boolean
   public readonly isNext: boolean
   public readonly isUntimed: boolean
@@ -21,6 +22,7 @@ export class PartDto {
     this.id = part.id
     this.segmentId = part.getSegmentId()
     this.name = part.name
+    this.rank = part.getRank()
     this.isOnAir = part.isOnAir()
     this.isNext = part.isNext()
     this.isUntimed = part.isUntimed()
