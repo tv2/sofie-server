@@ -69,7 +69,13 @@ export class IngestedEntityToEntityMapper {
       isUnsynced: false, // Updated are never unsynced since Core removes and adds new Segments instead of updating them
       expectedDurationInMs: ingestedSegment.budgetDuration,
       executedAtEpochTime: segmentToBeUpdated.getExecutedAtEpochTime(),
-      parts: segmentToBeUpdated.getParts(),
+      parts: segmentToBeUpdated.getParts().map(part => {
+        const ingestedPart: IngestedPart | undefined = ingestedSegment.ingestedParts.find(ingestedPart => ingestedPart.id === part.id)
+        if (!ingestedPart) {
+          return part
+        }
+        return this.updatePartWithIngestedPart(part, ingestedPart)
+      }),
     })
   }
 
