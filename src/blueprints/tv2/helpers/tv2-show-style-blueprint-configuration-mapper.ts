@@ -1,23 +1,15 @@
 import {
   Breaker,
   BreakerTransitionEffect,
-  CutTransitionEffect,
-  DipTransitionEffect,
   GraphicsDefault,
   GraphicsSetup,
   GraphicsTemplate,
-  MixTransitionEffect,
   SplitScreenConfiguration,
-  TransitionEffect,
   TransitionEffectType,
   Tv2ShowStyleBlueprintConfiguration
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { ShowStyle } from '../../../model/entities/show-style'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-
-const CUT_TRANSITION_EFFECT_REGEX: RegExp = /cut/i
-const MIX_TRANSITION_EFFECT_REGEX: RegExp = /mix ?(\d+)/i
-const DIP_TRANSITION_EFFECT_REGEX: RegExp = /dip ?(\d+)/i
 
 interface CoreShowStyleBlueprintConfiguration {
   GfxDefaults: CoreGraphicsDefault[]
@@ -79,7 +71,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       graphicsTemplates: this.mapGraphicsTemplates(coreConfiguration.GfxTemplates),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
       splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
-      transitionEffectConfigurations: this.mapTransitionEffectConfigurations([
+      breakerTransitionEffectConfigurations: this.mapTransitionEffectConfigurations([
         ...coreConfiguration.Transitions.map(transition => transition.Transition),
         coreConfiguration.ShowstyleTransition
       ]),
@@ -156,44 +148,8 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     })
   }
 
-  private mapTransitionEffectConfigurations(transitions: string[]): TransitionEffect[] {
-    return transitions.map(transition => {
-      if (transition.match(CUT_TRANSITION_EFFECT_REGEX)) {
-        return this.mapToCutTransitionEffect()
-      }
-      if (transition.match(MIX_TRANSITION_EFFECT_REGEX)) {
-        return this.mapToMixTransitionEffect(transition)
-      }
-      if (transition.match(DIP_TRANSITION_EFFECT_REGEX)) {
-        return this.mapToDipTransitionEffect(transition)
-      }
-      return this.mapToVideoClipTransitionEffect(transition)
-    })
-  }
-
-  private mapToCutTransitionEffect(): CutTransitionEffect {
-    return {
-      type: TransitionEffectType.CUT,
-    }
-  }
-
-  private mapToMixTransitionEffect(transition: string): MixTransitionEffect {
-    return {
-      type: TransitionEffectType.MIX,
-      durationInFrames: this.getDurationFromTransition(transition, MIX_TRANSITION_EFFECT_REGEX)
-    }
-  }
-
-  private getDurationFromTransition(transition: string, regex: RegExp): number {
-    const transitionProperties: RegExpMatchArray | null = transition.match(regex)
-    return Number(transitionProperties![1])
-  }
-
-  private mapToDipTransitionEffect(transition: string): DipTransitionEffect {
-    return {
-      type: TransitionEffectType.DIP,
-      durationInFrames: this.getDurationFromTransition(transition, DIP_TRANSITION_EFFECT_REGEX)
-    }
+  private mapTransitionEffectConfigurations(transitions: string[]): BreakerTransitionEffect[] {
+    return transitions.map(this.mapToVideoClipTransitionEffect)
   }
 
   private mapToVideoClipTransitionEffect(transition: string): BreakerTransitionEffect {

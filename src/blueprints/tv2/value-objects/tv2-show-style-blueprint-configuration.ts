@@ -6,7 +6,7 @@ export interface Tv2ShowStyleBlueprintConfiguration {
   graphicsTemplates: GraphicsTemplate[]
   selectedGraphicsSetup: GraphicsSetup
   splitScreenConfigurations: SplitScreenConfiguration[]
-  transitionEffectConfigurations: TransitionEffect[]
+  breakerTransitionEffectConfigurations: BreakerTransitionEffect[]
   breakers: Breaker[]
 }
 
@@ -80,22 +80,6 @@ export interface SplitScreenBoxProperties {
   cropBottom: number
   cropLeft: number
   cropRight: number
-}
-
-export type TransitionEffect = CutTransitionEffect | MixTransitionEffect | DipTransitionEffect | BreakerTransitionEffect
-
-export interface CutTransitionEffect {
-  type: TransitionEffectType.CUT
-}
-
-export interface MixTransitionEffect {
-  type: TransitionEffectType.MIX
-  durationInFrames: number
-}
-
-export interface DipTransitionEffect {
-  type: TransitionEffectType.DIP
-  durationInFrames: number
 }
 
 export interface BreakerTransitionEffect {
