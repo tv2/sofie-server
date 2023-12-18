@@ -168,16 +168,16 @@ export class DatabaseChangeIngestService implements IngestChangeService {
         return
       }
 
-      const updateParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.getUpdatedPartFromIngestedPart(segmentOnRundown, ingestedPart))
+      const updatedParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.getUpdatedPartFromIngestedPart(segmentOnRundown, ingestedPart))
 
       const ingestedPartIds: string[] = ingestedSegment.ingestedParts.map(ingestedPart => ingestedPart.id)
       const onAirPartToBeDeleted: Part | undefined = segmentOnRundown.getParts().find(part => part.isOnAir() && !ingestedPartIds.includes(part.id))
       if (onAirPartToBeDeleted) {
         rundown.removePartFromSegment(onAirPartToBeDeleted.id) // Marks the Part as unsynced
-        updateParts.push(onAirPartToBeDeleted) // Need to include the unsynced Part in the updated Segment
+        updatedParts.push(onAirPartToBeDeleted) // Need to include the unsynced Part in the updated Segment
       }
 
-      segmentOnRundown.setParts(updateParts)
+      segmentOnRundown.setParts(updatedParts)
 
       const updatedSegment: Segment = this.ingestedEntityToEntityMapper.updateSegmentWithIngestedSegment(segmentOnRundown, ingestedSegment)
       // This will put the Segment as reference in the ActiveCursor. It will also replace all the Parts with the Parts from the "old" Segment
