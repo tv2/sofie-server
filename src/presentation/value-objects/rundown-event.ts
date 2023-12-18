@@ -4,6 +4,7 @@ import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
 import { SegmentDto } from '../dtos/segment-dto'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
+import {RundownDto} from '../dtos/rundown-dto'
 
 export interface RundownEvent extends TypedEvent {
   type: EventType
@@ -36,32 +37,32 @@ export interface PartSetAsNextEvent extends PartEvent {
 }
 
 export interface PartInsertedAsOnAirEvent extends RundownEvent {
-  type: RundownEventType.PART_INSERTED_AS_ON_AIR,
+  type: RundownEventType.PART_INSERTED_AS_ON_AIR
   part: PartDto,
 }
 
 export interface PartInsertedAsNextEvent extends RundownEvent {
-  type: RundownEventType.PART_INSERTED_AS_NEXT,
+  type: RundownEventType.PART_INSERTED_AS_NEXT
   part: PartDto
 }
 
 export interface PieceInsertedEvent extends PartEvent {
-  type: RundownEventType.PIECE_INSERTED,
+  type: RundownEventType.PIECE_INSERTED
   piece: PieceDto
 }
 
 export interface RundownInfinitePieceAddedEvent extends RundownEvent {
-  type: RundownEventType.INFINITE_PIECES_UPDATED,
+  type: RundownEventType.INFINITE_PIECES_UPDATED
   infinitePieces: PieceDto[]
 }
 
 export interface RundownCreatedEvent extends RundownEvent {
-  type: IngestEventType.RUNDOWN_CREATED,
-  basicRundown: BasicRundownDto
+  type: IngestEventType.RUNDOWN_CREATED
+  rundown: RundownDto
 }
 
 export interface RundownUpdatedEvent extends RundownEvent {
-  type: IngestEventType.RUNDOWN_UPDATED,
+  type: IngestEventType.RUNDOWN_UPDATED
   basicRundown: BasicRundownDto
 }
 
@@ -84,6 +85,12 @@ export interface SegmentDeletedEvent extends RundownEvent {
   segmentId: string
 }
 
+export interface SegmentUnsyncedEvent extends RundownEvent {
+  type: IngestEventType.SEGMENT_UNSYNCED
+  unsyncedSegment: SegmentDto
+  originalSegmentId: string
+}
+
 export interface PartCreatedEvent extends RundownEvent {
   type: IngestEventType.PART_CREATED
   part: PartDto
@@ -96,5 +103,11 @@ export interface PartUpdatedEvent extends RundownEvent {
 
 export interface PartDeletedEvent extends RundownEvent {
   type: IngestEventType.PART_DELETED
+  segmentId: string
   partId: string
+}
+
+export interface PartUnsyncedEvent extends RundownEvent {
+  type: IngestEventType.PART_UNSYNCED
+  part: PartDto
 }

@@ -361,6 +361,8 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     if (removedSegment) {
       if (!removedSegment.isUnsynced()) {
         this.eventEmitter.emitSegmentDeleted(rundown, removedSegment.id)
+      } else {
+        this.eventEmitter.emitSegmentUnsynced(rundown, removedSegment, segmentId)
       }
       await this.segmentRepository.delete(removedSegment.id)
     }
@@ -393,8 +395,12 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     const rundown: Rundown = await this.rundownRepository.getRundown(partFromDatabase.rundownId)
 
     const removedPart: Part | undefined = rundown.removePartFromSegment(partId)
-    if (removedPart && !removedPart.isUnsynced()) {
-      this.eventEmitter.emitPartDeleted(rundown, removedPart.id)
+    if (removedPart) {
+      if (!removedPart.isUnsynced()) {
+        this.eventEmitter.emitPartDeleted(rundown, removedPart.getSegmentId(), removedPart.id)
+      } else {
+        this.eventEmitter.emitPartUnsynced(rundown, removedPart)
+      }
       await this.partRepository.delete(removedPart.id)
     }
     await this.persistRundown(rundown)
