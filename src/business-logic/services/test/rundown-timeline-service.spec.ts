@@ -84,7 +84,7 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
-    it('does not emit events unless piecess are changed on activateRundown', async () => {
+    it('does not emit infinitePiecesUpdatedEvent unless piecess are changed', async () => {
       const aRundown: Rundown = EntityMockFactory.createRundown({ id: 'aRundown', isRundownActive: false })
       const rundowns: Rundown[] = [aRundown]
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
@@ -103,7 +103,7 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.takeNext.name}`, () => {
-    it('does not emit events unless piecess are changed on takeNext', async () => {
+    it('does not emit infinitePiecesUpdatedEvent unless piecess are changed', async () => {
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
       const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [activePiece] })
@@ -150,7 +150,7 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.insertPartAsOnAir.name}`, () => {
-    it('does not emit events unless piecess are changed on insertPieceAsOnAir', async () => {
+    it('does not emit infinitePiecesUpdatedEvent unless piecess are changed', async () => {
       const aPiece: Piece = EntityMockFactory.createPiece({executedAt:0, id: 'aPieceId'})
       const aPart: Part = EntityMockFactory.createPart()
       const aRundown: Rundown = EntityMockFactory.createActiveRundown({ activePart: aPart })
