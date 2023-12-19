@@ -17,6 +17,7 @@ import { NotFoundException } from '../../model/exceptions/not-found-exception'
 import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { BasicRundown } from '../../model/entities/basic-rundown'
+import { Logger } from '../../logger/logger'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
@@ -33,6 +34,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     timelineBuilder: TimelineBuilder,
     eventEmitter: RundownEventEmitter,
     ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
+    logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>
@@ -47,6 +49,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
         timelineBuilder,
         eventEmitter,
         ingestedEntityToEntityMapper,
+        logger,
         rundownChangeListener,
         segmentChangedListener,
         partChangedListener
@@ -57,6 +60,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
   // Event Queue Priority: The lower the number, the higher the priority
   private readonly eventPriorityQueue: Record<number, (() => Promise<void>)[]> = { }
+  private readonly logger: Logger
   private isExecutingEvent: boolean = false
   private lastBulkExecutionStartTimestamp: number = 0
   private readonly rundownIdsToBuild: Set<string> = new Set<string>()
@@ -72,10 +76,13 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     private readonly timelineBuilder: TimelineBuilder,
     private readonly eventEmitter: RundownEventEmitter,
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
+    logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>
   ) {
+    this.logger = logger.tag(DatabaseChangeIngestService.name)
+
     this.listenForRundownChanges(rundownChangeListener)
     this.listenForSegmentChanges(segmentChangedListener)
     this.listenForPartChanges(partChangedListener)
@@ -161,16 +168,16 @@ export class DatabaseChangeIngestService implements IngestChangeService {
         return
       }
 
-      const updateParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.getUpdatedPartFromIngestedPart(segmentOnRundown, ingestedPart))
+      const updatedParts: Part[] = ingestedSegment.ingestedParts.map(ingestedPart => this.getUpdatedPartFromIngestedPart(segmentOnRundown, ingestedPart))
 
       const ingestedPartIds: string[] = ingestedSegment.ingestedParts.map(ingestedPart => ingestedPart.id)
       const onAirPartToBeDeleted: Part | undefined = segmentOnRundown.getParts().find(part => part.isOnAir() && !ingestedPartIds.includes(part.id))
       if (onAirPartToBeDeleted) {
         rundown.removePartFromSegment(onAirPartToBeDeleted.id) // Marks the Part as unsynced
-        updateParts.push(onAirPartToBeDeleted) // Need to include the unsynced Part in the updated Segment
+        updatedParts.push(onAirPartToBeDeleted) // Need to include the unsynced Part in the updated Segment
       }
 
-      segmentOnRundown.setParts(updateParts)
+      segmentOnRundown.setParts(updatedParts)
 
       const updatedSegment: Segment = this.ingestedEntityToEntityMapper.updateSegmentWithIngestedSegment(segmentOnRundown, ingestedSegment)
       // This will put the Segment as reference in the ActiveCursor. It will also replace all the Parts with the Parts from the "old" Segment
@@ -248,7 +255,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
 
     this.isExecutingEvent = true
     eventCallback()
-      .catch(error => console.error('Error when executing Ingest event:', error))
+      .catch(error => this.logger.data(error).error('Error when executing Ingest event:'))
       .finally(() => {
         this.isExecutingEvent = false
         void this.buildRundowns()
@@ -282,7 +289,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
           // The Rundown has been deleted from the database
           continue
         }
-        console.log('Error when trying to build Rundowns for bulk', exception)
+        this.logger.data(exception).error('Error when trying to build Rundowns for bulk')
       }
     }
     this.rundownIdsToBuild.clear()

@@ -10,6 +10,7 @@ import { BasicRundown } from '../../model/entities/basic-rundown'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { Owner } from '../../model/enums/owner'
 import { IngestService } from '../../business-logic/services/interfaces/ingest-service'
+import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -17,108 +18,109 @@ export class RundownController extends BaseController {
     private readonly rundownService: RundownService,
     private readonly rundownRepository: RundownRepository,
     private readonly ingestService: IngestService,
-    private readonly httpErrorHandler: HttpErrorHandler
+    private readonly httpErrorHandler: HttpErrorHandler,
+    private readonly httpResponseFormatter: HttpResponseFormatter
   ) {
     super()
   }
 
   @GetRequest('/basic')
-  public async getBasicRundowns(_reg: Request, res: Response): Promise<void> {
+  public async getBasicRundowns(_request: Request, response: Response): Promise<void> {
     try {
       const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns()
-      res.send(basicRundowns.map((basicRundown) => new BasicRundownDto(basicRundown)))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(basicRundowns.map(basicRundown => new BasicRundownDto(basicRundown))))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @GetRequest('/:rundownId')
-  public async getRundown(req: Request, res: Response): Promise<void> {
+  public async getRundown(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
+      const rundownId: string = request.params.rundownId
       const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      res.send(new RundownDto(rundown))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(new RundownDto(rundown)))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @PutRequest('/:rundownId/activate')
-  public async activate(req: Request, res: Response): Promise<void> {
+  public async activate(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
+      const rundownId: string = request.params.rundownId
       await this.rundownService.activateRundown(rundownId)
-      res.send(`Rundown "${rundownId}" successfully activated`)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully activated`))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @PutRequest('/:rundownId/deactivate')
-  public async deactivate(req: Request, res: Response): Promise<void> {
+  public async deactivate(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
+      const rundownId: string = request.params.rundownId
       await this.rundownService.deactivateRundown(rundownId)
-      res.send(`Rundown "${rundownId}" successfully deactivated`)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully deactivated` ))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @PutRequest('/:rundownId/takeNext')
-  public async takeNext(req: Request, res: Response): Promise<void> {
+  public async takeNext(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
+      const rundownId: string = request.params.rundownId
       await this.rundownService.takeNext(rundownId)
-      res.send(`Rundown "${rundownId}" successfully took next`)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully took next`))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @PutRequest('/:rundownId/segments/:segmentId/parts/:partId/setNext')
-  public async setNext(req: Request, res: Response): Promise<void> {
+  public async setNext(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
-      const segmentId: string = req.params.segmentId
-      const partId: string = req.params.partId
+      const rundownId: string = request.params.rundownId
+      const segmentId: string = request.params.segmentId
+      const partId: string = request.params.partId
       await this.rundownService.setNext(rundownId, segmentId, partId, Owner.EXTERNAL)
-      res.send(`Part "${partId}" is now set as next`)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Part "${partId}" is now set as next`))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @PutRequest('/:rundownId/reset')
-  public async resetRundown(req: Request, res: Response): Promise<void> {
+  public async resetRundown(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
+      const rundownId: string = request.params.rundownId
       await this.rundownService.resetRundown(rundownId)
-      res.send(`Rundown "${rundownId}" has been reset`)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" has been reset` ))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @PostRequest('/:rundownId/reingest')
-  public async reloadRundownData(req: Request, res: Response): Promise<void> {
+  public async reloadRundownData(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
+      const rundownId: string = request.params.rundownId
       await this.ingestService.reloadIngestData(rundownId)
-      res.send(`Reingested rundown data for ${rundownId}`)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Reingested rundown data for ${rundownId}`))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @DeleteRequest('/:rundownId')
-  public async deleteRundown(req: Request, res: Response): Promise<void> {
+  public async deleteRundown(request: Request, response: Response): Promise<void> {
     try {
-      const rundownId: string = req.params.rundownId
+      const rundownId: string = request.params.rundownId
       await this.rundownService.deleteRundown(rundownId)
-      res.send(`Rundown "${rundownId}" has been deleted`)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" has been deleted` ))
     } catch (error) {
-      this.httpErrorHandler.handleError(res, error as Exception)
+      this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 }

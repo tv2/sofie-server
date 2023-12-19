@@ -10,7 +10,7 @@ import {
   RundownDeactivatedEvent,
   RundownDeletedEvent,
   RundownEvent,
-  RundownInfinitePieceAddedEvent,
+  RundownInfinitePiecesUpdatedEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
   SegmentCreatedEvent, SegmentDeletedEvent, SegmentUnsyncedEvent,
@@ -53,7 +53,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
   }
 
   public emitInfinitePiecesUpdatedEvent(rundown: Rundown): void {
-    const event: RundownInfinitePieceAddedEvent = this.rundownEventBuilder.buildInfinitePiecesUpdatedEvent(rundown)
+    const event: RundownInfinitePiecesUpdatedEvent = this.rundownEventBuilder.buildInfinitePiecesUpdatedEvent(rundown)
     this.emitRundownEvent(event)
   }
 
