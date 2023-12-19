@@ -40,12 +40,12 @@ export class RundownTimelineService implements RundownService {
   public async activateRundown(rundownId: string): Promise<void> {
     await this.assertNoRundownIsActive()
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const snapBefore = rundown.getInfinitePiecesMap()
+    const infinitePiecesBeforeActivation: Map<string,Piece> = rundown.getInfinitePiecesMap()
     rundown.activate()
 
     await this.buildAndPersistTimeline(rundown)
-    const snapAfter = rundown.getInfinitePiecesMap()
-    if (isDeepStrictEqual(snapBefore, snapAfter)) {
+    const infinitePiecesAfterActivation: Map<string,Piece> = rundown.getInfinitePiecesMap()
+    if (!isDeepStrictEqual(infinitePiecesBeforeActivation, infinitePiecesAfterActivation)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitActivateEvent(rundown)
