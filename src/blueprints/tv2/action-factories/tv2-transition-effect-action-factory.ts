@@ -1,6 +1,12 @@
-import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import {
+  Action,
+  ActionArgumentType,
+  MutateActionMethods,
+  MutateActionType,
+  MutateActionWithPieceMethods
+} from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { Piece } from '../../../model/entities/piece'
+import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
@@ -8,7 +14,6 @@ import {
   Tv2Action,
   Tv2ActionContentType,
   Tv2BreakerTransitionEffectActionMetadata,
-  Tv2CutTransitionEffectActionMetadata,
   Tv2DipTransitionEffectActionMetadata,
   Tv2MixTransitionEffectActionMetadata,
   Tv2TransitionEffectAction,
@@ -21,8 +26,6 @@ import {
 import {
   Breaker,
   BreakerTransitionEffect,
-  DipTransitionEffect,
-  MixTransitionEffect,
   TransitionEffectType
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
@@ -59,61 +62,78 @@ export class Tv2TransitionEffectActionFactory {
   }
 
   public createTransitionEffectActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
-    return blueprintConfiguration.showStyle.transitionEffectConfigurations.flatMap(transitionEffect => {
-      switch (transitionEffect.type) {
-        case TransitionEffectType.CUT: {
-          return [
-            this.createCutTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT),
-            this.createCutTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE)
-          ]
-        }
-        case TransitionEffectType.MIX: {
-          return [
-            this.createMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect),
-            this.createMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect)
-          ]
-        }
-        case TransitionEffectType.DIP: {
-          return [
-            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource),
-            this.createDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource)
-          ]
-        }
-        case TransitionEffectType.BREAKER: {
-          return [
-            this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
-            this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
-          ]
-        }
-      }
-    })
+    return [
+      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT),
+      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE),
+      this.createEmptyDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource),
+      this.createEmptyDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource),
+      ...blueprintConfiguration.showStyle.breakerTransitionEffectConfigurations.flatMap(transitionEffect => {
+        return [
+          this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
+          this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
+        ]
+      })]
   }
 
-  public isTransitionEffectAction(action: Tv2Action): boolean {
-    return [Tv2ActionContentType.TRANSITION].includes(action.metadata.contentType)
+  public isTransitionEffectAction(action: Tv2Action): action is Tv2TransitionEffectAction {
+    return action.metadata.contentType === Tv2ActionContentType.TRANSITION
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
-    switch (action.metadata.contentType) {
-      case Tv2ActionContentType.TRANSITION: {
-        return [{
-          type: MutateActionType.PIECE,
-          updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
-          piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
-        }]
+    if (!this.isTransitionEffectAction(action)) {
+      return []
+    }
+
+    const mutateActionMethods: MutateActionMethods[] = []
+
+    switch (action.metadata.transitionEffectType) {
+      case TransitionEffectType.CUT:
+      case TransitionEffectType.BREAKER: {
+        break
+      }
+      case TransitionEffectType.DIP: {
+        mutateActionMethods.push({
+          type: MutateActionType.APPLY_ARGUMENTS,
+          updateActionWithArguments: (action: Action, actionArguments: unknown) => {
+            if (!this.isTransitionDurationArgumentInteger(actionArguments)) {
+              throw new Tv2MisconfigurationException(`DipTransitionAction expects 'actionArguments' to be an integer. ${actionArguments} is not an integer.`)
+            }
+            const transitionEffectAction: Tv2TransitionEffectAction = action as Tv2TransitionEffectAction
+            const metadata: Tv2DipTransitionEffectActionMetadata =  transitionEffectAction.metadata as Tv2DipTransitionEffectActionMetadata
+            return this.createDipTransitionEffectAction(transitionEffectAction.type, actionArguments, metadata.dipInput)
+          }
+        })
+        break
+      }
+      case TransitionEffectType.MIX: {
+        mutateActionMethods.push({
+          type: MutateActionType.APPLY_ARGUMENTS,
+          updateActionWithArguments: (action: Action, actionArguments: unknown) => {
+            if (!this.isTransitionDurationArgumentInteger(actionArguments)) {
+              throw new Tv2MisconfigurationException(`MixTransitionAction expects 'actionArguments' to be an integer. ${actionArguments} is not an integer.`)
+            }
+            const transitionEffectAction: Tv2TransitionEffectAction = action as Tv2TransitionEffectAction
+            return this.createMixTransitionEffectAction(transitionEffectAction.type, actionArguments)
+          }
+        })
+        break
       }
     }
-    return []
+
+    const updateTransitionMutateAction: MutateActionWithPieceMethods = {
+      type: MutateActionType.PIECE,
+      updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
+      piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
+    }
+    mutateActionMethods.push(updateTransitionMutateAction)
+    return mutateActionMethods
   }
 
-  private createCutTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
-    const effectName: string = 'Cut'
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, 0)
-    const metadata: Tv2CutTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
-      transitionEffectType: TransitionEffectType.CUT
+  private isTransitionDurationArgumentInteger(transitionDurationInFrames: unknown): transitionDurationInFrames is number {
+    if (!Number.isInteger(transitionDurationInFrames)) {
+      throw new Tv2MisconfigurationException(`Then transition duration of the Action must be an integer. ${transitionDurationInFrames} is not an integer`)
     }
-    return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
+    return true
   }
 
   private createPieceInterface(effectName: string, durationFrames: number): Tv2PieceInterface {
@@ -156,24 +176,79 @@ export class Tv2TransitionEffectActionFactory {
     }
   }
 
-  private createMixTransitionEffectAction(actionType: PieceActionType, transitionEffect: MixTransitionEffect): Tv2TransitionEffectAction {
-    const effectName: string = `Mix${transitionEffect.durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
+  /**
+   * Creates an "empty" Mix transition effect Action.
+   * The Action will be "populated" with a PieceInterface from the APPLY ARGUMENTS mutateActionMethod where it will also get the transition duration as an argument.
+   */
+  private createEmptyMixTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.MIX,
-      durationInFrames: transitionEffect.durationInFrames
+      durationInFrames: 0 // Default duration - To be overridden by APPLY ARGUMENTS
+    }
+    return {
+      id: `mix_transition_action_${actionType.toString()}`,
+      name: 'Mix',
+      description: 'Applies a Mix Transition Effect',
+      type: actionType,
+      data: {
+        pieceInterface: {} as PieceInterface
+      },
+      metadata,
+      argument: {
+        name: 'Transition duration',
+        description: 'The duration of the transition in frames',
+        type: ActionArgumentType.NUMBER
+      }
+    }
+  }
+
+  /**
+   * Creates an "empty" Dip transition effect Action.
+   * The Action will be "populated" with a PieceInterface from the APPLY ARGUMENTS mutateActionMethod where it will also get the transition duration as an argument.
+   */
+  private createEmptyDipTransitionEffectAction(actionType: PieceActionType, dipInputSource: number): Tv2TransitionEffectAction {
+    const metadata: Tv2DipTransitionEffectActionMetadata = {
+      contentType: Tv2ActionContentType.TRANSITION,
+      transitionEffectType: TransitionEffectType.DIP,
+      durationInFrames: 0, // Default duration - To be overridden by APPLY ARGUMENTS,
+      dipInput: dipInputSource
+    }
+    return {
+      id: `dip_transition_action_${actionType.toString()}`,
+      name: 'Dip',
+      description: 'Applies a Dip Transition Effect',
+      type: actionType,
+      data: {
+        pieceInterface: {} as PieceInterface
+      },
+      metadata,
+      argument: {
+        name: 'Transition duration',
+        description: 'The duration of the transition in frames',
+        type: ActionArgumentType.NUMBER
+      }
+    }
+  }
+
+  private createMixTransitionEffectAction(actionType: PieceActionType, durationInFrames: number): Tv2TransitionEffectAction {
+    const effectName: string = `Mix${durationInFrames}`
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames)
+    const metadata: Tv2MixTransitionEffectActionMetadata = {
+      contentType: Tv2ActionContentType.TRANSITION,
+      transitionEffectType: TransitionEffectType.MIX,
+      durationInFrames
     }
     return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
 
-  private createDipTransitionEffectAction(actionType: PieceActionType, transitionEffect: DipTransitionEffect, configuredDipInput: number): Tv2TransitionEffectAction {
-    const effectName: string = `Dip${transitionEffect.durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, transitionEffect.durationInFrames)
+  private createDipTransitionEffectAction(actionType: PieceActionType, durationInFrames: number, configuredDipInput: number): Tv2TransitionEffectAction {
+    const effectName: string = `Dip${durationInFrames}`
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.DIP,
-      durationInFrames: transitionEffect.durationInFrames,
+      durationInFrames,
       dipInput: configuredDipInput
     }
     return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)

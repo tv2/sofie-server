@@ -15,6 +15,20 @@ export interface Action {
    * Undefined means the action is a general one. Having a value means the action is for that specific rundown.
    * */
   rundownId?: string
+  argument?: ActionArgument
+}
+
+export interface ActionArgument {
+  name: string
+  description: string
+  type: ActionArgumentType
+}
+
+export enum ActionArgumentType {
+  STRING = 'STRING',
+  STRING_ARRAY = 'STRING_ARRAY',
+  NUMBER = 'NUMBER',
+  NUMBER_ARRAY = 'NUMBER_ARRAY'
 }
 
 export interface PartAction extends Action {
