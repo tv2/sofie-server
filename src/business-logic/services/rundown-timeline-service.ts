@@ -228,15 +228,15 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPieceAsOnAir(rundownId: string, piece: Piece, layersToStopPiecesOn: string[] = []): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const snapBefore = rundown.getInfinitePiecesMap()
+    const infinitePiecesBeforeInsertPieceAsOnAir: Map<string,Piece> = rundown.getInfinitePiecesMap()
     rundown.stopActivePiecesOnLayers(layersToStopPiecesOn)
     rundown.insertPieceIntoActivePart(piece)
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
     await this.buildAndPersistTimeline(rundown)
 
-    const snapAfter = rundown.getInfinitePiecesMap()
-    if (isDeepStrictEqual(snapBefore, snapAfter)) {
+    const infinitePiecesAfterInsertPieceAsOnAir: Map<string,Piece> = rundown.getInfinitePiecesMap()
+    if (!isDeepStrictEqual(infinitePiecesBeforeInsertPieceAsOnAir, infinitePiecesAfterInsertPieceAsOnAir)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getActivePart())
