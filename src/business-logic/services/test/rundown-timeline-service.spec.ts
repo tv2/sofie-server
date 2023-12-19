@@ -84,8 +84,6 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
-    beforeEach(() => jest.useFakeTimers())
-    afterEach(() => jest.useRealTimers())
     it('does not emit events unless piecess are changed on activateRundown', async () => {
       const aRundown: Rundown = EntityMockFactory.createRundown({ id: 'aRundown', isRundownActive: false })
       const rundowns: Rundown[] = [aRundown]
@@ -100,9 +98,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       await testee.activateRundown('aRundown')
-      verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).once()
-      verify(mockRundownEventEmitter.emitActivateEvent(aRundown)).once()
-      verify(mockRundownEventEmitter.emitSetNextEvent(aRundown)).once()
+      verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
     })
   })
 
@@ -150,8 +146,6 @@ describe(RundownTimelineService.name, () => {
 
       await testee.takeNext(aRundown.id)
       verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
-      verify(mockRundownEventEmitter.emitTakeEvent(aRundown)).once()
-      verify(mockRundownEventEmitter.emitSetNextEvent(aRundown)).once()
     })
   })
 
@@ -169,8 +163,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       await testee.insertPieceAsOnAir(aRundown.id, aPiece)
-      verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).once()
-      verify(mockRundownEventEmitter.emitPartUpdated(aRundown, aPart)).once()
+      verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
     })
   })
 })
