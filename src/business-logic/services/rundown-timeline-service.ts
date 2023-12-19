@@ -106,7 +106,7 @@ export class RundownTimelineService implements RundownService {
     this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const snapBefore = rundown.getInfinitePiecesMap()
+    const infinitePiecesBeforeStartAutoNext: Map<string,Piece> = rundown.getInfinitePiecesMap()
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
@@ -114,8 +114,8 @@ export class RundownTimelineService implements RundownService {
 
     this.startAutoNext(timeline, rundownId)
 
-    const snapAfter = rundown.getInfinitePiecesMap()
-    if (isDeepStrictEqual(snapBefore, snapAfter)) {
+    const infinitePiecesAfterStartAutoNext: Map<string,Piece> = rundown.getInfinitePiecesMap()
+    if (!isDeepStrictEqual(infinitePiecesBeforeStartAutoNext, infinitePiecesAfterStartAutoNext)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitTakeEvent(rundown)
