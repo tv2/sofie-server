@@ -7,17 +7,19 @@ import {
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
   PartTakenEvent,
+  PartUnsyncedEvent,
   PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
-  RundownInfinitePieceAddedEvent,
+  RundownInfinitePiecesUpdatedEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
   SegmentCreatedEvent,
   SegmentDeletedEvent,
+  SegmentUnsyncedEvent,
   SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
 import { Piece } from '../../model/entities/piece'
@@ -36,6 +38,7 @@ import {
   ActionTriggerUpdatedEvent
 } from '../value-objects/action-trigger-event'
 import { ActionTriggerDto } from '../dtos/action-trigger-dto'
+import {RundownDto} from '../dtos/rundown-dto'
 
 export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder {
 
@@ -83,7 +86,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     }
   }
 
-  public buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePieceAddedEvent {
+  public buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePiecesUpdatedEvent {
     return {
       type: RundownEventType.INFINITE_PIECES_UPDATED,
       timestamp: Date.now(),
@@ -126,7 +129,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.RUNDOWN_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      basicRundown: new BasicRundownDto(rundown)
+      rundown: new RundownDto(rundown)
     }
   }
 
@@ -174,6 +177,16 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     }
   }
 
+  public buildSegmentUnsyncedEvent(rundown: Rundown, unsyncedSegment: Segment, originalSegmentId: string): SegmentUnsyncedEvent {
+    return {
+      type: IngestEventType.SEGMENT_UNSYNCED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      unsyncedSegment: new SegmentDto(unsyncedSegment),
+      originalSegmentId: originalSegmentId
+    }
+  }
+
   public buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent {
     return {
       type: IngestEventType.PART_CREATED,
@@ -192,12 +205,22 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     }
   }
 
-  public buildPartDeletedEvent(rundown: Rundown, partId: string): PartDeletedEvent {
+  public buildPartDeletedEvent(rundown: Rundown, segmentId: string, partId: string): PartDeletedEvent {
     return {
       type: IngestEventType.PART_DELETED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      partId
+      segmentId,
+      partId,
+    }
+  }
+
+  public buildPartUnsyncedEvent(rundown: Rundown, part: Part): PartUnsyncedEvent {
+    return {
+      type: IngestEventType.PART_UNSYNCED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      part: new PartDto(part)
     }
   }
 

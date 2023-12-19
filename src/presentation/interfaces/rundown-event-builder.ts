@@ -5,18 +5,18 @@ import {
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
-  PartTakenEvent,
+  PartTakenEvent, PartUnsyncedEvent,
   PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
-  RundownInfinitePieceAddedEvent,
+  RundownInfinitePiecesUpdatedEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
   SegmentCreatedEvent,
-  SegmentDeletedEvent,
+  SegmentDeletedEvent, SegmentUnsyncedEvent,
   SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
 import { Piece } from '../../model/entities/piece'
@@ -32,7 +32,7 @@ export interface RundownEventBuilder {
   buildPartInsertedAsOnAirEvent(rundown: Rundown, part: Part): PartInsertedAsOnAirEvent
   buildPartInsertedAsNextEvent(rundown: Rundown, part: Part): PartInsertedAsNextEvent
   buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent
-  buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePieceAddedEvent
+  buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePiecesUpdatedEvent
 
   buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent
   buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent
@@ -41,8 +41,10 @@ export interface RundownEventBuilder {
   buildSegmentCreatedEvent(rundown: Rundown, segment: Segment): SegmentCreatedEvent
   buildSegmentUpdatedEvent(rundown: Rundown, segment: Segment): SegmentUpdatedEvent
   buildSegmentDeletedEvent(rundown: Rundown, segmentId: string): SegmentDeletedEvent
+  buildSegmentUnsyncedEvent(rundown: Rundown, unsyncedSegment: Segment, originalSegmentId: string): SegmentUnsyncedEvent
 
   buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent
   buildPartUpdatedEvent(rundown: Rundown, part: Part): PartUpdatedEvent
-  buildPartDeletedEvent(rundown: Rundown, partId: string): PartDeletedEvent
+  buildPartDeletedEvent(rundown: Rundown, segmentId: string, partId: string): PartDeletedEvent
+  buildPartUnsyncedEvent(rundown: Rundown, part: Part): PartUnsyncedEvent
 }
