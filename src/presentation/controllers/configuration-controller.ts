@@ -1,4 +1,4 @@
-import { BaseController, GetRequest, RestController } from './base-controller'
+import { BaseController, GetRequest, PostRequest, RestController } from './base-controller'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Request, Response } from 'express'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
@@ -38,6 +38,16 @@ export class ConfigurationController extends BaseController {
       const rundownId: string = request.params.rundownId
       const showStyleVariant: ShowStyleVariant = await this.showStyleVariantRepository.getShowStyleVariant(rundownId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(showStyleVariant))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @PostRequest('/reset')
+  public postClearConfigurationCache(request: Request, response: Response): Promise<void> {
+    try {
+      this.configurationRepository.clearConfigurationCache()
+      response.send(this.httpResponseFormatter.formatSuccessResponse())
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
