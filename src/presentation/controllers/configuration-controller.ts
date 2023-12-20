@@ -44,7 +44,7 @@ export class ConfigurationController extends BaseController {
   }
 
   @PostRequest('/reset')
-  public postClearConfigurationCache(request: Request, response: Response): Promise<void> {
+  public postClearConfigurationCache(response: Response): void {
     try {
       this.configurationRepository.clearConfigurationCache()
       response.send(this.httpResponseFormatter.formatSuccessResponse())
