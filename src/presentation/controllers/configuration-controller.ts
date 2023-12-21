@@ -44,10 +44,10 @@ export class ConfigurationController extends BaseController {
   }
 
   @PostRequest('/reset')
-  public postClearConfigurationCache(response: Response): void {
+  public postClearConfigurationCache(_request: Request, response: Response): void {
     try {
       this.configurationRepository.clearConfigurationCache()
-      response.send(this.httpResponseFormatter.formatSuccessResponse())
+      response.send(this.httpResponseFormatter.formatSuccessResponse(null))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }

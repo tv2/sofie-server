@@ -1,7 +1,7 @@
 import {instance, mock, verify} from '@typestrong/ts-mockito'
 import { ConfigurationRepository } from '../interfaces/configuration-repository'
 import { ConfigurationController } from '../../../presentation/controllers/configuration-controller'
-import {Response } from 'express'
+import { Request, Response } from 'express'
 import {ShowStyleVariantRepository} from '../interfaces/show-style-variant-repository'
 import {HttpErrorHandler} from '../../../presentation/interfaces/http-error-handler'
 import {HttpResponseFormatter} from '../../../presentation/interfaces/http-response-formatter'
@@ -9,6 +9,7 @@ import {HttpResponseFormatter} from '../../../presentation/interfaces/http-respo
 describe(ConfigurationController.name, () => {
   describe(ConfigurationController.prototype.postClearConfigurationCache.name, () => {
     it('invokes repo method for clearing of configuration cache when posted', () => {
+      const mockRequest: Request = mock<Request>()
       const mockResponse: Response = mock<Response>()
 
       const mockConfigurationRepository: ConfigurationRepository = mock<ConfigurationRepository>()
@@ -21,7 +22,7 @@ describe(ConfigurationController.name, () => {
         instance(mockHttpErrorHandler),
         instance(mockHttpResponseFormatter)
       )
-      configurationController.postClearConfigurationCache(mockResponse)
+      configurationController.postClearConfigurationCache(mockRequest, mockResponse)
       verify(mockConfigurationRepository.clearConfigurationCache()).once()
     })
   })
