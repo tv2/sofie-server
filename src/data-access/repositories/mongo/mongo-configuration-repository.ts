@@ -18,6 +18,10 @@ export class MongoConfigurationRepository implements ConfigurationRepository {
   ) {
   }
 
+  public clearConfigurationCache(): void {
+    throw new Error('Method not applicable.')
+  }
+
   public async getConfiguration(): Promise<Configuration> {
     const studio: Studio = await this.studioRepository.getStudio(STUDIO_ID)
     const showStyle: ShowStyle = await this.showStyleRepository.getShowStyle(SHOW_STYLE_ID)
