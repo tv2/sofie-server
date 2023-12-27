@@ -27,6 +27,7 @@ describe(ConfigurationController.name, () => {
             instance(mockHttpErrorHandler),
             instance(mockHttpResponseFormatter),
           )
+
         configurationController.postClearConfigurationCache(
           mockRequest,
           mockResponse,
