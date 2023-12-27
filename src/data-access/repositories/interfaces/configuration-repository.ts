@@ -1,6 +1,6 @@
 import { Configuration } from '../../../model/entities/configuration'
 
 export interface ConfigurationRepository {
-  clearConfigurationCache(): void
+  clearConfigurationCache(): Promise<void>
   getConfiguration(): Promise<Configuration>
 }

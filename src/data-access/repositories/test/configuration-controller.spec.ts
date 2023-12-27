@@ -10,7 +10,7 @@ describe(ConfigurationController.name, () => {
   describe(
     ConfigurationController.prototype.postClearConfigurationCache.name,
     () => {
-      it('invokes repo method for clearing of configuration cache when posted', () => {
+      it('invokes repo method for clearing of configuration cache when posted', async () => {
         const mockRequest: Request = mock<Request>()
         const mockResponse: Response = mock<Response>()
         const mockConfigurationRepository: ConfigurationRepository =
@@ -27,7 +27,7 @@ describe(ConfigurationController.name, () => {
             instance(mockHttpErrorHandler),
             instance(mockHttpResponseFormatter),
           )
-        configurationController.postClearConfigurationCache(
+        await configurationController.postClearConfigurationCache(
           mockRequest,
           mockResponse,
         )
