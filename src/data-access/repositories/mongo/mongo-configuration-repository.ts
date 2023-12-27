@@ -18,7 +18,7 @@ export class MongoConfigurationRepository implements ConfigurationRepository {
   ) {
   }
 
-  public clearConfigurationCache(): Promise<void> {
+  public clearConfigurationCache(): void {
     throw new Error('Method not applicable.')
   }
 
