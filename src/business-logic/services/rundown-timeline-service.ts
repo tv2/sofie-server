@@ -20,7 +20,6 @@ import { InTransition } from '../../model/value-objects/in-transition'
 import { BasicRundown } from '../../model/entities/basic-rundown'
 import { AlreadyActivatedException } from '../../model/exceptions/already-activated-exception'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
-import { isDeepStrictEqual } from 'util'
 
 export class RundownTimelineService implements RundownService {
 
@@ -45,7 +44,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
     const infinitePiecesAfterActivation: Map<string,Piece> = rundown.getInfinitePiecesMap()
-    if (!isDeepStrictEqual(infinitePiecesBeforeActivation, infinitePiecesAfterActivation)) {
+    if (this.doInfinitePiecesMapsDiffer(infinitePiecesBeforeActivation, infinitePiecesAfterActivation)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitActivateEvent(rundown)
@@ -71,6 +70,17 @@ export class RundownTimelineService implements RundownService {
     return timeline
   }
 
+  private doInfinitePiecesMapsDiffer(first: Map<string, Piece>, second: Map<string, Piece>):boolean {
+    if ( first !== null && second != null){
+      if (first.size != second.size) return true
+      first.forEach((firstPiece, firstMapKey)=>{
+        const secondPiece: Piece | undefined = second.get(firstMapKey)
+        if (secondPiece !== undefined && secondPiece.id !== firstPiece.id) return true
+        else return true
+      })
+    }
+    return false
+  }
   public async deactivateRundown(rundownId: string): Promise<void> {
     this.stopAutoNext()
 
@@ -115,7 +125,7 @@ export class RundownTimelineService implements RundownService {
     this.startAutoNext(timeline, rundownId)
 
     const infinitePiecesAfterStartAutoNext: Map<string,Piece> = rundown.getInfinitePiecesMap()
-    if (!isDeepStrictEqual(infinitePiecesBeforeStartAutoNext, infinitePiecesAfterStartAutoNext)) {
+    if (this.doInfinitePiecesMapsDiffer(infinitePiecesBeforeStartAutoNext, infinitePiecesAfterStartAutoNext)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitTakeEvent(rundown)
@@ -236,7 +246,7 @@ export class RundownTimelineService implements RundownService {
     await this.buildAndPersistTimeline(rundown)
 
     const infinitePiecesAfterInsertPieceAsOnAir: Map<string,Piece> = rundown.getInfinitePiecesMap()
-    if (!isDeepStrictEqual(infinitePiecesBeforeInsertPieceAsOnAir, infinitePiecesAfterInsertPieceAsOnAir)) {
+    if (this.doInfinitePiecesMapsDiffer(infinitePiecesBeforeInsertPieceAsOnAir, infinitePiecesAfterInsertPieceAsOnAir)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getActivePart())

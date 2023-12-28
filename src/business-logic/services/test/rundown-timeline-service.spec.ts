@@ -151,17 +151,32 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.insertPartAsOnAir.name}`, () => {
     it('does not emit infinitePiecesUpdatedEvent unless piecess are changed', async () => {
-      const aPiece: Piece = EntityMockFactory.createPiece({executedAt:0, id: 'aPieceId'})
-      const aPart: Part = EntityMockFactory.createPart()
-      const aRundown: Rundown = EntityMockFactory.createActiveRundown({ activePart: aPart })
+      const aPiece: Piece = EntityTestFactory.createPiece({id: 'aPieceId'})
+      const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
+      const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
+      const activeSegment: Segment = EntityTestFactory.createSegment({parts: [activePart]})
+      const activePartInfinitePiecesMap: Map<string, Piece> = new Map<string, Piece>([['activeLayerId', activePiece]])
+      const previousPiece: Piece = EntityTestFactory.createPiece({id: 'previousPieceId'})
+      const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPart', pieces: [previousPiece] })
+      const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [aPiece] })
+      const nextSegment: Segment = EntityTestFactory.createSegment({parts: [nextPart]})
+      const aRundown: Rundown = EntityMockFactory.createActiveRundown({
+        activePart: activePart,
+        nextPart: nextPart,
+        previousPart: previousPart,
+        activeSegment: activeSegment,
+        nextSegment: nextSegment,
+        infinitePiecesMap: activePartInfinitePiecesMap,
+      })
+      const basicRundowns: Rundown[] = [aRundown]
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
       when(mockRundownRepository.getRundown(aRundown.id)).thenResolve(aRundown)
+      when(mockRundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
       const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
       const testee: RundownTimelineService = createTestee({
         rundownRepository: instance(mockRundownRepository),
         rundownEventEmitter: instance(mockRundownEventEmitter),
       })
-
       await testee.insertPieceAsOnAir(aRundown.id, aPiece)
       verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
     })
