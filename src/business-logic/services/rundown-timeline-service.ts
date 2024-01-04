@@ -70,15 +70,23 @@ export class RundownTimelineService implements RundownService {
     return timeline
   }
 
-  private doInfinitePiecesMapsDiffer(first: Map<string, Piece>, second: Map<string, Piece>):boolean {
-    if ( first !== null && second != null){
-      if (first.size != second.size) return true
-      first.forEach((firstPiece, firstMapKey)=>{
-        const secondPiece: Piece | undefined = second.get(firstMapKey)
-        if (secondPiece !== undefined && secondPiece.id !== firstPiece.id) return true
-        else return true
-      })
+  private doInfinitePiecesMapsDiffer(firstMap: Map<string, Piece>, secondMap: Map<string, Piece>): boolean {
+    if (firstMap === null && secondMap !== null) return true
+    if (firstMap !== null && secondMap === null) return true
+
+    if (firstMap !== null && secondMap !== null) {
+      if (firstMap.size !== secondMap.size) {
+        return true
+      }
+
+      for (const [firstMapKey, firstPiece] of firstMap) {
+        const secondPiece: Piece | undefined = secondMap.get(firstMapKey)
+        if (secondPiece === undefined || secondPiece.id !== firstPiece.id) {
+          return true
+        }
+      }
     }
+    // firstMap and secondMap are both null
     return false
   }
   public async deactivateRundown(rundownId: string): Promise<void> {
