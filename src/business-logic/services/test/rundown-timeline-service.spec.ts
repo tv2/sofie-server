@@ -85,16 +85,23 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
     it('does not emit infinitePiecesUpdatedEvent unless piecess are changed', async () => {
-      const aRundown: Rundown = EntityMockFactory.createRundown({ id: 'aRundown', isRundownActive: false })
+      const aRundownMock: Rundown = EntityMockFactory.createRundownMock({ id: 'aRundown', isRundownActive: false })
+      const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
+      const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceIdcomm' })
+      const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',firstLayerPiece]])
+      const secondMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',secondLayerPiece]])
+      const aRundown: Rundown = instance(aRundownMock)
+      when(aRundownMock.getInfinitePiecesMap()).thenReturn(firstMap).thenReturn(secondMap)
       const rundowns: Rundown[] = [aRundown]
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
       when(mockRundownRepository.getRundown(aRundown.id)).thenResolve(aRundown)
       when(mockRundownRepository.getBasicRundowns()).thenResolve(rundowns)
       const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
-
+      const mockRundownRepositoryInstance: RundownRepository = instance(mockRundownRepository)
+      const mockRundownEventEmitterInstance: RundownEventEmitter = instance(mockRundownEventEmitter)
       const testee: RundownTimelineService = createTestee({
-        rundownRepository: instance(mockRundownRepository),
-        rundownEventEmitter: instance(mockRundownEventEmitter),
+        rundownRepository: mockRundownRepositoryInstance,
+        rundownEventEmitter: mockRundownEventEmitterInstance,
       })
 
       await testee.activateRundown('aRundown')
@@ -102,8 +109,34 @@ describe(RundownTimelineService.name, () => {
     })
   })
 
+  describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
+    it('emits infinitePiecesUpdatedEvent when pieces are changed', async () => {
+      const aRundownMock: Rundown = EntityMockFactory.createRundownMock({ id: 'aRundown', isRundownActive: false })
+      const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'firstLayerPiece' })
+      const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'secondLayerPiece' })
+      const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',firstLayerPiece]])
+      const secondMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',secondLayerPiece]])
+      const aRundown: Rundown = instance(aRundownMock)
+      when(aRundownMock.getInfinitePiecesMap()).thenReturn(firstMap).thenReturn(secondMap)
+      const rundowns: Rundown[] = [aRundown]
+      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
+      when(mockRundownRepository.getRundown(aRundown.id)).thenResolve(aRundown)
+      when(mockRundownRepository.getBasicRundowns()).thenResolve(rundowns)
+      const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+      const mockRundownRepositoryInstance: RundownRepository = instance(mockRundownRepository)
+      const mockRundownEventEmitterInstance: RundownEventEmitter = instance(mockRundownEventEmitter)
+      const testee: RundownTimelineService = createTestee({
+        rundownRepository: mockRundownRepositoryInstance,
+        rundownEventEmitter: mockRundownEventEmitterInstance,
+      })
+
+      await testee.activateRundown('aRundown')
+      verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).once()
+    })
+  })
+
   describe(`${RundownTimelineService.prototype.takeNext.name}`, () => {
-    it('does not emit infinitePiecesUpdatedEvent unless piecess are changed', async () => {
+    it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async () => {
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
       const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [activePiece] })
@@ -150,7 +183,7 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.insertPartAsOnAir.name}`, () => {
-    it('does not emit infinitePiecesUpdatedEvent unless piecess are changed', async () => {
+    it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async () => {
       const aPiece: Piece = EntityTestFactory.createPiece({id: 'aPieceId'})
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })

@@ -44,7 +44,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
     const infinitePiecesAfterActivation: Map<string,Piece> = rundown.getInfinitePiecesMap()
-    if (this.doInfinitePiecesMapsDiffer(infinitePiecesBeforeActivation, infinitePiecesAfterActivation)) {
+    if (this.doInfinitePieceMapsDiffer(infinitePiecesBeforeActivation, infinitePiecesAfterActivation)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitActivateEvent(rundown)
@@ -70,24 +70,11 @@ export class RundownTimelineService implements RundownService {
     return timeline
   }
 
-  private doInfinitePiecesMapsDiffer(firstMap: Map<string, Piece>, secondMap: Map<string, Piece>): boolean {
-    if (firstMap === null && secondMap !== null) return true
-    if (firstMap !== null && secondMap === null) return true
-
-    if (firstMap !== null && secondMap !== null) {
-      if (firstMap.size !== secondMap.size) {
-        return true
-      }
-
-      for (const [firstMapKey, firstPiece] of firstMap) {
-        const secondPiece: Piece | undefined = secondMap.get(firstMapKey)
-        if (secondPiece === undefined || secondPiece.id !== firstPiece.id) {
-          return true
-        }
-      }
+  private doInfinitePieceMapsDiffer(firstInfinitePieceMap: Map<string, Piece>, secondInfinitePieceMap: Map<string, Piece>): boolean {
+    if (firstInfinitePieceMap.size !== secondInfinitePieceMap.size) {
+      return true
     }
-    // firstMap and secondMap are both null
-    return false
+    return [...firstInfinitePieceMap.entries()].some(([layer, piece]) => secondInfinitePieceMap.get(layer)?.id !== piece.id)
   }
   public async deactivateRundown(rundownId: string): Promise<void> {
     this.stopAutoNext()
@@ -133,7 +120,7 @@ export class RundownTimelineService implements RundownService {
     this.startAutoNext(timeline, rundownId)
 
     const infinitePiecesAfterStartAutoNext: Map<string,Piece> = rundown.getInfinitePiecesMap()
-    if (this.doInfinitePiecesMapsDiffer(infinitePiecesBeforeStartAutoNext, infinitePiecesAfterStartAutoNext)) {
+    if (this.doInfinitePieceMapsDiffer(infinitePiecesBeforeStartAutoNext, infinitePiecesAfterStartAutoNext)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitTakeEvent(rundown)
@@ -254,7 +241,7 @@ export class RundownTimelineService implements RundownService {
     await this.buildAndPersistTimeline(rundown)
 
     const infinitePiecesAfterInsertPieceAsOnAir: Map<string,Piece> = rundown.getInfinitePiecesMap()
-    if (this.doInfinitePiecesMapsDiffer(infinitePiecesBeforeInsertPieceAsOnAir, infinitePiecesAfterInsertPieceAsOnAir)) {
+    if (this.doInfinitePieceMapsDiffer(infinitePiecesBeforeInsertPieceAsOnAir, infinitePiecesAfterInsertPieceAsOnAir)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getActivePart())
