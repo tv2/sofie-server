@@ -1,0 +1,35 @@
+name: 'Publish Image'
+
+env:
+  node-version: '18'
+  node-package-manager: 'yarn'
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionTag:
+        description: 'Version tag (e.g. 46.3.1-staging)'
+        required: true
+        type: 'string'
+
+jobs:
+  publish-image-to-docker-hub:
+    name: 'Publish image to Docker Hub'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Retrieve repository files'
+        uses: 'actions/checkout@v4'
+
+      - name: 'Log in to Docker Hub'
+        uses: 'docker/login-action@v3'
+        with:
+          username: '${{ secrets.DOCKERHUB_USERNAME }}'
+          password: '${{ secrets.DOCKERHUB_PASSWORD }}'
+
+      - name: 'Build and publish Docker image'
+        uses: 'docker/build-push-action@v5'
+        with:
+          context: '.'
+          push: true
+          tags: |
+            tv2media/sofie-server:${{ inputs.versionTag }}

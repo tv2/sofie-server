@@ -4,9 +4,13 @@ import { DatabaseNotConnectedException } from '../../../model/exceptions/databas
 import { MongoId } from './mongo-entity-converter'
 import { Logger } from '../../../logger/logger'
 
-// TODO: Move to ENV variables
 const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
-const MONGO_DB_NAME: string = 'meteor'
+const MONGO_DB_NAME: string = getMongoDatabaseName()
+
+function getMongoDatabaseName(): string {
+  const mongoUrlPattern: RegExp = /^mongodb:\/\/\w+(:\d+)?\/(?<databaseName>[^/]+)/i
+  return mongoUrlPattern.exec(MONGO_CONNECTION_STRING)?.groups?.databaseName ?? 'meteor'
+}
 
 export class MongoDatabase {
   private static instance: MongoDatabase
