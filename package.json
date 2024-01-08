@@ -11,7 +11,7 @@
     "test-watch": "jest --watch --coverage",
     "lint": "eslint --ext .ts .",
     "lint-fix": "eslint --fix --ext .ts .",
-    "validate": "yarn audit --level moderate --groups dependencies",
+    "validate": "yarn audit --level moderate --groups dependencies --recursive",
     "clean": "rimraf dist",
     "reset": "rimraf --glob dist node_modules coverage *.log"
   },
