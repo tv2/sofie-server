@@ -41,7 +41,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.splitScreenActionFactory.isSplitScreenAction(action)) {
       return this.splitScreenActionFactory.getMutateActionMethods(action)
     }
-    if(this.remoteActionFactory.isRemoteAction(action)) {
+    if (this.remoteActionFactory.isRemoteAction(action)) {
       return this.remoteActionFactory.getMutateActionMethods(action)
     }
     if (this.audioActionFactory.isAudioAction(action)) {
