@@ -41,6 +41,7 @@ export class EntityMockFactory {
       activeSegment?: Segment
       nextSegment?: Segment
       infinitePieces?: Piece[]
+      infinitePiecesMap?: Map<string, Piece>
     } = {},
     rundownInterface?: Partial<RundownInterface>
   ): Rundown {
@@ -56,6 +57,7 @@ export class EntityMockFactory {
       activeSegment?: Segment
       nextSegment?: Segment
       infinitePieces?: Piece[]
+      infinitePiecesMap?: Map<string, Piece>
     } = {},
     rundownInterface?: Partial<RundownInterface>
   ): Rundown {
@@ -66,6 +68,7 @@ export class EntityMockFactory {
     when(mockedRundown.getActiveSegment()).thenReturn(activeRundownProperties.activeSegment ?? this.createSegment())
     when(mockedRundown.getNextSegment()).thenReturn(activeRundownProperties.nextSegment ?? this.createSegment())
     when(mockedRundown.getInfinitePieces()).thenReturn(activeRundownProperties.infinitePieces ?? [])
+    when(mockedRundown.getInfinitePiecesMap()).thenReturn(activeRundownProperties.infinitePiecesMap ?? new Map<string, Piece>([]))
     when(mockedRundown.isActivePartSet()).thenReturn(true)
 
     return mockedRundown
