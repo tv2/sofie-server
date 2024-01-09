@@ -8,7 +8,7 @@ import { HttpResponseFormatter } from '../../../presentation/interfaces/http-res
 
 describe(ConfigurationController.name, () => {
   describe(
-    ConfigurationController.prototype.postClearConfigurationCache.name,
+    ConfigurationController.prototype.clearConfigurationCache.name,
     () => {
       it('invokes repo method for clearing of configuration cache when posted', () => {
         const mockRequest: Request = mock<Request>()
@@ -28,7 +28,7 @@ describe(ConfigurationController.name, () => {
             instance(mockHttpResponseFormatter),
           )
 
-        configurationController.postClearConfigurationCache(
+        configurationController.clearConfigurationCache(
           mockRequest,
           mockResponse,
         )

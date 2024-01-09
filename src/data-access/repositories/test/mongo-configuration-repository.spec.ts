@@ -12,7 +12,7 @@ describe(MongoConfigurationRepository.name, () => {
         instance(mockStudioRepository),
         instance(mockShowStyleRepository)
       )
-      expect(()=>aMongoConfigurationRepository.clearConfigurationCache()).toThrow('Method not applicable.')
+      expect(() => aMongoConfigurationRepository.clearConfigurationCache()).toThrow('Method not applicable.')
     })
   })
 })
