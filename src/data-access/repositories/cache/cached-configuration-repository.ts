@@ -21,4 +21,8 @@ export class CachedConfigurationRepository implements ConfigurationRepository {
     }
     return this.cachedConfiguration
   }
+
+  public clearConfigurationCache(): void {
+    this.cachedConfiguration = undefined
+  }
 }
