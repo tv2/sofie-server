@@ -22,11 +22,21 @@ export class ActionController extends BaseController {
     super()
   }
 
+  @GetRequest()
+  public async getActions(_request: Request, response: Response): Promise<void> {
+    try {
+      const actions: Action[] = await this.actionService.getActions()
+      response.send(this.httpResponseFormatter.formatSuccessResponse(actions.map(action => new ActionDto(action))))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
   @GetRequest('/rundowns/:rundownId')
-  public async getActions(request: Request, response: Response): Promise<void> {
+  public async getActionsForRundown(request: Request, response: Response): Promise<void> {
     try {
       const rundownId: string = request.params.rundownId
-      const actions: Action[] = await this.actionService.getActions(rundownId)
+      const actions: Action[] = await this.actionService.getActionsForRundown(rundownId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(actions.map(action => new ActionDto(action))))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
