@@ -103,6 +103,10 @@ export interface MongoIngestedPiece extends MongoId {
   isUnsynced: boolean
 }
 
+export interface MongoIngestedMedia extends MongoId {
+  mediaId: string
+}
+
 export class MongoIngestedEntityConverter {
 
   public convertToIngestedRundown(mongoRundown: MongoIngestedRundown): IngestedRundown {

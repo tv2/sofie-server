@@ -18,6 +18,7 @@ import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { BasicRundown } from '../../model/entities/basic-rundown'
 import { Logger } from '../../logger/logger'
+import {IngestedMedia} from '../../model/entities/ingested-media'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
@@ -37,7 +38,8 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
-    partChangedListener: DataChangedListener<IngestedPart>
+    partChangedListener: DataChangedListener<IngestedPart>,
+    mediaChangedListener: DataChangedListener<IngestedMedia>
   ): IngestChangeService {
     if (!this.instance) {
       this.instance = new DatabaseChangeIngestService(
@@ -52,7 +54,8 @@ export class DatabaseChangeIngestService implements IngestChangeService {
         logger,
         rundownChangeListener,
         segmentChangedListener,
-        partChangedListener
+        partChangedListener,
+        mediaChangedListener
       )
     }
     return this.instance
@@ -79,13 +82,15 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
-    partChangedListener: DataChangedListener<IngestedPart>
+    partChangedListener: DataChangedListener<IngestedPart>,
+    mediaChangedListener: DataChangedListener<IngestedMedia>
   ) {
     this.logger = logger.tag(DatabaseChangeIngestService.name)
 
     this.listenForRundownChanges(rundownChangeListener)
     this.listenForSegmentChanges(segmentChangedListener)
     this.listenForPartChanges(partChangedListener)
+    this.listenForMediaChanges(mediaChangedListener)
 
     this.enqueueEvent(0, () => this.synchronizeEntitiesWithIngestedEntities())
   }
@@ -106,6 +111,12 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     partChangedListener.onCreated(part => this.enqueueEvent(3, () => this.createPart(part)))
     partChangedListener.onUpdated(part => this.enqueueEvent(4, () => this.updatePart(part)))
     partChangedListener.onDeleted(partId => this.enqueueEvent(7, () => this.deletePart(partId)))
+  }
+
+  private listenForMediaChanges(mediaChangedListener: DataChangedListener<IngestedMedia>): void {
+    mediaChangedListener.onCreated(media => this.enqueueEvent(10, () => this.createMedia(media)))
+    mediaChangedListener.onUpdated( media => this.enqueueEvent(16, () => this.updateMedia(media)))
+    mediaChangedListener.onDeleted( mediaId => this.enqueueEvent(19, () => this.deleteMedia(mediaId)))
   }
 
   private async synchronizeEntitiesWithIngestedEntities(): Promise<void> {
@@ -404,5 +415,17 @@ export class DatabaseChangeIngestService implements IngestChangeService {
       await this.partRepository.delete(removedPart.id)
     }
     await this.persistRundown(rundown)
+  }
+
+  private async createMedia(media: IngestedMedia): Promise<void> {
+    console.log('created: ', media)
+  }
+
+  private async updateMedia(media: IngestedMedia): Promise<void> {
+    console.log('updated: ', media)
+  }
+
+  private async deleteMedia(mediaId: string): Promise<void> {
+    console.log('deleted: ', mediaId)
   }
 }

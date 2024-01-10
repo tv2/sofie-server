@@ -78,7 +78,8 @@ export class ServiceFacade {
       LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
-      RepositoryFacade.createIngestedPartChangedListener()
+      RepositoryFacade.createIngestedPartChangedListener(),
+      RepositoryFacade.createIngestedMediaChangedListener()
     )
   }
 

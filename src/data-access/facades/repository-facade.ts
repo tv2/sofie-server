@@ -53,6 +53,8 @@ import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action
 import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
 import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
 import { LoggerFacade } from '../../logger/logger-facade'
+import {IngestedMedia} from '../../model/entities/ingested-media'
+import {MongoIngestedMediaChangedListener} from '../repositories/mongo/mongo-ingested-media-changed-listener'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -136,6 +138,13 @@ export class RepositoryFacade {
     return new MongoIngestedPartChangedListener(
       RepositoryFacade.getMongoDatabaseInstance(),
       RepositoryFacade.createIngestedPartRepository(),
+      LoggerFacade.createLogger()
+    )
+  }
+
+  public static createIngestedMediaChangedListener(): DataChangedListener<IngestedMedia> {
+    return new MongoIngestedMediaChangedListener(
+      RepositoryFacade.getMongoDatabaseInstance(),
       LoggerFacade.createLogger()
     )
   }
