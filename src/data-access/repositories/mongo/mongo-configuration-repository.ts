@@ -4,6 +4,7 @@ import { StudioRepository } from '../interfaces/studio-repository'
 import { ShowStyleRepository } from '../interfaces/show-style-repository'
 import { ShowStyle } from '../../../model/entities/show-style'
 import { Studio } from '../../../model/entities/studio'
+import {UnsupportedOperationException} from '../../../model/exceptions/unsupported-operation-exception'
 
 // Sofie currently only uses one hardcoded studio.
 const STUDIO_ID: string = 'studio0'
@@ -16,6 +17,10 @@ export class MongoConfigurationRepository implements ConfigurationRepository {
     private readonly studioRepository: StudioRepository,
     private readonly showStyleRepository: ShowStyleRepository
   ) {
+  }
+
+  public clearConfigurationCache(): void {
+    throw new UnsupportedOperationException('Method not applicable.')
   }
 
   public async getConfiguration(): Promise<Configuration> {
