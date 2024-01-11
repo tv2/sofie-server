@@ -4,6 +4,7 @@ import { Action } from '../../../model/entities/action'
 import { MongoDatabase } from './mongo-database'
 import { DeleteResult } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const COLLECTION_NAME: string = 'actions'
 
@@ -19,7 +20,11 @@ export class MongoActionRepository extends BaseMongoRepository implements Action
 
   public async getAction(actionId: string): Promise<Action> {
     this.assertDatabaseConnection(this.getAction.name)
-    return await this.getCollection().findOne({id: actionId}) as unknown as Action
+    const action: Action | null = await this.getCollection().findOne<Action>({ id: actionId })
+    if (action === null) {
+      throw new NotFoundException(`No Action found for ActionId ${actionId}`)
+    }
+    return action
   }
 
   public async saveActions(actions: Action[]): Promise<void> {
