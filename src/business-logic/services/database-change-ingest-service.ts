@@ -18,7 +18,7 @@ import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { BasicRundown } from '../../model/entities/basic-rundown'
 import { Logger } from '../../logger/logger'
-import {IngestedMedia} from '../../model/entities/ingested-media'
+import { Media } from '../../model/entities/media'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
@@ -39,7 +39,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>,
-    mediaChangedListener: DataChangedListener<IngestedMedia>
+    mediaChangedListener: DataChangedListener<Media>
   ): IngestChangeService {
     if (!this.instance) {
       this.instance = new DatabaseChangeIngestService(
@@ -83,7 +83,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>,
-    mediaChangedListener: DataChangedListener<IngestedMedia>
+    mediaChangedListener: DataChangedListener<Media>
   ) {
     this.logger = logger.tag(DatabaseChangeIngestService.name)
 
@@ -113,7 +113,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     partChangedListener.onDeleted(partId => this.enqueueEvent(7, () => this.deletePart(partId)))
   }
 
-  private listenForMediaChanges(mediaChangedListener: DataChangedListener<IngestedMedia>): void {
+  private listenForMediaChanges(mediaChangedListener: DataChangedListener<Media>): void {
     mediaChangedListener.onCreated(media => this.enqueueEvent(10, () => this.createMedia(media)))
     mediaChangedListener.onUpdated( media => this.enqueueEvent(16, () => this.updateMedia(media)))
     mediaChangedListener.onDeleted( mediaId => this.enqueueEvent(19, () => this.deleteMedia(mediaId)))
@@ -417,15 +417,18 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     await this.persistRundown(rundown)
   }
 
-  private async createMedia(media: IngestedMedia): Promise<void> {
+  private async createMedia(media: Media): Promise<void> {
+    // TODO: If media is added that relates to a Piece/Pieces, fiind the corresponding Part/Parts and emit updated events
     console.log('created: ', media)
   }
 
-  private async updateMedia(media: IngestedMedia): Promise<void> {
+  private async updateMedia(media: Media): Promise<void> {
+    // TODO: Find all pieces that correspond to the given media, replace their mediaInformation and send Part updated events
     console.log('updated: ', media)
   }
 
   private async deleteMedia(mediaId: string): Promise<void> {
+    // TODO: Find alle pieces that make use of the deleted media, set mediaInformation to undefined and update part
     console.log('deleted: ', mediaId)
   }
 }
