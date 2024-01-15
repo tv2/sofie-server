@@ -108,6 +108,7 @@ export class EntityMockFactory {
     when(mockedSegment.isNext()).thenReturn(segmentInterface.isNext ?? false)
     when(mockedSegment.isOnAir()).thenReturn(segmentInterface.isOnAir ?? false)
     when(mockedSegment.rank).thenReturn(segmentInterface.rank ?? 1)
+    when(mockedSegment.isHidden).thenReturn(segmentInterface.isHidden ?? false)
     when(mockedSegment.rundownId).thenReturn(segmentInterface.rundownId ?? 'rundownId')
     when(mockedSegment.getParts()).thenReturn(segmentInterface.parts ?? [])
 
