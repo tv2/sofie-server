@@ -57,6 +57,8 @@ export interface MongoSegment extends MongoId {
   rundownId: string
   name: string
   rank: number
+  isHidden: boolean
+  metadata?: unknown
   partIds: string[]
   isOnAir: boolean
   isNext: boolean
@@ -267,6 +269,8 @@ export class MongoEntityConverter {
       rundownId: segment.rundownId,
       name: segment.name,
       rank: segment.rank,
+      isHidden: segment.isHidden,
+      metadata: segment.metadata,
       partIds: segment.getParts().map(part => part.id),
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
