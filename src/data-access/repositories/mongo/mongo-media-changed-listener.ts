@@ -7,7 +7,7 @@ import {
   ChangeStreamDeleteDocument,
   ChangeStreamDocument,
   ChangeStreamInsertDocument,
-  ChangeStreamOptions, ChangeStreamReplaceDocument
+  ChangeStreamOptions, ChangeStreamReplaceDocument, ChangeStreamUpdateDocument
 } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
 import {MongoMedia} from './mongo-entity-converter'
@@ -51,7 +51,6 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
         const insertChange: ChangeStreamInsertDocument<MongoMedia> = change as ChangeStreamInsertDocument<MongoMedia>
         const mongoMediaId: string = insertChange.fullDocument.mediaId
         const media: Media | undefined = await this.mediaRepository.getMedia(mongoMediaId)
-        console.log('INSERT', mongoMediaId, media)
         if (media) {
           void this.onCreatedCallback(media)
         }
@@ -64,18 +63,24 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
         break
       }
       case MongoChangeEvent.REPLACE: {
-        console.log('REPLACE')
         const replaceChange: ChangeStreamReplaceDocument<MongoMedia> = change as ChangeStreamReplaceDocument<MongoMedia>
         const mongoMediaId: string = replaceChange.fullDocument.mediaId
         const media: Media | undefined = await this.mediaRepository.getMedia(mongoMediaId)
-        console.log('INSERT', mongoMediaId, media)
         if (media) {
           void this.onUpdateCallback(media)
         }
         break
       }
       case MongoChangeEvent.UPDATE: {
-        // TODO: Do we need these?
+        const updateChange: ChangeStreamUpdateDocument<MongoMedia> = change as ChangeStreamUpdateDocument<MongoMedia>
+        const mongoMediaId: string | undefined = updateChange.fullDocument?.mediaId
+        if (!mongoMediaId) {
+          break
+        }
+        const media: Media | undefined = await this.mediaRepository.getMedia(mongoMediaId)
+        if (media) {
+          void this.onUpdateCallback(media)
+        }
         break
       }
     }

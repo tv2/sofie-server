@@ -74,6 +74,7 @@ export class ServiceFacade {
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       EventEmitterFacade.createRundownEventEmitter(),
+      EventEmitterFacade.createMediaEventEmitter(),
       new IngestedEntityToEntityMapper(),
       LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),

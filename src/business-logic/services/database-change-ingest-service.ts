@@ -3,6 +3,7 @@ import { RundownRepository } from '../../data-access/repositories/interfaces/run
 import { Rundown } from '../../model/entities/rundown'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
 import { RundownEventEmitter } from './interfaces/rundown-event-emitter'
+import { MediaEventEmitter } from './interfaces/media-event-emitter'
 import { Segment } from '../../model/entities/segment'
 import { TimelineBuilder } from './interfaces/timeline-builder'
 import { TimelineRepository } from '../../data-access/repositories/interfaces/timeline-repository'
@@ -20,6 +21,7 @@ import { BasicRundown } from '../../model/entities/basic-rundown'
 import { Logger } from '../../logger/logger'
 import { Media } from '../../model/entities/media'
 
+
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
 export class DatabaseChangeIngestService implements IngestChangeService {
@@ -34,6 +36,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     timelineRepository: TimelineRepository,
     timelineBuilder: TimelineBuilder,
     eventEmitter: RundownEventEmitter,
+    mediaEventEmitter: MediaEventEmitter,
     ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
@@ -50,6 +53,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
         timelineRepository,
         timelineBuilder,
         eventEmitter,
+        mediaEventEmitter,
         ingestedEntityToEntityMapper,
         logger,
         rundownChangeListener,
@@ -78,6 +82,7 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly eventEmitter: RundownEventEmitter,
+    private readonly mediaEventEmitter: MediaEventEmitter,
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
@@ -417,18 +422,18 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     await this.persistRundown(rundown)
   }
 
-  private async createMedia(media: Media): Promise<void> {
-    // TODO: If media is added that relates to a Piece/Pieces, fiind the corresponding Part/Parts and emit updated events
-    console.log('created: ', media)
+  private createMedia(media: Media): Promise<void> {
+    this.mediaEventEmitter.emitMediaCreated(media)
+    return Promise.resolve()
   }
 
   private async updateMedia(media: Media): Promise<void> {
-    // TODO: Find all pieces that correspond to the given media, replace their mediaInformation and send Part updated events
-    console.log('updated: ', media)
+    this.mediaEventEmitter.emitMediaUpdated(media)
+    return Promise.resolve()
   }
 
   private async deleteMedia(mediaId: string): Promise<void> {
-    // TODO: Find alle pieces that make use of the deleted media, set mediaInformation to undefined and update part
-    console.log('deleted: ', mediaId)
+    this.mediaEventEmitter.emitMediaDeleted(mediaId)
+    return Promise.resolve()
   }
 }

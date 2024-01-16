@@ -7,6 +7,8 @@ import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
 import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
 import { Logger } from '../../logger/logger'
+import {MediaEventObserver} from '../interfaces/media-event-observer'
+import {MediaEvent} from '../value-objects/media-event'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer
@@ -14,10 +16,11 @@ export class WebSocketEventServer implements EventServer {
   public static getInstance(
     rundownEventObserver: RundownEventObserver,
     actionTriggerEventObserver: ActionTriggerEventObserver,
+    mediaEventObserver: MediaEventObserver,
     logger: Logger
   ): EventServer {
     if (!this.instance) {
-      this.instance = new WebSocketEventServer(rundownEventObserver, actionTriggerEventObserver, logger)
+      this.instance = new WebSocketEventServer(rundownEventObserver, actionTriggerEventObserver, mediaEventObserver, logger)
     }
     return this.instance
   }
@@ -28,6 +31,7 @@ export class WebSocketEventServer implements EventServer {
   private constructor(
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionTriggerEventObserver: ActionTriggerEventObserver,
+    private readonly mediaEventObserver: MediaEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -77,6 +81,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.actionTriggerEventObserver.subscribeToActionTriggerEvents((actionTriggerEvent: ActionTriggerEvent) => {
       webSocket.send(JSON.stringify(actionTriggerEvent))
+    })
+    this.mediaEventObserver.subscribeToMediaEvents((mediaEvent: MediaEvent) => {
+      webSocket.send(JSON.stringify(mediaEvent))
     })
   }
 
