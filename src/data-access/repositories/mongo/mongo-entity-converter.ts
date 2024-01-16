@@ -121,6 +121,9 @@ export interface MongoTimeline extends MongoId {
 }
 
 export interface MongoStudio {
+  settings: {
+    mediaPreviewsUrl: string
+  }
   mappings: MongoLayerMappings
   blueprintConfig: unknown
 }
@@ -392,7 +395,13 @@ export class MongoEntityConverter {
         maximumLookaheadSearchDistance: mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookaheadDistance,
       })
     }
-    return { layers, blueprintConfiguration: mongoStudio.blueprintConfig }
+    return {
+      settings: {
+        mediaPreviewUrl: mongoStudio.settings.mediaPreviewsUrl
+      },
+      layers,
+      blueprintConfiguration: mongoStudio.blueprintConfig
+    }
   }
 
   private mapLookaheadNumberToEnum(lookAheadNumber: number): LookaheadMode {
