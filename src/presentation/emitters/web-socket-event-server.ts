@@ -7,8 +7,8 @@ import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
 import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
 import { Logger } from '../../logger/logger'
-import {MediaEventObserver} from '../interfaces/media-event-observer'
-import {MediaEvent} from '../value-objects/media-event'
+import { MediaEventObserver } from '../interfaces/media-event-observer'
+import { MediaEvent } from '../value-objects/media-event'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer

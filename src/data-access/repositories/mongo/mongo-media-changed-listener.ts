@@ -10,9 +10,9 @@ import {
   ChangeStreamOptions, ChangeStreamReplaceDocument, ChangeStreamUpdateDocument
 } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
-import {MongoMedia} from './mongo-entity-converter'
-import {Media} from '../../../model/entities/media'
-import {MediaRepository} from '../interfaces/MediaRepository'
+import { MongoMedia } from './mongo-entity-converter'
+import { Media } from '../../../model/entities/media'
+import { MediaRepository } from '../interfaces/MediaRepository'
 
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'

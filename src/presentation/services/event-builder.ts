@@ -1,5 +1,5 @@
-import {RundownEventBuilder} from '../interfaces/rundown-event-builder'
-import {Rundown} from '../../model/entities/rundown'
+import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
+import { Rundown } from '../../model/entities/rundown'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
@@ -22,27 +22,27 @@ import {
   SegmentUnsyncedEvent,
   SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
-import {Piece} from '../../model/entities/piece'
-import {Part} from '../../model/entities/part'
-import {PartDto} from '../dtos/part-dto'
-import {PieceDto} from '../dtos/piece-dto'
-import {ActionTriggerEventType, IngestEventType, RundownEventType} from '../enums/rundown-event-type'
-import {SegmentDto} from '../dtos/segment-dto'
-import {Segment} from '../../model/entities/segment'
-import {BasicRundownDto} from '../dtos/basic-rundown-dto'
-import {ActionTriggerEventBuilder} from '../interfaces/action-trigger-event-builder'
-import {ActionTrigger} from '../../model/entities/action-trigger'
+import { Piece } from '../../model/entities/piece'
+import { Part } from '../../model/entities/part'
+import { PartDto } from '../dtos/part-dto'
+import { PieceDto } from '../dtos/piece-dto'
+import { ActionTriggerEventType, IngestEventType, RundownEventType } from '../enums/rundown-event-type'
+import { SegmentDto } from '../dtos/segment-dto'
+import { Segment } from '../../model/entities/segment'
+import { BasicRundownDto } from '../dtos/basic-rundown-dto'
+import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
+import { ActionTrigger } from '../../model/entities/action-trigger'
 import {
   ActionTriggerCreatedEvent,
   ActionTriggerDeletedEvent,
   ActionTriggerUpdatedEvent
 } from '../value-objects/action-trigger-event'
-import {ActionTriggerDto} from '../dtos/action-trigger-dto'
-import {RundownDto} from '../dtos/rundown-dto'
-import {Media} from '../../model/entities/media'
-import {MediaDto} from '../dtos/media-dto'
-import {MediaEventBuilder} from '../interfaces/media-event-builder'
-import {MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent} from '../value-objects/media-event'
+import { ActionTriggerDto } from '../dtos/action-trigger-dto'
+import { RundownDto } from '../dtos/rundown-dto'
+import { Media } from '../../model/entities/media'
+import { MediaDto } from '../dtos/media-dto'
+import { MediaEventBuilder } from '../interfaces/media-event-builder'
+import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
 
 export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder {
 
