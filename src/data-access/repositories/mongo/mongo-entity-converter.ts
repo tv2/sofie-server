@@ -430,7 +430,6 @@ export class MongoEntityConverter {
     return {
       id: mongoMedia.id,
       mediaId: mongoMedia.mediaId,
-      filePath: mongoMedia.mediaPath,
       duration: mongoMedia.mediainfo.format.duration
     }
   }
