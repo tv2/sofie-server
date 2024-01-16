@@ -2,6 +2,7 @@ import { Rundown, RundownInterface } from '../rundown'
 import { Segment, SegmentInterface } from '../segment'
 import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
+import { PieceLifespan } from '../../enums/piece-lifespan'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -49,6 +50,7 @@ export class EntityTestFactory {
       name: 'pieceName',
       duration: 420,
       start: 0,
+      pieceLifespan: PieceLifespan.WITHIN_PART,
       ...pieceInterface
     } as PieceInterface)
   }
