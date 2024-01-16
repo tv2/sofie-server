@@ -153,9 +153,9 @@ interface MongoLayerMapping {
 
 export interface MongoMedia {
   mediaId: string
-  mediainfo: {
-    format: {
-      duration: number
+  mediainfo?: {
+    format?: {
+      duration?: number
     }
   }
 }
@@ -440,7 +440,7 @@ export class MongoEntityConverter {
   public convertMedia(mongoMedia: MongoMedia): Media {
     return {
       id: mongoMedia.mediaId,
-      duration: mongoMedia.mediainfo.format.duration
+      duration: mongoMedia.mediainfo?.format?.duration ?? 0
     }
   }
 }
