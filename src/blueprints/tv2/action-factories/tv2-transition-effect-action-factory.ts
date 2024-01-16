@@ -63,10 +63,20 @@ export class Tv2TransitionEffectActionFactory {
 
   public createTransitionEffectActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return [
-      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT),
-      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE),
-      this.createEmptyDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource),
-      this.createEmptyDipTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource),
+      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, 'Mix transition on next Take', 'Applies a Mix transition on next Take'),
+      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, 'Take with Mix transition', 'Applies a Mix transition and does Take'),
+      this.createEmptyDipTransitionEffectAction(
+        PieceActionType.INSERT_PIECE_AS_NEXT, 
+        blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource, 
+        'Dip transition on next Take', 
+        'Applies a Dip transition on next Take'
+      ),
+      this.createEmptyDipTransitionEffectAction(
+        PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, 
+        blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource, 
+        'Take with Dip transition', 
+        'Applies a Dip transition and does Take'
+      ),
       ...blueprintConfiguration.showStyle.breakerTransitionEffectConfigurations.flatMap(transitionEffect => {
         return [
           this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
@@ -180,7 +190,7 @@ export class Tv2TransitionEffectActionFactory {
    * Creates an "empty" Mix transition effect Action.
    * The Action will be "populated" with a PieceInterface from the APPLY ARGUMENTS mutateActionMethod where it will also get the transition duration as an argument.
    */
-  private createEmptyMixTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
+  private createEmptyMixTransitionEffectAction(actionType: PieceActionType, name: string, description: string): Tv2TransitionEffectAction {
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.MIX,
@@ -188,8 +198,8 @@ export class Tv2TransitionEffectActionFactory {
     }
     return {
       id: `mix_transition_action_${actionType.toString()}`,
-      name: 'Mix',
-      description: 'Applies a Mix Transition Effect',
+      name,
+      description,
       type: actionType,
       data: {
         pieceInterface: {} as PieceInterface
@@ -207,7 +217,7 @@ export class Tv2TransitionEffectActionFactory {
    * Creates an "empty" Dip transition effect Action.
    * The Action will be "populated" with a PieceInterface from the APPLY ARGUMENTS mutateActionMethod where it will also get the transition duration as an argument.
    */
-  private createEmptyDipTransitionEffectAction(actionType: PieceActionType, dipInputSource: number): Tv2TransitionEffectAction {
+  private createEmptyDipTransitionEffectAction(actionType: PieceActionType, dipInputSource: number, name: string, description: string): Tv2TransitionEffectAction {
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.DIP,
@@ -216,8 +226,8 @@ export class Tv2TransitionEffectActionFactory {
     }
     return {
       id: `dip_transition_action_${actionType.toString()}`,
-      name: 'Dip',
-      description: 'Applies a Dip Transition Effect',
+      name,
+      description,
       type: actionType,
       data: {
         pieceInterface: {} as PieceInterface
