@@ -12,7 +12,7 @@ import {
   UnscheduledRundownTiming
 } from '../../../model/value-objects/rundown-timing'
 import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
-import {MongoId } from './mongo-entity-converter'
+import { MongoId } from './mongo-entity-converter'
 
 export interface MongoIngestedRundown extends MongoId {
   name: string
