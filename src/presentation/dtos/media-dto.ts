@@ -1,8 +1,8 @@
 import { Media } from '../../model/entities/media'
 
 export class MediaDto {
-  public readonly mediaName: string
+  public readonly sourceName: string
   constructor(media: Media) {
-    this.mediaName = media.mediaName
+    this.sourceName = media.sourceName
   }
 }

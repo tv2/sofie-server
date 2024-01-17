@@ -428,7 +428,7 @@ export class MongoEntityConverter {
   public convertMedia(mongoMedia: MongoMedia): Media {
     return {
       id: mongoMedia._id,
-      mediaName: mongoMedia.mediaId,
+      sourceName: mongoMedia.mediaId,
       duration: mongoMedia.mediainfo.format.duration
     }
   }
