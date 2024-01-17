@@ -427,12 +427,12 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     return Promise.resolve()
   }
 
-  private async updateMedia(media: Media): Promise<void> {
+  private updateMedia(media: Media): Promise<void> {
     this.mediaEventEmitter.emitMediaUpdated(media)
     return Promise.resolve()
   }
 
-  private async deleteMedia(mediaId: string): Promise<void> {
+  private deleteMedia(mediaId: string): Promise<void> {
     this.mediaEventEmitter.emitMediaDeleted(mediaId)
     return Promise.resolve()
   }
