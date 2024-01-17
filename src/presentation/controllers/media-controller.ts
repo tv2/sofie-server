@@ -6,6 +6,7 @@ import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { Media } from '../../model/entities/media'
 import { Exception } from '../../model/exceptions/exception'
 import { NotFoundException } from '../../model/exceptions/not-found-exception'
+import { MediaDto } from '../dtos/media-dto'
 
 @RestController('/media')
 export class MediaController extends BaseController {
@@ -22,7 +23,7 @@ export class MediaController extends BaseController {
   public async getMedia(_request: Request, response: Response): Promise<void> {
     try {
       const media: Media[] = await this.mediaRepository.getMedia()
-      response.send(this.httpResponseFormatter.formatSuccessResponse(media))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(media.map(m => new MediaDto(m))))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -36,7 +37,7 @@ export class MediaController extends BaseController {
       if (!media) {
         throw new NotFoundException(`No Media for found for MediaId ${mediaId}`)
       }
-      response.send(this.httpResponseFormatter.formatSuccessResponse(media))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(new MediaDto(media)))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
