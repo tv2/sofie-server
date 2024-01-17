@@ -1,5 +1,5 @@
 export interface Media {
   id: string
-  mediaId: string
+  mediaName: string
   duration?: number
 }

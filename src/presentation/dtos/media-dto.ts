@@ -1,9 +1,8 @@
-import {Media} from '../../model/entities/media'
-
+import { Media } from '../../model/entities/media'
 
 export class MediaDto {
-  public readonly mediaId: string
+  public readonly mediaName: string
   constructor(media: Media) {
-    this.mediaId = media.mediaId
+    this.mediaName = media.mediaName
   }
 }

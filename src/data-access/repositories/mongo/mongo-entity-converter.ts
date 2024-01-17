@@ -147,7 +147,6 @@ interface MongoLayerMapping {
 }
 
 export interface MongoMedia extends MongoId {
-  id: string
   mediaId: string
   mediaPath: string
   mediainfo: {
@@ -428,8 +427,8 @@ export class MongoEntityConverter {
 
   public convertMedia(mongoMedia: MongoMedia): Media {
     return {
-      id: mongoMedia.id,
-      mediaId: mongoMedia.mediaId,
+      id: mongoMedia._id,
+      mediaName: mongoMedia.mediaId,
       duration: mongoMedia.mediainfo.format.duration
     }
   }
