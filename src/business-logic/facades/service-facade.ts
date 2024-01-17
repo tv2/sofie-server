@@ -80,7 +80,7 @@ export class ServiceFacade {
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
       RepositoryFacade.createIngestedPartChangedListener(),
-      RepositoryFacade.createIngestedMediaChangedListener()
+      RepositoryFacade.createMediaChangedListener()
     )
   }
 

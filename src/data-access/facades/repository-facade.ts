@@ -142,7 +142,7 @@ export class RepositoryFacade {
     )
   }
 
-  public static createIngestedMediaChangedListener(): DataChangedListener<Media> {
+  public static createMediaChangedListener(): DataChangedListener<Media> {
     return new MongoMediaChangedListener(
       RepositoryFacade.getMongoDatabaseInstance(),
       LoggerFacade.createLogger(),

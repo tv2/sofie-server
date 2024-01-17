@@ -14,7 +14,6 @@ import { MongoMedia } from './mongo-entity-converter'
 import { Media } from '../../../model/entities/media'
 import { MediaRepository } from '../interfaces/MediaRepository'
 
-
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 
 export class MongoMediaChangedListener extends BaseMongoRepository implements DataChangedListener<Media> {
