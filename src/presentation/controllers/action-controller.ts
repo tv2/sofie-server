@@ -22,11 +22,21 @@ export class ActionController extends BaseController {
     super()
   }
 
+  @GetRequest()
+  public async getActions(_request: Request, response: Response): Promise<void> {
+    try {
+      const actions: Action[] = await this.actionService.getActions()
+      response.send(this.httpResponseFormatter.formatSuccessResponse(actions.map(action => new ActionDto(action))))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
   @GetRequest('/rundowns/:rundownId')
-  public async getActions(request: Request, response: Response): Promise<void> {
+  public async getActionsForRundown(request: Request, response: Response): Promise<void> {
     try {
       const rundownId: string = request.params.rundownId
-      const actions: Action[] = await this.actionService.getActions(rundownId)
+      const actions: Action[] = await this.actionService.getActionsForRundown(rundownId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(actions.map(action => new ActionDto(action))))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
@@ -42,7 +52,7 @@ export class ActionController extends BaseController {
       const actionId: string = request.params.actionId
       const rundownId: string = request.params.rundownId
       const body: ExecuteActionRequestBody = request.body
-      await this.actionService.executeAction(actionId, rundownId, body.actionArguments)
+      await this.actionService.executeAction(actionId, rundownId, body.actionArguments ?? undefined)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully executed action: ${actionId} on Rundown: ${rundownId}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
