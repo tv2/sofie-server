@@ -116,8 +116,11 @@ export class Rundown extends BasicRundown {
   }
 
   private findFirstSegment(): Segment {
-    return this.segments
-      .filter(segment => this.isSegmentValidForRundownExecution(segment))[0]
+    const segment: Segment | undefined = this.segments.find(segment => this.isSegmentValidForRundownExecution(segment))
+    if (!segment) {
+      throw new NotFoundException(`Unable to find first valid Segment for Rundown ${this.id}`)
+    }
+    return segment
   }
 
   private isSegmentValidForRundownExecution(segment: Segment): boolean {
@@ -145,9 +148,9 @@ export class Rundown extends BasicRundown {
         const segment: Segment = this.findNextValidSegment()
         this.nextCursor = this.createCursor(this.nextCursor, { segment, part: segment.findFirstPart(), owner })
         this.markNextSegment()
-      } catch (err) {
-        if (!(err instanceof LastSegmentInRundownException)) {
-          throw err
+      } catch (error) {
+        if (!(error instanceof LastSegmentInRundownException)) {
+          throw error
         }
         // TODO: Notify about last Segment.
       }
