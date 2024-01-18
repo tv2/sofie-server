@@ -1,7 +1,5 @@
 import { Segment } from './segment'
 import { Part } from './part'
-import { Exception } from '../exceptions/exception'
-import { ErrorCode } from '../enums/error-code'
 import { LastPartInSegmentException } from '../exceptions/last-part-in-segment-exception'
 import { NotFoundException } from '../exceptions/not-found-exception'
 import { NotActivatedException } from '../exceptions/not-activated-exception'
@@ -18,7 +16,7 @@ import { UnsupportedOperationException } from '../exceptions/unsupported-operati
 import { RundownCursor } from '../value-objects/rundown-cursor'
 import { Owner } from '../enums/owner'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
-import { LastSegmentInRundown } from '../exceptions/last-segment-in-rundown'
+import { LastSegmentInRundownException } from '../exceptions/last-segment-in-rundown-exception'
 import { NoPartInHistoryException } from '../exceptions/no-part-in-history-exception'
 import { OnAirException } from '../exceptions/on-air-exception'
 import { RundownTiming } from '../value-objects/rundown-timing'
@@ -118,9 +116,15 @@ export class Rundown extends BasicRundown {
   }
 
   private findFirstSegment(): Segment {
-    return this.segments.reduce((previousSegment: Segment, currentSegment: Segment) => {
-      return previousSegment.rank < currentSegment.rank ? previousSegment : currentSegment
-    })
+    const segment: Segment | undefined = this.segments.find(segment => this.isSegmentValidForRundownExecution(segment))
+    if (!segment) {
+      throw new NotFoundException(`Unable to find first valid Segment for Rundown ${this.id}`)
+    }
+    return segment
+  }
+
+  private isSegmentValidForRundownExecution(segment: Segment): boolean {
+    return !segment.isHidden && segment.getParts().length > 0
   }
 
   private setNextFromActive(owner: Owner): void {
@@ -135,15 +139,20 @@ export class Rundown extends BasicRundown {
       const nextSegment: Segment | undefined = this.segments.find(segment => segment.id === nextPart.getSegmentId())
       this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextPart, owner })
     } catch (exception) {
-      if ((exception as Exception).errorCode !== ErrorCode.LAST_PART_IN_SEGMENT) {
+      if (!(exception instanceof LastPartInSegmentException)) {
         throw exception
       }
       this.unmarkNextSegment()
-      const segment: Segment = this.findNextSegment()
-      // TODO: Handle that we might be on the last Segment
-      if (segment) {
+      // TODO: Refactor to use less nesting
+      try {
+        const segment: Segment = this.findNextValidSegment()
         this.nextCursor = this.createCursor(this.nextCursor, { segment, part: segment.findFirstPart(), owner })
         this.markNextSegment()
+      } catch (error) {
+        if (!(error instanceof LastSegmentInRundownException)) {
+          throw error
+        }
+        // TODO: Notify about last Segment.
       }
     }
 
@@ -178,15 +187,18 @@ export class Rundown extends BasicRundown {
     this.nextCursor.part.setAsNext()
   }
 
-  private findNextSegment(): Segment {
+  private findNextValidSegment(): Segment {
     const activeSegmentIndex: number = this.segments.findIndex((segment) => segment.id === this.activeCursor?.segment?.id)
     if (activeSegmentIndex === -1) {
-      throw new NotFoundException('Segment does not exist in Rundown')
+      throw new NotFoundException('Active Segment does not exist in Rundown')
     }
-    if (activeSegmentIndex === this.segments.length + 1) {
-      throw new LastSegmentInRundown(`Segment: ${this.activeCursor?.segment?.id} is the last Segment of Rundown: ${this.id}`)
+
+    const nextValidSegment: Segment | undefined = this.segments.slice(activeSegmentIndex + 1).find(segment => this.isSegmentValidForRundownExecution(segment))
+    if (!nextValidSegment) {
+      throw new LastSegmentInRundownException(`Segment: ${this.activeCursor?.segment?.id} is the last valid Segment of Rundown: ${this.id}`)
     }
-    return this.segments[activeSegmentIndex + 1]
+
+    return nextValidSegment
   }
 
   public deactivate(): void {
@@ -263,7 +275,7 @@ export class Rundown extends BasicRundown {
       if (segmentIndexForPart + 1 === this.segments.length) {
         throw new LastPartInRundownException(`Part: ${part.id} is the last Part of Rundown: ${this.id}`)
       }
-      return this.findFirstPartOfSegmentSkippingUnsyncedSegment(segmentIndexForPart + 1)
+      return this.findFirstPartOfValidSegmentSkippingUnsyncedSegments(segmentIndexForPart + 1)
     }
   }
 
@@ -277,9 +289,9 @@ export class Rundown extends BasicRundown {
     return segmentIndexForPart
   }
 
-  private findFirstPartOfSegmentSkippingUnsyncedSegment(indexToSearchFrom: number): Part {
+  private findFirstPartOfValidSegmentSkippingUnsyncedSegments(indexToSearchFrom: number): Part {
     while (indexToSearchFrom < this.segments.length) {
-      if (!this.segments[indexToSearchFrom].isUnsynced()) {
+      if (!this.segments[indexToSearchFrom].isUnsynced() && this.isSegmentValidForRundownExecution(this.segments[indexToSearchFrom])) {
         return this.segments[indexToSearchFrom].findFirstPart()
       }
       indexToSearchFrom++

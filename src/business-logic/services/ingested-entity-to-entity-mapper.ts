@@ -52,6 +52,8 @@ export class IngestedEntityToEntityMapper {
       rundownId: ingestedSegment.rundownId,
       name: ingestedSegment.name,
       rank: ingestedSegment.rank,
+      isHidden: ingestedSegment.isHidden,
+      metadata: ingestedSegment.metadata,
       isOnAir: false,
       isNext: false,
       isUnsynced: false,

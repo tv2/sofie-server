@@ -1,8 +1,8 @@
 import { Exception } from './exception'
 import { ErrorCode } from '../enums/error-code'
 
-export class LastSegmentInRundown extends Exception {
+export class LastSegmentInRundownException extends Exception {
   constructor(message: string) {
-    super(ErrorCode.LAST_PART_IN_SEGMENT, message)
+    super(ErrorCode.LAST_SEGMENT_IN_RUNDOWN, message)
   }
 }
