@@ -40,5 +40,4 @@ export class MediaEventService implements MediaEventEmitter, MediaEventObserver 
   public subscribeToMediaEvents(onMediaEventCallback: (mediaEvent: MediaEvent) => void): void {
     this.callbacks.push(onMediaEventCallback)
   }
-
 }

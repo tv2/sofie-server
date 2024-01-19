@@ -58,7 +58,7 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
       case MongoChangeEvent.DELETE: {
         const deleteChange: ChangeStreamDeleteDocument<MongoMedia> = change as ChangeStreamDeleteDocument<MongoMedia>
         const mongoMediaId: string = deleteChange.documentKey._id
-        void this. onDeletedCallback(mongoMediaId)
+        void this.onDeletedCallback(mongoMediaId)
         break
       }
       case MongoChangeEvent.REPLACE: {
@@ -89,11 +89,11 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
     this.onCreatedCallback = onCreatedCallback
   }
 
-  public onUpdated(onUpdatedCallback:(media: Media) => void): void {
+  public onUpdated(onUpdatedCallback: (media: Media) => void): void {
     this.onUpdateCallback = onUpdatedCallback
   }
 
-  public onDeleted(onDeletedCallback:(mediaId: string) => void): void {
+  public onDeleted(onDeletedCallback: (mediaId: string) => void): void {
     this.onDeletedCallback = onDeletedCallback
   }
 }

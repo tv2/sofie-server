@@ -9,8 +9,8 @@ import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
-import { IngestChangeService } from '../services/interfaces/ingest-change-service'
-import { DatabaseChangeIngestService } from '../services/database-change-ingest-service'
+import { DataChangeService } from '../services/interfaces/data-change-service'
+import { DataChangeIngestService } from '../services/data-change-ingest-service'
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
 import { IngestService } from '../services/interfaces/ingest-service'
 import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
@@ -20,6 +20,7 @@ import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-ent
 import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
 import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
 import { LoggerFacade } from '../../logger/logger-facade'
+import { MediaDataChangeService } from '../services/media-data-change-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -65,8 +66,8 @@ export class ServiceFacade {
     )
   }
 
-  public static createIngestChangeService(): IngestChangeService {
-    return DatabaseChangeIngestService.getInstance(
+  public static createIngestChangeService(): DataChangeService {
+    return DataChangeIngestService.getInstance(
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createSegmentRepository(),
@@ -74,12 +75,17 @@ export class ServiceFacade {
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       EventEmitterFacade.createRundownEventEmitter(),
-      EventEmitterFacade.createMediaEventEmitter(),
       new IngestedEntityToEntityMapper(),
       LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
-      RepositoryFacade.createIngestedPartChangedListener(),
+      RepositoryFacade.createIngestedPartChangedListener()
+    )
+  }
+
+  public static createMongoDatabaseChangeService(): DataChangeService {
+    return MediaDataChangeService.getInstance(
+      EventEmitterFacade.createMediaEventEmitter(),
       RepositoryFacade.createMediaChangedListener()
     )
   }
