@@ -51,14 +51,14 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
         const mongoMediaId: string = insertChange.fullDocument.mediaId
         const media: Media | undefined = await this.mediaRepository.getMedia(mongoMediaId)
         if (media) {
-          void this.onCreatedCallback(media)
+          this.onCreatedCallback(media)
         }
         break
       }
       case MongoChangeEvent.DELETE: {
         const deleteChange: ChangeStreamDeleteDocument<MongoMedia> = change as ChangeStreamDeleteDocument<MongoMedia>
         const mongoMediaId: string = deleteChange.documentKey._id
-        void this.onDeletedCallback(mongoMediaId)
+        this.onDeletedCallback(mongoMediaId)
         break
       }
       case MongoChangeEvent.REPLACE: {
@@ -66,7 +66,7 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
         const mongoMediaId: string = replaceChange.fullDocument.mediaId
         const media: Media | undefined = await this.mediaRepository.getMedia(mongoMediaId)
         if (media) {
-          void this.onUpdateCallback(media)
+          this.onUpdateCallback(media)
         }
         break
       }
@@ -78,7 +78,7 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
         }
         const media: Media | undefined = await this.mediaRepository.getMedia(mongoMediaId)
         if (media) {
-          void this.onUpdateCallback(media)
+          this.onUpdateCallback(media)
         }
         break
       }

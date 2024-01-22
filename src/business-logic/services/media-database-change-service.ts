@@ -1,18 +1,18 @@
-import { DataChangeService } from './interfaces/data-change-service'
+import { DatabaseChangeService } from './interfaces/database-change-service'
 import { MediaEventEmitter } from './interfaces/media-event-emitter'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
 import { Media } from '../../model/entities/media'
 
-export class MediaDataChangeService implements DataChangeService {
+export class MediaDatabaseChangeService implements DatabaseChangeService {
 
-  private static instance: DataChangeService
+  private static instance: DatabaseChangeService
 
   public static getInstance(
     mediaEventEmitter: MediaEventEmitter,
     mediaChangedListener: DataChangedListener<Media>
-  ): DataChangeService {
+  ): DatabaseChangeService {
     if (!this.instance) {
-      this.instance = new MediaDataChangeService(
+      this.instance = new MediaDatabaseChangeService(
         mediaEventEmitter,
         mediaChangedListener
       )
@@ -25,8 +25,8 @@ export class MediaDataChangeService implements DataChangeService {
   }
 
   private listenForMediaChanges(mediaChangedListener: DataChangedListener<Media>): void {
-    mediaChangedListener.onCreated(media => this.createMedia(media))
-    mediaChangedListener.onUpdated( media=> this.updateMedia(media))
+    mediaChangedListener.onCreated( media => this.createMedia(media))
+    mediaChangedListener.onUpdated( media => this.updateMedia(media))
     mediaChangedListener.onDeleted( mediaId => this.deleteMedia(mediaId))
   }
 
