@@ -29,13 +29,13 @@ export class MediaController extends BaseController {
     }
   }
 
-  @GetRequest('/:mediaId')
+  @GetRequest('/:sourceName')
   public async getMediaById(request: Request, response: Response): Promise<void> {
     try {
-      const mediaId: string = request.params.mediaId
-      const media: Media | undefined = await this.mediaRepository.getMediaById(mediaId)
+      const sourceName: string = request.params.sourceName
+      const media: Media | undefined = await this.mediaRepository.getMediaBySourceName(sourceName)
       if (!media) {
-        throw new NotFoundException(`No Media for found for MediaId ${mediaId}`)
+        throw new NotFoundException(`No Media for found for Media with source name ${sourceName}`)
       }
       response.send(this.httpResponseFormatter.formatSuccessResponse(new MediaDto(media)))
     } catch (error) {

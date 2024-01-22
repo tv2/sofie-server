@@ -46,7 +46,7 @@ export class Tv2VideoClipActionFactory {
     if (this.isVideoClipAction(action)) {
       return [{
         type: MutateActionType.MEDIA,
-        getMediaId: () => action.name,
+        getMediaSourceName: () => action.name,
         updateActionWithMedia: (action: Action, media: Media | undefined) => this.updateVideoClipAction(action, media)
       }]
     }

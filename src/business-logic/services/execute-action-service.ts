@@ -151,7 +151,7 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async mutateActionWithMedia(mutateActionMethods: MutateActionWithMedia, action: Action): Promise<Action> {
-    const media: Media | undefined = await this.mediaRepository.getMediaById(mutateActionMethods.getMediaId())
+    const media: Media | undefined = await this.mediaRepository.getMediaBySourceName(mutateActionMethods.getMediaSourceName())
     return mutateActionMethods.updateActionWithMedia(action, media)
   }
 
