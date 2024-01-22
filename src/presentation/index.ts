@@ -63,7 +63,7 @@ function startRundownEventServer(): void {
 function startSystemServices(): void {
   ServiceFacade.createIngestChangeService()
   ServiceFacade.createIngestService()
-  ServiceFacade.createMongoDatabaseChangeService()
+  ServiceFacade.createMediaDataChangeService()
 }
 
 startSofieServer()

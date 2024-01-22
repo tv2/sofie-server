@@ -148,7 +148,6 @@ interface MongoLayerMapping {
 
 export interface MongoMedia extends MongoId {
   mediaId: string
-  mediaPath: string
   mediainfo: {
     format: {
       duration: number

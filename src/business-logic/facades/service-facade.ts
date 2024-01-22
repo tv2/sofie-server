@@ -83,7 +83,7 @@ export class ServiceFacade {
     )
   }
 
-  public static createMongoDatabaseChangeService(): DataChangeService {
+  public static createMediaDataChangeService(): DataChangeService {
     return MediaDataChangeService.getInstance(
       EventEmitterFacade.createMediaEventEmitter(),
       RepositoryFacade.createMediaChangedListener()
