@@ -155,10 +155,12 @@ export interface MongoMedia extends MongoId {
   mediaId: string
   mediainfo?: {
     format?: {
-      duration?: number
+      duration?: string
     }
   }
 }
+
+const MILLISECONDS: number = 1000
 
 export class MongoEntityConverter {
 
@@ -441,7 +443,7 @@ export class MongoEntityConverter {
     return {
       id: mongoMedia._id,
       sourceName: mongoMedia.mediaId,
-      duration: mongoMedia.mediainfo?.format?.duration ?? 0
+      duration: mongoMedia.mediainfo?.format?.duration ? Number.parseFloat(mongoMedia.mediainfo?.format?.duration) * MILLISECONDS : 0
     }
   }
 }
