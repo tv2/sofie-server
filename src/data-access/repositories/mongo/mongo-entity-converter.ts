@@ -160,7 +160,7 @@ export interface MongoMedia extends MongoId {
   }
 }
 
-const MILLISECONDS: number = 1000
+const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 
 export class MongoEntityConverter {
 
@@ -443,7 +443,7 @@ export class MongoEntityConverter {
     return {
       id: mongoMedia._id,
       sourceName: mongoMedia.mediaId,
-      duration: mongoMedia.mediainfo?.format?.duration ? Number.parseFloat(mongoMedia.mediainfo?.format?.duration) * MILLISECONDS : 0
+      duration: mongoMedia.mediainfo?.format?.duration ? Number.parseFloat(mongoMedia.mediainfo?.format?.duration) * MILLISECONDS_TO_SECONDS_RATIO : 0
     }
   }
 }
