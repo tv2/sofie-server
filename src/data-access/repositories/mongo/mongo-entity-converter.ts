@@ -151,7 +151,7 @@ interface MongoLayerMapping {
   lookaheadMaxSearchDistance: number
 }
 
-export interface MongoMedia {
+export interface MongoMedia extends MongoId {
   mediaId: string
   mediainfo?: {
     format?: {
@@ -439,7 +439,8 @@ export class MongoEntityConverter {
 
   public convertMedia(mongoMedia: MongoMedia): Media {
     return {
-      id: mongoMedia.mediaId,
+      id: mongoMedia._id,
+      sourceName: mongoMedia.mediaId,
       duration: mongoMedia.mediainfo?.format?.duration ?? 0
     }
   }

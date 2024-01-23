@@ -38,9 +38,13 @@ import {
   ActionTriggerUpdatedEvent
 } from '../value-objects/action-trigger-event'
 import { ActionTriggerDto } from '../dtos/action-trigger-dto'
-import {RundownDto} from '../dtos/rundown-dto'
+import { RundownDto } from '../dtos/rundown-dto'
+import { Media } from '../../model/entities/media'
+import { MediaDto } from '../dtos/media-dto'
+import { MediaEventBuilder } from '../interfaces/media-event-builder'
+import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
 
-export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder {
 
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
@@ -221,6 +225,30 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       timestamp: Date.now(),
       rundownId: rundown.id,
       part: new PartDto(part)
+    }
+  }
+
+  public buildMediaCreatedEvent(media: Media): MediaCreatedEvent {
+    return {
+      type: IngestEventType.MEDIA_CREATED,
+      timestamp: Date.now(),
+      media: new MediaDto(media)
+    }
+  }
+
+  public buildMediaUpdatedEvent(media: Media): MediaUpdatedEvent {
+    return {
+      type: IngestEventType.MEDIA_UPDATED,
+      timestamp: Date.now(),
+      media: new MediaDto(media)
+    }
+  }
+
+  public buildMediaDeletedEvent(mediaId: string): MediaDeletedEvent {
+    return {
+      type: IngestEventType.MEDIA_DELETED,
+      timestamp: Date.now(),
+      mediaId: mediaId
     }
   }
 

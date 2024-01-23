@@ -1,4 +1,4 @@
-import { IngestChangeService } from './interfaces/ingest-change-service'
+import { DatabaseChangeService } from './interfaces/database-change-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
@@ -21,9 +21,9 @@ import { Logger } from '../../logger/logger'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
-export class DatabaseChangeIngestService implements IngestChangeService {
+export class IngestDatabaseChangeService implements DatabaseChangeService {
 
-  private static instance: IngestChangeService
+  private static instance: DatabaseChangeService
 
   public static getInstance(
     ingestedRundownRepository: IngestedRundownRepository,
@@ -32,27 +32,27 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     partRepository: PartRepository,
     timelineRepository: TimelineRepository,
     timelineBuilder: TimelineBuilder,
-    eventEmitter: RundownEventEmitter,
+    rundownEventEmitter: RundownEventEmitter,
     ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
-    partChangedListener: DataChangedListener<IngestedPart>
-  ): IngestChangeService {
+    partChangedListener: DataChangedListener<IngestedPart>,
+  ): DatabaseChangeService {
     if (!this.instance) {
-      this.instance = new DatabaseChangeIngestService(
+      this.instance = new IngestDatabaseChangeService(
         ingestedRundownRepository,
         rundownRepository,
         segmentRepository,
         partRepository,
         timelineRepository,
         timelineBuilder,
-        eventEmitter,
+        rundownEventEmitter,
         ingestedEntityToEntityMapper,
         logger,
         rundownChangeListener,
         segmentChangedListener,
-        partChangedListener
+        partChangedListener,
       )
     }
     return this.instance
@@ -79,9 +79,9 @@ export class DatabaseChangeIngestService implements IngestChangeService {
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
-    partChangedListener: DataChangedListener<IngestedPart>
+    partChangedListener: DataChangedListener<IngestedPart>,
   ) {
-    this.logger = logger.tag(DatabaseChangeIngestService.name)
+    this.logger = logger.tag(IngestDatabaseChangeService.name)
 
     this.listenForRundownChanges(rundownChangeListener)
     this.listenForSegmentChanges(segmentChangedListener)

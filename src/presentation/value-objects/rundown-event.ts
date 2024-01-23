@@ -4,7 +4,7 @@ import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
 import { SegmentDto } from '../dtos/segment-dto'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
-import {RundownDto} from '../dtos/rundown-dto'
+import { RundownDto } from '../dtos/rundown-dto'
 
 export interface RundownEvent extends TypedEvent {
   type: EventType
