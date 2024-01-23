@@ -57,6 +57,8 @@ export interface MongoSegment extends MongoId {
   rundownId: string
   name: string
   rank: number
+  isHidden: boolean
+  metadata?: unknown
   partIds: string[]
   isOnAir: boolean
   isNext: boolean
@@ -119,6 +121,9 @@ export interface MongoTimeline extends MongoId {
 }
 
 export interface MongoStudio {
+  settings: {
+    mediaPreviewsUrl: string
+  }
   mappings: MongoLayerMappings
   blueprintConfig: unknown
 }
@@ -148,9 +153,9 @@ interface MongoLayerMapping {
 
 export interface MongoMedia extends MongoId {
   mediaId: string
-  mediainfo: {
-    format: {
-      duration: number
+  mediainfo?: {
+    format?: {
+      duration?: number
     }
   }
 }
@@ -267,6 +272,8 @@ export class MongoEntityConverter {
       rundownId: segment.rundownId,
       name: segment.name,
       rank: segment.rank,
+      isHidden: segment.isHidden,
+      metadata: segment.metadata,
       partIds: segment.getParts().map(part => part.id),
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
@@ -388,7 +395,13 @@ export class MongoEntityConverter {
         maximumLookaheadSearchDistance: mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookaheadDistance,
       })
     }
-    return { layers, blueprintConfiguration: mongoStudio.blueprintConfig }
+    return {
+      settings: {
+        mediaPreviewUrl: mongoStudio.settings.mediaPreviewsUrl
+      },
+      layers,
+      blueprintConfiguration: mongoStudio.blueprintConfig
+    }
   }
 
   private mapLookaheadNumberToEnum(lookAheadNumber: number): LookaheadMode {
@@ -428,7 +441,7 @@ export class MongoEntityConverter {
     return {
       id: mongoMedia._id,
       sourceName: mongoMedia.mediaId,
-      duration: mongoMedia.mediainfo.format.duration
+      duration: mongoMedia.mediainfo?.format?.duration ?? 0
     }
   }
 }

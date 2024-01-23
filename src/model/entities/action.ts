@@ -66,7 +66,7 @@ export interface MutateActionWithPieceMethods {
 export interface MutateActionWithMedia {
   type: MutateActionType.MEDIA
   updateActionWithMedia: (action: Action, media?: Media) => Action
-  getMediaId: () => string
+  getMediaSourceName: () => string
 }
 
 export interface MutateActionWithHistoricPartMethods {

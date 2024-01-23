@@ -11,6 +11,8 @@ export interface SegmentInterface {
   rundownId: string
   name: string
   rank: number
+  isHidden: boolean
+  metadata?: unknown
   parts: Part[]
   isOnAir: boolean
   isNext: boolean
@@ -22,9 +24,11 @@ export interface SegmentInterface {
 export class Segment {
   public readonly id: string
   public readonly rundownId: string
-  public name: string
+  public readonly name: string
+  public readonly expectedDurationInMs?: number
+  public readonly isHidden: boolean
+  public readonly metadata?: unknown
   public rank: number
-  public expectedDurationInMs?: number
 
   private isSegmentOnAir: boolean
   private isSegmentNext: boolean
@@ -38,6 +42,8 @@ export class Segment {
     this.rundownId = segment.rundownId
     this.name = segment.name
     this.rank = segment.rank
+    this.isHidden = segment.isHidden
+    this.metadata = segment.metadata
     this.isSegmentOnAir = segment.isOnAir
     this.isSegmentNext = segment.isNext
     this.isSegmentUnsynced = segment.isUnsynced

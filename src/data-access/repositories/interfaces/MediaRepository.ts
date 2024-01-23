@@ -1,5 +1,6 @@
 import { Media } from '../../../model/entities/media'
 
 export interface MediaRepository {
-  getMedia(mediaId: string): Promise<Media | undefined>
+  getMedia(): Promise<Media[]>
+  getMediaBySourceName(sourceName: string): Promise<Media | undefined>
 }

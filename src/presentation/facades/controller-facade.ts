@@ -9,6 +9,7 @@ import { ConfigurationController } from '../controllers/configuration-controller
 import { JsendResponseFormatter } from '../jsend-response-formatter'
 import { ActionTriggerController } from '../controllers/action-trigger-controller'
 import { LoggerFacade } from '../../logger/logger-facade'
+import { MediaController } from '../controllers/media-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -18,6 +19,7 @@ export class ControllerFacade {
       this.createActionController(),
       this.createActionTriggerController(),
       this.createConfigurationController(),
+      this.createMediaController()
     ]
   }
 
@@ -63,6 +65,14 @@ export class ControllerFacade {
     return new ConfigurationController(
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
+    )
+  }
+
+  private static createMediaController(): MediaController {
+    return new MediaController(
+      RepositoryFacade.createMediaRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )

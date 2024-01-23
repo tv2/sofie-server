@@ -16,9 +16,15 @@ export class MongoMediaRepository extends BaseMongoRepository implements MediaRe
     return MEDIA_COLLECTION_NAME
   }
 
-  public async getMedia(mediaId: string): Promise<Media | undefined> {
+  public async getMedia(): Promise<Media[]> {
     this.assertDatabaseConnection(this.getMedia.name)
-    const mongoMedia: MongoMedia | null = await this.getCollection().findOne<MongoMedia>({ mediaId })
+    const mongoMedia: MongoMedia[] = await this.getCollection().find<MongoMedia>({}).toArray()
+    return mongoMedia.map(media => this.mongoEntityConverter.convertMedia(media))
+  }
+
+  public async getMediaBySourceName(sourceName: string): Promise<Media | undefined> {
+    this.assertDatabaseConnection(this.getMediaBySourceName.name)
+    const mongoMedia: MongoMedia | null = await this.getCollection().findOne<MongoMedia>({ mediaId: sourceName })
     if (!mongoMedia) {
       // There might not be Media available yet.
       return undefined

@@ -54,6 +54,7 @@ export interface MongoIngestedSegment extends MongoId {
   rundownId: string
   externalId: string
   isHidden: boolean
+  metaData?: unknown // This is the current spelling in the database from Core... TOD: Update when we control Ingest
   budgetDuration?: number
 }
 
@@ -159,6 +160,8 @@ export class MongoIngestedEntityConverter {
       rundownId: mongoSegment.rundownId,
       name: mongoSegment.name,
       rank: mongoSegment._rank,
+      isHidden: mongoSegment.isHidden,
+      metadata: mongoSegment.metaData,
       ingestedParts: [],
       budgetDuration: mongoSegment.budgetDuration ?? undefined
     }
@@ -166,7 +169,6 @@ export class MongoIngestedEntityConverter {
 
   public convertToIngestedSegments(mongoSegments: MongoIngestedSegment[]): IngestedSegment[] {
     return mongoSegments
-      .filter((segment) => !segment.isHidden)
       .map(this.convertToIngestedSegment)
   }
 

@@ -23,7 +23,7 @@ export class MongoAdLibActionsRepository extends BaseMongoRepository implements 
 
   public async getActionManifests(rundownId: string): Promise<ActionManifest[]> {
     this.assertDatabaseConnection(this.getActionManifests.name)
-    const adLibActions: AdLibAction[] = await this.getCollection().find<AdLibAction>({rundownId: rundownId}).toArray()
+    const adLibActions: AdLibAction[] = await this.getCollection().find<AdLibAction>({ rundownId }).toArray()
     return adLibActions.map(adLibAction => this.mapToActionManifest(adLibAction))
   }
 
