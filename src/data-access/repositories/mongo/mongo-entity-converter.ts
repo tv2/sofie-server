@@ -121,6 +121,9 @@ export interface MongoTimeline extends MongoId {
 }
 
 export interface MongoStudio {
+  settings: {
+    mediaPreviewsUrl: string
+  }
   mappings: MongoLayerMappings
   blueprintConfig: unknown
 }
@@ -150,9 +153,9 @@ interface MongoLayerMapping {
 
 export interface MongoMedia {
   mediaId: string
-  mediainfo: {
-    format: {
-      duration: number
+  mediainfo?: {
+    format?: {
+      duration?: number
     }
   }
 }
@@ -392,7 +395,13 @@ export class MongoEntityConverter {
         maximumLookaheadSearchDistance: mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookaheadDistance,
       })
     }
-    return { layers, blueprintConfiguration: mongoStudio.blueprintConfig }
+    return {
+      settings: {
+        mediaPreviewUrl: mongoStudio.settings.mediaPreviewsUrl
+      },
+      layers,
+      blueprintConfiguration: mongoStudio.blueprintConfig
+    }
   }
 
   private mapLookaheadNumberToEnum(lookAheadNumber: number): LookaheadMode {
@@ -431,7 +440,7 @@ export class MongoEntityConverter {
   public convertMedia(mongoMedia: MongoMedia): Media {
     return {
       id: mongoMedia.mediaId,
-      duration: mongoMedia.mediainfo.format.duration
+      duration: mongoMedia.mediainfo?.format?.duration ?? 0
     }
   }
 }

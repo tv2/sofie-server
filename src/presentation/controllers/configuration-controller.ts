@@ -19,6 +19,16 @@ export class ConfigurationController extends BaseController {
     super()
   }
 
+  @GetRequest('/studio')
+  public async getStudio(_request: Request, response: Response): Promise<void> {
+    try {
+      const configuration: Configuration = await this.configurationRepository.getConfiguration()
+      response.send(this.httpResponseFormatter.formatSuccessResponse(configuration.studio))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
   @GetRequest('/blueprints')
   public async getBlueprintConfiguration(_request: Request, response: Response): Promise<void> {
     try {
@@ -52,5 +62,4 @@ export class ConfigurationController extends BaseController {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
-
 }
