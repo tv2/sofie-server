@@ -25,9 +25,9 @@ export class MediaDatabaseChangeService implements DatabaseChangeService {
   }
 
   private listenForMediaChanges(mediaChangedListener: DataChangedListener<Media>): void {
-    mediaChangedListener.onCreated( media => this.createMedia(media))
-    mediaChangedListener.onUpdated( media => this.updateMedia(media))
-    mediaChangedListener.onDeleted( mediaId => this.deleteMedia(mediaId))
+    mediaChangedListener.onCreated(media => this.createMedia(media))
+    mediaChangedListener.onUpdated(media => this.updateMedia(media))
+    mediaChangedListener.onDeleted(mediaId => this.deleteMedia(mediaId))
   }
 
   private createMedia(media: Media): void {
