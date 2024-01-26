@@ -138,21 +138,22 @@ export class Rundown extends BasicRundown {
       const nextPart: Part = this.activeCursor.segment.findNextPart(this.activeCursor.part)
       const nextSegment: Segment | undefined = this.segments.find(segment => segment.id === nextPart.getSegmentId())
       this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextPart, owner })
+      this.markNextPart()
+      return
     } catch (exception) {
       if (!(exception instanceof LastPartInSegmentException)) {
         throw exception
       }
-      this.unmarkNextSegment()
-      // TODO: Refactor to use less nesting
-      try {
-        const segment: Segment = this.findNextValidSegment()
-        this.nextCursor = this.createCursor(this.nextCursor, { segment, part: segment.findFirstPart(), owner })
-        this.markNextSegment()
-      } catch (error) {
-        if (!(error instanceof LastSegmentInRundownException)) {
-          throw error
-        }
-        // TODO: Notify about last Segment.
+    }
+
+    this.unmarkNextSegment()
+    try {
+      const segment: Segment = this.findNextValidSegment()
+      this.nextCursor = this.createCursor(this.nextCursor, { segment, part: segment.findFirstPart(), owner })
+      this.markNextSegment()
+    } catch (error) {
+      if (!(error instanceof LastSegmentInRundownException)) {
+        throw error
       }
     }
 
@@ -479,7 +480,9 @@ export class Rundown extends BasicRundown {
       this.unmarkNextSegment()
     }
 
-    this.nextCursor?.part.reset()
+    if (this.activeCursor?.part.id !== this.nextCursor?.part.id) {
+      this.nextCursor?.part.reset()
+    }
     this.unmarkNextPart()
 
     this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextPart, owner: owner ?? Owner.SYSTEM })
