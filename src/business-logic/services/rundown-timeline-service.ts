@@ -22,7 +22,6 @@ import { AlreadyActivatedException } from '../../model/exceptions/already-activa
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 
 export class RundownTimelineService implements RundownService {
-
   constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
@@ -100,7 +99,7 @@ export class RundownTimelineService implements RundownService {
       this.partRepository.deleteAllUnsyncedParts(),
       this.pieceRepository.deleteAllUnsyncedPieces(),
       this.partRepository.deleteAllUnplannedParts(),
-      this.pieceRepository.deleteAllUnplannedPieces()
+      this.pieceRepository.deleteAllUnplannedPieces(),
     ])
   }
 
@@ -118,14 +117,13 @@ export class RundownTimelineService implements RundownService {
 
     const timeline: Timeline = await this.buildAndPersistTimeline(rundown)
 
-    this.startAutoNext(timeline, rundownId)
-
     const infinitePiecesAfterTakeNext: Map<string, Piece> = rundown.getInfinitePiecesMap()
     if (this.doInfinitePieceMapsDiffer(infinitePiecesBeforeTakeNext, infinitePiecesAfterTakeNext)) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
     this.rundownEventEmitter.emitTakeEvent(rundown)
     this.rundownEventEmitter.emitSetNextEvent(rundown)
+    this.startAutoNext(timeline, rundownId)
 
     await this.deleteUnsyncedPreviousPart(rundown)
     await this.deleteUnsyncedSegments(rundown)
@@ -142,33 +140,31 @@ export class RundownTimelineService implements RundownService {
 
   private async deleteUnsyncedSegments(rundown: Rundown): Promise<void> {
     const unsyncedSegments: Segment[] = rundown.getSegments().filter(segment => segment.isUnsynced())
-    await Promise.all(unsyncedSegments.map(async segment => {
-      if (rundown.isActive() && segment.isOnAir()) {
-        await this.partRepository.deleteUnsyncedPartsForSegment(segment.id)
-        return
-      }
-      if (!segment.isOnAir()) {
-        rundown.removeUnsyncedSegment(segment)
-        this.rundownEventEmitter.emitSegmentDeleted(rundown, segment.id)
-      }
-      await this.segmentRepository.deleteUnsyncedSegmentsForRundown(rundown.id)
-    }))
+    await Promise.all(
+      unsyncedSegments.map(async segment => {
+        if (rundown.isActive() && segment.isOnAir()) {
+          await this.partRepository.deleteUnsyncedPartsForSegment(segment.id)
+          return
+        }
+        if (!segment.isOnAir()) {
+          rundown.removeUnsyncedSegment(segment)
+          this.rundownEventEmitter.emitSegmentDeleted(rundown, segment.id)
+        }
+        await this.segmentRepository.deleteUnsyncedSegmentsForRundown(rundown.id)
+      })
+    )
     await this.pieceRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
   }
 
   private getEndStateForActivePart(rundown: Rundown): PartEndState {
-    return this.blueprint.getEndStateForPart(
-      rundown.getActivePart(),
-      rundown.getPreviousPart(),
-      Date.now(),
-      undefined
-    )
+    return this.blueprint.getEndStateForPart(rundown.getActivePart(), rundown.getPreviousPart(), Date.now(), undefined)
   }
 
   private startAutoNext(timeline: Timeline, rundownId: string): void {
     if (timeline.autoNext) {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
+      this.rundownEventEmitter.emitAutoNextStarted(rundownId)
     }
   }
 
@@ -269,9 +265,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id
-      ? rundown.getActiveSegment().id
-      : rundown.getNextSegment().id
+    const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id ? rundown.getActiveSegment().id : rundown.getNextSegment().id
     this.rundownEventEmitter.emitPieceInsertedEvent(rundown, segmentId, newPiece)
 
     await this.saveRundown(rundown)

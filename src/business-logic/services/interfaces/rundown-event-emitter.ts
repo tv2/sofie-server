@@ -27,4 +27,6 @@ export interface RundownEventEmitter {
   emitPartUpdated(rundown: Rundown, part: Part): void
   emitPartDeleted(rundown: Rundown, segmentId: string, partId: string): void
   emitPartUnsynced(rundown: Rundown, part: Part): void
+
+  emitAutoNextStarted(rundownId: string): void
 }
