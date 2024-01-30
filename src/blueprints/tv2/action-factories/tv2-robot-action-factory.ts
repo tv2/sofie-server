@@ -63,20 +63,22 @@ export class Tv2RobotActionFactory {
       case Tv2ActionSubtype.CALL_PRESET: {
         return [{
           type: MutateActionType.APPLY_ARGUMENTS,
-          updateActionWithArguments: (action: Action, actionArguments: unknown) => {
-            if (!this.isCallPresetArgumentInteger(actionArguments)) {
-              throw new Tv2MisconfigurationException(`CallPresetAction expects the 'actionArgument' to be an integer. ${actionArguments} is not an integer`)
-            }
-            const robotAction: Tv2RobotAction = action as Tv2RobotAction
-            robotAction.data.pieceInterface = this.createCallPresetPieceInterface(actionArguments)
-            return robotAction
-          }
+          updateActionWithArguments: (action: Action, actionArguments: unknown) => this.applyArgumentsToCallPresetAction(action, actionArguments)
         }]
       }
       default: {
         return []
       }
     }
+  }
+
+  private applyArgumentsToCallPresetAction(action: Action, actionArguments: unknown): Action {
+    if (!this.isCallPresetArgumentInteger(actionArguments)) {
+      throw new Tv2MisconfigurationException(`CallPresetAction expects the 'actionArgument' to be an integer. ${actionArguments} is not an integer`)
+    }
+    const robotAction: Tv2RobotAction = action as Tv2RobotAction
+    robotAction.data.pieceInterface = this.createCallPresetPieceInterface(actionArguments)
+    return robotAction
   }
 
   private isCallPresetArgumentInteger(callPresetArgument: unknown): callPresetArgument is number {
