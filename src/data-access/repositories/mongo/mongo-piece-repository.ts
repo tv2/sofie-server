@@ -56,8 +56,8 @@ export class MongoPieceRepository extends BaseMongoRepository implements PieceRe
     }
   }
 
-  public async deletePieces(pieceIdsToBeDeleted: string[]): Promise<void> {
-    await this.getCollection().deleteMany({ _id: { $in: pieceIdsToBeDeleted }})
+  public async deletePieces(pieceIds: string[]): Promise<void> {
+    await this.getCollection().deleteMany({ _id: { $in: pieceIds }})
   }
 
   public async deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {
