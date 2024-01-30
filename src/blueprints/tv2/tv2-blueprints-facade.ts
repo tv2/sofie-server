@@ -42,6 +42,11 @@ import {
 } from './timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
 import { Tv2ActionManifestMapper } from './helpers/tv2-action-manifest-mapper'
 import { Tv2LoggerFacade } from './tv2-logger-facade'
+import { Tv2RobotActionFactory } from './action-factories/tv2-robot-action-factory'
+import { Tv2RobotTimelineObjectFactory } from './timeline-object-factories/interfaces/tv2-robot-timeline-object-factory'
+import {
+  Tv2TelemetricsTimelineObjectFactory
+} from './timeline-object-factories/tv2-telemetrics-timeline-object-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -60,6 +65,8 @@ export class Tv2BlueprintsFacade {
     const graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory = new Tv2GraphicsTimelineObjectFactoryFactory(assetPathHelper)
     const graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
     const videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
+
+    const robotTimelineObjectFactory: Tv2RobotTimelineObjectFactory = new Tv2TelemetricsTimelineObjectFactory()
 
     const actionService: Tv2ActionService = new Tv2ActionService(
       configurationMapper,
@@ -83,7 +90,7 @@ export class Tv2BlueprintsFacade {
       new Tv2VideoClipActionFactory(
         actionManifestMapper,
         videoMixerTimelineObjectFactory,
-        audioTimelineObjectFactory, 
+        audioTimelineObjectFactory,
         videoClipTimelineObjectFactory,
       ),
       new Tv2VideoMixerConfigurationActionFactory(videoMixerTimelineObjectFactory),
@@ -95,7 +102,8 @@ export class Tv2BlueprintsFacade {
         videoClipTimelineObjectFactory,
         assetPathHelper
       ),
-      new Tv2ReplayActionFactory(videoMixerTimelineObjectFactory, audioTimelineObjectFactory)
+      new Tv2ReplayActionFactory(videoMixerTimelineObjectFactory, audioTimelineObjectFactory),
+      new Tv2RobotActionFactory(robotTimelineObjectFactory)
     )
 
     return new Tv2Blueprint(

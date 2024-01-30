@@ -16,6 +16,7 @@ import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-fac
 import { Tv2RemoteActionFactory } from './action-factories/tv2-remote-action-factory'
 import { Tv2ActionManifest } from './value-objects/tv2-action-manifest'
 import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
+import { Tv2RobotActionFactory } from './action-factories/tv2-robot-action-factory'
 
 export class Tv2ActionService implements BlueprintGenerateActions {
   constructor(
@@ -28,7 +29,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     private readonly videoClipActionFactory: Tv2VideoClipActionFactory,
     private readonly videoMixerActionFactory: Tv2VideoMixerConfigurationActionFactory,
     private readonly splitScreenActionFactory: Tv2SplitScreenActionFactory,
-    private readonly replayActionFactory: Tv2ReplayActionFactory
+    private readonly replayActionFactory: Tv2ReplayActionFactory,
+    private readonly robotActionFactory: Tv2RobotActionFactory
   ) {}
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -47,6 +49,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.audioActionFactory.isAudioAction(action)) {
       return this.audioActionFactory.getMutateActionMethods(action)
     }
+    if (this.robotActionFactory.isRobotAction(action)) {
+      return this.robotActionFactory.getMutateActionMethods(action)
+    }
     return []
   }
 
@@ -62,7 +67,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, actionManifests),
       ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration),
       ...this.splitScreenActionFactory.createSplitScreenActions(blueprintConfiguration, actionManifests),
-      ...this.replayActionFactory.createReplayActions(blueprintConfiguration)
+      ...this.replayActionFactory.createReplayActions(blueprintConfiguration),
+      ...this.robotActionFactory.createRobotActions()
     ]
   }
 }
