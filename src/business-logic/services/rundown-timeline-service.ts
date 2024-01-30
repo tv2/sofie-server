@@ -157,7 +157,12 @@ export class RundownTimelineService implements RundownService {
   }
 
   private getEndStateForActivePart(rundown: Rundown): PartEndState {
-    return this.blueprint.getEndStateForPart(rundown.getActivePart(), rundown.getPreviousPart(), Date.now(), undefined)
+    return this.blueprint.getEndStateForPart(
+      rundown.getActivePart(), 
+      rundown.getPreviousPart(), 
+      Date.now(), 
+      undefined
+    )
   }
 
   private startAutoNext(timeline: Timeline, rundownId: string): void {
@@ -265,7 +270,9 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id ? rundown.getActiveSegment().id : rundown.getNextSegment().id
+    const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id
+      ? rundown.getActiveSegment().id
+      : rundown.getNextSegment().id
     this.rundownEventEmitter.emitPieceInsertedEvent(rundown, segmentId, newPiece)
 
     await this.saveRundown(rundown)

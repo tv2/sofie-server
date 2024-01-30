@@ -148,12 +148,12 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
     this.emitRundownEvent(event)
   }
 
-  public subscribeToRundownEvents(onRundownEventCallback: (rundownEvent: RundownEvent) => void): void {
-    this.callbacks.push(onRundownEventCallback)
-  }
-
   public emitAutoNextStarted(rundownId: string): void {
     const event: AutoNextStartedEvent = this.rundownEventBuilder.buildAutoNextStartedEvent(rundownId)
     this.emitRundownEvent(event)
+  }
+
+  public subscribeToRundownEvents(onRundownEventCallback: (rundownEvent: RundownEvent) => void): void {
+    this.callbacks.push(onRundownEventCallback)
   }
 }
