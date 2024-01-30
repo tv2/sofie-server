@@ -1,9 +1,13 @@
 import {
-  PartCreatedEvent, PartDeletedEvent,
+  AutoNextStartedEvent,
+  PartCreatedEvent,
+  PartDeletedEvent,
   PartInsertedAsNextEvent,
   PartInsertedAsOnAirEvent,
   PartSetAsNextEvent,
-  PartTakenEvent, PartUnsyncedEvent, PartUpdatedEvent,
+  PartTakenEvent,
+  PartUnsyncedEvent,
+  PartUpdatedEvent,
   PieceInsertedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
@@ -13,8 +17,10 @@ import {
   RundownInfinitePiecesUpdatedEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
-  SegmentCreatedEvent, SegmentDeletedEvent, SegmentUnsyncedEvent,
-  SegmentUpdatedEvent
+  SegmentCreatedEvent,
+  SegmentDeletedEvent,
+  SegmentUnsyncedEvent,
+  SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
 import { RundownEventEmitter } from '../../business-logic/services/interfaces/rundown-event-emitter'
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
@@ -36,7 +42,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   private readonly callbacks: ((rundownEvent: RundownEvent) => void)[] = []
 
-  private constructor(private readonly rundownEventBuilder: RundownEventBuilder) { }
+  private constructor(private readonly rundownEventBuilder: RundownEventBuilder) {}
 
   private emitRundownEvent(rundownEvent: RundownEvent): void {
     this.callbacks.forEach(callback => callback(rundownEvent))
@@ -139,6 +145,11 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   public emitPartUnsynced(rundown: Rundown, part: Part): void {
     const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, part)
+    this.emitRundownEvent(event)
+  }
+
+  public emitAutoNextStarted(rundownId: string): void {
+    const event: AutoNextStartedEvent = this.rundownEventBuilder.buildAutoNextStartedEvent(rundownId)
     this.emitRundownEvent(event)
   }
 
