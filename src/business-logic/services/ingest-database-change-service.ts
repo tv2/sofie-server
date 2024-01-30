@@ -18,6 +18,7 @@ import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { BasicRundown } from '../../model/entities/basic-rundown'
 import { Logger } from '../../logger/logger'
+import { PieceRepository } from '../../data-access/repositories/interfaces/piece-repository'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
@@ -30,6 +31,7 @@ export class IngestDatabaseChangeService implements DatabaseChangeService {
     rundownRepository: RundownRepository,
     segmentRepository: SegmentRepository,
     partRepository: PartRepository,
+    pieceRepository: PieceRepository,
     timelineRepository: TimelineRepository,
     timelineBuilder: TimelineBuilder,
     rundownEventEmitter: RundownEventEmitter,
@@ -45,6 +47,7 @@ export class IngestDatabaseChangeService implements DatabaseChangeService {
         rundownRepository,
         segmentRepository,
         partRepository,
+        pieceRepository,
         timelineRepository,
         timelineBuilder,
         rundownEventEmitter,
@@ -72,6 +75,7 @@ export class IngestDatabaseChangeService implements DatabaseChangeService {
     private readonly rundownRepository: RundownRepository,
     private readonly segmentRepository: SegmentRepository,
     private readonly partRepository: PartRepository,
+    private readonly pieceRepository: PieceRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly eventEmitter: RundownEventEmitter,
@@ -347,10 +351,17 @@ export class IngestDatabaseChangeService implements DatabaseChangeService {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedSegment.rundownId)
     const segmentToBeUpdated: Segment = await this.segmentRepository.getSegment(ingestedSegment.id)
 
+    const pieceIdsBeforeUpdate: string[] = segmentToBeUpdated.getParts().flatMap(part => part.getPieces()).map(piece => piece.id)
+
     const updatedSegment: Segment = this.ingestedEntityToEntityMapper.updateSegmentWithIngestedSegment(segmentToBeUpdated, ingestedSegment)
     rundown.updateSegment(updatedSegment)
 
     this.eventEmitter.emitSegmentUpdated(rundown, updatedSegment)
+
+    const pieceIdsAfterUpdate: string[] = updatedSegment.getParts().flatMap(part => part.getPieces()).map(piece => piece.id)
+    const pieceIdsToBeDelete: string[] = pieceIdsBeforeUpdate.filter(pieceId => !pieceIdsAfterUpdate.includes(pieceId))
+    await this.pieceRepository.deletePieces(pieceIdsToBeDelete)
+
     await this.persistRundown(rundown)
   }
 
