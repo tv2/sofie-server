@@ -21,6 +21,7 @@ export enum Tv2SourceLayer {
   REPLAY_STUDIO_AUXILIARY = 'studio0_aux_studio_screen',
   REPLAY_VIZ_AUXILIARY = 'studio0_aux_viz_full1',
   VIDEO_CLIP = 'studio0_selected_clip',
+  ROBOT_CAMERA = 'studio0_robot_camera'
 }
 
 export enum Tv2GraphicsLayer {
@@ -69,4 +70,8 @@ export enum Tv2SisyfosLayer {
   AUDIO_BED = 'sisyfos_source_audiobed',
   RESYNCHRONIZE = 'sisyfos_resync',
   BREAKER = 'sisyfos_source_jingle'
+}
+
+export enum Tv2TelemetricsLayer {
+  CALL_PRESET = 'telemetrics_layer' // There is a mismatch in the name and value here since we need to match the same value as Core currently does, but the name doesn't fit into our naming pattern.
 }
