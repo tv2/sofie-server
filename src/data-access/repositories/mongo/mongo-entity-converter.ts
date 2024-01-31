@@ -26,6 +26,7 @@ import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { SystemInformation } from '../../../model/entities/system-information'
 
 export interface MongoId {
   _id: string
@@ -158,6 +159,10 @@ export interface MongoMedia extends MongoId {
       duration?: string
     }
   }
+}
+
+export interface MongoSystemInformation extends MongoId {
+  name: string
 }
 
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
@@ -444,6 +449,12 @@ export class MongoEntityConverter {
       id: mongoMedia._id,
       sourceName: mongoMedia.mediaId,
       duration: mongoMedia.mediainfo?.format?.duration ? Number.parseFloat(mongoMedia.mediainfo?.format?.duration) * MILLISECONDS_TO_SECONDS_RATIO : 0
+    }
+  }
+
+  public convertSystemInformation(mongoSystemInformation: MongoSystemInformation): SystemInformation {
+    return {
+      name: mongoSystemInformation.name
     }
   }
 }

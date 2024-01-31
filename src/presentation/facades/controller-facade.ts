@@ -10,6 +10,7 @@ import { JsendResponseFormatter } from '../jsend-response-formatter'
 import { ActionTriggerController } from '../controllers/action-trigger-controller'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaController } from '../controllers/media-controller'
+import { SystemInformationController } from '../controllers/system-information-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -19,7 +20,8 @@ export class ControllerFacade {
       this.createActionController(),
       this.createActionTriggerController(),
       this.createConfigurationController(),
-      this.createMediaController()
+      this.createMediaController(),
+      this.createSystemInformationController()
     ]
   }
 
@@ -73,6 +75,14 @@ export class ControllerFacade {
   private static createMediaController(): MediaController {
     return new MediaController(
       RepositoryFacade.createMediaRepository(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
+    )
+  }
+
+  private static createSystemInformationController(): SystemInformationController {
+    return new SystemInformationController(
+      RepositoryFacade.createSystemInformationRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
