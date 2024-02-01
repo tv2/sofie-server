@@ -3215,6 +3215,41 @@ describe(Rundown.name, () => {
       verify(mockedNextPart.reset()).once()
     })
 
+    describe('nextCursor.Part is the same Part as the onAirCursor.Part OnAir', () => {
+      it('does not reset the OnAir Part', () => {
+        const mockedActivePart: Part = EntityMockFactory.createPartMock({ id: 'active-part-id', isOnAir: true })
+        const activePart: Part = instance(mockedActivePart)
+        const otherPartInActiveSegment: Part = EntityMockFactory.createPart({ id: 'other-part-in-active-segment-id' })
+        const mockedActiveSegment: Segment = EntityMockFactory.createSegmentMock({ id: 'active-segment-id', isOnAir: true, parts: [mockedActivePart, otherPartInActiveSegment] })
+        when(mockedActiveSegment.findPart(otherPartInActiveSegment.id)).thenReturn(otherPartInActiveSegment)
+        const activeSegment: Segment = instance(mockedActiveSegment)
+
+        const testee: Rundown = new Rundown({
+          isRundownActive: true,
+          alreadyActiveProperties: {
+            activeCursor: {
+              part: activePart,
+              segment: activeSegment,
+              owner: Owner.SYSTEM
+            },
+            nextCursor: {
+              part: activePart,
+              segment: activeSegment,
+              owner: Owner.SYSTEM
+            },
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment
+          ],
+        } as RundownInterface)
+
+        testee.setNext(activeSegment.id, otherPartInActiveSegment.id)
+
+        verify(mockedActivePart.reset()).never()
+      })
+    })
+
     describe('when next part is on air', () => {
       it('throws an active part exception', () => {
         const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })

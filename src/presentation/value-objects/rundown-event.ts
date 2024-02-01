@@ -38,7 +38,7 @@ export interface PartSetAsNextEvent extends PartEvent {
 
 export interface PartInsertedAsOnAirEvent extends RundownEvent {
   type: RundownEventType.PART_INSERTED_AS_ON_AIR
-  part: PartDto,
+  part: PartDto
 }
 
 export interface PartInsertedAsNextEvent extends RundownEvent {
@@ -52,8 +52,12 @@ export interface PieceInsertedEvent extends PartEvent {
 }
 
 export interface RundownInfinitePiecesUpdatedEvent extends RundownEvent {
-  type: RundownEventType.INFINITE_PIECES_UPDATED,
+  type: RundownEventType.INFINITE_PIECES_UPDATED
   infinitePieces: PieceDto[]
+}
+
+export interface AutoNextStartedEvent extends RundownEvent {
+  type: RundownEventType.AUTO_NEXT_STARTED
 }
 
 export interface RundownCreatedEvent extends RundownEvent {

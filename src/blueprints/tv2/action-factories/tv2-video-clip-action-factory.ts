@@ -84,7 +84,7 @@ export class Tv2VideoClipActionFactory {
     const partId: string = 'videoClipInsertAction'
     const partInterface: PartInterface = this.createPartInterface(partId, videoClipData)
     return {
-      id: `videoClipAsNextAction_${videoClipData.fileName}`,
+      id: `videoClipAsNextAction_${videoClipData.name}_${videoClipData.fileName}`, // TODO: Utilize information about the Segment once we control ingest
       name: videoClipData.name,
       rundownId: videoClipData.rundownId,
       type: PartActionType.INSERT_PART_AS_NEXT,

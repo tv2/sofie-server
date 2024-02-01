@@ -55,6 +55,8 @@ import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MongoMediaChangedListener } from '../repositories/mongo/mongo-media-changed-listener'
 import { Media } from '../../model/entities/media'
+import { SystemInformationRepository } from '../repositories/interfaces/system-information-repository'
+import { MongoSystemInformationRepository } from '../repositories/mongo/mongo-system-information-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -204,6 +206,10 @@ export class RepositoryFacade {
 
   public static createMediaRepository(): MediaRepository {
     return new MongoMediaRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
+  }
+
+  public static createSystemInformationRepository(): SystemInformationRepository {
+    return new MongoSystemInformationRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
   private static createUuidGenerator(): UuidGenerator {

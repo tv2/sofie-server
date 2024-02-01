@@ -104,14 +104,12 @@ export class IngestedEntityToEntityMapper {
   }
 
   public updatePartWithIngestedPart(partToBeUpdated: Part, ingestedPart: IngestedPart): Part {
-    const updatedPieces: Piece[] = partToBeUpdated.getPieces()
-      .map(piece => {
-        const ingestedPiece: IngestedPiece | undefined = ingestedPart.ingestedPieces.find(ingestedPiece => ingestedPiece.id === piece.id)
-        if (!ingestedPiece) {
-          return piece
-        }
-        return this.updatePieceWithIngestedPiece(piece, ingestedPiece)
-      })
+    const updatedPieces: Piece[] = ingestedPart.ingestedPieces.map(ingestedPiece => {
+      const existingPiece: Piece | undefined = partToBeUpdated.getPieces().find(piece => piece.id === ingestedPiece.id)
+      return existingPiece
+        ? this.updatePieceWithIngestedPiece(existingPiece, ingestedPiece)
+        : this.convertIngestedPieceToPiece(ingestedPiece)
+    })
 
     return new Part({
       ...ingestedPart,

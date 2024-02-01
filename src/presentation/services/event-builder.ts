@@ -1,6 +1,7 @@
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
+  AutoNextStartedEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -32,11 +33,7 @@ import { Segment } from '../../model/entities/segment'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
 import { ActionTrigger } from '../../model/entities/action-trigger'
-import {
-  ActionTriggerCreatedEvent,
-  ActionTriggerDeletedEvent,
-  ActionTriggerUpdatedEvent
-} from '../value-objects/action-trigger-event'
+import { ActionTriggerCreatedEvent, ActionTriggerDeletedEvent, ActionTriggerUpdatedEvent } from '../value-objects/action-trigger-event'
 import { ActionTriggerDto } from '../dtos/action-trigger-dto'
 import { RundownDto } from '../dtos/rundown-dto'
 import { Media } from '../../model/entities/media'
@@ -45,12 +42,11 @@ import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
 
 export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder {
-
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
       timestamp: Date.now(),
-      rundownId: rundown.id
+      rundownId: rundown.id,
     }
   }
 
@@ -95,7 +91,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: RundownEventType.INFINITE_PIECES_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      infinitePieces: rundown.getInfinitePieces().map(piece => new PieceDto(piece))
+      infinitePieces: rundown.getInfinitePieces().map(piece => new PieceDto(piece)),
     }
   }
 
@@ -104,7 +100,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: RundownEventType.PART_INSERTED_AS_ON_AIR,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: new PartDto(part)
+      part: new PartDto(part),
     }
   }
 
@@ -113,7 +109,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: RundownEventType.PART_INSERTED_AS_NEXT,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: new PartDto(part)
+      part: new PartDto(part),
     }
   }
 
@@ -124,7 +120,15 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       rundownId: rundown.id,
       segmentId,
       partId: piece.getPartId(),
-      piece: new PieceDto(piece)
+      piece: new PieceDto(piece),
+    }
+  }
+
+  public buildAutoNextStartedEvent(rundownId: string): AutoNextStartedEvent {
+    return {
+      type: RundownEventType.AUTO_NEXT_STARTED,
+      timestamp: Date.now(),
+      rundownId: rundownId,
     }
   }
 
@@ -133,7 +137,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.RUNDOWN_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      rundown: new RundownDto(rundown)
+      rundown: new RundownDto(rundown),
     }
   }
 
@@ -142,7 +146,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.RUNDOWN_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      basicRundown: new BasicRundownDto(rundown)
+      basicRundown: new BasicRundownDto(rundown),
     }
   }
 
@@ -159,7 +163,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.SEGMENT_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segment: new SegmentDto(segment)
+      segment: new SegmentDto(segment),
     }
   }
 
@@ -168,7 +172,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.SEGMENT_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segment: new SegmentDto(segment)
+      segment: new SegmentDto(segment),
     }
   }
 
@@ -177,7 +181,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.SEGMENT_DELETED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      segmentId
+      segmentId,
     }
   }
 
@@ -187,7 +191,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       timestamp: Date.now(),
       rundownId: rundown.id,
       unsyncedSegment: new SegmentDto(unsyncedSegment),
-      originalSegmentId: originalSegmentId
+      originalSegmentId: originalSegmentId,
     }
   }
 
@@ -196,7 +200,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.PART_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: new PartDto(part)
+      part: new PartDto(part),
     }
   }
 
@@ -205,7 +209,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.PART_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: new PartDto(part)
+      part: new PartDto(part),
     }
   }
 
@@ -224,7 +228,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: IngestEventType.PART_UNSYNCED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: new PartDto(part)
+      part: new PartDto(part),
     }
   }
 
@@ -232,7 +236,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     return {
       type: IngestEventType.MEDIA_CREATED,
       timestamp: Date.now(),
-      media: new MediaDto(media)
+      media: new MediaDto(media),
     }
   }
 
@@ -240,7 +244,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     return {
       type: IngestEventType.MEDIA_UPDATED,
       timestamp: Date.now(),
-      media: new MediaDto(media)
+      media: new MediaDto(media),
     }
   }
 
@@ -248,7 +252,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     return {
       type: IngestEventType.MEDIA_DELETED,
       timestamp: Date.now(),
-      mediaId: mediaId
+      mediaId: mediaId,
     }
   }
 
@@ -256,7 +260,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     return {
       type: ActionTriggerEventType.ACTION_TRIGGER_CREATED,
       timestamp: Date.now(),
-      actionTrigger: new ActionTriggerDto(actionTrigger)
+      actionTrigger: new ActionTriggerDto(actionTrigger),
     }
   }
 
@@ -264,7 +268,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     return {
       type: ActionTriggerEventType.ACTION_TRIGGER_UPDATED,
       timestamp: Date.now(),
-      actionTrigger: new ActionTriggerDto(actionTrigger)
+      actionTrigger: new ActionTriggerDto(actionTrigger),
     }
   }
 
@@ -272,7 +276,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     return {
       type: ActionTriggerEventType.ACTION_TRIGGER_DELETED,
       timestamp: Date.now(),
-      actionTriggerId
+      actionTriggerId,
     }
   }
 }

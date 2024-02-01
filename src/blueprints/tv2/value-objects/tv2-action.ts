@@ -14,6 +14,7 @@ export enum Tv2ActionContentType {
   AUDIO = 'AUDIO',
   SPLIT_SCREEN = 'SPLIT_SCREEN',
   REPLAY = 'REPLAY',
+  ROBOT = 'ROBOT',
   UNKNOWN = 'UNKNOWN'
 }
 
@@ -23,7 +24,8 @@ export enum Tv2ActionSubtype {
   SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT = 'SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT',
   SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
   RECALL_LAST_PLANNED_REMOTE = 'RECALL_LAST_PLANNED_REMOTE',
-  FADE_AUDIO_BED = 'FADE_AUDIO_BED'
+  FADE_AUDIO_BED = 'FADE_AUDIO_BED',
+  CALL_PRESET = 'CALL_PRESET'
 }
 
 export type Tv2Action = Tv2PartAction | Tv2PieceAction
@@ -178,5 +180,12 @@ export interface Tv2ReplayAction extends Tv2PartAction {
 export interface Tv2ReplayAuxAction extends Tv2PieceAction {
   metadata: {
     contentType: Tv2ActionContentType.REPLAY
+  }
+}
+
+export interface Tv2RobotAction extends Tv2PieceAction {
+  metadata: {
+    contentType: Tv2ActionContentType.ROBOT
+    actionSubtype: Tv2ActionSubtype.CALL_PRESET
   }
 }
