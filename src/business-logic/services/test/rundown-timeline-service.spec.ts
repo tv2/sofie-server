@@ -213,10 +213,92 @@ describe(RundownTimelineService.name, () => {
       await testee.insertPieceAsOnAir(aRundown.id, aPiece)
       verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
     })
+
+    it('inserts the new Part as OnAir', async () => {
+      const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
+
+      const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPart' })
+      const onAirSegment: Segment = EntityTestFactory.createSegment({ id: 'onAirSegment', parts: [onAirPart] })
+
+      const rundown: Rundown = EntityTestFactory.createRundown({
+        segments: [onAirSegment]
+      })
+      rundown.activate()
+      rundown.takeNext()
+
+      const rundownRepository: RundownRepository = mock<RundownRepository>()
+      when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+
+      expect(rundown.getActivePart().id).not.toBe(partToBeInserted.id)
+
+      await testee.insertPartAsOnAir(rundown.id, partToBeInserted)
+
+      expect(rundown.getActivePart().id).toBe(partToBeInserted.id)
+    })
+
+    describe('there is already an unplanned Part queued as Next', () => {
+      it('keeps the unplanned Part as the Next Part', async () => {
+        const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
+
+        const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPart' })
+        const onAirSegment: Segment = EntityTestFactory.createSegment({ id: 'onAirSegment', parts: [onAirPart], rank: 1 })
+
+        const unplannedNextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', ingestedPart: undefined })
+
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          segments: [onAirSegment]
+        })
+        rundown.activate()
+        rundown.takeNext()
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+
+        // We need to insert the unplanned Part as next before we execute the 'insertPartAsOnAir' method that we want to test.
+        await testee.insertPartAsNext(rundown.id, unplannedNextPart)
+        expect(rundown.getNextPart().id).toBe(unplannedNextPart.id)
+
+        await testee.insertPartAsOnAir(rundown.id, partToBeInserted)
+        expect(rundown.getNextPart().id).toBe(unplannedNextPart.id)
+      })
+    })
+
+    describe('the Next Part is a planned Part', () => {
+      it('keeps the planned Part as the Next Part', async () => {
+        const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
+
+        const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPart' })
+        const onAirSegment: Segment = EntityTestFactory.createSegment({ id: 'onAirSegment', parts: [onAirPart], rank: 1 })
+
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'nextSegment', parts: [nextPart], rank: 2 })
+
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          segments: [onAirSegment, nextSegment]
+        })
+        rundown.activate()
+        rundown.takeNext()
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+
+        expect(rundown.getNextPart().id).toBe(nextPart.id)
+
+        await testee.insertPartAsOnAir(rundown.id, partToBeInserted)
+
+        expect(rundown.getNextPart().id).toBe(nextPart.id)
+      })
+    })
   })
 })
 
-function createTestee(params: {
+function createTestee(params?: {
   rundownEventEmitter?: RundownEventEmitter
   ingestedRundownRepository?: IngestedRundownRepository
   rundownRepository?: RundownRepository
@@ -229,15 +311,15 @@ function createTestee(params: {
   blueprint?: Blueprint
 }): RundownTimelineService {
   return new RundownTimelineService(
-    params.rundownEventEmitter ?? instance(mock<RundownEventEmitter>()),
-    params.ingestedRundownRepository ?? instance(mock<IngestedRundownRepository>()),
-    params.rundownRepository ?? instance(mock<RundownRepository>()),
-    params.segmentRepository ?? instance(mock<SegmentRepository>()),
-    params.partRepository ?? instance(mock<PartRepository>()),
-    params.pieceRepository ?? instance(mock<PieceRepository>()),
-    params.timelineRepository ?? instance(mock<TimelineRepository>()),
-    params.timelineBuilder ?? instance(mock<TimelineBuilder>()),
-    params.callbackScheduler ?? instance(mock<CallbackScheduler>()),
-    params.blueprint ?? instance(mock<Blueprint>())
+    params?.rundownEventEmitter ?? instance(mock<RundownEventEmitter>()),
+    params?.ingestedRundownRepository ?? instance(mock<IngestedRundownRepository>()),
+    params?.rundownRepository ?? instance(mock<RundownRepository>()),
+    params?.segmentRepository ?? instance(mock<SegmentRepository>()),
+    params?.partRepository ?? instance(mock<PartRepository>()),
+    params?.pieceRepository ?? instance(mock<PieceRepository>()),
+    params?.timelineRepository ?? instance(mock<TimelineRepository>()),
+    params?.timelineBuilder ?? instance(mock<TimelineBuilder>()),
+    params?.callbackScheduler ?? instance(mock<CallbackScheduler>()),
+    params?.blueprint ?? instance(mock<Blueprint>())
   )
 }
