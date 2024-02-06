@@ -11,7 +11,6 @@ import { ActionTriggerController } from '../controllers/action-trigger-controlle
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaController } from '../controllers/media-controller'
 import { SystemInformationController } from '../controllers/system-information-controller'
-import { ShelfController } from '../controllers/shelf-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -22,8 +21,7 @@ export class ControllerFacade {
       this.createActionTriggerController(),
       this.createConfigurationController(),
       this.createMediaController(),
-      this.createSystemInformationController(),
-      this.createShelfController()
+      this.createSystemInformationController()
     ]
   }
 
@@ -67,8 +65,10 @@ export class ControllerFacade {
 
   private static createConfigurationController(): ConfigurationController {
     return new ConfigurationController(
+      ServiceFacade.createConfigurationService(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
+      RepositoryFacade.createShelfRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
@@ -85,14 +85,6 @@ export class ControllerFacade {
   private static createSystemInformationController(): SystemInformationController {
     return new SystemInformationController(
       RepositoryFacade.createSystemInformationRepository(),
-      ControllerFacade.createExpressErrorHandler(),
-      new JsendResponseFormatter()
-    )
-  }
-
-  private static createShelfController(): ShelfController {
-    return new ShelfController(
-      RepositoryFacade.createShelfRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )

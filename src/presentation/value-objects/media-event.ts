@@ -1,4 +1,4 @@
-import { IngestEventType } from '../enums/rundown-event-type'
+import { IngestEventType } from '../enums/event-type'
 import { MediaDto } from '../dtos/media-dto'
 import { TypedEvent } from './typed-event'
 

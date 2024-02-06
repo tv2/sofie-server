@@ -1,5 +1,5 @@
 import { TypedEvent } from './typed-event'
-import { ActionTriggerEventType } from '../enums/rundown-event-type'
+import { ActionTriggerEventType } from '../enums/event-type'
 import { ActionTriggerDto } from '../dtos/action-trigger-dto'
 
 export type ActionTriggerEvent = ActionTriggerCreatedEvent | ActionTriggerUpdatedEvent | ActionTriggerDeletedEvent

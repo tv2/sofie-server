@@ -1,4 +1,4 @@
-export type EventType = RundownEventType | IngestEventType | ActionTriggerEventType
+export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | ActionTriggerEventType
 
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
@@ -28,6 +28,10 @@ export enum IngestEventType {
   MEDIA_CREATED = 'MEDIA_CREATED',
   MEDIA_UPDATED = 'MEDIA_UPDATED',
   MEDIA_DELETED = 'MEDIA_DELETED'
+}
+
+export enum ConfigurationEventType {
+  SHELF_UPDATED = 'SHELF_UPDATED'
 }
 
 export enum ActionTriggerEventType {
