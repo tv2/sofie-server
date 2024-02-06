@@ -158,9 +158,9 @@ export class RundownTimelineService implements RundownService {
 
   private getEndStateForActivePart(rundown: Rundown): PartEndState {
     return this.blueprint.getEndStateForPart(
-      rundown.getActivePart(), 
-      rundown.getPreviousPart(), 
-      Date.now(), 
+      rundown.getActivePart(),
+      rundown.getPreviousPart(),
+      Date.now(),
       undefined
     )
   }
@@ -211,9 +211,15 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const unplannedNextPartToKeepAsNextPart: Part | undefined = !rundown.getNextPart().isPlanned ? rundown.getNextPart() : undefined
+
     rundown.insertPartAsNext(part)
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
+
+    if (unplannedNextPartToKeepAsNextPart) {
+      rundown.insertPartAsNext(unplannedNextPartToKeepAsNextPart)
+    }
 
     await this.buildAndPersistTimeline(rundown)
 
