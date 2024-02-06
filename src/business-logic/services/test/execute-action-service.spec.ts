@@ -27,12 +27,12 @@ describe(ExecuteActionService.name, () => {
     describe('it receives an InsertPartAsOnAirAction', () => {
       it('calls RundownService.insertPartAsOnAir', async () => {
         const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_ON_AIR)
-        const rundownServiceMock: RundownService = mock<RundownService>()
+        const rundownService: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService }, { action })
         await testee.executeAction(action.id, 'rundownId')
 
-        verify(rundownServiceMock.insertPartAsOnAir(anyString(), anyOfClass(Part))).once()
+        verify(rundownService.insertPartAsOnAir(anyString(), anyOfClass(Part))).once()
       })
 
       it('updates Part id to be unique', async () => {
@@ -48,6 +48,17 @@ describe(ExecuteActionService.name, () => {
         const [, lastExecutedPart] = capture(rundownServiceMock.insertPartAsOnAir).last()
 
         expect(firstExecutedPart.id).not.toBe(lastExecutedPart.id)
+      })
+
+      it('adds the ActionId to the metadata of the Part', async () => {
+        const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_ON_AIR)
+        const rundownService: RundownService = mock<RundownService>()
+
+        const testee: ExecuteActionService = createTestee({ rundownService }, { action })
+        await testee.executeAction(action.id, 'rundownId')
+
+        const [, part] = capture(rundownService.insertPartAsOnAir).last()
+        expect(part.metadata?.actionId).toBe(action.id)
       })
     })
 
@@ -75,6 +86,17 @@ describe(ExecuteActionService.name, () => {
         const [, lastExecutedPart] = capture(rundownServiceMock.insertPartAsNext).last()
 
         expect(firstExecutedPart.id).not.toBe(lastExecutedPart.id)
+      })
+
+      it('adds the ActionId to the metadata of the Part', async () => {
+        const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_NEXT)
+        const rundownService: RundownService = mock<RundownService>()
+
+        const testee: ExecuteActionService = createTestee({ rundownService }, { action })
+        await testee.executeAction(action.id, 'rundownId')
+
+        const [, part] = capture(rundownService.insertPartAsNext).last()
+        expect(part.metadata?.actionId).toBe(action.id)
       })
     })
 

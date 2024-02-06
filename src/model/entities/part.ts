@@ -35,6 +35,12 @@ export interface PartInterface {
   endState?: PartEndState
 
   ingestedPart?: IngestedPart
+
+  metadata?: PartMetadata
+}
+
+export interface PartMetadata {
+  actionId?: string // If the Part was created from an Action, this is the id of said Action.
 }
 
 export class Part {
@@ -67,6 +73,8 @@ export class Part {
   private timings?: PartTimings
 
   private inTransition: InTransition
+
+  public metadata?: PartMetadata
 
   /*
    * The EndState of the Part
@@ -105,6 +113,8 @@ export class Part {
     this.isPartUnsynced = part.isUnsynced
 
     this.ingestedPart = part.ingestedPart
+
+    this.metadata = part.metadata
   }
 
   public putOnAir(): void {
