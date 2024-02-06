@@ -7,7 +7,7 @@ import { PieceLifespan } from '../../enums/piece-lifespan'
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
     return new Rundown({
-      id: 'rundownId' + Math.floor(Math.random()*1000),
+      id: 'rundownId' + Math.floor(Math.random() * 1000),
       name: 'rundownName',
       segments: [],
       isRundownActive: false,
@@ -19,12 +19,11 @@ export class EntityTestFactory {
   public static createSegment(segmentInterface: Partial<SegmentInterface> = {}): Segment {
     return new Segment(
       {
-        id: 'segmentId' + Math.floor(Math.random()*1000),
+        id: 'segmentId' + Math.floor(Math.random() * 1000),
         rundownId: 'rundownId',
         name: 'segmentName',
         isNext: false,
         isOnAir: false,
-        rank: 666,
         parts: [],
         ...segmentInterface
       } as SegmentInterface)
@@ -32,12 +31,12 @@ export class EntityTestFactory {
 
   public static createPart(partInterface: Partial<PartInterface> = {}): Part {
     return new Part({
-      id: 'partId' + Math.floor(Math.random()*1000),
+      id: 'partId' + Math.floor(Math.random() * 1000),
       segmentId: 'segmentId',
-      rank: 666,
-      name: 'parrrrtName',
+      name: 'partName',
       isNext: false,
-      isOnAir:false,
+      isOnAir: false,
+      ingestedPart: {},
       pieces: [],
       ...partInterface
     } as PartInterface)
@@ -45,7 +44,7 @@ export class EntityTestFactory {
 
   public static createPiece(pieceInterface: Partial<PieceInterface> = {}): Piece {
     return new Piece({
-      id: 'pieceId' + Math.floor(Math.random()*1000),
+      id: 'pieceId' + Math.floor(Math.random() * 1000),
       partId: 'partId',
       name: 'pieceName',
       duration: 420,
