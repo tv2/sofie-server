@@ -25,6 +25,7 @@ import { Rundown } from '../../model/entities/rundown'
 import { ActionManifestRepository } from '../../data-access/repositories/interfaces/action-manifest-repository'
 import { MediaRepository } from '../../data-access/repositories/interfaces/MediaRepository'
 import { Media } from '../../model/entities/media'
+import axios from 'axios'
 
 export class ExecuteActionService implements ActionService {
   constructor(
@@ -152,7 +153,10 @@ export class ExecuteActionService implements ActionService {
 
   private async mutateActionWithMedia(mutateActionMethods: MutateActionWithMedia, action: Action): Promise<Action> {
     const media: Media | undefined = await this.mediaRepository.getMediaBySourceName(mutateActionMethods.getMediaSourceName())
-    return mutateActionMethods.updateActionWithMedia(action, media)
+    const response = await axios.put('http://localhost:3010/api/blueprints/mutateActions', { action, media }, { responseType: 'json'  })
+    console.log(response.data)
+    return response.data
+    // return mutateActionMethods.updateActionWithMedia(action, media)
   }
 
   private async mutateActionWithHistoricPart(rundownId: string, mutateActionMethods: MutateActionWithHistoricPartMethods, action: Action): Promise<Action> {
