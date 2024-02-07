@@ -1,4 +1,4 @@
-import { Part } from '../../model/entities/part'
+import { Part, PartMetadata } from '../../model/entities/part'
 import { PieceDto } from './piece-dto'
 import { AutoNext } from '../../model/value-objects/auto-next'
 
@@ -16,6 +16,7 @@ export class PartDto {
   public readonly playedDuration: number
   public readonly autoNext?: AutoNext
   public readonly isPlanned: boolean
+  public readonly metadata?: PartMetadata
   public readonly pieces: PieceDto[]
 
   constructor(part: Part) {
@@ -32,6 +33,7 @@ export class PartDto {
     this.playedDuration = part.getPlayedDuration()
     this.autoNext = part.autoNext
     this.isPlanned = part.isPlanned
+    this.metadata = part.metadata
     this.pieces = part.getPieces().map((piece) => new PieceDto(piece))
   }
 }

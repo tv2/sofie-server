@@ -174,6 +174,7 @@ export class ExecuteActionService implements ActionService {
 
   private createPartFromAction(partAction: PartAction): Part {
     const partInterface: PartInterface = partAction.data.partInterface
+    partInterface.metadata = { actionId: partAction.id }
     partInterface.id = this.makeUnique(partInterface.id)
 
     partInterface.pieces = partAction.data.pieceInterfaces.map(pieceInterface => new Piece({
