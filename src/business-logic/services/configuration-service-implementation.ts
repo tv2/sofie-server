@@ -11,8 +11,8 @@ export class ConfigurationServiceImplementation implements ConfigurationService 
   ) { }
 
   public async updateShelf(shelf: Shelf): Promise<Shelf> {
-    const updateShelf: Shelf = await this.shelfRepository.updateShelf(shelf)
-    this.configurationEventEmitter.emitShelfUpdated(updateShelf)
-    return updateShelf
+    const updatedShelf: Shelf = await this.shelfRepository.updateShelf(shelf)
+    this.configurationEventEmitter.emitShelfUpdated(updatedShelf)
+    return updatedShelf
   }
 }
