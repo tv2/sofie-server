@@ -1,4 +1,4 @@
-import { EventType, IngestEventType, RundownEventType } from '../enums/rundown-event-type'
+import { EventType, IngestEventType, RundownEventType } from '../enums/event-type'
 import { TypedEvent } from './typed-event'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'

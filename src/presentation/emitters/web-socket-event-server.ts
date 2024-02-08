@@ -9,6 +9,8 @@ import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
 import { Logger } from '../../logger/logger'
 import { MediaEventObserver } from '../interfaces/media-event-observer'
 import { MediaEvent } from '../value-objects/media-event'
+import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
+import { ConfigurationEvent } from '../value-objects/configuration-event'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer
@@ -17,10 +19,17 @@ export class WebSocketEventServer implements EventServer {
     rundownEventObserver: RundownEventObserver,
     actionTriggerEventObserver: ActionTriggerEventObserver,
     mediaEventObserver: MediaEventObserver,
+    configurationEventObserver: ConfigurationEventObserver,
     logger: Logger
   ): EventServer {
     if (!this.instance) {
-      this.instance = new WebSocketEventServer(rundownEventObserver, actionTriggerEventObserver, mediaEventObserver, logger)
+      this.instance = new WebSocketEventServer(
+        rundownEventObserver,
+        actionTriggerEventObserver,
+        mediaEventObserver,
+        configurationEventObserver,
+        logger
+      )
     }
     return this.instance
   }
@@ -32,6 +41,7 @@ export class WebSocketEventServer implements EventServer {
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionTriggerEventObserver: ActionTriggerEventObserver,
     private readonly mediaEventObserver: MediaEventObserver,
+    private readonly configurationEventObserver: ConfigurationEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -84,6 +94,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.mediaEventObserver.subscribeToMediaEvents((mediaEvent: MediaEvent) => {
       webSocket.send(JSON.stringify(mediaEvent))
+    })
+    this.configurationEventObserver.subscribeToConfigurationEvents((configurationEvent: ConfigurationEvent) => {
+      webSocket.send(JSON.stringify(configurationEvent))
     })
   }
 
