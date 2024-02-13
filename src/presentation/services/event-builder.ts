@@ -289,7 +289,7 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
 
   public buildShelfConfigurationUpdatedEvent(shelfConfiguration: ShelfConfiguration): ShelfConfigurationUpdatedEvent {
     return {
-      type: ConfigurationEventType.SHELF_UPDATED_CONFIGURATION,
+      type: ConfigurationEventType.SHELF_CONFIGURATION_UPDATED,
       timestamp: Date.now(),
       shelfConfiguration
     }

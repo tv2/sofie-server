@@ -5,6 +5,6 @@ import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
 export type ConfigurationEvent = ShelfConfigurationUpdatedEvent
 
 export interface ShelfConfigurationUpdatedEvent extends TypedEvent {
-  type: ConfigurationEventType.SHELF_UPDATED_CONFIGURATION
+  type: ConfigurationEventType.SHELF_CONFIGURATION_UPDATED
   shelfConfiguration: ShelfConfiguration
 }
