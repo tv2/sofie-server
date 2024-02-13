@@ -47,14 +47,14 @@ export class Tv2ReplayActionFactory {
   }
 
   private createReplayActionWithVoiceOver(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): Tv2ReplayAction {
-    const noWhitespaceName: string = this.removeAllWhitespace(source.name)
+    const noWhitespaceName: string = this.sanitizeString(source.name)
     const partId: string = `${noWhitespaceName}_VO_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name} VO`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.VOICE_OVER)
 
     return {
       id: `insert_${noWhitespaceName}_VO_as_next_part_action`,
-      name: source.name,
+      name: `${source.name} VO`,
       description: '',
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -69,12 +69,12 @@ export class Tv2ReplayActionFactory {
     }
   }
 
-  private removeAllWhitespace(value: string): string {
-    return value.replaceAll(' ', '')
+  private sanitizeString(value: string): string {
+    return value.replaceAll(' ', '').replaceAll('/', '_')
   }
 
   private createReplayActionWithoutVoiceOver(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): Tv2ReplayAction {
-    const noWhitespaceName: string = this.removeAllWhitespace(source.name)
+    const noWhitespaceName: string = this.sanitizeString(source.name)
     const partId: string = `${noWhitespaceName}_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name}`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.FULL)
@@ -140,7 +140,7 @@ export class Tv2ReplayActionFactory {
       }
     }
     return {
-      id: `replayAction_${this.removeAllWhitespace(source.name)}`,
+      id: `replayAction_${this.sanitizeString(source.name)}`,
       partId: parentPartId,
       name: `${source.name}${audioMode === Tv2AudioMode.VOICE_OVER ? ' VO' : ''}`,
       layer: Tv2SourceLayer.REPLAY,
@@ -159,7 +159,7 @@ export class Tv2ReplayActionFactory {
   }
 
   private createReplayStudioAuxAction(source: Tv2SourceMappingWithSound): Tv2ReplayAuxAction {
-    const noWhitespaceName: string = this.removeAllWhitespace(source.name)
+    const noWhitespaceName: string = this.sanitizeString(source.name)
     return {
       id: `insert_studio_aux_${noWhitespaceName}_action`,
       name: `${source.name} Studio AUX`,
@@ -175,7 +175,7 @@ export class Tv2ReplayActionFactory {
   }
 
   private createStudioAuxPieceInterface(source: Tv2SourceMappingWithSound): Tv2PieceInterface {
-    const noWhitespaceName: string = this.removeAllWhitespace(source.name)
+    const noWhitespaceName: string = this.sanitizeString(source.name)
     return {
       id: `insert_studio_aux_${noWhitespaceName}_piece`,
       name: `${source.name} Studio AUX`,
@@ -201,7 +201,7 @@ export class Tv2ReplayActionFactory {
   }
 
   private createReplayVizAuxAction(source: Tv2SourceMappingWithSound): Tv2ReplayAuxAction {
-    const noWhitespaceName: string = this.removeAllWhitespace(source.name)
+    const noWhitespaceName: string = this.sanitizeString(source.name)
     return {
       id: `insert_viz_aux_${noWhitespaceName}_action`,
       name: `${source.name} Viz AUX`,
@@ -217,7 +217,7 @@ export class Tv2ReplayActionFactory {
   }
 
   private createVizAuxPieceInterface(source: Tv2SourceMappingWithSound): Tv2PieceInterface {
-    const noWhitespaceName: string = this.removeAllWhitespace(source.name)
+    const noWhitespaceName: string = this.sanitizeString(source.name)
     return {
       id: `insert_viz_aux_${noWhitespaceName}_piece`,
       name: `${source.name} Viz AUX`,
