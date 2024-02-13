@@ -31,7 +31,7 @@ export enum IngestEventType {
 }
 
 export enum ConfigurationEventType {
-  SHELF_UPDATED = 'SHELF_UPDATED'
+  SHELF_UPDATED_CONFIGURATION = 'SHELF_UPDATED_CONFIGURATION'
 }
 
 export enum ActionTriggerEventType {

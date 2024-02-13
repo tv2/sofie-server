@@ -45,8 +45,8 @@ import { MediaDto } from '../dtos/media-dto'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
-import { Shelf } from '../../model/entities/shelf'
-import { ShelfUpdatedEvent } from '../value-objects/configuration-event'
+import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
+import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
 
 export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
@@ -287,11 +287,11 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     }
   }
 
-  public buildShelfUpdatedEvent(shelf: Shelf): ShelfUpdatedEvent {
+  public buildShelfConfigurationUpdatedEvent(shelfConfiguration: ShelfConfiguration): ShelfConfigurationUpdatedEvent {
     return {
-      type: ConfigurationEventType.SHELF_UPDATED,
+      type: ConfigurationEventType.SHELF_UPDATED_CONFIGURATION,
       timestamp: Date.now(),
-      shelf
+      shelfConfiguration
     }
   }
 }

@@ -68,7 +68,7 @@ export class ControllerFacade {
       ServiceFacade.createConfigurationService(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
-      RepositoryFacade.createShelfRepository(),
+      RepositoryFacade.createShelfConfigurationRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )

@@ -1,6 +1,6 @@
-import { Shelf } from '../../model/entities/shelf'
-import { ShelfUpdatedEvent } from '../value-objects/configuration-event'
+import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
+import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
 
 export interface ConfigurationEventBuilder {
-  buildShelfUpdatedEvent(shelf: Shelf): ShelfUpdatedEvent
+  buildShelfConfigurationUpdatedEvent(shelfConfiguration: ShelfConfiguration): ShelfConfigurationUpdatedEvent
 }

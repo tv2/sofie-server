@@ -101,7 +101,7 @@ export class ServiceFacade {
   public static createConfigurationService(): ConfigurationService {
     return new ConfigurationServiceImplementation(
       EventEmitterFacade.createConfigurationEventEmitter(),
-      RepositoryFacade.createShelfRepository()
+      RepositoryFacade.createShelfConfigurationRepository()
     )
   }
 }

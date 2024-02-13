@@ -1,5 +1,6 @@
 import { ShelfConfiguration } from '../../../model/entities/shelf-configuration'
 
-export interface ConfigurationService {
+export interface ShelfConfigurationRepository {
+  getShelfConfiguration(): Promise<ShelfConfiguration>
   updateShelfConfiguration(shelfConfiguration: ShelfConfiguration): Promise<ShelfConfiguration>
 }

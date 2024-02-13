@@ -1,10 +1,10 @@
 import { TypedEvent } from './typed-event'
 import { ConfigurationEventType } from '../enums/event-type'
-import { Shelf } from '../../model/entities/shelf'
+import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
 
-export type ConfigurationEvent = ShelfUpdatedEvent
+export type ConfigurationEvent = ShelfConfigurationUpdatedEvent
 
-export interface ShelfUpdatedEvent extends TypedEvent {
-  type: ConfigurationEventType.SHELF_UPDATED
-  shelf: Shelf
+export interface ShelfConfigurationUpdatedEvent extends TypedEvent {
+  type: ConfigurationEventType.SHELF_UPDATED_CONFIGURATION
+  shelfConfiguration: ShelfConfiguration
 }
