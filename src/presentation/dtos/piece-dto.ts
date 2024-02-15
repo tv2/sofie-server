@@ -1,4 +1,5 @@
 import { Piece } from '../../model/entities/piece'
+import { PieceLifespan } from '../../model/enums/piece-lifespan'
 
 export class PieceDto {
   public readonly id: string
@@ -8,6 +9,7 @@ export class PieceDto {
   public readonly duration?: number
   public readonly layer: string
   public readonly isPlanned: boolean
+  public readonly lifespan: PieceLifespan
   public readonly metadata?: unknown
 
   constructor(piece: Piece) {
@@ -18,6 +20,7 @@ export class PieceDto {
     this.duration = piece.getDuration()
     this.layer = piece.layer
     this.isPlanned = piece.isPlanned
+    this.lifespan = piece.pieceLifespan
     this.metadata = piece.metadata
   }
 }
