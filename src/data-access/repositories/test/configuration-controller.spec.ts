@@ -6,7 +6,7 @@ import { ShowStyleVariantRepository } from '../interfaces/show-style-variant-rep
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { ConfigurationService } from '../../../business-logic/services/interfaces/configuration-service'
-import { ShelfRepository } from '../interfaces/shelf-repository'
+import { ShelfConfigurationRepository } from '../interfaces/shelf-configuration-repository'
 
 describe(ConfigurationController.name, () => {
   describe(
@@ -36,7 +36,7 @@ function createTestee(params?: {
   configurationService?: ConfigurationService,
   configurationRepository?: ConfigurationRepository,
   showStyleVariantRepository?: ShowStyleVariantRepository,
-  shelfRepository?: ShelfRepository,
+  shelfConfigurationRepository?: ShelfConfigurationRepository,
   httpErrorHandler?: HttpErrorHandler,
   httpResponseFormatter?: HttpResponseFormatter
 }): ConfigurationController {
@@ -44,7 +44,7 @@ function createTestee(params?: {
     params?.configurationService ?? instance(mock<ConfigurationService>()),
     params?.configurationRepository ?? instance(mock<ConfigurationRepository>()),
     params?.showStyleVariantRepository ?? instance(mock<ShowStyleVariantRepository>()),
-    params?.shelfRepository ?? instance(mock<ShelfRepository>()),
+    params?.shelfConfigurationRepository ?? instance(mock<ShelfConfigurationRepository>()),
     params?.httpErrorHandler ?? instance(mock<HttpErrorHandler>()),
     params?.httpResponseFormatter ?? instance(mock<HttpResponseFormatter>()),
   )

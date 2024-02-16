@@ -8,9 +8,9 @@ import { ShowStyleVariantRepository } from '../../data-access/repositories/inter
 import { ShowStyleVariant } from '../../model/entities/show-style-variant'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { ConfigurationService } from '../../business-logic/services/interfaces/configuration-service'
-import { ShelfRepository } from '../../data-access/repositories/interfaces/shelf-repository'
-import { Shelf } from '../../model/entities/shelf'
-import { ShelfDto } from '../dtos/shelf-dto'
+import { ShelfConfigurationRepository } from '../../data-access/repositories/interfaces/shelf-configuration-repository'
+import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
+import { ShelfConfigurationDto } from '../dtos/shelf-configuration-dto'
 
 @RestController('/configurations')
 export class ConfigurationController extends BaseController {
@@ -18,7 +18,7 @@ export class ConfigurationController extends BaseController {
     private readonly configurationService: ConfigurationService,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly showStyleVariantRepository: ShowStyleVariantRepository,
-    private readonly shelfRepository: ShelfRepository,
+    private readonly shelfConfigurationRepository: ShelfConfigurationRepository,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter
   ) {
@@ -69,26 +69,26 @@ export class ConfigurationController extends BaseController {
     }
   }
 
-  @GetRequest('/shelves')
-  public async getShelf(_request: Request, response: Response): Promise<void> {
+  @GetRequest('/shelfConfigurations')
+  public async getShelfConfiguration(_request: Request, response: Response): Promise<void> {
     try {
-      const shelf: Shelf = await this.shelfRepository.getShelf()
-      response.send(this.httpResponseFormatter.formatSuccessResponse([new ShelfDto(shelf)]))
+      const shelfConfiguration: ShelfConfiguration = await this.shelfConfigurationRepository.getShelfConfiguration()
+      response.send(this.httpResponseFormatter.formatSuccessResponse([new ShelfConfigurationDto(shelfConfiguration)]))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
-  @PutRequest('/shelves')
-  public async updateShelf(request: Request, response: Response): Promise<void> {
+  @PutRequest('/shelfConfigurations')
+  public async updateShelfConfiguration(request: Request, response: Response): Promise<void> {
     try {
-      const shelfDto: ShelfDto = request.body as ShelfDto
-      const shelf: Shelf = {
-        id: shelfDto.id,
-        actionPanels: shelfDto.actionPanels
+      const shelfConfigurationDto: ShelfConfigurationDto = request.body as ShelfConfigurationDto
+      const shelfConfiguration: ShelfConfiguration = {
+        id: shelfConfigurationDto.id,
+        actionPanelConfigurations: shelfConfigurationDto.actionPanelConfigurations
       }
-      const updatedShelf: Shelf = await this.configurationService.updateShelf(shelf)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(new ShelfDto(updatedShelf)))
+      const updatedShelfConfiguration: ShelfConfiguration = await this.configurationService.updateShelfConfiguration(shelfConfiguration)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(new ShelfConfigurationDto(updatedShelfConfiguration)))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
