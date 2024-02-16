@@ -1,7 +1,7 @@
 import { ConfigurationEventEmitter } from '../../business-logic/services/interfaces/configuration-event-emitter'
-import { Shelf } from '../../model/entities/shelf'
+import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
 import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
-import { ConfigurationEvent, ShelfUpdatedEvent } from '../value-objects/configuration-event'
+import { ConfigurationEvent, ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
 
 export class ConfigurationEventService implements ConfigurationEventEmitter, ConfigurationEventObserver {
@@ -19,16 +19,16 @@ export class ConfigurationEventService implements ConfigurationEventEmitter, Con
 
   constructor(private readonly configurationEventBuilder: ConfigurationEventBuilder) { }
 
-  public emitShelfUpdated(shelf: Shelf): void {
-    const shelfUpdatedEvent: ShelfUpdatedEvent = this.configurationEventBuilder.buildShelfUpdatedEvent(shelf)
-    this.emitConfigurationEvents(shelfUpdatedEvent)
+  public emitShelfConfigurationUpdated(shelfConfiguration: ShelfConfiguration): void {
+    const shelfConfigurationUpdatedEvent: ShelfConfigurationUpdatedEvent = this.configurationEventBuilder.buildShelfConfigurationUpdatedEvent(shelfConfiguration)
+    this.emitConfigurationEvents(shelfConfigurationUpdatedEvent)
   }
 
   private emitConfigurationEvents(configurationEvent: ConfigurationEvent): void {
     this.callbacks.forEach(callback => callback(configurationEvent))
   }
 
-  public subscribeToConfigurationEvents(onConfigurationEventCallback: (configurationEvent: ShelfUpdatedEvent) => void): void {
+  public subscribeToConfigurationEvents(onConfigurationEventCallback: (configurationEvent: ShelfConfigurationUpdatedEvent) => void): void {
     this.callbacks.push(onConfigurationEventCallback)
   }
 }

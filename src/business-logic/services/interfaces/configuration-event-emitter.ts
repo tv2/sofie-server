@@ -1,5 +1,5 @@
-import { Shelf } from '../../../model/entities/shelf'
+import { ShelfConfiguration } from '../../../model/entities/shelf-configuration'
 
 export interface ConfigurationEventEmitter {
-  emitShelfUpdated(shelf: Shelf): void
+  emitShelfConfigurationUpdated(shelfConfiguration: ShelfConfiguration): void
 }

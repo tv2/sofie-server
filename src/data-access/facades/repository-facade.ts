@@ -57,7 +57,7 @@ import { MongoMediaChangedListener } from '../repositories/mongo/mongo-media-cha
 import { Media } from '../../model/entities/media'
 import { SystemInformationRepository } from '../repositories/interfaces/system-information-repository'
 import { MongoSystemInformationRepository } from '../repositories/mongo/mongo-system-information-repository'
-import { ShelfRepository } from '../repositories/interfaces/shelf-repository'
+import { ShelfConfigurationRepository } from '../repositories/interfaces/shelf-configuration-repository'
 import { MongoShelfRepository } from '../repositories/mongo/mongo-shelf-repository'
 
 export class RepositoryFacade {
@@ -182,7 +182,7 @@ export class RepositoryFacade {
     return new MongoShowStyleRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
-  public static createShelfRepository(): ShelfRepository {
+  public static createShelfConfigurationRepository(): ShelfConfigurationRepository {
     return new MongoShelfRepository(RepositoryFacade.getMongoDatabaseInstance())
   }
 
