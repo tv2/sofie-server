@@ -3,6 +3,7 @@ import { EventBuilder } from '../services/event-builder'
 import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
+import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
 
 export class EventBuilderFacade {
 
@@ -19,6 +20,10 @@ export class EventBuilderFacade {
   }
 
   public static createConfigurationEventBuilder(): ConfigurationEventBuilder {
+    return new EventBuilder()
+  }
+
+  public static createStatusMessageEventBuilder(): StatusMessageEventBuilder {
     return new EventBuilder()
   }
 }

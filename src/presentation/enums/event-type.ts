@@ -39,3 +39,7 @@ export enum ActionTriggerEventType {
   ACTION_TRIGGER_UPDATED = 'ACTION_TRIGGER_UPDATED',
   ACTION_TRIGGER_DELETED = 'ACTION_TRIGGER_DELETED'
 }
+
+export enum StatusMessageEventType {
+  STATUS_MESSAGE = 'STATUS_MESSAGE'
+}

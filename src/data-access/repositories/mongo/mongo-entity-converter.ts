@@ -165,6 +165,15 @@ export interface MongoSystemInformation extends MongoId {
   name: string
 }
 
+export interface MongoDevice extends MongoId {
+  name: string
+  status: {
+    statusCode: number,
+    messages: string[]
+  }
+  connected: boolean
+}
+
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 
 export class MongoEntityConverter {

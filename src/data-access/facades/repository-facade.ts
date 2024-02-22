@@ -59,6 +59,10 @@ import { SystemInformationRepository } from '../repositories/interfaces/system-i
 import { MongoSystemInformationRepository } from '../repositories/mongo/mongo-system-information-repository'
 import { ShelfConfigurationRepository } from '../repositories/interfaces/shelf-configuration-repository'
 import { MongoShelfRepository } from '../repositories/mongo/mongo-shelf-repository'
+import { Device } from '../../model/entities/device'
+import { MongoDeviceChangedListener } from '../repositories/mongo/mongo-device-changed-listener'
+import { StatusMessageRepository } from '../repositories/interfaces/status-message-repository'
+import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status-message-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -216,6 +220,14 @@ export class RepositoryFacade {
 
   public static createSystemInformationRepository(): SystemInformationRepository {
     return new MongoSystemInformationRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
+  }
+
+  public static createDeviceDataChangedListener(): DataChangedListener<Device> {
+    return new MongoDeviceChangedListener(this.getMongoDatabaseInstance(), LoggerFacade.createLogger())
+  }
+
+  public static createStatusMessageRepository(): StatusMessageRepository {
+    return new MongoStatusMessageRepository(this.getMongoDatabaseInstance())
   }
 
   private static createUuidGenerator(): UuidGenerator {

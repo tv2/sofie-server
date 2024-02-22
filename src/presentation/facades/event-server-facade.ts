@@ -10,6 +10,7 @@ export class EventServerFacade {
       EventEmitterFacade.createActionTriggerEventObserver(),
       EventEmitterFacade.createMediaEventObserver(),
       EventEmitterFacade.createConfigurationEventObserver(),
+      EventEmitterFacade.createStatusMessageEventObserver(),
       LoggerFacade.createLogger()
     )
   }
