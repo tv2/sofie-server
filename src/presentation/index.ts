@@ -64,6 +64,7 @@ function startSystemServices(): void {
   ServiceFacade.createIngestChangeService()
   ServiceFacade.createIngestService()
   ServiceFacade.createMediaDataChangeService()
+  ServiceFacade.createDeviceDataChangedService()
 }
 
 startSofieServer()

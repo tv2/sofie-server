@@ -3,6 +3,9 @@ import { Segment, SegmentInterface } from '../segment'
 import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
+import { Device } from '../device'
+import { StatusCode } from '../../enums/status-code'
+import { StatusMessage } from '../status-message'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -52,5 +55,26 @@ export class EntityTestFactory {
       pieceLifespan: PieceLifespan.WITHIN_PART,
       ...pieceInterface
     } as PieceInterface)
+  }
+
+  public static createDevice(device: Partial<Device> = {}): Device {
+    return {
+      id: 'deviceId',
+      name: 'deviceName',
+      statusCode: StatusCode.UNKNOWN,
+      statusMessage: [],
+      isConnected: false,
+      ...device
+    }
+  }
+
+  public static createStatusMessage(statusMessage: Partial<StatusMessage> = {}): StatusMessage {
+    return {
+      id: 'statusMessageId',
+      title: 'statusMessageTitle',
+      message: 'someMessage',
+      statusCode: StatusCode.UNKNOWN,
+      ...statusMessage
+    }
   }
 }

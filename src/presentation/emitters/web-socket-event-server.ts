@@ -11,6 +11,8 @@ import { MediaEventObserver } from '../interfaces/media-event-observer'
 import { MediaEvent } from '../value-objects/media-event'
 import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
 import { ConfigurationEvent } from '../value-objects/configuration-event'
+import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
+import { StatusMessageEvent } from '../value-objects/status-message-event'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer
@@ -20,6 +22,7 @@ export class WebSocketEventServer implements EventServer {
     actionTriggerEventObserver: ActionTriggerEventObserver,
     mediaEventObserver: MediaEventObserver,
     configurationEventObserver: ConfigurationEventObserver,
+    statusMessageEventObserver: StatusMessageEventObserver,
     logger: Logger
   ): EventServer {
     if (!this.instance) {
@@ -28,6 +31,7 @@ export class WebSocketEventServer implements EventServer {
         actionTriggerEventObserver,
         mediaEventObserver,
         configurationEventObserver,
+        statusMessageEventObserver,
         logger
       )
     }
@@ -42,6 +46,7 @@ export class WebSocketEventServer implements EventServer {
     private readonly actionTriggerEventObserver: ActionTriggerEventObserver,
     private readonly mediaEventObserver: MediaEventObserver,
     private readonly configurationEventObserver: ConfigurationEventObserver,
+    private readonly statusMessageEventObserver: StatusMessageEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -97,6 +102,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.configurationEventObserver.subscribeToConfigurationEvents((configurationEvent: ConfigurationEvent) => {
       webSocket.send(JSON.stringify(configurationEvent))
+    })
+    this.statusMessageEventObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => {
+      webSocket.send(JSON.stringify(statusMessageEvent))
     })
   }
 

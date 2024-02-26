@@ -23,6 +23,7 @@ import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaDatabaseChangeService } from '../services/media-database-change-service'
 import { ConfigurationService } from '../services/interfaces/configuration-service'
 import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
+import { DeviceChangedService } from '../services/device-changed-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -102,6 +103,14 @@ export class ServiceFacade {
     return new ConfigurationServiceImplementation(
       EventEmitterFacade.createConfigurationEventEmitter(),
       RepositoryFacade.createShelfConfigurationRepository()
+    )
+  }
+
+  public static createDeviceDataChangedService(): DatabaseChangeService {
+    return DeviceChangedService.getInstance(
+      EventEmitterFacade.createStatusMessageEventEmitter(),
+      RepositoryFacade.createStatusMessageRepository(),
+      RepositoryFacade.createDeviceDataChangedListener()
     )
   }
 }

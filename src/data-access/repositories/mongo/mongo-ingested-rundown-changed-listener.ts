@@ -8,7 +8,7 @@ import {
   ChangeStreamOptions,
   ChangeStreamReplaceDocument
 } from 'mongodb'
-import { MongoIngestedRundown, MongoIngestedSegment } from './mongo-ingested-entity-converter'
+import { MongoIngestedRundown } from './mongo-ingested-entity-converter'
 import { MongoDatabase } from './mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedRundownRepository } from '../interfaces/ingested-rundown-repository'
@@ -40,7 +40,7 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
 
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
-    const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
+    const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedRundown, ChangeStreamDocument<MongoIngestedRundown>>([], options)
     changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedRundown>) => void this.onChange(change))
     this.logger.debug('Listening for Rundown collection changes...')
   }

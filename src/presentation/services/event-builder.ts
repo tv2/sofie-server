@@ -27,7 +27,13 @@ import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
-import { ActionTriggerEventType, ConfigurationEventType, IngestEventType, RundownEventType } from '../enums/event-type'
+import {
+  ActionTriggerEventType,
+  ConfigurationEventType,
+  IngestEventType,
+  RundownEventType,
+  StatusMessageEventType
+} from '../enums/event-type'
 import { SegmentDto } from '../dtos/segment-dto'
 import { Segment } from '../../model/entities/segment'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
@@ -47,8 +53,11 @@ import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../valu
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
 import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
 import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
+import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
+import { StatusMessage } from '../../model/entities/status-message'
+import { StatusMessageEvent } from '../value-objects/status-message-event'
 
-export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -292,6 +301,14 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: ConfigurationEventType.SHELF_CONFIGURATION_UPDATED,
       timestamp: Date.now(),
       shelfConfiguration
+    }
+  }
+
+  public buildStatusMessageEvent(statusMessage: StatusMessage): StatusMessageEvent {
+    return {
+      type: StatusMessageEventType.STATUS_MESSAGE,
+      timestamp: Date.now(),
+      statusMessage
     }
   }
 }
