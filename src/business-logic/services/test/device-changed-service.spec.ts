@@ -7,11 +7,13 @@ import { Device } from '../../../model/entities/device'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { StatusCode } from '../../../model/enums/status-code'
 import { StatusMessage } from '../../../model/entities/status-message'
+import { DeviceRepository } from '../../../data-access/repositories/interfaces/device-repository'
+import { Logger } from '../../../logger/logger'
 
 describe(DeviceChangedService.name, () => {
   describe('there are no StatusMessages for the Device', () => {
     describe('the Device is not connected', () => {
-      it('does nothing', async () => {
+      it('creates a new Bad StatusMessage', async () => {
         const device: Device = EntityTestFactory.createDevice({ isConnected: false })
         const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
 
@@ -19,16 +21,17 @@ describe(DeviceChangedService.name, () => {
         const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
 
         // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(statusMessageEventEmitter),
-          instance(statusMessageRepository),
-          instance(deviceDataChangedListener)
-        )
+        createTestee({
+          statusMessageEventEmitter: instance(statusMessageEventEmitter),
+          statusMessageRepository: instance(statusMessageRepository),
+          deviceDataChangeListener: instance(deviceDataChangedListener)
+        })
 
         await wait()
 
-        assertNoModifyMethodsCalled(statusMessageRepository)
-        verify(statusMessageEventEmitter.emitStatusMessageEvent(anything())).never()
+        const [statusMessage] = capture(statusMessageEventEmitter.emitStatusMessageEvent).last()
+        expect(statusMessage.statusCode).toBe(StatusCode.BAD)
+        verify(statusMessageRepository.createStatusMessage(anything())).once()
       })
     })
 
@@ -41,31 +44,11 @@ describe(DeviceChangedService.name, () => {
         const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
 
         // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(statusMessageEventEmitter),
-          instance(statusMessageRepository),
-          instance(deviceDataChangedListener)
-        )
-
-        await wait()
-
-        assertNoModifyMethodsCalled(statusMessageRepository)
-        verify(statusMessageEventEmitter.emitStatusMessageEvent(anything())).never()
-      })
-
-      it('does nothing when the Device status is UNKNOWN', async () => {
-        const device: Device = EntityTestFactory.createDevice({ isConnected: true, statusCode: StatusCode.UNKNOWN })
-        const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
-
-        const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
-        const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
-
-        // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(statusMessageEventEmitter),
-          instance(statusMessageRepository),
-          instance(deviceDataChangedListener)
-        )
+        createTestee({
+          statusMessageEventEmitter: instance(statusMessageEventEmitter),
+          statusMessageRepository: instance(statusMessageRepository),
+          deviceDataChangeListener: instance(deviceDataChangedListener)
+        })
 
         await wait()
 
@@ -80,11 +63,10 @@ describe(DeviceChangedService.name, () => {
         const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
 
         // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(statusMessageEventEmitter),
-          instance(mock<StatusMessageRepository>()),
-          instance(deviceDataChangedListener)
-        )
+        createTestee({
+          statusMessageEventEmitter: instance(statusMessageEventEmitter),
+          deviceDataChangeListener: instance(deviceDataChangedListener)
+        })
 
         await wait()
 
@@ -92,17 +74,16 @@ describe(DeviceChangedService.name, () => {
       })
 
       it('emits a StatusMessage event with values of the Device', async () => {
-        const device: Device = EntityTestFactory.createDevice({ isConnected: true, statusCode: StatusCode.BAD, statusMessage: ['Hello', 'World'] })
+        const device: Device = EntityTestFactory.createDevice({ isConnected: true, statusCode: StatusCode.BAD, statusMessage: 'Hello world' })
         const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
 
         const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
 
         // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(statusMessageEventEmitter),
-          instance(mock<StatusMessageRepository>()),
-          instance(deviceDataChangedListener)
-        )
+        createTestee({
+          statusMessageEventEmitter: instance(statusMessageEventEmitter),
+          deviceDataChangeListener: instance(deviceDataChangedListener)
+        })
 
         await wait()
 
@@ -117,11 +98,10 @@ describe(DeviceChangedService.name, () => {
         const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
 
         // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(mock<StatusMessageEventEmitter>()),
-          instance(statusMessageRepository),
-          instance(deviceDataChangedListener)
-        )
+        createTestee({
+          statusMessageRepository: instance(statusMessageRepository),
+          deviceDataChangeListener: instance(deviceDataChangedListener)
+        })
 
         await wait()
 
@@ -129,17 +109,16 @@ describe(DeviceChangedService.name, () => {
       })
 
       it('saves a new StatusMessage with the values for the Device', async () => {
-        const device: Device = EntityTestFactory.createDevice({ isConnected: true, statusCode: StatusCode.BAD, statusMessage: ['Hello', 'World'] })
+        const device: Device = EntityTestFactory.createDevice({ isConnected: true, statusCode: StatusCode.BAD, statusMessage: 'Hello world' })
         const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
 
         const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
 
         // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(mock<StatusMessageEventEmitter>()),
-          instance(statusMessageRepository),
-          instance(deviceDataChangedListener)
-        )
+        createTestee({
+          statusMessageRepository: instance(statusMessageRepository),
+          deviceDataChangeListener: instance(deviceDataChangedListener)
+        })
 
         await wait()
 
@@ -151,7 +130,7 @@ describe(DeviceChangedService.name, () => {
 
   describe('there is a StatusMessage for the Device', () => {
     describe('the Device is not connected', () => {
-      it('does not emit any events', async () => {
+      it('updates the StatusMessage to be BAD', async () => {
         const device: Device = EntityTestFactory.createDevice({ isConnected: false })
         const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
 
@@ -160,37 +139,17 @@ describe(DeviceChangedService.name, () => {
         when(statusMessageRepository.getStatusMessage(device.id)).thenReturn(Promise.resolve(EntityTestFactory.createStatusMessage()))
 
         // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(statusMessageEventEmitter),
-          instance(statusMessageRepository),
-          instance(deviceDataChangedListener)
-        )
+        createTestee({
+          statusMessageEventEmitter: instance(statusMessageEventEmitter),
+          statusMessageRepository: instance(statusMessageRepository),
+          deviceDataChangeListener: instance(deviceDataChangedListener)
+        })
 
         await wait()
 
-        verify(statusMessageEventEmitter.emitStatusMessageEvent(anything())).never()
-      })
-
-      it('deletes the StatusMessage for the Device', async () => {
-        const device: Device = EntityTestFactory.createDevice({ isConnected: false, statusCode: StatusCode.BAD })
-        const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
-
-        const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
-        const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
-
-        const statusMessageInDatabase: StatusMessage = createStatusMessageFromDevice(device)
-        when(statusMessageRepository.getStatusMessage(device.id)).thenReturn(Promise.resolve(statusMessageInDatabase))
-
-        // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-        new DeviceChangedService(
-          instance(statusMessageEventEmitter),
-          instance(statusMessageRepository),
-          instance(deviceDataChangedListener)
-        )
-
-        await wait()
-
-        verify(statusMessageRepository.deleteStatusMessage(statusMessageInDatabase.id)).once()
+        const [statusMessage] = capture(statusMessageEventEmitter.emitStatusMessageEvent).last()
+        expect(statusMessage.statusCode).toBe(StatusCode.BAD)
+        verify(statusMessageRepository.updateStatusMessage(anything())).once()
       })
     })
 
@@ -207,11 +166,11 @@ describe(DeviceChangedService.name, () => {
           when(statusMessageRepository.getStatusMessage(device.id)).thenReturn(Promise.resolve(statusMessageInDatabase))
 
           // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-          new DeviceChangedService(
-            instance(statusMessageEventEmitter),
-            instance(statusMessageRepository),
-            instance(deviceDataChangedListener)
-          )
+          createTestee({
+            statusMessageEventEmitter: instance(statusMessageEventEmitter),
+            statusMessageRepository: instance(statusMessageRepository),
+            deviceDataChangeListener: instance(deviceDataChangedListener)
+          })
 
           await wait()
 
@@ -232,11 +191,11 @@ describe(DeviceChangedService.name, () => {
           when(statusMessageRepository.getStatusMessage(device.id)).thenReturn(Promise.resolve(statusMessageInDatabase))
 
           // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-          new DeviceChangedService(
-            instance(statusMessageEventEmitter),
-            instance(statusMessageRepository),
-            instance(deviceDataChangedListener)
-          )
+          createTestee({
+            statusMessageEventEmitter: instance(statusMessageEventEmitter),
+            statusMessageRepository: instance(statusMessageRepository),
+            deviceDataChangeListener: instance(deviceDataChangedListener)
+          })
 
           await wait()
 
@@ -256,34 +215,11 @@ describe(DeviceChangedService.name, () => {
           when(statusMessageRepository.getStatusMessage(device.id)).thenReturn(Promise.resolve(statusMessageInDatabase))
 
           // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-          new DeviceChangedService(
-            instance(statusMessageEventEmitter),
-            instance(statusMessageRepository),
-            instance(deviceDataChangedListener)
-          )
-
-          await wait()
-
-          verify(statusMessageRepository.deleteStatusMessage(statusMessageInDatabase.id)).once()
-          verify(statusMessageRepository.updateStatusMessage(anything())).never()
-        })
-
-        it('deletes the saved StatusMessage when the Device status is UNKNOWN', async () => {
-          const device: Device = EntityTestFactory.createDevice({ isConnected: true, statusCode: StatusCode.UNKNOWN })
-          const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
-
-          const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
-          const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
-
-          const statusMessageInDatabase: StatusMessage = EntityTestFactory.createStatusMessage({ id: 'differentStatusMessageId', title: 'different', statusCode: StatusCode.GOOD })
-          when(statusMessageRepository.getStatusMessage(device.id)).thenReturn(Promise.resolve(statusMessageInDatabase))
-
-          // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-          new DeviceChangedService(
-            instance(statusMessageEventEmitter),
-            instance(statusMessageRepository),
-            instance(deviceDataChangedListener)
-          )
+          createTestee({
+            statusMessageEventEmitter: instance(statusMessageEventEmitter),
+            statusMessageRepository: instance(statusMessageRepository),
+            deviceDataChangeListener: instance(deviceDataChangedListener)
+          })
 
           await wait()
 
@@ -303,11 +239,11 @@ describe(DeviceChangedService.name, () => {
             when(statusMessageRepository.getStatusMessage(device.id)).thenReturn(Promise.resolve(statusMessageInDatabase))
 
             // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-            new DeviceChangedService(
-              instance(statusMessageEventEmitter),
-              instance(statusMessageRepository),
-              instance(deviceDataChangedListener)
-            )
+            createTestee({
+              statusMessageEventEmitter: instance(statusMessageEventEmitter),
+              statusMessageRepository: instance(statusMessageRepository),
+              deviceDataChangeListener: instance(deviceDataChangedListener)
+            })
 
             await wait()
 
@@ -319,6 +255,31 @@ describe(DeviceChangedService.name, () => {
     })
   })
 })
+
+function createTestee(params?: {
+  statusMessageEventEmitter?: StatusMessageEventEmitter,
+  statusMessageRepository?: StatusMessageRepository,
+  deviceRepository?: DeviceRepository,
+  deviceDataChangeListener?: DataChangedListener<Device>,
+  logger?: Logger
+}): DeviceChangedService {
+  let deviceRepository: DeviceRepository
+  if (!params?.deviceRepository) {
+    const deviceRepositoryMock: DeviceRepository = mock<DeviceRepository>()
+    when(deviceRepositoryMock.getDevices()).thenReturn(Promise.resolve([]))
+    deviceRepository = instance(deviceRepositoryMock)
+  } else {
+    deviceRepository = params.deviceRepository
+  }
+
+  return new DeviceChangedService(
+    params?.statusMessageEventEmitter ?? instance(mock<StatusMessageEventEmitter>()),
+    params?.statusMessageRepository ?? instance(mock<StatusMessageRepository>()),
+    deviceRepository,
+    params?.deviceDataChangeListener ?? instance(mock<DataChangedListener<Device>>()),
+    params?.logger ?? instance(mock<Logger>())
+  )
+}
 
 function createDeviceChangedListenerMock(device: Device): DataChangedListener<Device> {
   const deviceDataChangedListener: DataChangedListener<Device> = mock<DataChangedListener<Device>>()
@@ -345,13 +306,10 @@ function assertStatusMessageIsFromDevice(emittedStatusMessage: StatusMessage, de
 }
 
 function createStatusMessageFromDevice(device: Device): StatusMessage {
-  const message: string = device.statusMessage.length === 0
-    ? ''
-    : device.statusMessage.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
   return {
     id: device.id,
     title: device.name,
     statusCode: device.statusCode,
-    message
+    message: device.statusMessage
   }
 }

@@ -110,7 +110,9 @@ export class ServiceFacade {
     return DeviceChangedService.getInstance(
       EventEmitterFacade.createStatusMessageEventEmitter(),
       RepositoryFacade.createStatusMessageRepository(),
-      RepositoryFacade.createDeviceDataChangedListener()
+      RepositoryFacade.createDeviceRepository(),
+      RepositoryFacade.createDeviceDataChangedListener(),
+      LoggerFacade.createLogger()
     )
   }
 }

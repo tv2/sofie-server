@@ -62,7 +62,7 @@ export class EntityTestFactory {
       id: 'deviceId',
       name: 'deviceName',
       statusCode: StatusCode.UNKNOWN,
-      statusMessage: [],
+      statusMessage: '',
       isConnected: false,
       ...device
     }
