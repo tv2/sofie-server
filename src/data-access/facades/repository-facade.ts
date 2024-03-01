@@ -63,6 +63,8 @@ import { Device } from '../../model/entities/device'
 import { MongoDeviceChangedListener } from '../repositories/mongo/mongo-device-changed-listener'
 import { StatusMessageRepository } from '../repositories/interfaces/status-message-repository'
 import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status-message-repository'
+import { DeviceRepository } from '../repositories/interfaces/device-repository'
+import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -223,7 +225,11 @@ export class RepositoryFacade {
   }
 
   public static createDeviceDataChangedListener(): DataChangedListener<Device> {
-    return new MongoDeviceChangedListener(this.getMongoDatabaseInstance(), LoggerFacade.createLogger())
+    return new MongoDeviceChangedListener(this.getMongoDatabaseInstance(), new MongoEntityConverter(), LoggerFacade.createLogger())
+  }
+
+  public static createDeviceRepository(): DeviceRepository {
+    return new MongoDeviceRepository(this.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
   public static createStatusMessageRepository(): StatusMessageRepository {

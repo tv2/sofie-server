@@ -5,5 +5,5 @@ export interface Device {
   name: string
   isConnected: boolean
   statusCode: StatusCode
-  statusMessage: string[]
+  statusMessage: string
 }

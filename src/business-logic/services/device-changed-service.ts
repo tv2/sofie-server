@@ -6,6 +6,11 @@ import { StatusMessage } from '../../model/entities/status-message'
 import { StatusMessageRepository } from '../../data-access/repositories/interfaces/status-message-repository'
 import { NotFoundException } from '../../model/exceptions/not-found-exception'
 import { StatusCode } from '../../model/enums/status-code'
+import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
+import { Logger } from '../../logger/logger'
+
+// TODO: Find a way to translate
+const NOT_CONNECTED_MESSAGE: string = 'Not connected'
 
 export class DeviceChangedService implements DatabaseChangeService {
   private static instance: DatabaseChangeService
@@ -13,47 +18,69 @@ export class DeviceChangedService implements DatabaseChangeService {
   public static getInstance(
     statusMessageEventEmitter: StatusMessageEventEmitter,
     statusMessageRepository: StatusMessageRepository,
-    deviceChangedListener: DataChangedListener<Device>
+    deviceRepository: DeviceRepository,
+    deviceChangedListener: DataChangedListener<Device>,
+    logger: Logger
   ): DatabaseChangeService {
     if (!this.instance) {
       this.instance = new DeviceChangedService(
         statusMessageEventEmitter,
         statusMessageRepository,
-        deviceChangedListener
+        deviceRepository,
+        deviceChangedListener,
+        logger
       )
     }
     return this.instance
   }
 
+  private readonly logger: Logger
+
   constructor(
     private readonly statusMessageEventEmitter: StatusMessageEventEmitter,
     private readonly statusMessageRepository: StatusMessageRepository,
-    deviceChangedListener: DataChangedListener<Device>
+    private readonly deviceRepository: DeviceRepository,
+    deviceChangedListener: DataChangedListener<Device>,
+    logger: Logger
   ) {
+    this.logger = logger.tag(DeviceChangedService.name)
+    this.callAgainOnError(() => this.updateStatusMessageFromCurrentDeviceStatus())
     this.listenForStatusMessageChanges(deviceChangedListener)
   }
 
+  private callAgainOnError(callback: () => Promise<void>, attemptNumber: number = 1): void {
+    const maxAttempts: number = 10
+    callback().catch((error) => {
+      if (attemptNumber >= maxAttempts){
+        this.logger.debug(`Unable to successfully call method on ${attemptNumber} attempts. Stopping recursive function`)
+        this.logger.error(error)
+        return
+      }
+      setTimeout(() => {
+        this.callAgainOnError(callback, ++attemptNumber)
+      }, 1000)
+    })
+  }
+
+  private async updateStatusMessageFromCurrentDeviceStatus(): Promise<void> {
+    const devices: Device[] = await this.deviceRepository.getDevices()
+    await Promise.all(devices.map(device => this.onDeviceUpdated(device)))
+  }
+
   private listenForStatusMessageChanges(deviceChangedListener: DataChangedListener<Device>): void {
+    deviceChangedListener.onCreated(device => void this.onDeviceUpdated(device))
     deviceChangedListener.onUpdated(device => void this.onDeviceUpdated(device))
   }
 
   private async onDeviceUpdated(device: Device): Promise<void> {
-    const statusMessageFromDatabase: StatusMessage | undefined = await this.getStatusMessageFromDatabase(device.id)
-    if (!statusMessageFromDatabase) {
-      if (!device.isConnected) {
-        return
-      }
-
-      if ([StatusCode.GOOD, StatusCode.UNKNOWN].includes(device.statusCode)) {
-        return
-      }
-      this.statusMessageEventEmitter.emitStatusMessageEvent(this.convertDeviceToStatusMessage(device))
-      await this.statusMessageRepository.createStatusMessage(this.convertDeviceToStatusMessage(device))
-      return
+    if (!device.isConnected) {
+      device.statusCode = StatusCode.BAD
+      device.statusMessage = NOT_CONNECTED_MESSAGE
     }
 
-    if (!device.isConnected) {
-      await this.statusMessageRepository.deleteStatusMessage(statusMessageFromDatabase.id)
+    const statusMessageFromDatabase: StatusMessage | undefined = await this.getStatusMessageFromDatabase(device.id)
+    if (!statusMessageFromDatabase) {
+      await this.createNewStatusMessageIfStatusIsNotGood(device)
       return
     }
 
@@ -61,13 +88,22 @@ export class DeviceChangedService implements DatabaseChangeService {
       return
     }
 
-    if ([StatusCode.GOOD, StatusCode.UNKNOWN].includes(device.statusCode)) {
+    this.statusMessageEventEmitter.emitStatusMessageEvent(this.convertDeviceToStatusMessage(device))
+
+    if ([StatusCode.GOOD].includes(device.statusCode)) {
       await this.statusMessageRepository.deleteStatusMessage(statusMessageFromDatabase.id)
-    } else {
-      await this.statusMessageRepository.updateStatusMessage(this.convertDeviceToStatusMessage(device))
+      return
     }
 
+    await this.statusMessageRepository.updateStatusMessage(this.convertDeviceToStatusMessage(device))
+  }
+
+  private async createNewStatusMessageIfStatusIsNotGood(device: Device): Promise<void> {
+    if ([StatusCode.GOOD].includes(device.statusCode)) {
+      return
+    }
     this.statusMessageEventEmitter.emitStatusMessageEvent(this.convertDeviceToStatusMessage(device))
+    await this.statusMessageRepository.createStatusMessage(this.convertDeviceToStatusMessage(device))
   }
 
   private async getStatusMessageFromDatabase(statusMessageId: string): Promise<StatusMessage | undefined> {
@@ -88,15 +124,11 @@ export class DeviceChangedService implements DatabaseChangeService {
   }
 
   private convertDeviceToStatusMessage(device: Device): StatusMessage {
-    const message: string = device.statusMessage.length === 0
-      ? ''
-      : device.statusMessage.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
-
     return {
       id: device.id,
       statusCode: device.statusCode,
       title: device.name,
-      message
+      message: device.statusMessage
     }
   }
 }
