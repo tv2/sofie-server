@@ -21,6 +21,9 @@ import { ActionTriggerService } from '../services/interfaces/action-trigger-serv
 import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaDatabaseChangeService } from '../services/media-database-change-service'
+import { ConfigurationService } from '../services/interfaces/configuration-service'
+import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
+import { DeviceChangedService } from '../services/device-changed-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -94,5 +97,22 @@ export class ServiceFacade {
   public static createIngestService(): IngestService {
     const httpService: HttpService = new GotHttpService()
     return new Tv2INewsIngestService(httpService, RepositoryFacade.createRundownRepository())
+  }
+
+  public static createConfigurationService(): ConfigurationService {
+    return new ConfigurationServiceImplementation(
+      EventEmitterFacade.createConfigurationEventEmitter(),
+      RepositoryFacade.createShelfConfigurationRepository()
+    )
+  }
+
+  public static createDeviceDataChangedService(): DatabaseChangeService {
+    return DeviceChangedService.getInstance(
+      EventEmitterFacade.createStatusMessageEventEmitter(),
+      RepositoryFacade.createStatusMessageRepository(),
+      RepositoryFacade.createDeviceRepository(),
+      RepositoryFacade.createDeviceDataChangedListener(),
+      LoggerFacade.createLogger()
+    )
   }
 }

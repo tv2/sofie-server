@@ -27,21 +27,37 @@ import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
-import { ActionTriggerEventType, IngestEventType, RundownEventType } from '../enums/rundown-event-type'
+import {
+  ActionTriggerEventType,
+  ConfigurationEventType,
+  IngestEventType,
+  RundownEventType,
+  StatusMessageEventType
+} from '../enums/event-type'
 import { SegmentDto } from '../dtos/segment-dto'
 import { Segment } from '../../model/entities/segment'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
 import { ActionTrigger } from '../../model/entities/action-trigger'
-import { ActionTriggerCreatedEvent, ActionTriggerDeletedEvent, ActionTriggerUpdatedEvent } from '../value-objects/action-trigger-event'
+import {
+  ActionTriggerCreatedEvent,
+  ActionTriggerDeletedEvent,
+  ActionTriggerUpdatedEvent
+} from '../value-objects/action-trigger-event'
 import { ActionTriggerDto } from '../dtos/action-trigger-dto'
 import { RundownDto } from '../dtos/rundown-dto'
 import { Media } from '../../model/entities/media'
 import { MediaDto } from '../dtos/media-dto'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
+import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
+import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
+import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
+import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
+import { StatusMessage } from '../../model/entities/status-message'
+import { StatusMessageEvent } from '../value-objects/status-message-event'
 
-export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -277,6 +293,22 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: ActionTriggerEventType.ACTION_TRIGGER_DELETED,
       timestamp: Date.now(),
       actionTriggerId,
+    }
+  }
+
+  public buildShelfConfigurationUpdatedEvent(shelfConfiguration: ShelfConfiguration): ShelfConfigurationUpdatedEvent {
+    return {
+      type: ConfigurationEventType.SHELF_CONFIGURATION_UPDATED,
+      timestamp: Date.now(),
+      shelfConfiguration
+    }
+  }
+
+  public buildStatusMessageEvent(statusMessage: StatusMessage): StatusMessageEvent {
+    return {
+      type: StatusMessageEventType.STATUS_MESSAGE,
+      timestamp: Date.now(),
+      statusMessage
     }
   }
 }

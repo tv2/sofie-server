@@ -119,7 +119,7 @@ export class Tv2VideoClipActionFactory {
     return {
       id: `videoClipActionPiece_${videoClipData.fileName}`,
       partId,
-      name: videoClipData.name,
+      name: videoClipData.fileName,
       layer: Tv2SourceLayer.VIDEO_CLIP,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,

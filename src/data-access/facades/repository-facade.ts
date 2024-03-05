@@ -57,6 +57,14 @@ import { MongoMediaChangedListener } from '../repositories/mongo/mongo-media-cha
 import { Media } from '../../model/entities/media'
 import { SystemInformationRepository } from '../repositories/interfaces/system-information-repository'
 import { MongoSystemInformationRepository } from '../repositories/mongo/mongo-system-information-repository'
+import { ShelfConfigurationRepository } from '../repositories/interfaces/shelf-configuration-repository'
+import { MongoShelfRepository } from '../repositories/mongo/mongo-shelf-repository'
+import { Device } from '../../model/entities/device'
+import { MongoDeviceChangedListener } from '../repositories/mongo/mongo-device-changed-listener'
+import { StatusMessageRepository } from '../repositories/interfaces/status-message-repository'
+import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status-message-repository'
+import { DeviceRepository } from '../repositories/interfaces/device-repository'
+import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -180,6 +188,10 @@ export class RepositoryFacade {
     return new MongoShowStyleRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
   }
 
+  public static createShelfConfigurationRepository(): ShelfConfigurationRepository {
+    return new MongoShelfRepository(RepositoryFacade.getMongoDatabaseInstance())
+  }
+
   public static createActionRepository(): ActionRepository {
     return new MongoActionRepository(RepositoryFacade.getMongoDatabaseInstance())
   }
@@ -210,6 +222,18 @@ export class RepositoryFacade {
 
   public static createSystemInformationRepository(): SystemInformationRepository {
     return new MongoSystemInformationRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
+  }
+
+  public static createDeviceDataChangedListener(): DataChangedListener<Device> {
+    return new MongoDeviceChangedListener(this.getMongoDatabaseInstance(), new MongoEntityConverter(), LoggerFacade.createLogger())
+  }
+
+  public static createDeviceRepository(): DeviceRepository {
+    return new MongoDeviceRepository(this.getMongoDatabaseInstance(), new MongoEntityConverter())
+  }
+
+  public static createStatusMessageRepository(): StatusMessageRepository {
+    return new MongoStatusMessageRepository(this.getMongoDatabaseInstance())
   }
 
   private static createUuidGenerator(): UuidGenerator {

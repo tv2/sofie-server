@@ -65,8 +65,10 @@ export class ControllerFacade {
 
   private static createConfigurationController(): ConfigurationController {
     return new ConfigurationController(
+      ServiceFacade.createConfigurationService(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleVariantRepository(),
+      RepositoryFacade.createShelfConfigurationRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
@@ -83,6 +85,7 @@ export class ControllerFacade {
   private static createSystemInformationController(): SystemInformationController {
     return new SystemInformationController(
       RepositoryFacade.createSystemInformationRepository(),
+      RepositoryFacade.createStatusMessageRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )

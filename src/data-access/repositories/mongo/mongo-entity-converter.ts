@@ -27,6 +27,8 @@ import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { SystemInformation } from '../../../model/entities/system-information'
+import { Device } from '../../../model/entities/device'
+import { StatusCode } from '../../../model/enums/status-code'
 
 export interface MongoId {
   _id: string
@@ -163,6 +165,15 @@ export interface MongoMedia extends MongoId {
 
 export interface MongoSystemInformation extends MongoId {
   name: string
+}
+
+export interface MongoDevice extends MongoId {
+  name: string
+  status: {
+    statusCode: number,
+    messages: string[]
+  }
+  connected: boolean
 }
 
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
@@ -456,5 +467,41 @@ export class MongoEntityConverter {
     return {
       name: mongoSystemInformation.name
     }
+  }
+
+  public convertToDevice(mongoDevice: MongoDevice): Device {
+    const statusMessage: string = mongoDevice.status.messages && mongoDevice.status.messages.length > 0
+      ? mongoDevice.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
+      : ''
+    return {
+      id: mongoDevice._id,
+      name: mongoDevice.name,
+      isConnected: mongoDevice.connected,
+      statusCode: this.getStatusCode(mongoDevice.status.statusCode),
+      statusMessage
+    }
+  }
+
+  private getStatusCode(value: number): StatusCode {
+    switch (value) {
+      case 1: {
+        return StatusCode.GOOD
+      }
+      case 2:
+      case 3: {
+        return StatusCode.WARNING
+      }
+      case 4:
+      case 5: {
+        return StatusCode.BAD
+      }
+      default: {
+        return StatusCode.UNKNOWN
+      }
+    }
+  }
+
+  public convertToDevices(mongoDevices: MongoDevice[]): Device[] {
+    return mongoDevices.map(mongoDevice => this.convertToDevice(mongoDevice))
   }
 }
