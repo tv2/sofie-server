@@ -189,7 +189,7 @@ export class RepositoryFacade {
   }
 
   public static createShelfConfigurationRepository(): ShelfConfigurationRepository {
-    return new MongoShelfRepository(RepositoryFacade.getMongoDatabaseInstance())
+    return new MongoShelfRepository(RepositoryFacade.getMongoDatabaseInstance(), this.createUuidGenerator())
   }
 
   public static createActionRepository(): ActionRepository {
