@@ -22,6 +22,7 @@ import { OnAirException } from '../exceptions/on-air-exception'
 import { RundownTiming } from '../value-objects/rundown-timing'
 import { InTransition } from '../value-objects/in-transition'
 import { RundownMode } from '../enums/rundown-mode'
+import { AlreadyRehearsalException } from '../exceptions/already-rehearsal-exception'
 
 export interface RundownInterface {
   id: string
@@ -85,10 +86,24 @@ export class Rundown extends BasicRundown {
     if (this.isActive()) {
       throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated')
     }
+    this.initializeRundown(RundownMode.ACTIVE)
+  }
+
+  public enterRehearsal() :void {
+    if (this.isActive()) {
+      throw new AlreadyActivatedException('Can\'t set Rundown to rehearsal since it is already activated')
+    }
+    if (this.getMode() === RundownMode.REHEARSAL) {
+      throw new AlreadyRehearsalException('Can\'t set Rundown to rehearsal since it is already in rehearsal')
+    }
+    this.initializeRundown(RundownMode.REHEARSAL)
+  }
+
+  private initializeRundown(mode: RundownMode): void {
     this.resetSegments()
     this.resetHistory()
+    this.mode = mode
     this.infinitePieces = new Map()
-    this.mode = RundownMode.ACTIVE
 
     const firstSegment: Segment = this.findFirstSegment()
     firstSegment.setAsNext()
