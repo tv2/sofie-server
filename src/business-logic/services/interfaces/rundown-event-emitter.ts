@@ -5,6 +5,7 @@ import { Segment } from '../../../model/entities/segment'
 
 export interface RundownEventEmitter {
   emitActivateEvent(rundown: Rundown): void
+  emitRehearsalEvent(rundown: Rundown): void
   emitDeactivateEvent(rundown: Rundown): void
   emitResetEvent(rundown: Rundown): void
   emitTakeEvent(rundown: Rundown): void

@@ -17,9 +17,10 @@ import { Segment } from '../../model/entities/segment'
 import { SegmentRepository } from '../../data-access/repositories/interfaces/segment-repository'
 import { PieceRepository } from '../../data-access/repositories/interfaces/piece-repository'
 import { InTransition } from '../../model/value-objects/in-transition'
-import { BasicRundown } from '../../model/entities/basic-rundown'
 import { AlreadyActivatedException } from '../../model/exceptions/already-activated-exception'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
+import { RundownMode } from '../../model/enums/rundown-mode'
+import { AlreadyRehearsalException } from '../../model/exceptions/already-rehearsal-exception'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -36,17 +37,28 @@ export class RundownTimelineService implements RundownService {
   ) {}
 
   public async activateRundown(rundownId: string): Promise<void> {
-    await this.assertNoRundownIsActive()
+    await this.assertNoRundownIsActiveOrInRehearsal()
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBeforeActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
     rundown.activate()
 
     await this.buildAndPersistTimeline(rundown)
-    const infinitePiecesAfterActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
-    if (this.doInfinitePieceMapsDiffer(infinitePiecesBeforeActivation, infinitePiecesAfterActivation)) {
-      this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
-    }
+    this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeActivation)
     this.rundownEventEmitter.emitActivateEvent(rundown)
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
+
+    await this.saveRundown(rundown)
+  }
+
+  public async enterRehearsalOnRundown(rundownId: string): Promise<void> {
+    await this.assertNoRundownIsActiveOrInRehearsal()
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const infinitePiecesBeforeRehearsal: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    rundown.enterRehearsal()
+
+    await this.buildAndPersistTimeline(rundown)
+    this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeRehearsal)
+    this.rundownEventEmitter.emitRehearsalEvent(rundown)
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.saveRundown(rundown)
@@ -56,17 +68,27 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private async assertNoRundownIsActive(): Promise<void> {
-    const activeRundown: BasicRundown | undefined = (await this.rundownRepository.getBasicRundowns()).find(rundown => rundown.isActive())
-    if (activeRundown) {
-      throw new AlreadyActivatedException(`Unable to activate rundown, because the rundown ${activeRundown.name} is active. `)
-    }
+  private async assertNoRundownIsActiveOrInRehearsal(): Promise<void> {
+    (await this.rundownRepository.getBasicRundowns()).forEach(rundown => {
+      if (rundown.getMode() === RundownMode.ACTIVE) {
+        throw new AlreadyActivatedException(`Unable to do action. Rundown ${rundown.name} is already active.`)
+      }
+      if (rundown.getMode() === RundownMode.REHEARSAL) {
+        throw new AlreadyRehearsalException(`Unable to do action. Rundown ${rundown.name} is already in rehearsal.`)
+      }
+    })
   }
 
   private async buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
     const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
     await this.timelineRepository.saveTimeline(timeline)
     return timeline
+  }
+
+  private emitIfInfinitePiecesHasChanged(rundown: Rundown, infinitePiecesBefore: Map<string, Piece>): void {
+    if (this.doInfinitePieceMapsDiffer(infinitePiecesBefore, rundown.getInfinitePiecesMap())) {
+      this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    }
   }
 
   private doInfinitePieceMapsDiffer(firstInfinitePieceMap: Map<string, Piece>, secondInfinitePieceMap: Map<string, Piece>): boolean {
@@ -117,10 +139,7 @@ export class RundownTimelineService implements RundownService {
 
     const timeline: Timeline = await this.buildAndPersistTimeline(rundown)
 
-    const infinitePiecesAfterTakeNext: Map<string, Piece> = rundown.getInfinitePiecesMap()
-    if (this.doInfinitePieceMapsDiffer(infinitePiecesBeforeTakeNext, infinitePiecesAfterTakeNext)) {
-      this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
-    }
+    this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundownId)
@@ -248,10 +267,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const infinitePiecesAfterInsertPieceAsOnAir: Map<string, Piece> = rundown.getInfinitePiecesMap()
-    if (this.doInfinitePieceMapsDiffer(infinitePiecesBeforeInsertPieceAsOnAir, infinitePiecesAfterInsertPieceAsOnAir)) {
-      this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
-    }
+    this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeInsertPieceAsOnAir)
     this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getActivePart())
 
     await this.saveRundown(rundown)

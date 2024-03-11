@@ -16,6 +16,7 @@ import {
   RundownDeactivatedEvent,
   RundownDeletedEvent,
   RundownInfinitePiecesUpdatedEvent,
+  RundownRehearsalEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
   SegmentCreatedEvent,
@@ -61,6 +62,14 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+    }
+  }
+
+  public buildRehearsalEvent(rundown: Rundown): RundownRehearsalEvent {
+    return {
+      type: RundownEventType.REHEARSAL,
       timestamp: Date.now(),
       rundownId: rundown.id,
     }

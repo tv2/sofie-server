@@ -22,6 +22,7 @@ import { Segment } from '../../../model/entities/segment'
 import { Timeline } from '../../../model/entities/timeline'
 import { TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
 import { RundownMode } from '../../../model/enums/rundown-mode'
+import { AlreadyRehearsalException } from '../../../model/exceptions/already-rehearsal-exception'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -71,16 +72,59 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
     it('throws an exception, when trying to active a rundown when there is another already activated rundown', async () => {
-      const activeBasicRundown: Rundown = EntityMockFactory.createRundown({ mode: RundownMode.ACTIVE })
-      const basicRundowns: Rundown[] = [activeBasicRundown]
-      const rundownToActivate: Rundown = EntityMockFactory.createRundown({id: 'inactiveRundown', mode: RundownMode.INACTIVE})
+      const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE })]
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
       when(mockRundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
-      const testee: RundownTimelineService = createTestee({rundownRepository: instance(mockRundownRepository)})
 
-      const result: () => Promise<void> = () => testee.activateRundown(rundownToActivate.name)
+      const rundownToActivate: Rundown = EntityMockFactory.createRundown({ id: 'inactiveRundown', mode: RundownMode.INACTIVE })
+      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
+
+      const result: () => Promise<void> = () => testee.activateRundown(rundownToActivate.id)
 
       await expect(result).rejects.toThrow(AlreadyActivatedException)
+    })
+
+    it('throws an exception when trying to active a Rundown when there is another Rundown in rehearsal', async () => {
+      const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.REHEARSAL })]
+      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
+      when(mockRundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
+
+      const rundownToActivate: Rundown = EntityMockFactory.createRundown({ id: 'inactiveRundown', mode: RundownMode.INACTIVE })
+
+      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
+
+      const result: () => Promise<void> = () => testee.activateRundown(rundownToActivate.id)
+
+      await expect(result).rejects.toThrow(AlreadyRehearsalException)
+    })
+  })
+
+  describe(`${RundownTimelineService.prototype.enterRehearsalOnRundown.name}`, () => {
+    it('throws an exception when trying to enter rehearsal on a Rundown when another Rundown is already active', async () => {
+      const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE })]
+      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
+      when(mockRundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
+
+      const rundownToEnterRehearsal: Rundown = EntityMockFactory.createRundown({ id: 'inactiveRundown', mode: RundownMode.INACTIVE })
+      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
+
+      const result: () => Promise<void> = () => testee.enterRehearsalOnRundown(rundownToEnterRehearsal.id)
+
+      await expect(result).rejects.toThrow(AlreadyActivatedException)
+    })
+
+    it('throws an exception when trying to enter rehearsal on a Rundown when another Rundown is already in rehearsal', async () => {
+      const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.REHEARSAL })]
+      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
+      when(mockRundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
+
+      const rundownToEnterRehearsal: Rundown = EntityMockFactory.createRundown({ id: 'inactiveRundown', mode: RundownMode.INACTIVE })
+
+      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
+
+      const result: () => Promise<void> = () => testee.enterRehearsalOnRundown(rundownToEnterRehearsal.id)
+
+      await expect(result).rejects.toThrow(AlreadyRehearsalException)
     })
   })
 
