@@ -27,7 +27,7 @@ export class IngestedEntityToEntityMapper {
   }
 
   public updateRundownFromIngestedRundown(rundownToUpdate: Rundown, ingestedRundown: IngestedRundown): Rundown {
-    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = rundownToUpdate.isActive()
+    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = rundownToUpdate.isActive() || rundownToUpdate.isRehearsal()
       ? {
         activeCursor: rundownToUpdate.getActiveCursor(),
         nextCursor: rundownToUpdate.getNextCursor(),

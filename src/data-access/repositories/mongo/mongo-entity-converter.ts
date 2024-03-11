@@ -182,7 +182,7 @@ const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 export class MongoEntityConverter {
 
   public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {
-    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = mongoRundown.mode
+    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = [RundownMode.ACTIVE, RundownMode.REHEARSAL].includes(mongoRundown.mode)
       ? {
         activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
         nextCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.nextCursor, segments),

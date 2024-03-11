@@ -37,7 +37,7 @@ export class RundownTimelineService implements RundownService {
   ) {}
 
   public async activateRundown(rundownId: string): Promise<void> {
-    await this.assertNoRundownIsActiveOrInRehearsal()
+    await this.assertNoRundownIsActiveOrInRehearsal(rundownId)
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBeforeActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
     rundown.activate()
@@ -68,10 +68,13 @@ export class RundownTimelineService implements RundownService {
     await this.rundownRepository.saveRundown(rundown)
   }
 
-  private async assertNoRundownIsActiveOrInRehearsal(): Promise<void> {
+  private async assertNoRundownIsActiveOrInRehearsal(rundownIdExemptFromRehearsalCheck?: string): Promise<void> {
     (await this.rundownRepository.getBasicRundowns()).forEach(rundown => {
       if (rundown.getMode() === RundownMode.ACTIVE) {
         throw new AlreadyActivatedException(`Unable to do action. Rundown ${rundown.name} is already active.`)
+      }
+      if (!!rundownIdExemptFromRehearsalCheck && rundown.id === rundownIdExemptFromRehearsalCheck) {
+        return
       }
       if (rundown.getMode() === RundownMode.REHEARSAL) {
         throw new AlreadyRehearsalException(`Unable to do action. Rundown ${rundown.name} is already in rehearsal.`)

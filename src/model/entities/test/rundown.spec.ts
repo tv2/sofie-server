@@ -2640,6 +2640,59 @@ describe(Rundown.name, () => {
       expect(testee.isActive()).toBeTruthy()
     })
 
+    describe('Rundown is in Rehearsal', () => {
+      it ('sets the Rundown to be active', () => {
+        const testee: Rundown = new Rundown({ mode: RundownMode.REHEARSAL } as RundownInterface)
+        testee.activate()
+        expect(testee.getMode()).toBe(RundownMode.ACTIVE)
+      })
+
+      it('has same state as before activation', () => {
+        const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'activeSegment', parts: [activePart] })
+
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'nextSegment', parts: [nextPart] })
+
+        const infinitePiece: Piece = EntityTestFactory.createPiece({ pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+        const thirdPart: Part = EntityTestFactory.createPart({ id: 'thirdPart', pieces: [infinitePiece] })
+        const thirdSegment: Segment = EntityTestFactory.createSegment({ id: 'thirdSegment', parts: [thirdPart] })
+
+        const infinitePieces: Map<string, Piece> = new Map([
+          ['layerOne', EntityTestFactory.createPiece({ id: 'infinitePieceOne' })],
+          ['layerTwo', EntityTestFactory.createPiece({ id: 'infinitePieceTwo' })]
+        ])
+        const testee: Rundown = new Rundown({
+          mode: RundownMode.REHEARSAL,
+          segments: [activeSegment, nextSegment, thirdSegment],
+          alreadyActiveProperties: {
+            activeCursor: {
+              part: activePart,
+              segment: activeSegment,
+              owner: Owner.SYSTEM
+            },
+            nextCursor: {
+              part: nextPart,
+              segment: nextSegment,
+              owner: Owner.SYSTEM
+            },
+            infinitePieces
+          }
+        } as RundownInterface)
+
+        const historyBefore: Part[] = testee.getHistory()
+
+        testee.activate()
+
+        expect(testee.getActivePart()).toBe(activePart)
+        expect(testee.getActiveSegment()).toBe(activeSegment)
+        expect(testee.getNextPart()).toBe(nextPart)
+        expect(testee.getNextSegment()).toBe(nextSegment)
+        expect(testee.getInfinitePieces().length).toBe(infinitePieces.size)
+        expect(testee.getHistory()).toBe(historyBefore)
+      })
+    })
+
     describe('first Segment is hidden', () => {
       it('sets the second Segment as the first Segment', () => {
         const firstSegment: Segment = EntityMockFactory.createSegment({ id: 'first', rank: 1, parts: [EntityMockFactory.createPart()], isHidden: true })

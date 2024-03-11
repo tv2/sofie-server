@@ -97,6 +97,22 @@ describe(RundownTimelineService.name, () => {
 
       await expect(result).rejects.toThrow(AlreadyRehearsalException)
     })
+
+    it('does not throw an AlreadyRehearsalException when trying to activate a Rundown that is in rehearsal', async () => {
+      const rundownToActivate: Rundown = EntityTestFactory.createRundown({ mode: RundownMode.REHEARSAL })
+
+      const basicRundowns: Rundown[] = [rundownToActivate]
+      const mockRundownRepository: RundownRepository = mock<RundownRepository>()
+      when(mockRundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
+      when(mockRundownRepository.getRundown(rundownToActivate.id)).thenResolve(rundownToActivate)
+
+
+      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
+
+      const result: () => Promise<void> = () => testee.activateRundown(rundownToActivate.id)
+
+      expect(result).not.toThrow(AlreadyRehearsalException)
+    })
   })
 
   describe(`${RundownTimelineService.prototype.enterRehearsalOnRundown.name}`, () => {

@@ -86,6 +86,10 @@ export class Rundown extends BasicRundown {
     if (this.isActive()) {
       throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated')
     }
+    if (this.mode === RundownMode.REHEARSAL) {
+      this.mode = RundownMode.ACTIVE
+      return
+    }
     this.initializeRundown(RundownMode.ACTIVE)
   }
 

@@ -20,6 +20,10 @@ export class BasicRundown {
     return this.mode === RundownMode.ACTIVE
   }
 
+  public isRehearsal(): boolean {
+    return this.mode === RundownMode.REHEARSAL
+  }
+
   public getMode(): RundownMode {
     return this.mode
   }
