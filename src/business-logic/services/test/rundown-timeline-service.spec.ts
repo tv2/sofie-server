@@ -98,7 +98,7 @@ describe(RundownTimelineService.name, () => {
       await expect(result).rejects.toThrow(AlreadyRehearsalException)
     })
 
-    it('does not throw an AlreadyRehearsalException when trying to activate a Rundown that is in rehearsal', async () => {
+    it('does not throw an AlreadyRehearsalException when trying to activate a Rundown that is in rehearsal', () => {
       const rundownToActivate: Rundown = EntityTestFactory.createRundown({ mode: RundownMode.REHEARSAL })
 
       const basicRundowns: Rundown[] = [rundownToActivate]
