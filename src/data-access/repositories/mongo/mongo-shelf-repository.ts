@@ -46,7 +46,7 @@ export class MongoShelfRepository extends BaseMongoRepository implements ShelfCo
 
   private applyMissingActionPanelIds(shelfConfiguration: ShelfConfiguration): ShelfConfiguration {
     shelfConfiguration.actionPanelConfigurations = shelfConfiguration.actionPanelConfigurations.map(actionPanel => {
-      if (!actionPanel.id || actionPanel.id.length <= 0) {
+      if (!actionPanel.id) {
         actionPanel.id = this.uuidGenerator.generateUuid()
       }
       return actionPanel
