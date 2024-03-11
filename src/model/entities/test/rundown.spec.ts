@@ -17,6 +17,7 @@ import { RundownCursor } from '../../value-objects/rundown-cursor'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { OnAirException } from '../../exceptions/on-air-exception'
 import { NoPartInHistoryException } from '../../exceptions/no-part-in-history-exception'
+import { RundownMode } from '../../enums/rundown-mode'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -24,7 +25,7 @@ describe(Rundown.name, () => {
       describe('active status is provided as false', () => {
         it('throws error', () => {
           const rundownInterface: RundownInterface = {
-            isRundownActive: false,
+            mode: RundownMode.INACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: EntityMockFactory.createPart(),
@@ -68,7 +69,7 @@ describe(Rundown.name, () => {
             })
 
             const rundownInterface: RundownInterface = {
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   part: activePart,
@@ -116,7 +117,7 @@ describe(Rundown.name, () => {
 
         const testee: Rundown = new Rundown({
           segments: [segment],
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             activeCursor: {
               part: firstPart,
@@ -159,7 +160,7 @@ describe(Rundown.name, () => {
 
         const testee: Rundown = new Rundown({
           segments: [segment],
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             activeCursor: {
               part: firstPart,
@@ -189,7 +190,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 segment,
@@ -220,7 +221,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 segment,
@@ -257,7 +258,7 @@ describe(Rundown.name, () => {
 
             const testee: Rundown = new Rundown({
               segments: [onAirAndNextSegment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   segment: onAirAndNextSegment,
@@ -297,7 +298,7 @@ describe(Rundown.name, () => {
 
             const testee: Rundown = new Rundown({
               segments: [onAirSegment, nextSegment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   segment: onAirSegment,
@@ -340,7 +341,7 @@ describe(Rundown.name, () => {
             const testee: Rundown = new Rundown({
               history,
               segments: [segment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   segment,
@@ -381,7 +382,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               nextCursor: {
                 segment,
@@ -413,7 +414,7 @@ describe(Rundown.name, () => {
 
         const testee: Rundown = new Rundown({
           segments: [segment],
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             activeCursor: {
               part: segment.findFirstPart(),
@@ -459,7 +460,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: segment.findFirstPart(),
@@ -515,7 +516,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -573,7 +574,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -634,7 +635,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -682,7 +683,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, nextSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -733,7 +734,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, nextSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -770,7 +771,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -804,7 +805,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -838,7 +839,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -902,7 +903,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -965,7 +966,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: lastPart,
@@ -1022,7 +1023,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1079,7 +1080,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1144,7 +1145,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1209,7 +1210,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1271,7 +1272,7 @@ describe(Rundown.name, () => {
 
             const testee: Rundown = new Rundown({
               segments: [firstSegment, middleSegment, lastSegment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   part: lastPart,
@@ -1326,7 +1327,7 @@ describe(Rundown.name, () => {
 
             const testee: Rundown = new Rundown({
               segments: [firstSegment, middleSegment, lastSegment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   part: lastPart,
@@ -1374,7 +1375,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1428,7 +1429,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1487,7 +1488,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, nextSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1544,7 +1545,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1602,7 +1603,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1660,7 +1661,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: lastPart,
@@ -1716,7 +1717,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1772,7 +1773,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1832,7 +1833,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1881,7 +1882,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, nextSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1938,7 +1939,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -1996,7 +1997,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -2051,7 +2052,7 @@ describe(Rundown.name, () => {
 
             const testee: Rundown = new Rundown({
               segments: [segment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   part: lastPart,
@@ -2099,7 +2100,7 @@ describe(Rundown.name, () => {
 
             const testee: Rundown = new Rundown({
               segments: [segment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   part: lastPart,
@@ -2153,7 +2154,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -2208,7 +2209,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [segment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -2257,7 +2258,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, nextSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -2306,7 +2307,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, nextSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -2359,7 +2360,7 @@ describe(Rundown.name, () => {
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 part: firstPart,
@@ -2413,7 +2414,7 @@ describe(Rundown.name, () => {
 
             const testee: Rundown = new Rundown({
               segments: [firstSegment, middleSegment, lastSegment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   part: lastPart,
@@ -2462,7 +2463,7 @@ describe(Rundown.name, () => {
 
             const testee: Rundown = new Rundown({
               segments: [firstSegment, middleSegment, lastSegment],
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
                 activeCursor: {
                   part: lastPart,
@@ -2491,7 +2492,7 @@ describe(Rundown.name, () => {
   describe(Rundown.prototype.getPartAfter.name, () => {
     describe('rundown is not active', () => {
       it('throws NotActivatedException', () => {
-        const testee: Rundown = new Rundown({ isRundownActive: false } as RundownInterface)
+        const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE } as RundownInterface)
         expect(() => testee.getPartAfter(instance(mock(Part)))).toThrow(NotActivatedException)
       })
     })
@@ -2507,7 +2508,7 @@ describe(Rundown.name, () => {
             EntityMockFactory.createSegment({ id: 'segmentTwo' }),
           ]
 
-          const testee: Rundown = new Rundown({ isRundownActive: true, segments } as RundownInterface)
+          const testee: Rundown = new Rundown({ mode: RundownMode.ACTIVE, segments } as RundownInterface)
 
           expect(() => testee.getPartAfter(partNotInAnySegments)).toThrow(NotFoundException)
         })
@@ -2524,7 +2525,7 @@ describe(Rundown.name, () => {
           )
 
           const testee: Rundown = new Rundown({
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             segments: [segment],
           } as RundownInterface)
 
@@ -2555,7 +2556,7 @@ describe(Rundown.name, () => {
             )
 
             const testee: Rundown = new Rundown({
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               segments: [firstSegment, secondSegment],
             } as RundownInterface)
 
@@ -2587,7 +2588,7 @@ describe(Rundown.name, () => {
             )
 
             const testee: Rundown = new Rundown({
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               segments: [firstSegment, instance(secondSegmentMock), thirdSegment],
             } as RundownInterface)
 
@@ -2610,7 +2611,7 @@ describe(Rundown.name, () => {
             const firstSegment: Segment = instance(firstSegmentMock)
 
             const testee: Rundown = new Rundown({
-              isRundownActive: true,
+              mode: RundownMode.ACTIVE,
               segments: [firstSegment],
             } as RundownInterface)
 
@@ -2624,14 +2625,14 @@ describe(Rundown.name, () => {
   describe(Rundown.prototype.activate.name, () => {
     describe('Rundown is already active', () => {
       it('throws AlreadyActivatedException', () => {
-        const testee: Rundown = new Rundown({ isRundownActive: true } as RundownInterface)
+        const testee: Rundown = new Rundown({ mode: RundownMode.ACTIVE } as RundownInterface)
         expect(() => testee.activate()).toThrow(AlreadyActivatedException)
       })
     })
 
     it('sets the Rundown to be active', () => {
       const segment: Segment = EntityMockFactory.createSegment({ parts: [EntityMockFactory.createPart()] })
-      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
+      const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [segment] } as RundownInterface)
 
       expect(testee.isActive()).toBeFalsy()
       testee.activate()
@@ -2644,7 +2645,7 @@ describe(Rundown.name, () => {
         const secondSegment: Segment = EntityMockFactory.createSegment({ id: 'second', rank: 2, parts: [EntityMockFactory.createPart()] })
         const lastSegment: Segment = EntityMockFactory.createSegment({ id: 'last', rank: 3, parts: [EntityMockFactory.createPart()] })
 
-        const testee: Rundown = new Rundown({ isRundownActive: false, segments: [firstSegment, secondSegment, lastSegment] } as RundownInterface)
+        const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [firstSegment, secondSegment, lastSegment] } as RundownInterface)
         testee.activate()
         expect(testee.getNextSegment()).toEqual(secondSegment)
       })
@@ -2656,7 +2657,7 @@ describe(Rundown.name, () => {
         const secondSegment: Segment = EntityMockFactory.createSegment({ id: 'second', rank: 2, parts: [EntityMockFactory.createPart()] })
         const lastSegment: Segment = EntityMockFactory.createSegment({ id: 'last', rank: 3, parts: [EntityMockFactory.createPart()] })
 
-        const testee: Rundown = new Rundown({ isRundownActive: false, segments: [firstSegment, secondSegment, lastSegment] } as RundownInterface)
+        const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [firstSegment, secondSegment, lastSegment] } as RundownInterface)
         testee.activate()
         expect(testee.getNextSegment()).toEqual(secondSegment)
       })
@@ -2667,7 +2668,7 @@ describe(Rundown.name, () => {
       const middleSegment: Segment = EntityMockFactory.createSegment({ id: 'middle', rank: 2, parts: [EntityMockFactory.createPart()] })
       const lastSegment: Segment = EntityMockFactory.createSegment({ id: 'last', rank: 3, parts: [EntityMockFactory.createPart()] })
 
-      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [firstSegment, middleSegment, lastSegment] } as RundownInterface)
+      const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [firstSegment, middleSegment, lastSegment] } as RundownInterface)
       testee.activate()
       expect(testee.getNextSegment()).toEqual(firstSegment)
     })
@@ -2677,7 +2678,7 @@ describe(Rundown.name, () => {
       const lastPart: Part = EntityMockFactory.createPart({ id: 'last' })
       const segment: Segment = new Segment({ parts: [firstPart, lastPart] } as SegmentInterface)
 
-      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
+      const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [segment] } as RundownInterface)
       testee.activate()
       expect(testee.getNextPart()).toEqual(firstPart)
     })
@@ -2685,7 +2686,7 @@ describe(Rundown.name, () => {
     it('does not set active Part', () => {
       const part: Part = EntityMockFactory.createPart()
       const segment: Segment = new Segment({ parts: [part] } as SegmentInterface)
-      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
+      const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [segment] } as RundownInterface)
 
       testee.activate()
 
@@ -2695,7 +2696,7 @@ describe(Rundown.name, () => {
     it('does not set active Segment', () => {
       const part: Part = EntityMockFactory.createPart()
       const segment: Segment = new Segment({ parts: [part] } as SegmentInterface)
-      const testee: Rundown = new Rundown({ isRundownActive: false, segments: [segment] } as RundownInterface)
+      const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [segment] } as RundownInterface)
 
       testee.activate()
 
@@ -2715,7 +2716,7 @@ describe(Rundown.name, () => {
 
       const testee: Rundown = new Rundown({
         segments,
-        isRundownActive: false,
+        mode: RundownMode.INACTIVE,
       } as RundownInterface)
 
       testee.activate()
@@ -2784,7 +2785,7 @@ describe(Rundown.name, () => {
       describe('the Rundown is not active', () => {
         it('does not update the Next cursor', () => {
           const segmentToAdd: Segment = EntityTestFactory.createSegment()
-          const testee: Rundown = new Rundown({ isRundownActive: false } as RundownInterface)
+          const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE } as RundownInterface)
 
           const nextCursorBefore: RundownCursor | undefined = testee.getNextCursor()
           testee.addSegment(segmentToAdd)
@@ -2981,7 +2982,7 @@ describe(Rundown.name, () => {
               owner: Owner.SYSTEM
             }
 
-            const testee: Rundown = new Rundown({ segments: [segment], isRundownActive: true, alreadyActiveProperties: { activeCursor } } as RundownInterface)
+            const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: { activeCursor } } as RundownInterface)
 
             expect(activeCursor).toBe(testee.getActiveCursor())
             testee.removeSegment(segment.id)
@@ -3134,7 +3135,7 @@ describe(Rundown.name, () => {
         const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
 
         const testee: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             infinitePieces: infinitePieceMap
           },
@@ -3163,7 +3164,7 @@ describe(Rundown.name, () => {
         const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
 
         const testee: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             infinitePieces: infinitePieceMap
           },
@@ -3190,7 +3191,7 @@ describe(Rundown.name, () => {
       when(mockedActiveSegment.findPart(otherPartInActiveSegment.id)).thenReturn(otherPartInActiveSegment)
       const activeSegment: Segment = instance(mockedActiveSegment)
       const testee: Rundown = new Rundown({
-        isRundownActive: true,
+        mode: RundownMode.ACTIVE,
         alreadyActiveProperties: {
           activeCursor: {
             part: activePart,
@@ -3225,7 +3226,7 @@ describe(Rundown.name, () => {
         const activeSegment: Segment = instance(mockedActiveSegment)
 
         const testee: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             activeCursor: {
               part: activePart,
@@ -3257,7 +3258,7 @@ describe(Rundown.name, () => {
         const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true })
         const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', isNext: true, parts: [nextPart]})
         const rundown: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             activeCursor: {
               segment: activeSegment,
@@ -3292,7 +3293,7 @@ describe(Rundown.name, () => {
         const noMatchingPartPredicate: (part: Part) => boolean = () => false
 
         const testee: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           history,
           alreadyActiveProperties: {
             activeCursor: {
@@ -3318,7 +3319,7 @@ describe(Rundown.name, () => {
         const predicate: (part: Part) => boolean = (part: Part) => part.id === activePart.id
 
         const testee: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           history,
           alreadyActiveProperties: {
             activeCursor: {
@@ -3348,7 +3349,7 @@ describe(Rundown.name, () => {
         const predicate: (part: Part) => boolean = (part: Part) => part.name === name
 
         const testee: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           history,
           alreadyActiveProperties: {
             activeCursor: {
@@ -3377,7 +3378,7 @@ describe(Rundown.name, () => {
         const predicate: (part: Part) => boolean = (part: Part) => part.id === historyPartToFind.id
 
         const testee: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           history,
           alreadyActiveProperties: {
             activeCursor: {
@@ -3406,7 +3407,7 @@ describe(Rundown.name, () => {
         const predicate: (part: Part) => boolean = (part: Part) => part.name === name
 
         const testee: Rundown = new Rundown({
-          isRundownActive: true,
+          mode: RundownMode.ACTIVE,
           history,
           alreadyActiveProperties: {
             activeCursor: {
@@ -3447,7 +3448,7 @@ function createTesteeWithActiveAndNextCursors(params?: {
     owner: params?.nextOwner ?? Owner.EXTERNAL
   }
   return new Rundown({
-    isRundownActive: true,
+    mode: RundownMode.ACTIVE,
     alreadyActiveProperties: {
       activeCursor,
       nextCursor

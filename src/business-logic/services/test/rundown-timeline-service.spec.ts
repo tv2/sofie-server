@@ -21,6 +21,7 @@ import { Owner } from '../../../model/enums/owner'
 import { Segment } from '../../../model/entities/segment'
 import { Timeline } from '../../../model/entities/timeline'
 import { TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
+import { RundownMode } from '../../../model/enums/rundown-mode'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -28,7 +29,7 @@ describe(RundownTimelineService.name, () => {
       const mockIngestedRundownRepository: IngestedRundownRepository = mock<IngestedRundownRepository>()
 
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
-      const rundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: false })
+      const rundown: Rundown = EntityMockFactory.createRundown({ mode: RundownMode.INACTIVE })
 
       when(mockRundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
@@ -40,7 +41,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     it('emits a rundown deleted event, when it receives a valid RundownId', async () => {
-      const rundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: false })
+      const rundown: Rundown = EntityMockFactory.createRundown({ mode: RundownMode.INACTIVE })
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
       when(mockRundownRepository.getRundown(rundown.id)).thenResolve(rundown)
       const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
@@ -58,7 +59,7 @@ describe(RundownTimelineService.name, () => {
     it('throws an exception, when it receives a RundownId of an active rundown', async () => {
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
 
-      const rundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: true })
+      const rundown: Rundown = EntityMockFactory.createRundown({ mode: RundownMode.ACTIVE })
 
       when(mockRundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
@@ -70,9 +71,9 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
     it('throws an exception, when trying to active a rundown when there is another already activated rundown', async () => {
-      const activeBasicRundown: Rundown = EntityMockFactory.createRundown({ isRundownActive: true })
+      const activeBasicRundown: Rundown = EntityMockFactory.createRundown({ mode: RundownMode.ACTIVE })
       const basicRundowns: Rundown[] = [activeBasicRundown]
-      const rundownToActivate: Rundown = EntityMockFactory.createRundown({id: 'inactiveRundown', isRundownActive: false})
+      const rundownToActivate: Rundown = EntityMockFactory.createRundown({id: 'inactiveRundown', mode: RundownMode.INACTIVE})
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
       when(mockRundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
       const testee: RundownTimelineService = createTestee({rundownRepository: instance(mockRundownRepository)})
@@ -85,7 +86,7 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
     it('does not emit infinitePiecesUpdatedEvent unless piecess are changed', async () => {
-      const aRundownMock: Rundown = EntityMockFactory.createRundownMock({ id: 'aRundown', isRundownActive: false })
+      const aRundownMock: Rundown = EntityMockFactory.createRundownMock({ id: 'aRundown', mode: RundownMode.INACTIVE })
       const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
       const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
       const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',firstLayerPiece]])
@@ -111,7 +112,7 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
     it('emits infinitePiecesUpdatedEvent when pieces are changed', async () => {
-      const aRundownMock: Rundown = EntityMockFactory.createRundownMock({ id: 'aRundown', isRundownActive: false })
+      const aRundownMock: Rundown = EntityMockFactory.createRundownMock({ id: 'aRundown', mode: RundownMode.INACTIVE })
       const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'firstLayerPiece' })
       const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'secondLayerPiece' })
       const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',firstLayerPiece]])
@@ -145,7 +146,7 @@ describe(RundownTimelineService.name, () => {
       const segments: Segment[] = [firstSegment, secondSegment]
       const aRundown: Rundown = EntityTestFactory.createRundown({
         segments: segments,
-        isRundownActive: true,
+        mode: RundownMode.ACTIVE,
         alreadyActiveProperties: {
           activeCursor: {
             segment: firstSegment,

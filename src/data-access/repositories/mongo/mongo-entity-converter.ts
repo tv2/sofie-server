@@ -29,6 +29,7 @@ import { UnsupportedOperationException } from '../../../model/exceptions/unsuppo
 import { SystemInformation } from '../../../model/entities/system-information'
 import { Device } from '../../../model/entities/device'
 import { StatusCode } from '../../../model/enums/status-code'
+import { RundownMode } from '../../../model/enums/rundown-mode'
 
 export interface MongoId {
   _id: string
@@ -38,7 +39,7 @@ export interface MongoRundown extends MongoId {
   name: string
   showStyleVariantId: string
   segmentIds: string[]
-  isActive: boolean
+  mode: RundownMode
   baselineTimelineObjects: TimelineObject[]
   modifiedAt: number
 
@@ -181,7 +182,7 @@ const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 export class MongoEntityConverter {
 
   public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {
-    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = mongoRundown.isActive
+    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = mongoRundown.mode
       ? {
         activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
         nextCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.nextCursor, segments),
@@ -192,7 +193,7 @@ export class MongoEntityConverter {
       id: mongoRundown._id,
       name: mongoRundown.name,
       showStyleVariantId: mongoRundown.showStyleVariantId,
-      isRundownActive: mongoRundown.isActive ?? false,
+      mode: mongoRundown.mode ?? RundownMode.INACTIVE,
       baselineTimelineObjects: mongoRundown.baselineTimelineObjects,
       segments,
       modifiedAt: mongoRundown.modifiedAt,
@@ -242,7 +243,7 @@ export class MongoEntityConverter {
       activeCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getActiveCursor()),
       nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor()),
       history: rundown.getHistory().map(part => this.convertToMongoPart(part)),
-      isActive: rundown.isActive(),
+      mode: rundown.getMode(),
       timing: rundown.timing
     }
   }
@@ -262,7 +263,7 @@ export class MongoEntityConverter {
     return new BasicRundown(
       mongoRundown._id,
       mongoRundown.name,
-      mongoRundown.isActive ?? false,
+      mongoRundown.mode ?? RundownMode.INACTIVE,
       mongoRundown.modifiedAt,
       mongoRundown.timing
     )

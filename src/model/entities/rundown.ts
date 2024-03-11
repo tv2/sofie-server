@@ -21,6 +21,7 @@ import { NoPartInHistoryException } from '../exceptions/no-part-in-history-excep
 import { OnAirException } from '../exceptions/on-air-exception'
 import { RundownTiming } from '../value-objects/rundown-timing'
 import { InTransition } from '../value-objects/in-transition'
+import { RundownMode } from '../enums/rundown-mode'
 
 export interface RundownInterface {
   id: string
@@ -28,7 +29,7 @@ export interface RundownInterface {
   showStyleVariantId: string
   segments: Segment[]
   baselineTimelineObjects: TimelineObject[]
-  isRundownActive: boolean
+  mode: RundownMode
   modifiedAt: number
   persistentState?: RundownPersistentState
   history: Part[]
@@ -63,7 +64,7 @@ export class Rundown extends BasicRundown {
   private history: Part[]
 
   constructor(rundown: RundownInterface) {
-    super(rundown.id, rundown.name, rundown.isRundownActive, rundown.modifiedAt, rundown.timing)
+    super(rundown.id, rundown.name, rundown.mode, rundown.modifiedAt, rundown.timing)
     this.segments = rundown.segments ? [...rundown.segments].sort(this.compareSegments) : []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
@@ -71,7 +72,7 @@ export class Rundown extends BasicRundown {
     this.persistentState = rundown.persistentState
 
     if (rundown.alreadyActiveProperties) {
-      if (!rundown.isRundownActive) {
+      if (rundown.mode === RundownMode.INACTIVE) {
         throw new MisconfigurationException('Trying to instantiate an inactive Rundown as active')
       }
       this.activeCursor = rundown.alreadyActiveProperties.activeCursor
@@ -87,7 +88,7 @@ export class Rundown extends BasicRundown {
     this.resetSegments()
     this.resetHistory()
     this.infinitePieces = new Map()
-    this.isRundownActive = true
+    this.mode = RundownMode.ACTIVE
 
     const firstSegment: Segment = this.findFirstSegment()
     firstSegment.setAsNext()
@@ -210,13 +211,13 @@ export class Rundown extends BasicRundown {
     this.segments.forEach(segment => segment.takeOffAir())
     this.nextCursor = undefined
     this.infinitePieces = new Map()
-    this.isRundownActive = false
+    this.mode = RundownMode.INACTIVE
     this.previousPart = undefined
     this.persistentState = undefined
   }
 
   private assertActive(operationName: string): void {
-    if (!this.isRundownActive) {
+    if (this.mode === RundownMode.INACTIVE) {
       throw new NotActivatedException(`Rundown "${this.name}" is not active. Unable to ${operationName}`)
     }
   }

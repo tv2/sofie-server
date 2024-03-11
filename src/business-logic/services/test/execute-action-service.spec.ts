@@ -21,6 +21,7 @@ import { ActionManifestRepository } from '../../../data-access/repositories/inte
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { Rundown } from '../../../model/entities/rundown'
 import { Owner } from '../../../model/enums/owner'
+import { RundownMode } from '../../../model/enums/rundown-mode'
 
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
@@ -177,7 +178,7 @@ describe(ExecuteActionService.name, () => {
           const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
           const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
           const rundown: Rundown = EntityTestFactory.createRundown({
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 segment: EntityTestFactory.createSegment(),
@@ -235,7 +236,7 @@ describe(ExecuteActionService.name, () => {
           const nextPiece: Piece = EntityTestFactory.createPiece({id: 'nextPiece'})
           const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart', pieces: [nextPiece]})
           const rundown: Rundown = EntityTestFactory.createRundown({
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 segment: EntityTestFactory.createSegment(),
@@ -299,7 +300,7 @@ describe(ExecuteActionService.name, () => {
           const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart', pieces: [nextPiece]})
 
           const rundown: Rundown = EntityTestFactory.createRundown({
-            isRundownActive: true,
+            mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
                 segment: EntityTestFactory.createSegment(),

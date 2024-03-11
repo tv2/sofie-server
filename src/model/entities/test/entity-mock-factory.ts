@@ -6,6 +6,7 @@ import { Rundown, RundownInterface } from '../rundown'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { TransitionType } from '../../enums/transition-type'
 import { PartTimings } from '../../value-objects/part-timings'
+import { RundownMode } from '../../enums/rundown-mode'
 
 export class EntityMockFactory {
   public static createRundown(rundownInterface?: Partial<RundownInterface>): Rundown {
@@ -22,7 +23,7 @@ export class EntityMockFactory {
 
     when(mockedRundown.id).thenReturn(rundownInterface.id ?? 'rundownId')
     when(mockedRundown.name).thenReturn(rundownInterface.name ?? 'rundownName')
-    when(mockedRundown.isActive()).thenReturn(rundownInterface.isRundownActive ?? false)
+    when(mockedRundown.isActive()).thenReturn(rundownInterface.mode === RundownMode.ACTIVE ?? false)
     when(mockedRundown.getLastTimeModified()).thenReturn(rundownInterface.modifiedAt ?? 0)
     when(mockedRundown.getSegments()).thenReturn(rundownInterface.segments ?? [])
 
@@ -61,7 +62,7 @@ export class EntityMockFactory {
     } = {},
     rundownInterface?: Partial<RundownInterface>
   ): Rundown {
-    const mockedRundown: Rundown = this.createRundownMock({ ...rundownInterface, isRundownActive: true })
+    const mockedRundown: Rundown = this.createRundownMock({ ...rundownInterface, mode: RundownMode.ACTIVE })
     when(mockedRundown.getActivePart()).thenReturn(activeRundownProperties.activePart ?? this.createPart())
     when(mockedRundown.getNextPart()).thenReturn(activeRundownProperties.nextPart ?? this.createPart())
     when(mockedRundown.getPreviousPart()).thenReturn(activeRundownProperties.previousPart ?? undefined)

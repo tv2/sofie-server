@@ -13,7 +13,7 @@ export class EntityTestFactory {
       id: 'rundownId' + Math.floor(Math.random() * 1000),
       name: 'rundownName',
       segments: [],
-      isRundownActive: false,
+      mode: false,
       modifiedAt: Date.now(),
       ...rundownInterface
     } as RundownInterface)
