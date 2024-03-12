@@ -2,7 +2,7 @@ export type EventType = RundownEventType | IngestEventType | ConfigurationEventT
 
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
-  REHEARSAL = 'REHEARSAL',
+  REHEARSE = 'REHEARSE',
   DEACTIVATED = 'DEACTIVATED',
   RESET = 'RESET',
   TAKEN = 'TAKEN',

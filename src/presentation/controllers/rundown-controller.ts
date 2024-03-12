@@ -56,11 +56,11 @@ export class RundownController extends BaseController {
     }
   }
 
-  @PutRequest('/:rundownId/rehearsal')
+  @PutRequest('/:rundownId/rehearse')
   public async enterRehearsal(request: Request, response: Response): Promise<void> {
     try {
       const rundownId: string = request.params.rundownId
-      await this.rundownService.enterRehearsalOnRundown(rundownId)
+      await this.rundownService.enterRehearsal(rundownId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully entered rehearsal`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)

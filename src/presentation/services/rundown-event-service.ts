@@ -15,7 +15,7 @@ import {
   RundownDeletedEvent,
   RundownEvent,
   RundownInfinitePiecesUpdatedEvent,
-  RundownRehearsalEvent,
+  RundownRehearseEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
   SegmentCreatedEvent,
@@ -54,8 +54,8 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
     this.emitRundownEvent(event)
   }
 
-  public emitRehearsalEvent(rundown: Rundown): void {
-    const event: RundownRehearsalEvent = this.rundownEventBuilder.buildRehearsalEvent(rundown)
+  public emitRehearseEvent(rundown: Rundown): void {
+    const event: RundownRehearseEvent = this.rundownEventBuilder.buildRehearseEvent(rundown)
     this.emitRundownEvent(event)
   }
 

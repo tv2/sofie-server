@@ -115,7 +115,7 @@ describe(RundownTimelineService.name, () => {
     })
   })
 
-  describe(`${RundownTimelineService.prototype.enterRehearsalOnRundown.name}`, () => {
+  describe(`${RundownTimelineService.prototype.enterRehearsal.name}`, () => {
     it('throws an exception when trying to enter rehearsal on a Rundown when another Rundown is already active', async () => {
       const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE })]
       const mockRundownRepository: RundownRepository = mock<RundownRepository>()
@@ -124,7 +124,7 @@ describe(RundownTimelineService.name, () => {
       const rundownToEnterRehearsal: Rundown = EntityMockFactory.createRundown({ id: 'inactiveRundown', mode: RundownMode.INACTIVE })
       const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
 
-      const result: () => Promise<void> = () => testee.enterRehearsalOnRundown(rundownToEnterRehearsal.id)
+      const result: () => Promise<void> = () => testee.enterRehearsal(rundownToEnterRehearsal.id)
 
       await expect(result).rejects.toThrow(AlreadyActivatedException)
     })
@@ -138,7 +138,7 @@ describe(RundownTimelineService.name, () => {
 
       const testee: RundownTimelineService = createTestee({ rundownRepository: instance(mockRundownRepository) })
 
-      const result: () => Promise<void> = () => testee.enterRehearsalOnRundown(rundownToEnterRehearsal.id)
+      const result: () => Promise<void> = () => testee.enterRehearsal(rundownToEnterRehearsal.id)
 
       await expect(result).rejects.toThrow(AlreadyRehearsalException)
     })
