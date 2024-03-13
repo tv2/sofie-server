@@ -119,8 +119,8 @@ export class IngestDatabaseChangeService implements DatabaseChangeService {
     await Promise.all(ingestedRundowns.map(async (ingestedRundown) => {
       const oldRundown: Rundown | undefined = await this.fetchRundown(ingestedRundown.id)
 
-      // If the Rundown isn't active, we can simply just "re-ingest" it into our database collection as a fresh Rundown.
-      const updatedRundown: Rundown = oldRundown?.isActive()
+      // If the Rundown isn't active or in rehearsal, we can simply just "re-ingest" it into our database collection as a fresh Rundown.
+      const updatedRundown: Rundown = oldRundown?.isActive() || oldRundown?.isRehearsal()
         ? this.updateActiveRundownFromIngestedRundown(ingestedRundown, oldRundown)
         : this.createNewRundownFromIngestedRundown(ingestedRundown)
 
