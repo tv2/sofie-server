@@ -65,6 +65,10 @@ import { StatusMessageRepository } from '../repositories/interfaces/status-messa
 import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status-message-repository'
 import { DeviceRepository } from '../repositories/interfaces/device-repository'
 import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
+import { ShowStyle } from '../../model/entities/show-style'
+import {
+  MongoShowStyleConfigurationChangedListener
+} from '../repositories/mongo/mongo-show-style-configuration-changed-listener'
 
 export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
@@ -186,6 +190,10 @@ export class RepositoryFacade {
 
   private static createShowStyleRepository(): ShowStyleRepository {
     return new MongoShowStyleRepository(RepositoryFacade.getMongoDatabaseInstance(), new MongoEntityConverter())
+  }
+
+  public static createShowStyleChangedListener(): DataChangedListener<ShowStyle> {
+    return new MongoShowStyleConfigurationChangedListener(RepositoryFacade.getMongoDatabaseInstance(), LoggerFacade.createLogger())
   }
 
   public static createShelfConfigurationRepository(): ShelfConfigurationRepository {

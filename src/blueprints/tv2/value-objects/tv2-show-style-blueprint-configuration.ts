@@ -4,6 +4,7 @@ export interface Tv2ShowStyleBlueprintConfiguration {
   graphicsDefault: GraphicsDefault
   graphicsSetups: GraphicsSetup[]
   graphicsTemplates: GraphicsTemplate[]
+  graphicsSchemas: GraphicsSchema[]
   selectedGraphicsSetup: GraphicsSetup
   splitScreenConfigurations: SplitScreenConfiguration[]
   breakerTransitionEffectConfigurations: BreakerTransitionEffect[]
@@ -27,6 +28,19 @@ export interface GraphicsSetup {
 export interface GraphicsTemplate {
   name: string
   lifespan: PieceLifespan
+}
+
+export interface GraphicsSchema {
+  iNewsName: string
+  iNewsSchemaColumn: string
+  graphicsTemplateName: string
+  casparCgDesignValues: CasparCgDesignValue[]
+}
+
+export interface CasparCgDesignValue {
+  name: string
+  properties: string[]
+  backgroundLoop: string
 }
 
 export interface SplitScreenConfiguration {

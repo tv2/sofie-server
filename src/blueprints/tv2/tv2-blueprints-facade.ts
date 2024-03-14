@@ -47,6 +47,7 @@ import { Tv2RobotTimelineObjectFactory } from './timeline-object-factories/inter
 import {
   Tv2TelemetricsTimelineObjectFactory
 } from './timeline-object-factories/tv2-telemetrics-timeline-object-factory'
+import { Tv2BlueprintConfigurationValidator } from './tv2-blueprint-configuration-validator'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -109,7 +110,8 @@ export class Tv2BlueprintsFacade {
     return new Tv2Blueprint(
       new Tv2EndStateForPartService(sisyfosPersistentLayerFinder),
       new Tv2OnTimelineGenerateService(configurationMapper, sisyfosPersistentLayerFinder),
-      actionService
+      actionService,
+      new Tv2BlueprintConfigurationValidator(configurationMapper)
     )
   }
 }

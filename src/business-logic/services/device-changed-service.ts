@@ -1,31 +1,27 @@
-import { DatabaseChangeService } from './interfaces/database-change-service'
-import { StatusMessageEventEmitter } from './interfaces/status-message-event-emitter'
+import { DataChangeService } from './interfaces/data-change-service'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
 import { Device } from '../../model/entities/device'
 import { StatusMessage } from '../../model/entities/status-message'
-import { StatusMessageRepository } from '../../data-access/repositories/interfaces/status-message-repository'
-import { NotFoundException } from '../../model/exceptions/not-found-exception'
 import { StatusCode } from '../../model/enums/status-code'
 import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
 import { Logger } from '../../logger/logger'
+import { StatusMessageService } from './interfaces/status-message-service'
 
 // TODO: Find a way to translate
 const NOT_CONNECTED_MESSAGE: string = 'Not connected'
 
-export class DeviceChangedService implements DatabaseChangeService {
-  private static instance: DatabaseChangeService
+export class DeviceChangedService implements DataChangeService {
+  private static instance: DataChangeService
 
   public static getInstance(
-    statusMessageEventEmitter: StatusMessageEventEmitter,
-    statusMessageRepository: StatusMessageRepository,
+    statusMessageService: StatusMessageService,
     deviceRepository: DeviceRepository,
     deviceChangedListener: DataChangedListener<Device>,
     logger: Logger
-  ): DatabaseChangeService {
+  ): DataChangeService {
     if (!this.instance) {
       this.instance = new DeviceChangedService(
-        statusMessageEventEmitter,
-        statusMessageRepository,
+        statusMessageService,
         deviceRepository,
         deviceChangedListener,
         logger
@@ -37,8 +33,7 @@ export class DeviceChangedService implements DatabaseChangeService {
   private readonly logger: Logger
 
   constructor(
-    private readonly statusMessageEventEmitter: StatusMessageEventEmitter,
-    private readonly statusMessageRepository: StatusMessageRepository,
+    private readonly statusMessageService: StatusMessageService,
     private readonly deviceRepository: DeviceRepository,
     deviceChangedListener: DataChangedListener<Device>,
     logger: Logger
@@ -78,49 +73,7 @@ export class DeviceChangedService implements DatabaseChangeService {
       device.statusMessage = NOT_CONNECTED_MESSAGE
     }
 
-    const statusMessageFromDatabase: StatusMessage | undefined = await this.getStatusMessageFromDatabase(device.id)
-    if (!statusMessageFromDatabase) {
-      await this.createNewStatusMessageIfStatusIsNotGood(device)
-      return
-    }
-
-    if (!this.isStatusMessagesDifferent(statusMessageFromDatabase, this.convertDeviceToStatusMessage(device))) {
-      return
-    }
-
-    this.statusMessageEventEmitter.emitStatusMessageEvent(this.convertDeviceToStatusMessage(device))
-
-    if ([StatusCode.GOOD].includes(device.statusCode)) {
-      await this.statusMessageRepository.deleteStatusMessage(statusMessageFromDatabase.id)
-      return
-    }
-
-    await this.statusMessageRepository.updateStatusMessage(this.convertDeviceToStatusMessage(device))
-  }
-
-  private async createNewStatusMessageIfStatusIsNotGood(device: Device): Promise<void> {
-    if ([StatusCode.GOOD].includes(device.statusCode)) {
-      return
-    }
-    this.statusMessageEventEmitter.emitStatusMessageEvent(this.convertDeviceToStatusMessage(device))
-    await this.statusMessageRepository.createStatusMessage(this.convertDeviceToStatusMessage(device))
-  }
-
-  private async getStatusMessageFromDatabase(statusMessageId: string): Promise<StatusMessage | undefined> {
-    try {
-      return await this.statusMessageRepository.getStatusMessage(statusMessageId)
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        return
-      }
-      throw error
-    }
-  }
-
-  private isStatusMessagesDifferent(statusMessageOne: StatusMessage, statusMessageTwo: StatusMessage): boolean {
-    const isDifferentStatusCode: boolean = statusMessageOne.statusCode != statusMessageTwo.statusCode
-    const isDifferentMessage: boolean = statusMessageOne.message != statusMessageTwo.message
-    return isDifferentStatusCode || isDifferentMessage
+    await this.statusMessageService.updateStatusMessage(this.convertDeviceToStatusMessage(device))
   }
 
   private convertDeviceToStatusMessage(device: Device): StatusMessage {
