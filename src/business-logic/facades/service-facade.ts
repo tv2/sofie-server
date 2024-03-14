@@ -123,7 +123,8 @@ export class ServiceFacade {
       BlueprintsFacade.createBlueprint(),
       ServiceFacade.createStatusMessageService(),
       RepositoryFacade.createConfigurationRepository(),
-      RepositoryFacade.createShowStyleChangedListener()
+      RepositoryFacade.createShowStyleChangedListener(),
+      LoggerFacade.createLogger()
     )
   }
 

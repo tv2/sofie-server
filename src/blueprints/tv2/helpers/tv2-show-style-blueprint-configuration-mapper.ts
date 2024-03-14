@@ -1,7 +1,8 @@
 import {
   Breaker,
   BreakerTransitionEffect,
-  GraphicsDefault, GraphicsSchema,
+  GraphicsDefault,
+  GraphicsSchema,
   GraphicsSetup,
   GraphicsTemplate,
   SplitScreenConfiguration,

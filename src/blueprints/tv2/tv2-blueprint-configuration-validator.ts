@@ -33,7 +33,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
         .map(designValues => {
           return {
             id: `${schema.iNewsName}_${schema.iNewsSchemaColumn}`,
-            title: 'Schema Configuration',
+            title: `${schema.iNewsName} Schema Configuration`,
             message: `The Schema ${schema.iNewsName} has an invalid CasparCgDesignValue. "${designValues.name}" contains a whitespace!`,
             statusCode: StatusCode.BAD
           }

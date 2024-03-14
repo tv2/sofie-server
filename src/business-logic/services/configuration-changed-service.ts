@@ -6,6 +6,7 @@ import { StatusMessage } from '../../model/entities/status-message'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
 import { StatusMessageService } from './interfaces/status-message-service'
+import { Logger } from '../../logger/logger'
 
 const CONFIGURATION_STATUS_MESSAGE_ID_PREFIX: string = 'INVALID_CONFIGURATION_'
 
@@ -17,21 +18,47 @@ export class ConfigurationChangedService implements DataChangeService {
     blueprint: Blueprint,
     statusMessageService: StatusMessageService,
     configurationRepository: ConfigurationRepository,
-    showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>
+    showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>,
+    logger: Logger
   ): DataChangeService {
     if (!this.instance) {
-      this.instance = new ConfigurationChangedService(blueprint, statusMessageService, configurationRepository, showStyleConfigurationChangedListener)
+      this.instance = new ConfigurationChangedService(
+        blueprint,
+        statusMessageService,
+        configurationRepository,
+        showStyleConfigurationChangedListener,
+        logger
+      )
     }
     return this.instance
   }
+
+  private readonly logger: Logger
 
   private constructor(
     private readonly blueprint: Blueprint,
     private readonly statusMessageService: StatusMessageService,
     private readonly configurationRepository: ConfigurationRepository,
-    showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>
+    showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>,
+    logger: Logger
   ) {
+    this.logger = logger.tag(ConfigurationChangedService.name)
+    this.callAgainOnError(() => this.validateConfiguration())
     this.listenForShowStyleChanges(showStyleConfigurationChangedListener)
+  }
+
+  private callAgainOnError(callback: () => Promise<void>, attemptNumber: number = 1): void {
+    const maxAttempts: number = 10
+    callback().catch((error) => {
+      if (attemptNumber >= maxAttempts){
+        this.logger.debug(`Unable to successfully call method on ${attemptNumber} attempts. Stopping recursive function`)
+        this.logger.error(error)
+        return
+      }
+      setTimeout(() => {
+        this.callAgainOnError(callback, ++attemptNumber)
+      }, 1000)
+    })
   }
 
   private listenForShowStyleChanges(showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>): void {
