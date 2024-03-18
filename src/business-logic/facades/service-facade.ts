@@ -24,10 +24,11 @@ import { MediaDatabaseChangeService } from '../services/media-database-change-se
 import { ConfigurationService } from '../services/interfaces/configuration-service'
 import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
 import { DeviceChangedService } from '../services/device-changed-service'
+import { RundownLockService } from '../services/rundown-lock-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
-    return new RundownTimelineService(
+    const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
       EventEmitterFacade.createRundownEventEmitter(),
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
@@ -39,15 +40,13 @@ export class ServiceFacade {
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint()
     )
+
+    return RundownLockService.getInstance(rundownTimelineService)
   }
 
   public static createTimelineBuilder(): TimelineBuilder {
     const superflyTimelineBuilder: TimelineBuilder = new SuperflyTimelineBuilder(new JsonObjectCloner())
-    return new BlueprintTimelineBuilder(
-      superflyTimelineBuilder,
-      RepositoryFacade.createConfigurationRepository(),
-      BlueprintsFacade.createBlueprint()
-    )
+    return new BlueprintTimelineBuilder(superflyTimelineBuilder, RepositoryFacade.createConfigurationRepository(), BlueprintsFacade.createBlueprint())
   }
 
   public static createActionService(): ActionService {
@@ -63,10 +62,7 @@ export class ServiceFacade {
   }
 
   public static createActionTriggerService(): ActionTriggerService {
-    return new ActionTriggerServiceImplementation(
-      EventEmitterFacade.createActionTriggerEventEmitter(),
-      RepositoryFacade.createActionTriggerRepository()
-    )
+    return new ActionTriggerServiceImplementation(EventEmitterFacade.createActionTriggerEventEmitter(), RepositoryFacade.createActionTriggerRepository())
   }
 
   public static createIngestChangeService(): DatabaseChangeService {
@@ -88,10 +84,7 @@ export class ServiceFacade {
   }
 
   public static createMediaDataChangeService(): DatabaseChangeService {
-    return MediaDatabaseChangeService.getInstance(
-      EventEmitterFacade.createMediaEventEmitter(),
-      RepositoryFacade.createMediaChangedListener()
-    )
+    return MediaDatabaseChangeService.getInstance(EventEmitterFacade.createMediaEventEmitter(), RepositoryFacade.createMediaChangedListener())
   }
 
   public static createIngestService(): IngestService {
@@ -100,10 +93,7 @@ export class ServiceFacade {
   }
 
   public static createConfigurationService(): ConfigurationService {
-    return new ConfigurationServiceImplementation(
-      EventEmitterFacade.createConfigurationEventEmitter(),
-      RepositoryFacade.createShelfConfigurationRepository()
-    )
+    return new ConfigurationServiceImplementation(EventEmitterFacade.createConfigurationEventEmitter(), RepositoryFacade.createShelfConfigurationRepository())
   }
 
   public static createDeviceDataChangedService(): DatabaseChangeService {
