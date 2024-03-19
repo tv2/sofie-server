@@ -46,7 +46,11 @@ export class ServiceFacade {
 
   public static createTimelineBuilder(): TimelineBuilder {
     const superflyTimelineBuilder: TimelineBuilder = new SuperflyTimelineBuilder(new JsonObjectCloner())
-    return new BlueprintTimelineBuilder(superflyTimelineBuilder, RepositoryFacade.createConfigurationRepository(), BlueprintsFacade.createBlueprint())
+    return new BlueprintTimelineBuilder(
+      superflyTimelineBuilder,
+      RepositoryFacade.createConfigurationRepository(),
+      BlueprintsFacade.createBlueprint()
+    )
   }
 
   public static createActionService(): ActionService {
@@ -62,7 +66,10 @@ export class ServiceFacade {
   }
 
   public static createActionTriggerService(): ActionTriggerService {
-    return new ActionTriggerServiceImplementation(EventEmitterFacade.createActionTriggerEventEmitter(), RepositoryFacade.createActionTriggerRepository())
+    return new ActionTriggerServiceImplementation(
+      EventEmitterFacade.createActionTriggerEventEmitter(),
+      RepositoryFacade.createActionTriggerRepository()
+    )
   }
 
   public static createIngestChangeService(): DatabaseChangeService {
@@ -84,7 +91,10 @@ export class ServiceFacade {
   }
 
   public static createMediaDataChangeService(): DatabaseChangeService {
-    return MediaDatabaseChangeService.getInstance(EventEmitterFacade.createMediaEventEmitter(), RepositoryFacade.createMediaChangedListener())
+    return MediaDatabaseChangeService.getInstance(
+      EventEmitterFacade.createMediaEventEmitter(),
+      RepositoryFacade.createMediaChangedListener()
+    )
   }
 
   public static createIngestService(): IngestService {
@@ -93,7 +103,10 @@ export class ServiceFacade {
   }
 
   public static createConfigurationService(): ConfigurationService {
-    return new ConfigurationServiceImplementation(EventEmitterFacade.createConfigurationEventEmitter(), RepositoryFacade.createShelfConfigurationRepository())
+    return new ConfigurationServiceImplementation(
+      EventEmitterFacade.createConfigurationEventEmitter(),
+      RepositoryFacade.createShelfConfigurationRepository()
+    )
   }
 
   public static createDeviceDataChangedService(): DatabaseChangeService {
