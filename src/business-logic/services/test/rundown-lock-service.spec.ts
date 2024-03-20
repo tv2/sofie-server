@@ -1,84 +1,90 @@
-import { RundownLockService } from './../rundown-lock-service'
+import { ThrottledRundownService } from './../rundown-lock-service'
 import { instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown, RundownInterface } from '../../../model/entities/rundown'
 import { LockRundownException } from '../../../model/exceptions/lock-rundown-exception'
 
-describe(RundownLockService.name, () => {
-  describe('Rundown lock throw error cases', () => {
-    it('Throw error if we call 2 times takeNext without any time between', async () => {
-      const mockRepo: RundownLockService = mock<RundownLockService>()
-      const randomRundownId: string = 'randomRundownId'
-      const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
+describe(ThrottledRundownService.name, () => {
+  describe('when two operations are performed within the locked interval', () => {
+    beforeEach(() => jest.useFakeTimers())
+    afterEach(() => jest.useRealTimers())
+    describe('throws an error to second operation', () => {
+      it('throws error when two take nexts are performed with 0ms delay', async () => {
+        const mockRepo: ThrottledRundownService = mock<ThrottledRundownService>()
+        const randomRundownId: string = 'randomRundownId'
+        const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
 
-      when(mockRepo.takeNext(randomRundownId)).thenReturn(Promise.resolve())
+        when(mockRepo.takeNext(randomRundownId)).thenReturn(Promise.resolve())
 
-      const testee: RundownLockService = new RundownLockService(instance(mockRepo))
+        const testee: ThrottledRundownService = new ThrottledRundownService(instance(mockRepo))
 
-      await testee.takeNext(randomRundown.id)
+        await testee.takeNext(randomRundown.id)
 
-      verify(mockRepo.takeNext(randomRundownId)).once()
+        verify(mockRepo.takeNext(randomRundownId)).once()
 
-      const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
+        const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
 
-      expect(result).toThrow(LockRundownException)
-    })
+        expect(result).toThrow(LockRundownException)
+      })
 
-    it('Throw error if we call 2 different actions without any time between', async () => {
-      const mockRepo: RundownLockService = mock<RundownLockService>()
-      const randomRundownId: string = 'randomRundownId'
-      const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
+      it('throws error when two different actions are performed with 0ms delay', async () => {
+        const mockRepo: ThrottledRundownService = mock<ThrottledRundownService>()
+        const randomRundownId: string = 'randomRundownId'
+        const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
 
-      when(mockRepo.activateRundown(randomRundownId)).thenReturn(Promise.resolve())
-      when(mockRepo.takeNext(randomRundownId)).thenReturn(Promise.resolve())
+        when(mockRepo.activateRundown(randomRundownId)).thenReturn(Promise.resolve())
+        when(mockRepo.takeNext(randomRundownId)).thenReturn(Promise.resolve())
 
-      const testee: RundownLockService = new RundownLockService(instance(mockRepo))
+        const testee: ThrottledRundownService = new ThrottledRundownService(instance(mockRepo))
 
-      await testee.activateRundown(randomRundown.id)
+        await testee.activateRundown(randomRundown.id)
 
-      verify(mockRepo.activateRundown(randomRundownId)).once()
+        verify(mockRepo.activateRundown(randomRundownId)).once()
 
-      const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
+        const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
 
-      expect(result).toThrow(LockRundownException)
-    })
+        expect(result).toThrow(LockRundownException)
+      })
 
-    it('Throw error if we call 2 different actions with 499 ms time between', async () => {
-      const mockRepo: RundownLockService = mock<RundownLockService>()
-      const randomRundownId: string = 'randomRundownId'
-      const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
-      const now: number = Date.now()
+      it('throws error when two take nexts are performed with 499ms delay', async () => {
+        const mockRepo: ThrottledRundownService = mock<ThrottledRundownService>()
+        const randomRundownId: string = 'randomRundownId'
+        const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
+        const now: number = Date.now()
 
-      jest.useFakeTimers().setSystemTime(now)
+        jest.setSystemTime(now)
 
-      when(mockRepo.activateRundown(randomRundownId)).thenReturn(Promise.resolve())
-      when(mockRepo.takeNext(randomRundownId)).thenReturn(Promise.resolve())
+        when(mockRepo.activateRundown(randomRundownId)).thenReturn(Promise.resolve())
+        when(mockRepo.takeNext(randomRundownId)).thenReturn(Promise.resolve())
 
-      const testee: RundownLockService = new RundownLockService(instance(mockRepo))
+        const testee: ThrottledRundownService = new ThrottledRundownService(instance(mockRepo))
 
-      await testee.activateRundown(randomRundown.id)
+        await testee.activateRundown(randomRundown.id)
 
-      verify(mockRepo.activateRundown(randomRundownId)).once()
+        verify(mockRepo.activateRundown(randomRundownId)).once()
 
-      jest.advanceTimersByTime(499)
+        jest.advanceTimersByTime(499)
 
-      const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
+        const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
 
-      expect(result).toThrow(LockRundownException)
+        expect(result).toThrow(LockRundownException)
+      })
     })
   })
 
-  describe('Rundown lock success cases', () => {
-    it('2 success calls to takeNext with 500ms between', async () => {
-      const mockRepo: RundownLockService = mock<RundownLockService>()
+  describe('when two operations are performed outside of a locked interval', () => {
+    beforeEach(() => jest.useFakeTimers())
+    afterEach(() => jest.useRealTimers())
+    it('performed two take nexts with 500ms between', async () => {
+      const mockRepo: ThrottledRundownService = mock<ThrottledRundownService>()
       const randomRundownId: string = 'randomRundownId'
       const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
       const now: number = Date.now()
 
-      jest.useFakeTimers().setSystemTime(now)
+      jest.setSystemTime(now)
 
       when(mockRepo.takeNext(randomRundownId)).thenReturn(Promise.resolve())
 
-      const testee: RundownLockService = new RundownLockService(instance(mockRepo))
+      const testee: ThrottledRundownService = new ThrottledRundownService(instance(mockRepo))
 
       await testee.takeNext(randomRundown.id)
 
@@ -91,18 +97,18 @@ describe(RundownLockService.name, () => {
       verify(mockRepo.takeNext(randomRundownId)).times(2)
     })
 
-    it('2 success calls to 2 different actions with 500ms between', async () => {
-      const mockRepo: RundownLockService = mock<RundownLockService>()
+    it('performed two different operations with 500ms between', async () => {
+      const mockRepo: ThrottledRundownService = mock<ThrottledRundownService>()
       const randomRundownId: string = 'randomRundownId'
       const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
       const now: number = Date.now()
-      
-      jest.useFakeTimers().setSystemTime(now)
+
+      jest.setSystemTime(now)
 
       when(mockRepo.activateRundown(randomRundownId)).thenReturn(Promise.resolve())
       when(mockRepo.takeNext(randomRundownId)).thenReturn(Promise.resolve())
 
-      const testee: RundownLockService = new RundownLockService(instance(mockRepo))
+      const testee: ThrottledRundownService = new ThrottledRundownService(instance(mockRepo))
 
       await testee.activateRundown(randomRundown.id)
 

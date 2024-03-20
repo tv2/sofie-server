@@ -6,28 +6,28 @@ import { InTransition } from '../../model/value-objects/in-transition'
 import { RundownService } from './interfaces/rundown-service'
 
 const RUNDOWN_LOCK_INTERVAL_MS: number = 500
-const RUNDOWN_LOCK_ERROR_TEXT: string = 'Unable to do action. An action was already executed less than 500ms ago'
+const RUNDOWN_LOCK_ERROR_TEXT: string = `Unable to do action. An action was already executed less than ${RUNDOWN_LOCK_INTERVAL_MS}ms ago`
 
-export class RundownLockService implements RundownService {
+export class ThrottledRundownService implements RundownService {
   private static instance: RundownService
 
   public static getInstance(rundownService: RundownService): RundownService {
     if (!this.instance) {
-      this.instance = new RundownLockService(rundownService)
+      this.instance = new ThrottledRundownService(rundownService)
     }
     return this.instance
   }
 
-  private lastActionCalledTimestamp: number
+  private lastOperationTakenEpochTimestamp: number
 
   constructor(private readonly rundownService: RundownService) {}
 
   private assertEnoughTimeHasPassed(): void {
     const now: number = Date.now()
-    if (now < this.lastActionCalledTimestamp + RUNDOWN_LOCK_INTERVAL_MS) {
+    if (now < this.lastOperationTakenEpochTimestamp + RUNDOWN_LOCK_INTERVAL_MS) {
       throw new LockRundownException(RUNDOWN_LOCK_ERROR_TEXT)
     }
-    this.lastActionCalledTimestamp = now
+    this.lastOperationTakenEpochTimestamp = now
   }
 
   public takeNext(rundownId: string): Promise<void> {
