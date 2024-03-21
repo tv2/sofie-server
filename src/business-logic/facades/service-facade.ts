@@ -24,7 +24,7 @@ import { MediaDatabaseChangeService } from '../services/media-database-change-se
 import { ConfigurationService } from '../services/interfaces/configuration-service'
 import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
 import { DeviceChangedService } from '../services/device-changed-service'
-import { ThrottledRundownService } from '../services/rundown-lock-service'
+import { ThrottledRundownService } from '../services/throttled-rundown-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {

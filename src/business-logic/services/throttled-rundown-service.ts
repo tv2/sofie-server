@@ -1,7 +1,7 @@
 import { Part } from '../../model/entities/part'
 import { Piece } from '../../model/entities/piece'
 import { Owner } from '../../model/enums/owner'
-import { LockRundownException } from '../../model/exceptions/lock-rundown-exception'
+import { ThrottledRundownException } from '../../model/exceptions/throttled-rundown-exception'
 import { InTransition } from '../../model/value-objects/in-transition'
 import { RundownService } from './interfaces/rundown-service'
 
@@ -25,7 +25,7 @@ export class ThrottledRundownService implements RundownService {
   private assertEnoughTimeHasPassed(): void {
     const now: number = Date.now()
     if (now < this.lastOperationTakenEpochTimestamp + RUNDOWN_LOCK_INTERVAL_MS) {
-      throw new LockRundownException(RUNDOWN_LOCK_ERROR_TEXT)
+      throw new ThrottledRundownException(RUNDOWN_LOCK_ERROR_TEXT)
     }
     this.lastOperationTakenEpochTimestamp = now
   }

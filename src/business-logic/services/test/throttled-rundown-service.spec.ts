@@ -1,7 +1,7 @@
-import { ThrottledRundownService } from './../rundown-lock-service'
+import { ThrottledRundownService } from '../throttled-rundown-service'
 import { instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown, RundownInterface } from '../../../model/entities/rundown'
-import { LockRundownException } from '../../../model/exceptions/lock-rundown-exception'
+import { ThrottledRundownException } from '../../../model/exceptions/throttled-rundown-exception'
 
 describe(ThrottledRundownService.name, () => {
   describe('when two operations are performed within the locked interval', () => {
@@ -23,7 +23,7 @@ describe(ThrottledRundownService.name, () => {
 
         const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
 
-        expect(result).toThrow(LockRundownException)
+        expect(result).toThrow(ThrottledRundownException)
       })
 
       it('throws error when two different actions are performed with 0ms delay', async () => {
@@ -42,7 +42,7 @@ describe(ThrottledRundownService.name, () => {
 
         const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
 
-        expect(result).toThrow(LockRundownException)
+        expect(result).toThrow(ThrottledRundownException)
       })
 
       it('throws error when two take nexts are performed with 499ms delay', async () => {
@@ -66,7 +66,7 @@ describe(ThrottledRundownService.name, () => {
 
         const result: () => Promise<void> = () => testee.takeNext(randomRundown.id)
 
-        expect(result).toThrow(LockRundownException)
+        expect(result).toThrow(ThrottledRundownException)
       })
     })
   })
