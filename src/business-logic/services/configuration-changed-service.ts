@@ -51,8 +51,7 @@ export class ConfigurationChangedService implements DataChangeService {
     const maxAttempts: number = 10
     callback().catch((error) => {
       if (attemptNumber >= maxAttempts){
-        this.logger.debug(`Unable to successfully call method on ${attemptNumber} attempts. Stopping recursive function`)
-        this.logger.error(error)
+        this.logger.data(error).error(`The retry limit of ${maxAttempts} is reached for calling the provided function`)
         return
       }
       setTimeout(() => {

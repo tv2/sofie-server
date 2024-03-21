@@ -27,13 +27,13 @@ export class MongoStatusMessageRepository extends BaseMongoRepository implements
 
   public async getAllStatusMessages(): Promise<StatusMessage[]> {
     this.assertDatabaseConnection(this.getAllStatusMessages.name)
-    return await this.getCollection().find<StatusMessage>({}).toArray()
+    return this.getCollection().find<StatusMessage>({}).toArray()
   }
 
   public async getStatusMessagesWithIdPrefix(idPrefix: string): Promise<StatusMessage[]> {
     this.assertDatabaseConnection(this.getStatusMessagesWithIdPrefix.name)
-    return await this.getCollection().find<StatusMessage>({
-      id: new RegExp(idPrefix, 'g')
+    return this.getCollection().find<StatusMessage>({
+      id: new RegExp(`^${idPrefix}`, 'g')
     }).toArray()
   }
 

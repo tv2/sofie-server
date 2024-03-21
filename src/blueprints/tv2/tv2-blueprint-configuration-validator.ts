@@ -8,8 +8,7 @@ import { StatusCode } from '../../model/enums/status-code'
 
 export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConfiguration {
 
-  constructor(private readonly configurationMapper: Tv2ConfigurationMapper) {
-  }
+  constructor(private readonly configurationMapper: Tv2ConfigurationMapper) { }
 
 
   public validateConfiguration(configuration: Configuration): StatusMessage[] {
@@ -29,12 +28,12 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
   private validateGraphicsSchemas(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     return showStyleConfiguration.graphicsSchemas.flatMap(schema => {
       return schema.casparCgDesignValues
-        .filter(designValues => designValues.name && designValues.name.includes(' '))
-        .map(designValues => {
+        .filter(designValues => designValues.name?.includes(' '))
+        .map(designValue => {
           return {
             id: `${schema.iNewsName}_${schema.iNewsSchemaColumn}`,
             title: `${schema.iNewsName} Schema Configuration`,
-            message: `The Schema ${schema.iNewsName} has an invalid CasparCgDesignValue. "${designValues.name}" contains a whitespace!`,
+            message: `The Schema ${schema.iNewsName} has an invalid CasparCg design value, since the design name '${designValue.name}' must not contain whitespace`,
             statusCode: StatusCode.BAD
           }
         })

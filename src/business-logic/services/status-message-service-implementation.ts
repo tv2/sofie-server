@@ -48,7 +48,7 @@ export class StatusMessageServiceImplementation implements StatusMessageService 
 
   private async getStatusMessageFromDatabase(statusMessageId: string): Promise<StatusMessage | undefined> {
     try {
-      return await this.statusMessageRepository.getStatusMessage(statusMessageId)
+      return this.statusMessageRepository.getStatusMessage(statusMessageId)
     } catch (error) {
       if (error instanceof NotFoundException) {
         return
@@ -63,8 +63,8 @@ export class StatusMessageServiceImplementation implements StatusMessageService 
     return isDifferentStatusCode || isDifferentMessage
   }
 
-  public async deleteStatusMessagesWithIdPrefixNotInCollection(idPrefix: string, statusMessagesNotToDelete: StatusMessage[]): Promise<void> {
-    const statusMessageIdsNotToBeDeleted: string[] = statusMessagesNotToDelete.map(statusMessage => statusMessage.id)
+  public async deleteStatusMessagesWithIdPrefixNotInCollection(idPrefix: string, statusMessagesToKeep: StatusMessage[]): Promise<void> {
+    const statusMessageIdsNotToBeDeleted: string[] = statusMessagesToKeep.map(statusMessage => statusMessage.id)
     const statusMessages: StatusMessage[] = await this.statusMessageRepository.getStatusMessagesWithIdPrefix(idPrefix)
 
     await Promise.all(statusMessages.filter(statusMessage => !statusMessageIdsNotToBeDeleted.includes(statusMessage.id))
