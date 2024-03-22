@@ -48,7 +48,8 @@ export class StatusMessageServiceImplementation implements StatusMessageService 
 
   private async getStatusMessageFromDatabase(statusMessageId: string): Promise<StatusMessage | undefined> {
     try {
-      return this.statusMessageRepository.getStatusMessage(statusMessageId)
+      // We must await here. If we don't, then the try-catch does nothing resulting in wrong behaviour.
+      return await this.statusMessageRepository.getStatusMessage(statusMessageId)
     } catch (error) {
       if (error instanceof NotFoundException) {
         return

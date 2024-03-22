@@ -43,12 +43,14 @@ export class ConfigurationChangedService implements DataChangeService {
     logger: Logger
   ) {
     this.logger = logger.tag(ConfigurationChangedService.name)
-    this.validateConfiguration().catch(error => this.logger.data(error).error('Unable to validate configuration'))
+    this.validateConfiguration().catch(error => this.logger.data(error).error('Failed to validate configuration'))
     this.listenForShowStyleChanges(showStyleConfigurationChangedListener)
   }
 
   private listenForShowStyleChanges(showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>): void {
-    showStyleConfigurationChangedListener.onUpdated(() => void this.validateConfiguration())
+    showStyleConfigurationChangedListener.onUpdated(() => {
+      this.validateConfiguration().catch(error => this.logger.data(error).error('Failed to validate configuration'))
+    })
   }
 
   private async validateConfiguration(): Promise<void> {
