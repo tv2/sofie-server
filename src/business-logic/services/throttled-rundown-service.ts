@@ -5,8 +5,8 @@ import { ThrottledRundownException } from '../../model/exceptions/throttled-rund
 import { InTransition } from '../../model/value-objects/in-transition'
 import { RundownService } from './interfaces/rundown-service'
 
-const RUNDOWN_LOCK_INTERVAL_MS: number = 500
-const RUNDOWN_LOCK_ERROR_TEXT: string = `Unable to do action. An action was already executed less than ${RUNDOWN_LOCK_INTERVAL_MS}ms ago`
+const RUNDOWN_THROTTLED_INTERVAL_MS: number = 500
+const RUNDOWN_THROTTLED_ERROR_TEXT: string = `Unable to do action. An action was already executed less than ${RUNDOWN_THROTTLED_INTERVAL_MS}ms ago`
 
 export class ThrottledRundownService implements RundownService {
   private static instance: RundownService
@@ -24,8 +24,8 @@ export class ThrottledRundownService implements RundownService {
 
   private assertEnoughTimeHasPassed(): void {
     const now: number = Date.now()
-    if (now < this.lastOperationTakenEpochTimestamp + RUNDOWN_LOCK_INTERVAL_MS) {
-      throw new ThrottledRundownException(RUNDOWN_LOCK_ERROR_TEXT)
+    if (now < this.lastOperationTakenEpochTimestamp + RUNDOWN_THROTTLED_INTERVAL_MS) {
+      throw new ThrottledRundownException(RUNDOWN_THROTTLED_ERROR_TEXT)
     }
     this.lastOperationTakenEpochTimestamp = now
   }
