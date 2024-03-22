@@ -68,6 +68,10 @@ export class MongoDatabase implements Database {
   }
 
   public onConnect(callbackIdentifier: string, callback: () => void): void {
+    if (this.db) {
+      callback()
+      return
+    }
     this.onConnectCallbacks.set(callbackIdentifier, callback)
   }
 }
