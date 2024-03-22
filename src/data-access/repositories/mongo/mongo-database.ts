@@ -3,6 +3,7 @@ import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
 import { MongoId } from './mongo-entity-converter'
 import { Logger } from '../../../logger/logger'
+import { Database } from '../interfaces/database'
 
 const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
 const MONGO_DB_NAME: string = getMongoDatabaseName()
@@ -12,7 +13,7 @@ function getMongoDatabaseName(): string {
   return mongoUrlPattern.exec(MONGO_CONNECTION_STRING)?.groups?.databaseName ?? 'meteor'
 }
 
-export class MongoDatabase {
+export class MongoDatabase implements Database {
   private static instance: MongoDatabase
 
   public static getInstance(logger: Logger): MongoDatabase {
@@ -30,11 +31,13 @@ export class MongoDatabase {
 
   private constructor(logger: Logger) {
     this.logger = logger.tag(MongoDatabase.name)
-    this.connectToDatabase()
-      .catch((reason) => this.logger.data(reason).error('Failed connecting to mongo database.'))
   }
 
-  private async connectToDatabase(): Promise<void> {
+  public async connect(): Promise<void> {
+    await this.connectToMongoDatabase()
+  }
+
+  private async connectToMongoDatabase(): Promise<void> {
     if (this.db) {
       this.logger.info('Already connected to database. Skipping reconnection...')
       return

@@ -43,21 +43,8 @@ export class ConfigurationChangedService implements DataChangeService {
     logger: Logger
   ) {
     this.logger = logger.tag(ConfigurationChangedService.name)
-    this.callAgainOnError(() => this.validateConfiguration())
+    this.validateConfiguration().catch(error => this.logger.data(error).error('Unable to validate configuration'))
     this.listenForShowStyleChanges(showStyleConfigurationChangedListener)
-  }
-
-  private callAgainOnError(callback: () => Promise<void>, attemptNumber: number = 1): void {
-    const maxAttempts: number = 10
-    callback().catch((error) => {
-      if (attemptNumber >= maxAttempts){
-        this.logger.data(error).error(`The retry limit of ${maxAttempts} is reached for calling the provided function`)
-        return
-      }
-      setTimeout(() => {
-        this.callAgainOnError(callback, ++attemptNumber)
-      }, 1000)
-    })
   }
 
   private listenForShowStyleChanges(showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>): void {

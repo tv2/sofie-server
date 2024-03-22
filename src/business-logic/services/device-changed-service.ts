@@ -39,22 +39,9 @@ export class DeviceChangedService implements DataChangeService {
     logger: Logger
   ) {
     this.logger = logger.tag(DeviceChangedService.name)
-    this.callAgainOnError(() => this.updateStatusMessageFromCurrentDeviceStatus())
+    this.updateStatusMessageFromCurrentDeviceStatus()
+      .catch((error) => this.logger.data(error).error('Unable to update status messages from current devices'))
     this.listenForStatusMessageChanges(deviceChangedListener)
-  }
-
-  private callAgainOnError(callback: () => Promise<void>, attemptNumber: number = 1): void {
-    const maxAttempts: number = 10
-    callback().catch((error) => {
-      if (attemptNumber >= maxAttempts){
-        this.logger.debug(`Unable to successfully call method on ${attemptNumber} attempts. Stopping recursive function`)
-        this.logger.error(error)
-        return
-      }
-      setTimeout(() => {
-        this.callAgainOnError(callback, ++attemptNumber)
-      }, 1000)
-    })
   }
 
   private async updateStatusMessageFromCurrentDeviceStatus(): Promise<void> {

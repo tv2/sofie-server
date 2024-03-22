@@ -6,6 +6,7 @@ import { EventServerFacade } from './facades/event-server-facade'
 import { ServiceFacade } from '../business-logic/facades/service-facade'
 import { Logger } from '../logger/logger'
 import { LoggerFacade } from '../logger/logger-facade'
+import { RepositoryFacade } from '../data-access/facades/repository-facade'
 
 export * from './controllers/rundown-controller'
 
@@ -33,7 +34,7 @@ class SofieServer {
   }
 
   public mapControllerToRouter(controller: BaseController): Router {
-    const router = Router()
+    const router: Router = Router()
     controller.getRoutes().forEach((route) => router[route.method](route.path, route.action.bind(controller)))
     return router
   }
@@ -43,21 +44,29 @@ class SofieServer {
   }
 }
 
-function startSofieServer(): void {
+async function startSofieServer(): Promise<void> {
   attachExpressServerToPort(REST_API_PORT)
   startRundownEventServer()
+  await connectToDatabase()
   startSystemServices()
 }
 
 function attachExpressServerToPort(port: number): void {
   new SofieServer().server.listen(port, () => {
-    const logger: Logger = LoggerFacade.createLogger().tag('presentation-index')
+    const logger: Logger = LoggerFacade.createLogger().tag('startup')
     return logger.info(`Express is listening at http://localhost:${port}`)
   })
 }
 
 function startRundownEventServer(): void {
   EventServerFacade.createEventServer().startServer(RUNDOWN_EVENT_SERVER_PORT)
+}
+
+async function connectToDatabase(): Promise<void> {
+  const logger: Logger = LoggerFacade.createLogger().tag('startup')
+  await RepositoryFacade.getDatabase()
+    .connect()
+    .catch((reason) => logger.data(reason).error('### Failed to connect to database ###'))
 }
 
 function startSystemServices(): void {
@@ -68,4 +77,4 @@ function startSystemServices(): void {
   ServiceFacade.createConfigurationDataChangedService()
 }
 
-startSofieServer()
+startSofieServer().catch((error) => LoggerFacade.createLogger().tag('startup').data(error).error('### Unable to start Sofie Server ###'))
