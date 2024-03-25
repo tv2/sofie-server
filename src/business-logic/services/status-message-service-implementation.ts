@@ -59,8 +59,8 @@ export class StatusMessageServiceImplementation implements StatusMessageService 
   }
 
   private isStatusMessagesDifferent(statusMessageOne: StatusMessage, statusMessageTwo: StatusMessage): boolean {
-    const isDifferentStatusCode: boolean = statusMessageOne.statusCode != statusMessageTwo.statusCode
-    const isDifferentMessage: boolean = statusMessageOne.message != statusMessageTwo.message
+    const isDifferentStatusCode: boolean = statusMessageOne.statusCode !== statusMessageTwo.statusCode
+    const isDifferentMessage: boolean = statusMessageOne.message !== statusMessageTwo.message
     return isDifferentStatusCode || isDifferentMessage
   }
 

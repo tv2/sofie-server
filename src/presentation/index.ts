@@ -66,7 +66,7 @@ async function connectToDatabase(): Promise<void> {
   const logger: Logger = LoggerFacade.createLogger().tag('startup')
   await RepositoryFacade.getDatabase()
     .connect()
-    .catch((reason) => logger.data(reason).error('### Failed to connect to database ###'))
+    .catch((reason) => logger.data(reason).error('Failed to connect to database'))
 }
 
 function startSystemServices(): void {
@@ -77,4 +77,4 @@ function startSystemServices(): void {
   ServiceFacade.createConfigurationDataChangedService()
 }
 
-startSofieServer().catch((error) => LoggerFacade.createLogger().tag('startup').data(error).error('### Unable to start Sofie Server ###'))
+startSofieServer().catch((error) => LoggerFacade.createLogger().tag('startup').data(error).error('Unable to start Sofie Server'))
