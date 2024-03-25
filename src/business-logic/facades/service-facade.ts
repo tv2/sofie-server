@@ -9,8 +9,8 @@ import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
-import { DatabaseChangeService } from '../services/interfaces/database-change-service'
-import { IngestDatabaseChangeService } from '../services/ingest-database-change-service'
+import { DataChangeService } from '../services/interfaces/data-change-service'
+import { IngestDataChangedService } from '../services/ingest-data-changed-service'
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
 import { IngestService } from '../services/interfaces/ingest-service'
 import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
@@ -20,11 +20,14 @@ import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-ent
 import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
 import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
 import { LoggerFacade } from '../../logger/logger-facade'
-import { MediaDatabaseChangeService } from '../services/media-database-change-service'
+import { MediaDatabaseChangedService } from '../services/media-database-changed-service'
 import { ConfigurationService } from '../services/interfaces/configuration-service'
 import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
 import { DeviceChangedService } from '../services/device-changed-service'
 import { ThrottledRundownService } from '../services/throttled-rundown-service'
+import { ConfigurationChangedService } from '../services/configuration-changed-service'
+import { StatusMessageService } from '../services/interfaces/status-message-service'
+import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -72,8 +75,8 @@ export class ServiceFacade {
     )
   }
 
-  public static createIngestChangeService(): DatabaseChangeService {
-    return IngestDatabaseChangeService.getInstance(
+  public static createIngestChangeService(): DataChangeService {
+    return IngestDataChangedService.getInstance(
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createSegmentRepository(),
@@ -90,8 +93,8 @@ export class ServiceFacade {
     )
   }
 
-  public static createMediaDataChangeService(): DatabaseChangeService {
-    return MediaDatabaseChangeService.getInstance(
+  public static createMediaDataChangeService(): DataChangeService {
+    return MediaDatabaseChangedService.getInstance(
       EventEmitterFacade.createMediaEventEmitter(),
       RepositoryFacade.createMediaChangedListener()
     )
@@ -109,13 +112,29 @@ export class ServiceFacade {
     )
   }
 
-  public static createDeviceDataChangedService(): DatabaseChangeService {
+  public static createDeviceDataChangedService(): DataChangeService {
     return DeviceChangedService.getInstance(
-      EventEmitterFacade.createStatusMessageEventEmitter(),
-      RepositoryFacade.createStatusMessageRepository(),
+      ServiceFacade.createStatusMessageService(),
       RepositoryFacade.createDeviceRepository(),
       RepositoryFacade.createDeviceDataChangedListener(),
       LoggerFacade.createLogger()
+    )
+  }
+
+  public static createConfigurationDataChangedService(): DataChangeService {
+    return ConfigurationChangedService.getInstance(
+      BlueprintsFacade.createBlueprint(),
+      ServiceFacade.createStatusMessageService(),
+      RepositoryFacade.createConfigurationRepository(),
+      RepositoryFacade.createShowStyleChangedListener(),
+      LoggerFacade.createLogger()
+    )
+  }
+
+  public static createStatusMessageService(): StatusMessageService {
+    return new StatusMessageServiceImplementation(
+      EventEmitterFacade.createStatusMessageEventEmitter(),
+      RepositoryFacade.createStatusMessageRepository()
     )
   }
 }

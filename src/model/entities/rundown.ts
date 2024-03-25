@@ -676,8 +676,9 @@ export class Rundown extends BasicRundown {
   }
 
   public reset(): void {
+    const isRundownInRehearsalBeforeResetting: boolean = this.mode === RundownMode.REHEARSAL
     this.deactivate()
-    this.activate()
+    isRundownInRehearsalBeforeResetting ? this.enterRehearsal() : this.activate()
   }
 
   public getPersistentState(): RundownPersistentState {

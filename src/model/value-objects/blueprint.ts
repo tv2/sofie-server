@@ -5,8 +5,9 @@ import { Timeline } from '../entities/timeline'
 import { Configuration } from '../entities/configuration'
 import { OnTimelineGenerateResult } from './on-timeline-generate-result'
 import { Action, ActionManifest, MutateActionMethods } from '../entities/action'
+import { StatusMessage } from '../entities/status-message'
 
-export type Blueprint = BlueprintOnTimelineGenerate & BlueprintGetEndStateForPart & BlueprintGenerateActions
+export type Blueprint = BlueprintOnTimelineGenerate & BlueprintGetEndStateForPart & BlueprintGenerateActions & BlueprintValidateConfiguration
 
 export interface BlueprintOnTimelineGenerate {
   onTimelineGenerate(
@@ -43,4 +44,13 @@ export interface BlueprintGenerateActions {
    * Any Action not interested in mutating its data at execution time can simply ignore this method.
    */
   getMutateActionMethods?(action: Action): MutateActionMethods[]
+}
+
+export interface BlueprintValidateConfiguration {
+  /**
+   * Validates the configuration.
+   * Returns a list of StatusMessages where each StatusMessage is an error with the configuration.
+   * The StatusMessages will be saved by SofieServer and all clients will be notified about them.
+   */
+  validateConfiguration(configuration: Configuration): StatusMessage[]
 }

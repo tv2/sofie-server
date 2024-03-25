@@ -1,4 +1,4 @@
-import { DatabaseChangeService } from './interfaces/database-change-service'
+import { DataChangeService } from './interfaces/data-change-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
@@ -22,9 +22,9 @@ import { PieceRepository } from '../../data-access/repositories/interfaces/piece
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
-export class IngestDatabaseChangeService implements DatabaseChangeService {
+export class IngestDataChangedService implements DataChangeService {
 
-  private static instance: DatabaseChangeService
+  private static instance: DataChangeService
 
   public static getInstance(
     ingestedRundownRepository: IngestedRundownRepository,
@@ -40,9 +40,9 @@ export class IngestDatabaseChangeService implements DatabaseChangeService {
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>,
-  ): DatabaseChangeService {
+  ): DataChangeService {
     if (!this.instance) {
-      this.instance = new IngestDatabaseChangeService(
+      this.instance = new IngestDataChangedService(
         ingestedRundownRepository,
         rundownRepository,
         segmentRepository,
@@ -85,7 +85,7 @@ export class IngestDatabaseChangeService implements DatabaseChangeService {
     segmentChangedListener: DataChangedListener<IngestedSegment>,
     partChangedListener: DataChangedListener<IngestedPart>,
   ) {
-    this.logger = logger.tag(IngestDatabaseChangeService.name)
+    this.logger = logger.tag(IngestDataChangedService.name)
 
     this.listenForRundownChanges(rundownChangeListener)
     this.listenForSegmentChanges(segmentChangedListener)
