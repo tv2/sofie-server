@@ -24,13 +24,14 @@ import { MediaDatabaseChangedService } from '../services/media-database-changed-
 import { ConfigurationService } from '../services/interfaces/configuration-service'
 import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
 import { DeviceChangedService } from '../services/device-changed-service'
+import { ThrottledRundownService } from '../services/throttled-rundown-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
-    return new RundownTimelineService(
+    const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
       EventEmitterFacade.createRundownEventEmitter(),
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
@@ -42,6 +43,8 @@ export class ServiceFacade {
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint()
     )
+
+    return ThrottledRundownService.getInstance(rundownTimelineService)
   }
 
   public static createTimelineBuilder(): TimelineBuilder {
