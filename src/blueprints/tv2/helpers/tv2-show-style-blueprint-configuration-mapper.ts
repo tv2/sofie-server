@@ -2,6 +2,7 @@ import {
   Breaker,
   BreakerTransitionEffect,
   GraphicsDefault,
+  GraphicsSchema,
   GraphicsSetup,
   GraphicsTemplate,
   SplitScreenConfiguration,
@@ -15,6 +16,7 @@ interface CoreShowStyleBlueprintConfiguration {
   GfxDefaults: CoreGraphicsDefault[]
   GfxSetups: CoreGraphicsSetup[]
   GfxTemplates: CoreGraphicsTemplate[]
+  GfxSchemaTemplates: CoreGraphicsSchema[]
   DVEStyles: CoreSplitScreenConfiguration[]
   BreakerConfig: CoreBreaker[]
   Transitions: { _id: string, Transition: string }[]
@@ -38,6 +40,13 @@ interface CoreGraphicsSetup {
 interface CoreGraphicsTemplate {
   VizTemplate: string
   OutType?: string
+}
+
+interface CoreGraphicsSchema {
+  VizTemplate: string
+  INewsSkemaColumn: string
+  GfxSchemaTemplatesName: string
+  CasparCgDesignValues: string
 }
 
 interface CoreSplitScreenConfiguration {
@@ -69,6 +78,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       graphicsDefault: this.mapGraphicsDefault(coreConfiguration.GfxDefaults),
       graphicsSetups: this.mapGraphicsSetups(coreConfiguration.GfxSetups),
       graphicsTemplates: this.mapGraphicsTemplates(coreConfiguration.GfxTemplates),
+      graphicsSchemas: this.mapGraphicsSchemas(coreConfiguration.GfxSchemaTemplates),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
       splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
       breakerTransitionEffectConfigurations: this.mapTransitionEffectConfigurations([
@@ -118,6 +128,17 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       default:
         return PieceLifespan.WITHIN_PART
     }
+  }
+
+  private mapGraphicsSchemas(coreGraphicsSchemas: CoreGraphicsSchema[]): GraphicsSchema[] {
+    return coreGraphicsSchemas.map(schema => {
+      return {
+        iNewsName: schema.VizTemplate,
+        iNewsSchemaColumn: schema.INewsSkemaColumn,
+        graphicsTemplateName: schema.GfxSchemaTemplatesName,
+        casparCgDesignValues: schema.CasparCgDesignValues ? JSON.parse(schema.CasparCgDesignValues) : []
+      }
+    })
   }
 
   private findSelectedGraphicsSetup(coreGraphicsDefaults: CoreGraphicsDefault[], coreGraphicsSetups: CoreGraphicsSetup[]): GraphicsSetup {
