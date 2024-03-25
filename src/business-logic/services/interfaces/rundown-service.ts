@@ -6,6 +6,7 @@ import { InTransition } from '../../../model/value-objects/in-transition'
 export interface RundownService {
   deleteRundown(rundownId: string): Promise<void>
   activateRundown(rundownId: string): Promise<void>
+  enterRehearsal(rundownId: string): Promise<void>
   deactivateRundown(rundownId: string): Promise<void>
   takeNext(rundownId: string): Promise<void>
   setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void>

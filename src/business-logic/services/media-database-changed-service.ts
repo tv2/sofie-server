@@ -1,18 +1,18 @@
-import { DatabaseChangeService } from './interfaces/database-change-service'
+import { DataChangeService } from './interfaces/data-change-service'
 import { MediaEventEmitter } from './interfaces/media-event-emitter'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
 import { Media } from '../../model/entities/media'
 
-export class MediaDatabaseChangeService implements DatabaseChangeService {
+export class MediaDatabaseChangedService implements DataChangeService {
 
-  private static instance: DatabaseChangeService
+  private static instance: DataChangeService
 
   public static getInstance(
     mediaEventEmitter: MediaEventEmitter,
     mediaChangedListener: DataChangedListener<Media>
-  ): DatabaseChangeService {
+  ): DataChangeService {
     if (!this.instance) {
-      this.instance = new MediaDatabaseChangeService(
+      this.instance = new MediaDatabaseChangedService(
         mediaEventEmitter,
         mediaChangedListener
       )

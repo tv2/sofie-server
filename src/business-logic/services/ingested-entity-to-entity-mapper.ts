@@ -8,6 +8,7 @@ import { Segment } from '../../model/entities/segment'
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { Rundown, RundownAlreadyActiveProperties } from '../../model/entities/rundown'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { RundownMode } from '../../model/enums/rundown-mode'
 
 export class IngestedEntityToEntityMapper {
 
@@ -18,7 +19,7 @@ export class IngestedEntityToEntityMapper {
       showStyleVariantId: ingestedRundown.showStyleVariantId,
       segments: [],
       history: [],
-      isRundownActive: false,
+      mode: RundownMode.INACTIVE,
       modifiedAt: ingestedRundown.modifiedAt,
       baselineTimelineObjects: ingestedRundown.baselineTimelineObjects,
       timing: ingestedRundown.timings
@@ -26,7 +27,7 @@ export class IngestedEntityToEntityMapper {
   }
 
   public updateRundownFromIngestedRundown(rundownToUpdate: Rundown, ingestedRundown: IngestedRundown): Rundown {
-    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = rundownToUpdate.isActive()
+    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = rundownToUpdate.isActive() || rundownToUpdate.isRehearsal()
       ? {
         activeCursor: rundownToUpdate.getActiveCursor(),
         nextCursor: rundownToUpdate.getNextCursor(),
@@ -37,7 +38,7 @@ export class IngestedEntityToEntityMapper {
     return new Rundown({
       ...ingestedRundown,
       id: rundownToUpdate.id,
-      isRundownActive: rundownToUpdate.isActive(),
+      mode: rundownToUpdate.getMode(),
       history: rundownToUpdate.getHistory(),
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),
