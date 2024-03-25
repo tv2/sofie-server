@@ -1,22 +1,31 @@
 import { RundownTiming } from '../value-objects/rundown-timing'
+import { RundownMode } from '../enums/rundown-mode'
 
 export class BasicRundown {
   public readonly id: string
   public readonly name: string
   public readonly timing: RundownTiming
-  protected isRundownActive: boolean
+  protected mode: RundownMode
   protected modifiedAt: number
 
-  constructor(id: string, name: string, isActive: boolean, modifiedAt: number, timing: RundownTiming) {
+  constructor(id: string, name: string, mode: RundownMode, modifiedAt: number, timing: RundownTiming) {
     this.id = id
     this.name = name
-    this.isRundownActive = isActive
+    this.mode = mode
     this.modifiedAt = modifiedAt
     this.timing = timing
   }
 
   public isActive(): boolean {
-    return this.isRundownActive
+    return this.mode === RundownMode.ACTIVE
+  }
+
+  public isRehearsal(): boolean {
+    return this.mode === RundownMode.REHEARSAL
+  }
+
+  public getMode(): RundownMode {
+    return this.mode
   }
 
   public getLastTimeModified(): number {

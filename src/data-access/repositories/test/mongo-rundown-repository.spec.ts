@@ -12,6 +12,7 @@ import { EntityMockFactory } from '../../../model/entities/test/entity-mock-fact
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoEntityConverter, MongoId, MongoRundown } from '../mongo/mongo-entity-converter'
+import { RundownMode } from '../../../model/enums/rundown-mode'
 
 const COLLECTION_NAME: string = RUNDOWN_COLLECTION_NAME
 
@@ -112,9 +113,9 @@ export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase):
       const inactiveMongoRundown: MongoRundown = createMongoRundown({
         _id: 'rundownId',
       })
-      const activeRundown: Rundown = EntityMockFactory.createActiveRundown({}, {
+      const activeRundown: Rundown = EntityTestFactory.createRundown( {
         id: inactiveMongoRundown._id,
-        isRundownActive: true,
+        mode: RundownMode.ACTIVE,
       })
       await testDatabase.populateCollection(COLLECTION_NAME, [inactiveMongoRundown])
 
@@ -126,7 +127,7 @@ export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase):
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       when(mongoConverter.convertToMongoRundown(anything())).thenReturn({
         _id: activeRundown.id,
-        isActive: activeRundown.isActive(),
+        mode: activeRundown.getMode(),
       } as unknown as MongoRundown)
 
       const testee: RundownRepository = createTestee({
@@ -138,14 +139,14 @@ export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase):
       const result: MongoRundown = (await db
         .collection<MongoRundown>(COLLECTION_NAME)
         .findOne({ _id: activeRundown.id })) as unknown as MongoRundown
-      expect(result.isActive).toBeTruthy()
+      expect(result.mode).toBe(RundownMode.ACTIVE)
     })
 
     it('has rundown as on air and saves the rundown as not on air', async () => {
       const activeMongoRundown: MongoRundown = createMongoRundown({ _id: 'rundownId' })
       const inactiveRundown: Rundown = EntityMockFactory.createRundown({
         id: activeMongoRundown._id,
-        isRundownActive: false,
+        mode: RundownMode.INACTIVE,
       })
       await testDatabase.populateCollection(COLLECTION_NAME, [activeMongoRundown])
 
@@ -169,7 +170,7 @@ export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase):
       const result: MongoRundown = (await db
         .collection<MongoRundown>(COLLECTION_NAME)
         .findOne({ _id: inactiveRundown.id })) as unknown as MongoRundown
-      expect(result.isActive).toBeFalsy()
+      expect(result.mode).toBeFalsy()
     })
   })
 

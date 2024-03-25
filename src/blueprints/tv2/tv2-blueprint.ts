@@ -2,7 +2,7 @@ import {
   Blueprint,
   BlueprintGenerateActions,
   BlueprintGetEndStateForPart,
-  BlueprintOnTimelineGenerate
+  BlueprintOnTimelineGenerate, BlueprintValidateConfiguration
 } from '../../model/value-objects/blueprint'
 import { RundownPersistentState } from '../../model/value-objects/rundown-persistent-state'
 import { Part } from '../../model/entities/part'
@@ -11,12 +11,14 @@ import { Timeline } from '../../model/entities/timeline'
 import { Configuration } from '../../model/entities/configuration'
 import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
 import { Tv2Action } from './value-objects/tv2-action'
+import { StatusMessage } from '../../model/entities/status-message'
 
 export class Tv2Blueprint implements Blueprint {
   constructor(
     private readonly endStateForPartService: BlueprintGetEndStateForPart,
     private readonly onTimelineGenerateService: BlueprintOnTimelineGenerate,
-    private readonly actionsService: BlueprintGenerateActions
+    private readonly actionsService: BlueprintGenerateActions,
+    private readonly configurationValidator: BlueprintValidateConfiguration
   ) {}
 
   public getEndStateForPart(
@@ -56,5 +58,9 @@ export class Tv2Blueprint implements Blueprint {
       return []
     }
     return this.actionsService.getMutateActionMethods(action)
+  }
+
+  public validateConfiguration(configuration: Configuration): StatusMessage[] {
+    return this.configurationValidator.validateConfiguration(configuration)
   }
 }

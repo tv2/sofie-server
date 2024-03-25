@@ -15,6 +15,7 @@ import {
   RundownDeactivatedEvent,
   RundownDeletedEvent,
   RundownInfinitePiecesUpdatedEvent,
+  RundownRehearseEvent,
   RundownResetEvent,
   RundownUpdatedEvent,
   SegmentCreatedEvent,
@@ -28,6 +29,7 @@ import { Segment } from '../../model/entities/segment'
 
 export interface RundownEventBuilder {
   buildActivateEvent(rundown: Rundown): RundownActivatedEvent
+  buildRehearseEvent(rundown: Rundown): RundownRehearseEvent
   buildDeactivateEvent(rundown: Rundown): RundownDeactivatedEvent
   buildResetEvent(rundown: Rundown): RundownResetEvent
   buildTakeEvent(rundown: Rundown): PartTakenEvent

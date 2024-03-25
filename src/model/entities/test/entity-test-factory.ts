@@ -6,6 +6,7 @@ import { PieceLifespan } from '../../enums/piece-lifespan'
 import { Device } from '../device'
 import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
+import { RundownMode } from '../../enums/rundown-mode'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -13,7 +14,7 @@ export class EntityTestFactory {
       id: 'rundownId' + Math.floor(Math.random() * 1000),
       name: 'rundownName',
       segments: [],
-      isRundownActive: false,
+      mode: RundownMode.INACTIVE,
       modifiedAt: Date.now(),
       ...rundownInterface
     } as RundownInterface)
