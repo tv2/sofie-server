@@ -1,0 +1,13 @@
+node_modules/
+coverage/
+dist/
+*.log
+
+# Ignore JetBrains specific files
+.idea
+
+# Ignore local pyenv
+.python-version
+
+# Ignore VSCode specifics
+.vscode
