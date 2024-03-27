@@ -1,0 +1,23 @@
+// TODO: This is currently copied from BlueprintIntegrations TSR in node_module. Get the info some other way.
+export enum DeviceType {
+  ABSTRACT = 0,
+  CASPAR_CG = 1,
+  ATEM = 2,
+  LAWO = 3,
+  HTTP_SEND = 4,
+  PANASONIC_PTZ = 5,
+  TCP_SEND = 6,
+  HYPER_DECK = 7,
+  PHAROS = 8,
+  OSC = 9,
+  HTTP_WATCHER = 10,
+  SISYFOS = 11,
+  QUANTEL = 12,
+  VIZ_MSE = 13,
+  SINGULAR_LIVE = 14,
+  SHOTOKU = 15,
+  VMIX = 20,
+  OBS = 21,
+  TELEMETRICS = 22,
+  TRICASTER = 24,
+}
