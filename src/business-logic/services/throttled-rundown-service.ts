@@ -56,7 +56,7 @@ export class ThrottledRundownService implements RundownService {
   }
 
   public deleteRundown(rundownId: string): Promise<void> {
-    return this.rundownService.deactivateRundown(rundownId)
+    return this.rundownService.deleteRundown(rundownId)
   }
 
   public setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
