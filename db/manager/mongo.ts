@@ -46,7 +46,7 @@ const {
 })
 
 if (values.help) {
-  console.log('Usage: mongo-manager [options]')
+  console.log('Usage: mongo-manager [option]')
   console.log('Options:')
   console.log('  -h, --help    Display this help message')
   console.log('  --start       Start the mongo service')
@@ -213,7 +213,7 @@ async function action(values: { [longOption: string]: string | boolean | undefin
       break
 
     default:
-      console.log('Please provide a valid option')
+      console.log('Please provide a valid option. Try --help for more information.')
       positionals.length > 0 && console.log('Unsupported: ', positionals)
       break
   }
