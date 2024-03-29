@@ -11,3 +11,7 @@ dist/
 
 # Ignore VSCode specifics
 .vscode
+
+jest.config.js*
+db/dumps/meteor
+db/manager/*.js*
