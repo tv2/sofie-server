@@ -39,6 +39,10 @@ const {
     spy: {
       type: 'boolean',
       default: false,
+    },
+    dump: {
+      type: 'boolean',
+      default: false,
     }
   },
   strict: false,
@@ -56,6 +60,7 @@ if (values.help) {
   console.log('  --seed        Seed the database with initial data')
   console.log('  --drop        Stop then drop the database container and its volumes')
   console.log('  --spy         Spy on database events')
+  console.log('  --dump        Dump all from mongodb://127.0.0.1:3001/ to ./db/dumps/meteor')
 
   process.exit(0)
 }
@@ -159,6 +164,17 @@ async function seedDatabase(): Promise<void>{
   ])
 }
 
+async function dumptDatabase(): Promise<void>{
+  const args = [
+    'docker', 'run', '--rm', '-it' ,
+    '-v', './db/dumps:/dumps',
+    'leafney/alpine-mongo-tools:latest',
+    'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
+  ]
+  console.log(args.join(' '))
+  return docker(args)
+}
+
 async function action(values: { [longOption: string]: string | boolean | undefined } & {
   help: string | boolean | undefined
   start: string | boolean | undefined
@@ -168,48 +184,55 @@ async function action(values: { [longOption: string]: string | boolean | undefin
   seed: string | boolean | undefined
   drop: string | boolean | undefined
   spy: string | boolean | undefined
+  dump: string | boolean | undefined
 }): Promise<void> {
   switch (true) {
-    case values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.drop && !values.spy:
+    case values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.drop && !values.spy && !values.dump:
       console.log('starting mongo...')
       await testDockerIsInstalled()
       await startMongoContainer()
       break
 
-    case values.stop && !values.start && !values.restart && !values.initrs && !values.seed && !values.drop && !values.spy:
+    case values.stop && !values.start && !values.restart && !values.initrs && !values.seed && !values.drop && !values.spy && !values.dump:
       console.log('stopping mongo...')
       await testDockerIsInstalled()
       await stopMongoContainer()
       break
 
-    case values.restart && !values.start && !values.stop && !values.initrs && !values.seed && !values.drop && !values.spy:
+    case values.restart && !values.start && !values.stop && !values.initrs && !values.seed && !values.drop && !values.spy && !values.dump:
       console.log('restarting mongo...')
       await testDockerIsInstalled()
       await restartMongoContainer()
       break
 
-    case values.initrs && !values.start && !values.stop && !values.restart && !values.seed && !values.drop && !values.spy:
+    case values.initrs && !values.start && !values.stop && !values.restart && !values.seed && !values.drop && !values.spy && !values.dump:
       console.log('initializing replica set...')
       await testDockerIsInstalled()
       await initReplicaSet()
       break
 
-    case values.seed && !values.start && !values.stop && !values.restart && !values.initrs && !values.drop && !values.spy:
+    case values.seed && !values.start && !values.stop && !values.restart && !values.initrs && !values.drop && !values.spy && !values.dump:
       console.log('seeding database...')
       await testDockerIsInstalled()
       await seedDatabase()
       break
 
-    case values.drop && !values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.spy:
+    case values.drop && !values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.spy && !values.dump:
       console.log('dropping database...')
       await testDockerIsInstalled()
       await dropMongoContainer()
       break
 
-    case values.spy && !values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.drop:
+    case values.spy && !values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.drop && !values.dump:
       console.log('spying on the database...')
       await testDockerIsInstalled()
       await spyOnDatabase()
+      break
+
+    case values.dump && !values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.drop && !values.spy:
+      console.log('dumping database...')
+      await testDockerIsInstalled()
+      await dumptDatabase()
       break
 
     default:

@@ -20,7 +20,8 @@
     "drop-database": "npx ts-node ./db/manager/mongo.ts --drop",
     "init-replica-set": "npx ts-node ./db/manager/mongo.ts --initrs",
     "seed-database": "npx ts-node ./db/manager/mongo.ts --seed",
-    "spy-database": "npx ts-node ./db/manager/mongo.ts --spy"
+    "spy-database": "npx ts-node ./db/manager/mongo.ts --spy",
+    "dump-database": "npx ts-node ./db/manager/mongo.ts --dump"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",

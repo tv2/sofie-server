@@ -1,14 +1,14 @@
 Goal
 ===
-Transfer data from Meteor's MongoDB to a containerized instance of MongoDB.
+Transfer data from Meteor's MongoDB to a containerized instance of MongoDB then maintain and operate with it for the purpose of `sofie-server` project.
 
 Pre-requisites
 ===
 
-- `tv-automation-server-core`
-- `sofie-server`
-- `docker`
-- mongodb-tools for running cli commands
+- `tv-automation-server-core` codebase running
+- `sofie-server` codebase running
+- `docker` installed
+- mongodb-tools for running cli commands (optional)
 
 Steps
 ===
@@ -25,8 +25,9 @@ Once the server is running, open second terminal and run the following command:
 cd sofie-server/db/dumps
 mongodump "mongodb://localhost:3001" --oplog --out=./meteor
 ```
+*note*: equivalent too the above command is `yarn run dump-database` from the `sofie-server` root folder. In this case you don't have to install mongotools for your distro.
 
-this will create a dump of the database in the `meteor` sub-folder. In the next steps we'll use this to restore the database in our containerized MongoDB. Once restored - you can safely remove the `meteor` sub-folder.
+this will create a dump of the database in the `meteor` sub-folder (git excluded!). In the next steps we'll use this to restore the database in our containerized MongoDB. Once restored - you can safely remove the `meteor` sub-folder.
 
 2. Stop `tv-automation-server-core` - we don't need it anymore.
 3. Open third terminal: :
