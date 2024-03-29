@@ -36,12 +36,10 @@ export class ThrottledRundownService implements RundownService {
   }
 
   public activateRundown(rundownId: string): Promise<void> {
-    this.assertEnoughTimeHasPassed()
     return this.rundownService.activateRundown(rundownId)
   }
 
   public deactivateRundown(rundownId: string): Promise<void> {
-    this.assertEnoughTimeHasPassed()
     return this.rundownService.deactivateRundown(rundownId)
   }
 
@@ -56,7 +54,7 @@ export class ThrottledRundownService implements RundownService {
   }
 
   public deleteRundown(rundownId: string): Promise<void> {
-    return this.rundownService.deactivateRundown(rundownId)
+    return this.rundownService.deleteRundown(rundownId)
   }
 
   public setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
