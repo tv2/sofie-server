@@ -97,20 +97,38 @@ function initReplicaSet(): void {
 }
 
 function startMongoContainer(): void {
-  docker([
-    'run',
-    '--name', 'sofie-mongodb',
-    '-v', './db/dumps:/dumps',
-    '-v', 'sofie-mongodb-data:/data/db',
-    '-v', 'sofie-mongodb-config:/data/configdb',
-    '-p', '3001:3001',
-    '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
-    '--health-interval=1s',
-    '-d', 'mongo:6.0.1',
-    '--replSet', 'rs0',
-    '--bind_ip_all',
-    '--port', '3001'
-  ])
+  if (/^win/i.test(process.platform)) {
+    docker([
+      'run',
+      '--name', 'sofie-mongodb',
+      '-v', '.\\db\\dumps:/dumps',
+      '-v', 'sofie-mongodb-data:/data/db',
+      '-v', 'sofie-mongodb-config:/data/configdb',
+      '-p', '3001:3001',
+      // requires mongotools installed on Windows
+      // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
+      '--health-interval=1s',
+      '-d', 'mongo:6.0.1',
+      '--replSet', 'rs0',
+      '--bind_ip_all',
+      '--port', '3001'
+    ])
+  } else {
+    docker([
+      'run',
+      '--name', 'sofie-mongodb',
+      '-v', './db/dumps:/dumps',
+      '-v', 'sofie-mongodb-data:/data/db',
+      '-v', 'sofie-mongodb-config:/data/configdb',
+      '-p', '3001:3001',
+      '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
+      '--health-interval=1s',
+      '-d', 'mongo:6.0.1',
+      '--replSet', 'rs0',
+      '--bind_ip_all',
+      '--port', '3001'
+    ])
+  }
 }
 
 function stopMongoContainer(): void {
@@ -158,12 +176,21 @@ function seedDatabase(): void {
 }
 
 function dumptDatabase(): void {
-  docker([
-    'run', '--rm',
-    '-v', './db/dumps:/dumps',
-    'leafney/alpine-mongo-tools:latest',
-    'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
-  ])
+  if (/^win/i.test(process.platform)) {
+    docker([
+      'run', '--rm',
+      '-v', '.\\db\\dumps:/dumps',
+      'leafney/alpine-mongo-tools:latest',
+      'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
+    ])
+  } else {
+    docker([
+      'run', '--rm',
+      '-v', './db/dumps:/dumps',
+      'leafney/alpine-mongo-tools:latest',
+      'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
+    ])
+  }
 }
 
 function action(values: { [longOption: string]: string | boolean | undefined } & {

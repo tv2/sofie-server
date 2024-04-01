@@ -13,6 +13,9 @@ Pre-requisites
 
 Steps
 ===
+
+*note*: short example at the bottom of the page
+
 1.Obtain dump from tv-automation-server-core
 Open a terminal and run the following commands:
 
@@ -40,7 +43,13 @@ yarn run start-database
 
 Should start the database in a docker container. You can check the logs to see if it started correctly.
 
-4. To restore the dump, return to your second terminal and run the following command:
+
+4. Next step is to initialize the single node replica set:
+```bash
+yarn run init-replica-set
+```
+
+5. To restore the dump, return to your second terminal and run the following command:
 
 ```bash
 mongorestore "mongodb://localhost:3001/?replicaSet=rs0" --oplogReplay ./meteor
@@ -52,9 +61,9 @@ yarn run seed-database
 ```
 
 
-5. Once the restore is complete, you can inspect your database using a MongoDB client.
+6. Once the restore is complete, you can inspect your database using a MongoDB client.
 
-6. From that point on, you can start the server as usual:
+7. From that point on, you can start the server as usual:
 
 ```bash
 cd sofie-server
