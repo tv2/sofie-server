@@ -1,5 +1,6 @@
 Goal
 ===
+
 Transfer data from Meteor's MongoDB to a containerized instance of MongoDB then maintain and operate with it for the purpose of `sofie-server` project.
 
 Pre-requisites
@@ -17,6 +18,7 @@ Steps
 *note*: short example at the bottom of the page
 
 1.Obtain dump from tv-automation-server-core
+
 Open a terminal and run the following commands:
 
 ```bash
@@ -30,6 +32,7 @@ cd sofie-server
 yarn run dump-database
 ```
 *note*: equivalent to the above command is:
+
 ```bash
 cd sofie-server/db/dumps
 mongodump "mongodb://localhost:3001" --oplog --out=./meteor
@@ -38,6 +41,7 @@ mongodump "mongodb://localhost:3001" --oplog --out=./meteor
 this will create a dump of the database in the `meteor` sub-folder (git excluded!). In the next steps we'll use this to restore the database in our containerized MongoDB. Once restored - you can safely remove the `meteor` sub-folder.
 
 2. Stop `tv-automation-server-core` - we don't need it anymore.
+
 3. Open third terminal: :
 
 ```bash
@@ -49,6 +53,7 @@ Should start the database in a docker container. You can check the logs to see i
 
 
 4. Next step is to initialize the single node replica set:
+
 ```bash
 yarn run init-replica-set
 ```
@@ -65,7 +70,6 @@ or you can use:
 mongorestore "mongodb://localhost:3001/?replicaSet=rs0" --oplogReplay ./meteor
 ```
 
-
 6. Once the restore is complete, you can inspect your database using a MongoDB client.
 
 7. From that point on, you can start the server as usual:
@@ -78,12 +82,14 @@ yarn watch
 Now you should have a working server with the database restored from the dump and sofie-server should be running off meteor.
 
 Example of the sequence of commands:
+
 ```bash
 # in terminal one
 cd tv-automation-server-core
 yarn watch
 ...
 ```
+
 ```bash
 # in terminal two
 cd sofie-server
@@ -112,6 +118,7 @@ Interoperability with `tv-automation-server-core` is preserved (Meteor will use 
 ```bash
 MONGO_URL='mongodb://127.0.0.1:3001/meteor?replicaSet=rs0' MONGO_OPLOG_URL='mongodb://127.0.0.1:3001/local?replicaSet=rs0' yarn dev
 ```
+
 or permanantly setting the `MONGO_URL` and `MONGO_OPLOG_URL` accordingly.
 
 For Mac/Linux users, the `MONGO_URL` and `MONGO_OPLOG_URL` can be set by running the following commands in the terminal:
@@ -121,7 +128,6 @@ export MONGO_URL='mongodb://127.0.0.1:3001/meteor?replicaSet=rs0'
 export MONGO_OPLOG_URL='mongodb://127.0.0.1:3001/local?replicaSet=rs0'
 yarn dev
 ```
-`
 
 For Windows users, the `MONGO_URL` and `MONGO_OPLOG_URL` can be set by running the following commands in the terminal:
 
@@ -130,6 +136,7 @@ set MONGO_URL='mongodb://127.0.0.1:3001/meteor?replicaSet=rs0'
 set MONGO_OPLOG_URL='mongodb://127.0.0.1:3001/local?replicaSet=rs0'
 yarn dev
 ```
+
 or for Powershell users:
 
 ```bash
