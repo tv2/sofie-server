@@ -26,10 +26,14 @@ yarn watch
 Once the server is running, open second terminal and run the following command:
 
 ```bash
+cd sofie-server
+yarn run dump-database
+```
+*note*: equivalent to the above command is:
+```bash
 cd sofie-server/db/dumps
 mongodump "mongodb://localhost:3001" --oplog --out=./meteor
 ```
-*note*: equivalent too the above command is `yarn run dump-database` from the `sofie-server` root folder. In this case you don't have to install mongotools for your distro.
 
 this will create a dump of the database in the `meteor` sub-folder (git excluded!). In the next steps we'll use this to restore the database in our containerized MongoDB. Once restored - you can safely remove the `meteor` sub-folder.
 
@@ -52,12 +56,13 @@ yarn run init-replica-set
 5. To restore the dump, return to your second terminal and run the following command:
 
 ```bash
-mongorestore "mongodb://localhost:3001/?replicaSet=rs0" --oplogReplay ./meteor
+yarn run seed-database
 ```
+
 or you can use:
 
 ```bash
-yarn run seed-database
+mongorestore "mongodb://localhost:3001/?replicaSet=rs0" --oplogReplay ./meteor
 ```
 
 
