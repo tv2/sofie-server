@@ -103,3 +103,39 @@ yarn run init-replica-set
 yarn run seed-database
 yarn run spy-database
 ```
+
+Additional notes
+===
+
+Interoperability with `tv-automation-server-core` is preserved (Meteor will use containerized Mongo) by simply starting the `tv-automation-server-core` server with the following command:
+
+```bash
+MONGO_URL='mongodb://127.0.0.1:3001/meteor?replicaSet=rs0' MONGO_OPLOG_URL='mongodb://127.0.0.1:3001/local?replicaSet=rs0' yarn dev
+```
+or permanantly setting the `MONGO_URL` and `MONGO_OPLOG_URL` accordingly.
+
+For Mac/Linux users, the `MONGO_URL` and `MONGO_OPLOG_URL` can be set by running the following commands in the terminal:
+
+```bash
+export MONGO_URL='mongodb://127.0.0.1:3001/meteor?replicaSet=rs0'
+export MONGO_OPLOG_URL='mongodb://127.0.0.1:3001/local?replicaSet=rs0'
+yarn dev
+```
+`
+
+For Windows users, the `MONGO_URL` and `MONGO_OPLOG_URL` can be set by running the following commands in the terminal:
+
+```bash
+set MONGO_URL='mongodb://127.0.0.1:3001/meteor?replicaSet=rs0'
+set MONGO_OPLOG_URL='mongodb://127.0.0.1:3001/local?replicaSet=rs0'
+yarn dev
+```
+or for Powershell users:
+
+```bash
+$env:MONGO_URL='mongodb://127.0.0.1:3001/meteor?replicaSet=rs0'
+$env:MONGO_OPLOG_URL='mongodb://127.0.0.1:3001/local?replicaSet=rs0'
+yarn dev
+```
+
+This will work in the same terminal till you  close it. To make it permanent, you can set the environment variables in the system settings.

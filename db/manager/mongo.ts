@@ -99,7 +99,7 @@ function initReplicaSet(): void {
 function startMongoContainer(): void {
   if (/^win/i.test(process.platform)) {
     docker([
-      'run',
+      'run', '--rm',
       '--name', 'sofie-mongodb',
       '-v', '.\\db\\dumps:/dumps',
       '-v', 'sofie-mongodb-data:/data/db',
@@ -115,7 +115,7 @@ function startMongoContainer(): void {
     ])
   } else {
     docker([
-      'run',
+      'run', '--rm',
       '--name', 'sofie-mongodb',
       '-v', './db/dumps:/dumps',
       '-v', 'sofie-mongodb-data:/data/db',
