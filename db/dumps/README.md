@@ -8,6 +8,7 @@ Pre-requisites
 - `tv-automation-server-core` codebase running
 - `sofie-server` codebase running
 - `docker` installed
+- `ts-node` installed ( `yarn global add ts-node typescript` )
 - mongodb-tools for running cli commands (optional)
 
 Steps

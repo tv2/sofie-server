@@ -159,7 +159,7 @@ function seedDatabase(): void {
 
 function dumptDatabase(): void {
   docker([
-    'run', '--rm', '-it' ,
+    'run', '--rm',
     '-v', './db/dumps:/dumps',
     'leafney/alpine-mongo-tools:latest',
     'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
