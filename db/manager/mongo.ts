@@ -50,7 +50,7 @@ const {
 })
 
 if (values.help) {
-  console.log('Usage: mongo-manager [option]')
+  console.log('Usage: npx ts-node ./db/manager/mongo.ts [option]')
   console.log('Options:')
   console.log('  -h, --help    Display this help message')
   console.log('  --start       Start the mongo service')
