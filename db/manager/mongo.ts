@@ -51,7 +51,7 @@ const {
 
 if (values.help) {
   console.log('Usage: npx ts-node ./db/manager/mongo.ts [option]')
-  console.log('Options:')
+  console.log('Options (use one of):')
   console.log('  -h, --help    Display this help message')
   console.log('  --start       Start the mongo service')
   console.log('  --stop        Stop the mongo service')
@@ -204,43 +204,47 @@ function action(values: { [longOption: string]: string | boolean | undefined } &
   spy: string | boolean | undefined
   dump: string | boolean | undefined
 }): void {
-  switch (true) {
-    case values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.drop && !values.spy && !values.dump:
+  const options: string[] = Object.entries(values)
+    .filter(([, isSet]) => isSet)
+    .map(([argument]) => argument)
+
+  switch (options[0]) {
+    case 'start':
       console.log('starting mongo...')
       startMongoContainer()
       break
 
-    case values.stop && !values.start && !values.restart && !values.initrs && !values.seed && !values.drop && !values.spy && !values.dump:
+    case 'stop':
       console.log('stopping mongo...')
       stopMongoContainer()
       break
 
-    case values.restart && !values.start && !values.stop && !values.initrs && !values.seed && !values.drop && !values.spy && !values.dump:
+    case 'restart':
       console.log('restarting mongo...')
       restartMongoContainer()
       break
 
-    case values.initrs && !values.start && !values.stop && !values.restart && !values.seed && !values.drop && !values.spy && !values.dump:
+    case 'initrs':
       console.log('initializing replica set...')
       initReplicaSet()
       break
 
-    case values.seed && !values.start && !values.stop && !values.restart && !values.initrs && !values.drop && !values.spy && !values.dump:
+    case 'seed':
       console.log('seeding database...')
       seedDatabase()
       break
 
-    case values.drop && !values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.spy && !values.dump:
+    case 'drop':
       console.log('dropping database...')
       dropMongoContainer()
       break
 
-    case values.spy && !values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.drop && !values.dump:
+    case 'spy':
       console.log('spying on the database...')
       spyOnDatabase()
       break
 
-    case values.dump && !values.start && !values.stop && !values.restart && !values.initrs && !values.seed && !values.drop && !values.spy:
+    case 'dump':
       console.log('dumping database...')
       dumptDatabase()
       break
