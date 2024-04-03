@@ -105,9 +105,9 @@ function startMongoContainer(): void {
       '-v', 'sofie-mongodb-data:/data/db',
       '-v', 'sofie-mongodb-config:/data/configdb',
       '-p', '3001:3001',
-      // requires mongotools installed on Windows
+      // requires mongodb-tools installed
       // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
-      '--health-interval=1s',
+      // '--health-interval=1s',
       '-d',
       'mongo:6.0.1',
       '--replSet', 'rs0',
@@ -122,8 +122,9 @@ function startMongoContainer(): void {
       '-v', 'sofie-mongodb-data:/data/db',
       '-v', 'sofie-mongodb-config:/data/configdb',
       '-p', '3001:3001',
-      '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
-      '--health-interval=1s',
+      // requires mongodb-tools installed
+      // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
+      // '--health-interval=1s',
       '-d',
       'mongo:6.0.1',
       '--replSet', 'rs0',
