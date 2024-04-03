@@ -42,7 +42,7 @@ this will create a dump of the database in the `meteor` sub-folder (git excluded
 
 2. Stop `tv-automation-server-core` - we don't need it anymore.
 
-3. Open third terminal: :
+3. Open third terminal:
 
 ```bash
 cd sofie-server
