@@ -108,7 +108,8 @@ function startMongoContainer(): void {
       // requires mongotools installed on Windows
       // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
       '--health-interval=1s',
-      '-d', 'mongo:6.0.1',
+      '-d',
+      'mongo:6.0.1',
       '--replSet', 'rs0',
       '--bind_ip_all',
       '--port', '3001'
@@ -123,7 +124,8 @@ function startMongoContainer(): void {
       '-p', '3001:3001',
       '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
       '--health-interval=1s',
-      '-d', 'mongo:6.0.1',
+      '-d',
+      'mongo:6.0.1',
       '--replSet', 'rs0',
       '--bind_ip_all',
       '--port', '3001'
@@ -149,8 +151,7 @@ function restartMongoContainer(): void {
 
 function dropMongoContainer(): void {
   docker([
-    'rm',
-    '-f', '-v',
+    'rm', '-f', '-v',
     'sofie-mongodb',
   ])
 }
