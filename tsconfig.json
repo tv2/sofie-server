@@ -32,5 +32,10 @@
 
     "skipLibCheck": true
   },
-  "exclude": ["**/*.spec.ts", "**/*mock*.ts", "jest.config.ts", "db/manager/*.ts"],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*mock*.ts",
+    "jest.config.ts",
+    "database/manager/*.ts"
+  ]
 }

@@ -101,7 +101,7 @@ function startMongoContainer(): void {
     docker([
       'run', '--rm',
       '--name', 'sofie-mongodb',
-      '-v', '.\\db\\dumps:/dumps',
+      '-v', '.\\database\\dumps:/dumps',
       '-v', 'sofie-mongodb-data:/data/db',
       '-v', 'sofie-mongodb-config:/data/configdb',
       '-p', '3001:3001',
@@ -118,7 +118,7 @@ function startMongoContainer(): void {
     docker([
       'run', '--rm',
       '--name', 'sofie-mongodb',
-      '-v', './db/dumps:/dumps',
+      '-v', './database/dumps:/dumps',
       '-v', 'sofie-mongodb-data:/data/db',
       '-v', 'sofie-mongodb-config:/data/configdb',
       '-p', '3001:3001',
@@ -180,14 +180,14 @@ function dumptDatabase(): void {
   if (/^win/i.test(process.platform)) {
     docker([
       'run', '--rm',
-      '-v', '.\\db\\dumps:/dumps',
+      '-v', '.\\database\\dumps:/dumps',
       'leafney/alpine-mongo-tools:latest',
       'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
     ])
   } else {
     docker([
       'run', '--rm',
-      '-v', './db/dumps:/dumps',
+      '-v', './database/dumps:/dumps',
       'leafney/alpine-mongo-tools:latest',
       'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
     ])

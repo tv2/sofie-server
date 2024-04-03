@@ -17,7 +17,7 @@ Steps
 
 *note*: short example at the bottom of the page
 
-1.Obtain dump from tv-automation-server-core
+1. Obtain dump from tv-automation-server-core
 
 Open a terminal and run the following commands:
 
