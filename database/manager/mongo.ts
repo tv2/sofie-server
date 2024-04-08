@@ -1,6 +1,12 @@
 import { parseArgs } from 'node:util'
-import { exec } from 'node:child_process'
 import { MongoClient } from 'mongodb'
+import { docker } from './docker'
+
+const MONGODB_VERSION: string = process.env.npm_package_confg_database_version || '6.0.1'
+const MONGODB_PORT: string = process.env.npm_package_confg_database_port || '3001'
+const MONGODB_HOST: string = process.env.npm_package_confg_database_host || '127.0.0.1'
+const MONGODB_REPLICA: string = process.env.npm_package_confg_database_replica || 'rs0'
+const MONGODB_DATABASE_NAME: string = process.env.npm_package_confg_database_name || 'meteor'
 
 const {
   positionals,
@@ -60,28 +66,9 @@ if (values.help) {
   console.log('  --seed        Seed the database with initial data')
   console.log('  --drop        Stop then drop the database container and its volumes')
   console.log('  --spy         Spy on database events')
-  console.log('  --dump        Dump all from mongodb://gateway.docker.internal:3001/ to ./db/dumps/meteor')
+  console.log('  --dump        Dump all from mongodb://gateway.docker.internal:${MONGODB_HOST}/ to ./db/dumps/meteor')
 
   process.exit(0)
-}
-
-function docker(args: string[]): void {
-  if (args.length === 0) {
-    throw new Error('No arguments provided to docker command')
-  }
-
-  exec(
-    ['docker']
-      .concat(args)
-      .join(' '),
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error(stderr)
-        process.exit(error.code || 1)
-      }
-      console.log(stdout)
-    }
-  )
 }
 
 function initReplicaSet(): void {
@@ -89,10 +76,11 @@ function initReplicaSet(): void {
     'exec',
     'sofie-mongodb',
     'mongosh',
-    '"mongodb://127.0.0.1:3001/"',
+    '--host', `${MONGODB_HOST}`,
+    '--port', `${MONGODB_PORT}`,
     '--quiet',
     '--eval',
-    '"rs.initiate({\'_id\':\'rs0\',members:[{\'_id\':0,\'host\':\'127.0.0.1:3001\'}]})"'
+    '"rs.initiate({\'_id\':\'rs0\',members:[{\'_id\':0,\'host\':\'${MONGODB_HOST}:${MONGODB_HOST}\'}]})"'
   ])
 }
 
@@ -104,13 +92,10 @@ function startMongoContainer(): void {
       '-v', '.\\database\\dumps:/dumps',
       '-v', 'sofie-mongodb-data:/data/db',
       '-v', 'sofie-mongodb-config:/data/configdb',
-      '-p', '3001:3001',
-      // requires mongodb-tools installed
-      // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
-      // '--health-interval=1s',
+      '-p', `${MONGODB_PORT}:3001`,
       '-d',
-      'mongo:6.0.1',
-      '--replSet', 'rs0',
+      `mongo:${MONGODB_VERSION}`,
+      '--replSet', `${MONGODB_REPLICA}`,
       '--bind_ip_all',
       '--port', '3001'
     ])
@@ -121,13 +106,10 @@ function startMongoContainer(): void {
       '-v', './database/dumps:/dumps',
       '-v', 'sofie-mongodb-data:/data/db',
       '-v', 'sofie-mongodb-config:/data/configdb',
-      '-p', '3001:3001',
-      // requires mongodb-tools installed
-      // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
-      // '--health-interval=1s',
+      '-p', `${MONGODB_PORT}:3001`,
       '-d',
-      'mongo:6.0.1',
-      '--replSet', 'rs0',
+      `mongo:${MONGODB_VERSION}`,
+      '--replSet', `${MONGODB_REPLICA}`,
       '--bind_ip_all',
       '--port', '3001'
     ])
@@ -158,7 +140,7 @@ function dropMongoContainer(): void {
 }
 
 function spyOnDatabase(): void {
-  void new MongoClient('mongodb://localhost:3001/sofie?replicaSet=rs0')
+  void new MongoClient(`mongodb://localhost:${MONGODB_PORT}/${MONGODB_DATABASE_NAME}?replicaSet=${MONGODB_REPLICA}`)
     .connect().then( (client) => {
       const changeStream = client.watch()
       changeStream.on('change', (change) => console.dir(change))
@@ -171,7 +153,7 @@ function seedDatabase(): void {
     'exec',
     'sofie-mongodb',
     'mongorestore',
-    '"mongodb://127.0.0.1:3001/?replicaSet=rs0"',
+    `"mongodb://${MONGODB_HOST}:${MONGODB_PORT}/?replicaSet=${MONGODB_REPLICA}"`,
     '--oplogReplay',
     '/dumps/meteor'
   ])
@@ -183,14 +165,14 @@ function dumptDatabase(): void {
       'run', '--rm',
       '-v', '.\\database\\dumps:/dumps',
       'leafney/alpine-mongo-tools:latest',
-      'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
+      'mongodump', '--host=gateway.docker.internal', `--port=${MONGODB_PORT}`, '--oplog', '--out=/dumps/meteor'
     ])
   } else {
     docker([
       'run', '--rm',
       '-v', './database/dumps:/dumps',
       'leafney/alpine-mongo-tools:latest',
-      'mongodump', '--host=gateway.docker.internal', '--port=3001', '--oplog', '--out=/dumps/meteor'
+      'mongodump', '--host=gateway.docker.internal', `--port=${MONGODB_PORT}`, '--oplog', '--out=/dumps/meteor'
     ])
   }
 }

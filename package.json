@@ -21,7 +21,8 @@
     "init-replica-set": "ts-node-script ./database/manager/mongo.ts --initrs",
     "seed-database": "ts-node-script ./database/manager/mongo.ts --seed",
     "spy-database": "ts-node-script ./database/manager/mongo.ts --spy",
-    "dump-database": "ts-node-script ./database/manager/mongo.ts --dump"
+    "dump-database": "ts-node-script ./database/manager/mongo.ts --dump",
+    "migrate-database": "ts-node-script ./database/manager/migrate.ts --help"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",
@@ -52,5 +53,15 @@
     "reflect-metadata": "^0.1.13",
     "superfly-timeline": "^9.0.0",
     "ws": "^8.14.0"
+  },
+  "config": {
+    "database": {
+      "host": "localhost",
+      "port": 3001,
+      "version": "6.0.1",
+      "replica": "rs0",
+      "name": "sofie",
+      "schema": "0.0.1"
+    }
   }
 }
