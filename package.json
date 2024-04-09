@@ -14,14 +14,14 @@
     "validate": "yarn audit --level moderate --groups dependencies --recursive",
     "clean": "rimraf dist",
     "reset": "rimraf --glob dist node_modules coverage *.log",
-    "start-database": "ts-node-script ./database/manager/mongo.ts --start",
-    "stop-database": "ts-node-script ./database/manager/mongo.ts --stop",
-    "restart-database": "ts-node-script ./database/manager/mongo.ts --restart",
-    "drop-database": "ts-node-script ./database/manager/mongo.ts --drop",
-    "init-replica-set": "ts-node-script ./database/manager/mongo.ts --initrs",
-    "seed-database": "ts-node-script ./database/manager/mongo.ts --seed",
-    "spy-database": "ts-node-script ./database/manager/mongo.ts --spy",
-    "dump-database": "ts-node-script ./database/manager/mongo.ts --dump"
+    "start-database": "ts-node ./database/manager/mongo.ts --start",
+    "stop-database": "ts-node ./database/manager/mongo.ts --stop",
+    "restart-database": "ts-node ./database/manager/mongo.ts --restart",
+    "drop-database": "ts-node ./database/manager/mongo.ts --drop",
+    "init-replica-set": "ts-node ./database/manager/mongo.ts --initrs",
+    "seed-database": "ts-node ./database/manager/mongo.ts --seed",
+    "spy-database": "ts-node ./database/manager/mongo.ts --spy",
+    "dump-database": "ts-node ./database/manager/mongo.ts --dump"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",

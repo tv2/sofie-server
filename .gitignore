@@ -12,6 +12,3 @@ dist/
 # Ignore VSCode specifics
 .vscode
 
-# Ignore database manager js*
-database/dumps/meteor
-database/manager/*.js*
