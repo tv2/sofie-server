@@ -13,6 +13,7 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 import { PieceRepository } from '../interfaces/piece-repository'
 import { MongoEntityConverter, MongoId, MongoRundown } from '../mongo/mongo-entity-converter'
 import { RundownMode } from '../../../model/enums/rundown-mode'
+import { Owner } from '../../../model/enums/owner'
 
 const COLLECTION_NAME: string = RUNDOWN_COLLECTION_NAME
 
@@ -172,6 +173,30 @@ export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase):
         .findOne({ _id: inactiveRundown.id })) as unknown as MongoRundown
       expect(result.mode).toBeFalsy()
     })
+
+    it('database has a nextCursor, rundown to save does not have a nextCursor, database should no longer have a nextCursor', async () => {
+      const rundownWithNextCursor: MongoRundown = createMongoRundown({ _id: 'rundownId', nextCursor: { partId: 'partId', segmentId: 'segmentId', owner: Owner.SYSTEM } })
+      await testDatabase.populateCollection(COLLECTION_NAME, [rundownWithNextCursor])
+
+      const mongoConverter: MongoEntityConverter = mock(MongoEntityConverter)
+      const mongoDb: MongoDatabase = mock(MongoDatabase)
+      const db: Db = testDatabase.getDatabase()
+      const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
+
+      when(mongoDb.getCollection(anything())).thenReturn(collection)
+      const rundownWithoutNextCursor: MongoRundown = createMongoRundown({ _id: rundownWithNextCursor._id, nextCursor: undefined})
+      when(mongoConverter.convertToMongoRundown(anything())).thenReturn(rundownWithoutNextCursor)
+
+      const testee: RundownRepository = createTestee({
+        mongoDb,
+        mongoConverter,
+      })
+      await testee.saveRundown(EntityTestFactory.createRundown())
+
+      const result: MongoRundown = (await db.collection<MongoRundown>(COLLECTION_NAME).findOne({ _id: rundownWithNextCursor._id })) as unknown as MongoRundown
+      console.log(result)
+      expect(result.nextCursor).toBeUndefined()
+    })
   })
 
   describe(MongoRundownRepository.prototype.getRundown.name, () => {
@@ -214,6 +239,7 @@ export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase):
 
   function createMongoRundown(mongoRundownInterface?: Partial<MongoRundown>): MongoRundown {
     return {
+      ...mongoRundownInterface,
       _id: mongoRundownInterface?._id ?? 'id' + Math.random(),
       name: mongoRundownInterface?.name ?? 'rundownName',
     } as MongoRundown
