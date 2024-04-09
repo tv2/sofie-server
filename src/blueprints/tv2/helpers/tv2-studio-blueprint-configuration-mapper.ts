@@ -1,13 +1,18 @@
 import { Studio } from '../../../model/entities/studio'
 import {
   AudioBedSettings,
-  Tv2DownstreamKeyerRole, Tv2FolderConfiguration,
-  Tv2GraphicsType, Tv2HtmlGraphics,
+  Tv2DownstreamKeyerRole,
+  Tv2FolderConfiguration,
+  Tv2GraphicsType,
+  Tv2HtmlGraphics,
   Tv2SourceMapping,
   Tv2SourceMappingWithSound,
   Tv2StudioBlueprintConfiguration,
-  Tv2VideoMixerBasicConfiguration, Tv2VizPilotGraphics
+  Tv2VideoMixerBasicConfiguration,
+  Tv2VizPilotGraphics,
+  VideoMixerType
 } from '../value-objects/tv2-studio-blueprint-configuration'
+import { DeviceType } from '../../../model/enums/device-type'
 
 interface CoreStudioBlueprintConfiguration {
   SourcesCam: CoreSourceMappingWithSound[] // Cameras
@@ -15,9 +20,11 @@ interface CoreStudioBlueprintConfiguration {
   SourcesReplay: CoreSourceMappingWithSound[] // Replays
   StudioMics: string[]
   ABMediaPlayers: CoreMediaPlayer[]
-  SwitcherSource: CoreVideoMixer
   CasparPrerollDuration: number
   ServerPostrollDuration: number
+
+  SwitcherType: string
+  SwitcherSource: CoreVideoMixer
 
   DVEFolder?: string,
   DVEFileExtension: string
@@ -119,6 +126,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
       replaySources: this.mapSourcesWithSound(coreConfiguration.SourcesReplay),
       studioMicrophones: coreConfiguration.StudioMics,
       mediaPlayers: this.mapSources(coreConfiguration.ABMediaPlayers),
+      videoMixerType: this.mapToVideoMixerType(coreConfiguration.SwitcherType),
       videoMixerBasicConfiguration: this.mapVideoMixerBasicConfiguration(coreConfiguration.SwitcherSource),
       casparCgPreRollDuration: coreConfiguration.CasparPrerollDuration,
       serverPostRollDuration: coreConfiguration.ServerPostrollDuration,
@@ -155,6 +163,18 @@ export class Tv2StudioBlueprintConfigurationMapper {
         videoMixerSource: source.SwitcherSource
       }
     })
+  }
+
+  private mapToVideoMixerType(videoMixerTypeString: string): VideoMixerType {
+    switch(videoMixerTypeString) {
+      case 'TRICASTER': {
+        return DeviceType.TRICASTER
+      }
+      case 'ATEM':
+      default: {
+        return DeviceType.ATEM
+      }
+    }
   }
 
   private mapVideoMixerBasicConfiguration(coreVideoMixer: CoreVideoMixer): Tv2VideoMixerBasicConfiguration {
