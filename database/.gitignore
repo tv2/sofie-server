@@ -1,3 +1,2 @@
 # Ignore database manager js*
-dumps/meteor
-manager/*.js*
+dumps/
