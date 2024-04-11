@@ -39,13 +39,11 @@ export interface TriCasterMixEffectPreviewContent {
 export interface TriCasterMixEffectDownstreamKeyerContent {
   type: TriCasterMixEffectContentType.DOWNSTREAM_KEYER
   keyers: Record<TriCasterKeyerName, TriCasterKeyer>
-  // TODO: To I need a TransitionEffect?
 }
 
 export interface TriCasterMixEffectEffectModeContent {
   type: TriCasterMixEffectContentType.EFFECT_MODE
   layers: Partial<Record<TriCasterLayerName, TriCasterLayer>>
-  // keyers: Record<TriCasterKeyerName, TriCasterKeyer>
   transitionEffect: TriCasterTransition
 }
 
