@@ -85,7 +85,8 @@ export class ConfigurationController extends BaseController {
       const shelfConfigurationDto: ShelfConfigurationDto = request.body as ShelfConfigurationDto
       const shelfConfiguration: ShelfConfiguration = {
         id: shelfConfigurationDto.id,
-        actionPanelConfigurations: shelfConfigurationDto.actionPanelConfigurations
+        actionPanelConfigurations: shelfConfigurationDto.actionPanelConfigurations,
+        staticActionIds: shelfConfigurationDto.staticActionIds
       }
       const updatedShelfConfiguration: ShelfConfiguration = await this.configurationService.updateShelfConfiguration(shelfConfiguration)
       response.send(this.httpResponseFormatter.formatSuccessResponse(new ShelfConfigurationDto(updatedShelfConfiguration)))
