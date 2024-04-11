@@ -9,6 +9,7 @@ import {
   AtemMeTimelineObject,
   AtemMeUpstreamKeyersTimelineObject,
   AtemMeWipePattern,
+  AtemSourceIndex,
   AtemSuperSourcePropertiesTimelineObject,
   AtemSuperSourceTimelineObject,
   AtemTransition,
@@ -29,7 +30,6 @@ import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { Tv2Logger } from '../tv2-logger'
 
-const ATEM_SUPER_SOURCE_INDEX: number = 6000
 const ATEM_PREFIX: string = 'atem_'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
@@ -47,7 +47,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         start: 0
       },
       priority: 10,
-      layer: `${this.getDownstreamKeyerLayerPrefix()}_${downstreamKeyerNumber}`,
+      layer: `${Tv2AtemLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.DSK,
@@ -74,10 +74,6 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
    */
   private convertPercentageToAtemPercentageValue(percentage: number): number {
     return percentage * 10
-  }
-
-  private getDownstreamKeyerLayerPrefix(): string {
-    return Tv2AtemLayer.DOWNSTREAM_KEYER
   }
 
   public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMeUpstreamKeyersTimelineObject {
@@ -138,7 +134,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   private createAtemMeWipeTransitionSettings(transitionSettings: VideoMixerWipeTransitionSettings): AtemMeTimelineObject['content']['me']['transitionSettings'] {
     return {
       wipe: {
-        rate: transitionSettings.frameRate,
+        rate: transitionSettings.durationInFrames,
         pattern: AtemMeWipePattern.TOP_TO_BOTTOM_BAR,
         reverseDirection: true,
         borderSoftness: transitionSettings.borderSoftness
@@ -270,7 +266,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   }
 
   public getSplitScreenSourceInput(): number {
-    return ATEM_SUPER_SOURCE_INDEX
+    return AtemSourceIndex.SUPER_SOURCE
   }
 
   public findProgramSourceInputFromPiece(piece: Piece): number | undefined {

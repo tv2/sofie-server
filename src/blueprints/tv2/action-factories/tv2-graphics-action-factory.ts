@@ -317,7 +317,7 @@ export class Tv2GraphicsActionFactory {
     const enable: TimelineEnable = { start: blueprintConfiguration.studio.casparCgPreRollDuration }
     const sourceInput: number = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).videoMixerFillSource
     const transitionSettings: VideoMixerWipeTransitionSettings = {
-      frameRate: blueprintConfiguration.studio.htmlGraphics.transitionSettings.wipeRate,
+      durationInFrames: blueprintConfiguration.studio.htmlGraphics.transitionSettings.wipeRate,
       borderSoftness: blueprintConfiguration.studio.htmlGraphics.transitionSettings.borderSoftness
     }
 

@@ -29,6 +29,6 @@ export interface Tv2VideoMixerTimelineObjectFactory {
 }
 
 export interface VideoMixerWipeTransitionSettings {
-  frameRate: number
+  durationInFrames: number
   borderSoftness: number
 }
