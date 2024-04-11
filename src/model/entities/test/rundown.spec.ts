@@ -94,6 +94,41 @@ describe(Rundown.name, () => {
             expect(rundown.getNextSegment()).toBe(nextSegment)
             expect(rundown.getInfinitePieces()).toContain(piece)
           })
+
+          it('marks the next Part as next', () => {
+            const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', isNext: false }) // Needs to be false, so we can verify it being set to true.
+            const activeSegment: Segment = EntityTestFactory.createSegment({
+              id: 'activeSegment',
+            })
+            const nextSegment: Segment = EntityTestFactory.createSegment({
+              id: 'nextSegment',
+            })
+            const piece: Piece = EntityTestFactory.createPiece({
+              pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
+            })
+
+            const rundownInterface: RundownInterface = {
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  part: activePart,
+                  segment: activeSegment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: nextPart,
+                  segment: nextSegment,
+                  owner: Owner.SYSTEM
+                },
+                infinitePieces: new Map([[piece.layer, piece]]),
+              },
+            } as RundownInterface
+
+            expect(nextPart.isNext()).toBeFalsy()
+            new Rundown(rundownInterface)
+            expect(nextPart.isNext()).toBeTruthy()
+          })
         })
       })
     })

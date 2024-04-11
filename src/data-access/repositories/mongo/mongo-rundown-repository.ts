@@ -60,7 +60,7 @@ export class MongoRundownRepository extends BaseMongoRepository implements Rundo
   public async saveRundown(rundown: Rundown): Promise<void> {
     this.assertDatabaseConnection(this.saveRundown.name)
     const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
-    await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
+    await this.getCollection().replaceOne({ _id: mongoRundown._id }, mongoRundown, { upsert: true, ignoreUndefined: true })
 
     await Promise.all([
       ...rundown.getSegments().map(segment => this.segmentRepository.saveSegment(segment)),
