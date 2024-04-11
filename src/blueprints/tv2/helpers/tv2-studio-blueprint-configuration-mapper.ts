@@ -165,8 +165,8 @@ export class Tv2StudioBlueprintConfigurationMapper {
     })
   }
 
-  private mapToVideoMixerType(videoMixerTypeString: string): VideoMixerType {
-    switch(videoMixerTypeString) {
+  private mapToVideoMixerType(rawVideoMixerType: string): VideoMixerType {
+    switch(rawVideoMixerType) {
       case 'TRICASTER': {
         return DeviceType.TRICASTER
       }
