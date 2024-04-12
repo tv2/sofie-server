@@ -1,7 +1,10 @@
-Goal
+Goals
 ===
 
-Transfer data from Meteor's MongoDB to a containerized instance of MongoDB then maintain and operate with it for the purpose of `sofie-server` project.
+- *Mongo-off-Meteor*
+>Transfer data from Meteor's MongoDB to a containerized instance of MongoDB then maintain and operate with it for the purpose of `sofie-server` project.
+- *Migrations*
+>Transform database (offline) by applying schema migration sets described in `schema` sub-folder.
 
 Pre-requisites
 ===
@@ -12,9 +15,7 @@ Pre-requisites
 - `ts-node` installed ( `yarn global add ts-node typescript` )
 - mongodb-tools for running cli commands (optional)
 
-Steps
-===
-
+# Mongo off Meteor
 *note*: short example at the bottom of the page
 
 1. Obtain dump from tv-automation-server-core
@@ -110,8 +111,7 @@ yarn run seed-database
 yarn run spy-database
 ```
 
-Additional notes
-===
+## Additional notes
 
 Interoperability with `tv-automation-server-core` is preserved (Meteor will use containerized Mongo) by simply starting the `tv-automation-server-core` server with the following command:
 
@@ -146,3 +146,20 @@ yarn dev
 ```
 
 This will work in the same terminal till you  close it. To make it permanent, you can set the environment variables in the system settings.
+
+# Migrations
+
+Schema migrations are applied to the database by running the following command:
+
+```bash
+yarn run migrate-database
+```
+This command will search in `database/schema` folder for  sem-ver named sub-foders - i.e. `v0.0.1`, `v0.0.2`, `v.0.1.0`, etc  and will pick latest/highest - in this example `v0.1.0`. Once the latest available version is identified, then a runner container will execute and apply  actual changes as described in this sub-folder content. 
+
+The content is a set of json files named after the collection  they represent. Each file contains an array of objects that represent the changes to be applied to the collection. The migration runner will apply these changes in the order they are found in the file. 
+
+All this is included in `runner:v1` docker image and at development time you have to rebuild the image, so that any chanes in the migration executor `database/manager/migrate.ts` are included, by running:
+
+```bash
+yarn run build-runner
+```

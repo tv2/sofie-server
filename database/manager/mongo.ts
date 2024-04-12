@@ -190,7 +190,7 @@ function dumptDatabase(): void {
 }
 
 async function getSchemaDirectories(parentFolderName: string): Promise<string[]> {
-  return (await readdir(parentFolderName, {withFileTypes: true}))
+  return (await readdir(parentFolderName, {withFileTypes: true, recursive: false}))
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name)
     .filter(name => name.match(/^v\d+\.\d+\.\d+$/))
@@ -266,9 +266,10 @@ async function getLatestSchemaVersion(): Promise<string> {
 
 async function migrateLatest(): Promise<void> {
   const latestVersion: string = await getLatestSchemaVersion()
-  console.log('Latest schema version available is discovered to be ', latestVersion)
+  console.log(`Latest schema version available is discovered to be ${latestVersion}`)
   docker([
     'run', '--rm',
+    '-v', './database/schema:/schema',
     '-e', `VERSION=${latestVersion}`,
     'runner:v1'
   ])

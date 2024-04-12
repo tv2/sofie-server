@@ -15,7 +15,6 @@ RUN /app/node_modules/.bin/tsc /app/manager/migrate.ts
 
 FROM gcr.io/distroless/nodejs20-debian11
 
-COPY --from=build /app/schema /app/schema
 COPY --from=build /app/manager /app/manager
 
 WORKDIR /app
