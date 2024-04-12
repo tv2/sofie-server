@@ -22,7 +22,8 @@
     "seed-database": "ts-node ./database/manager/mongo.ts --seed",
     "spy-database": "ts-node ./database/manager/mongo.ts --spy",
     "dump-database": "ts-node ./database/manager/mongo.ts --dump",
-    "migrate-database": "ts-node ./database/manager/migrate.ts --help"
+    "rebuild-runner": "ts-node ./database/manager/mongo.ts --rebuild",
+    "migrate-database": "yarn run rebuild-runner && ts-node ./database/manager/mongo.ts --latest"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",

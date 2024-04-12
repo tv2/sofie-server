@@ -1,6 +1,7 @@
 import { parseArgs } from 'node:util'
 import { MongoClient } from 'mongodb'
 import { docker } from './docker'
+import {readdir} from 'fs/promises'
 
 const MONGODB_VERSION: string = process.env.npm_package_confg_database_version || '6.0.1'
 const MONGODB_PORT: string = process.env.npm_package_confg_database_port || '3001'
@@ -49,6 +50,14 @@ const {
     dump: {
       type: 'boolean',
       default: false,
+    },
+    latest: {
+      type: 'boolean',
+      default: false,
+    },
+    rebuild: {
+      type: 'boolean',
+      default: false,
     }
   },
   strict: false,
@@ -67,6 +76,9 @@ if (values.help) {
   console.log('  --drop        Stop then drop the database container and its volumes')
   console.log('  --spy         Spy on database events')
   console.log('  --dump        Dump all from mongodb://gateway.docker.internal:${MONGODB_HOST}/ to ./db/dumps/meteor')
+  console.log('  --rebuild     Rebuild the migration runner container image')
+  console.log('  --latest      Migrate the database to the semantically latest schema version available in ../schema folder')
+
 
   process.exit(0)
 }
@@ -177,6 +189,91 @@ function dumptDatabase(): void {
   }
 }
 
+async function getSchemaDirectories(parentFolderName: string): Promise<string[]> {
+  return (await readdir(parentFolderName, {withFileTypes: true}))
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name)
+    .filter(name => name.match(/^v\d+\.\d+\.\d+$/))
+}
+
+function compareVersions(a: number[], b: number[]): number {
+  // v9999.9999.9999 is the latest possible version number
+  const majorWeight: number = 1000 * 1000
+  const minorWeight: number = 1000
+  const patchWeight: number = 1
+
+  const weightA: number = a[0] * majorWeight + a[1] * minorWeight + a[2] * patchWeight
+  const weightB: number = b[0] * majorWeight + b[1] * minorWeight + b[2] * patchWeight
+
+  if (weightA > weightB) {
+    return 1
+  }
+
+  if (weightA < weightB) {
+    return -1
+  }
+
+  return 0
+}
+
+function maxVersion(versions: string[]): string {
+  if (!versions.length) {
+    return 'v0.0.0'
+  }
+  const versionNumbers: number[][] = versions
+    .map((version) => {
+      if (!version.startsWith('v')) {
+        return [-1, -1, -1]
+      }
+
+      const versionStrings: string[] = version
+        .replace (/^v/,'')
+        .split('.')
+
+      if (versionStrings.length !== 3) {
+        return [-1, -1, -1]
+      }
+
+      return versionStrings
+        .map((versionString: string) => {
+          const parsedNumber = parseInt(versionString,10)
+          if(isNaN(parsedNumber)) {
+            return -1
+          }
+
+          return parsedNumber
+        })
+    })
+
+  const latestVersion: number[] | undefined = versionNumbers
+    .sort(compareVersions)
+    .pop()
+
+  if (!latestVersion) {
+    return 'v0.0.1'
+  }
+
+  return latestVersion
+    .join('.')
+    .replace (/^/,'v')
+}
+
+async function getLatestSchemaVersion(): Promise<string> {
+  const schemaDirectories: string[] = await getSchemaDirectories('./database/schema/')
+
+  return maxVersion(schemaDirectories)
+}
+
+async function migrateLatest(): Promise<void> {
+  const latestVersion: string = await getLatestSchemaVersion()
+  console.log('Latest schema version available is discovered to be ', latestVersion)
+  docker([
+    'run', '--rm',
+    '-e', `VERSION=${latestVersion}`,
+    'runner:v1'
+  ])
+}
+
 function action(values: { [longOption: string]: string | boolean | undefined } & {
   help: string | boolean | undefined
   start: string | boolean | undefined
@@ -187,6 +284,8 @@ function action(values: { [longOption: string]: string | boolean | undefined } &
   drop: string | boolean | undefined
   spy: string | boolean | undefined
   dump: string | boolean | undefined
+  rebuild: string | boolean | undefined
+  latest: string | boolean | undefined
 }): void {
   const options: string[] = Object.entries(values)
     .filter(([, isSet]) => isSet)
@@ -231,6 +330,24 @@ function action(values: { [longOption: string]: string | boolean | undefined } &
     case 'dump':
       console.log('dumping database...')
       dumptDatabase()
+      break
+
+    case 'latest':
+      console.log('migrating to latest schema version...')
+      void migrateLatest().then(
+        () => console.log('manage migration complete')
+      ).catch(console.error)
+      break
+
+    case 'rebuild':
+      console.log('rebuilding migration runner container image...')
+      docker([
+        'buildx',
+        'build',
+        '-f', './database/manager/runner/Dockerfile',
+        '-t', 'runner:v1',
+        '.',
+      ])
       break
 
     default:
