@@ -14,6 +14,7 @@
     "validate": "yarn audit --level moderate --groups dependencies --recursive",
     "clean": "rimraf dist",
     "reset": "rimraf --glob dist node_modules coverage *.log",
+    "help-database": "ts-node ./database/manager/mongo.ts --help",
     "start-database": "ts-node ./database/manager/mongo.ts --start",
     "stop-database": "ts-node ./database/manager/mongo.ts --stop",
     "restart-database": "ts-node ./database/manager/mongo.ts --restart",
@@ -57,11 +58,11 @@
   },
   "config": {
     "database": {
-      "host": "localhost",
+      "host": "host.docker.internal",
       "port": 3001,
       "version": "6.0.1",
       "replica": "rs0",
-      "name": "sofie",
+      "name": "meteor",
       "schema": "0.0.1"
     }
   }

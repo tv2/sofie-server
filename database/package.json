@@ -2,10 +2,8 @@
   "name": "runner",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-  },
-  "packageManager": "pnpm@8.6.6",
   "dependencies": {
+    "mongodb": "^6.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.5.1",

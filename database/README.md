@@ -149,17 +149,42 @@ This will work in the same terminal till you  close it. To make it permanent, yo
 
 # Migrations
 
+## Running
 Schema migrations are applied to the database by running the following command:
 
 ```bash
 yarn run migrate-database
 ```
-This command will search in `database/schema` folder for  sem-ver named sub-foders - i.e. `v0.0.1`, `v0.0.2`, `v.0.1.0`, etc  and will pick latest/highest - in this example `v0.1.0`. Once the latest available version is identified, then a runner container will execute and apply  actual changes as described in this sub-folder content. 
+This command will search in `database/schema` folder for  sem-ver named sub-foders - i.e. `v0.0.1`, `v0.0.2`, `v.0.1.0` etc.,  and will pick latest/highest - in this example `v0.1.0`. Once the latest available version is identified, then a runner container will execute and apply  actual changes as described in this sub-folder content. 
 
+## Migration
 The content is a set of json files named after the collection  they represent. Each file contains an array of objects that represent the changes to be applied to the collection. The migration runner will apply these changes in the order they are found in the file. 
 
-All this is included in `runner:v1` docker image and at development time you have to rebuild the image, so that any chanes in the migration executor `database/manager/migrate.ts` are included, by running:
+## Runner
+All tasks for the job are provided in `runner:v1` docker image and at development time you have to rebuild the image, so that any chanes in the migration executor `database/manager/migrate.ts` are included, by running:
 
+### Rebuilding the runner image
 ```bash
 yarn run build-runner
 ```
+
+Expected result can ve verified by running:
+
+```bash
+$ docker images                                                     15:27:07
+REPOSITORY                        TAG         IMAGE ID       CREATED        SIZE
+runner                            v1          b0ec896a6c11   4 hours ago    167MB
+...
+``` 
+
+*note*: Changes in `database/schema` does not require rebuilding the runner image, only the `database/manager/migrate.ts` changes do. `schema` folder content is consumed at runtime as exported volume.
+
+### Direct runner execution
+If you want to run the migration directly, you can do so by running:
+
+```bash
+docker run --rm -v ./database/schema:/schema -e VERSION=v0.1.0 -e MONGODB_HOST=127.0.0.1 -e MONGODB_PORT=3001 runner:v1
+```
+This way you can go through all the stages and perform the migration process selectively as needed.
+
+*note: MIRATION.md - contains more detailed information about the migration process and the structure of the migration data files.

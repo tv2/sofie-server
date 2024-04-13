@@ -5,7 +5,7 @@ import {readdir} from 'fs/promises'
 
 const MONGODB_VERSION: string = process.env.npm_package_confg_database_version || '6.0.1'
 const MONGODB_PORT: string = process.env.npm_package_confg_database_port || '3001'
-const MONGODB_HOST: string = process.env.npm_package_confg_database_host || '127.0.0.1'
+const MONGODB_HOST: string = process.env.npm_package_confg_database_host || 'gateway.docker.internal'
 const MONGODB_REPLICA: string = process.env.npm_package_confg_database_replica || 'rs0'
 const MONGODB_DATABASE_NAME: string = process.env.npm_package_confg_database_name || 'meteor'
 
@@ -75,7 +75,7 @@ if (values.help) {
   console.log('  --seed        Seed the database with initial data')
   console.log('  --drop        Stop then drop the database container and its volumes')
   console.log('  --spy         Spy on database events')
-  console.log('  --dump        Dump all from mongodb://gateway.docker.internal:${MONGODB_HOST}/ to ./db/dumps/meteor')
+  console.log(`  --dump        Dump all from mongodb://gateway.docker.internal:${MONGODB_PORT}/ to ./db/dumps/meteor`)
   console.log('  --rebuild     Rebuild the migration runner container image')
   console.log('  --latest      Migrate the database to the semantically latest schema version available in ../schema folder')
 
@@ -92,7 +92,7 @@ function initReplicaSet(): void {
     '--port', `${MONGODB_PORT}`,
     '--quiet',
     '--eval',
-    '"rs.initiate({\'_id\':\'rs0\',members:[{\'_id\':0,\'host\':\'${MONGODB_HOST}:${MONGODB_HOST}\'}]})"'
+    `"rs.initiate({'_id':'rs0',members:[{'_id':0,'host':'${MONGODB_HOST}:${MONGODB_PORT}'}]})"`
   ])
 }
 
@@ -104,12 +104,12 @@ function startMongoContainer(): void {
       '-v', '.\\database\\dumps:/dumps',
       '-v', 'sofie-mongodb-data:/data/db',
       '-v', 'sofie-mongodb-config:/data/configdb',
-      '-p', `${MONGODB_PORT}:3001`,
+      '-p', `${MONGODB_PORT}:27017`,
       '-d',
       `mongo:${MONGODB_VERSION}`,
       '--replSet', `${MONGODB_REPLICA}`,
       '--bind_ip_all',
-      '--port', '3001'
+      '--port', '27017'
     ])
   } else {
     docker([
@@ -118,12 +118,12 @@ function startMongoContainer(): void {
       '-v', './database/dumps:/dumps',
       '-v', 'sofie-mongodb-data:/data/db',
       '-v', 'sofie-mongodb-config:/data/configdb',
-      '-p', `${MONGODB_PORT}:3001`,
+      '-p', `${MONGODB_PORT}:27017`,
       '-d',
       `mongo:${MONGODB_VERSION}`,
       '--replSet', `${MONGODB_REPLICA}`,
       '--bind_ip_all',
-      '--port', '3001'
+      '--port', '27017'
     ])
   }
 }
@@ -268,9 +268,13 @@ async function migrateLatest(): Promise<void> {
   const latestVersion: string = await getLatestSchemaVersion()
   console.log(`Latest schema version available is discovered to be ${latestVersion}`)
   docker([
-    'run', '--rm',
+    'run', '--rm', '--name', 'runner',
     '-v', './database/schema:/schema',
     '-e', `VERSION=${latestVersion}`,
+    '-e', `MONGODB_HOST=${MONGODB_HOST}`,
+    '-e', `MONGODB_PORT=${MONGODB_PORT}`,
+    '-e', `MONGODB_REPLICA=${MONGODB_REPLICA}`,
+    '-e', `MONGODB_DATABASE_NAME=${MONGODB_DATABASE_NAME}`,
     'runner:v1'
   ])
 }
@@ -334,9 +338,9 @@ function action(values: { [longOption: string]: string | boolean | undefined } &
       break
 
     case 'latest':
-      console.log('migrating to latest schema version...')
+      console.log('manage migration runner...')
       void migrateLatest().then(
-        () => console.log('manage migration complete')
+        () => console.log('manage migration runner complete')
       ).catch(console.error)
       break
 
