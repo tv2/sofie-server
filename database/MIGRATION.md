@@ -17,5 +17,12 @@
 
 
 External resources:
+- https://mongodb.github.io/node-mongodb-native/
 - https://www.mongodb.com/docs/drivers/node/current/
 - https://www.mongodb.com/docs/drivers/node/current/fundamentals/typescript/
+- https://www.mongodb.com/docs/manual/core/schema-validation/#std-label-schema-validation-overview
+- 
+
+MEAN.js stack (MongoDB, Express, Angular, Node.js) https://github.com/meanjs/mean
+
+PRISMA.IO - a new type of ORM https://www.prisma.io/mongodb https://www.prisma.io/docs/orm/overview/prisma-in-your-stack/is-prisma-an-orm

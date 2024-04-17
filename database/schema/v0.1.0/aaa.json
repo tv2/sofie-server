@@ -1,0 +1,43 @@
+{
+  "define": {
+    "bsonType": "object",
+    "required": [
+      "phone",
+      "name"
+    ],
+    "properties": {
+      "name": {
+        "bsonType": "string",
+        "description": "must be a string and is required",
+        "minLength": 3,
+        "maxLength": 100,
+        "pattern": "^[a-zA-Z]+ [a-zA-Z]+$"
+      },
+      "phone": {
+        "bsonType": "string",
+        "pattern": "^[0-9]+$",
+        "minLength": 10,
+        "description": "must be a string that starts with +<country_code><area_code><number> and is required"
+      },
+      "email": {
+        "bsonType": "string",
+        "pattern": "@mongodb\\.com$",
+        "description": "must be a string and end with '@mongodb.com'"
+      }
+    }
+  },
+  "insert":[
+    {
+      "phone": "1231231231",
+      "name": "Jo Do"
+    },
+    {
+      "phone": "2342342341",
+      "name": "Joo Doo"
+    },
+    {
+      "phone": "3453453453",
+      "name": "Jooo Dooo"
+    }
+  ]
+}
