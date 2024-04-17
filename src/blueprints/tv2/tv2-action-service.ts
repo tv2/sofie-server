@@ -80,13 +80,13 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   private setFactories(configuration: Tv2BlueprintConfiguration): void {
     this.cameraActionFactory = this.actionFactoryProvider.createCameraActionFactory(configuration)
     this.remoteActionFactory = this.actionFactoryProvider.createRemoteActionFactory(configuration)
-    this.audioActionFactory = this.actionFactoryProvider.createAudioActionFactory()
+    this.audioActionFactory = this.actionFactoryProvider.createAudioActionFactory(configuration)
     this.transitionEffectActionFactory = this.actionFactoryProvider.createTransitionEffectActionFactory(configuration)
     this.graphicsActionFactory = this.actionFactoryProvider.createGraphicsActionFactory(configuration)
     this.videoClipActionFactory = this.actionFactoryProvider.createVideoClipActionFactory(configuration)
     this.videoMixerActionFactory = this.actionFactoryProvider.createVideoMixerActionFactory(configuration)
     this.splitScreenActionFactory = this.actionFactoryProvider.createSplitScreenActionFactory(configuration)
     this.replayActionFactory = this.actionFactoryProvider.createReplayActionFactory(configuration)
-    this.robotActionFactory = this.actionFactoryProvider.createRobotActionFactory()
+    this.robotActionFactory = this.actionFactoryProvider.createRobotActionFactory(configuration)
   }
 }
