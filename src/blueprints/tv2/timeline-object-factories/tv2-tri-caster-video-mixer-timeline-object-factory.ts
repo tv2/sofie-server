@@ -154,7 +154,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     )
   }
 
-  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): TriCasterMixEffectTimelineObject {
+  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): TriCasterMixOutputTimelineObject {
     return {
       id: `${TRI_CASTER_PREFIX}lookahead`,
       enable,
@@ -162,12 +162,8 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
       layer: Tv2TriCasterLayer.LOOKAHEAD,
       content: {
         deviceType: DeviceType.TRICASTER,
-        type: TriCasterType.ME,
-        me: {
-          type: TriCasterMixEffectContentType.PREVIEW,
-          previewInput: this.mapInputToTriCasterInput(sourceInput),
-          transitionEffect: TriCasterTransition.CUT
-        }
+        type: TriCasterType.MIX_OUTPUT,
+        source: this.mapInputToTriCasterInput(sourceInput)
       }
     }
   }
@@ -350,6 +346,10 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createDipTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number, _dipInput: number): TriCasterMixEffectTimelineObject {
     return this.createTransitionEffectTimelineObject(sourceInput, TriCasterTransition.DIP, durationInFrames)
+  }
+
+  public getProgramLayer(): string {
+    return Tv2TriCasterLayer.PROGRAM
   }
 
   public getSplitScreenBoxesLayer(): string {

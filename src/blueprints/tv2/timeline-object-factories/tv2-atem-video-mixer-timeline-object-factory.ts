@@ -261,6 +261,10 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       }
   }
 
+  public getProgramLayer(): string {
+    return Tv2AtemLayer.PROGRAM
+  }
+
   public getSplitScreenBoxesLayer(): string {
     return Tv2AtemLayer.SPLIT_SCREEN_BOXES
   }
