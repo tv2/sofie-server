@@ -189,8 +189,15 @@ async function processMigrationFle(db: Db, collectionFile: fs.Dirent, waveStep: 
     `${collectionFile.path}/${collectionFile.name}`,
     {encoding: 'utf-8'}
   )
+
   const migrationData: MigrationData = JSON.parse(fileContent)
-  await processMigrationData(db, waveStep, collectionName, migrationData)
+  if (migrationData === undefined) {
+    return
+  }
+
+  if (migrationData[waveStep] !== undefined) {
+    await processMigrationData(db, waveStep, collectionName, migrationData)
+  }
 }
 
 async function getMigrationData(): Promise<void> {
