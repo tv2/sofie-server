@@ -5,10 +5,10 @@ export interface TriCasterMixEffectTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.TRICASTER
     type: TriCasterType.ME,
-    me: TriCasterMixEffectProgramContent | TriCasterMixEffectPreviewContent | TriCasterMixEffectDownstreamKeyerContent | TriCasterMixEffectEffectModeContent
+    me: TriCasterMixEffectProgramContent | TriCasterMixEffectDownstreamKeyerContent | TriCasterMixEffectEffectModeContent
     /**
      * Priority used to sort commands that are supposed to execute at the same time
-     * Lower means faster execution (analaogous to other device integrations)
+     * Lower means faster execution (analogous to other device integrations)
      * Default: 0
      */
     temporalPriority?: number
@@ -25,15 +25,8 @@ export interface TriCasterMixEffectProgramContent {
 
 export enum TriCasterMixEffectContentType {
   PROGRAM = 'PROGRAM',
-  PREVIEW = 'PREVIEW',
   DOWNSTREAM_KEYER = 'DOWNSTREAM_KEYER',
   EFFECT_MODE = 'EFFECT_MODE'
-}
-
-export interface TriCasterMixEffectPreviewContent {
-  type: TriCasterMixEffectContentType.PREVIEW
-  previewInput: string
-  transitionEffect: TriCasterTransition.CUT
 }
 
 export interface TriCasterMixEffectDownstreamKeyerContent {
