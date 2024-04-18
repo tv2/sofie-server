@@ -79,6 +79,8 @@ export class Rundown extends BasicRundown {
       this.activeCursor = rundown.alreadyActiveProperties.activeCursor
       this.nextCursor = rundown.alreadyActiveProperties.nextCursor
       this.infinitePieces = rundown.alreadyActiveProperties.infinitePieces ?? new Map()
+
+      this.markNextPart()
     }
   }
 
