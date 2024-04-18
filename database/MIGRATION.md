@@ -303,6 +303,11 @@ Proposed workflow is a simple and effective way to manage schema changes in Mong
 ## Enhancements
 Tool script can be further enhanced to achieve migration idempotency and resilience.
 
+## In addition
+
+- Each schema version can live in separate database (named after the schema version t represents after the same version migration was run)
+- After each migratiion (resulting a fresh database) a snapshot can be taken and used as a point of next migration start
+- Schema migrations can be tricky to implement, so latest schema version available might not necessarily be ready for use by the application. Decupling the schema version from the application version wll give development and operatinal freedom. Using `config` object in `package.json` can be used to note which database to be used by the application.
 
 
 ### External resources:
