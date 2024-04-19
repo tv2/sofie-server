@@ -43,6 +43,16 @@ export enum Tv2AtemLayer {
   SPLIT_SCREEN_BOXES = 'atem_dve_boxes',
 }
 
+export enum Tv2TriCasterLayer {
+  PROGRAM = 'tricaster_me_program',
+  CLEAN_FEED = 'tricaster_me_clean',
+  LOOKAHEAD = 'tricaster_aux_lookahead',
+  DOWNSTREAM_KEYER = 'tricaster_dsk',
+  CLEAN_UPSTREAM_KEYER = 'tricaster_clean_usk_full',
+  SPLIT_SCREEN = 'tricaster_dve',
+  SPLIT_SCREEN_BOXES = 'tricaster_dve_boxes',
+}
+
 export enum Tv2VideoMixerLayer {
   AR = 'aux_ar',
   VIZ_OVERLAY_AUXILIARY = 'aux_viz_ovl_in_1'
