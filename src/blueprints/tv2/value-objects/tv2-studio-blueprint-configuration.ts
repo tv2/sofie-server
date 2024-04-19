@@ -1,9 +1,13 @@
+import { DeviceType } from '../../../model/enums/device-type'
+
 export interface Tv2StudioBlueprintConfiguration {
   cameraSources: Tv2SourceMappingWithSound[]
   remoteSources: Tv2SourceMappingWithSound[]
+  feedSources: Tv2SourceMappingWithSound[]
   replaySources: Tv2SourceMappingWithSound[]
   studioMicrophones: string[]
   mediaPlayers: Tv2MediaPlayer[]
+  videoMixerType: VideoMixerType
   videoMixerBasicConfiguration: Tv2VideoMixerBasicConfiguration
   casparCgPreRollDuration: number
   serverPostRollDuration: number
@@ -16,6 +20,8 @@ export interface Tv2StudioBlueprintConfiguration {
   shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: boolean,
   audioBedSettings: AudioBedSettings
 }
+
+export type VideoMixerType = DeviceType.ATEM | DeviceType.TRICASTER
 
 export interface Tv2FolderConfiguration {
   name?: string

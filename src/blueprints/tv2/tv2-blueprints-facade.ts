@@ -7,9 +7,6 @@ import { Tv2ActionService } from './tv2-action-service'
 import {
   Tv2SisyfosAudioTimelineObjectFactory
 } from './timeline-object-factories/tv2-sisyfos-audio-timeline-object-factory'
-import {
-  Tv2AtemVideoMixerTimelineObjectFactory
-} from './timeline-object-factories/tv2-atem-video-mixer-timeline-object-factory'
 import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
 import { Tv2TransitionEffectActionFactory } from './action-factories/tv2-transition-effect-action-factory'
 import { Tv2AudioActionFactory } from './action-factories/tv2-audio-action-factory'
@@ -48,6 +45,9 @@ import {
   Tv2TelemetricsTimelineObjectFactory
 } from './timeline-object-factories/tv2-telemetrics-timeline-object-factory'
 import { Tv2BlueprintConfigurationValidator } from './tv2-blueprint-configuration-validator'
+import {
+  Tv2AtemVideoMixerTimelineObjectFactory
+} from './timeline-object-factories/tv2-atem-video-mixer-timeline-object-factory'
 
 export class Tv2BlueprintsFacade {
   public static createBlueprint(): Blueprint {
@@ -62,6 +62,8 @@ export class Tv2BlueprintsFacade {
 
     const audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory = new Tv2SisyfosAudioTimelineObjectFactory()
     const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory(Tv2LoggerFacade.createLogger())
+    // TODO: Implement so this is based on the configuration.
+    // const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2TriCasterVideoMixerTimelineObjectFactory(new AtemToTriCasterSplitScreenConverter(), Tv2LoggerFacade.createLogger())
 
     const graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory = new Tv2GraphicsTimelineObjectFactoryFactory(assetPathHelper)
     const graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory = new Tv2CasparCgTimelineObjectFactory(assetPathHelper)
