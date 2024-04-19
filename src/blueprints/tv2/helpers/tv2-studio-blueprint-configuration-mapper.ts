@@ -12,6 +12,7 @@ import {
 interface CoreStudioBlueprintConfiguration {
   SourcesCam: CoreSourceMappingWithSound[] // Cameras
   SourcesRM: CoreSourceMappingWithSound[] // Lives
+  SourcesFeed: CoreSourceMappingWithSound[] // Feeds
   SourcesReplay: CoreSourceMappingWithSound[] // Replays
   StudioMics: string[]
   ABMediaPlayers: CoreMediaPlayer[]
@@ -116,6 +117,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
     return {
       cameraSources: this.mapSourcesWithSound(coreConfiguration.SourcesCam),
       remoteSources: this.mapSourcesWithSound(coreConfiguration.SourcesRM),
+      feedSources: this.mapSourcesWithSound(coreConfiguration.SourcesFeed),
       replaySources: this.mapSourcesWithSound(coreConfiguration.SourcesReplay),
       studioMicrophones: coreConfiguration.StudioMics,
       mediaPlayers: this.mapSources(coreConfiguration.ABMediaPlayers),
