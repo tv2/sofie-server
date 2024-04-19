@@ -40,8 +40,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
   constructor(private readonly atemToTriCasterSplitScreenConverter: AtemToTriCasterSplitScreenConverter, logger: Tv2Logger) {
     this.logger = logger.tag(Tv2TriCasterVideoMixerTimelineObjectFactory.name)
   }
-
-
+  
   public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): TriCasterMixEffectTimelineObject {
     return this.createTriCasterMeTimelineObjectForLayer(
       `${TRI_CASTER_PREFIX}program`,
