@@ -31,7 +31,8 @@ export class MongoShelfRepository extends BaseMongoRepository implements ShelfCo
   private async createEmptyShelfConfiguration(): Promise<ShelfConfiguration> {
     const shelfConfiguration: ShelfConfiguration = {
       id: SHELF_CONFIGURATION_ID,
-      actionPanelConfigurations: []
+      actionPanelConfigurations: [],
+      staticActionIds: []
     }
     await this.getCollection().insertOne({...shelfConfiguration, _id: shelfConfiguration.id })
     return shelfConfiguration

@@ -9,7 +9,7 @@ import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { Tv2AtemLayer, Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import {
   Tv2Action,
   Tv2ActionContentType,
@@ -66,15 +66,15 @@ export class Tv2TransitionEffectActionFactory {
       this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, 'Mix transition on next Take', 'Applies a Mix transition on next Take'),
       this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, 'Take with Mix transition', 'Applies a Mix transition and does Take'),
       this.createEmptyDipTransitionEffectAction(
-        PieceActionType.INSERT_PIECE_AS_NEXT, 
-        blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource, 
-        'Dip transition on next Take', 
+        PieceActionType.INSERT_PIECE_AS_NEXT,
+        blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource,
+        'Dip transition on next Take',
         'Applies a Dip transition on next Take'
       ),
       this.createEmptyDipTransitionEffectAction(
-        PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, 
-        blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource, 
-        'Take with Dip transition', 
+        PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE,
+        blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource,
+        'Take with Dip transition',
         'Applies a Dip transition and does Take'
       ),
       ...blueprintConfiguration.showStyle.breakerTransitionEffectConfigurations.flatMap(transitionEffect => {
@@ -133,7 +133,7 @@ export class Tv2TransitionEffectActionFactory {
     const updateTransitionMutateAction: MutateActionWithPieceMethods = {
       type: MutateActionType.PIECE,
       updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
-      piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM),
+      piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
     }
     mutateActionMethods.push(updateTransitionMutateAction)
     return mutateActionMethods

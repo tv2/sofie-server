@@ -56,16 +56,18 @@ export class Tv2RemoteActionFactory {
   }
 
   private createInsertRemoteAsNextActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
-    return blueprintConfiguration.studio.remoteSources
-      .map(source => this.createInsertRemoteAsNextAction(blueprintConfiguration, source))
+    return [
+      ...blueprintConfiguration.studio.remoteSources,
+      ...blueprintConfiguration.studio.feedSources
+    ].map(source => this.createInsertRemoteAsNextAction(blueprintConfiguration, source))
   }
 
   private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
-    const partId: string = `remoteInsertActionPart_${remoteSource.name}`
+    const partId: string = `remoteInsertActionPart_${remoteSource.name}`.replaceAll(' ', '')
     const remotePieceInterface: Tv2PieceInterface = this.createRemotePieceInterface(configuration, remoteSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
     return {
-      id: `remoteAsNextAction_${remoteSource.name}`,
+      id: `remoteAsNextAction_${remoteSource.name}`.replaceAll(' ', ''),
       name: `LIVE ${remoteSource.name}`,
       description: `Insert LIVE ${remoteSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
@@ -95,7 +97,7 @@ export class Tv2RemoteActionFactory {
     }
 
     return {
-      id: `remoteAction_${source.id}`,
+      id: `remoteAction_${source.id}`.replaceAll(' ', ''),
       partId: parentPartId,
       name: `LIVE ${source.name}`,
       layer: Tv2SourceLayer.REMOTE,

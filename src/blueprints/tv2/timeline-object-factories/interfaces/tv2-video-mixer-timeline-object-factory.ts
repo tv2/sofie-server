@@ -23,12 +23,13 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createCutTransitionEffectTimelineObject(sourceInput: number): Tv2BlueprintTimelineObject
   createMixTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number): Tv2BlueprintTimelineObject
   createDipTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number, dipInput: number): Tv2BlueprintTimelineObject
+  getProgramLayer(): string
   getSplitScreenBoxesLayer(): string
   getSplitScreenSourceInput(): number
   findProgramSourceInputFromPiece(piece: Piece): number | undefined
 }
 
 export interface VideoMixerWipeTransitionSettings {
-  frameRate: number
+  durationInFrames: number
   borderSoftness: number
 }

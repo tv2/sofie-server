@@ -3,10 +3,12 @@ import { ShelfConfiguration, ShelfActionPanelConfiguration } from '../../model/e
 export class ShelfConfigurationDto {
   public readonly id: string
   public readonly actionPanelConfigurations: ShelfActionPanelConfigurationDto[]
+  public readonly staticActionIds: string[]
 
   constructor(shelfConfiguration: ShelfConfiguration) {
     this.id = shelfConfiguration.id
     this.actionPanelConfigurations = shelfConfiguration.actionPanelConfigurations.map(actionPanelConfiguration => new ShelfActionPanelConfigurationDto(actionPanelConfiguration))
+    this.staticActionIds = shelfConfiguration.staticActionIds
   }
 }
 
