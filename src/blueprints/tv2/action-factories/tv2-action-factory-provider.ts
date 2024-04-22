@@ -91,16 +91,14 @@ export class Tv2ActionFactoryProvider {
     shouldFactoryBeRecreatedCallback: (configuration: Tv2BlueprintConfiguration) => boolean,
     configuration: Tv2BlueprintConfiguration
   ): ActionFactoryInstance<T> {
-    if (!!actionFactoryInstance && !actionFactoryInstance.shouldFactoryBeRecreated(configuration)) {
+    if (actionFactoryInstance && !actionFactoryInstance.shouldFactoryBeRecreated(configuration)) {
       return actionFactoryInstance
     }
 
-    actionFactoryInstance = {
+    return {
       factory: createFactoryCallback(),
       shouldFactoryBeRecreated: shouldFactoryBeRecreatedCallback
     }
-
-    return actionFactoryInstance
   }
 
   private didVideoMixerTypeChange(oldConfiguration: Tv2BlueprintConfiguration, newConfiguration: Tv2BlueprintConfiguration): boolean {
