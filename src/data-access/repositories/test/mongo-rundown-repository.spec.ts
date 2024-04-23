@@ -194,7 +194,6 @@ export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase):
       await testee.saveRundown(EntityTestFactory.createRundown())
 
       const result: MongoRundown = (await db.collection<MongoRundown>(COLLECTION_NAME).findOne({ _id: rundownWithNextCursor._id })) as unknown as MongoRundown
-      console.log(result)
       expect(result.nextCursor).toBeUndefined()
     })
   })
