@@ -143,7 +143,10 @@ export class Tv2StudioBlueprintConfigurationMapper {
     }
   }
 
-  private mapSourcesWithSound(sources: CoreSourceMappingWithSound[]): Tv2SourceMappingWithSound[] {
+  private mapSourcesWithSound(sources: CoreSourceMappingWithSound[] | undefined): Tv2SourceMappingWithSound[] {
+    if (!sources) {
+      return []
+    }
     return sources.map(source => {
       return {
         id: source._id,
