@@ -524,8 +524,8 @@ export class Tv2SplitScreenActionFactory {
   private createInsertLastVideoClipToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2SplitScreenInsertLastVideoClipInputAction[] {
     const actions: Tv2SplitScreenInsertLastVideoClipInputAction[] = []
     for (let inputIndex = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
-      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, this.createDisplayIndex(inputIndex), Tv2AudioMode.FULL))
-      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, this.createDisplayIndex(inputIndex), Tv2AudioMode.VOICE_OVER))
+      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.FULL))
+      actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.VOICE_OVER))
     }
 
     return actions
@@ -538,9 +538,9 @@ export class Tv2SplitScreenActionFactory {
     } as unknown as Tv2VideoClipManifestData)
 
     return {
-      id: `insert_last_video_clip_to_split_screen_input_${inputIndex}${audioMode === Tv2AudioMode.VOICE_OVER ? '_vo' : ''}_action`,
-      name: `Insert last Video ${audioMode === Tv2AudioMode.VOICE_OVER ? 'Voice Over ' : ''}Clip in DVE input ${inputIndex}`,
-      description: `Insert last Video Clip in DVE input ${inputIndex}`,
+      id: `insert_last_video_clip_to_split_screen_input_${this.createDisplayIndex(inputIndex)}${audioMode === Tv2AudioMode.VOICE_OVER ? '_vo' : ''}_action`,
+      name: `Insert last Video ${audioMode === Tv2AudioMode.VOICE_OVER ? 'Voice Over ' : ''}Clip in DVE input ${this.createDisplayIndex(inputIndex)}`,
+      description: `Insert last Video Clip in DVE input ${this.createDisplayIndex(inputIndex)}`,
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
         contentType: Tv2ActionContentType.SPLIT_SCREEN,
