@@ -20,9 +20,9 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): Tv2BlueprintTimelineObject
   createSplitScreenBoxesTimelineObject(boxes: SplitScreenBoxProperties[], priority?: number): Tv2BlueprintTimelineObject
   createSplitScreenPropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, layoutProperties: SplitScreenLayoutProperties): Tv2BlueprintTimelineObject
-  createCutTransitionEffectTimelineObject(sourceInput: number): Tv2BlueprintTimelineObject
-  createMixTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number): Tv2BlueprintTimelineObject
-  createDipTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number, dipInput: number): Tv2BlueprintTimelineObject
+  createCutTransitionEffectTimelineObjects(sourceInput: number): Tv2BlueprintTimelineObject[]
+  createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number): Tv2BlueprintTimelineObject[]
+  createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number): Tv2BlueprintTimelineObject[]
   getProgramLayer(): string
   getSplitScreenBoxesLayer(): string
   getSplitScreenSourceInput(): number
