@@ -1,68 +1,28 @@
 import { DeviceType } from '../../model/enums/device-type'
 import { TimelineObject } from '../../model/entities/timeline-object'
 
-export interface CasparCgTemplateTimelineObject extends TimelineObject {
+export interface CasparCgTemplateTimelineObject<T> extends TimelineObject {
   content: {
     deviceType: DeviceType.CASPAR_CG
     type: CasparCgType.TEMPLATE
-    templateType: string
+    templateType: CasparCgTemplateType
     name: string
-    data: CasparCgTemplateData
+    data: T
     useStopCommand: boolean
-    mixer: {
-      opacity?: number
-    }
+    mixer: Mixer
   }
 }
 
-// TODO: Move this to TV2 blueprints and split up the slots up into separate interfaces with a enumerated payload type.
-export interface CasparCgTemplateData {
-  display: CasparCgTemplateDisplayMode
-  partialUpdate: boolean
-  slots: {
-    [CasparCgTemplateSlotType.FULLSCREEN_GRAPHICS]?: {
-      display: CasparCgTemplateDisplayMode
-      payload: {
-        type: 'still'
-        url: string,
-        noAnimation: boolean
-      }
-    }
-    [CasparCgTemplateSlotType.LOWER_THIRD]?: {
-      display: CasparCgTemplateDisplayMode
-      payload: {
-        type: string
-        0: string
-      }
-    }
-    [CasparCgTemplateSlotType.IDENT]?: {
-      display: CasparCgTemplateDisplayMode
-      payload: {
-        type: string
-        0: string
-      }
-    }
-    [CasparCgTemplateSlotType.SPLIT_SCREEN]?: {
-      display: CasparCgTemplateDisplayMode
-      payload: {
-        type: 'locators'
-        style: object
-      }
-    }
-  }
+interface Mixer {
+  opacity?: number
+  keyer?: boolean
+  // A lot more to be found in TSR.
 }
 
-export enum CasparCgTemplateSlotType {
-  FULLSCREEN_GRAPHICS = '250_full',
-  LOWER_THIRD = '450_lowerThird',
-  IDENT = '650_ident',
-  SPLIT_SCREEN = '850_dve',
-}
-
-export enum CasparCgTemplateDisplayMode {
-  PROGRAM = 'program',
-  PREVIEW = 'preview',
-  HIDDEN = 'hidden',
+export enum CasparCgTemplateType {
+  // TSR needs the values to be lowercased.
+  HTML = 'html',
+  FLASH = 'flash'
 }
 
 export interface CasparCgMediaTimelineObject extends TimelineObject {
@@ -76,9 +36,7 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
     length?: number
     playing?: boolean
     noStarttime?: boolean // The typo is used by TSR... :(
-    mixer?: {
-      keyer?: boolean
-    }
+    mixer?: Mixer
     transitions?: {
       inTransition?: TimelineTransition
     }
@@ -93,11 +51,17 @@ interface TimelineTransition {
 }
 
 export enum CasparCgTransitionType {
-  MIX = 'MIX'
+  MIX = 'MIX',
+  CUT = 'CUT',
+  PUSH = 'PUSH',
+  WIPE = 'WIPE',
+  SLIDE = 'SLIDE',
+  STING = 'STING'
 }
 
 export enum CasparCgTransitionEase {
   LINEAR = 'LINEAR',
+  // A lot more to be found in TSR.
 }
 
 export enum CasparCgTransitionDirection {
@@ -108,4 +72,5 @@ export enum CasparCgTransitionDirection {
 export enum CasparCgType {
   MEDIA = 'media',
   TEMPLATE = 'template',
+  // More to be found in TSR.
 }

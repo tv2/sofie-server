@@ -3,10 +3,8 @@ import { Tv2GraphicsElementTimelineObjectFactory } from './interfaces/tv2-graphi
 import { DeviceType } from '../../../model/enums/device-type'
 import {
   CasparCgMediaTimelineObject,
-  CasparCgTemplateData,
-  CasparCgTemplateDisplayMode,
-  CasparCgTemplateSlotType,
   CasparCgTemplateTimelineObject,
+  CasparCgTemplateType,
   CasparCgTransitionDirection,
   CasparCgTransitionEase,
   CasparCgTransitionType,
@@ -25,6 +23,11 @@ import {
 } from './interfaces/tv2-graphics-split-screen-timeline-object-factory'
 import { Tv2VideoClipTimelineObjectFactory } from './interfaces/tv2-video-clip-timeline-object-factory'
 import { GraphicsSetup, SplitScreenConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
+import {
+  Tv2CasparCgTemplateData,
+  Tv2CasparCgTemplateDisplayMode,
+  Tv2CasparCgTemplateSlotType
+} from '../timeline-state-resolver-types/tv2-caspar-cg-types'
 
 const HTML_GRAPHICS_INDEX_FILENAME: string = 'index'
 
@@ -32,7 +35,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
 
   constructor(private readonly assetPathHelper: Tv2AssetPathHelper) {}
 
-  public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject {
+  public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
     const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.graphicsFolder.name
     const nameChunks: string[] = fullscreenGraphicsData.name.split('/')
     const sceneName: string = nameChunks[nameChunks.length - 1]
@@ -48,7 +51,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
       content: {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.TEMPLATE,
-        templateType: 'html',
+        templateType: CasparCgTemplateType.HTML,
         name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
         data: this.createFullscreenGraphicsTemplateData(blueprintConfiguration, fileName),
         useStopCommand: false,
@@ -59,7 +62,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
     }
   }
 
-  private createFullscreenGraphicsTemplateData(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): CasparCgTemplateData {
+  private createFullscreenGraphicsTemplateData(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): Tv2CasparCgTemplateData {
     if (!blueprintConfiguration.studio.htmlGraphics) {
       throw new MisconfigurationException(
         'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'GraphicURL\''
@@ -68,22 +71,22 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
 
     const absoluteFilePath: string = `${blueprintConfiguration.studio.htmlGraphics.graphicsUrl}\\${fileName}${blueprintConfiguration.studio.graphicsFolder.fileExtension}`
     return {
-      display: CasparCgTemplateDisplayMode.PROGRAM,
+      display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
       slots: {
-        [CasparCgTemplateSlotType.FULLSCREEN_GRAPHICS]: {
+        [Tv2CasparCgTemplateSlotType.FULLSCREEN_GRAPHICS]: {
           payload: {
             type: 'still',
             url: encodeURI(this.assetPathHelper.escapePath(this.assetPathHelper.convertUnixPathToWindowsPath(absoluteFilePath))),
             noAnimation: false
           },
-          display: CasparCgTemplateDisplayMode.PROGRAM,
+          display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
         }
       },
       partialUpdate: false
     }
   }
 
-  public createIdentGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): CasparCgTemplateTimelineObject {
+  public createIdentGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
     return {
       id: 'ident',
       priority: 1,
@@ -92,11 +95,11 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
       },
       layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_IDENT,
       content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, {
-        display: CasparCgTemplateDisplayMode.PROGRAM,
+        display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
         partialUpdate: true,
         slots: {
-          [CasparCgTemplateSlotType.IDENT]: {
-            display: CasparCgTemplateDisplayMode.PROGRAM,
+          [Tv2CasparCgTemplateSlotType.IDENT]: {
+            display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
             payload: {
               type: overlayGraphicsData.templateName,
               0: overlayGraphicsData.displayText
@@ -109,12 +112,12 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
 
   private createOverlayGraphicsTimelineObjectContent(
     blueprintConfiguration: Tv2BlueprintConfiguration,
-    templateData: CasparCgTemplateData,
-  ): CasparCgTemplateTimelineObject['content'] {
+    templateData: Tv2CasparCgTemplateData,
+  ): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData>['content'] {
     return {
       deviceType: DeviceType.CASPAR_CG,
       type: CasparCgType.TEMPLATE,
-      templateType: 'html',
+      templateType: CasparCgTemplateType.HTML,
       name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
       useStopCommand: false,
       mixer: {
@@ -124,7 +127,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
     }
   }
 
-  public createLowerThirdGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): CasparCgTemplateTimelineObject {
+  public createLowerThirdGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
     return {
       id: 'lowerThird',
       priority: 1,
@@ -133,11 +136,11 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
       },
       layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_LOWER,
       content: this.createOverlayGraphicsTimelineObjectContent(blueprintConfiguration, {
-        display: CasparCgTemplateDisplayMode.PROGRAM,
+        display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
         partialUpdate: true,
         slots: {
-          [CasparCgTemplateSlotType.LOWER_THIRD]: {
-            display: CasparCgTemplateDisplayMode.PROGRAM,
+          [Tv2CasparCgTemplateSlotType.LOWER_THIRD]: {
+            display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
             payload: {
               type: overlayGraphicsData.templateName,
               0: overlayGraphicsData.displayText
@@ -204,7 +207,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
     }
   }
 
-  public createSplitScreenLocatorTimelineObject(graphicsSetup: GraphicsSetup, splitScreenConfiguration: SplitScreenConfiguration, locatorLabels?: string[]): CasparCgTemplateTimelineObject {
+  public createSplitScreenLocatorTimelineObject(graphicsSetup: GraphicsSetup, splitScreenConfiguration: SplitScreenConfiguration, locatorLabels?: string[]): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
     return {
       id: 'casparCg_locators',
       enable: {
@@ -215,19 +218,19 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
       content: {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.TEMPLATE,
-        templateType: 'html',
+        templateType: CasparCgTemplateType.HTML,
         name: `${graphicsSetup.htmlPackageFolder}/${HTML_GRAPHICS_INDEX_FILENAME}`,
         useStopCommand: false,
         mixer: {
           opacity: 100
         },
         data: {
-          display: CasparCgTemplateDisplayMode.PROGRAM,
+          display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
           partialUpdate: true,
           slots:
             {
-              [CasparCgTemplateSlotType.SPLIT_SCREEN]: {
-                display: CasparCgTemplateDisplayMode.PROGRAM,
+              [Tv2CasparCgTemplateSlotType.SPLIT_SCREEN]: {
+                display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
                 payload: {
                   type: 'locators',
                   style: locatorLabels && locatorLabels.length > 0
