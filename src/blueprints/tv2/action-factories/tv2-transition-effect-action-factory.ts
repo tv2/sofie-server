@@ -204,7 +204,8 @@ export class Tv2TransitionEffectActionFactory {
   }
 
   private getEffectNamePrefix(effectName: string): string {
-    if ([SpecialEffectName.MIX.toString(), SpecialEffectName.DIP.toString()].includes(effectName)) {
+    const effectNamesWithoutPrefix: string[] = [SpecialEffectName.MIX, SpecialEffectName.DIP]
+    if (effectNamesWithoutPrefix.includes(effectName)) {
       return ''
     }
     return 'Effect '
