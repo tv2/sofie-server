@@ -48,6 +48,11 @@ import { Tv2Logger } from '../tv2-logger'
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
 
+enum SpecialEffectName {
+  MIX = 'Mix',
+  DIP = 'Dip'
+}
+
 export class Tv2TransitionEffectActionFactory {
   private readonly logger: Tv2Logger
 
@@ -63,19 +68,15 @@ export class Tv2TransitionEffectActionFactory {
 
   public createTransitionEffectActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return [
-      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, 'Mix transition on next Take', 'Applies a Mix transition on next Take'),
-      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, 'Take with Mix transition', 'Applies a Mix transition and does Take'),
+      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT),
+      this.createEmptyMixTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE),
       this.createEmptyDipTransitionEffectAction(
         PieceActionType.INSERT_PIECE_AS_NEXT,
         blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource,
-        'Dip transition on next Take',
-        'Applies a Dip transition on next Take'
       ),
       this.createEmptyDipTransitionEffectAction(
         PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE,
         blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource,
-        'Take with Dip transition',
-        'Applies a Dip transition and does Take'
       ),
       ...blueprintConfiguration.showStyle.breakerTransitionEffectConfigurations.flatMap(transitionEffect => {
         return [
@@ -176,8 +177,8 @@ export class Tv2TransitionEffectActionFactory {
   private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: Tv2PieceInterface): Tv2TransitionEffectAction {
     return {
       id: `${effectName}_transition_action_${actionType.toString()}`,
-      name: `${effectName}`,
-      description: `${effectName} transition on next Take.`,
+      name: this.mapToTransitionEffectNameForActionType(actionType, effectName),
+      description: this.mapToTransitionEffectDescriptionForActionType(actionType, effectName),
       type: actionType,
       data: {
         pieceInterface
@@ -186,11 +187,51 @@ export class Tv2TransitionEffectActionFactory {
     }
   }
 
+  private mapToTransitionEffectNameForActionType(actionType: PieceActionType, effectName: string): string {
+    switch (actionType) {
+      case PieceActionType.INSERT_PIECE_AS_NEXT: {
+        return `${this.getEffectNamePrefix(effectName)}${effectName} on Next`
+      }
+      case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
+        return `${this.getEffectNamePrefix(effectName)}${effectName} and Take`
+      }
+      case PieceActionType.REPLACE_PIECE:
+      case PieceActionType.INSERT_PIECE_AS_ON_AIR:
+      default: {
+        throw new Tv2MisconfigurationException(`ActionType ${actionType} is currently not supported.`)
+      }
+    }
+  }
+
+  private getEffectNamePrefix(effectName: string): string {
+    const effectNamesWithoutPrefix: string[] = [SpecialEffectName.MIX, SpecialEffectName.DIP]
+    if (effectNamesWithoutPrefix.includes(effectName)) {
+      return ''
+    }
+    return 'Effect '
+  }
+
+  private mapToTransitionEffectDescriptionForActionType(actionType: PieceActionType, effectName: string): string {
+    switch (actionType) {
+      case PieceActionType.INSERT_PIECE_AS_NEXT: {
+        return `Applies ${this.getEffectNamePrefix(effectName)}${effectName} on the next Take`
+      }
+      case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
+        return `Execute a Take with the ${this.getEffectNamePrefix(effectName)}${effectName} applied`
+      }
+      case PieceActionType.REPLACE_PIECE:
+      case PieceActionType.INSERT_PIECE_AS_ON_AIR:
+      default: {
+        throw new Tv2MisconfigurationException(`ActionType ${actionType} is currently not supported.`)
+      }
+    }
+  }
+
   /**
    * Creates an "empty" Mix transition effect Action.
    * The Action will be "populated" with a PieceInterface from the APPLY ARGUMENTS mutateActionMethod where it will also get the transition duration as an argument.
    */
-  private createEmptyMixTransitionEffectAction(actionType: PieceActionType, name: string, description: string): Tv2TransitionEffectAction {
+  private createEmptyMixTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.MIX,
@@ -198,8 +239,8 @@ export class Tv2TransitionEffectActionFactory {
     }
     return {
       id: `mix_transition_action_${actionType.toString()}`,
-      name,
-      description,
+      name: this.mapToTransitionEffectNameForActionType(actionType, SpecialEffectName.MIX),
+      description: this.mapToTransitionEffectDescriptionForActionType(actionType, SpecialEffectName.MIX),
       type: actionType,
       data: {
         pieceInterface: {} as PieceInterface
@@ -217,7 +258,7 @@ export class Tv2TransitionEffectActionFactory {
    * Creates an "empty" Dip transition effect Action.
    * The Action will be "populated" with a PieceInterface from the APPLY ARGUMENTS mutateActionMethod where it will also get the transition duration as an argument.
    */
-  private createEmptyDipTransitionEffectAction(actionType: PieceActionType, dipInputSource: number, name: string, description: string): Tv2TransitionEffectAction {
+  private createEmptyDipTransitionEffectAction(actionType: PieceActionType, dipInputSource: number): Tv2TransitionEffectAction {
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.DIP,
@@ -226,8 +267,8 @@ export class Tv2TransitionEffectActionFactory {
     }
     return {
       id: `dip_transition_action_${actionType.toString()}`,
-      name,
-      description,
+      name: this.mapToTransitionEffectNameForActionType(actionType, SpecialEffectName.DIP),
+      description: this.mapToTransitionEffectDescriptionForActionType(actionType, SpecialEffectName.DIP),
       type: actionType,
       data: {
         pieceInterface: {} as PieceInterface
@@ -265,18 +306,24 @@ export class Tv2TransitionEffectActionFactory {
   }
 
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
+    const breaker: Breaker | undefined = this.findBreakerFromConfiguration(transitionEffect, configuration)
+
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
+    const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
+    return this.createTransitionEffectAction(actionType, breaker.name, metadata, pieceInterface)
+  }
+
+  private findBreakerFromConfiguration(transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Breaker {
     const breaker: Breaker | undefined = configuration.showStyle.breakers.find(breaker => breaker.name === transitionEffect.name)
     if (!breaker) {
       throw new Tv2MisconfigurationException(`Can't create Transition Effect Action for ${transitionEffect.name}. ${transitionEffect.name} is missing in Configurations`)
     }
+    return breaker
+  }
 
-    const breakerDsk: Tv2DownstreamKeyer | undefined = configuration.studio.videoMixerBasicConfiguration.downstreamKeyers.find(dsk => dsk.roles.includes(Tv2DownstreamKeyerRole.JINGLE))
-    if (!breakerDsk) {
-      throw  new Tv2MisconfigurationException('Can\'t create Transition Effect Action. No DSK has been configured for Jingles.')
-    }
-
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
-    const metadata: Tv2BreakerTransitionEffectActionMetadata = {
+  private createBreakerTransitionEffectMetadata(breaker: Breaker, configuration: Tv2BlueprintConfiguration): Tv2BreakerTransitionEffectActionMetadata {
+    const breakerDsk: Tv2DownstreamKeyer = this.findDownstreamKeyerFromConfiguration(configuration)
+    return {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.BREAKER,
       casparCgPreRollDuration: configuration.studio.casparCgPreRollDuration,
@@ -284,7 +331,14 @@ export class Tv2TransitionEffectActionFactory {
       breakerFolder: configuration.studio.jingleFolder?.name ?? '',
       breaker
     }
-    return this.createTransitionEffectAction(actionType, breaker.name, metadata, pieceInterface)
+  }
+
+  private findDownstreamKeyerFromConfiguration(configuration: Tv2BlueprintConfiguration): Tv2DownstreamKeyer {
+    const breakerDsk: Tv2DownstreamKeyer | undefined = configuration.studio.videoMixerBasicConfiguration.downstreamKeyers.find(dsk => dsk.roles.includes(Tv2DownstreamKeyerRole.JINGLE))
+    if (!breakerDsk) {
+      throw new Tv2MisconfigurationException('Can\'t create Transition Effect Action. No DSK has been configured for Jingles.')
+    }
+    return breakerDsk
   }
 
   private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, piece: Piece): Tv2TransitionEffectAction {
