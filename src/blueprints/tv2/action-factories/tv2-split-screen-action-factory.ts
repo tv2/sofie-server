@@ -53,7 +53,7 @@ import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 
-const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
+const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 5
 
 // The "Layout" priority must be lower than the "Insert" priority for the inserted sources to "persist" through a Take.
 const LAYOUT_TIMELINE_OBJECT_PRIORITY: number = 0.5
@@ -247,7 +247,7 @@ export class Tv2SplitScreenActionFactory {
 
   private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string, audioMode: Tv2AudioMode = Tv2AudioMode.FULL): Tv2SplitScreenInsertSourceInputAction[] {
     const actions: Tv2SplitScreenInsertSourceInputAction[] = []
-    for (let inputIndex = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
+    for (let inputIndex = 1; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
       const actionsForInput: Tv2SplitScreenInsertSourceInputAction[] = sources
         .map(source => {
           const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, audioMode)
@@ -519,7 +519,7 @@ export class Tv2SplitScreenActionFactory {
 
   private createInsertLastVideoClipToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2SplitScreenInsertLastVideoClipInputAction[] {
     const actions: Tv2SplitScreenInsertLastVideoClipInputAction[] = []
-    for (let inputIndex = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
+    for (let inputIndex = 1; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
       actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.FULL))
       actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.VOICE_OVER))
     }
