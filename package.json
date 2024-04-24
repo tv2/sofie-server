@@ -51,6 +51,7 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "got": "11.8.6",
+    "ioredis": "^5.4.1",
     "mongodb": "^6.1.0",
     "reflect-metadata": "^0.1.13",
     "superfly-timeline": "^9.0.0",

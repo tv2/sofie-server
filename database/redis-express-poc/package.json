@@ -1,0 +1,21 @@
+{
+  "name": "redis-express-poc",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.7",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.0",
+    "redis-om": "^0.4.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "scripts": {
+    "dev": "nodemon ./src/app.ts"
+  }
+}

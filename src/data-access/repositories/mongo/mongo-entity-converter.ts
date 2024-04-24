@@ -31,6 +31,9 @@ import { Device } from '../../../model/entities/device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 
+export interface RedisId {
+  _id: string
+}
 export interface MongoId {
   _id: string
 }
