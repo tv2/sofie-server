@@ -253,9 +253,9 @@ export class Tv2SplitScreenActionFactory {
           const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, audioMode)
 
           return {
-            id: `insert_${this.replaceWhiteSpaceWithUnderscore(name)}_${this.replaceWhiteSpaceWithUnderscore(source.name)}_to_split_screen_input_${inputIndex}_action`,
-            name: `Insert ${name} ${source.name} in DVE input ${inputIndex}`,
-            description: `Insert ${name} ${source.name} in DVE input ${inputIndex}`,
+            id: `insert_${this.replaceWhiteSpaceWithUnderscore(name)}_${this.replaceWhiteSpaceWithUnderscore(source.name)}_to_split_screen_input_${this.createDisplayIndex(inputIndex)}_action`,
+            name: `Insert ${name} ${source.name} in DVE input ${this.createDisplayIndex(inputIndex)}`,
+            description: `Insert ${name} ${source.name} in DVE input ${this.createDisplayIndex(inputIndex)}`,
             type: PieceActionType.REPLACE_PIECE,
             data: {
               pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
@@ -273,6 +273,10 @@ export class Tv2SplitScreenActionFactory {
       actions.push(...actionsForInput)
     }
     return actions
+  }
+
+  private createDisplayIndex(index: number): number {
+    return index + 1
   }
 
   private replaceWhiteSpaceWithUnderscore(value: string): string {
@@ -534,9 +538,9 @@ export class Tv2SplitScreenActionFactory {
     } as unknown as Tv2VideoClipManifestData)
 
     return {
-      id: `insert_last_video_clip_to_split_screen_input_${inputIndex}${audioMode === Tv2AudioMode.VOICE_OVER ? '_vo' : ''}_action`,
-      name: `Insert last Video ${audioMode === Tv2AudioMode.VOICE_OVER ? 'Voice Over ' : ''}Clip in DVE input ${inputIndex}`,
-      description: `Insert last Video Clip in DVE input ${inputIndex}`,
+      id: `insert_last_video_clip_to_split_screen_input_${this.createDisplayIndex(inputIndex)}${audioMode === Tv2AudioMode.VOICE_OVER ? '_vo' : ''}_action`,
+      name: `Insert last Video ${audioMode === Tv2AudioMode.VOICE_OVER ? 'Voice Over ' : ''}Clip in DVE input ${this.createDisplayIndex(inputIndex)}`,
+      description: `Insert last Video Clip in DVE input ${this.createDisplayIndex(inputIndex)}`,
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
         contentType: Tv2ActionContentType.SPLIT_SCREEN,
