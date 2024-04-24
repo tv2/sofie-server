@@ -106,10 +106,7 @@ export class Rundown extends BasicRundown {
   }
 
   private initializeRundown(mode: RundownMode): void {
-    this.resetSegments()
-    this.resetHistory()
     this.mode = mode
-    this.infinitePieces = new Map()
 
     const firstSegment: Segment = this.findFirstSegment()
     firstSegment.setAsNext()
@@ -235,6 +232,10 @@ export class Rundown extends BasicRundown {
     this.mode = RundownMode.INACTIVE
     this.previousPart = undefined
     this.persistentState = undefined
+
+    this.resetSegments()
+    this.resetHistory()
+    this.infinitePieces = new Map()
   }
 
   private assertActive(operationName: string): void {

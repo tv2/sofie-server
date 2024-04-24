@@ -2791,8 +2791,10 @@ describe(Rundown.name, () => {
 
       expect(() => testee.getActiveSegment()).toThrow()
     })
+  })
 
-    it('resets all segments', () => {
+  describe(Rundown.prototype.deactivate.name, () => {
+    it('resets all Segments', () => {
       const mockedSegment1: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
       const mockedSegment2: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
       const mockedSegment3: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
@@ -2805,17 +2807,17 @@ describe(Rundown.name, () => {
 
       const testee: Rundown = new Rundown({
         segments,
-        mode: RundownMode.INACTIVE,
+        mode: RundownMode.ACTIVE,
       } as RundownInterface)
 
-      testee.activate()
+      testee.deactivate()
 
       verify(mockedSegment1.reset()).once()
       verify(mockedSegment2.reset()).once()
       verify(mockedSegment3.reset()).once()
     })
 
-    it('resets the history to an empty array', () => {
+    it('resets history to an empty array', () => {
       const segment: Segment = EntityMockFactory.createSegment({ parts: [EntityMockFactory.createPart()] })
       const history: Part[] = [
         EntityTestFactory.createPart(),
@@ -2823,11 +2825,11 @@ describe(Rundown.name, () => {
         EntityTestFactory.createPart()
       ]
 
-      const testee: Rundown = new Rundown({ history, segments: [segment] } as RundownInterface)
+      const testee: Rundown = new Rundown({ history, segments: [segment], mode: RundownMode.ACTIVE } as RundownInterface)
 
       expect(testee.getHistory()).toHaveLength(history.length)
 
-      testee.activate()
+      testee.deactivate()
 
       expect(testee.getHistory()).toHaveLength(0)
     })
@@ -2918,46 +2920,6 @@ describe(Rundown.name, () => {
       testee.enterRehearsal()
 
       expect(() => testee.getActiveSegment()).toThrow()
-    })
-
-    it('resets all segments', () => {
-      const mockedSegment1: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
-      const mockedSegment2: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
-      const mockedSegment3: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
-
-      const segments: Segment[] = [
-        instance(mockedSegment1),
-        instance(mockedSegment2),
-        instance(mockedSegment3),
-      ]
-
-      const testee: Rundown = new Rundown({
-        segments,
-        mode: RundownMode.INACTIVE,
-      } as RundownInterface)
-
-      testee.enterRehearsal()
-
-      verify(mockedSegment1.reset()).once()
-      verify(mockedSegment2.reset()).once()
-      verify(mockedSegment3.reset()).once()
-    })
-
-    it('resets the history to an empty array', () => {
-      const segment: Segment = EntityMockFactory.createSegment({ parts: [EntityMockFactory.createPart()] })
-      const history: Part[] = [
-        EntityTestFactory.createPart(),
-        EntityTestFactory.createPart(),
-        EntityTestFactory.createPart()
-      ]
-
-      const testee: Rundown = new Rundown({ history, segments: [segment] } as RundownInterface)
-
-      expect(testee.getHistory()).toHaveLength(history.length)
-
-      testee.enterRehearsal()
-
-      expect(testee.getHistory()).toHaveLength(0)
     })
   })
 
