@@ -87,7 +87,8 @@ export class Tv2ActionManifestMapper {
           fileName: data.partDefinition.fields.videoId,
           durationFromIngest: data.duration,
           adLibPix: data.adLibPix,
-          audioMode: data.voLevels ? Tv2AudioMode.VOICE_OVER : Tv2AudioMode.FULL
+          audioMode: data.voLevels ? Tv2AudioMode.VOICE_OVER : Tv2AudioMode.FULL,
+          rundownId: actionManifest.rundownId
         }
       })
   }

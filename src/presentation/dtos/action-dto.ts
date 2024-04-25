@@ -9,6 +9,7 @@ export class ActionDto {
   public readonly type: ActionType
   public readonly metadata?: unknown
   public readonly argument?: ActionArgument
+  public readonly rundownId?: string
 
   constructor(action: Action) {
     this.id = action.id
@@ -17,5 +18,6 @@ export class ActionDto {
     this.type = action.type
     this.metadata = action.metadata
     this.argument = action.argument
+    this.rundownId = action.rundownId
   }
 }
