@@ -42,6 +42,7 @@ export class Tv2CameraActionFactory {
     return {
       id: `cameraAsNextAction_${cameraSource.id}`,
       name: `KAM ${cameraSource.name} PVW`,
+      rank: 0,
       description: `Insert Camera ${cameraSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -127,6 +128,7 @@ export class Tv2CameraActionFactory {
     return {
       id: `cameraAsOnAirAction_${cameraSource.id}`,
       name: `KAM ${cameraSource.name}`,
+      rank: 0,
       description: `Insert and Take Camera ${cameraSource.name}.`,
       type: PartActionType.INSERT_PART_AS_ON_AIR,
       data: {

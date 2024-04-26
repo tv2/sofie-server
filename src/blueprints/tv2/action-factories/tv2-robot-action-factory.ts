@@ -34,6 +34,7 @@ export class Tv2RobotActionFactory {
     return {
       id: 'callRobotPresetAction',
       name: 'Robot Preset',
+      rank: 0,
       description: 'Calls the preset parsed as the argument',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
