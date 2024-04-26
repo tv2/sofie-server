@@ -1,5 +1,5 @@
-import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
-import { Rundown } from '../../model/entities/rundown'
+import {RundownEventBuilder} from '../interfaces/rundown-event-builder'
+import {Rundown} from '../../model/entities/rundown'
 import {
   AutoNextStartedEvent,
   PartCreatedEvent,
@@ -11,6 +11,7 @@ import {
   PartUnsyncedEvent,
   PartUpdatedEvent,
   PieceInsertedEvent,
+  PieceReplacedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
@@ -24,10 +25,10 @@ import {
   SegmentUnsyncedEvent,
   SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
-import { Piece } from '../../model/entities/piece'
-import { Part } from '../../model/entities/part'
-import { PartDto } from '../dtos/part-dto'
-import { PieceDto } from '../dtos/piece-dto'
+import {Piece} from '../../model/entities/piece'
+import {Part} from '../../model/entities/part'
+import {PartDto} from '../dtos/part-dto'
+import {PieceDto} from '../dtos/piece-dto'
 import {
   ActionTriggerEventType,
   ConfigurationEventType,
@@ -35,28 +36,28 @@ import {
   RundownEventType,
   StatusMessageEventType
 } from '../enums/event-type'
-import { SegmentDto } from '../dtos/segment-dto'
-import { Segment } from '../../model/entities/segment'
-import { BasicRundownDto } from '../dtos/basic-rundown-dto'
-import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
-import { ActionTrigger } from '../../model/entities/action-trigger'
+import {SegmentDto} from '../dtos/segment-dto'
+import {Segment} from '../../model/entities/segment'
+import {BasicRundownDto} from '../dtos/basic-rundown-dto'
+import {ActionTriggerEventBuilder} from '../interfaces/action-trigger-event-builder'
+import {ActionTrigger} from '../../model/entities/action-trigger'
 import {
   ActionTriggerCreatedEvent,
   ActionTriggerDeletedEvent,
   ActionTriggerUpdatedEvent
 } from '../value-objects/action-trigger-event'
-import { ActionTriggerDto } from '../dtos/action-trigger-dto'
-import { RundownDto } from '../dtos/rundown-dto'
-import { Media } from '../../model/entities/media'
-import { MediaDto } from '../dtos/media-dto'
-import { MediaEventBuilder } from '../interfaces/media-event-builder'
-import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
-import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
-import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
-import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
-import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
-import { StatusMessage } from '../../model/entities/status-message'
-import { StatusMessageEvent } from '../value-objects/status-message-event'
+import {ActionTriggerDto} from '../dtos/action-trigger-dto'
+import {RundownDto} from '../dtos/rundown-dto'
+import {Media} from '../../model/entities/media'
+import {MediaDto} from '../dtos/media-dto'
+import {MediaEventBuilder} from '../interfaces/media-event-builder'
+import {MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent} from '../value-objects/media-event'
+import {ConfigurationEventBuilder} from '../interfaces/configuration-event-builder'
+import {ShelfConfiguration} from '../../model/entities/shelf-configuration'
+import {ShelfConfigurationUpdatedEvent} from '../value-objects/configuration-event'
+import {StatusMessageEventBuilder} from '../interfaces/status-message-event-builder'
+import {StatusMessage} from '../../model/entities/status-message'
+import {StatusMessageEvent} from '../value-objects/status-message-event'
 
 export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
@@ -146,6 +147,18 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       segmentId,
       partId: piece.getPartId(),
       piece: new PieceDto(piece),
+    }
+  }
+
+  public buildPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPiece: Piece, newPiece: Piece): PieceReplacedEvent {
+    return {
+      type: RundownEventType.PIECE_REPLACED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId,
+      partId: newPiece.getPartId(),
+      replacedPiece: new PieceDto(replacedPiece),
+      newPiece: new PieceDto(newPiece)
     }
   }
 

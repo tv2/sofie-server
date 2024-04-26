@@ -13,6 +13,7 @@ export interface RundownEventEmitter {
   emitPartInsertedAsOnAirEvent(rundown: Rundown, part: Part): void
   emitPartInsertedAsNextEvent(rundown: Rundown, part: Part): void
   emitPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): void
+  emitPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPiece: Piece, newPiece: Piece): void
   emitInfinitePiecesUpdatedEvent(rundown: Rundown): void
 
   emitRundownCreated(rundown: Rundown): void
