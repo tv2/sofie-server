@@ -1,7 +1,6 @@
 import { ActionService } from './interfaces/action-service'
 import {
   Action,
-  ActionManifest,
   MutateActionMethods,
   MutateActionType,
   MutateActionWithArgumentsMethods,
@@ -12,8 +11,6 @@ import {
   PieceAction
 } from '../../model/entities/action'
 import { Blueprint } from '../../model/value-objects/blueprint'
-import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
-import { Configuration } from '../../model/entities/configuration'
 import { ActionRepository } from '../../data-access/repositories/interfaces/action-repository'
 import { PartActionType, PieceActionType } from '../../model/enums/action-type'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
@@ -22,44 +19,17 @@ import { Part, PartInterface } from '../../model/entities/part'
 import { Piece, PieceInterface } from '../../model/entities/piece'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
-import { ActionManifestRepository } from '../../data-access/repositories/interfaces/action-manifest-repository'
 import { MediaRepository } from '../../data-access/repositories/interfaces/MediaRepository'
 import { Media } from '../../model/entities/media'
 
 export class ExecuteActionService implements ActionService {
   constructor(
-    private readonly configurationRepository: ConfigurationRepository,
     private readonly actionRepository: ActionRepository,
-    private readonly actionManifestRepository: ActionManifestRepository,
     private readonly rundownRepository: RundownRepository,
     private readonly mediaRepository: MediaRepository,
     private readonly rundownService: RundownService,
     private readonly blueprint: Blueprint
   ) {}
-
-  /**
-   * Fetches all Actions that are not associated with a Rundown
-   */
-  public async getActions(): Promise<Action[]> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    // TODO: The Actions should be generated on ingest. Move them once we control ingest.
-    const actions: Action[] = this.blueprint.generateActions(configuration, [])
-    await this.actionRepository.saveActions(actions)
-    return actions
-  }
-
-  /**
-   * Fetches all Actions that are not associated with a Rundown plus all Rundown specific Actions for the parsed RundownId
-   */
-  public async getActionsForRundown(rundownId: string): Promise<Action[]> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests(rundownId)
-    // TODO: The Actions should be generated on ingest. Move them once we control ingest.
-    const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
-    await this.actionRepository.deleteActionsForRundown(rundownId)
-    await this.actionRepository.saveActions(actions)
-    return actions
-  }
 
   public async executeAction(actionId: string, rundownId: string, actionArguments?: unknown): Promise<void> {
     const action: Action = await this.actionRepository.getAction(actionId)

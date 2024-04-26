@@ -50,6 +50,7 @@ export class ControllerFacade {
   private static createActionController(): ActionController {
     return new ActionController(
       ServiceFacade.createActionService(),
+      RepositoryFacade.createActionRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )

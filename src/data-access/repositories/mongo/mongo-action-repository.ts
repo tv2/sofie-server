@@ -27,6 +27,18 @@ export class MongoActionRepository extends BaseMongoRepository implements Action
     return action
   }
 
+  public async getActions(): Promise<Action[]> {
+    this.assertDatabaseConnection(this.getActions.name)
+    return await this.getCollection().find<Action>({ rundownId: { $exists: false } }).toArray()
+  }
+
+  public async getActionsForRundown(rundownId:string): Promise<Action[]> {
+    this.assertDatabaseConnection(this.getActionsForRundown.name)
+    const systemActions: Action[] = await this.getActions()
+    const rundownActions: Action[] = await this.getCollection().find<Action>({ rundownId: rundownId }).toArray()
+    return systemActions.concat(rundownActions)
+  }
+
   public async saveActions(actions: Action[]): Promise<void> {
     this.assertDatabaseConnection(this.saveActions.name)
     await Promise.all(

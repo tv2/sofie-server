@@ -19,6 +19,13 @@ import { IngestedRundownRepository } from '../../data-access/repositories/interf
 import { BasicRundown } from '../../model/entities/basic-rundown'
 import { Logger } from '../../logger/logger'
 import { PieceRepository } from '../../data-access/repositories/interfaces/piece-repository'
+import { ActionManifestRepository } from '../../data-access/repositories/interfaces/action-manifest-repository'
+import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
+import { Configuration } from '../../model/entities/configuration'
+import { Action, ActionManifest } from '../../model/entities/action'
+import { ActionRepository } from '../../data-access/repositories/interfaces/action-repository'
+import { Blueprint } from '../../model/value-objects/blueprint'
+import { ActionEventEmitter } from './interfaces/action-event-emitter'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
@@ -33,8 +40,13 @@ export class IngestDataChangedService implements DataChangeService {
     partRepository: PartRepository,
     pieceRepository: PieceRepository,
     timelineRepository: TimelineRepository,
+    actionManifestRepository: ActionManifestRepository,
+    actionRepository: ActionRepository,
+    configurationRepository: ConfigurationRepository,
+    blueprint: Blueprint,
     timelineBuilder: TimelineBuilder,
     rundownEventEmitter: RundownEventEmitter,
+    actionEventEmitter: ActionEventEmitter,
     ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
@@ -49,8 +61,13 @@ export class IngestDataChangedService implements DataChangeService {
         partRepository,
         pieceRepository,
         timelineRepository,
+        actionManifestRepository,
+        actionRepository,
+        configurationRepository,
+        blueprint,
         timelineBuilder,
         rundownEventEmitter,
+        actionEventEmitter,
         ingestedEntityToEntityMapper,
         logger,
         rundownChangeListener,
@@ -66,7 +83,8 @@ export class IngestDataChangedService implements DataChangeService {
   private readonly logger: Logger
   private isExecutingEvent: boolean = false
   private lastBulkExecutionStartTimestamp: number = 0
-  private readonly rundownIdsToBuild: Set<string> = new Set<string>()
+  private readonly rundownIdsToBuild: Set<string> = new Set()
+  private readonly rundownIdsToGenerateActionsFor: Set<string> = new Set()
 
   private timerId: NodeJS.Timeout | undefined
 
@@ -77,8 +95,13 @@ export class IngestDataChangedService implements DataChangeService {
     private readonly partRepository: PartRepository,
     private readonly pieceRepository: PieceRepository,
     private readonly timelineRepository: TimelineRepository,
+    private readonly actionManifestRepository: ActionManifestRepository,
+    private readonly actionRepository: ActionRepository,
+    private readonly configurationRepository: ConfigurationRepository,
+    private readonly blueprint: Blueprint,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly eventEmitter: RundownEventEmitter,
+    private readonly actionEventEmitter: ActionEventEmitter,
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
@@ -254,6 +277,8 @@ export class IngestDataChangedService implements DataChangeService {
     }
     const eventCallback: (() => Promise<void>) | undefined = this.getEventToExecute()
     if (!eventCallback) {
+      void this.generateActions()
+
       return
     }
 
@@ -273,6 +298,23 @@ export class IngestDataChangedService implements DataChangeService {
       .find(([, events]) => events.length > 0)?.[1]
 
     return events?.shift()
+  }
+
+  private async generateActions(): Promise<void> {
+    for (const rundownId of this.rundownIdsToGenerateActionsFor) {
+      await this.generateActionsForRundown(rundownId)
+    }
+    this.rundownIdsToGenerateActionsFor.clear()
+  }
+
+  private async generateActionsForRundown(rundownId: string): Promise<void> {
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests(rundownId)
+    const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
+    this.actionEventEmitter.emitActionsUpdatedEvent(actions, rundownId)
+
+    await this.actionRepository.deleteActionsForRundown(rundownId)
+    await this.actionRepository.saveActions(actions)
   }
 
   private async buildRundowns(): Promise<void> {
@@ -344,6 +386,7 @@ export class IngestDataChangedService implements DataChangeService {
 
   private async persistRundown(rundown: Rundown): Promise<void> {
     this.rundownIdsToBuild.add(rundown.id)
+    this.rundownIdsToGenerateActionsFor.add(rundown.id)
     await this.rundownRepository.saveRundown(rundown)
   }
 
