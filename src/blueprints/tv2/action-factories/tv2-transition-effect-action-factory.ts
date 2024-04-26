@@ -350,18 +350,18 @@ export class Tv2TransitionEffectActionFactory {
 
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
-        const cutTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObject(sourceInput)
-        action.data.pieceInterface.timelineObjects.push(cutTransitionTimelineObject)
+        const cutTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObjects(sourceInput)
+        action.data.pieceInterface.timelineObjects.push(...cutTransitionTimelineObjects)
         break
       }
       case TransitionEffectType.MIX: {
-        const mixTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames)
-        action.data.pieceInterface.timelineObjects.push(mixTransitionTimelineObject)
+        const mixTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames)
+        action.data.pieceInterface.timelineObjects.push(...mixTransitionTimelineObjects)
         break
       }
       case TransitionEffectType.DIP: {
-        const dipTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObject(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
-        action.data.pieceInterface.timelineObjects.push(dipTransitionTimelineObject)
+        const dipTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
+        action.data.pieceInterface.timelineObjects.push(...dipTransitionTimelineObjects)
         break
       }
       case TransitionEffectType.BREAKER: {

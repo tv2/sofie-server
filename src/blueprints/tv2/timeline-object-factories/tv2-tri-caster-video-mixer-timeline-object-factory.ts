@@ -40,7 +40,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
   constructor(private readonly atemToTriCasterSplitScreenConverter: AtemToTriCasterSplitScreenConverter, logger: Tv2Logger) {
     this.logger = logger.tag(Tv2TriCasterVideoMixerTimelineObjectFactory.name)
   }
-  
+
   public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): TriCasterMixEffectTimelineObject {
     return this.createTriCasterMeTimelineObjectForLayer(
       `${TRI_CASTER_PREFIX}program`,
@@ -313,17 +313,20 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createCutTransitionEffectTimelineObject(sourceInput: number): TriCasterMixEffectTimelineObject {
-    return this.createTransitionEffectTimelineObject(sourceInput, TriCasterTransition.CUT)
+  public createCutTransitionEffectTimelineObjects(sourceInput: number): TriCasterMixEffectTimelineObject[] {
+    return [
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, sourceInput, TriCasterTransition.CUT),
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, sourceInput, TriCasterTransition.CUT)
+    ]
   }
 
-  private createTransitionEffectTimelineObject(sourceInput: number, transitionEffect: TriCasterTransition, durationInFrames?: number): TriCasterMixEffectTimelineObject {
+  private createTransitionEffectTimelineObject(layer: Tv2TriCasterLayer, sourceInput: number, transitionEffect: TriCasterTransition, durationInFrames?: number): TriCasterMixEffectTimelineObject {
     return {
-      id: '',
+      id: `${layer}_${transitionEffect}`,
       enable: {
         start: 0
       },
-      layer: Tv2TriCasterLayer.PROGRAM,
+      layer,
       priority: 10,
       content: {
         deviceType: DeviceType.TRICASTER,
@@ -338,13 +341,19 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createMixTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number): TriCasterMixEffectTimelineObject {
-    return this.createTransitionEffectTimelineObject(sourceInput, TriCasterTransition.FADE, durationInFrames)
+  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number): TriCasterMixEffectTimelineObject[] {
+    return [
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, sourceInput, TriCasterTransition.FADE, durationInFrames),
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, sourceInput, TriCasterTransition.FADE, durationInFrames)
+    ]
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createDipTransitionEffectTimelineObject(sourceInput: number, durationInFrames: number, _dipInput: number): TriCasterMixEffectTimelineObject {
-    return this.createTransitionEffectTimelineObject(sourceInput, TriCasterTransition.DIP, durationInFrames)
+  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, _dipInput: number): TriCasterMixEffectTimelineObject[] {
+    return [
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, sourceInput, TriCasterTransition.DIP, durationInFrames),
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, sourceInput, TriCasterTransition.DIP, durationInFrames)
+    ]
   }
 
   public getProgramLayer(): string {
