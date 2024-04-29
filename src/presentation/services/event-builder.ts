@@ -150,14 +150,14 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     }
   }
 
-  public buildPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPiece: Piece, newPiece: Piece): PieceReplacedEvent {
+  public buildPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPieceId: string, newPiece: Piece): PieceReplacedEvent {
     return {
       type: RundownEventType.PIECE_REPLACED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       segmentId,
       partId: newPiece.getPartId(),
-      replacedPiece: new PieceDto(replacedPiece),
+      replacedPieceId: replacedPieceId,
       newPiece: new PieceDto(newPiece)
     }
   }

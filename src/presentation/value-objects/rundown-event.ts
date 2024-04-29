@@ -57,7 +57,7 @@ export interface PieceInsertedEvent extends PartEvent {
 
 export interface PieceReplacedEvent extends PartEvent {
   type: RundownEventType.PIECE_REPLACED
-  replacedPiece: PieceDto
+  replacedPieceId: string
   newPiece: PieceDto
 }
 
