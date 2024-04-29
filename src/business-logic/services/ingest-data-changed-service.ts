@@ -278,7 +278,6 @@ export class IngestDataChangedService implements DataChangeService {
     const eventCallback: (() => Promise<void>) | undefined = this.getEventToExecute()
     if (!eventCallback) {
       void this.generateActions()
-
       return
     }
 
