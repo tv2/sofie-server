@@ -260,9 +260,10 @@ export class IngestDataChangedService implements DataChangeService {
     this.isExecutingEvent = true
     eventCallback()
       .catch(error => this.logger.data(error).error('Error when executing Ingest event:'))
+      .then(() => this.buildRundowns())
+      .catch(error => this.logger.data(error).error('Failed building rundowns.'))
       .finally(() => {
         this.isExecutingEvent = false
-        void this.buildRundowns()
         this.executeNextEvent()
       })
   }

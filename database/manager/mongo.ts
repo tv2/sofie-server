@@ -158,11 +158,12 @@ function dropMongoContainer(): void {
 }
 
 function spyOnDatabase(): void {
-  void new MongoClient('mongodb://localhost:3001/sofie?replicaSet=rs0')
+  new MongoClient('mongodb://localhost:3001/sofie?replicaSet=rs0')
     .connect().then( (client) => {
       const changeStream = client.watch()
       changeStream.on('change', (change) => console.dir(change))
     })
+    .catch(error => console.error('Failed connecting to database.', error))
 }
 
 function seedDatabase(): void {
