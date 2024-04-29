@@ -95,6 +95,7 @@ export class Tv2GraphicsActionFactory {
     return {
       id: 'themeOutAction',
       name: 'Theme out',
+      rank: 0,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface
@@ -138,6 +139,7 @@ export class Tv2GraphicsActionFactory {
     return {
       id: 'overlayInitializeAction',
       name: 'Overlay initialize',
+      rank: 0,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface
@@ -159,6 +161,7 @@ export class Tv2GraphicsActionFactory {
     return {
       id: 'continueGraphicsAction',
       name: 'Gfx continue',
+      rank: 0,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface
@@ -181,6 +184,7 @@ export class Tv2GraphicsActionFactory {
     return {
       id: 'clearGraphicsAction',
       name: 'Gfx Clear',
+      rank: 0,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface,
@@ -206,6 +210,7 @@ export class Tv2GraphicsActionFactory {
     return {
       id: 'allOutGraphicsAction',
       name: 'Gfx All Out',
+      rank: 0,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface,
@@ -226,6 +231,7 @@ export class Tv2GraphicsActionFactory {
         id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
         rundownId: graphicsData.rundownId,
         name: `Fullscreen Graphics - ${graphicsData.name}`,
+        rank: graphicsData.rank,
         type: PartActionType.INSERT_PART_AS_NEXT,
         data: {
           partInterface: partInterface,
@@ -390,6 +396,7 @@ export class Tv2GraphicsActionFactory {
     return {
       id: `ident_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
       name: overlayGraphicsData.name,
+      rank: overlayGraphicsData.rank,
       rundownId: overlayGraphicsData.rundownId,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
@@ -427,6 +434,7 @@ export class Tv2GraphicsActionFactory {
     return {
       id: `lower_third_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
       name: overlayGraphicsData.name,
+      rank: overlayGraphicsData.rank,
       rundownId: overlayGraphicsData.rundownId,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {

@@ -32,10 +32,11 @@ export class Tv2ActionManifestMapper {
         const data: Tv2ActionManifestSplitScreenData = actionManifest.data
         const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
         return {
-          name: data.name,
+          name: data.userData.name,
+          rank: data.rank,
           rundownId: actionManifest.rundownId,
-          template: data.config.template,
-          locatorLabels: data.config.labels,
+          template: data.userData.config.template,
+          locatorLabels: data.userData.config.labels,
           sources
         }
       })
@@ -43,17 +44,17 @@ export class Tv2ActionManifestMapper {
 
   private getSplitScreenSourcesFromActionManifestData(data: Tv2ActionManifestSplitScreenData, blueprintConfiguration: Tv2BlueprintConfiguration): Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> {
     const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = new Map()
-    if (data.config.sources.INP1) {
-      sources.set(SplitScreenBoxInput.INPUT_1, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.config.sources.INP1))
+    if (data.userData.config.sources.INP1) {
+      sources.set(SplitScreenBoxInput.INPUT_1, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.userData.config.sources.INP1))
     }
-    if (data.config.sources.INP2) {
-      sources.set(SplitScreenBoxInput.INPUT_2, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.config.sources.INP2))
+    if (data.userData.config.sources.INP2) {
+      sources.set(SplitScreenBoxInput.INPUT_2, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.userData.config.sources.INP2))
     }
-    if (data.config.sources.INP3) {
-      sources.set(SplitScreenBoxInput.INPUT_3, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.config.sources.INP3))
+    if (data.userData.config.sources.INP3) {
+      sources.set(SplitScreenBoxInput.INPUT_3, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.userData.config.sources.INP3))
     }
-    if (data.config.sources.INP4) {
-      sources.set(SplitScreenBoxInput.INPUT_4, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.config.sources.INP4))
+    if (data.userData.config.sources.INP4) {
+      sources.set(SplitScreenBoxInput.INPUT_4, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.userData.config.sources.INP4))
     }
     return sources
   }
@@ -83,11 +84,12 @@ export class Tv2ActionManifestMapper {
       .map(actionManifest => {
         const data: Tv2ActionManifestVideoClipData = actionManifest.data
         return {
-          name: data.partDefinition.storyName,
-          fileName: data.partDefinition.fields.videoId,
-          durationFromIngest: data.duration,
-          adLibPix: data.adLibPix,
-          audioMode: data.voLevels ? Tv2AudioMode.VOICE_OVER : Tv2AudioMode.FULL,
+          name: data.userData.partDefinition.storyName,
+          rank: data.rank,
+          fileName: data.userData.partDefinition.fields.videoId,
+          durationFromIngest: data.userData.duration,
+          adLibPix: data.userData.adLibPix,
+          audioMode: data.userData.voLevels ? Tv2AudioMode.VOICE_OVER : Tv2AudioMode.FULL,
           rundownId: actionManifest.rundownId
         }
       })
@@ -99,9 +101,10 @@ export class Tv2ActionManifestMapper {
       .map(actionManifest => {
         const data: Tv2ActionManifestFullscreenGraphicsData = actionManifest.data
         return {
-          name: data.name,
+          name: data.userData.name,
+          rank: data.rank,
           rundownId: actionManifest.rundownId,
-          vcpId: data.vcpid
+          vcpId: data.userData.vcpid
         }
       })
   }
@@ -113,6 +116,7 @@ export class Tv2ActionManifestMapper {
         const data: Tv2ActionManifestOverlayGraphicsData = actionManifest.data
         return {
           name: data.name,
+          rank: data.rank,
           rundownId: actionManifest.rundownId,
           sourceLayerId: data.sourceLayerId,
           templateName: this.getTemplateName(data.name),

@@ -86,6 +86,7 @@ export class Tv2VideoClipActionFactory {
     return {
       id: `videoClipAsNextAction_${videoClipData.name}_${videoClipData.fileName}`, // TODO: Utilize information about the Segment once we control ingest
       name: videoClipData.name,
+      rank: videoClipData.rank,
       rundownId: videoClipData.rundownId,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
