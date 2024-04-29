@@ -83,7 +83,7 @@ export class IngestDataChangedService implements DataChangeService {
   private readonly logger: Logger
   private isExecutingEvent: boolean = false
   private lastBulkExecutionStartTimestamp: number = 0
-  private readonly rundownIdsToBuild: Set<string> = new Set()
+  private readonly rundownIdsToBuildFor: Set<string> = new Set()
   private readonly rundownIdsToGenerateActionsFor: Set<string> = new Set()
 
   private timerId: NodeJS.Timeout | undefined
@@ -277,7 +277,7 @@ export class IngestDataChangedService implements DataChangeService {
     }
     const eventCallback: (() => Promise<void>) | undefined = this.getEventToExecute()
     if (!eventCallback) {
-      void this.generateActions()
+      this.generateActions().catch(error => this.logger.data(error).error('Failed generating actions for ingest batch.'))
       return
     }
 
@@ -300,10 +300,12 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private async generateActions(): Promise<void> {
-    for (const rundownId of this.rundownIdsToGenerateActionsFor) {
-      await this.generateActionsForRundown(rundownId)
-    }
-    this.rundownIdsToGenerateActionsFor.clear()
+    await Promise.all(
+      [...this.rundownIdsToGenerateActionsFor].map(async (rundownId) => {
+        await this.generateActionsForRundown(rundownId)
+        this.rundownIdsToGenerateActionsFor.delete(rundownId)
+      })
+    )
   }
 
   private async generateActionsForRundown(rundownId: string): Promise<void> {
@@ -321,7 +323,7 @@ export class IngestDataChangedService implements DataChangeService {
       return
     }
 
-    for (const rundownId of this.rundownIdsToBuild.values()) {
+    for (const rundownId of this.rundownIdsToBuildFor.values()) {
       try {
         const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
         if (!rundown.isActive()) {
@@ -337,7 +339,7 @@ export class IngestDataChangedService implements DataChangeService {
         this.logger.data(exception).error('Error when trying to build Rundowns for bulk')
       }
     }
-    this.rundownIdsToBuild.clear()
+    this.rundownIdsToBuildFor.clear()
   }
 
   private isEventQueueEmpty(): boolean {
@@ -384,7 +386,7 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private async persistRundown(rundown: Rundown): Promise<void> {
-    this.rundownIdsToBuild.add(rundown.id)
+    this.rundownIdsToBuildFor.add(rundown.id)
     this.rundownIdsToGenerateActionsFor.add(rundown.id)
     await this.rundownRepository.saveRundown(rundown)
   }

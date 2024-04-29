@@ -29,7 +29,7 @@ export class MongoActionRepository extends BaseMongoRepository implements Action
 
   public async getActions(): Promise<Action[]> {
     this.assertDatabaseConnection(this.getActions.name)
-    return await this.getCollection().find<Action>({ rundownId: { $exists: false } }).toArray()
+    return this.getCollection().find<Action>({ rundownId: { $exists: false } }).toArray()
   }
 
   public async getActionsForRundown(rundownId:string): Promise<Action[]> {
