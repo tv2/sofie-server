@@ -172,6 +172,7 @@ export class Tv2SplitScreenActionFactory {
       return {
         id: `splitScreenLayoutAsNextAction_${splitScreenConfiguration.name}`,
         name: splitScreenConfiguration.name,
+        rank: 0,
         description: '',
         type: PartActionType.INSERT_PART_AS_NEXT,
         data: {
@@ -255,6 +256,7 @@ export class Tv2SplitScreenActionFactory {
           return {
             id: `insert_${this.replaceWhiteSpaceWithUnderscore(name)}_${this.replaceWhiteSpaceWithUnderscore(source.name)}_to_split_screen_input_${this.createDisplayIndex(inputIndex)}_action`,
             name: `Insert ${name} ${source.name} in DVE input ${this.createDisplayIndex(inputIndex)}`,
+            rank: 0,
             description: `Insert ${name} ${source.name} in DVE input ${this.createDisplayIndex(inputIndex)}`,
             type: PieceActionType.REPLACE_PIECE,
             data: {
@@ -404,6 +406,7 @@ export class Tv2SplitScreenActionFactory {
       return {
         id: `plannedSplitScreenAsNextAction_${data.name.replace(/\s/g, '')}`,
         name: data.template,
+        rank: data.rank,
         rundownId: data.rundownId,
         description: '',
         type: PartActionType.INSERT_PART_AS_NEXT,
@@ -439,6 +442,7 @@ export class Tv2SplitScreenActionFactory {
     return {
       id: 'recall_last_split_screen_action',
       name: 'Recall DVE',
+      rank: 0,
       description: 'Recalls the last planned DVE that has been on Air',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
@@ -540,6 +544,7 @@ export class Tv2SplitScreenActionFactory {
     return {
       id: `insert_last_video_clip_to_split_screen_input_${this.createDisplayIndex(inputIndex)}${audioMode === Tv2AudioMode.VOICE_OVER ? '_vo' : ''}_action`,
       name: `Insert last Video ${audioMode === Tv2AudioMode.VOICE_OVER ? 'Voice Over ' : ''}Clip in DVE input ${this.createDisplayIndex(inputIndex)}`,
+      rank: 0,
       description: `Insert last Video Clip in DVE input ${this.createDisplayIndex(inputIndex)}`,
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
@@ -605,6 +610,7 @@ export class Tv2SplitScreenActionFactory {
 
     const videoClipData: Tv2VideoClipManifestData = {
       name: '',
+      rank: 0,
       fileName: fileContent.fileName,
       durationFromIngest: 0,
       adLibPix: audioMode === Tv2AudioMode.VOICE_OVER,

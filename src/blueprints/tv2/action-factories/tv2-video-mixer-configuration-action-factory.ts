@@ -42,6 +42,7 @@ export class Tv2VideoMixerConfigurationActionFactory {
     return {
       id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Action`,
       name: `Downstream Keyer ${downstreamKeyerNumber} ${actionName}`,
+      rank: 0,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface

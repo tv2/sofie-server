@@ -178,6 +178,7 @@ export class Tv2TransitionEffectActionFactory {
     return {
       id: `${effectName}_transition_action_${actionType.toString()}`,
       name: this.mapToTransitionEffectNameForActionType(actionType, effectName),
+      rank: 0,
       description: this.mapToTransitionEffectDescriptionForActionType(actionType, effectName),
       type: actionType,
       data: {
@@ -240,6 +241,7 @@ export class Tv2TransitionEffectActionFactory {
     return {
       id: `mix_transition_action_${actionType.toString()}`,
       name: this.mapToTransitionEffectNameForActionType(actionType, SpecialEffectName.MIX),
+      rank: 0,
       description: this.mapToTransitionEffectDescriptionForActionType(actionType, SpecialEffectName.MIX),
       type: actionType,
       data: {
@@ -268,6 +270,7 @@ export class Tv2TransitionEffectActionFactory {
     return {
       id: `dip_transition_action_${actionType.toString()}`,
       name: this.mapToTransitionEffectNameForActionType(actionType, SpecialEffectName.DIP),
+      rank: 0,
       description: this.mapToTransitionEffectDescriptionForActionType(actionType, SpecialEffectName.DIP),
       type: actionType,
       data: {

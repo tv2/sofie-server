@@ -55,6 +55,7 @@ export class Tv2ReplayActionFactory {
     return {
       id: `insert_${sanitizedName}_VO_as_next_part_action`,
       name: `${source.name} VO`,
+      rank: 0,
       description: '',
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -82,6 +83,7 @@ export class Tv2ReplayActionFactory {
     return {
       id: `insert_${sanitizedName}_as_next_part_action`,
       name: source.name,
+      rank: 0,
       description: '',
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -163,6 +165,7 @@ export class Tv2ReplayActionFactory {
     return {
       id: `insert_studio_aux_${sanitizedName}_action`,
       name: `${source.name} Studio AUX`,
+      rank: 0,
       description: '',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
@@ -205,6 +208,7 @@ export class Tv2ReplayActionFactory {
     return {
       id: `insert_viz_aux_${sanitizedName}_action`,
       name: `${source.name} Viz AUX`,
+      rank: 0,
       description: '',
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {

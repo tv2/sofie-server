@@ -69,6 +69,7 @@ export class Tv2RemoteActionFactory {
     return {
       id: `remoteAsNextAction_${remoteSource.name}`.replaceAll(' ', ''),
       name: `LIVE ${remoteSource.name}`,
+      rank: 0,
       description: `Insert LIVE ${remoteSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -153,6 +154,7 @@ export class Tv2RemoteActionFactory {
     return {
       id: 'recall_last_planned_remote_as_next_action',
       name: 'Recall last Live',
+      rank: 0,
       description: 'Recalls the last live that has been on air.',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {

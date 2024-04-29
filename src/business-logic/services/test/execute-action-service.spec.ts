@@ -355,6 +355,7 @@ function createPartAction(actionType: PartActionType): PartAction {
   return {
     id: 'actionId',
     name: 'someAction',
+    rank: 0,
     type: actionType,
     data: {
       partInterface: {
@@ -369,6 +370,7 @@ function createPieceAction(actionType: PieceActionType): PieceAction {
   return {
     id: 'actionId',
     name: 'someAction',
+    rank: 0,
     type: actionType,
     data: {
       pieceInterface: {
