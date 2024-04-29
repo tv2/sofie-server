@@ -14,6 +14,9 @@ import { ConfigurationEventObserver } from '../interfaces/configuration-event-ob
 import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
 import { StatusMessageEventService } from '../services/status-message-event-service'
 import { StatusMessageEventEmitter } from '../../business-logic/services/interfaces/status-message-event-emitter'
+import { ActionEventObserver } from '../interfaces/action-event-observer'
+import { ActionEventService } from '../services/action-event-service'
+import { ActionEventEmitter } from '../../business-logic/services/interfaces/action-event-emitter'
 
 export class EventEmitterFacade {
 
@@ -27,6 +30,14 @@ export class EventEmitterFacade {
 
   public static createActionTriggerEventEmitter(): ActionTriggerEventEmitter {
     return ActionTriggerEventService.getInstance(EventBuilderFacade.createActionTriggerEventBuilder())
+  }
+
+  public static createActionEventEmitter(): ActionEventEmitter {
+    return ActionEventService.getInstance(EventBuilderFacade.createActionEventBuilder())
+  }
+
+  public static createActionEventObserver(): ActionEventObserver {
+    return ActionEventService.getInstance(EventBuilderFacade.createActionEventBuilder())
   }
 
   public static createActionTriggerEventObserver(): ActionTriggerEventObserver {
