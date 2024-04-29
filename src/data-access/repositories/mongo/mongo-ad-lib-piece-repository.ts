@@ -7,10 +7,11 @@ import { MongoId } from './mongo-entity-converter'
 
 const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
 
-interface AdLibPiece {
+interface MongoAdLibPiece {
   sourceLayerId: string
   rundownId: string
   name: string
+  _rank: number
   expectedDuration: number | null
 }
 
@@ -26,7 +27,7 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
 
   public async getActionManifests(rundownId: string): Promise<ActionManifest[]> {
     this.assertDatabaseConnection(this.getActionManifests.name)
-    const mongoAdLibPieces: AdLibPiece[] = await this.getCollection().find<AdLibPiece>({
+    const mongoAdLibPieces: MongoAdLibPiece[] = await this.getCollection().find<MongoAdLibPiece>({
       rundownId: rundownId,
       ...this.filterOutCommentatorManifests()
     }).toArray()
@@ -38,12 +39,13 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
     return { uniquenessId: { $not: { $regex: '.*_commentator$' } } }
   }
 
-  private mapToActionManifest(adLibPiece: AdLibPiece): ActionManifest {
+  private mapToActionManifest(adLibPiece: MongoAdLibPiece): ActionManifest {
     return {
       actionId: adLibPiece.sourceLayerId,
       rundownId: adLibPiece.rundownId,
       data: {
         name: adLibPiece.name,
+        rank: adLibPiece._rank,
         expectedDuration: adLibPiece.expectedDuration ?? undefined,
         sourceLayerId: adLibPiece.sourceLayerId
       },

@@ -8,47 +8,56 @@ export type Tv2ActionManifestData = Tv2ActionManifestVideoClipData
 | Tv2ActionManifestFullscreenGraphicsData
 | Tv2ActionManifestOverlayGraphicsData
 /**
- * This corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Video Clips.
+ * The 'userData' field corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Video Clips.
  * The attributes need to match the attributes in the database
  */
 export interface Tv2ActionManifestVideoClipData {
-  adLibPix: boolean
-  voLevels: boolean
-  duration: number
-  partDefinition: {
-    storyName: string
-    fields: {
-      videoId: string
+  rank: number
+  userData: {
+    adLibPix: boolean
+    voLevels: boolean
+    duration: number
+    partDefinition: {
+      storyName: string
+      fields: {
+        videoId: string
+      }
     }
   }
 }
 
 /**
- * This corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with split screens.
+ * The 'userData' field corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with split screens.
  * The attributes need to match the attributes in the database.
  */
 export interface Tv2ActionManifestSplitScreenData {
-  name: string
-  pieceType: Tv2PieceType
-  config: {
-    template: string
-    labels: string[]
-    sources: {
-      [SplitScreenBoxInput.INPUT_1]?: Tv2ActionManifestSplitScreenSource,
-      [SplitScreenBoxInput.INPUT_2]?: Tv2ActionManifestSplitScreenSource,
-      [SplitScreenBoxInput.INPUT_3]?: Tv2ActionManifestSplitScreenSource,
-      [SplitScreenBoxInput.INPUT_4]?: Tv2ActionManifestSplitScreenSource,
+  rank: number
+  userData: {
+    name: string
+    pieceType: Tv2PieceType
+    config: {
+      template: string
+      labels: string[]
+      sources: {
+        [SplitScreenBoxInput.INPUT_1]?: Tv2ActionManifestSplitScreenSource,
+        [SplitScreenBoxInput.INPUT_2]?: Tv2ActionManifestSplitScreenSource,
+        [SplitScreenBoxInput.INPUT_3]?: Tv2ActionManifestSplitScreenSource,
+        [SplitScreenBoxInput.INPUT_4]?: Tv2ActionManifestSplitScreenSource,
+      }
     }
   }
 }
 
 /**
- * This corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Fullscreen Graphics.
+ * The 'userData' field corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Fullscreen Graphics.
  * The attributes need to match the attributes in the database.
  */
 export interface Tv2ActionManifestFullscreenGraphicsData {
-  vcpid: number
-  name: string,
+  rank: number
+  userData: {
+    vcpid: number
+    name: string
+  }
 }
 
 /**
@@ -56,6 +65,7 @@ export interface Tv2ActionManifestFullscreenGraphicsData {
  * The attributes need to match the attributes in the database.
  */
 export interface Tv2ActionManifestOverlayGraphicsData {
+  rank: number
   sourceLayerId: Tv2SourceLayer
   name: string,
   expectedDuration?: number
@@ -81,6 +91,7 @@ export enum TvActionManifestSplitScreenSourceType {
 
 export interface Tv2VideoClipManifestData {
   name: string // userData.partDefinition.storyName
+  rank: number
   fileName: string // userData.partDefinition.videoId
   durationFromIngest: number // userData.duration
   adLibPix: boolean // userData.adLibPix // What does "adLibPix" mean?
@@ -91,6 +102,7 @@ export interface Tv2VideoClipManifestData {
 export interface Tv2SplitScreenManifestData {
   rundownId: string
   name: string
+  rank: number
   template: string
   locatorLabels: string[]
   sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound>
@@ -100,12 +112,14 @@ export interface Tv2FullscreenGraphicsManifestData {
   rundownId: string
   vcpId: number
   name: string
+  rank: number
 }
 
 export interface Tv2OverlayGraphicsManifestData {
   rundownId: string
   sourceLayerId: Tv2SourceLayer
   name: string
+  rank: number
   templateName: string
   displayText: string
   expectedDuration?: number
