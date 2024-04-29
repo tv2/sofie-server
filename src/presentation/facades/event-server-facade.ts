@@ -7,6 +7,7 @@ export class EventServerFacade {
   public static createEventServer(): EventServer {
     return WebSocketEventServer.getInstance(
       EventEmitterFacade.createRundownEventObserver(),
+      EventEmitterFacade.createActionEventObserver(),
       EventEmitterFacade.createActionTriggerEventObserver(),
       EventEmitterFacade.createMediaEventObserver(),
       EventEmitterFacade.createConfigurationEventObserver(),

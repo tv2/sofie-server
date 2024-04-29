@@ -4,6 +4,7 @@ import { Request, Response } from 'express'
 import { ActionService } from '../../../business-logic/services/interfaces/action-service'
 import { HttpErrorHandler } from '../../interfaces/http-error-handler'
 import { HttpResponseFormatter } from '../../interfaces/http-response-formatter'
+import { ActionRepository } from '../../../data-access/repositories/interfaces/action-repository'
 
 describe(ActionController.name, () => {
   describe(ActionController.prototype.executeAction.name, () => {
@@ -43,8 +44,10 @@ describe(ActionController.name, () => {
 })
 
 function createTestee(params?: {
-  actionService?: ActionService
+  actionService?: ActionService,
+  actionRepository?: ActionRepository
 }): ActionController {
   const actionServiceMock: ActionService = params?.actionService ?? mock<ActionService>()
-  return new ActionController(instance(actionServiceMock), instance(mock<HttpErrorHandler>()), instance(mock<HttpResponseFormatter>()))
+  const actionRepositoryMock: ActionRepository = params?.actionRepository ?? mock<ActionRepository>()
+  return new ActionController(instance(actionServiceMock), instance(actionRepositoryMock), instance(mock<HttpErrorHandler>()), instance(mock<HttpResponseFormatter>()))
 }
