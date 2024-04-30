@@ -67,6 +67,7 @@ export interface MongoSegment extends MongoId {
   isOnAir: boolean
   isNext: boolean
   isUnsynced: boolean
+  referenceTag?: string
   budgetDuration?: number
   executedAtEpochTime?: number
 }
@@ -291,6 +292,7 @@ export class MongoEntityConverter {
       rundownId: segment.rundownId,
       name: segment.name,
       rank: segment.rank,
+      referenceTag: segment.referenceTag,
       isHidden: segment.isHidden,
       metadata: segment.metadata,
       partIds: segment.getParts().map(part => part.id),

@@ -6,6 +6,7 @@ export interface IngestedSegment {
   readonly name: string
   readonly rank: number
   readonly isHidden: boolean
+  readonly referenceTag?: string
   readonly metadata?: unknown
   readonly budgetDuration?: number
   readonly ingestedParts: Readonly<IngestedPart[]>
