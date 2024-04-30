@@ -51,7 +51,7 @@ import {
 
 interface ActionFactoryInstance<T> {
   factory: T,
-  shouldFactoryBeRecreated: (configuration: Tv2BlueprintConfiguration) => boolean
+  shouldFactoryBeRecreated: (configuration?: Tv2BlueprintConfiguration) => boolean
 }
 
 export class Tv2ActionFactoryProvider {
@@ -67,7 +67,7 @@ export class Tv2ActionFactoryProvider {
   private replayActionFactoryInstance: ActionFactoryInstance<Tv2ReplayActionFactory>
   private robotActionFactoryInstance: ActionFactoryInstance<Tv2RobotActionFactory>
 
-  public createCameraActionFactory(configuration: Tv2BlueprintConfiguration): Tv2CameraActionFactory {
+  public createCameraActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2CameraActionFactory {
     this.cameraActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.cameraActionFactoryInstance,
       () => {
@@ -76,7 +76,7 @@ export class Tv2ActionFactoryProvider {
           this.createAudioTimelineObjectFactory()
         )
       },
-      (c: Tv2BlueprintConfiguration): boolean => {
+      (c?: Tv2BlueprintConfiguration): boolean => {
         return this.didVideoMixerTypeChange(c, configuration)
       },
       configuration
@@ -88,8 +88,8 @@ export class Tv2ActionFactoryProvider {
   private getUpdatedActionFactoryInstance<T>(
     actionFactoryInstance: ActionFactoryInstance<T> | undefined,
     createFactoryCallback: () => T,
-    shouldFactoryBeRecreatedCallback: (configuration: Tv2BlueprintConfiguration) => boolean,
-    configuration: Tv2BlueprintConfiguration
+    shouldFactoryBeRecreatedCallback: (configuration?: Tv2BlueprintConfiguration) => boolean,
+    configuration?: Tv2BlueprintConfiguration
   ): ActionFactoryInstance<T> {
     if (actionFactoryInstance && !actionFactoryInstance.shouldFactoryBeRecreated(configuration)) {
       return actionFactoryInstance
@@ -101,11 +101,15 @@ export class Tv2ActionFactoryProvider {
     }
   }
 
-  private didVideoMixerTypeChange(oldConfiguration: Tv2BlueprintConfiguration, newConfiguration: Tv2BlueprintConfiguration): boolean {
-    return oldConfiguration.studio.videoMixerType !== newConfiguration.studio.videoMixerType
+  private didVideoMixerTypeChange(oldConfiguration?: Tv2BlueprintConfiguration, newConfiguration?: Tv2BlueprintConfiguration): boolean {
+    return oldConfiguration?.studio.videoMixerType !== newConfiguration?.studio.videoMixerType
   }
 
-  private createVideoMixerTimelineObjectFactory(configuration: Tv2BlueprintConfiguration): Tv2VideoMixerTimelineObjectFactory {
+  private createVideoMixerTimelineObjectFactory(configuration?: Tv2BlueprintConfiguration): Tv2VideoMixerTimelineObjectFactory {
+    if (!configuration) {
+      return new Tv2AtemVideoMixerTimelineObjectFactory(Tv2LoggerFacade.createLogger())
+    }
+
     switch (configuration.studio.videoMixerType) {
       case DeviceType.ATEM: {
         return new Tv2AtemVideoMixerTimelineObjectFactory(Tv2LoggerFacade.createLogger())
@@ -123,7 +127,7 @@ export class Tv2ActionFactoryProvider {
     return new Tv2SisyfosAudioTimelineObjectFactory()
   }
 
-  public createRemoteActionFactory(configuration: Tv2BlueprintConfiguration): Tv2RemoteActionFactory {
+  public createRemoteActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2RemoteActionFactory {
     this.remoteActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.remoteActionFactoryInstance,
       () => {
@@ -132,7 +136,7 @@ export class Tv2ActionFactoryProvider {
           this.createAudioTimelineObjectFactory()
         )
       },
-      (c: Tv2BlueprintConfiguration): boolean => {
+      (c?: Tv2BlueprintConfiguration): boolean => {
         return this.didVideoMixerTypeChange(c, configuration)
       },
       configuration
@@ -141,7 +145,7 @@ export class Tv2ActionFactoryProvider {
     return this.remoteActionFactoryInstance.factory
   }
 
-  public createTransitionEffectActionFactory(configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectActionFactory {
+  public createTransitionEffectActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2TransitionEffectActionFactory {
     this.transitionEffectActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.transitionEffectActionFactoryInstance,
       () => {
@@ -153,7 +157,7 @@ export class Tv2ActionFactoryProvider {
           Tv2LoggerFacade.createLogger()
         )
       },
-      (c: Tv2BlueprintConfiguration): boolean => {
+      (c?: Tv2BlueprintConfiguration): boolean => {
         return this.didVideoMixerTypeChange(c, configuration)
       },
       configuration
@@ -170,7 +174,7 @@ export class Tv2ActionFactoryProvider {
     return new Tv2AssetPathHelper()
   }
 
-  public createAudioActionFactory(configuration: Tv2BlueprintConfiguration): Tv2AudioActionFactory {
+  public createAudioActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2AudioActionFactory {
     this.audioActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.audioActionFactoryInstance,
       () => {
@@ -188,7 +192,7 @@ export class Tv2ActionFactoryProvider {
     return this.audioActionFactoryInstance.factory
   }
 
-  public createGraphicsActionFactory(configuration: Tv2BlueprintConfiguration): Tv2GraphicsActionFactory {
+  public createGraphicsActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2GraphicsActionFactory {
     this.graphicsActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.graphicsActionFactoryInstance,
       () => {
@@ -200,7 +204,7 @@ export class Tv2ActionFactoryProvider {
           this.createStringHashConverter()
         )
       },
-      (c: Tv2BlueprintConfiguration): boolean => {
+      (c?: Tv2BlueprintConfiguration): boolean => {
         return this.didVideoMixerTypeChange(c, configuration)
       },
       configuration
@@ -221,7 +225,7 @@ export class Tv2ActionFactoryProvider {
     return new Tv2StringHashConverter()
   }
 
-  public createVideoClipActionFactory(configuration: Tv2BlueprintConfiguration): Tv2VideoClipActionFactory {
+  public createVideoClipActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2VideoClipActionFactory {
     this.videoClipActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.videoClipActionFactoryInstance,
       () => {
@@ -232,7 +236,7 @@ export class Tv2ActionFactoryProvider {
           this.createVideoClipTimelineObjectFactory()
         )
       },
-      (c: Tv2BlueprintConfiguration): boolean => {
+      (c?: Tv2BlueprintConfiguration): boolean => {
         return this.didVideoMixerTypeChange(c, configuration)
       },
       configuration
@@ -241,7 +245,7 @@ export class Tv2ActionFactoryProvider {
     return this.videoClipActionFactoryInstance.factory
   }
 
-  public createVideoMixerActionFactory(configuration: Tv2BlueprintConfiguration): Tv2VideoMixerConfigurationActionFactory {
+  public createVideoMixerActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2VideoMixerConfigurationActionFactory {
     this.videoMixerConfigurationActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.videoMixerConfigurationActionFactoryInstance,
       () => {
@@ -249,7 +253,7 @@ export class Tv2ActionFactoryProvider {
           this.createVideoMixerTimelineObjectFactory(configuration)
         )
       },
-      (c: Tv2BlueprintConfiguration): boolean => {
+      (c?: Tv2BlueprintConfiguration): boolean => {
         return this.didVideoMixerTypeChange(c, configuration)
       },
       configuration
@@ -258,7 +262,7 @@ export class Tv2ActionFactoryProvider {
     return this.videoMixerConfigurationActionFactoryInstance.factory
   }
 
-  public createSplitScreenActionFactory(configuration: Tv2BlueprintConfiguration): Tv2SplitScreenActionFactory {
+  public createSplitScreenActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2SplitScreenActionFactory {
     this.splitScreenActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.splitScreenActionFactoryInstance,
       () => {
@@ -271,7 +275,7 @@ export class Tv2ActionFactoryProvider {
           this.createAssetPathHelper()
         )
       },
-      (c: Tv2BlueprintConfiguration): boolean => {
+      (c?: Tv2BlueprintConfiguration): boolean => {
         return this.didVideoMixerTypeChange(c, configuration)
       },
       configuration
@@ -284,7 +288,7 @@ export class Tv2ActionFactoryProvider {
     return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper())
   }
 
-  public createReplayActionFactory(configuration: Tv2BlueprintConfiguration): Tv2ReplayActionFactory {
+  public createReplayActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2ReplayActionFactory {
     this.replayActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.replayActionFactoryInstance,
       () => {
@@ -293,7 +297,7 @@ export class Tv2ActionFactoryProvider {
           this.createAudioTimelineObjectFactory()
         )
       },
-      (c: Tv2BlueprintConfiguration): boolean => {
+      (c?: Tv2BlueprintConfiguration): boolean => {
         return this.didVideoMixerTypeChange(c, configuration)
       },
       configuration
@@ -302,7 +306,7 @@ export class Tv2ActionFactoryProvider {
     return this.replayActionFactoryInstance.factory
   }
 
-  public createRobotActionFactory(configuration: Tv2BlueprintConfiguration): Tv2RobotActionFactory {
+  public createRobotActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2RobotActionFactory {
     this.robotActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.robotActionFactoryInstance,
       () => {
