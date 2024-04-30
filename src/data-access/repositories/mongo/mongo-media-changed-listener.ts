@@ -40,7 +40,9 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoMedia, ChangeStreamDocument<MongoMedia>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoMedia>) => void this.onChange(change))
+    changeStream.on('change', (change: ChangeStreamDocument<MongoMedia>) => {
+      this.onChange(change).catch(error => this.logger.data({ event: change, error }).error('Failed processing media change event.'))
+    })
     this.logger.debug('Listening for Media collection changes...')
   }
 
