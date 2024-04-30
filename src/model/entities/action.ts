@@ -7,6 +7,7 @@ import { InTransition } from '../value-objects/in-transition'
 export interface Action {
   id: string
   name: string
+  rank: number
   description?: string
   type: ActionType
   data: unknown
