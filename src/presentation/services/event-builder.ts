@@ -11,6 +11,7 @@ import {
   PartUnsyncedEvent,
   PartUpdatedEvent,
   PieceInsertedEvent,
+  PieceReplacedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
@@ -151,6 +152,18 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
       segmentId,
       partId: piece.getPartId(),
       piece: new PieceDto(piece),
+    }
+  }
+
+  public buildPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPieceId: string, newPiece: Piece): PieceReplacedEvent {
+    return {
+      type: RundownEventType.PIECE_REPLACED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId,
+      partId: newPiece.getPartId(),
+      replacedPieceId: replacedPieceId,
+      newPiece: new PieceDto(newPiece)
     }
   }
 

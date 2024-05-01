@@ -305,7 +305,8 @@ export class RundownTimelineService implements RundownService {
     const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id
       ? rundown.getActiveSegment().id
       : rundown.getNextSegment().id
-    this.rundownEventEmitter.emitPieceInsertedEvent(rundown, segmentId, newPiece)
+
+    this.rundownEventEmitter.emitPieceReplacedEvent(rundown, segmentId, pieceToBeReplaced.id, newPiece)
 
     await this.saveRundown(rundown)
   }
