@@ -51,6 +51,7 @@ export class Tv2RemoteActionFactory {
   public createRemoteActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PartAction[] {
     return [
       ...this.createInsertRemoteAsNextActions(blueprintConfiguration),
+      ...this.createInsertRemoteAsOnAirActions(blueprintConfiguration),
       this.createRecallLastPlannedRemoteAsNextAction(),
     ]
   }
@@ -68,7 +69,7 @@ export class Tv2RemoteActionFactory {
     const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
     return {
       id: `remoteAsNextAction_${remoteSource.name}`.replaceAll(' ', ''),
-      name: remoteSource.name,
+      name: `${remoteSource.name} PVW`,
       rank: 0,
       description: `Insert ${remoteSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
@@ -147,6 +148,34 @@ export class Tv2RemoteActionFactory {
         keepAliveDuration: 0
       },
       disableNextInTransition: false
+    }
+  }
+
+  private createInsertRemoteAsOnAirActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
+    return [
+      ...blueprintConfiguration.studio.remoteSources,
+      ...blueprintConfiguration.studio.feedSources
+    ].map(source => this.createInsertRemoteAsOnAirAction(blueprintConfiguration, source))
+  }
+
+  private createInsertRemoteAsOnAirAction(blueprintConfiguration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
+    const partId: string = `remoteInsertActionPart_${remoteSource.name}`.replaceAll(' ', '')
+    const remotePieceInterface: Tv2PieceInterface = this.createRemotePieceInterface(blueprintConfiguration, remoteSource, partId)
+    const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
+    return {
+      id: `remoteAsOnAirAction_${remoteSource.name}`.replaceAll(' ', ''),
+      name: `${remoteSource.name} PGM`,
+      rank: 0,
+      description: `Insert and Take ${remoteSource.name}.`,
+      type: PartActionType.INSERT_PART_AS_ON_AIR,
+      data: {
+        partInterface: partInterface,
+        pieceInterfaces: [remotePieceInterface]
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.REMOTE,
+        remoteNumber: remoteSource.name,
+      },
     }
   }
 
