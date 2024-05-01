@@ -12,6 +12,7 @@ export interface SegmentInterface {
   name: string
   rank: number
   isHidden: boolean
+  referenceTag?: string
   metadata?: unknown
   parts: Part[]
   isOnAir: boolean
@@ -27,6 +28,7 @@ export class Segment {
   public readonly name: string
   public readonly expectedDurationInMs?: number
   public readonly isHidden: boolean
+  public readonly referenceTag?: string
   public readonly metadata?: unknown
   public rank: number
 
@@ -43,6 +45,7 @@ export class Segment {
     this.name = segment.name
     this.rank = segment.rank
     this.isHidden = segment.isHidden
+    this.referenceTag = segment.referenceTag
     this.metadata = segment.metadata
     this.isSegmentOnAir = segment.isOnAir
     this.isSegmentNext = segment.isNext
