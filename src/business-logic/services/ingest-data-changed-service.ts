@@ -150,6 +150,7 @@ export class IngestDataChangedService implements DataChangeService {
       await this.rundownRepository.deleteRundown(ingestedRundown.id) // Delete the old Rundown to get rid of deleted Entities
       await this.rundownRepository.saveRundown(updatedRundown) // Save the new Rundown
       this.eventEmitter.emitRundownUpdated(updatedRundown)
+      this.rundownIdsToGenerateActionsFor.add(updatedRundown.id)
     }))
   }
 

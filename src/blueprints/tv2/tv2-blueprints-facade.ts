@@ -18,7 +18,7 @@ export class Tv2BlueprintsFacade {
     )
     const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
 
-    const actionService: Tv2ActionService = new Tv2ActionService(
+    const actionService: Tv2ActionService = Tv2ActionService.getInstance(
       configurationMapper,
       new Tv2ActionFactoryProvider()
     )

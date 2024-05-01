@@ -21,6 +21,18 @@ import { Tv2RobotActionFactory } from './action-factories/tv2-robot-action-facto
 
 export class Tv2ActionService implements BlueprintGenerateActions {
 
+  private static instance: Tv2ActionService
+
+  public static getInstance(
+    configurationMapper: Tv2ConfigurationMapper,
+    actionFactoryProvider: Tv2ActionFactoryProvider
+  ): Tv2ActionService {
+    if (!this.instance) {
+      this.instance = new Tv2ActionService(configurationMapper, actionFactoryProvider)
+    }
+    return this.instance
+  }
+
   private cameraActionFactory: Tv2CameraActionFactory
   private remoteActionFactory: Tv2RemoteActionFactory
   private audioActionFactory: Tv2AudioActionFactory
@@ -32,10 +44,12 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   private replayActionFactory: Tv2ReplayActionFactory
   private robotActionFactory: Tv2RobotActionFactory
 
-  constructor(
+  private constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly actionFactoryProvider: Tv2ActionFactoryProvider
-  ) {}
+  ) {
+    this.setFactories()
+  }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
     if (this.transitionEffectActionFactory.isTransitionEffectAction(action)) {
@@ -77,16 +91,16 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     ]
   }
 
-  private setFactories(configuration: Tv2BlueprintConfiguration): void {
-    this.cameraActionFactory = this.actionFactoryProvider.createCameraActionFactory(configuration)
-    this.remoteActionFactory = this.actionFactoryProvider.createRemoteActionFactory(configuration)
-    this.audioActionFactory = this.actionFactoryProvider.createAudioActionFactory(configuration)
-    this.transitionEffectActionFactory = this.actionFactoryProvider.createTransitionEffectActionFactory(configuration)
-    this.graphicsActionFactory = this.actionFactoryProvider.createGraphicsActionFactory(configuration)
-    this.videoClipActionFactory = this.actionFactoryProvider.createVideoClipActionFactory(configuration)
-    this.videoMixerActionFactory = this.actionFactoryProvider.createVideoMixerActionFactory(configuration)
-    this.splitScreenActionFactory = this.actionFactoryProvider.createSplitScreenActionFactory(configuration)
-    this.replayActionFactory = this.actionFactoryProvider.createReplayActionFactory(configuration)
-    this.robotActionFactory = this.actionFactoryProvider.createRobotActionFactory(configuration)
+  private setFactories(blueprintConfiguration?: Tv2BlueprintConfiguration): void {
+    this.cameraActionFactory = this.actionFactoryProvider.createCameraActionFactory(blueprintConfiguration)
+    this.remoteActionFactory = this.actionFactoryProvider.createRemoteActionFactory(blueprintConfiguration)
+    this.audioActionFactory = this.actionFactoryProvider.createAudioActionFactory(blueprintConfiguration)
+    this.transitionEffectActionFactory = this.actionFactoryProvider.createTransitionEffectActionFactory(blueprintConfiguration)
+    this.graphicsActionFactory = this.actionFactoryProvider.createGraphicsActionFactory(blueprintConfiguration)
+    this.videoClipActionFactory = this.actionFactoryProvider.createVideoClipActionFactory(blueprintConfiguration)
+    this.videoMixerActionFactory = this.actionFactoryProvider.createVideoMixerActionFactory(blueprintConfiguration)
+    this.splitScreenActionFactory = this.actionFactoryProvider.createSplitScreenActionFactory(blueprintConfiguration)
+    this.replayActionFactory = this.actionFactoryProvider.createReplayActionFactory(blueprintConfiguration)
+    this.robotActionFactory = this.actionFactoryProvider.createRobotActionFactory(blueprintConfiguration)
   }
 }
