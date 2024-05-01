@@ -2,14 +2,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { DataChangedListener } from '../interfaces/data-changed-listener'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedPart, MongoIngestedSegment } from './mongo-ingested-entity-converter'
-import {
-  ChangeStream,
-  ChangeStreamDeleteDocument,
-  ChangeStreamDocument,
-  ChangeStreamInsertDocument,
-  ChangeStreamOptions,
-  ChangeStreamReplaceDocument
-} from 'mongodb'
+import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
 import { IngestedPart } from '../../../model/entities/ingested-part'
@@ -37,30 +30,29 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository implem
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedPart>) => void this.onChange(change))
+    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedPart>) => {
+      this.onChange(change).catch(error => this.logger.data({ event: change, error }).error('Failed processing ingested part change event.'))
+    })
     this.logger.debug('Listening for Part collection changes...')
   }
 
   private async onChange(change: ChangeStreamDocument<MongoIngestedPart>): Promise<void> {
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
-        const insertChange: ChangeStreamInsertDocument<MongoIngestedPart> = change as ChangeStreamInsertDocument<MongoIngestedPart>
-        const ingestedPartId: string = insertChange.fullDocument._id
+        const ingestedPartId: string = change.fullDocument._id
         const ingestedPart: IngestedPart = await this.partRepository.getIngestedPart(ingestedPartId)
-        void this.onCreatedCallback(ingestedPart)
+        this.onCreatedCallback(ingestedPart)
         break
       }
       case MongoChangeEvent.DELETE: {
-        const deleteChange: ChangeStreamDeleteDocument<MongoIngestedPart> = change as ChangeStreamDeleteDocument<MongoIngestedPart>
-        const partId: string = deleteChange.documentKey._id
-        void this.onDeletedCallback(partId)
+        const partId: string = change.documentKey._id
+        this.onDeletedCallback(partId)
         break
       }
       case MongoChangeEvent.REPLACE: {
-        const replaceChange: ChangeStreamReplaceDocument<MongoIngestedPart> = change as ChangeStreamReplaceDocument<MongoIngestedPart>
-        const ingestedPartId: string = replaceChange.fullDocument._id
+        const ingestedPartId: string = change.fullDocument._id
         const ingestedPart: IngestedPart = await this.partRepository.getIngestedPart(ingestedPartId)
-        void this.onUpdatedCallback(ingestedPart)
+        this.onUpdatedCallback(ingestedPart)
         break
       }
       case MongoChangeEvent.UPDATE: {

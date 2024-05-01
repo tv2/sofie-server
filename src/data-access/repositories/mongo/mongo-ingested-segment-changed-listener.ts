@@ -37,7 +37,9 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository imp
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedSegment>) => void this.onChange(change))
+    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedSegment>) => {
+      this.onChange(change).catch(error => this.logger.data({ event: change, error }).error('Failed processing ingested segment change event.'))
+    })
     this.logger.debug('Listening for Segment collection changes...')
   }
 

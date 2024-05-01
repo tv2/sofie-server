@@ -41,7 +41,9 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedRundown, ChangeStreamDocument<MongoIngestedRundown>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedRundown>) => void this.onChange(change))
+    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedRundown>) => {
+      this.onChange(change).catch(error => this.logger.data({ event: change, error }).error('Failed processing ingested rundown change event.'))
+    })
     this.logger.debug('Listening for Rundown collection changes...')
   }
 
