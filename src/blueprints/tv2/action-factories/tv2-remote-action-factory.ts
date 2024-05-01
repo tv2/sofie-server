@@ -68,9 +68,9 @@ export class Tv2RemoteActionFactory {
     const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
     return {
       id: `remoteAsNextAction_${remoteSource.name}`.replaceAll(' ', ''),
-      name: `LIVE ${remoteSource.name}`,
+      name: remoteSource.name,
       rank: 0,
-      description: `Insert LIVE ${remoteSource.name} as next.`,
+      description: `Insert ${remoteSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -100,7 +100,7 @@ export class Tv2RemoteActionFactory {
     return {
       id: `remoteAction_${source.id}`.replaceAll(' ', ''),
       partId: parentPartId,
-      name: `LIVE ${source.name}`,
+      name: source.name,
       layer: Tv2SourceLayer.REMOTE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -131,7 +131,7 @@ export class Tv2RemoteActionFactory {
     return {
       id: partId,
       rundownId: '',
-      name: `Live Part ${source.name}`,
+      name: `Part ${source.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,
