@@ -30,6 +30,7 @@ import { Part } from '../../model/entities/part'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
 import {
+  ActionEventType,
   ActionTriggerEventType,
   ConfigurationEventType,
   IngestEventType,
@@ -58,8 +59,12 @@ import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-e
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusMessageEvent } from '../value-objects/status-message-event'
+import { ActionEventBuilder } from '../interfaces/action-event-builder'
+import { Action } from '../../model/entities/action'
+import { ActionsUpdatedEvent } from '../value-objects/action-event'
+import { ActionDto } from '../dtos/action-dto'
 
-export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -331,6 +336,15 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: StatusMessageEventType.STATUS_MESSAGE,
       timestamp: Date.now(),
       statusMessage
+    }
+  }
+
+  public buildActionsUpdatedEvent(actions: Action[], rundownId?: string): ActionsUpdatedEvent {
+    return {
+      type: ActionEventType.ACTIONS_UPDATED,
+      timestamp: Date.now(),
+      actions: actions.map(action => new ActionDto(action)),
+      rundownId
     }
   }
 }

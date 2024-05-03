@@ -13,12 +13,15 @@ import { ConfigurationEventObserver } from '../interfaces/configuration-event-ob
 import { ConfigurationEvent } from '../value-objects/configuration-event'
 import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
 import { StatusMessageEvent } from '../value-objects/status-message-event'
+import { ActionEventObserver } from '../interfaces/action-event-observer'
+import { ActionEvent } from '../value-objects/action-event'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer
 
   public static getInstance(
     rundownEventObserver: RundownEventObserver,
+    actionEventObserver: ActionEventObserver,
     actionTriggerEventObserver: ActionTriggerEventObserver,
     mediaEventObserver: MediaEventObserver,
     configurationEventObserver: ConfigurationEventObserver,
@@ -28,6 +31,7 @@ export class WebSocketEventServer implements EventServer {
     if (!this.instance) {
       this.instance = new WebSocketEventServer(
         rundownEventObserver,
+        actionEventObserver,
         actionTriggerEventObserver,
         mediaEventObserver,
         configurationEventObserver,
@@ -43,6 +47,7 @@ export class WebSocketEventServer implements EventServer {
 
   private constructor(
     private readonly rundownEventObserver: RundownEventObserver,
+    private readonly actionEventObserver: ActionEventObserver,
     private readonly actionTriggerEventObserver: ActionTriggerEventObserver,
     private readonly mediaEventObserver: MediaEventObserver,
     private readonly configurationEventObserver: ConfigurationEventObserver,
@@ -93,6 +98,9 @@ export class WebSocketEventServer implements EventServer {
   private addObserversForWebSocket(webSocket: WebSocket): void {
     this.rundownEventObserver.subscribeToRundownEvents((rundownEvent: RundownEvent) => {
       webSocket.send(JSON.stringify(rundownEvent))
+    })
+    this.actionEventObserver.subscribeToActionEvents((actionEvent: ActionEvent) => {
+      webSocket.send(JSON.stringify(actionEvent))
     })
     this.actionTriggerEventObserver.subscribeToActionTriggerEvents((actionTriggerEvent: ActionTriggerEvent) => {
       webSocket.send(JSON.stringify(actionTriggerEvent))

@@ -58,9 +58,7 @@ export class ServiceFacade {
 
   public static createActionService(): ActionService {
     return new ExecuteActionService(
-      RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionRepository(),
-      RepositoryFacade.createActionManifestRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createMediaRepository(),
       ServiceFacade.createRundownService(),
@@ -83,8 +81,13 @@ export class ServiceFacade {
       RepositoryFacade.createPartRepository(),
       RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
+      RepositoryFacade.createActionManifestRepository(),
+      RepositoryFacade.createActionRepository(),
+      RepositoryFacade.createConfigurationRepository(),
+      BlueprintsFacade.createBlueprint(),
       ServiceFacade.createTimelineBuilder(),
       EventEmitterFacade.createRundownEventEmitter(),
+      EventEmitterFacade.createActionEventEmitter(),
       new IngestedEntityToEntityMapper(),
       LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),

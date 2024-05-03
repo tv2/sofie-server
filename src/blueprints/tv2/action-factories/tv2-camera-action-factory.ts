@@ -127,7 +127,7 @@ export class Tv2CameraActionFactory {
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
       id: `cameraAsOnAirAction_${cameraSource.id}`,
-      name: `KAM ${cameraSource.name}`,
+      name: `KAM ${cameraSource.name} PGM`,
       rank: 0,
       description: `Insert and Take Camera ${cameraSource.name}.`,
       type: PartActionType.INSERT_PART_AS_ON_AIR,

@@ -50,8 +50,12 @@ export class DeviceChangedService implements DataChangeService {
   }
 
   private listenForStatusMessageChanges(deviceChangedListener: DataChangedListener<Device>): void {
-    deviceChangedListener.onCreated(device => void this.onDeviceUpdated(device))
-    deviceChangedListener.onUpdated(device => void this.onDeviceUpdated(device))
+    deviceChangedListener.onCreated(device => {
+      this.onDeviceUpdated(device).catch(error => this.logger.data(error).error(`Failed processing device created event for device '${device.name}' with id '${device.id}'.`))
+    })
+    deviceChangedListener.onUpdated(device => {
+      this.onDeviceUpdated(device).catch(error => this.logger.data(error).error(`Failed processing device updated event for device '${device.name}' with id '${device.id}'.`))
+    })
   }
 
   private async onDeviceUpdated(device: Device): Promise<void> {
