@@ -326,6 +326,7 @@ export class IngestDataChangedService implements DataChangeService {
     const actions: Action[] = this.blueprint.generateActions(configuration, [])
     this.actionEventEmitter.emitActionsUpdatedEvent(actions)
 
+    await this.actionRepository.deleteActionsNotOnRundowns()
     await this.actionRepository.saveActions(actions)
   }
 
