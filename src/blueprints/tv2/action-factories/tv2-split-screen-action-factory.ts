@@ -52,6 +52,7 @@ import {
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
+import { ActionFactory } from './ActionFactory'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 
@@ -63,7 +64,7 @@ const PLANNED_SPLIT_SCREEN_TIMELINE_OBJECT_PRIORITY: number = 1
 const CAMERA_SOURCE_NAME: string = 'Camera'
 const REPLAY_SOURCE_NAME: string = 'Replay'
 
-export class Tv2SplitScreenActionFactory {
+export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
@@ -72,7 +73,9 @@ export class Tv2SplitScreenActionFactory {
     private readonly graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper
-  ) {}
+  ) {
+    super()
+  }
 
 
   public createSplitScreenActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Action[] {
@@ -168,7 +171,7 @@ export class Tv2SplitScreenActionFactory {
       }
 
       return {
-        id: `splitScreenLayoutAsNextAction_${splitScreenConfiguration.name}`,
+        id: `splitScreenLayoutAsNextAction_${this.sanitizeStringForId(splitScreenConfiguration.name)}`,
         name: splitScreenConfiguration.name,
         rank: 0,
         description: '',
@@ -252,7 +255,7 @@ export class Tv2SplitScreenActionFactory {
           const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, audioMode)
 
           return {
-            id: `insert_${this.replaceWhiteSpaceWithUnderscore(name)}_${this.replaceWhiteSpaceWithUnderscore(source.name)}_to_split_screen_input_${this.createDisplayIndex(inputIndex)}_action`,
+            id: `insert_${this.sanitizeStringForId(name)}_${this.sanitizeStringForId(source.name)}_to_split_screen_input_${this.createDisplayIndex(inputIndex)}_action`,
             name: `Insert ${name} ${source.name} in DVE input ${this.createDisplayIndex(inputIndex)}`,
             rank: 0,
             description: `Insert ${name} ${source.name} in DVE input ${this.createDisplayIndex(inputIndex)}`,
@@ -277,10 +280,6 @@ export class Tv2SplitScreenActionFactory {
 
   private createDisplayIndex(index: number): number {
     return index + 1
-  }
-
-  private replaceWhiteSpaceWithUnderscore(value: string): string {
-    return value.replaceAll(' ', '_')
   }
 
   private createEmptyPieceInterfaceToBeUpdatedByMutateActions(): Tv2PieceInterface {
@@ -402,7 +401,7 @@ export class Tv2SplitScreenActionFactory {
       ]
 
       return {
-        id: `plannedSplitScreenAsNextAction_${data.name.replace(/\s/g, '')}`,
+        id: `plannedSplitScreenAsNextAction_${this.sanitizeStringForId(data.name)}`,
         name: data.template,
         rank: data.rank,
         rundownId: data.rundownId,

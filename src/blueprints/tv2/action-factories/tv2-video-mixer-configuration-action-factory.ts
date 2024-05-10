@@ -12,9 +12,12 @@ import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-actio
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { ActionFactory } from './ActionFactory'
 
-export class Tv2VideoMixerConfigurationActionFactory {
+export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
+
   constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
+    super()
   }
 
   public createVideoMixerActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
@@ -31,7 +34,7 @@ export class Tv2VideoMixerConfigurationActionFactory {
   private createDownStreamKeyerAction(downstreamKeyer: Tv2DownstreamKeyer, actionName: string, isOn: boolean): Tv2PieceAction {
     const downstreamKeyerNumber: string = String(downstreamKeyer.index + 1)
     const pieceInterface: Tv2PieceInterface = this.createVideoSwitcherPieceInterface({
-      id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`,
+      id: this.sanitizeStringForId(`downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`),
       name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
       layer: `${Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
@@ -40,7 +43,7 @@ export class Tv2VideoMixerConfigurationActionFactory {
       ]
     })
     return {
-      id: `downstreamKeyer${downstreamKeyerNumber}${actionName}Action`,
+      id: this.sanitizeStringForId(`downstreamKeyer${downstreamKeyerNumber}${actionName}Action`),
       name: `Downstream Keyer ${downstreamKeyerNumber} ${actionName}`,
       rank: 0,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
