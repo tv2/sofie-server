@@ -343,8 +343,8 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
     return {
       type: ActionEventType.ACTIONS_UPDATED,
       timestamp: Date.now(),
-      actions: actions.map(action => new ActionDto(action)),
-      rundownId
+      rundownId,
+      actions: actions.map(action => new ActionDto(action))
     }
   }
 }

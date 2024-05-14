@@ -308,6 +308,7 @@ export class IngestDataChangedService implements DataChangeService {
         this.rundownIdsToGenerateActionsFor.delete(rundownId)
       })
     )
+    await this.generateActionsForSystem()
   }
 
   private async generateActionsForRundown(rundownId: string): Promise<void> {
@@ -317,6 +318,14 @@ export class IngestDataChangedService implements DataChangeService {
     this.actionEventEmitter.emitActionsUpdatedEvent(actions, rundownId)
 
     await this.actionRepository.deleteActionsForRundown(rundownId)
+    await this.actionRepository.saveActions(actions)
+  }
+
+  private async generateActionsForSystem(): Promise<void> {
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const actions: Action[] = this.blueprint.generateActions(configuration, [])
+    this.actionEventEmitter.emitActionsUpdatedEvent(actions)
+
     await this.actionRepository.saveActions(actions)
   }
 
