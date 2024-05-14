@@ -57,6 +57,7 @@ export interface MongoIngestedSegment extends MongoId {
   identifier?: string
   metaData?: unknown // This is the current spelling in the database from Core... TOD: Update when we control Ingest
   budgetDuration?: number
+  invalidity: { reason: string }
 }
 
 export interface MongoIngestedPart extends MongoId {
@@ -165,7 +166,8 @@ export class MongoIngestedEntityConverter {
       referenceTag: mongoSegment.identifier,
       metadata: mongoSegment.metaData,
       ingestedParts: [],
-      budgetDuration: mongoSegment.budgetDuration ?? undefined
+      budgetDuration: mongoSegment.budgetDuration ?? undefined,
+      invalidity: mongoSegment.invalidity
     }
   }
 

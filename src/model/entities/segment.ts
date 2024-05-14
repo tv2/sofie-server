@@ -5,6 +5,7 @@ import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import { Invalidity } from '../value-objects/invalidity'
 
 export interface SegmentInterface {
   id: string
@@ -20,6 +21,7 @@ export interface SegmentInterface {
   isUnsynced: boolean
   executedAtEpochTime?: number
   expectedDurationInMs?: number
+  invalidity?: Invalidity
 }
 
 export class Segment {
@@ -30,6 +32,7 @@ export class Segment {
   public readonly isHidden: boolean
   public readonly referenceTag?: string
   public readonly metadata?: unknown
+  public readonly invalidity?: Invalidity
   public rank: number
 
   private isSegmentOnAir: boolean
@@ -52,6 +55,7 @@ export class Segment {
     this.isSegmentUnsynced = segment.isUnsynced
     this.expectedDurationInMs = segment.expectedDurationInMs
     this.executedAtEpochTime = segment.executedAtEpochTime
+    this.invalidity = segment.invalidity
     this.setParts(segment.parts ?? [])
   }
 
