@@ -26,17 +26,20 @@ import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
+import { ActionFactory } from './ActionFactory'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
-export class Tv2VideoClipActionFactory {
+export class Tv2VideoClipActionFactory extends ActionFactory {
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
-  ) { }
+  ) {
+    super()
+  }
 
   public isVideoClipAction(action: Tv2Action): boolean {
     return [Tv2ActionContentType.VIDEO_CLIP].includes(action.metadata.contentType)
@@ -84,7 +87,7 @@ export class Tv2VideoClipActionFactory {
     const partId: string = 'videoClipInsertAction'
     const partInterface: PartInterface = this.createPartInterface(partId, videoClipData)
     return {
-      id: `videoClipAsNextAction_${videoClipData.name}_${videoClipData.fileName}`, // TODO: Utilize information about the Segment once we control ingest
+      id: this.sanitizeStringForId(`videoClipAsNextAction_${videoClipData.name}_${videoClipData.fileName}`), // TODO: Utilize information about the Segment once we control ingest
       name: videoClipData.name,
       rank: videoClipData.rank,
       rundownId: videoClipData.rundownId,
@@ -118,7 +121,7 @@ export class Tv2VideoClipActionFactory {
     }
 
     return {
-      id: `videoClipActionPiece_${videoClipData.fileName}`,
+      id: `videoClipActionPiece_${this.sanitizeStringForId(videoClipData.fileName)}`,
       partId,
       name: videoClipData.fileName,
       layer: Tv2SourceLayer.VIDEO_CLIP,

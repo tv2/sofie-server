@@ -44,6 +44,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { Tv2Logger } from '../tv2-logger'
+import { ActionFactory } from './ActionFactory'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
@@ -53,7 +54,7 @@ enum SpecialEffectName {
   DIP = 'Dip'
 }
 
-export class Tv2TransitionEffectActionFactory {
+export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private readonly logger: Tv2Logger
 
   constructor(
@@ -63,6 +64,7 @@ export class Tv2TransitionEffectActionFactory {
     private readonly assetPathHelper: Tv2AssetPathHelper,
     logger: Tv2Logger
   ) {
+    super()
     this.logger = logger.tag(Tv2TransitionEffectActionFactory.name)
   }
 
@@ -149,7 +151,7 @@ export class Tv2TransitionEffectActionFactory {
 
   private createPieceInterface(effectName: string, durationFrames: number): Tv2PieceInterface {
     return {
-      id: `${effectName}TransitionActionPiece`,
+      id: `${this.sanitizeStringForId(effectName)}TransitionActionPiece`,
       name: `${effectName} transition`,
       partId: '',
       layer: Tv2SourceLayer.JINGLE,
@@ -176,7 +178,7 @@ export class Tv2TransitionEffectActionFactory {
 
   private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: Tv2PieceInterface): Tv2TransitionEffectAction {
     return {
-      id: `${effectName}_transition_action_${actionType.toString()}`,
+      id: `${this.sanitizeStringForId(effectName)}_transition_action_${this.sanitizeStringForId(actionType.toString())}`,
       name: this.mapToTransitionEffectNameForActionType(actionType, effectName),
       rank: 0,
       description: this.mapToTransitionEffectDescriptionForActionType(actionType, effectName),
@@ -239,7 +241,7 @@ export class Tv2TransitionEffectActionFactory {
       durationInFrames: 0 // Default duration - To be overridden by APPLY ARGUMENTS
     }
     return {
-      id: `mix_transition_action_${actionType.toString()}`,
+      id: `mix_transition_action_${this.sanitizeStringForId(actionType.toString())}`,
       name: this.mapToTransitionEffectNameForActionType(actionType, SpecialEffectName.MIX),
       rank: 0,
       description: this.mapToTransitionEffectDescriptionForActionType(actionType, SpecialEffectName.MIX),
@@ -268,7 +270,7 @@ export class Tv2TransitionEffectActionFactory {
       dipInput: dipInputSource
     }
     return {
-      id: `dip_transition_action_${actionType.toString()}`,
+      id: `dip_transition_action_${this.sanitizeStringForId(actionType.toString())}`,
       name: this.mapToTransitionEffectNameForActionType(actionType, SpecialEffectName.DIP),
       rank: 0,
       description: this.mapToTransitionEffectDescriptionForActionType(actionType, SpecialEffectName.DIP),
