@@ -6,6 +6,7 @@ import { PieceLifespan } from '../enums/piece-lifespan'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 import { Invalidity } from '../value-objects/invalidity'
+import { InvalidSegmentException } from '../exceptions/invalid-segment-exception'
 
 export interface SegmentInterface {
   id: string
@@ -67,8 +68,16 @@ export class Segment {
   }
 
   public putOnAir(): void {
+    this.assertNotInvalid(this.putOnAir.name)
     this.isSegmentOnAir = true
     this.executedAtEpochTime ??= Date.now()
+  }
+
+  private assertNotInvalid(operationName: string): void {
+    if (!this.invalidity) {
+      return
+    }
+    throw new InvalidSegmentException(`Segment "${this.name}" is invalid. Unable to do "${operationName}".`)
   }
 
   public takeOffAir(): void {
@@ -99,6 +108,7 @@ export class Segment {
   }
 
   public setAsNext(): void {
+    this.assertNotInvalid(this.setAsNext.name)
     this.isSegmentNext = true
     if (!this.isSegmentOnAir) {
       this.reset()

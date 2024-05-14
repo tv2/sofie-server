@@ -4,7 +4,7 @@ import { Part } from '../part'
 import { Piece } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { NotActivatedException } from '../../exceptions/not-activated-exception'
 import { NotFoundException } from '../../exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
@@ -19,6 +19,8 @@ import { OnAirException } from '../../exceptions/on-air-exception'
 import { NoPartInHistoryException } from '../../exceptions/no-part-in-history-exception'
 import { RundownMode } from '../../enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../exceptions/already-rehearsal-exception'
+import { InvalidSegmentException } from '../../exceptions/invalid-segment-exception'
+import { Invalidity } from '../../value-objects/invalidity'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -3457,6 +3459,77 @@ describe(Rundown.name, () => {
         const result: () => void = () => rundown.setNext(activeSegment.id, activePart.id)
 
         expect(result).toThrow(OnAirException)
+      })
+    })
+
+    describe('next Segment is invalid', () => {
+      it('does not call setNext on the Segment', () => {
+        const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true })
+        const invalidity: Invalidity = {
+          reason: 'Some Reason'
+        }
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', invalidity, isNext: true, parts: [nextPart]})
+        const rundown: Rundown = new Rundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: activeSegment,
+              part: activePart,
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: nextPart,
+            },
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment,
+            nextSegment
+          ],
+        } as RundownInterface)
+
+        const spiedNextSegment: Segment = spy(nextSegment)
+
+        try {
+          rundown.setNext(nextSegment.id, nextPart.id)
+        } catch (e) {
+          // Do nothing - the error is expected.
+        }
+
+        verify(spiedNextSegment.setAsNext()).never()
+      })
+
+      it('throws InvalidSegmentException', () => {
+        const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true })
+        const invalidity: Invalidity = {
+          reason: 'Some Reason'
+        }
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', invalidity, isNext: true, parts: [nextPart]})
+        const rundown: Rundown = new Rundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: activeSegment,
+              part: activePart,
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: nextPart,
+            },
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment,
+            nextSegment
+          ],
+        } as RundownInterface)
+
+
+        expect(() => rundown.setNext(nextSegment.id, nextPart.id)).toThrow(InvalidSegmentException)
       })
     })
   })
