@@ -57,7 +57,7 @@ export interface MongoIngestedSegment extends MongoId {
   identifier?: string
   metaData?: unknown // This is the current spelling in the database from Core... TOD: Update when we control Ingest
   budgetDuration?: number
-  invalidity: { reason: string }
+  invalidity?: { reason: string }
 }
 
 export interface MongoIngestedPart extends MongoId {

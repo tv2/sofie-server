@@ -11,5 +11,5 @@ export interface IngestedSegment {
   readonly metadata?: unknown
   readonly budgetDuration?: number
   readonly ingestedParts: Readonly<IngestedPart[]>
-  readonly invalidity: Invalidity
+  readonly invalidity?: Invalidity
 }
