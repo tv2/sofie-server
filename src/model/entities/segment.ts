@@ -68,16 +68,16 @@ export class Segment {
   }
 
   public putOnAir(): void {
-    this.assertNotInvalid(this.putOnAir.name)
+    this.assertValidity(this.putOnAir.name)
     this.isSegmentOnAir = true
     this.executedAtEpochTime ??= Date.now()
   }
 
-  private assertNotInvalid(operationName: string): void {
+  private assertValidity(operationName: string): void {
     if (!this.invalidity) {
       return
     }
-    throw new InvalidSegmentException(`Segment "${this.name}" is invalid. Unable to do "${operationName}".`)
+    throw new InvalidSegmentException(`Unable to do "${operationName}", since segment "${this.name}" is invalid.`)
   }
 
   public takeOffAir(): void {
@@ -108,7 +108,7 @@ export class Segment {
   }
 
   public setAsNext(): void {
-    this.assertNotInvalid(this.setAsNext.name)
+    this.assertValidity(this.setAsNext.name)
     this.isSegmentNext = true
     if (!this.isSegmentOnAir) {
       this.reset()

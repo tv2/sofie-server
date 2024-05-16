@@ -1,3 +1,3 @@
 export interface Invalidity {
-  reason: string
+  readonly reason: string
 }

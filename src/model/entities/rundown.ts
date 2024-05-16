@@ -497,7 +497,7 @@ export class Rundown extends BasicRundown {
     const nextPart: Part = nextSegment.findPart(partId)
 
     if (nextSegment.invalidity) {
-      throw new InvalidSegmentException(`Can't set Segment ${nextSegment.name}. The Segment is invalid.`)
+      throw new InvalidSegmentException(`Unable to set segment ${nextSegment.name} as next, since it is invalid.`)
     }
 
     if (nextPart.isOnAir()) {
