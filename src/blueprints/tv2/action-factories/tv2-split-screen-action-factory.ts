@@ -233,21 +233,21 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private createInsertSplitScreenInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2SplitScreenInsertSourceInputAction[] {
     const cameraSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.cameraSources.slice(0, 5)
-    const liveSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.remoteSources
+    const remoteSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.remoteSources
     const feedSources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.feedSources
     const replaySources: Tv2SourceMappingWithSound[] = blueprintConfiguration.studio.replaySources
     const replaySourcesWithoutVoiceOver: Tv2SourceMappingWithSound[] = replaySources.filter(replaySource => !/EPSIO/i.test(replaySource.name))
 
     return [
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, CAMERA_SOURCE_NAME),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, liveSources),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, feedSources),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySources, `${REPLAY_SOURCE_NAME} VO`, Tv2AudioMode.VOICE_OVER),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySourcesWithoutVoiceOver, REPLAY_SOURCE_NAME, Tv2AudioMode.FULL)
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, Tv2ActionContentType.CAMERA, CAMERA_SOURCE_NAME),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, remoteSources, Tv2ActionContentType.REMOTE),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, feedSources, Tv2ActionContentType.REMOTE),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySources, Tv2ActionContentType.REPLAY, `${REPLAY_SOURCE_NAME} VO`, Tv2AudioMode.VOICE_OVER),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySourcesWithoutVoiceOver, Tv2ActionContentType.REPLAY, REPLAY_SOURCE_NAME, Tv2AudioMode.FULL)
     ]
   }
 
-  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], name: string = '', audioMode: Tv2AudioMode = Tv2AudioMode.FULL): Tv2SplitScreenInsertSourceInputAction[] {
+  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], insertedContentType: Tv2ActionContentType, name: string = '', audioMode: Tv2AudioMode = Tv2AudioMode.FULL): Tv2SplitScreenInsertSourceInputAction[] {
     const actions: Tv2SplitScreenInsertSourceInputAction[] = []
     for (let inputIndex = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
       const actionsForInput: Tv2SplitScreenInsertSourceInputAction[] = sources
@@ -266,6 +266,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
             metadata: {
               contentType: Tv2ActionContentType.SPLIT_SCREEN,
               actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
+              insertedContentType,
               inputIndex,
               videoMixerSource: source.videoMixerSource,
               audioTimelineObjects
