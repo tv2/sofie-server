@@ -22,9 +22,9 @@
     "seed-database": "ts-node ./database/manager/mongo.ts --seed",
     "spy-database": "ts-node ./database/manager/mongo.ts --spy",
     "dump-database": "ts-node ./database/manager/mongo.ts --dump",
-    "migrate:create": "sh -c 'ts-node node_modules/migrate-mongo/bin/migrate-mongo create $0 -f src/data-access/migrations/mongo/migrate-mongo-config.ts'",
-    "migrate:status": "ts-node node_modules/migrate-mongo/bin/migrate-mongo status -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
-    "migrate:undo-last": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts && npm run migrate:status",
+    "create-migration": "sh -c 'ts-node node_modules/migrate-mongo/bin/migrate-mongo create $0 -f src/data-access/migrations/mongo/migrate-mongo-config.ts'",
+    "migration-status": "ts-node node_modules/migrate-mongo/bin/migrate-mongo status -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
+    "undo-last-migration": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts && npm run migration-status",
     "migrate": "ts-node node_modules/migrate-mongo/bin/migrate-mongo up -f src/data-access/migrations/mongo/migrate-mongo-config.ts"
   },
   "devDependencies": {
