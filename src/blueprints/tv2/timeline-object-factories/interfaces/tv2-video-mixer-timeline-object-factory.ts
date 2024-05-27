@@ -23,6 +23,7 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createCutTransitionEffectTimelineObjects(sourceInput: number): Tv2BlueprintTimelineObject[]
   createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number): Tv2BlueprintTimelineObject[]
   createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number): Tv2BlueprintTimelineObject[]
+  createTBarTransitionEffectTimelineObject(sourceInput: number, tBarPosition: number): Tv2BlueprintTimelineObject
   getProgramLayer(): string
   getSplitScreenBoxesLayer(): string
   getSplitScreenSourceInput(): number

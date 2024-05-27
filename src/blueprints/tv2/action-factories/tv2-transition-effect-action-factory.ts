@@ -85,7 +85,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
           this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
           this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
         ]
-      })]
+      }),
+      this.createEmptyTBarAction()
+    ]
   }
 
   public isTransitionEffectAction(action: Tv2Action): action is Tv2TransitionEffectAction {
@@ -127,6 +129,18 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
             }
             const transitionEffectAction: Tv2TransitionEffectAction = action as Tv2TransitionEffectAction
             return this.createMixTransitionEffectAction(transitionEffectAction.type, actionArguments)
+          }
+        })
+        break
+      }
+      case TransitionEffectType.T_BAR: {
+        mutateActionMethods.push({
+          type: MutateActionType.APPLY_ARGUMENTS,
+          updateActionWithArguments: (_action: Action, actionArguments: unknown) => {
+            if (!this.isTransitionDurationArgumentInteger(actionArguments)) {
+              throw new Tv2MisconfigurationException(`TBarTransitionAction expects 'actionArguments' to be an integer. ${actionArguments} is not an integer.`)
+            }
+            return this.createTBarAction(actionArguments)
           }
         })
         break
@@ -374,6 +388,13 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         action.data.partInTransition = this.createPartInTransitionForBreakerTransitionEffect(action.metadata)
         break
       }
+      case TransitionEffectType.T_BAR: {
+        // TODO: Find PROGRAM and NEXT inputs
+        // TODO: "SourceInput" is currently next
+        const tBarTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createTBarTransitionEffectTimelineObject(sourceInput, action.metadata.tBarPosition)
+        action.data.pieceInterface.timelineObjects.push(tBarTimelineObject)
+        break
+      }
     }
 
     return action
@@ -404,6 +425,67 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return {
       keepPreviousPartAliveDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
       delayPiecesDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
+    }
+  }
+
+  private createEmptyTBarAction(): Tv2TransitionEffectAction {
+    return {
+      id: 't_bar_transition_action',
+      name: 'T-bar transition',
+      description: 'Action to control a transition with a T-bar',
+      rank: 0,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR, // TODO: Is this right?
+      data: {
+        pieceInterface: {} as PieceInterface
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.TRANSITION,
+        transitionEffectType: TransitionEffectType.T_BAR,
+        tBarPosition: 0  // Default duration - To be overridden by APPLY ARGUMENTS
+      },
+      argument: {
+        name: 'T-bar position',
+        description: 'The position of the T-bar',
+        type: ActionArgumentType.NUMBER
+      }
+    }
+  }
+
+  private createTBarAction(tBarPosition: number): Tv2TransitionEffectAction {
+    const pieceInterface: PieceInterface = { // TODO: Do I need this Piece?
+      id: `tBarPosition_${tBarPosition}_TransitionActionPiece`,
+      name: 'T-bar transition',
+      partId: '',
+      layer: Tv2SourceLayer.JINGLE,
+      pieceLifespan: PieceLifespan.WITHIN_PART,
+      transitionType: TransitionType.IN_TRANSITION,
+      isPlanned: false,
+      start: 0,
+      postRollDuration: 0,
+      preRollDuration: 0,
+      tags: [],
+      isUnsynced: false,
+      timelineObjects: [],
+      metadata: {
+        type: Tv2PieceType.TRANSITION,
+        outputLayer: Tv2OutputLayer.SECONDARY
+      }
+    }
+
+
+    return {
+      id: 't_bar_transition_action',
+      name: 'Action to control a transition with a T-bar',
+      rank: 0,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR, // TODO: Is this right?
+      data: {
+        pieceInterface
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.TRANSITION,
+        transitionEffectType: TransitionEffectType.T_BAR,
+        tBarPosition
+      }
     }
   }
 }

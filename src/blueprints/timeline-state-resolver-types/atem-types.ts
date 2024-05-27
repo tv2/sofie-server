@@ -8,7 +8,11 @@ export interface AtemMeTimelineObject extends TimelineObject {
     me: {
       input: number
       transition: AtemTransition,
-      transitionSettings?: AtemTransitionSettings
+      transitionSettings?: AtemTransitionSettings,
+      // ####
+      inTransition?: boolean,
+      transitionPreview?: boolean,
+      transitionPosition?: number,
     }
   }
 }
@@ -49,6 +53,24 @@ export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
         mask: {
           enable: boolean
         }
+      }
+    }
+  }
+}
+
+export interface AtemTBarTransitionTimelineObject extends TimelineObject {
+  // TODO: Figure how much of this is needed.
+  content: {
+    deviceType: DeviceType.ATEM,
+    type: AtemType.ME,
+    me: {
+      programInput?: number,
+      previewInput?: number,
+      transitionPreview: boolean,
+      transitionPosition: {
+        inTransition: boolean,
+        remainingFrames: number,
+        handlePosition: number
       }
     }
   }
