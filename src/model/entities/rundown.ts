@@ -701,8 +701,24 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.insertPartAsNext.name)
     this.assertNotUndefined(this.activeCursor, 'active Segment')
 
+    this.updateRankFromOnAirAndNextParts(part)
     this.activeCursor.segment.insertPartAfterActivePart(part)
     this.setNext(this.activeCursor.segment.id, part.id)
+  }
+
+  private updateRankFromOnAirAndNextParts(partToBeUpdated: Part): void {
+    const onAirRank: number = this.activeCursor?.part.getRank() ?? 0
+    const nextRank: number = this.nextCursor?.part.getRank() ?? 0
+
+    if (this.activeCursor?.segment.id !== this.nextCursor?.segment.id) {
+      // The new rank is onAir Parts rank times 1.5
+      partToBeUpdated.updateRank(onAirRank * 1.5)
+      return
+    }
+
+    // The new rank is half the 'distance' between the onAir and next Parts plus the rank of the onAir Part.
+    const newRank: number = (nextRank - onAirRank) / 2 + onAirRank
+    partToBeUpdated.updateRank(newRank)
   }
 
   public stopActivePiecesOnLayers(layers: string[]): void {

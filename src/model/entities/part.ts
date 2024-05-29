@@ -235,6 +235,10 @@ export class Part {
     return this.rank
   }
 
+  public updateRank(rank: number): void {
+    this.rank = rank
+  }
+
   public setSegmentId(segmentId: string): void {
     if (this.isPlanned) {
       throw new UnsupportedOperationException(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
