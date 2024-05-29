@@ -139,6 +139,9 @@ export class Part {
   }
 
   public markAsUnsynced(): void {
+    if (!this.isPlanned) {
+      return // Only planned Parts can be unsynced
+    }
     this.isPartUnsynced = true
     this.rank = this.rank - 1
     this.pieces.forEach(piece => piece.markAsUnsyncedWithUnsyncedPart())
