@@ -186,15 +186,6 @@ export class Part {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
     }
-    const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === unPlannedPiece.layer)
-    if (indexOfExistingPieceOnLayer >= 0) {
-      const piecesToBeRemoved: Piece[] = this.pieces.splice(indexOfExistingPieceOnLayer, 1)
-      piecesToBeRemoved.forEach(piece => {
-        if (piece.isPlanned) {
-          this.replacedPlannedPieces.push(piece)
-        }
-      })
-    }
     this.pieces.push(unPlannedPiece)
   }
 
