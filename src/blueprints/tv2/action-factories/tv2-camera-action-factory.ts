@@ -18,13 +18,16 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { ActionFactory } from './ActionFactory'
 
-export class Tv2CameraActionFactory {
+export class Tv2CameraActionFactory extends ActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
-  ) {}
+  ) {
+    super()
+  }
 
   public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
     return blueprintConfiguration.studio.cameraSources
@@ -36,11 +39,12 @@ export class Tv2CameraActionFactory {
   }
 
   private createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
-    const partId: string = `cameraInsertActionPart_${cameraSource.id}`
+    const sanitizedId: string = this.sanitizeStringForId(cameraSource.id)
+    const partId: string = `cameraInsertActionPart_${sanitizedId}`
     const cameraPieceInterface: Tv2PieceInterface = this.createCameraPieceInterface(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
-      id: `cameraAsNextAction_${cameraSource.id}`,
+      id: `cameraAsNextAction_${sanitizedId}`,
       name: `KAM ${cameraSource.name} PVW`,
       rank: 0,
       description: `Insert Camera ${cameraSource.name} as next.`,
@@ -69,7 +73,7 @@ export class Tv2CameraActionFactory {
     }
 
     return {
-      id: `cameraAction_${source.id}`,
+      id: `cameraAction_${this.sanitizeStringForId(source.id)}`,
       partId: parentPartId,
       name: `KAM ${source.name}`,
       layer: Tv2SourceLayer.CAMERA,
@@ -122,11 +126,12 @@ export class Tv2CameraActionFactory {
   }
 
   public createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
-    const partId: string = `cameraInsertAndTakeActionPart_${cameraSource.id}`
+    const sanitizedId: string = this.sanitizeStringForId(cameraSource.id)
+    const partId: string = `cameraInsertAndTakeActionPart_${sanitizedId}`
     const cameraPieceInterface: Tv2PieceInterface = this.createCameraPieceInterface(configuration, cameraSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, cameraSource)
     return {
-      id: `cameraAsOnAirAction_${cameraSource.id}`,
+      id: `cameraAsOnAirAction_${sanitizedId}`,
       name: `KAM ${cameraSource.name} PGM`,
       rank: 0,
       description: `Insert and Take Camera ${cameraSource.name}.`,

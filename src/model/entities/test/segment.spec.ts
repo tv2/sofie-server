@@ -3,13 +3,83 @@ import { Piece } from '../piece'
 import { Part, PartInterface } from '../part'
 import { Segment, SegmentInterface } from '../segment'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance, verify } from '@typestrong/ts-mockito'
+import { capture, instance, spy, verify } from '@typestrong/ts-mockito'
 import { EntityTestFactory } from './entity-test-factory'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { AlreadyExistException } from '../../exceptions/already-exist-exception'
 import { NotFoundException } from '../../exceptions/not-found-exception'
+import { Invalidity } from '../../value-objects/invalidity'
+import { InvalidSegmentException } from '../../exceptions/invalid-segment-exception'
 
 describe(Segment.name, () => {
+  describe(Segment.prototype.putOnAir, () => {
+    describe('the Segment is valid', () => {
+      it('marks the Segment as OnAir', () => {
+        const testee: Segment = new Segment({ isOnAir: false, invalidity: undefined } as SegmentInterface)
+        expect(testee.isOnAir()).toBeFalsy()
+        testee.putOnAir()
+        expect(testee.isOnAir()).toBeTruthy()
+      })
+
+      it('sets the executedAtEpochTime to now', () => {
+        const now: number = Date.now()
+        jest.useFakeTimers()
+        jest.setSystemTime(now)
+
+        const testee: Segment = new Segment({ executedAtEpochTime: undefined, invalidity: undefined } as SegmentInterface)
+        expect(testee.getExecutedAtEpochTime()).toBeFalsy()
+        testee.putOnAir()
+        expect(testee.getExecutedAtEpochTime()).toBe(now)
+      })
+    })
+    describe('the Segment is invalid', () => {
+      it('throws InvalidSegmentException', () => {
+        const invalidity: Invalidity = {
+          reason: 'SomeReason'
+        }
+        const testee: Segment = new Segment({ invalidity } as SegmentInterface)
+        expect(() => testee.putOnAir()).toThrow(InvalidSegmentException)
+      })
+    })
+  })
+
+  describe(Segment.prototype.setAsNext, () => {
+    describe('the Segment is valid', () => {
+      it('marks the Segment as next', () => {
+        const testee: Segment = new Segment({ isNext: false, invalidity: undefined } as SegmentInterface)
+        expect(testee.isNext()).toBeFalsy()
+        testee.setAsNext()
+        expect(testee.isNext()).toBeTruthy()
+      })
+
+      describe('the Segment is OnAir', () => {
+        it('does not reset the Segment', () => {
+          const testee: Segment = new Segment({ isOnAir: true, invalidity: undefined } as SegmentInterface)
+          const spiedTestee: Segment = spy(testee)
+          testee.setAsNext()
+          verify(spiedTestee.reset()).never()
+        })
+      })
+      describe('the Segment is not OnAir', () => {
+        it('resets the Segment', () => {
+          const testee: Segment = new Segment({ isOnAir: false, invalidity: undefined } as SegmentInterface)
+          const spiedTestee: Segment = spy(testee)
+          testee.setAsNext()
+          verify(spiedTestee.reset()).once()
+        })
+      })
+    })
+    describe('the Segment is invalid', () => {
+      it('throws InvalidSegmentException', () => {
+        const invalidity: Invalidity = {
+          reason: 'SomeReason'
+        }
+        const testee: Segment = new Segment({ invalidity } as SegmentInterface)
+        expect(() => testee.setAsNext()).toThrow(InvalidSegmentException)
+      })
+    })
+  })
+
   describe(Segment.prototype.getFirstSpanningPieceForEachLayerBeforePart.name, () => {
     describe('Segment has two Parts', () => {
       describe('One Part is "after" the search point', () => {

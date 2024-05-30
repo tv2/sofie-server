@@ -41,6 +41,7 @@ import {
 } from '../timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
+import { ActionFactory } from './ActionFactory'
 
 const TV2_GRAPHICS_LAYERS: Tv2SourceLayer[] = [
   Tv2SourceLayer.GRAPHICS_IDENT,
@@ -51,7 +52,7 @@ const TV2_GRAPHICS_LAYERS: Tv2SourceLayer[] = [
   Tv2SourceLayer.GRAPHICS_TELEPHONE
 ]
 
-export class Tv2GraphicsActionFactory {
+export class Tv2GraphicsActionFactory extends ActionFactory {
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
@@ -59,7 +60,9 @@ export class Tv2GraphicsActionFactory {
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly stringHashConverter: Tv2StringHashConverter
-  ) { }
+  ) {
+    super()
+  }
 
   public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Action[] {
     const commandTimelineObjectFactory: Tv2GraphicsCommandTimelineObjectFactory = this.graphicsTimelineObjectFactoryFactory.createGraphicsCommandTimelineObjectFactory(blueprintConfiguration)

@@ -22,15 +22,18 @@ import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
+import { ActionFactory } from './ActionFactory'
 
 const FRAME_RATE: number = 25
 
-export class Tv2AudioActionFactory {
+export class Tv2AudioActionFactory extends ActionFactory {
 
   constructor(
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
-  ) { }
+  ) {
+    super()
+  }
 
   public isAudioAction(action: Tv2Action): boolean {
     const actionSubType: Tv2ActionSubtype | undefined = action.metadata.actionSubtype
