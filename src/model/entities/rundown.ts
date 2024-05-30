@@ -701,12 +701,12 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.insertPartAsNext.name)
     this.assertNotUndefined(this.activeCursor, 'active Segment')
 
-    this.updateRankFromOnAirAndNextParts(part)
+    this.updateRankFromOnAirPart(part)
     this.activeCursor.segment.insertPartAfterActivePart(part)
     this.setNext(this.activeCursor.segment.id, part.id)
   }
 
-  private updateRankFromOnAirAndNextParts(partToBeUpdated: Part): void {
+  private updateRankFromOnAirPart(partToBeUpdated: Part): void {
     if (!this.activeCursor) {
       return
     }
