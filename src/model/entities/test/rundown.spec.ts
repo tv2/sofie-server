@@ -3675,6 +3675,164 @@ describe(Rundown.name, () => {
       })
     })
   })
+
+  describe(Rundown.prototype.insertPartAsNext.name, () => {
+    describe('there is no onAir Part', () => {
+      it ('throws an exception', () => {
+        const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted' })
+
+        const testee: Rundown = new Rundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: undefined
+          }
+        } as RundownInterface)
+
+        expect(() => testee.insertPartAsNext(partToBeInserted)).toThrow()
+      })
+    })
+
+    describe('there is an onAir Part', () => {
+      describe('next Part is in the same Segment as the onAir Part', () => {
+        describe('next Part is right after the onAir Part', () => {
+          it('sets the rank of the inserted Part to be between the onAir and next Parts', () => {
+            const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', rank: -1, ingestedPart: undefined })
+            const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, rank: 5 })
+            const nextPart: Part = EntityTestFactory.createPart({ isNext: true, rank: 10 })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, nextPart] })
+
+            const expectedRank: number =  (nextPart.getRank() - onAirPart.getRank()) / 2 + onAirPart.getRank()
+
+            const testee: Rundown = new Rundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: onAirSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                }
+              },
+              segments: [onAirSegment]
+            } as RundownInterface)
+
+            testee.insertPartAsNext(partToBeInserted)
+
+            expect(partToBeInserted.getRank()).toBe(expectedRank)
+          })
+        })
+
+        describe('next Part is not right after the onAir Part', () => {
+          it('sets the rank to be between the onAir Part and the part after the onAir Part', () => {
+            const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', rank: -1, ingestedPart: undefined })
+            const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, rank: 5 })
+            const partBetweenOnAirAndNextPart: Part = EntityTestFactory.createPart({ id: 'partBetweenOnAirAndNextPart', rank: 7 })
+            const nextPart: Part = EntityTestFactory.createPart({ isNext: true, rank: 10 })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, partBetweenOnAirAndNextPart, nextPart] })
+
+            const expectedRank: number =  (partBetweenOnAirAndNextPart.getRank() - onAirPart.getRank()) / 2 + onAirPart.getRank()
+
+            const testee: Rundown = new Rundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: onAirSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                }
+              },
+              segments: [onAirSegment]
+            } as RundownInterface)
+
+            testee.insertPartAsNext(partToBeInserted)
+
+            expect(partToBeInserted.getRank()).toBe(expectedRank)
+          })
+        })
+      })
+
+      describe('next Part is another Segment', () => {
+        describe('onAir Part is last Part in the Segment', () => {
+          it('sets the rank to be the rank of the onAir Part plus 0.1', () => {
+            const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', rank: -1, ingestedPart: undefined })
+            const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, rank: 4 })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart] })
+            const nextPart: Part = EntityTestFactory.createPart({ isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
+
+            const expectedRank: number =  onAirPart.getRank() + 1
+
+            const testee: Rundown = new Rundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                }
+              },
+              segments: [onAirSegment]
+            } as RundownInterface)
+
+            testee.insertPartAsNext(partToBeInserted)
+
+            expect(partToBeInserted.getRank()).toBe(expectedRank)
+          })
+        })
+
+        describe('there is a Part after the onAir Part in the Segment', () => {
+          it ('sets the rank to be between the onAir Part and the Part after the onAir Part', () => {
+            const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', rank: -1, ingestedPart: undefined })
+
+            const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, rank: 4 })
+            const partAfterOnAirPart: Part = EntityTestFactory.createPart({ id: 'partAfterOnAirPart', rank: 6 })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, partAfterOnAirPart] })
+
+            const nextPart: Part = EntityTestFactory.createPart({ isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
+
+            // The new rank is the rank of the onAir Part plus the distance between the onAir Part and the next Part: 4 + ((6 - 4) / 2)
+            const expectedRank: number =  5
+
+            const testee: Rundown = new Rundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                }
+              },
+              segments: [onAirSegment]
+            } as RundownInterface)
+
+            testee.insertPartAsNext(partToBeInserted)
+
+            expect(partToBeInserted.getRank()).toBe(expectedRank)
+          })
+        })
+      })
+    })
+  })
 })
 
 function createTesteeWithActiveAndNextCursors(params?: {
