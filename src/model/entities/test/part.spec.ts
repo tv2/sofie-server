@@ -169,6 +169,24 @@ describe(Part.name, () => {
         expect(testee.getPieces()).toContain(unplannedPiece)
       })
 
+      describe('there is already a Piece on the layer of the inserted Piece', () => {
+        it('does not remove the existing Piece from the Part', () => {
+          const layer: string = 'someLayer'
+          const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
+          const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
+
+          const testee: Part = new Part({ id: 'partId', pieces: [existingPiece] } as PartInterface)
+
+          expect(testee.getPieces()).toContain(existingPiece)
+          expect(testee.getPieces()).not.toContain(unplannedPiece)
+
+          testee.insertPiece(unplannedPiece)
+
+          expect(testee.getPieces()).toContain(existingPiece)
+          expect(testee.getPieces()).toContain(unplannedPiece)
+        })
+      })
+
       describe('the Part is On Air', () => {
         it('sets the start of the Piece to the amount of time since the Part was started', () => {
           const now: number = 1000
