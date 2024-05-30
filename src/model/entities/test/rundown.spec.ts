@@ -3769,7 +3769,7 @@ describe(Rundown.name, () => {
             const nextPart: Part = EntityTestFactory.createPart({ isNext: true })
             const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
 
-            const expectedRank: number =  onAirPart.getRank() + 0.1
+            const expectedRank: number =  onAirPart.getRank() + 1
 
             const testee: Rundown = new Rundown({
               mode: RundownMode.ACTIVE,

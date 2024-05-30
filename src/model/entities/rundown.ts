@@ -722,7 +722,7 @@ export class Rundown extends BasicRundown {
       if (!(error instanceof LastPartInSegmentException)) {
         throw error
       }
-      partToBeUpdated.updateRank(onAirPart.getRank() + 0.1)
+      partToBeUpdated.updateRank(onAirPart.getRank() + 1)
     }
   }
 
