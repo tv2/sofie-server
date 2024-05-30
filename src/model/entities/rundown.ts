@@ -707,18 +707,23 @@ export class Rundown extends BasicRundown {
   }
 
   private updateRankFromOnAirAndNextParts(partToBeUpdated: Part): void {
-    const onAirRank: number = this.activeCursor?.part.getRank() ?? 0
-    const nextRank: number = this.nextCursor?.part.getRank() ?? 0
-
-    if (this.activeCursor?.segment.id !== this.nextCursor?.segment.id) {
-      // The new rank is onAir Parts rank times 1.5
-      partToBeUpdated.updateRank(onAirRank * 1.5)
+    if (!this.activeCursor) {
       return
     }
 
-    // The new rank is half the 'distance' between the onAir and next Parts plus the rank of the onAir Part.
-    const newRank: number = (nextRank - onAirRank) / 2 + onAirRank
-    partToBeUpdated.updateRank(newRank)
+    const onAirPart: Part = this.activeCursor.part
+    const onAirSegment: Segment = this.activeCursor.segment
+
+    try {
+      const partAfterOnAirPart: Part = onAirSegment.findNextPart(onAirPart)
+      const newRank: number = (partAfterOnAirPart.getRank() - onAirPart.getRank()) / 2 + onAirPart.getRank()
+      partToBeUpdated.updateRank(newRank)
+    } catch (error) {
+      if (!(error instanceof LastPartInSegmentException)) {
+        throw error
+      }
+      partToBeUpdated.updateRank(onAirPart.getRank() + 0.1)
+    }
   }
 
   public stopActivePiecesOnLayers(layers: string[]): void {
