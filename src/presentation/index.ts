@@ -45,10 +45,10 @@ class SofieServer {
 }
 
 async function startSofieServer(): Promise<void> {
+  await connectToDatabase()
+  await startSystemServices()
   attachExpressServerToPort(REST_API_PORT)
   startRundownEventServer()
-  await connectToDatabase()
-  startSystemServices()
 }
 
 function attachExpressServerToPort(port: number): void {
@@ -69,8 +69,8 @@ async function connectToDatabase(): Promise<void> {
     .catch((reason) => logger.data(reason).error('Failed to connect to database'))
 }
 
-function startSystemServices(): void {
-  ServiceFacade.createIngestChangeService()
+async function startSystemServices(): Promise<void> {
+  await ServiceFacade.createIngestChangeService().initialize()
   ServiceFacade.createIngestService()
   ServiceFacade.createMediaDataChangeService()
   ServiceFacade.createDeviceDataChangedService()
