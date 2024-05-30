@@ -7,6 +7,7 @@ import { ConfigurationRepository } from '../../data-access/repositories/interfac
 import { Configuration } from '../../model/entities/configuration'
 import { StatusMessageService } from './interfaces/status-message-service'
 import { Logger } from '../../logger/logger'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 
 const CONFIGURATION_STATUS_MESSAGE_ID_PREFIX: string = 'INVALID_CONFIGURATION_'
 
@@ -45,6 +46,10 @@ export class ConfigurationChangedService implements DataChangeService {
     this.logger = logger.tag(ConfigurationChangedService.name)
     this.validateConfiguration().catch(error => this.logger.data(error).error('Failed to validate configuration'))
     this.listenForShowStyleChanges(showStyleConfigurationChangedListener)
+  }
+
+  public initialize(): Promise<void> {
+    throw new UnsupportedOperationException('Not implemented')
   }
 
   private listenForShowStyleChanges(showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>): void {
