@@ -169,6 +169,24 @@ describe(Part.name, () => {
         expect(testee.getPieces()).toContain(unplannedPiece)
       })
 
+      describe('there is already a Piece on the layer of the inserted Piece', () => {
+        it('does not remove the existing Piece from the Part', () => {
+          const layer: string = 'someLayer'
+          const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
+          const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
+
+          const testee: Part = new Part({ id: 'partId', pieces: [existingPiece] } as PartInterface)
+
+          expect(testee.getPieces()).toContain(existingPiece)
+          expect(testee.getPieces()).not.toContain(unplannedPiece)
+
+          testee.insertPiece(unplannedPiece)
+
+          expect(testee.getPieces()).toContain(existingPiece)
+          expect(testee.getPieces()).toContain(unplannedPiece)
+        })
+      })
+
       describe('the Part is On Air', () => {
         it('sets the start of the Piece to the amount of time since the Part was started', () => {
           const now: number = 1000
@@ -2277,61 +2295,78 @@ describe(Part.name, () => {
   })
 
   describe(Part.prototype.markAsUnsynced.name, () => {
-    it('marks the Part as unsynced',() => {
-      const testee: Part = new Part({ isUnsynced: false, segmentId: 'someSegmentId' } as PartInterface)
-      expect(testee.isUnsynced()).toBeFalsy()
-      testee.markAsUnsynced()
-      expect(testee.isUnsynced()).toBeTruthy()
-    })
-
-    it('sets the rank to one lower than the original rank', () => {
-      const rank: number = 500
-      const testee: Part = new Part({ rank, segmentId: 'someSegmentId' } as PartInterface)
-      testee.markAsUnsynced()
-      expect(testee.getRank()).toBe(rank - 1)
-    })
-
-    describe('segment id already have the unsynced postfix', () => {
-      it('does not add an extra postfix', () => {
-        const segmentIdWithPostfix: string = `someSegmentId${UNSYNCED_ID_POSTFIX}`
-        const testee: Part = new Part({ segmentId: segmentIdWithPostfix } as PartInterface)
+    describe('the Part is not planned', () => {
+      it('is not marked as unsynced', () => {
+        // A Part is planned if it has an "ingestedPart"
+        const testee: Part = new Part({ isUnsynced: false, ingestedPart: undefined } as PartInterface)
+        expect(testee.isUnsynced()).toBeFalsy()
         testee.markAsUnsynced()
-        expect(testee.getSegmentId()).toBe(segmentIdWithPostfix)
+        expect(testee.isUnsynced()).toBeFalsy()
       })
     })
 
-    it('marks all its Pieces as unsynced', () => {
-      const pieceOne: Piece = EntityMockFactory.createPieceMock({ id: '1' } as PieceInterface)
-      const pieceTwo: Piece = EntityMockFactory.createPieceMock({ id: '2' } as PieceInterface)
-      const pieceThree: Piece = EntityMockFactory.createPieceMock({ id: '3' } as PieceInterface)
+    describe('the Part is planned', () => {
+      it('marks the Part as unsynced',() => {
+        const ingestedPart: IngestedPart = {} as IngestedPart
+        const testee: Part = new Part({ isUnsynced: false, ingestedPart,  segmentId: 'someSegmentId' } as PartInterface)
+        expect(testee.isUnsynced()).toBeFalsy()
+        testee.markAsUnsynced()
+        expect(testee.isUnsynced()).toBeTruthy()
+      })
 
-      const pieces: Piece[] = [
-        instance(pieceOne),
-        instance(pieceTwo),
-        instance(pieceThree)
-      ]
+      it('sets the rank to one lower than the original rank', () => {
+        const ingestedPart: IngestedPart = {} as IngestedPart
+        const rank: number = 500
+        const testee: Part = new Part({ rank, ingestedPart, segmentId: 'someSegmentId' } as PartInterface)
+        testee.markAsUnsynced()
+        expect(testee.getRank()).toBe(rank - 1)
+      })
 
-      const testee: Part = new Part({ pieces, segmentId: 'segmentId' } as PartInterface)
-      testee.markAsUnsynced()
+      describe('segment id already have the unsynced postfix', () => {
+        const ingestedPart: IngestedPart = {} as IngestedPart
+        it('does not add an extra postfix', () => {
+          const segmentIdWithPostfix: string = `someSegmentId${UNSYNCED_ID_POSTFIX}`
+          const testee: Part = new Part({ ingestedPart, segmentId: segmentIdWithPostfix } as PartInterface)
+          testee.markAsUnsynced()
+          expect(testee.getSegmentId()).toBe(segmentIdWithPostfix)
+        })
+      })
 
-      verify(pieceOne.markAsUnsyncedWithUnsyncedPart()).once()
-      verify(pieceTwo.markAsUnsyncedWithUnsyncedPart()).once()
-      verify(pieceThree.markAsUnsyncedWithUnsyncedPart()).once()
-    })
+      it('marks all its Pieces as unsynced', () => {
+        const pieceOne: Piece = EntityMockFactory.createPieceMock({ id: '1' } as PieceInterface)
+        const pieceTwo: Piece = EntityMockFactory.createPieceMock({ id: '2' } as PieceInterface)
+        const pieceThree: Piece = EntityMockFactory.createPieceMock({ id: '3' } as PieceInterface)
 
-    it('converts all its pieces into unsynced copies', () => {
-      const pieceOne: Piece = EntityTestFactory.createPiece({ id: '1' } as PieceInterface)
-      const pieceTwo: Piece = EntityTestFactory.createPiece({ id: '2' } as PieceInterface)
-      const pieceThree: Piece = EntityTestFactory.createPiece({ id: '3' } as PieceInterface)
+        const pieces: Piece[] = [
+          instance(pieceOne),
+          instance(pieceTwo),
+          instance(pieceThree)
+        ]
 
-      const pieces: Piece[] = [pieceOne, pieceTwo, pieceThree]
+        const ingestedPart: IngestedPart = {} as IngestedPart
+        const testee: Part = new Part({ pieces, ingestedPart, segmentId: 'segmentId' } as PartInterface)
+        testee.markAsUnsynced()
 
-      const testee: Part = new Part({ pieces, segmentId: 'segmentId' } as PartInterface)
+        verify(pieceOne.markAsUnsyncedWithUnsyncedPart()).once()
+        verify(pieceTwo.markAsUnsyncedWithUnsyncedPart()).once()
+        verify(pieceThree.markAsUnsyncedWithUnsyncedPart()).once()
+      })
 
-      testee.markAsUnsynced()
+      it('converts all its pieces into unsynced copies', () => {
+        const pieceOne: Piece = EntityTestFactory.createPiece({ id: '1' } as PieceInterface)
+        const pieceTwo: Piece = EntityTestFactory.createPiece({ id: '2' } as PieceInterface)
+        const pieceThree: Piece = EntityTestFactory.createPiece({ id: '3' } as PieceInterface)
 
-      expect(testee.getPieces()).not.toEqual(pieces)
-      testee.getPieces().forEach(piece => expect(piece.id).toContain(UNSYNCED_ID_POSTFIX))
+        const pieces: Piece[] = [pieceOne, pieceTwo, pieceThree]
+
+        const ingestedPart: IngestedPart = {} as IngestedPart
+        const testee: Part = new Part({ pieces, ingestedPart, segmentId: 'segmentId' } as PartInterface)
+
+        testee.markAsUnsynced()
+
+        expect(testee.getPieces()).not.toEqual(pieces)
+        testee.getPieces().forEach(piece => expect(piece.id).toContain(UNSYNCED_ID_POSTFIX))
+      })
     })
   })
 

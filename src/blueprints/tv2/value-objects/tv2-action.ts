@@ -149,6 +149,7 @@ export interface Tv2SplitScreenInsertSourceInputAction extends Tv2PieceAction {
   metadata: {
     contentType: Tv2ActionContentType.SPLIT_SCREEN,
     actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT
+    insertedContentType: Tv2ActionContentType
   } & Tv2SplitScreenInsertSourceInputMetadata
 }
 

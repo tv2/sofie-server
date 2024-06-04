@@ -23,6 +23,7 @@ import { RundownTiming } from '../value-objects/rundown-timing'
 import { InTransition } from '../value-objects/in-transition'
 import { RundownMode } from '../enums/rundown-mode'
 import { AlreadyRehearsalException } from '../exceptions/already-rehearsal-exception'
+import { InvalidSegmentException } from '../exceptions/invalid-segment-exception'
 
 export interface RundownInterface {
   id: string
@@ -143,7 +144,7 @@ export class Rundown extends BasicRundown {
   }
 
   private isSegmentValidForRundownExecution(segment: Segment): boolean {
-    return !segment.isHidden && segment.getParts().length > 0
+    return !segment.invalidity && !segment.isHidden && segment.getParts().length > 0
   }
 
   private setNextFromActive(owner: Owner): void {
@@ -495,6 +496,10 @@ export class Rundown extends BasicRundown {
     const nextSegment: Segment = this.findSegment(segmentId)
     const nextPart: Part = nextSegment.findPart(partId)
 
+    if (nextSegment.invalidity) {
+      throw new InvalidSegmentException(`Unable to set segment "${nextSegment.name}" as next, since it is invalid.`)
+    }
+
     if (nextPart.isOnAir()) {
       throw new OnAirException('Can\'t set active part as next.')
     }
@@ -696,8 +701,29 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.insertPartAsNext.name)
     this.assertNotUndefined(this.activeCursor, 'active Segment')
 
+    this.updateRankFromOnAirPart(part)
     this.activeCursor.segment.insertPartAfterActivePart(part)
     this.setNext(this.activeCursor.segment.id, part.id)
+  }
+
+  private updateRankFromOnAirPart(partToBeUpdated: Part): void {
+    if (!this.activeCursor) {
+      return
+    }
+
+    const onAirPart: Part = this.activeCursor.part
+    const onAirSegment: Segment = this.activeCursor.segment
+
+    try {
+      const partAfterOnAirPart: Part = onAirSegment.findNextPart(onAirPart)
+      const newRank: number = (partAfterOnAirPart.getRank() - onAirPart.getRank()) / 2 + onAirPart.getRank()
+      partToBeUpdated.updateRank(newRank)
+    } catch (error) {
+      if (!(error instanceof LastPartInSegmentException)) {
+        throw error
+      }
+      partToBeUpdated.updateRank(onAirPart.getRank() + 1)
+    }
   }
 
   public stopActivePiecesOnLayers(layers: string[]): void {

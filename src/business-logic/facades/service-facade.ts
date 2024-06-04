@@ -104,8 +104,11 @@ export class ServiceFacade {
   }
 
   public static createIngestService(): IngestService {
-    const httpService: HttpService = new GotHttpService()
-    return new Tv2INewsIngestService(httpService, RepositoryFacade.createRundownRepository())
+    return new Tv2INewsIngestService(ServiceFacade.createHttpService(), RepositoryFacade.createRundownRepository())
+  }
+
+  private static createHttpService(): HttpService {
+    return new GotHttpService()
   }
 
   public static createConfigurationService(): ConfigurationService {
