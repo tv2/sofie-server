@@ -23,6 +23,12 @@ import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configu
 import { SisyfosChannelsTimelineObject, SisyfosType } from '../timeline-state-resolver-types/sisyfos-types'
 import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
 import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
+import {
+  TriCasterInputName, TriCasterLayer, TriCasterLayerName,
+  TriCasterMixEffectContentType, TriCasterMixEffectEffectModeContent,
+  TriCasterMixEffectTimelineObject, TriCasterMixOutputTimelineObject, TriCasterTransition,
+  TriCasterType
+} from '../timeline-state-resolver-types/tri-caster-type'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -218,6 +224,12 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
         this.updateAtemSplitScreenBoxesWithMediaPlayer(timelineObject, mediaPlayer)
         break
       }
+      case DeviceType.TRICASTER: {
+        this.updateTriCasterProgramWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateTriCasterLookaheadWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateTriCasterSplitScreenBoxesWithMediaPlayer(timelineObject, mediaPlayer)
+        break
+      }
       case DeviceType.SISYFOS: {
         this.updateSisyfosTimelineObjectWithMediaPlayer(timelineObject, mediaPlayer)
         break
@@ -278,6 +290,47 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
         continue
       }
       box.source = mediaPlayer.videoMixerSource
+    }
+  }
+
+  private updateTriCasterProgramWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+    if (timelineObject.content.deviceType !== DeviceType.TRICASTER || timelineObject.content.type !== TriCasterType.ME) {
+      return
+    }
+    const triCasterMeTimelineObject: TriCasterMixEffectTimelineObject = timelineObject as TriCasterMixEffectTimelineObject
+    if (triCasterMeTimelineObject.content.me.type !== TriCasterMixEffectContentType.PROGRAM) {
+      return
+    }
+    triCasterMeTimelineObject.content.me.programInput = this.prefixSourceInputWithTriCasterPrefix(mediaPlayer.videoMixerSource)
+  }
+
+  private prefixSourceInputWithTriCasterPrefix(sourceInput: number): TriCasterInputName {
+    return `input${sourceInput}`
+  }
+
+  private updateTriCasterLookaheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+    if (timelineObject.content.deviceType !== DeviceType.TRICASTER || timelineObject.content.type !== TriCasterType.MIX_OUTPUT) {
+      return
+    }
+    const triCasterMixOutputTimelineObject: TriCasterMixOutputTimelineObject = timelineObject as TriCasterMixOutputTimelineObject
+    triCasterMixOutputTimelineObject.content.source = this.prefixSourceInputWithTriCasterPrefix(mediaPlayer.videoMixerSource)
+  }
+
+  private updateTriCasterSplitScreenBoxesWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+    if (timelineObject.content.deviceType !== DeviceType.TRICASTER || timelineObject.content.type !== TriCasterType.ME) {
+      return
+    }
+    const triCasterMeTimelineObject: TriCasterMixEffectTimelineObject = timelineObject as TriCasterMixEffectTimelineObject
+    if (triCasterMeTimelineObject.content.me.type !== TriCasterMixEffectContentType.EFFECT_MODE || triCasterMeTimelineObject.content.me.transitionEffect !== TriCasterTransition.SPLIT_SCREEN) {
+      return
+    }
+    const meEffectContent: TriCasterMixEffectEffectModeContent = triCasterMeTimelineObject.content.me
+    for (const key of Object.keys(meEffectContent.layers)) {
+      const layer: TriCasterLayer | undefined = meEffectContent.layers[key as TriCasterLayerName]
+      if (!layer || !layer.input || layer.input !== this.prefixSourceInputWithTriCasterPrefix(A_B_SOURCE_INPUT_PLACEHOLDER)) {
+        continue
+      }
+      layer.input = this.prefixSourceInputWithTriCasterPrefix(mediaPlayer.videoMixerSource)
     }
   }
 
