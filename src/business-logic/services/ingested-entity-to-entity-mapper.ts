@@ -54,6 +54,7 @@ export class IngestedEntityToEntityMapper {
       name: ingestedSegment.name,
       rank: ingestedSegment.rank,
       isHidden: ingestedSegment.isHidden,
+      referenceTag: ingestedSegment.referenceTag,
       metadata: ingestedSegment.metadata,
       isOnAir: false,
       isNext: false,
