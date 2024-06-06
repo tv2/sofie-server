@@ -70,6 +70,9 @@ export interface MongoSegment extends MongoId {
   referenceTag?: string
   budgetDuration?: number
   executedAtEpochTime?: number
+  invalidity?: {
+    reason: string
+  }
 }
 
 export interface MongoPart extends MongoId {
@@ -301,6 +304,7 @@ export class MongoEntityConverter {
       isUnsynced: segment.isUnsynced(),
       budgetDuration: segment.expectedDurationInMs,
       executedAtEpochTime: segment.getExecutedAtEpochTime(),
+      invalidity: segment.invalidity
     }
   }
 

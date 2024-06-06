@@ -19,15 +19,17 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
+import { ActionFactory } from './ActionFactory'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
-export class Tv2ReplayActionFactory {
+export class Tv2ReplayActionFactory extends ActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
   ) {
+    super()
   }
 
   public createReplayActions(configuration: Tv2BlueprintConfiguration): Action[] {
@@ -49,13 +51,13 @@ export class Tv2ReplayActionFactory {
   }
 
   private createReplayActionWithVoiceOverAsNext(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): Tv2ReplayAction {
-    const sanitizedName: string = this.getSanitizedName(source)
-    const partId: string = `${sanitizedName}_VO_as_next_part_action`
+    const sanitizedId: string = this.sanitizeStringForId(source.name)
+    const partId: string = `${sanitizedId}_VO_as_next_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name} VO`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.VOICE_OVER)
 
     return {
-      id: `insert_${sanitizedName}_VO_as_next_part_action`,
+      id: `insert_${sanitizedId}_VO_as_next_part_action`,
       name: `${source.name} VO PVW`,
       rank: 0,
       description: '',
@@ -73,13 +75,13 @@ export class Tv2ReplayActionFactory {
   }
 
   private createReplayActionWithVoiceOverAsOnAir(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): Tv2ReplayAction {
-    const sanitizedName: string = this.getSanitizedName(source)
-    const partId: string = `${sanitizedName}_VO_on_air_part_action`
+    const sanitizedId: string = this.sanitizeStringForId(source.name)
+    const partId: string = `${sanitizedId}_VO_on_air_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name} VO`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.VOICE_OVER)
 
     return {
-      id: `insert_${sanitizedName}_VO_as_on_air_part_action`,
+      id: `insert_${sanitizedId}_VO_as_on_air_part_action`,
       name: `${source.name} VO PGM`,
       rank: 0,
       description: '',
@@ -96,18 +98,14 @@ export class Tv2ReplayActionFactory {
     }
   }
 
-  private getSanitizedName(source: Tv2SourceMappingWithSound): string {
-    return source.name.replaceAll(' ', '').replaceAll('/', '_')
-  }
-
   private createReplayActionWithoutVoiceOverAsNext(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): Tv2ReplayAction {
-    const sanitizedName: string = this.getSanitizedName(source)
-    const partId: string = `${sanitizedName}_part_action`
+    const sanitizedId: string = this.sanitizeStringForId(source.name)
+    const partId: string = `${sanitizedId}_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name}`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.FULL)
 
     return {
-      id: `insert_${sanitizedName}_as_next_part_action`,
+      id: `insert_${sanitizedId}_as_next_part_action`,
       name: `${source.name} PVW`,
       rank: 0,
       description: '',
@@ -125,13 +123,13 @@ export class Tv2ReplayActionFactory {
   }
 
   private createReplayActionWithoutVoiceOverAsOnAir(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound): Tv2ReplayAction {
-    const sanitizedName: string = this.getSanitizedName(source)
-    const partId: string = `${sanitizedName}_on_air_part_action`
+    const sanitizedId: string = this.sanitizeStringForId(source.name)
+    const partId: string = `${sanitizedId}_on_air_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name}`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.FULL)
 
     return {
-      id: `insert_${sanitizedName}_as_on_air_part_action`,
+      id: `insert_${sanitizedId}_as_on_air_part_action`,
       name: source.name,
       rank: 0,
       description: '',
@@ -192,7 +190,7 @@ export class Tv2ReplayActionFactory {
       }
     }
     return {
-      id: `replayAction_${this.getSanitizedName(source)}`,
+      id: `replayAction_${this.sanitizeStringForId(source.name)}`,
       partId: parentPartId,
       name: `${source.name}${audioMode === Tv2AudioMode.VOICE_OVER ? ' VO' : ''}`,
       layer: Tv2SourceLayer.REPLAY,
@@ -211,9 +209,9 @@ export class Tv2ReplayActionFactory {
   }
 
   private createReplayStudioAuxAction(source: Tv2SourceMappingWithSound): Tv2ReplayAuxAction {
-    const sanitizedName: string = this.getSanitizedName(source)
+    const sanitizedId: string = this.sanitizeStringForId(source.name)
     return {
-      id: `insert_studio_aux_${sanitizedName}_action`,
+      id: `insert_studio_aux_${sanitizedId}_action`,
       name: `${source.name} Studio AUX`,
       rank: 0,
       description: '',
@@ -228,9 +226,9 @@ export class Tv2ReplayActionFactory {
   }
 
   private createStudioAuxPieceInterface(source: Tv2SourceMappingWithSound): Tv2PieceInterface {
-    const sanitizedName: string = this.getSanitizedName(source)
+    const sanitizedId: string = this.sanitizeStringForId(source.name)
     return {
-      id: `insert_studio_aux_${sanitizedName}_piece`,
+      id: `insert_studio_aux_${sanitizedId}_piece`,
       name: `${source.name} Studio AUX`,
       partId: '',
       layer: Tv2SourceLayer.REPLAY_STUDIO_AUXILIARY,
@@ -254,9 +252,9 @@ export class Tv2ReplayActionFactory {
   }
 
   private createReplayVizAuxAction(source: Tv2SourceMappingWithSound): Tv2ReplayAuxAction {
-    const sanitizedName: string = this.getSanitizedName(source)
+    const sanitizedId: string = this.sanitizeStringForId(source.name)
     return {
-      id: `insert_viz_aux_${sanitizedName}_action`,
+      id: `insert_viz_aux_${sanitizedId}_action`,
       name: `${source.name} Viz AUX`,
       rank: 0,
       description: '',
@@ -271,9 +269,9 @@ export class Tv2ReplayActionFactory {
   }
 
   private createVizAuxPieceInterface(source: Tv2SourceMappingWithSound): Tv2PieceInterface {
-    const sanitizedName: string = this.getSanitizedName(source)
+    const sanitizedId: string = this.sanitizeStringForId(source.name)
     return {
-      id: `insert_viz_aux_${sanitizedName}_piece`,
+      id: `insert_viz_aux_${sanitizedId}_piece`,
       name: `${source.name} Viz AUX`,
       partId: '',
       layer: Tv2SourceLayer.REPLAY_VIZ_AUXILIARY,

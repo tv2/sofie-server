@@ -139,6 +139,9 @@ export class Part {
   }
 
   public markAsUnsynced(): void {
+    if (!this.isPlanned) {
+      return // Only planned Parts can be unsynced
+    }
     this.isPartUnsynced = true
     this.rank = this.rank - 1
     this.pieces.forEach(piece => piece.markAsUnsyncedWithUnsyncedPart())
@@ -186,15 +189,6 @@ export class Part {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
     }
-    const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === unPlannedPiece.layer)
-    if (indexOfExistingPieceOnLayer >= 0) {
-      const piecesToBeRemoved: Piece[] = this.pieces.splice(indexOfExistingPieceOnLayer, 1)
-      piecesToBeRemoved.forEach(piece => {
-        if (piece.isPlanned) {
-          this.replacedPlannedPieces.push(piece)
-        }
-      })
-    }
     this.pieces.push(unPlannedPiece)
   }
 
@@ -230,6 +224,10 @@ export class Part {
 
   public getRank(): number {
     return this.rank
+  }
+
+  public updateRank(rank: number): void {
+    this.rank = rank
   }
 
   public setSegmentId(segmentId: string): void {

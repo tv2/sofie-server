@@ -18,10 +18,12 @@ import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import {
   Tv2RobotTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-robot-timeline-object-factory'
+import { ActionFactory } from './ActionFactory'
 
-export class Tv2RobotActionFactory {
+export class Tv2RobotActionFactory extends ActionFactory {
 
   constructor(private readonly robotTimelineObjectFactory: Tv2RobotTimelineObjectFactory) {
+    super()
   }
 
   public createRobotActions(): Tv2PieceAction[] {
@@ -91,7 +93,7 @@ export class Tv2RobotActionFactory {
 
   private createCallPresetPieceInterface(preset: number): Tv2PieceInterface {
     return {
-      id: `callRobotPreset_${preset}`,
+      id: `callRobotPreset_${this.sanitizeStringForId(preset + '')}`,
       name: `Call Preset ${preset}`,
       partId: '',
       layer: Tv2SourceLayer.ROBOT_CAMERA,
