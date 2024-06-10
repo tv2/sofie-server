@@ -296,14 +296,14 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
   }
 
   private updateTriCasterProgramWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
-    if (timelineObject.content.deviceType !== DeviceType.TRICASTER || timelineObject.content.type !== TriCasterType.ME) {
+    if (!this.isTriCasterTimelineObject(timelineObject, TriCasterType.ME)) {
       return
     }
-    const triCasterMeTimelineObject: TriCasterMixEffectTimelineObject = timelineObject as TriCasterMixEffectTimelineObject
-    if (triCasterMeTimelineObject.content.me.type !== TriCasterMixEffectContentType.PROGRAM) {
+
+    if (timelineObject.content.me.type !== TriCasterMixEffectContentType.PROGRAM) {
       return
     }
-    triCasterMeTimelineObject.content.me.programInput = this.prefixSourceInputWithTriCasterPrefix(mediaPlayer.videoMixerSource)
+    timelineObject.content.me.programInput = this.prefixSourceInputWithTriCasterPrefix(mediaPlayer.videoMixerSource)
   }
 
   private prefixSourceInputWithTriCasterPrefix(sourceInput: number): TriCasterInputName {
