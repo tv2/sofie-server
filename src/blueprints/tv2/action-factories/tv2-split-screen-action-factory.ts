@@ -213,7 +213,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private createSplitScreenPieceInterface(partId: string, name: string, metadata: Tv2PieceMetadata, timelineObjects: Tv2BlueprintTimelineObject[]): Tv2PieceInterface {
     return {
-      id: `${partId}_piece`,
+      id: `${partId}_piece_${Date.now()}`,
       partId,
       name,
       layer: Tv2SourceLayer.SPLIT_SCREEN,
@@ -233,7 +233,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private createSplitScreenPieceInterfaceFromPiece(piece: Piece, metadata: Tv2PieceMetadata, timelineObjects: Tv2BlueprintTimelineObject[]): Tv2PieceInterface {
     return {
-      id: `${piece.getPartId()}_piece`,
+      id: `${piece.getPartId()}_piece_${Date.now()}`,
       partId: piece.getPartId(),
       name: piece.name,
       layer: Tv2SourceLayer.SPLIT_SCREEN,
