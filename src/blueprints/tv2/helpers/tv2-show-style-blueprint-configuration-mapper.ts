@@ -72,8 +72,8 @@ interface CoreBreaker {
   LoadFirstFrame: boolean
 }
 
-interface CoreShowStyleVariantBlueprintConfiguration {
-  GfxDefaults: CoreGraphicsDefault[]
+export interface CoreShowStyleVariantBlueprintConfiguration {
+  GfxDefaults?: CoreGraphicsDefault[]
 }
 
 export class Tv2ShowStyleBlueprintConfigurationMapper {
