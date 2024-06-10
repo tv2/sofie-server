@@ -23,6 +23,14 @@ import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configu
 import { SisyfosChannelsTimelineObject, SisyfosType } from '../timeline-state-resolver-types/sisyfos-types'
 import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
 import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
+import {
+  TriCasterInputName,
+  TriCasterMixEffectContentType,
+  TriCasterMixEffectTimelineObject,
+  TriCasterMixOutputTimelineObject,
+  TriCasterTransition,
+  TriCasterType
+} from '../timeline-state-resolver-types/tri-caster-type'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -218,6 +226,12 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
         this.updateAtemSplitScreenBoxesWithMediaPlayer(timelineObject, mediaPlayer)
         break
       }
+      case DeviceType.TRICASTER: {
+        this.updateTriCasterProgramWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateTriCasterLookaheadWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateTriCasterSplitScreenBoxesWithMediaPlayer(timelineObject, mediaPlayer)
+        break
+      }
       case DeviceType.SISYFOS: {
         this.updateSisyfosTimelineObjectWithMediaPlayer(timelineObject, mediaPlayer)
         break
@@ -278,6 +292,51 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
         continue
       }
       box.source = mediaPlayer.videoMixerSource
+    }
+  }
+
+  private updateTriCasterProgramWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+    if (!this.isTriCasterTimelineObject(timelineObject, TriCasterType.ME)) {
+      return
+    }
+
+    if (timelineObject.content.me.type !== TriCasterMixEffectContentType.PROGRAM) {
+      return
+    }
+    timelineObject.content.me.programInput = this.prefixSourceInputWithTriCasterPrefix(mediaPlayer.videoMixerSource)
+  }
+
+  private prefixSourceInputWithTriCasterPrefix(sourceInput: number): TriCasterInputName {
+    return `input${sourceInput}`
+  }
+
+  private updateTriCasterLookaheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+    if (!this.isTriCasterTimelineObject(timelineObject, TriCasterType.MIX_OUTPUT)) {
+      return
+    }
+    timelineObject.content.source = this.prefixSourceInputWithTriCasterPrefix(mediaPlayer.videoMixerSource)
+  }
+
+  private isTriCasterTimelineObject(timelineObject: Tv2BlueprintTimelineObject, contentType: TriCasterType.MIX_OUTPUT): timelineObject is TriCasterMixOutputTimelineObject
+  private isTriCasterTimelineObject(timelineObject: Tv2BlueprintTimelineObject, contentType: TriCasterType.ME): timelineObject is TriCasterMixEffectTimelineObject
+  private isTriCasterTimelineObject(timelineObject: Tv2BlueprintTimelineObject, contentType: TriCasterType): timelineObject is TriCasterMixOutputTimelineObject | TriCasterMixEffectTimelineObject {
+    return timelineObject.content.deviceType === DeviceType.TRICASTER  && timelineObject.content.type === contentType
+  }
+
+  private updateTriCasterSplitScreenBoxesWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+    if (!this.isTriCasterTimelineObject(timelineObject, TriCasterType.ME)) {
+      return
+    }
+    if (timelineObject.content.me.type !== TriCasterMixEffectContentType.EFFECT_MODE || timelineObject.content.me.transitionEffect !== TriCasterTransition.SPLIT_SCREEN) {
+      return
+    }
+
+    const triCasterAbSourceInputPlaceholder: string = this.prefixSourceInputWithTriCasterPrefix(A_B_SOURCE_INPUT_PLACEHOLDER)
+    for (const layer of Object.values(timelineObject.content.me.layers)) {
+      if (layer !== triCasterAbSourceInputPlaceholder) {
+        continue
+      }
+      layer.input = this.prefixSourceInputWithTriCasterPrefix(mediaPlayer.videoMixerSource)
     }
   }
 
