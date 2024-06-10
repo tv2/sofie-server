@@ -12,7 +12,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
 
 
   public validateConfiguration(configuration: Configuration): StatusMessage[] {
-    const tv2BlueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration)
+    const tv2BlueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, '')
     // Add validation as needed.
     return [
       ...this.validateShowStyleConfiguration(tv2BlueprintConfiguration.showStyle)

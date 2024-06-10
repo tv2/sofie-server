@@ -191,7 +191,11 @@ export class RepositoryFacade {
   }
 
   private static createShowStyleRepository(): ShowStyleRepository {
-    return new MongoShowStyleRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter())
+    return new MongoShowStyleRepository(
+      MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      RepositoryFacade.createShowStyleVariantRepository(),
+      new MongoEntityConverter()
+    )
   }
 
   public static createShowStyleChangedListener(): DataChangedListener<ShowStyle> {

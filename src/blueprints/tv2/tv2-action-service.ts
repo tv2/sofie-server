@@ -73,8 +73,8 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     return []
   }
 
-  public generateActions(configuration: Configuration, actionManifests: Tv2ActionManifest[]): Action[] {
-    const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration)
+  public generateActions(configuration: Configuration, showStyleVariantId: string, actionManifests: Tv2ActionManifest[]): Action[] {
+    const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, showStyleVariantId)
     this.setFactories(blueprintConfiguration)
 
     return [
