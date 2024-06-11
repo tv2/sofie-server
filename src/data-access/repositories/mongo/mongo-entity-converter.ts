@@ -447,7 +447,7 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertShowStyle(mongoShowStyle: MongoShowStyle, showStyleVariants: ShowStyleVariant[] = []): ShowStyle {
+  public convertShowStyle(mongoShowStyle: MongoShowStyle, showStyleVariants: ShowStyleVariant[]): ShowStyle {
     return {
       blueprintConfiguration: mongoShowStyle.blueprintConfig,
       variants: showStyleVariants
