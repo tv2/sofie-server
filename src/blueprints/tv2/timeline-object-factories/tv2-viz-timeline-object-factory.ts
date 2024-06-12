@@ -24,6 +24,8 @@ enum EngineName {
   WALL = 'WALL1'
 }
 
+const ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR: string = '\n - '
+
 export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineObjectFactory, Tv2GraphicsElementTimelineObjectFactory {
 
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): VizMseElementInternalTimelineObject {
@@ -173,7 +175,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       deviceType: DeviceType.VIZ_MSE,
       type: VizType.ELEMENT_INTERNAL,
       templateName: overlayGraphicsData.templateName,
-      templateData: [overlayGraphicsData.displayText],
+      templateData: overlayGraphicsData.displayText.split(ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR), // TODO: When ingest is implemented, this should no longer be based on the display name.
       channelName: EngineName.OVERLAY,
       showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }
