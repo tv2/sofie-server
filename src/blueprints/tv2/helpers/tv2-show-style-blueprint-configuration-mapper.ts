@@ -19,8 +19,14 @@ interface CoreShowStyleBlueprintConfiguration {
   GfxSchemaTemplates: CoreGraphicsSchema[]
   DVEStyles: CoreSplitScreenConfiguration[]
   BreakerConfig: CoreBreaker[]
-  Transitions: { _id: string, Transition: string }[]
+  Transitions: Transition[]
   ShowstyleTransition: string
+}
+
+// SOF-2004
+interface Transition {
+  _id: string
+  Transition: string
 }
 
 interface CoreGraphicsDefault {
@@ -81,12 +87,30 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       graphicsSchemas: this.mapGraphicsSchemas(coreConfiguration.GfxSchemaTemplates),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
       splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
-      breakerTransitionEffectConfigurations: this.mapTransitionEffectConfigurations([
-        ...coreConfiguration.Transitions.map(transition => transition.Transition),
-        coreConfiguration.ShowstyleTransition
-      ]),
+      // SOF-2004 - Need to handle undefined values from Sofie core
+      // breakerTransitionEffectConfigurations: this.mapTransitionEffectConfigurations([
+      //   ...coreConfiguration.Transitions.map(transition => transition.Transition),
+      //   coreConfiguration.ShowstyleTransition
+      // ]),
+      breakerTransitionEffectConfigurations: this.mapBreakerTransitionEffectConfigurations(
+        coreConfiguration.Transitions, 
+        coreConfiguration.ShowstyleTransition),
       breakers: this.mapToBreakers(coreConfiguration.BreakerConfig)
     }
+  }
+
+  private mapBreakerTransitionEffectConfigurations(coreTransitions: Transition[], showstyleTransition: string) : BreakerTransitionEffect[] {
+    //SOF-2004 insert guard clause to protect against undefined values
+    if (!coreTransitions) {
+      return []
+    }
+
+    const transitions = coreTransitions.map(transition => transition.Transition).filter(transition => transition !== undefined)
+
+    // If no undefined value is found, proceed with mapping
+    const breakerTransitionEffectConfigurations = this.mapTransitionEffectConfigurations([...transitions, showstyleTransition])
+    
+    return breakerTransitionEffectConfigurations
   }
 
   private mapGraphicsDefault(coreGraphicsDefaults: CoreGraphicsDefault[]): GraphicsDefault {
@@ -98,6 +122,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapGraphicsSetups(coreGraphicsSetups: CoreGraphicsSetup[]): GraphicsSetup[] {
+    //SOF-2004 insert guard clause to protect against undefined values
+    if (!coreGraphicsSetups) {
+      return []
+    }
+    
     return coreGraphicsSetups.map(setup => {
       return {
         id: setup._id,
@@ -109,7 +138,13 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     })
   }
 
+
   private mapGraphicsTemplates(coreGraphicsTemplates: CoreGraphicsTemplate[]): GraphicsTemplate[] {
+    //SOF-2004 insert guard clause to protect against undefined values
+    if(!coreGraphicsTemplates) {
+      return []
+    }
+
     return coreGraphicsTemplates.map(template => {
       return {
         name: template.VizTemplate,
@@ -131,6 +166,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapGraphicsSchemas(coreGraphicsSchemas: CoreGraphicsSchema[]): GraphicsSchema[] {
+    //SOF-2004 insert guard clause to protect against undefined values
+    if(!coreGraphicsSchemas) {
+      return []
+    }
+
     return coreGraphicsSchemas.map(schema => {
       return {
         iNewsName: schema.VizTemplate,
@@ -156,6 +196,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapSplitScreenConfigurations(coreSplitScreenConfigurations: CoreSplitScreenConfiguration[]): SplitScreenConfiguration[] {
+    //SOF-2004 insert guard clause to protect against undefined values
+    if(!coreSplitScreenConfigurations) {
+      return []
+    }
+    
     return coreSplitScreenConfigurations.map(coreSplitScreenConfiguration => {
       return {
         id: coreSplitScreenConfiguration._id,
@@ -181,6 +226,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapToBreakers(coreBreakers: CoreBreaker[]): Breaker[] {
+    //SOF-2004 insert guard clause to protect against undefined values
+    if(!coreBreakers) {
+      return []
+    }
+
     return coreBreakers.map(coreBreaker => {
       return {
         id: coreBreaker._id,

@@ -21,7 +21,8 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
 
   private validateShowStyleConfiguration(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     return [
-      ...this.validateGraphicsSchemas(showStyleConfiguration)
+      ...this.validateGraphicsSchemas(showStyleConfiguration),
+      ...this.validateGraphicsDefault(showStyleConfiguration)
     ]
   }
 
@@ -39,4 +40,50 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
         })
     })
   }
-}
+
+  private validateGraphicsDefault(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
+    const validationErrors: StatusMessage[] = []
+  
+    // Check if showStyleConfiguration.graphicsDefault exists
+    if (!showStyleConfiguration.graphicsDefault) {
+      validationErrors.push({
+        id: 'GraphicsDefaultMissing',
+        title: 'Graphics Default Configuration',
+        message: 'Graphics default configuration is missing',
+        statusCode: StatusCode.BAD
+      })
+    } else {
+      // Check if DefaultSetupName is empty
+      if (!showStyleConfiguration.graphicsDefault.setupName?.value) {
+        validationErrors.push({
+          id: 'DefaultSetupName',
+          title: 'Default Setup Name Configuration',
+          message: 'The Default Setup Name is missing or empty',
+          statusCode: StatusCode.BAD
+        })
+      }
+  
+      // Check if DefaultSchema is empty
+      if (!showStyleConfiguration.graphicsDefault.schema?.value) {
+        validationErrors.push({
+          id: 'DefaultSchema',
+          title: 'Default Schema Configuration',
+          message: 'The Default Schema is missing or empty',
+          statusCode: StatusCode.BAD
+        })
+      }
+  
+      // Check if DefaultDesign is empty
+      if (!showStyleConfiguration.graphicsDefault.design?.value) {
+        validationErrors.push({
+          id: 'DefaultDesign',
+          title: 'Default Design Configuration',
+          message: 'The Default Design is missing or empty',
+          statusCode: StatusCode.BAD
+        })
+      }
+    }
+  
+    return validationErrors
+  }
+} 
