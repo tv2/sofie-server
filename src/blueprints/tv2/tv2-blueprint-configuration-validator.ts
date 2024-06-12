@@ -45,7 +45,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
 
   private validateShowStyleVariants(showStyleVariants: ShowStyleVariant[]): StatusMessage[] {
     return showStyleVariants
-      .filter(variant => !(variant.blueprintConfiguration as CoreShowStyleVariantBlueprintConfiguration).GfxDefaults)
+      .filter(variant => !Array.isArray((variant.blueprintConfiguration as CoreShowStyleVariantBlueprintConfiguration).GfxDefaults))
       .map(variant => {
         return {
           id: `${variant.id}_noGraphicsDefault`,
