@@ -30,6 +30,7 @@ import {
 } from '../timeline-state-resolver-types/tv2-caspar-cg-types'
 
 const HTML_GRAPHICS_INDEX_FILENAME: string = 'index'
+const ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR: string = '\n - '
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory {
 
@@ -143,7 +144,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
             display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
             payload: {
               type: overlayGraphicsData.templateName,
-              0: overlayGraphicsData.displayText
+              ...Object.fromEntries(overlayGraphicsData.displayText.split(ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR).entries()), // TODO: When ingest is implemented, this should no longer be based on the display name.
             }
           }
         }
