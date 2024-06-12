@@ -21,7 +21,7 @@ import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 const SPLIT_SCREEN_ACTION_MANIFEST_ID: string = 'select_dve'
 const VIDEO_CLIP_ACTION_MANIFEST_ID: string = 'select_server_clip'
 const FULLSCREEN_GRAPHICS_ACTION_MANIFEST_ID: string = 'select_full_grafik'
-const OVERLAY_GRAPHCIS_ACTION_MANIFEST_IDS: string[] = ['studio0_graphicsLower', 'studio0_graphicsIdent', 'studio0_overlay', 'studio0_pilotOverlay']
+const OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS: string[] = ['studio0_graphicsLower', 'studio0_graphicsIdent', 'studio0_overlay', 'studio0_pilotOverlay']
 
 export class Tv2ActionManifestMapper {
 
@@ -111,7 +111,7 @@ export class Tv2ActionManifestMapper {
 
   public mapToOverlayGraphicsData(actionManifests: ActionManifest[]): Tv2OverlayGraphicsManifestData[] {
     return actionManifests
-      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestOverlayGraphicsData> => OVERLAY_GRAPHCIS_ACTION_MANIFEST_IDS.includes(actionManifest.actionId))
+      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestOverlayGraphicsData> => OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS.includes(actionManifest.actionId))
       .map(actionManifest => {
         const data: Tv2ActionManifestOverlayGraphicsData = actionManifest.data
         return {
