@@ -9,6 +9,7 @@ import { PartEndState } from '../value-objects/part-end-state'
 import { IngestedPart } from './ingested-part'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import { Invalidity } from '../value-objects/invalidity'
 
 export interface PartInterface {
   id: string
@@ -24,6 +25,7 @@ export interface PartInterface {
   expectedDuration?: number
   executedAt?: number
   playedDuration?: number
+  invalidity?: Invalidity
 
   inTransition: InTransition
   outTransition: OutTransition
@@ -55,6 +57,7 @@ export class Part {
 
   public readonly autoNext?: AutoNext
   public readonly disableNextInTransition: boolean
+  public readonly invalidity?: Invalidity
 
   private segmentId: string
   private rank: number
@@ -96,6 +99,7 @@ export class Part {
     this.isPartOnAir = part.isOnAir
     this.isPartNext = part.isNext
     this.expectedDuration = part.expectedDuration
+    this.invalidity = part.invalidity
 
     this.inTransition = part.inTransition ?? { keepPreviousPartAliveDuration: 0, delayPiecesDuration: 0 }
     this.outTransition = part.outTransition ?? { keepAliveDuration: 0 }

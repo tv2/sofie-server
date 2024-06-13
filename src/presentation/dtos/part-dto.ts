@@ -1,6 +1,7 @@
 import { Part, PartMetadata } from '../../model/entities/part'
 import { PieceDto } from './piece-dto'
 import { AutoNext } from '../../model/value-objects/auto-next'
+import { Invalidity } from '../../model/value-objects/invalidity'
 
 export class PartDto {
   public readonly id: string
@@ -14,6 +15,7 @@ export class PartDto {
   public readonly expectedDuration?: number
   public readonly executedAt: number
   public readonly playedDuration: number
+  public readonly invalidity?: Invalidity
   public readonly autoNext?: AutoNext
   public readonly isPlanned: boolean
   public readonly metadata?: PartMetadata
@@ -31,6 +33,7 @@ export class PartDto {
     this.expectedDuration = part.expectedDuration
     this.executedAt = part.getExecutedAt()
     this.playedDuration = part.getPlayedDuration()
+    this.invalidity = part.invalidity
     this.autoNext = part.autoNext
     this.isPlanned = part.isPlanned
     this.metadata = part.metadata
