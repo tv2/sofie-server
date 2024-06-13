@@ -216,7 +216,7 @@ export class MongoIngestedEntityConverter {
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
       duration: mongoPiece.enable.duration ?? undefined,
       preRollDuration: mongoPiece.prerollDuration,
-      postRollDuration: mongoPiece.prerollDuration,
+      postRollDuration: mongoPiece.postrollDuration,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
       metadata: mongoPiece.metaData,
