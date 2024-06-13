@@ -59,7 +59,6 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onDeleted(_onDeletedCallback: (id: string) => void): void {
     throw new UnsupportedOperationException(`${MongoDeviceChangedListener.name} does not support ${MongoDeviceChangedListener.prototype.onDeleted.name}`)
   }
