@@ -126,7 +126,6 @@ export class IngestedEntityToEntityMapper {
       pieces: updatedPieces,
       executedAt: partToBeUpdated.getExecutedAt(),
       playedDuration: partToBeUpdated.getPlayedDuration(),
-      invalidity: partToBeUpdated.invalidity,
       endState: partToBeUpdated.getEndState(),
       timings: this.getPartTimings(partToBeUpdated),
       ingestedPart
