@@ -23,6 +23,7 @@ import { Timeline } from '../../../model/entities/timeline'
 import { TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../../model/exceptions/already-rehearsal-exception'
+import {IngestService} from '../interfaces/ingest-service'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -368,6 +369,7 @@ function createTestee(params?: {
   pieceRepository?: PieceRepository
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
+  ingestService?: IngestService
   callbackScheduler?: CallbackScheduler
   blueprint?: Blueprint
 }): RundownTimelineService {
@@ -380,6 +382,7 @@ function createTestee(params?: {
     params?.pieceRepository ?? instance(mock<PieceRepository>()),
     params?.timelineRepository ?? instance(mock<TimelineRepository>()),
     params?.timelineBuilder ?? instance(mock<TimelineBuilder>()),
+    params?.ingestService ?? instance(mock<IngestService>()),
     params?.callbackScheduler ?? instance(mock<CallbackScheduler>()),
     params?.blueprint ?? instance(mock<Blueprint>())
   )
