@@ -357,6 +357,73 @@ describe(RundownTimelineService.name, () => {
       })
     })
   })
+
+  describe(RundownTimelineService.prototype.resetRundown.name, () => {
+    describe('when rundown is in rehearsal', () => {
+      it('is still in rehearsal after reset', async () => {
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          id: 'rundown-id',
+          segments: [EntityTestFactory.createSegment({
+            parts: [EntityTestFactory.createPart()]
+          })],
+        })
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+        rundown.enterRehearsal()
+        expect(rundown.isRehearsal()).toBeTruthy()
+
+        await testee.resetRundown(rundown.id)
+
+        expect(rundown.isRehearsal()).toBeTruthy()
+      })
+    })
+
+    describe('when rundown is active', () => {
+      it('is still active after reset', async () => {
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          id: 'rundown-id',
+          segments: [EntityTestFactory.createSegment({
+            parts: [EntityTestFactory.createPart()]
+          })],
+        })
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+        rundown.activate()
+        expect(rundown.isActive()).toBeTruthy()
+
+        await testee.resetRundown(rundown.id)
+
+        expect(rundown.isActive()).toBeTruthy()
+      })
+    })
+
+    it('emits set next event after reset event', async () => {
+      const rundown: Rundown = EntityTestFactory.createRundown({
+        id: 'rundown-id',
+        segments: [EntityTestFactory.createSegment({
+          parts: [EntityTestFactory.createPart()]
+        })],
+      })
+
+      const rundownRepository: RundownRepository = mock<RundownRepository>()
+      when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+      const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+
+      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository), rundownEventEmitter: instance(rundownEventEmitter) })
+      rundown.activate()
+
+      await testee.resetRundown(rundown.id)
+
+      verify(rundownEventEmitter.emitSetNextEvent(rundown)).calledAfter(rundownEventEmitter.emitResetEvent(rundown))
+    })
+  })
 })
 
 function createTestee(params?: {
