@@ -70,6 +70,10 @@ import {
   MongoShowStyleConfigurationChangedListener
 } from '../repositories/mongo/mongo-show-style-configuration-changed-listener'
 import { Database } from '../repositories/interfaces/database'
+import { ShowStyleVariant } from '../../model/entities/show-style-variant'
+import {
+  MongoShowStyleVariantConfigurationListener
+} from '../repositories/mongo/mongo-show-style-variant-configuration-listener'
 
 export class RepositoryFacade {
 
@@ -191,11 +195,19 @@ export class RepositoryFacade {
   }
 
   private static createShowStyleRepository(): ShowStyleRepository {
-    return new MongoShowStyleRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter())
+    return new MongoShowStyleRepository(
+      MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      RepositoryFacade.createShowStyleVariantRepository(),
+      new MongoEntityConverter()
+    )
   }
 
   public static createShowStyleChangedListener(): DataChangedListener<ShowStyle> {
     return new MongoShowStyleConfigurationChangedListener(MongoDatabase.getInstance(LoggerFacade.createLogger()), LoggerFacade.createLogger())
+  }
+
+  public static createShowStyleVariantConfigurationListener(): DataChangedListener<ShowStyleVariant> {
+    return new MongoShowStyleVariantConfigurationListener(MongoDatabase.getInstance(LoggerFacade.createLogger()), LoggerFacade.createLogger())
   }
 
   public static createShelfConfigurationRepository(): ShelfConfigurationRepository {

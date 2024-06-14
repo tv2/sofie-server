@@ -133,6 +133,7 @@ export class ServiceFacade {
       ServiceFacade.createStatusMessageService(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleChangedListener(),
+      RepositoryFacade.createShowStyleVariantConfigurationListener(),
       LoggerFacade.createLogger()
     )
   }
