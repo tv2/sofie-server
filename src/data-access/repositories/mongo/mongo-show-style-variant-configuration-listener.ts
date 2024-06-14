@@ -28,7 +28,7 @@ export class MongoShowStyleVariantConfigurationListener extends BaseMongoReposit
   }
 
   private onChange(): void {
-    // We just want to notify that a changed has been made
+    // We just want to notify that a change has been made
     this.onUpdatedCallback({} as ShowStyleVariant)
   }
 
