@@ -118,7 +118,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
 
   public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): VizMseElementPilotTimelineObject {
     return {
-      id: 'full',
+      id: 'full_graphics_viz',
       enable: {
         start: 0
       },
@@ -151,6 +151,26 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       outTransition: {
         type: VizMseTransitionType.DELAY,
         delay: blueprintConfiguration.studio.vizPilotGraphics.outTransitionDurationInMs
+      }
+    }
+  }
+
+  public createPilotGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData): VizMseElementPilotTimelineObject {
+    return {
+      id: 'ovl_graphics_viz',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_PILOT,
+      content: {
+        deviceType: DeviceType.VIZ_MSE,
+        type: VizType.ELEMENT_PILOT,
+        templateVcpId: graphicsData.vcpId,
+        continueStep: -1, // TODO: Blueprints currently don't save this value, so we can't fetch it until we control ingest
+        noAutoPreloading: false,
+        channelName: EngineName.OVERLAY,
+        ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
       }
     }
   }

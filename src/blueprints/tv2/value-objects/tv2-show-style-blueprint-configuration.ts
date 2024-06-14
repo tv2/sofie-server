@@ -118,3 +118,7 @@ export interface Breaker {
   autoNext: boolean,
   shouldLoadFirstFrame: boolean
 }
+
+export interface Tv2ShowStyleVariantBlueprintConfiguration {
+  graphicsDefault: GraphicsDefault
+}
