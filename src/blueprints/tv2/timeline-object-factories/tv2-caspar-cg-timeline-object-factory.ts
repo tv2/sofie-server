@@ -36,13 +36,10 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
   constructor(private readonly assetPathHelper: Tv2AssetPathHelper) {}
 
   public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
-    const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.graphicsFolder.name
-    const nameChunks: string[] = fullscreenGraphicsData.name.split('/')
-    const sceneName: string = nameChunks[nameChunks.length - 1]
-    const fileName: string = this.assetPathHelper.joinAssetToFolder(sceneName, rawGraphicsFolder)
+    const fileName: string = this.prependGraphicsFolder(blueprintConfiguration, fullscreenGraphicsData.name)
 
     return {
-      id: 'full',
+      id: 'full_graphics_caspar_cg',
       enable: {
         while: 1
       },
@@ -62,14 +59,15 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
     }
   }
 
-  private createFullscreenGraphicsTemplateData(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): Tv2CasparCgTemplateData {
-    if (!blueprintConfiguration.studio.htmlGraphics) {
-      throw new MisconfigurationException(
-        'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'GraphicURL\''
-      )
-    }
+  private prependGraphicsFolder(blueprintConfiguration: Tv2BlueprintConfiguration, name: string): string {
+    const rawGraphicsFolder: string | undefined = blueprintConfiguration.studio.graphicsFolder.name
+    const nameChunks: string[] = name.split('/')
+    const sceneName: string = nameChunks[nameChunks.length - 1]
+    return this.assetPathHelper.joinAssetToFolder(sceneName, rawGraphicsFolder)
+  }
 
-    const absoluteFilePath: string = `${blueprintConfiguration.studio.htmlGraphics.graphicsUrl}\\${fileName}${blueprintConfiguration.studio.graphicsFolder.fileExtension}`
+  private createFullscreenGraphicsTemplateData(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): Tv2CasparCgTemplateData {
+    const absoluteFilePath: string = this.getAbsoluteFilePath(blueprintConfiguration, fileName)
     return {
       display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
       slots: {
@@ -86,9 +84,57 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
     }
   }
 
+  private getAbsoluteFilePath(blueprintConfiguration: Tv2BlueprintConfiguration, fileName: string): string {
+    if (!blueprintConfiguration.studio.htmlGraphics) {
+      throw new MisconfigurationException(
+        'Missing configuration of \'HTMLGraphics\' in settings. Make sure it exists, and contains a value for \'GraphicURL\''
+      )
+    }
+
+    return `${blueprintConfiguration.studio.htmlGraphics.graphicsUrl}\\${fileName}${blueprintConfiguration.studio.graphicsFolder.fileExtension}`
+  }
+
+  public createPilotGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
+    const fileName: string = this.prependGraphicsFolder(blueprintConfiguration, graphicsData.name)
+    const absoluteFilePath: string = this.getAbsoluteFilePath(blueprintConfiguration, fileName)
+
+    return {
+      id: 'pilot_caspar_cg',
+      enable: {
+        while: '1'
+      },
+      priority: 100,
+      layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_PILOT,
+      content: {
+        deviceType: DeviceType.CASPAR_CG,
+        type: CasparCgType.TEMPLATE,
+        templateType: CasparCgTemplateType.HTML,
+        name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
+        useStopCommand: false,
+        mixer: {
+          opacity: 100
+        },
+        data: {
+          display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
+          slots: {
+            [Tv2CasparCgTemplateSlotType.PILOT_OVERLAY]: {
+              payload: {
+                type: 'overlay',
+                url: encodeURI(this.assetPathHelper.escapePath(this.assetPathHelper.convertUnixPathToWindowsPath(absoluteFilePath))),
+                noAnimation: false
+              },
+              display: Tv2CasparCgTemplateDisplayMode.PROGRAM
+            }
+          },
+          partialUpdate: true
+        }
+      }
+    }
+  }
+
   public createIdentGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
     return {
-      id: 'ident',
+      id: 'ident_caspar_cg',
       priority: 1,
       enable: {
         start: 0
