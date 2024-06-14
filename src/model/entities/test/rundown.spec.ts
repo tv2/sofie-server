@@ -130,7 +130,6 @@ describe(Rundown.name, () => {
 
         describe('when next part is invalid', () => {
           describe('when there are no valid parts after the on air part', () => {
-            // XXX
             it ('sets the on air part as next', () => {
               const segmentId: string = 'segment-id'
               const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', segmentId, isOnAir: true })
@@ -162,7 +161,6 @@ describe(Rundown.name, () => {
           })
 
           describe('when there is a valid part after the on air part', () => {
-            // XXX
             it('sets the first valid part after the on air part as next', () => {
               const segmentId: string = 'segment-id'
               const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', segmentId, isOnAir: true })
