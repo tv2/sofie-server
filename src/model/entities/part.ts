@@ -10,6 +10,7 @@ import { IngestedPart } from './ingested-part'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 import { Invalidity } from '../value-objects/invalidity'
+import { InvalidPartException } from '../exceptions/invalid-part-exception'
 
 export interface PartInterface {
   id: string
@@ -122,12 +123,20 @@ export class Part {
   }
 
   public putOnAir(): void {
+    this.assertValidity(this.putOnAir.name)
     this.isPartOnAir = true
 
     const now: number = Date.now()
     this.executedAt = now
     this.playedDuration = 0
     this.pieces.forEach((piece) => piece.setExecutedAt(now))
+  }
+
+  private assertValidity(operationName: string): void {
+    if (!this.invalidity) {
+      return
+    }
+    throw new InvalidPartException(`Unable to do "${operationName}", since part "${this.name}" is invalid.`)
   }
 
   public takeOffAir(): void {
@@ -165,6 +174,7 @@ export class Part {
   }
 
   public setAsNext(): void {
+    this.assertValidity(this.setAsNext.name)
     this.isPartNext = true
   }
 
