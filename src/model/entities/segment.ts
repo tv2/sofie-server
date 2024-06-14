@@ -23,7 +23,7 @@ export interface SegmentInterface {
   executedAtEpochTime?: number
   expectedDurationInMs?: number
   invalidity?: Invalidity
-  definesShowStyleVariant?: boolean
+  definesShowStyleVariant: boolean
 }
 
 export class Segment {
@@ -35,7 +35,7 @@ export class Segment {
   public readonly referenceTag?: string
   public readonly metadata?: unknown
   public readonly invalidity?: Invalidity
-  public readonly definesShowStyleVariant?: boolean
+  public readonly definesShowStyleVariant: boolean
   public rank: number
 
   private isSegmentOnAir: boolean

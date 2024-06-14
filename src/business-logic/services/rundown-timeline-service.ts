@@ -156,14 +156,13 @@ export class RundownTimelineService implements RundownService {
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundownId)
 
+    await this.deleteUnsyncedPreviousPart(rundown)
+    await this.deleteUnsyncedSegments(rundown)
+    await this.saveRundown(rundown)
 
     if (rundown.getActiveSegment().definesShowStyleVariant) {
       await this.ingestService.reloadIngestData(rundown.id)
     }
-
-    await this.deleteUnsyncedPreviousPart(rundown)
-    await this.deleteUnsyncedSegments(rundown)
-    await this.saveRundown(rundown)
   }
 
   private async deleteUnsyncedPreviousPart(rundown: Rundown): Promise<void> {

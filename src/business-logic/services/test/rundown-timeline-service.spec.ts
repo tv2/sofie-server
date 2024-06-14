@@ -242,6 +242,56 @@ describe(RundownTimelineService.name, () => {
       await testee.takeNext(aRundown.id)
       verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
     })
+
+    it('calls for reingest of rundown data if segment put on air defines a show style variant', async () => {
+      const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
+      const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
+      const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [activePiece] })
+      const firstSegment: Segment = EntityTestFactory.createSegment({ definesShowStyleVariant: false, parts: [activePart] })
+      const secondSegment: Segment = EntityTestFactory.createSegment({ definesShowStyleVariant: true, parts: [nextPart] })
+      const segments: Segment[] = [firstSegment, secondSegment]
+      const aRundown: Rundown = EntityTestFactory.createRundown({
+        segments: segments,
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            segment: firstSegment,
+            part: activePart,
+            owner: Owner.SYSTEM
+          },
+          nextCursor: {
+            segment: secondSegment,
+            part: nextPart,
+            owner: Owner.SYSTEM
+          },
+          infinitePieces: new Map()
+        },
+      })
+
+      const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+      const mockIngestService: IngestService = mock<IngestService>()
+      const aRundownRepo: RundownRepository = mock<RundownRepository>()
+      when(aRundownRepo.getRundown(aRundown.id)).thenResolve(aRundown)
+      const mockTimeLineObject: TimelineObject = mock<TimelineObject>()
+      const mockTimeLineObjects: TimelineObject[] = [mockTimeLineObject]
+      const mockTimelineObjectGroup: TimelineObjectGroup = mock<TimelineObjectGroup>({isGroup: true, children:mockTimeLineObjects})
+      const mockTimeline: Timeline = mock<Timeline>({
+        mockTimelineObjectGroup: instance(mockTimelineObjectGroup)
+      })
+      const mockTimelineBuilder: TimelineBuilder = mock<TimelineBuilder>()
+      when(mockTimelineBuilder.buildTimeline(aRundown)).thenResolve(mockTimeline)
+
+      const testee: RundownTimelineService = createTestee({
+        rundownEventEmitter: instance(mockRundownEventEmitter),
+        rundownRepository: instance(aRundownRepo),
+        timelineBuilder: instance(mockTimelineBuilder),
+        ingestService: instance(mockIngestService)
+      })
+
+      await testee.takeNext(aRundown.id)
+      verify(mockIngestService.reloadIngestData(aRundown.id)).called()
+
+    })
   })
 
   describe(`${RundownTimelineService.prototype.insertPartAsOnAir.name}`, () => {
