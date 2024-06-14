@@ -22,7 +22,7 @@ export interface Tv2CasparCgTemplateData {
       display: Tv2CasparCgTemplateDisplayMode
       payload: {
         type: string
-        0: string
+        [locatorIndex: number]: string
       }
     }
     [Tv2CasparCgTemplateSlotType.IDENT]?: {
