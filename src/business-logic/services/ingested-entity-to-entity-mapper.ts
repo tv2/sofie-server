@@ -60,6 +60,7 @@ export class IngestedEntityToEntityMapper {
       isNext: false,
       isUnsynced: false,
       expectedDurationInMs: ingestedSegment.budgetDuration,
+      definesShowStyleVariant: ingestedSegment.definesShowStyleVariant ?? false,
       parts: [],
     })
   }

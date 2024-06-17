@@ -23,6 +23,7 @@ export interface SegmentInterface {
   executedAtEpochTime?: number
   expectedDurationInMs?: number
   invalidity?: Invalidity
+  definesShowStyleVariant: boolean
 }
 
 export class Segment {
@@ -34,6 +35,7 @@ export class Segment {
   public readonly referenceTag?: string
   public readonly metadata?: unknown
   public readonly invalidity?: Invalidity
+  public readonly definesShowStyleVariant: boolean
   public rank: number
 
   private isSegmentOnAir: boolean
@@ -57,6 +59,7 @@ export class Segment {
     this.expectedDurationInMs = segment.expectedDurationInMs
     this.executedAtEpochTime = segment.executedAtEpochTime
     this.invalidity = segment.invalidity
+    this.definesShowStyleVariant = segment.definesShowStyleVariant
     this.setParts(segment.parts ?? [])
   }
 

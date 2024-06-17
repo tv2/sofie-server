@@ -73,6 +73,7 @@ export interface MongoSegment extends MongoId {
   invalidity?: {
     reason: string
   }
+  definesShowStyleVariant: boolean
 }
 
 export interface MongoPart extends MongoId {
@@ -304,7 +305,8 @@ export class MongoEntityConverter {
       isUnsynced: segment.isUnsynced(),
       budgetDuration: segment.expectedDurationInMs,
       executedAtEpochTime: segment.getExecutedAtEpochTime(),
-      invalidity: segment.invalidity
+      invalidity: segment.invalidity,
+      definesShowStyleVariant: segment.definesShowStyleVariant
     }
   }
 
