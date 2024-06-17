@@ -2,6 +2,7 @@ import { Tv2SourceMappingWithSound } from './tv2-studio-blueprint-configuration'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2SourceLayer } from './tv2-layers'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
+import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
 export type Tv2ActionManifestData = Tv2ActionManifestVideoClipData
 | Tv2ActionManifestSplitScreenData
@@ -69,6 +70,10 @@ export interface Tv2ActionManifestOverlayGraphicsData {
   sourceLayerId: Tv2SourceLayer
   name: string,
   expectedDuration?: number
+  lifespan?: string
+  content?: {
+    path: string // This is the VcpId for Pilot graphics
+  }
 }
 
 export enum SplitScreenBoxInput {
@@ -123,5 +128,7 @@ export interface Tv2OverlayGraphicsManifestData {
   templateName: string
   displayText: string
   expectedDuration?: number
+  lifespan?: PieceLifespan
+  vcpId: number
 }
 

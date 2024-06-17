@@ -74,6 +74,7 @@ export interface MongoSegment extends MongoId {
   invalidity?: {
     reason: string
   }
+  definesShowStyleVariant: boolean
 }
 
 export interface MongoPart extends MongoId {
@@ -306,7 +307,8 @@ export class MongoEntityConverter {
       isUnsynced: segment.isUnsynced(),
       budgetDuration: segment.expectedDurationInMs,
       executedAtEpochTime: segment.getExecutedAtEpochTime(),
-      invalidity: segment.invalidity
+      invalidity: segment.invalidity,
+      definesShowStyleVariant: segment.definesShowStyleVariant
     }
   }
 
@@ -450,10 +452,15 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertShowStyle(mongoShowStyle: MongoShowStyle): ShowStyle {
+  public convertShowStyle(mongoShowStyle: MongoShowStyle, showStyleVariants: ShowStyleVariant[]): ShowStyle {
     return {
       blueprintConfiguration: mongoShowStyle.blueprintConfig,
+      variants: showStyleVariants
     }
+  }
+
+  public convertShowStyleVariants(mongoShowStyleVariants: MongoShowStyleVariant[]): ShowStyleVariant[] {
+    return mongoShowStyleVariants.map(this.convertShowStyleVariant)
   }
 
   public convertShowStyleVariant(mongoShowStyleVariant: MongoShowStyleVariant): ShowStyleVariant {
