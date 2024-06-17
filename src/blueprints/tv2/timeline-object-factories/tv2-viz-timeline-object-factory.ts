@@ -24,6 +24,8 @@ enum EngineName {
   WALL = 'WALL1'
 }
 
+const ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR: string = '\n - '
+
 export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineObjectFactory, Tv2GraphicsElementTimelineObjectFactory {
 
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): VizMseElementInternalTimelineObject {
@@ -116,7 +118,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
 
   public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): VizMseElementPilotTimelineObject {
     return {
-      id: 'full',
+      id: 'full_graphics_viz',
       enable: {
         start: 0
       },
@@ -153,6 +155,26 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
     }
   }
 
+  public createPilotGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2OverlayGraphicsManifestData): VizMseElementPilotTimelineObject {
+    return {
+      id: 'ovl_graphics_viz',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2GraphicsLayer.GRAPHICS_OVERLAY_PILOT,
+      content: {
+        deviceType: DeviceType.VIZ_MSE,
+        type: VizType.ELEMENT_PILOT,
+        templateVcpId: graphicsData.vcpId,
+        continueStep: -1, // TODO: Blueprints currently don't save this value, so we can't fetch it until we control ingest
+        noAutoPreloading: false,
+        channelName: EngineName.OVERLAY,
+        ...this.getFullGraphicOutTransitionProperties(blueprintConfiguration)
+      }
+    }
+  }
+
   public createIdentGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, overlayGraphicsData: Tv2OverlayGraphicsManifestData): VizMseElementInternalTimelineObject {
     return {
       id: 'ident',
@@ -173,7 +195,7 @@ export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineOb
       deviceType: DeviceType.VIZ_MSE,
       type: VizType.ELEMENT_INTERNAL,
       templateName: overlayGraphicsData.templateName,
-      templateData: [overlayGraphicsData.displayText],
+      templateData: overlayGraphicsData.displayText.split(ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR), // TODO: When ingest is implemented, this should no longer be based on the display name.
       channelName: EngineName.OVERLAY,
       showName: blueprintConfiguration.showStyle.selectedGraphicsSetup.overlayShowName ?? ''
     }

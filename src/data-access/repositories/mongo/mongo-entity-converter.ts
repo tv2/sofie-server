@@ -449,10 +449,15 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertShowStyle(mongoShowStyle: MongoShowStyle): ShowStyle {
+  public convertShowStyle(mongoShowStyle: MongoShowStyle, showStyleVariants: ShowStyleVariant[]): ShowStyle {
     return {
       blueprintConfiguration: mongoShowStyle.blueprintConfig,
+      variants: showStyleVariants
     }
+  }
+
+  public convertShowStyleVariants(mongoShowStyleVariants: MongoShowStyleVariant[]): ShowStyleVariant[] {
+    return mongoShowStyleVariants.map(this.convertShowStyleVariant)
   }
 
   public convertShowStyleVariant(mongoShowStyleVariant: MongoShowStyleVariant): ShowStyleVariant {

@@ -37,12 +37,13 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
 
   public onTimelineGenerate(
     configuration: Configuration,
+    showStyleVariantId: string,
     timeline: Timeline,
     activePart: Part,
     previousRundownPersistentState: RundownPersistentState | undefined,
     previousPart: Part | undefined,
   ): OnTimelineGenerateResult {
-    const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration)
+    const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, showStyleVariantId)
 
     const rundownPersistentState: Tv2RundownPersistentState = (previousRundownPersistentState ?? this.getEmptyTv2RundownPersistentState()) as Tv2RundownPersistentState
     const newRundownPersistentState: Tv2RundownPersistentState = {

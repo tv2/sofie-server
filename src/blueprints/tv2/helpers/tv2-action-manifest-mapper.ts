@@ -17,11 +17,12 @@ import {
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
+import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
 const SPLIT_SCREEN_ACTION_MANIFEST_ID: string = 'select_dve'
 const VIDEO_CLIP_ACTION_MANIFEST_ID: string = 'select_server_clip'
 const FULLSCREEN_GRAPHICS_ACTION_MANIFEST_ID: string = 'select_full_grafik'
-const OVERLAY_GRAPHCIS_ACTION_MANIFEST_IDS: string[] = ['studio0_graphicsLower', 'studio0_graphicsIdent', 'studio0_overlay', 'studio0_pilotOverlay']
+const OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS: string[] = ['studio0_graphicsLower', 'studio0_graphicsIdent', 'studio0_overlay', 'studio0_pilotOverlay']
 
 export class Tv2ActionManifestMapper {
 
@@ -111,7 +112,7 @@ export class Tv2ActionManifestMapper {
 
   public mapToOverlayGraphicsData(actionManifests: ActionManifest[]): Tv2OverlayGraphicsManifestData[] {
     return actionManifests
-      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestOverlayGraphicsData> => OVERLAY_GRAPHCIS_ACTION_MANIFEST_IDS.includes(actionManifest.actionId))
+      .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestOverlayGraphicsData> => OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS.includes(actionManifest.actionId))
       .map(actionManifest => {
         const data: Tv2ActionManifestOverlayGraphicsData = actionManifest.data
         return {
@@ -121,16 +122,35 @@ export class Tv2ActionManifestMapper {
           sourceLayerId: data.sourceLayerId,
           templateName: this.getTemplateName(data.name),
           displayText: this.getDisplayText(data.name),
-          expectedDuration: data.expectedDuration
+          expectedDuration: data.expectedDuration,
+          lifespan: this.getLifespan(data.lifespan),
+          vcpId: Number(data.content?.path)
         }
       })
   }
 
-  protected getTemplateName(rawName: string): string {
+  private getTemplateName(rawName: string): string {
     return rawName.split('-')[0].trim()
   }
 
-  protected getDisplayText(rawText: string): string {
+  private getDisplayText(rawText: string): string {
     return rawText.split('-').slice(1).join('-').trim()
+  }
+
+  private getLifespan(lifespan: string | undefined): PieceLifespan | undefined {
+    switch (lifespan) {
+      case 'rundown-change': {
+        return PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE
+      }
+      case 'segment-end': {
+        return PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE
+      }
+      case 'part-only': {
+        return PieceLifespan.WITHIN_PART
+      }
+      default: {
+        return
+      }
+    }
   }
 }
