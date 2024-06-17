@@ -13,6 +13,7 @@ import {
 } from '../../../model/value-objects/rundown-timing'
 import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
 import { MongoId } from './mongo-entity-converter'
+import { Invalidity } from '../../../model/value-objects/invalidity'
 
 export interface MongoIngestedRundown extends MongoId {
   name: string
@@ -83,6 +84,7 @@ export interface MongoIngestedPart extends MongoId {
   autoNextOverlap: number
   disableNextInTransition: boolean
   timings?: PartTimings
+  invalidity?: Invalidity
 }
 
 export interface MongoIngestedPiece extends MongoId {
@@ -198,6 +200,7 @@ export class MongoIngestedEntityConverter {
       disableNextInTransition: mongoPart.disableNextInTransition,
       isUntimed: mongoPart.untimed ?? false,
       timings: mongoPart.timings,
+      invalidity: mongoPart.invalidity
     }
   }
 

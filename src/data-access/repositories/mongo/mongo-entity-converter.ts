@@ -30,6 +30,7 @@ import { SystemInformation } from '../../../model/entities/system-information'
 import { Device } from '../../../model/entities/device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
+import { Invalidity } from '../../../model/value-objects/invalidity'
 
 export interface MongoId {
   _id: string
@@ -90,6 +91,7 @@ export interface MongoPart extends MongoId {
   expectedDuration?: number
   executedAt?: number
   playedDuration?: number
+  invalidity?: Invalidity
 
   inTransition: InTransition
   outTransition: OutTransition
@@ -338,6 +340,7 @@ export class MongoEntityConverter {
       expectedDuration: part.expectedDuration,
       executedAt: part.getExecutedAt(),
       playedDuration: part.getPlayedDuration(),
+      invalidity: part.invalidity,
 
       inTransition: part.getInTransition(),
       outTransition: part.outTransition,
