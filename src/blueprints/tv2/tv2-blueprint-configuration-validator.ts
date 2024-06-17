@@ -41,49 +41,47 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
     })
   }
 
-  private validateGraphicsDefault(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
-    const validationErrors: StatusMessage[] = []
-  
+  private validateGraphicsDefault(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {  
     // Check if showStyleConfiguration.graphicsDefault exists
     if (!showStyleConfiguration.graphicsDefault) {
-      validationErrors.push({
+      return [{
         id: 'GraphicsDefaultMissing',
         title: 'Graphics Default Configuration',
         message: 'Graphics default configuration is missing',
         statusCode: StatusCode.BAD
-      })
-    } else {
-      // Check if DefaultSetupName is empty
-      if (!showStyleConfiguration.graphicsDefault.setupName?.value) {
-        validationErrors.push({
-          id: 'DefaultSetupName',
-          title: 'Default Setup Name Configuration',
-          message: 'The Default Setup Name is missing or empty',
-          statusCode: StatusCode.BAD
-        })
-      }
-  
-      // Check if DefaultSchema is empty
-      if (!showStyleConfiguration.graphicsDefault.schema?.value) {
-        validationErrors.push({
-          id: 'DefaultSchema',
-          title: 'Default Schema Configuration',
-          message: 'The Default Schema is missing or empty',
-          statusCode: StatusCode.BAD
-        })
-      }
-  
-      // Check if DefaultDesign is empty
-      if (!showStyleConfiguration.graphicsDefault.design?.value) {
-        validationErrors.push({
-          id: 'DefaultDesign',
-          title: 'Default Design Configuration',
-          message: 'The Default Design is missing or empty',
-          statusCode: StatusCode.BAD
-        })
-      }
+      }]
+    }
+
+
+    // Check if DefaultSetupName is empty
+    if (!showStyleConfiguration.graphicsDefault.setupName?.value) {
+      return [{
+        id: 'DefaultSetupName',
+        title: 'Default Setup Name Configuration',
+        message: 'The Default Setup Name is missing or empty',
+        statusCode: StatusCode.BAD
+      }]
     }
   
-    return validationErrors
+    // Check if DefaultSchema is empty
+    if (!showStyleConfiguration.graphicsDefault.schema?.value) {
+      return [{
+        id: 'DefaultSchema',
+        title: 'Default Schema Configuration',
+        message: 'The Default Schema is missing or empty',
+        statusCode: StatusCode.BAD
+      }]
+    }
+  
+    // Check if DefaultDesign is empty
+    if (!showStyleConfiguration.graphicsDefault.design?.value) {
+      return [{
+        id: 'DefaultDesign',
+        title: 'Default Design Configuration',
+        message: 'The Default Design is missing or empty',
+        statusCode: StatusCode.BAD
+      }]
+    }
+    return []
   }
 } 
