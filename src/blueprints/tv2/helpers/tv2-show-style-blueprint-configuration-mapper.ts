@@ -101,7 +101,6 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
 
     const transitions: string[] = coreTransitions.map(transition => transition.Transition).filter(transition => transition !== undefined)
 
-    // If no undefined value is found, proceed with mapping
     return this.mapTransitionEffectConfigurations([...transitions, showstyleTransition])  
   }
 
