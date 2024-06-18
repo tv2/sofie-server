@@ -22,7 +22,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
   private validateShowStyleConfiguration(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     return [
       ...this.validateGraphicsSchemas(showStyleConfiguration),
-      ...this.validateGraphicsDefault(showStyleConfiguration)
+      ...this.validateGraphicsDefaults(showStyleConfiguration)
     ]
   }
 
