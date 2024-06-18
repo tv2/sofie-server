@@ -156,6 +156,7 @@ export class IngestDataChangedService implements DataChangeService {
       await this.rundownRepository.saveRundown(updatedRundown) // Save the new Rundown
       this.eventEmitter.emitRundownUpdated(updatedRundown)
       this.rundownIdsToGenerateActionsFor.add(updatedRundown.id)
+      await this.generateActions()
     }))
   }
 
@@ -321,9 +322,10 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private async generateActionsForRundown(rundownId: string): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
     const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests(rundownId)
-    const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
+    const actions: Action[] = this.blueprint.generateActions(configuration, rundown.getShowStyleVariantId(), actionManifests)
     this.actionEventEmitter.emitActionsUpdatedEvent(actions, rundownId)
 
     await this.actionRepository.deleteActionsForRundown(rundownId)
@@ -331,8 +333,9 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private async generateActionsForSystem(): Promise<void> {
+    const nonExistingShowStyleVariantId: string = 'nonExistingShowStyleVariantId'
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    const actions: Action[] = this.blueprint.generateActions(configuration, [])
+    const actions: Action[] = this.blueprint.generateActions(configuration, nonExistingShowStyleVariantId, [])
     this.actionEventEmitter.emitActionsUpdatedEvent(actions)
 
     await this.actionRepository.deleteActionsNotOnRundowns()
