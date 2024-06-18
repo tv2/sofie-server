@@ -70,7 +70,6 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
       }]
     }
   
-    // Check if DefaultDesign is empty
     if (!showStyleConfiguration.graphicsDefault.design?.value) {
       return [{
         id: 'DefaultDesign',
