@@ -8,6 +8,8 @@ import { EntityTestFactory } from './entity-test-factory'
 import { UnsupportedOperationException } from '../../exceptions/unsupported-operation-exception'
 import { IngestedPiece } from '../ingested-piece'
 import { IngestedPart } from '../ingested-part'
+import { Invalidity } from '../../value-objects/invalidity'
+import { InvalidPartException } from '../../exceptions/invalid-part-exception'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -46,6 +48,17 @@ describe(Part.name, () => {
 
       const result: number = testee.getExecutedAt()
       expect(result).toBe(now)
+    })
+
+    describe('when part is invalid', () => {
+      it('throws an invalid part exception', () => {
+        const invalidity: Invalidity = { reason: 'Some reason' }
+        const testee: Part = EntityTestFactory.createPart({ invalidity })
+
+        const result: () => void = () => testee.putOnAir()
+
+        expect(result).toThrow(InvalidPartException)
+      })
     })
   })
 
@@ -2376,6 +2389,19 @@ describe(Part.name, () => {
       const testee: Part = new Part({ segmentId: segmentIdWithoutPostfix } as PartInterface)
       testee.markAsUnsyncedWithUnsyncedSegment()
       expect(testee.getSegmentId()).toBe(`${segmentIdWithoutPostfix}${UNSYNCED_ID_POSTFIX}`)
+    })
+  })
+
+  describe(Part.prototype.setAsNext.name, () => {
+    describe('when part is invalid', () => {
+      it('throws an invalid part exception', () => {
+        const invalidity: Invalidity = { reason: 'Some reason' }
+        const testee: Part = EntityTestFactory.createPart({ invalidity })
+
+        const result: () => void = () => testee.setAsNext()
+
+        expect(result).toThrow(InvalidPartException)
+      })
     })
   })
 })
