@@ -51,6 +51,6 @@
     "mongodb": "^6.1.0",
     "reflect-metadata": "^0.1.13",
     "superfly-timeline": "^9.0.0",
-    "ws": "^8.14.0"
+    "ws": "^8.17.1"
   }
 }
