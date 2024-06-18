@@ -21,8 +21,13 @@ interface CoreShowStyleBlueprintConfiguration {
   GfxSchemaTemplates: CoreGraphicsSchema[]
   DVEStyles: CoreSplitScreenConfiguration[]
   BreakerConfig: CoreBreaker[]
-  Transitions: { _id: string, Transition: string }[]
+  Transitions: Transition[]
   ShowstyleTransition: string
+}
+
+interface Transition {
+  _id: string
+  Transition: string
 }
 
 interface CoreGraphicsDefault {
@@ -89,14 +94,23 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       graphicsSchemas: this.mapGraphicsSchemas(coreConfiguration.GfxSchemaTemplates),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(showStyleVariantBlueprintConfiguration, coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
       splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
-      breakerTransitionEffectConfigurations: this.mapTransitionEffectConfigurations([
-        ...coreConfiguration.Transitions.map(transition => transition.Transition),
-        coreConfiguration.ShowstyleTransition
-      ]),
+      breakerTransitionEffectConfigurations: this.mapBreakerTransitionEffectConfigurations( 
+        coreConfiguration.ShowstyleTransition,
+        coreConfiguration.Transitions),
       breakers: this.mapToBreakers(coreConfiguration.BreakerConfig)
     }
   }
 
+  private mapBreakerTransitionEffectConfigurations(showstyleTransition: string, coreTransitions?: Transition[]) : BreakerTransitionEffect[] {
+    if (!coreTransitions) {
+      return []
+    }
+
+    const transitions: string[] = coreTransitions.map(transition => transition.Transition).filter(transition => transition !== undefined)
+
+    return this.mapTransitionEffectConfigurations([...transitions, showstyleTransition])  
+  }
+    
   private findShowStyleVariantBlueprintConfiguration(showStyleVariantId: string, showStyle: ShowStyle): Tv2ShowStyleVariantBlueprintConfiguration | undefined {
     const showStyleVariant: ShowStyleVariant | undefined = showStyle.variants.find(variant => variant.id === showStyleVariantId)
     if (!showStyleVariant) {
@@ -119,7 +133,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapGraphicsSetups(coreGraphicsSetups: CoreGraphicsSetup[]): GraphicsSetup[] {
+  private mapGraphicsSetups(coreGraphicsSetups?: CoreGraphicsSetup[]): GraphicsSetup[] {
+    if (!coreGraphicsSetups) {
+      return []
+    }
+    
     return coreGraphicsSetups.map(setup => {
       return {
         id: setup._id,
@@ -131,7 +149,12 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     })
   }
 
-  private mapGraphicsTemplates(coreGraphicsTemplates: CoreGraphicsTemplate[]): GraphicsTemplate[] {
+
+  private mapGraphicsTemplates(coreGraphicsTemplates?: CoreGraphicsTemplate[]): GraphicsTemplate[] {
+    if(!coreGraphicsTemplates) {
+      return []
+    }
+
     return coreGraphicsTemplates.map(template => {
       return {
         name: template.VizTemplate,
@@ -152,7 +175,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapGraphicsSchemas(coreGraphicsSchemas: CoreGraphicsSchema[]): GraphicsSchema[] {
+  private mapGraphicsSchemas(coreGraphicsSchemas?: CoreGraphicsSchema[]): GraphicsSchema[] {
+    if(!coreGraphicsSchemas) {
+      return []
+    }
+
     return coreGraphicsSchemas.map(schema => {
       return {
         iNewsName: schema.VizTemplate,
@@ -178,7 +205,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapSplitScreenConfigurations(coreSplitScreenConfigurations: CoreSplitScreenConfiguration[]): SplitScreenConfiguration[] {
+  private mapSplitScreenConfigurations(coreSplitScreenConfigurations?: CoreSplitScreenConfiguration[]): SplitScreenConfiguration[] {
+    if(!coreSplitScreenConfigurations) {
+      return []
+    }
+    
     return coreSplitScreenConfigurations.map(coreSplitScreenConfiguration => {
       return {
         id: coreSplitScreenConfiguration._id,
@@ -203,7 +234,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapToBreakers(coreBreakers: CoreBreaker[]): Breaker[] {
+  private mapToBreakers(coreBreakers?: CoreBreaker[]): Breaker[] {
+    if(!coreBreakers) {
+      return []
+    }
+
     return coreBreakers.map(coreBreaker => {
       return {
         id: coreBreaker._id,

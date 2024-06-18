@@ -24,7 +24,8 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
 
   private validateShowStyleConfiguration(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     return [
-      ...this.validateGraphicsSchemas(showStyleConfiguration)
+      ...this.validateGraphicsSchemas(showStyleConfiguration),
+      ...this.validateGraphicsDefaults(showStyleConfiguration)
     ]
   }
 
@@ -41,6 +42,46 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
           }
         })
     })
+  }
+
+  private validateGraphicsDefaults(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {  
+    if (!showStyleConfiguration.graphicsDefault) {
+      return [{
+        id: 'GraphicsDefaultMissing',
+        title: 'Graphics Default Configuration',
+        message: 'Graphics default configuration is missing',
+        statusCode: StatusCode.BAD
+      }]
+    }
+
+
+    if (!showStyleConfiguration.graphicsDefault.setupName?.value) {
+      return [{
+        id: 'DefaultSetupName',
+        title: 'Default Setup Name Configuration',
+        message: 'The Default Setup Name is missing or empty',
+        statusCode: StatusCode.BAD
+      }]
+    }
+  
+    if (!showStyleConfiguration.graphicsDefault.schema?.value) {
+      return [{
+        id: 'DefaultSchema',
+        title: 'Default Schema Configuration',
+        message: 'The Default Schema is missing or empty',
+        statusCode: StatusCode.BAD
+      }]
+    }
+  
+    if (!showStyleConfiguration.graphicsDefault.design?.value) {
+      return [{
+        id: 'DefaultDesign',
+        title: 'Default Design Configuration',
+        message: 'The Default Design is missing or empty',
+        statusCode: StatusCode.BAD
+      }]
+    }
+    return []
   }
 
   private validateShowStyleVariants(showStyleVariants: ShowStyleVariant[]): StatusMessage[] {
