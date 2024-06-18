@@ -52,7 +52,6 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
     }
 
 
-    // Check if DefaultSetupName is empty
     if (!showStyleConfiguration.graphicsDefault.setupName?.value) {
       return [{
         id: 'DefaultSetupName',
