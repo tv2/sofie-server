@@ -23,7 +23,6 @@ interface CoreShowStyleBlueprintConfiguration {
   ShowstyleTransition: string
 }
 
-// SOF-2004
 interface Transition {
   _id: string
   Transition: string
