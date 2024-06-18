@@ -83,7 +83,6 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
     }
     return []
   }
-} 
 
   private validateShowStyleVariants(showStyleVariants: ShowStyleVariant[]): StatusMessage[] {
     return showStyleVariants
