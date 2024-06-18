@@ -61,7 +61,6 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
       }]
     }
   
-    // Check if DefaultSchema is empty
     if (!showStyleConfiguration.graphicsDefault.schema?.value) {
       return [{
         id: 'DefaultSchema',
