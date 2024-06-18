@@ -41,7 +41,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
     })
   }
 
-  private validateGraphicsDefault(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {  
+  private validateGraphicsDefaults(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {  
     if (!showStyleConfiguration.graphicsDefault) {
       return [{
         id: 'GraphicsDefaultMissing',
