@@ -40,6 +40,7 @@ export class ServiceFacade {
       RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
+      ServiceFacade.createIngestService(),
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint()
     )
@@ -133,6 +134,7 @@ export class ServiceFacade {
       ServiceFacade.createStatusMessageService(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleChangedListener(),
+      RepositoryFacade.createShowStyleVariantConfigurationListener(),
       LoggerFacade.createLogger()
     )
   }

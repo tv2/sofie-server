@@ -21,6 +21,7 @@ import { AlreadyActivatedException } from '../../model/exceptions/already-activa
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { RundownMode } from '../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../model/exceptions/already-rehearsal-exception'
+import { IngestService } from './interfaces/ingest-service'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -32,6 +33,7 @@ export class RundownTimelineService implements RundownService {
     private readonly pieceRepository: PieceRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
+    private readonly ingestService: IngestService,
     private readonly callbackScheduler: CallbackScheduler,
     private readonly blueprint: Blueprint
   ) {}
@@ -157,6 +159,10 @@ export class RundownTimelineService implements RundownService {
     await this.deleteUnsyncedPreviousPart(rundown)
     await this.deleteUnsyncedSegments(rundown)
     await this.saveRundown(rundown)
+
+    if (rundown.getActiveSegment().definesShowStyleVariant) {
+      await this.ingestService.reloadIngestData(rundown.id)
+    }
   }
 
   private async deleteUnsyncedPreviousPart(rundown: Rundown): Promise<void> {

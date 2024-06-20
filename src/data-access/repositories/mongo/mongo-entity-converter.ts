@@ -30,6 +30,7 @@ import { SystemInformation } from '../../../model/entities/system-information'
 import { Device } from '../../../model/entities/device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
+import { Invalidity } from '../../../model/value-objects/invalidity'
 
 export interface MongoId {
   _id: string
@@ -73,6 +74,7 @@ export interface MongoSegment extends MongoId {
   invalidity?: {
     reason: string
   }
+  definesShowStyleVariant: boolean
 }
 
 export interface MongoPart extends MongoId {
@@ -89,6 +91,7 @@ export interface MongoPart extends MongoId {
   expectedDuration?: number
   executedAt?: number
   playedDuration?: number
+  invalidity?: Invalidity
 
   inTransition: InTransition
   outTransition: OutTransition
@@ -304,7 +307,8 @@ export class MongoEntityConverter {
       isUnsynced: segment.isUnsynced(),
       budgetDuration: segment.expectedDurationInMs,
       executedAtEpochTime: segment.getExecutedAtEpochTime(),
-      invalidity: segment.invalidity
+      invalidity: segment.invalidity,
+      definesShowStyleVariant: segment.definesShowStyleVariant
     }
   }
 
@@ -336,6 +340,7 @@ export class MongoEntityConverter {
       expectedDuration: part.expectedDuration,
       executedAt: part.getExecutedAt(),
       playedDuration: part.getPlayedDuration(),
+      invalidity: part.invalidity,
 
       inTransition: part.getInTransition(),
       outTransition: part.outTransition,
@@ -447,10 +452,15 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertShowStyle(mongoShowStyle: MongoShowStyle): ShowStyle {
+  public convertShowStyle(mongoShowStyle: MongoShowStyle, showStyleVariants: ShowStyleVariant[]): ShowStyle {
     return {
       blueprintConfiguration: mongoShowStyle.blueprintConfig,
+      variants: showStyleVariants
     }
+  }
+
+  public convertShowStyleVariants(mongoShowStyleVariants: MongoShowStyleVariant[]): ShowStyleVariant[] {
+    return mongoShowStyleVariants.map(this.convertShowStyleVariant)
   }
 
   public convertShowStyleVariant(mongoShowStyleVariant: MongoShowStyleVariant): ShowStyleVariant {

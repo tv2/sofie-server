@@ -3,7 +3,6 @@ import { ShowStyle } from '../../../model/entities/show-style'
 import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
-import { MongoIngestedRundown } from './mongo-ingested-entity-converter'
 import { Logger } from '../../../logger/logger'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 
@@ -27,7 +26,7 @@ export class MongoShowStyleConfigurationChangedListener extends BaseMongoReposit
 
   protected listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
-    const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedRundown, ChangeStreamDocument<ShowStyle>>([], options)
+    const changeStream: ChangeStream = this.getCollection().watch<ShowStyle, ChangeStreamDocument<ShowStyle>>([], options)
     changeStream.on('change', () => this.onChange())
     this.logger.debug('Listening for ShowStyleConfiguration collection changes...')
   }

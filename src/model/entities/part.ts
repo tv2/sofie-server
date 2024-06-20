@@ -9,6 +9,8 @@ import { PartEndState } from '../value-objects/part-end-state'
 import { IngestedPart } from './ingested-part'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import { Invalidity } from '../value-objects/invalidity'
+import { InvalidPartException } from '../exceptions/invalid-part-exception'
 
 export interface PartInterface {
   id: string
@@ -24,6 +26,7 @@ export interface PartInterface {
   expectedDuration?: number
   executedAt?: number
   playedDuration?: number
+  invalidity?: Invalidity
 
   inTransition: InTransition
   outTransition: OutTransition
@@ -55,6 +58,7 @@ export class Part {
 
   public readonly autoNext?: AutoNext
   public readonly disableNextInTransition: boolean
+  public readonly invalidity?: Invalidity
 
   private segmentId: string
   private rank: number
@@ -96,6 +100,7 @@ export class Part {
     this.isPartOnAir = part.isOnAir
     this.isPartNext = part.isNext
     this.expectedDuration = part.expectedDuration
+    this.invalidity = part.invalidity
 
     this.inTransition = part.inTransition ?? { keepPreviousPartAliveDuration: 0, delayPiecesDuration: 0 }
     this.outTransition = part.outTransition ?? { keepAliveDuration: 0 }
@@ -118,12 +123,20 @@ export class Part {
   }
 
   public putOnAir(): void {
+    this.assertValidity(this.putOnAir.name)
     this.isPartOnAir = true
 
     const now: number = Date.now()
     this.executedAt = now
     this.playedDuration = 0
     this.pieces.forEach((piece) => piece.setExecutedAt(now))
+  }
+
+  private assertValidity(operationName: string): void {
+    if (!this.invalidity) {
+      return
+    }
+    throw new InvalidPartException(`Unable to do "${operationName}", since part "${this.name}" is invalid.`)
   }
 
   public takeOffAir(): void {
@@ -161,6 +174,7 @@ export class Part {
   }
 
   public setAsNext(): void {
+    this.assertValidity(this.setAsNext.name)
     this.isPartNext = true
   }
 
