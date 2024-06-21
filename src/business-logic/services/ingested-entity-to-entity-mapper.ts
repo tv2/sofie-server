@@ -54,11 +54,13 @@ export class IngestedEntityToEntityMapper {
       name: ingestedSegment.name,
       rank: ingestedSegment.rank,
       isHidden: ingestedSegment.isHidden,
+      referenceTag: ingestedSegment.referenceTag,
       metadata: ingestedSegment.metadata,
       isOnAir: false,
       isNext: false,
       isUnsynced: false,
       expectedDurationInMs: ingestedSegment.budgetDuration,
+      definesShowStyleVariant: ingestedSegment.definesShowStyleVariant ?? false,
       parts: [],
     })
   }
@@ -96,6 +98,7 @@ export class IngestedEntityToEntityMapper {
       isUntimed: ingestedPart.isUntimed,
       pieces: ingestedPart.ingestedPieces.map((ingestedPiece: IngestedPiece) => this.convertIngestedPieceToPiece(ingestedPiece)),
       expectedDuration: ingestedPart.expectedDuration,
+      invalidity: ingestedPart.invalidity,
       inTransition: ingestedPart.inTransition,
       outTransition: ingestedPart.outTransition,
       autoNext: ingestedPart.autoNext,

@@ -32,6 +32,7 @@ export class Tv2Blueprint implements Blueprint {
 
   public onTimelineGenerate(
     configuration: Configuration,
+    showStyleVariantId: string,
     timeline: Timeline,
     activePart: Part,
     previousRundownPersistentState: RundownPersistentState | undefined,
@@ -42,6 +43,7 @@ export class Tv2Blueprint implements Blueprint {
     } {
     return this.onTimelineGenerateService.onTimelineGenerate(
       configuration,
+      showStyleVariantId,
       timeline,
       activePart,
       previousRundownPersistentState,
@@ -49,8 +51,8 @@ export class Tv2Blueprint implements Blueprint {
     )
   }
 
-  public generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[] {
-    return this.actionsService.generateActions(configuration, actionManifests)
+  public generateActions(configuration: Configuration, showStyleVariantId: string, actionManifests: ActionManifest[]): Action[] {
+    return this.actionsService.generateActions(configuration, showStyleVariantId, actionManifests)
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {

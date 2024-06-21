@@ -213,7 +213,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private createSplitScreenPieceInterface(partId: string, name: string, metadata: Tv2PieceMetadata, timelineObjects: Tv2BlueprintTimelineObject[]): Tv2PieceInterface {
     return {
-      id: `${partId}_piece`,
+      id: `${partId}_piece_${Date.now()}`,
       partId,
       name,
       layer: Tv2SourceLayer.SPLIT_SCREEN,
@@ -225,6 +225,26 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       duration: 0,
       preRollDuration: 0,
       postRollDuration: 0,
+      tags: [],
+      metadata,
+      timelineObjects
+    }
+  }
+
+  private createSplitScreenPieceInterfaceFromPiece(piece: Piece, metadata: Tv2PieceMetadata, timelineObjects: Tv2BlueprintTimelineObject[]): Tv2PieceInterface {
+    return {
+      id: `${piece.getPartId()}_piece_${Date.now()}`,
+      partId: piece.getPartId(),
+      name: piece.name,
+      layer: Tv2SourceLayer.SPLIT_SCREEN,
+      pieceLifespan: PieceLifespan.WITHIN_PART,
+      transitionType: TransitionType.NO_TRANSITION,
+      isPlanned: false,
+      isUnsynced: false,
+      start: piece.getStart(),
+      duration: piece.getDuration(),
+      preRollDuration: piece.preRollDuration,
+      postRollDuration: piece.postRollDuration,
       tags: [],
       metadata,
       timelineObjects
@@ -332,7 +352,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
     const splitScreenAction: Tv2SplitScreenInsertSourceInputAction = action as Tv2SplitScreenInsertSourceInputAction
     splitScreenAction.data = {
-      pieceInterface: this.createSplitScreenPieceInterface(splitScreenPieceFromRundown.getPartId(), splitScreenPieceFromRundown.name, pieceMetadata, timelineObjects)
+      pieceInterface: this.createSplitScreenPieceInterfaceFromPiece(splitScreenPieceFromRundown, pieceMetadata, timelineObjects)
     }
     return splitScreenAction
   }
@@ -640,7 +660,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     }
 
     const isSplitScreenPart: boolean = this.doesPartHavePieceWithType(part, Tv2PieceType.SPLIT_SCREEN)
-    if (isSplitScreenPart) { // If the Part is a split screen we can't use it find the Video Clip we want to insert into the split screen.
+    if (isSplitScreenPart) { // If the Part is a split screen we can't use it to find the Video Clip we want to insert into the split screen.
       return false
     }
 

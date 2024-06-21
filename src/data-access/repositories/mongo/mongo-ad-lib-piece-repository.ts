@@ -13,6 +13,10 @@ interface MongoAdLibPiece {
   name: string
   _rank: number
   expectedDuration: number | null
+  lifespan: string | null
+  content?: {
+    path: string
+  }
 }
 
 export class MongoAdLibPieceRepository extends BaseMongoRepository implements ActionManifestRepository {
@@ -47,7 +51,9 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
         name: adLibPiece.name,
         rank: adLibPiece._rank,
         expectedDuration: adLibPiece.expectedDuration ?? undefined,
-        sourceLayerId: adLibPiece.sourceLayerId
+        sourceLayerId: adLibPiece.sourceLayerId,
+        lifespan: adLibPiece.lifespan ?? undefined,
+        content: adLibPiece.content
       },
     }
   }

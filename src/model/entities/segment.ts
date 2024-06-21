@@ -23,6 +23,7 @@ export interface SegmentInterface {
   executedAtEpochTime?: number
   expectedDurationInMs?: number
   invalidity?: Invalidity
+  definesShowStyleVariant: boolean
 }
 
 export class Segment {
@@ -34,6 +35,7 @@ export class Segment {
   public readonly referenceTag?: string
   public readonly metadata?: unknown
   public readonly invalidity?: Invalidity
+  public readonly definesShowStyleVariant: boolean
   public rank: number
 
   private isSegmentOnAir: boolean
@@ -57,14 +59,16 @@ export class Segment {
     this.expectedDurationInMs = segment.expectedDurationInMs
     this.executedAtEpochTime = segment.executedAtEpochTime
     this.invalidity = segment.invalidity
+    this.definesShowStyleVariant = segment.definesShowStyleVariant
     this.setParts(segment.parts ?? [])
   }
 
   public findFirstPart(): Part {
-    if (this.parts.length === 0) {
-      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no parts.`)
+    const part: Part | undefined = this.parts.find(part => !part.invalidity)
+    if (!part) {
+      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid parts.`)
     }
-    return this.parts[0]
+    return part
   }
 
   public putOnAir(): void {
@@ -128,10 +132,11 @@ export class Segment {
     if (fromPartIndex === -1) {
       throw new NotFoundException('Part does not exist in Segment')
     }
-    if (fromPartIndex + 1 === this.parts.length) {
-      throw new LastPartInSegmentException(`Part: ${fromPart.id} is the last Part in Segment: ${this.id}`)
+    const nextPart: Part | undefined = this.parts.slice(fromPartIndex + 1).find(part => !part.invalidity)
+    if (!nextPart) {
+      throw new LastPartInSegmentException(`The part "${fromPart.name}" with id "${fromPart.id}" is the last part in the segment "${this.name}" with id "${this.id}".`)
     }
-    return this.parts[fromPartIndex + 1]
+    return nextPart
   }
 
   public findPart(partId: string): Part {

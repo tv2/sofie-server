@@ -24,6 +24,7 @@ import { InTransition } from '../value-objects/in-transition'
 import { RundownMode } from '../enums/rundown-mode'
 import { AlreadyRehearsalException } from '../exceptions/already-rehearsal-exception'
 import { InvalidSegmentException } from '../exceptions/invalid-segment-exception'
+import { InvalidPartException } from '../exceptions/invalid-part-exception'
 
 export interface RundownInterface {
   id: string
@@ -144,7 +145,7 @@ export class Rundown extends BasicRundown {
   }
 
   private isSegmentValidForRundownExecution(segment: Segment): boolean {
-    return !segment.invalidity && !segment.isHidden && segment.getParts().length > 0
+    return !segment.invalidity && !segment.isHidden && segment.getParts().some(part => !part.invalidity)
   }
 
   private setNextFromActive(owner: Owner): void {
@@ -175,6 +176,8 @@ export class Rundown extends BasicRundown {
       if (!(error instanceof LastSegmentInRundownException)) {
         throw error
       }
+      this.nextCursor = this.createCursor(this.activeCursor)
+      this.markNextSegment()
     }
 
     this.markNextPart()
@@ -205,6 +208,11 @@ export class Rundown extends BasicRundown {
     if (!this.nextCursor) {
       return
     }
+
+    if (this.nextCursor.part.invalidity) {
+      this.setNextFromActive(Owner.SYSTEM)
+    }
+
     this.nextCursor.part.setAsNext()
   }
 
@@ -494,10 +502,13 @@ export class Rundown extends BasicRundown {
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
 
     const nextSegment: Segment = this.findSegment(segmentId)
-    const nextPart: Part = nextSegment.findPart(partId)
-
     if (nextSegment.invalidity) {
       throw new InvalidSegmentException(`Unable to set segment "${nextSegment.name}" as next, since it is invalid.`)
+    }
+
+    const nextPart: Part = nextSegment.findPart(partId)
+    if (nextPart.invalidity) {
+      throw new InvalidPartException(`Unable to set part "${nextPart.name}" as next, since it is invalid.`)
     }
 
     if (nextPart.isOnAir()) {
@@ -554,7 +565,7 @@ export class Rundown extends BasicRundown {
 
     const nextCursorPart: Part | undefined = nextCursorSegment?.getParts().find(part => part.id === this.nextCursor?.part.id)
     const isNextPartSameObjectReferenceAsNextCursorPart: boolean = nextCursorPart === this.nextCursor?.part
-    if (nextCursorPart && !isNextPartSameObjectReferenceAsNextCursorPart) {
+    if (nextCursorPart && !isNextPartSameObjectReferenceAsNextCursorPart && !nextCursorPart.invalidity) {
       nextCursorPart.setAsNext()
       this.nextCursor = this.createCursor(this.nextCursor, { part: nextCursorPart })
     }
@@ -563,6 +574,7 @@ export class Rundown extends BasicRundown {
       && this.nextCursor.owner === Owner.EXTERNAL
       && nextCursorSegment
       && nextCursorPart
+      && !nextCursorPart.invalidity
     ) {
       return
     }
@@ -701,8 +713,29 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.insertPartAsNext.name)
     this.assertNotUndefined(this.activeCursor, 'active Segment')
 
+    this.updateRankFromOnAirPart(part)
     this.activeCursor.segment.insertPartAfterActivePart(part)
     this.setNext(this.activeCursor.segment.id, part.id)
+  }
+
+  private updateRankFromOnAirPart(partToBeUpdated: Part): void {
+    if (!this.activeCursor) {
+      return
+    }
+
+    const onAirPart: Part = this.activeCursor.part
+    const onAirSegment: Segment = this.activeCursor.segment
+
+    try {
+      const partAfterOnAirPart: Part = onAirSegment.findNextPart(onAirPart)
+      const newRank: number = (partAfterOnAirPart.getRank() - onAirPart.getRank()) / 2 + onAirPart.getRank()
+      partToBeUpdated.updateRank(newRank)
+    } catch (error) {
+      if (!(error instanceof LastPartInSegmentException)) {
+        throw error
+      }
+      partToBeUpdated.updateRank(onAirPart.getRank() + 1)
+    }
   }
 
   public stopActivePiecesOnLayers(layers: string[]): void {

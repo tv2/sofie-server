@@ -3,7 +3,6 @@ import { ShowStyle } from '../../../model/entities/show-style'
 import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
-import { MongoIngestedRundown } from './mongo-ingested-entity-converter'
 import { Logger } from '../../../logger/logger'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 
@@ -27,7 +26,7 @@ export class MongoShowStyleConfigurationChangedListener extends BaseMongoReposit
 
   protected listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
-    const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedRundown, ChangeStreamDocument<ShowStyle>>([], options)
+    const changeStream: ChangeStream = this.getCollection().watch<ShowStyle, ChangeStreamDocument<ShowStyle>>([], options)
     changeStream.on('change', () => this.onChange())
     this.logger.debug('Listening for ShowStyleConfiguration collection changes...')
   }
@@ -37,7 +36,6 @@ export class MongoShowStyleConfigurationChangedListener extends BaseMongoReposit
     this.onUpdatedCallback({} as ShowStyle)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onCreated(_onCreatedCallback: (showStyle: ShowStyle) => void): void {
     throw new UnsupportedOperationException(
       `${MongoShowStyleConfigurationChangedListener.prototype.onCreated.name} is not supported in ${MongoShowStyleConfigurationChangedListener.name}`
@@ -48,7 +46,6 @@ export class MongoShowStyleConfigurationChangedListener extends BaseMongoReposit
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onDeleted(_onDeletedCallback: (id: string) => void): void {
     throw new UnsupportedOperationException(
       `${MongoShowStyleConfigurationChangedListener.prototype.onDeleted.name} is not supported in ${MongoShowStyleConfigurationChangedListener.name}`

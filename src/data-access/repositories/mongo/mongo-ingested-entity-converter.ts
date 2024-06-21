@@ -13,6 +13,7 @@ import {
 } from '../../../model/value-objects/rundown-timing'
 import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
 import { MongoId } from './mongo-entity-converter'
+import { Invalidity } from '../../../model/value-objects/invalidity'
 
 export interface MongoIngestedRundown extends MongoId {
   name: string
@@ -58,6 +59,7 @@ export interface MongoIngestedSegment extends MongoId {
   metaData?: unknown // This is the current spelling in the database from Core... TOD: Update when we control Ingest
   budgetDuration?: number
   invalidity?: { reason: string }
+  definesShowStyleVariant: boolean
 }
 
 export interface MongoIngestedPart extends MongoId {
@@ -82,6 +84,7 @@ export interface MongoIngestedPart extends MongoId {
   autoNextOverlap: number
   disableNextInTransition: boolean
   timings?: PartTimings
+  invalidity?: Invalidity
 }
 
 export interface MongoIngestedPiece extends MongoId {
@@ -167,7 +170,8 @@ export class MongoIngestedEntityConverter {
       metadata: mongoSegment.metaData,
       ingestedParts: [],
       budgetDuration: mongoSegment.budgetDuration ?? undefined,
-      invalidity: mongoSegment.invalidity
+      invalidity: mongoSegment.invalidity,
+      definesShowStyleVariant: mongoSegment.definesShowStyleVariant
     }
   }
 
@@ -196,6 +200,7 @@ export class MongoIngestedEntityConverter {
       disableNextInTransition: mongoPart.disableNextInTransition,
       isUntimed: mongoPart.untimed ?? false,
       timings: mongoPart.timings,
+      invalidity: mongoPart.invalidity
     }
   }
 
@@ -213,7 +218,7 @@ export class MongoIngestedEntityConverter {
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
       duration: mongoPiece.enable.duration ?? undefined,
       preRollDuration: mongoPiece.prerollDuration,
-      postRollDuration: mongoPiece.prerollDuration,
+      postRollDuration: mongoPiece.postrollDuration,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
       metadata: mongoPiece.metaData,

@@ -7,6 +7,8 @@ import { ConfigurationRepository } from '../../data-access/repositories/interfac
 import { Configuration } from '../../model/entities/configuration'
 import { StatusMessageService } from './interfaces/status-message-service'
 import { Logger } from '../../logger/logger'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { ShowStyleVariant } from '../../model/entities/show-style-variant'
 
 const CONFIGURATION_STATUS_MESSAGE_ID_PREFIX: string = 'INVALID_CONFIGURATION_'
 
@@ -19,6 +21,7 @@ export class ConfigurationChangedService implements DataChangeService {
     statusMessageService: StatusMessageService,
     configurationRepository: ConfigurationRepository,
     showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>,
+    showStyleVariantConfigurationChangedListener: DataChangedListener<ShowStyleVariant>,
     logger: Logger
   ): DataChangeService {
     if (!this.instance) {
@@ -27,6 +30,7 @@ export class ConfigurationChangedService implements DataChangeService {
         statusMessageService,
         configurationRepository,
         showStyleConfigurationChangedListener,
+        showStyleVariantConfigurationChangedListener,
         logger
       )
     }
@@ -40,15 +44,21 @@ export class ConfigurationChangedService implements DataChangeService {
     private readonly statusMessageService: StatusMessageService,
     private readonly configurationRepository: ConfigurationRepository,
     showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>,
+    showStyleVariantConfigurationChangedListener: DataChangedListener<ShowStyleVariant>,
     logger: Logger
   ) {
     this.logger = logger.tag(ConfigurationChangedService.name)
     this.validateConfiguration().catch(error => this.logger.data(error).error('Failed to validate configuration'))
-    this.listenForShowStyleChanges(showStyleConfigurationChangedListener)
+    this.validateConfigurationOnChange(showStyleConfigurationChangedListener)
+    this.validateConfigurationOnChange(showStyleVariantConfigurationChangedListener)
   }
 
-  private listenForShowStyleChanges(showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>): void {
-    showStyleConfigurationChangedListener.onUpdated(() => {
+  public initialize(): Promise<void> {
+    throw new UnsupportedOperationException('Not implemented')
+  }
+
+  private validateConfigurationOnChange<T>(dataChangedListener: DataChangedListener<T>): void {
+    dataChangedListener.onUpdated(() => {
       this.validateConfiguration().catch(error => this.logger.data(error).error('Failed to validate configuration'))
     })
   }

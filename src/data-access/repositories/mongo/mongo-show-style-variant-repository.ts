@@ -23,6 +23,11 @@ export class MongoShowStyleVariantRepository extends BaseMongoRepository impleme
     return COLLECTION_NAME
   }
 
+  public async getShowStyleVariantsForShowStyle(showStyleId: string): Promise<ShowStyleVariant[]> {
+    const mongoShowStyleVariants: MongoShowStyleVariant[] = await this.getCollection().find<MongoShowStyleVariant>({ showStyleBaseId: showStyleId }).toArray()
+    return this.mongoEntityConverter.convertShowStyleVariants(mongoShowStyleVariants)
+  }
+
   public async getShowStyleVariant(rundownId: string): Promise<ShowStyleVariant> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const mongoShowStyleVariant: MongoShowStyleVariant | null = await this.getCollection().findOne<MongoShowStyleVariant>({ _id: rundown.getShowStyleVariantId() })

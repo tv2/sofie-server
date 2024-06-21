@@ -10,6 +10,7 @@ import { AlreadyExistException } from '../../exceptions/already-exist-exception'
 import { NotFoundException } from '../../exceptions/not-found-exception'
 import { Invalidity } from '../../value-objects/invalidity'
 import { InvalidSegmentException } from '../../exceptions/invalid-segment-exception'
+import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
 
 describe(Segment.name, () => {
   describe(Segment.prototype.putOnAir, () => {
@@ -929,6 +930,44 @@ describe(Segment.name, () => {
           testee.removePart(somePart.id)
           expect(testee.getParts()).toHaveLength(0)
         })
+      })
+    })
+  })
+
+  describe(Segment.prototype.findNextPart.name, () => {
+    describe('when the from part is the last part in the segment', () => {
+      it('throws a last part in segment exception', () => {
+        const fromPart: Part = EntityTestFactory.createPart({ id: 'from-part' })
+        const testee: Segment = EntityTestFactory.createSegment({ parts: [fromPart] })
+
+        const result: () => Part = () => testee.findNextPart(fromPart)
+
+        expect(result).toThrow(LastPartInSegmentException)
+      })
+    })
+
+    describe('when part is last valid part in segment', () => {
+      it('throws a last part in segment exception', () => {
+        const fromPart: Part = EntityTestFactory.createPart({ id: 'from-part' })
+        const invalidPart: Part = EntityTestFactory.createPart({ invalidity: { reason: 'some reason' }})
+        const testee: Segment = EntityTestFactory.createSegment({ parts: [fromPart, invalidPart] })
+
+        const result: () => Part = () => testee.findNextPart(fromPart)
+
+        expect(result).toThrow(LastPartInSegmentException)
+      })
+    })
+
+    describe('when part is followed by an invalid part', () => {
+      it('skips the invalid part', () => {
+        const fromPart: Part = EntityTestFactory.createPart({ id: 'from-part' })
+        const invalidPart: Part = EntityTestFactory.createPart({ invalidity: { reason: 'some reason' }})
+        const nextValidPart: Part = EntityTestFactory.createPart({ id: 'next-valid-part' })
+        const testee: Segment = EntityTestFactory.createSegment({ parts: [fromPart, invalidPart, nextValidPart] })
+
+        const result: Part = testee.findNextPart(fromPart)
+
+        expect(result).toBe(nextValidPart)
       })
     })
   })

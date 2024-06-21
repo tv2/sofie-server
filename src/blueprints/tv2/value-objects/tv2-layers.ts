@@ -7,6 +7,7 @@ export enum Tv2SourceLayer {
 
   GRAPHICS_IDENT = 'studio0_graphicsIdent',
   GRAPHICS_LOWER_THIRD = 'studio0_graphicsLower',
+  GRAPHICS_PILOT_OVERLAY = 'studio0_pilotOverlay',
   GRAPHICS_TOP = 'studio0_graphicsTop',
   GRAPHICS_HEADLINE = 'studio0_graphicsHeadline',
   GRAPHICS_TEMA = 'studio0_graphicsTema',

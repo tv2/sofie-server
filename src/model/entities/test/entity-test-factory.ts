@@ -7,6 +7,7 @@ import { Device } from '../device'
 import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
+import { RundownTimingType } from '../../enums/rundown-timing-type'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -16,8 +17,12 @@ export class EntityTestFactory {
       segments: [],
       mode: RundownMode.INACTIVE,
       modifiedAt: Date.now(),
+      showStyleVariantId: 'showstyle-variant-id',
+      baselineTimelineObjects: [],
+      history: [],
+      timing: { type: RundownTimingType.UNSCHEDULED },
       ...rundownInterface
-    } as RundownInterface)
+    })
   }
 
   public static createSegment(segmentInterface: Partial<SegmentInterface> = {}): Segment {

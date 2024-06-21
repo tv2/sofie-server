@@ -23,6 +23,7 @@ import { Timeline } from '../../../model/entities/timeline'
 import { TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../../model/exceptions/already-rehearsal-exception'
+import { IngestService } from '../interfaces/ingest-service'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -197,49 +198,125 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.takeNext.name}`, () => {
+    const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
+    const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
+    const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [activePiece] })
+    const activeSegment: Segment = EntityTestFactory.createSegment({parts: [activePart], definesShowStyleVariant: false})
+    const nextSegment: Segment = EntityTestFactory.createSegment({parts: [nextPart], definesShowStyleVariant: false})
+    const nextShowStyleVariantSegment: Segment = EntityTestFactory.createSegment( { parts: [nextPart], definesShowStyleVariant: true})
+
+    const rundownRepository: RundownRepository = mock<RundownRepository>()
+    const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+    const mockTimeLineObject: TimelineObject = mock<TimelineObject>()
+    const mockTimeLineObjects: TimelineObject[] = [mockTimeLineObject]
+    const mockTimelineObjectGroup: TimelineObjectGroup = mock<TimelineObjectGroup>({isGroup: true, children:mockTimeLineObjects})
+    const mockTimeline: Timeline = mock<Timeline>({
+      mockTimelineObjectGroup: instance(mockTimelineObjectGroup)
+    })
+    const mockTimelineBuilder: TimelineBuilder = mock<TimelineBuilder>()
+    const mockIngestService: IngestService = mock<IngestService>()
+
     it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async () => {
-      const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
-      const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
-      const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [activePiece] })
-      const firstSegment: Segment = EntityTestFactory.createSegment({parts: [activePart]})
-      const secondSegment: Segment = EntityTestFactory.createSegment({parts: [nextPart]})
-      const segments: Segment[] = [firstSegment, secondSegment]
-      const aRundown: Rundown = EntityTestFactory.createRundown({
+      const segments: Segment[] = [activeSegment, nextSegment]
+      const rundown: Rundown = EntityTestFactory.createRundown({
         segments: segments,
         mode: RundownMode.ACTIVE,
         alreadyActiveProperties: {
           activeCursor: {
-            segment: firstSegment,
+            segment: activeSegment,
             part: activePart,
             owner: Owner.SYSTEM
           },
           nextCursor: {
-            segment: secondSegment,
+            segment: nextSegment,
             part: nextPart,
             owner: Owner.SYSTEM
           },
           infinitePieces: new Map()
         },
       })
-      const aRundownRepo: RundownRepository = mock<RundownRepository>()
-      when(aRundownRepo.getRundown(aRundown.id)).thenResolve(aRundown)
-      const mockRundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
-      const mockTimeLineObject: TimelineObject = mock<TimelineObject>()
-      const mockTimeLineObjects: TimelineObject[] = [mockTimeLineObject]
-      const mockTimelineObjectGroup: TimelineObjectGroup = mock<TimelineObjectGroup>({isGroup: true, children:mockTimeLineObjects})
-      const mockTimeline: Timeline = mock<Timeline>({
-        mockTimelineObjectGroup: instance(mockTimelineObjectGroup)
-      })
-      const mockTimelineBuilder: TimelineBuilder = mock<TimelineBuilder>()
-      when(mockTimelineBuilder.buildTimeline(aRundown)).thenResolve(mockTimeline)
+
+      when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+      when(mockTimelineBuilder.buildTimeline(rundown)).thenResolve(mockTimeline)
+
       const testee: RundownTimelineService = createTestee({
         rundownEventEmitter: instance(mockRundownEventEmitter),
-        rundownRepository: instance(aRundownRepo),
+        rundownRepository: instance(rundownRepository),
         timelineBuilder: instance(mockTimelineBuilder),
       })
 
-      await testee.takeNext(aRundown.id)
-      verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
+      await testee.takeNext(rundown.id)
+      verify(mockRundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)).never()
+    })
+
+    it('calls for reingest of rundown data if segment put on air defines a show style variant', async () => {
+      const segments: Segment[] = [activeSegment, nextShowStyleVariantSegment]
+      const rundown: Rundown = EntityTestFactory.createRundown({
+        segments: segments,
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            segment: activeSegment,
+            part: activePart,
+            owner: Owner.SYSTEM
+          },
+          nextCursor: {
+            segment: nextShowStyleVariantSegment,
+            part: nextPart,
+            owner: Owner.SYSTEM
+          },
+          infinitePieces: new Map()
+        },
+      })
+
+      when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+      when(mockTimelineBuilder.buildTimeline(rundown)).thenResolve(mockTimeline)
+
+      const testee: RundownTimelineService = createTestee( {
+        rundownEventEmitter: instance(mockRundownEventEmitter),
+        rundownRepository: instance(rundownRepository),
+        timelineBuilder: instance(mockTimelineBuilder),
+        ingestService: instance(mockIngestService)
+      })
+
+      await testee.takeNext(rundown.id)
+
+      verify(mockIngestService.reloadIngestData(rundown.id)).once()
+    })
+
+    it('does not call for reingest of rundown data if segment put on air has not defined a show style variant', async () => {
+      const segments: Segment[] = [activeSegment, nextSegment]
+      const rundown: Rundown = EntityTestFactory.createRundown({
+        segments: segments,
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            segment: activeSegment,
+            part: activePart,
+            owner: Owner.SYSTEM
+          },
+          nextCursor: {
+            segment: nextSegment,
+            part: nextPart,
+            owner: Owner.SYSTEM
+          },
+          infinitePieces: new Map()
+        },
+      })
+
+      when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+      when(mockTimelineBuilder.buildTimeline(rundown)).thenResolve(mockTimeline)
+
+      const testee: RundownTimelineService = createTestee( {
+        rundownEventEmitter: instance(mockRundownEventEmitter),
+        rundownRepository: instance(rundownRepository),
+        timelineBuilder: instance(mockTimelineBuilder),
+        ingestService: instance(mockIngestService)
+      })
+
+      await testee.takeNext(rundown.id)
+
+      verify(mockIngestService.reloadIngestData(rundown.id)).never()
     })
   })
 
@@ -357,6 +434,73 @@ describe(RundownTimelineService.name, () => {
       })
     })
   })
+
+  describe(RundownTimelineService.prototype.resetRundown.name, () => {
+    describe('when rundown is in rehearsal', () => {
+      it('is still in rehearsal after reset', async () => {
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          id: 'rundown-id',
+          segments: [EntityTestFactory.createSegment({
+            parts: [EntityTestFactory.createPart()]
+          })],
+        })
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+        rundown.enterRehearsal()
+        expect(rundown.isRehearsal()).toBeTruthy()
+
+        await testee.resetRundown(rundown.id)
+
+        expect(rundown.isRehearsal()).toBeTruthy()
+      })
+    })
+
+    describe('when rundown is active', () => {
+      it('is still active after reset', async () => {
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          id: 'rundown-id',
+          segments: [EntityTestFactory.createSegment({
+            parts: [EntityTestFactory.createPart()]
+          })],
+        })
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+        rundown.activate()
+        expect(rundown.isActive()).toBeTruthy()
+
+        await testee.resetRundown(rundown.id)
+
+        expect(rundown.isActive()).toBeTruthy()
+      })
+    })
+
+    it('emits set next event after reset event', async () => {
+      const rundown: Rundown = EntityTestFactory.createRundown({
+        id: 'rundown-id',
+        segments: [EntityTestFactory.createSegment({
+          parts: [EntityTestFactory.createPart()]
+        })],
+      })
+
+      const rundownRepository: RundownRepository = mock<RundownRepository>()
+      when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+      const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+
+      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository), rundownEventEmitter: instance(rundownEventEmitter) })
+      rundown.activate()
+
+      await testee.resetRundown(rundown.id)
+
+      verify(rundownEventEmitter.emitSetNextEvent(rundown)).calledAfter(rundownEventEmitter.emitResetEvent(rundown))
+    })
+  })
 })
 
 function createTestee(params?: {
@@ -368,6 +512,7 @@ function createTestee(params?: {
   pieceRepository?: PieceRepository
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
+  ingestService?: IngestService
   callbackScheduler?: CallbackScheduler
   blueprint?: Blueprint
 }): RundownTimelineService {
@@ -380,6 +525,7 @@ function createTestee(params?: {
     params?.pieceRepository ?? instance(mock<PieceRepository>()),
     params?.timelineRepository ?? instance(mock<TimelineRepository>()),
     params?.timelineBuilder ?? instance(mock<TimelineBuilder>()),
+    params?.ingestService ?? instance(mock<IngestService>()),
     params?.callbackScheduler ?? instance(mock<CallbackScheduler>()),
     params?.blueprint ?? instance(mock<Blueprint>())
   )

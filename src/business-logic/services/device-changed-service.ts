@@ -6,6 +6,7 @@ import { StatusCode } from '../../model/enums/status-code'
 import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
 import { Logger } from '../../logger/logger'
 import { StatusMessageService } from './interfaces/status-message-service'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 
 // TODO: Find a way to translate
 const NOT_CONNECTED_MESSAGE: string = 'Not connected'
@@ -42,6 +43,10 @@ export class DeviceChangedService implements DataChangeService {
     this.updateStatusMessageFromCurrentDeviceStatus()
       .catch((error) => this.logger.data(error).error('Unable to update status messages from current devices'))
     this.listenForStatusMessageChanges(deviceChangedListener)
+  }
+
+  public initialize(): Promise<void> {
+    throw new UnsupportedOperationException('Not implemented')
   }
 
   private async updateStatusMessageFromCurrentDeviceStatus(): Promise<void> {

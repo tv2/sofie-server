@@ -12,4 +12,5 @@ export interface IngestedSegment {
   readonly budgetDuration?: number
   readonly ingestedParts: Readonly<IngestedPart[]>
   readonly invalidity?: Invalidity
+  readonly definesShowStyleVariant: boolean
 }

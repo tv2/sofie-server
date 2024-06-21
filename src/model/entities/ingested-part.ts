@@ -3,6 +3,7 @@ import { OutTransition } from '../value-objects/out-transition'
 import { AutoNext } from '../value-objects/auto-next'
 import { PartTimings } from '../value-objects/part-timings'
 import { IngestedPiece } from './ingested-piece'
+import { Invalidity } from '../value-objects/invalidity'
 
 export interface IngestedPart {
   readonly id: string
@@ -11,6 +12,7 @@ export interface IngestedPart {
   readonly name: string
   readonly rank: number
   readonly expectedDuration?: number
+  readonly invalidity?: Invalidity
 
   readonly inTransition: InTransition
   readonly outTransition: OutTransition

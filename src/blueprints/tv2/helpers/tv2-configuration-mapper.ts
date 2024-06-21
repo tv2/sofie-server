@@ -10,10 +10,10 @@ export class Tv2ConfigurationMapper {
     private readonly showStyleMapper: Tv2ShowStyleBlueprintConfigurationMapper
   ) {}
 
-  public mapBlueprintConfiguration(configuration: Configuration): Tv2BlueprintConfiguration {
+  public mapBlueprintConfiguration(configuration: Configuration, showStyleVariantId: string): Tv2BlueprintConfiguration {
     return {
       studio: this.studioMapper.mapStudioConfiguration(configuration.studio),
-      showStyle: this.showStyleMapper.mapShowStyleConfiguration(configuration.showStyle)
+      showStyle: this.showStyleMapper.mapShowStyleConfiguration(configuration.showStyle, showStyleVariantId)
     }
   }
 }

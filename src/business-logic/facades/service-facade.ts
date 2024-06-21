@@ -40,6 +40,7 @@ export class ServiceFacade {
       RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
+      ServiceFacade.createIngestService(),
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint()
     )
@@ -104,8 +105,11 @@ export class ServiceFacade {
   }
 
   public static createIngestService(): IngestService {
-    const httpService: HttpService = new GotHttpService()
-    return new Tv2INewsIngestService(httpService, RepositoryFacade.createRundownRepository())
+    return new Tv2INewsIngestService(ServiceFacade.createHttpService(), RepositoryFacade.createRundownRepository())
+  }
+
+  private static createHttpService(): HttpService {
+    return new GotHttpService()
   }
 
   public static createConfigurationService(): ConfigurationService {
@@ -130,6 +134,7 @@ export class ServiceFacade {
       ServiceFacade.createStatusMessageService(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleChangedListener(),
+      RepositoryFacade.createShowStyleVariantConfigurationListener(),
       LoggerFacade.createLogger()
     )
   }

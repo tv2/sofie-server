@@ -78,6 +78,8 @@ export class IngestDataChangedService implements DataChangeService {
     return this.instance
   }
 
+  private isInitialized: boolean = false
+
   // Event Queue Priority: The lower the number, the higher the priority
   private readonly eventPriorityQueue: Record<number, (() => Promise<void>)[]> = { }
   private readonly logger: Logger
@@ -113,8 +115,6 @@ export class IngestDataChangedService implements DataChangeService {
     this.listenForRundownChanges(rundownChangeListener)
     this.listenForSegmentChanges(segmentChangedListener)
     this.listenForPartChanges(partChangedListener)
-
-    this.enqueueEvent(0, () => this.synchronizeEntitiesWithIngestedEntities())
   }
 
   private listenForRundownChanges(rundownChangeListener: DataChangedListener<IngestedRundown>): void {
@@ -135,12 +135,17 @@ export class IngestDataChangedService implements DataChangeService {
     partChangedListener.onDeleted(partId => this.enqueueEvent(7, () => this.deletePart(partId)))
   }
 
+  public async initialize(): Promise<void> {
+    await this.synchronizeEntitiesWithIngestedEntities()
+    this.isInitialized = true
+  }
+
   private async synchronizeEntitiesWithIngestedEntities(): Promise<void> {
     const ingestedRundowns: IngestedRundown[] = await this.ingestedRundownRepository.getIngestedRundowns()
     await this.deleteRundownsNotPresentInIngestedRundowns(ingestedRundowns)
 
     await Promise.all(ingestedRundowns.map(async (ingestedRundown) => {
-      const oldRundown: Rundown | undefined = await this.fetchRundown(ingestedRundown.id)
+      const oldRundown: Rundown | undefined = await this.loadRundown(ingestedRundown.id)
 
       // If the Rundown isn't active or in rehearsal, we can simply just "re-ingest" it into our database collection as a fresh Rundown.
       const updatedRundown: Rundown = oldRundown?.isActive() || oldRundown?.isRehearsal()
@@ -151,6 +156,7 @@ export class IngestDataChangedService implements DataChangeService {
       await this.rundownRepository.saveRundown(updatedRundown) // Save the new Rundown
       this.eventEmitter.emitRundownUpdated(updatedRundown)
       this.rundownIdsToGenerateActionsFor.add(updatedRundown.id)
+      await this.generateActions()
     }))
   }
 
@@ -166,7 +172,7 @@ export class IngestDataChangedService implements DataChangeService {
     }
   }
 
-  private async fetchRundown(rundownId: string): Promise<Rundown | undefined> {
+  private async loadRundown(rundownId: string): Promise<Rundown | undefined> {
     try {
       return await this.rundownRepository.getRundown(rundownId)
     } catch (exception) {
@@ -263,6 +269,10 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private enqueueEvent(priority: number, event: () => Promise<void>): void {
+    if (!this.isInitialized) {
+      return
+    }
+
     this.eventPriorityQueue[priority] ??= []
     this.eventPriorityQueue[priority].push(event)
     clearTimeout(this.timerId)
@@ -312,9 +322,10 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private async generateActionsForRundown(rundownId: string): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
     const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests(rundownId)
-    const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
+    const actions: Action[] = this.blueprint.generateActions(configuration, rundown.getShowStyleVariantId(), actionManifests)
     this.actionEventEmitter.emitActionsUpdatedEvent(actions, rundownId)
 
     await this.actionRepository.deleteActionsForRundown(rundownId)
@@ -322,8 +333,9 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private async generateActionsForSystem(): Promise<void> {
+    const nonExistingShowStyleVariantId: string = 'nonExistingShowStyleVariantId'
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    const actions: Action[] = this.blueprint.generateActions(configuration, [])
+    const actions: Action[] = this.blueprint.generateActions(configuration, nonExistingShowStyleVariantId, [])
     this.actionEventEmitter.emitActionsUpdatedEvent(actions)
 
     await this.actionRepository.deleteActionsNotOnRundowns()
