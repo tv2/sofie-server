@@ -64,7 +64,7 @@ import { MongoDeviceChangedListener } from '../repositories/mongo/mongo-device-c
 import { StatusMessageRepository } from '../repositories/interfaces/status-message-repository'
 import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status-message-repository'
 import { DeviceRepository } from '../repositories/interfaces/device-repository'
-import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
+import { MongoCoreDeviceRepository } from '../repositories/mongo/mongo-device-repository'
 import { ShowStyle } from '../../model/entities/show-style'
 import {
   MongoShowStyleConfigurationChangedListener
@@ -259,7 +259,7 @@ export class RepositoryFacade {
   }
 
   public static createDeviceRepository(): DeviceRepository {
-    return new MongoDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
+    return new MongoCoreDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
   }
 
   public static createStatusMessageRepository(): StatusMessageRepository {

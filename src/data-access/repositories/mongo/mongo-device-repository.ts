@@ -6,7 +6,7 @@ import { MongoDevice, MongoEntityConverter } from './mongo-entity-converter'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
-export class MongoDeviceRepository extends BaseMongoRepository implements DeviceRepository {
+export class MongoCoreDeviceRepository extends BaseMongoRepository implements DeviceRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)
@@ -17,7 +17,7 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
   }
 
   public async getDevices(): Promise<Device[]> {
-    this.assertDatabaseConnection(MongoDeviceRepository.prototype.getDevices.name)
+    this.assertDatabaseConnection(MongoCoreDeviceRepository.prototype.getDevices.name)
     const mongoDevices: MongoDevice[] = await this.getCollection().find<MongoDevice>({}).toArray()
     return this.mongoEntityConverter.convertToDevices(mongoDevices)
   }
