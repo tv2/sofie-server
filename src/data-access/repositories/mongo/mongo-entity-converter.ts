@@ -25,12 +25,13 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
-import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { SystemInformation } from '../../../model/entities/system-information'
 import { Device } from '../../../model/entities/device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { Invalidity } from '../../../model/value-objects/invalidity'
+import { Logger } from '../../../logger/logger'
+
 
 export interface MongoId {
   _id: string
@@ -187,6 +188,11 @@ export interface MongoDevice extends MongoId {
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 
 export class MongoEntityConverter {
+  private readonly logger: Logger
+
+  constructor(logger: Logger) {
+    this.logger = logger.tag(MongoEntityConverter.name)
+  }
 
   public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {
     const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = [RundownMode.ACTIVE, RundownMode.REHEARSAL].includes(mongoRundown.mode)
@@ -447,7 +453,8 @@ export class MongoEntityConverter {
         return LookaheadMode.WHEN_CLEAR
       }
       default: {
-        throw new UnsupportedOperationException(`Found unknown number for LookAhead: ${lookAheadNumber}`)
+        this.logger.warn(`Found unknown number for LookAhead: ${lookAheadNumber}. Defaulting to NONE.`)
+        return LookaheadMode.NONE
       }
     }
   }
