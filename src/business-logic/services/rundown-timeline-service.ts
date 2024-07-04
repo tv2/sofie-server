@@ -22,6 +22,7 @@ import { IngestedRundownRepository } from '../../data-access/repositories/interf
 import { RundownMode } from '../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../model/exceptions/already-rehearsal-exception'
 import { IngestService } from './interfaces/ingest-service'
+import { SetNextDirection } from '../../model/enums/set-next-direction'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -208,9 +209,20 @@ export class RundownTimelineService implements RundownService {
     }
   }
 
-  public async setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
+  public async setNextFromIds(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.setNext(segmentId, partId, owner)
+    rundown.setNextFromIds(segmentId, partId, owner)
+
+    await this.buildAndPersistTimeline(rundown)
+
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
+
+    await this.saveRundown(rundown)
+  }
+
+  public async setNext(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.setNextFromDirection(direction, owner)
 
     await this.buildAndPersistTimeline(rundown)
 

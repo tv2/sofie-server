@@ -11,6 +11,7 @@ import { NotFoundException } from '../../exceptions/not-found-exception'
 import { Invalidity } from '../../value-objects/invalidity'
 import { InvalidSegmentException } from '../../exceptions/invalid-segment-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
+import { FirstPartInSegmentException } from '../../exceptions/first-part-in-segment-exception'
 
 describe(Segment.name, () => {
   describe(Segment.prototype.putOnAir, () => {
@@ -934,13 +935,13 @@ describe(Segment.name, () => {
     })
   })
 
-  describe(Segment.prototype.findNextPart.name, () => {
+  describe(Segment.prototype.findNextPartNotOnAir.name, () => {
     describe('when the from part is the last part in the segment', () => {
       it('throws a last part in segment exception', () => {
         const fromPart: Part = EntityTestFactory.createPart({ id: 'from-part' })
         const testee: Segment = EntityTestFactory.createSegment({ parts: [fromPart] })
 
-        const result: () => Part = () => testee.findNextPart(fromPart)
+        const result: () => Part = () => testee.findNextPartNotOnAir(fromPart)
 
         expect(result).toThrow(LastPartInSegmentException)
       })
@@ -952,7 +953,7 @@ describe(Segment.name, () => {
         const invalidPart: Part = EntityTestFactory.createPart({ invalidity: { reason: 'some reason' }})
         const testee: Segment = EntityTestFactory.createSegment({ parts: [fromPart, invalidPart] })
 
-        const result: () => Part = () => testee.findNextPart(fromPart)
+        const result: () => Part = () => testee.findNextPartNotOnAir(fromPart)
 
         expect(result).toThrow(LastPartInSegmentException)
       })
@@ -965,9 +966,72 @@ describe(Segment.name, () => {
         const nextValidPart: Part = EntityTestFactory.createPart({ id: 'next-valid-part' })
         const testee: Segment = EntityTestFactory.createSegment({ parts: [fromPart, invalidPart, nextValidPart] })
 
-        const result: Part = testee.findNextPart(fromPart)
+        const result: Part = testee.findNextPartNotOnAir(fromPart)
 
         expect(result).toBe(nextValidPart)
+      })
+    })
+  })
+
+  describe(Segment.prototype.findPreviousPartNotOnAir.name, () => {
+    it ('returns the Part before the fromPart', () => {
+      const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPartId', rank: 1 })
+      const fromPart: Part = EntityTestFactory.createPart({ id: 'fromPartId', rank: 2 })
+
+      const testee: Segment = EntityTestFactory.createSegment({ parts: [previousPart, fromPart]})
+      const result: Part = testee.findPreviousPartNotOnAir(fromPart)
+
+      expect(result).toBe(previousPart)
+    })
+
+    describe('Segment has three Parts', () => {
+      it('returns the second Part when the fromPart is the third Part', () => {
+        const firstPart: Part = EntityTestFactory.createPart({ id: 'firstPartId', rank: 1 })
+        const secondPart: Part = EntityTestFactory.createPart({ id: 'secondPartId', rank: 2 })
+        const thirdPart: Part = EntityTestFactory.createPart({ id: 'thirdPartId', rank: 3 })
+
+        const testee: Segment = EntityTestFactory.createSegment({ parts: [firstPart, secondPart, thirdPart]})
+        const result: Part = testee.findPreviousPartNotOnAir(thirdPart)
+
+        expect(result).toBe(secondPart)
+      })
+    })
+
+    describe('fromPart does not exist in Segment', () => {
+      it('throws a not found exception', () => {
+        const nonExistingPart: Part = EntityTestFactory.createPart()
+        const testee: Segment = EntityTestFactory.createSegment()
+        expect(() => testee.findPreviousPartNotOnAir(nonExistingPart)).toThrow(NotFoundException)
+      })
+    })
+
+    describe('fromPart is the first Part in the Segment', () => {
+      it('throws a first Part in Segment exception', () => {
+        const firstPart: Part = EntityTestFactory.createPart()
+        const testee: Segment = EntityTestFactory.createSegment({ parts: [firstPart] })
+        expect(() => testee.findPreviousPartNotOnAir(firstPart)).toThrow(FirstPartInSegmentException)
+      })
+    })
+
+    describe('fromPart is the first valid Part in the Segment', () => {
+      it ('throws a first Part in Segment exception', () => {
+        const invalidPart: Part = EntityTestFactory.createPart({ id: 'invalidPart', rank: 1, invalidity: { reason: 'invalid' } })
+        const firstValidPart: Part = EntityTestFactory.createPart({ id: 'validPart', rank: 2 })
+        const testee: Segment = EntityTestFactory.createSegment({ parts: [invalidPart, firstValidPart] })
+        expect(() => testee.findPreviousPartNotOnAir(firstValidPart)).toThrow(FirstPartInSegmentException)
+      })
+    })
+
+    describe('the Part before the fromPart is an invalid Part', () => {
+      it('skips the invalid Part and returns the one before that', () => {
+        const firstPart: Part = EntityTestFactory.createPart({ id: 'firstPart', rank: 1 })
+        const invalidPart: Part = EntityTestFactory.createPart({ id: 'invalidPart', rank: 2, invalidity: { reason: 'invalid' } })
+        const thirdPart: Part = EntityTestFactory.createPart({ id: 'thirdPart', rank: 3 })
+
+        const testee: Segment = EntityTestFactory.createSegment({ parts: [firstPart, invalidPart, thirdPart] })
+        const result: Part = testee.findPreviousPartNotOnAir(thirdPart)
+
+        expect(result).toBe(firstPart)
       })
     })
   })
