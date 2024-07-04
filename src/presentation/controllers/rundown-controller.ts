@@ -11,6 +11,7 @@ import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { Owner } from '../../model/enums/owner'
 import { IngestService } from '../../business-logic/services/interfaces/ingest-service'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { SetNextDirection } from '../../model/enums/set-next-direction'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -90,13 +91,25 @@ export class RundownController extends BaseController {
   }
 
   @PutRequest('/:rundownId/segments/:segmentId/parts/:partId/setNext')
-  public async setNext(request: Request, response: Response): Promise<void> {
+  public async setNextFromIds(request: Request, response: Response): Promise<void> {
     try {
       const rundownId: string = request.params.rundownId
       const segmentId: string = request.params.segmentId
       const partId: string = request.params.partId
-      await this.rundownService.setNext(rundownId, segmentId, partId, Owner.EXTERNAL)
+      await this.rundownService.setNextFromIds(rundownId, segmentId, partId, Owner.EXTERNAL)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Part "${partId}" is now set as next`))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @PutRequest('/:rundownId/setNext/:direction')
+  public async setNext(request: Request, response: Response): Promise<void> {
+    try {
+      const rundownId: string = request.params.rundownId
+      const setNextDirection: SetNextDirection = request.params.direction as SetNextDirection
+      await this.rundownService.setNext(rundownId, setNextDirection, Owner.EXTERNAL)
+      response.send(this.httpResponseFormatter.formatSuccessResponse('Successfully set next'))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }

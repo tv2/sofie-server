@@ -535,7 +535,7 @@ describe(Rundown.name, () => {
           mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             activeCursor: {
-              part: segment.findFirstPart(),
+              part: segment.findFirstPartNotOnAir(),
               segment,
               owner: Owner.SYSTEM
             },
@@ -581,7 +581,7 @@ describe(Rundown.name, () => {
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
               activeCursor: {
-                part: segment.findFirstPart(),
+                part: segment.findFirstPartNotOnAir(),
                 segment,
                 owner: Owner.SYSTEM
               },
@@ -2687,7 +2687,7 @@ describe(Rundown.name, () => {
               id: firstSegmentId,
               parts: [part],
             })
-            when(firstSegmentMock.findNextPart(part)).thenThrow(new LastPartInSegmentException(''))
+            when(firstSegmentMock.findNextPartNotOnAir(part)).thenThrow(new LastPartInSegmentException(''))
             const firstSegment: Segment = instance(firstSegmentMock)
 
             const secondSegmentId: string = 'secondSegmentId'
@@ -2717,7 +2717,7 @@ describe(Rundown.name, () => {
               id: firstSegmentId,
               parts: [part],
             })
-            when(firstSegmentMock.findNextPart(part)).thenThrow(new LastPartInSegmentException(''))
+            when(firstSegmentMock.findNextPartNotOnAir(part)).thenThrow(new LastPartInSegmentException(''))
             const firstSegment: Segment = instance(firstSegmentMock)
 
             const secondSegmentMock: Segment = EntityMockFactory.createSegmentMock({ id: 'secondSegmentId', parts: [] })
@@ -2751,7 +2751,7 @@ describe(Rundown.name, () => {
               id: firstSegmentId,
               parts: [part],
             })
-            when(firstSegmentMock.findNextPart(part)).thenThrow(new LastPartInSegmentException(''))
+            when(firstSegmentMock.findNextPartNotOnAir(part)).thenThrow(new LastPartInSegmentException(''))
             const firstSegment: Segment = instance(firstSegmentMock)
 
             const testee: Rundown = new Rundown({
@@ -3552,7 +3552,7 @@ describe(Rundown.name, () => {
     })
   })
 
-  describe(Rundown.prototype.setNext.name, () => {
+  describe(Rundown.prototype.setNextFromIds.name, () => {
     it('resets next part right before changing next cursor', () => {
       const nextSegmentId: string = 'next-segment-id'
       const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true, segmentId: nextSegmentId })
@@ -3585,7 +3585,7 @@ describe(Rundown.name, () => {
         ],
       })
 
-      testee.setNext(activeSegment.id, otherPartInActiveSegment.id)
+      testee.setNextFromIds(activeSegment.id, otherPartInActiveSegment.id)
 
       verify(nextPartSpy.reset()).once()
     })
@@ -3619,7 +3619,7 @@ describe(Rundown.name, () => {
           ],
         } as RundownInterface)
 
-        testee.setNext(activeSegment.id, otherPartInActiveSegment.id)
+        testee.setNextFromIds(activeSegment.id, otherPartInActiveSegment.id)
 
         verify(mockedActivePart.reset()).never()
       })
@@ -3649,7 +3649,7 @@ describe(Rundown.name, () => {
           ],
         } as RundownInterface)
 
-        const result: () => void = () => testee.setNext(activeSegment.id, activePart.id)
+        const result: () => void = () => testee.setNextFromIds(activeSegment.id, activePart.id)
 
         expect(result).toThrow(OnAirException)
       })
@@ -3686,7 +3686,7 @@ describe(Rundown.name, () => {
         const spiedNextSegment: Segment = spy(nextSegment)
 
         try {
-          testee.setNext(nextSegment.id, nextPart.id)
+          testee.setNextFromIds(nextSegment.id, nextPart.id)
         } catch (e) {
           // Do nothing - the error is expected.
         }
@@ -3722,7 +3722,7 @@ describe(Rundown.name, () => {
         } as RundownInterface)
 
 
-        expect(() => testee.setNext(nextSegment.id, nextPart.id)).toThrow(InvalidSegmentException)
+        expect(() => testee.setNextFromIds(nextSegment.id, nextPart.id)).toThrow(InvalidSegmentException)
       })
     })
     describe('when next part is invalid', () => {
@@ -3759,7 +3759,7 @@ describe(Rundown.name, () => {
         const spiedNextPart: Part = spy(nextPart)
 
         try {
-          testee.setNext(nextSegment.id, nextPart.id)
+          testee.setNextFromIds(nextSegment.id, nextPart.id)
         } catch {
           // Do nothing. The error is expected.
         }
@@ -3798,7 +3798,7 @@ describe(Rundown.name, () => {
           ],
         })
 
-        const result: () => void = () => testee.setNext(nextSegment.id, nextPart.id)
+        const result: () => void = () => testee.setNextFromIds(nextSegment.id, nextPart.id)
 
         expect(result).toThrow(InvalidPartException)
       })
