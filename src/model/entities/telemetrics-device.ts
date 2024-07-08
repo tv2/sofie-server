@@ -27,6 +27,7 @@ export class TelemetricsDevice extends Device {
 
 
 export class TelemetricsDeviceDBDTO extends DeviceDbDto {
+  public type: string = 'TelemetricsDevice'
   private _host: string
 
   constructor(device: Device, host: string) {
@@ -46,6 +47,7 @@ export class TelemetricsDeviceDBDTO extends DeviceDbDto {
 }
 
 export class TelemetricsDeviceRestDTO extends DeviceRestDto {
+  public type: string = 'TelemetricsDevice'
   private _host: string
 
   constructor(device: Device, host: string) {

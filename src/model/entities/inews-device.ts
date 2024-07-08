@@ -36,6 +36,7 @@ export class INewsDevice extends Device {
 }
 
 export class INewsDeviceDBDTO extends DeviceDbDto {
+  public type: string = 'INewsDevice'
   private _username: string
   private _password: string
 
@@ -65,6 +66,7 @@ export class INewsDeviceDBDTO extends DeviceDbDto {
 }
 
 export class INewsDeviceRestDTO extends DeviceRestDto {
+  public type: string = 'INewsDevice'
   private _username: string
   private _password: string
 

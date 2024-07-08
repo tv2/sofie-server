@@ -1,15 +1,17 @@
 import { DeviceService } from './interfaces/device-service'
 import { MongoDeviceRepository } from '../../data-access/repositories/mongo/mongo-device-repository'
 import { Device } from '../../model/entities/device'
+import { INewsDevice } from '../../model/entities/inews-device'
+import { TelemetricsDevice } from '../../model/entities/telemetrics-device'
 
 export class DeviceServiceImplementation implements DeviceService {
   constructor(private readonly deviceRepository: MongoDeviceRepository) {}
   
-  public async readAllConfigurations(): Promise<Device[]> {
+  public async readAllConfigurations(): Promise<(Device | INewsDevice | TelemetricsDevice)[]> {
     return await this.deviceRepository.findAllDevices()
   }
 
-  public async readConfiguration(deviceId: string): Promise<Device> {
+  public async readConfiguration(deviceId: string): Promise<(Device | INewsDevice | TelemetricsDevice)> {
     const deviceConfig = await this.deviceRepository.findById(deviceId)
     if (!deviceConfig) {
       throw new Error(`Device with id ${deviceId} not found`)
@@ -17,12 +19,12 @@ export class DeviceServiceImplementation implements DeviceService {
     return deviceConfig
   }
 
-  public async create(config: Device): Promise<void> {
-    const existingDevice = await this.deviceRepository.findById(config.id)
+  public async create(_device: Device | INewsDevice | TelemetricsDevice): Promise<void> {
+    const existingDevice = await this.deviceRepository.findById(_device.id)
     if (existingDevice) {
-      throw new Error(`Device with id ${config.id} already exists`)
+      throw new Error(`Device with id ${_device.id} already exists`)
     }
-    await this.deviceRepository.create(config)
+    await this.deviceRepository.create(_device)
   }
 
   public async update(deviceId: string, config: Device): Promise<void> {

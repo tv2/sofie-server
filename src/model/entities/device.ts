@@ -2,7 +2,7 @@ import { StatusCode } from '../enums/status-code'
 
 export abstract class Device {
   public type: string = 'Device'
-  private _id: string
+  public _id: string
   private _name: string
   private _isConnected: boolean
   private _statusCode: StatusCode
@@ -62,6 +62,7 @@ export abstract class Device {
 }
 
 export class DeviceDbDto {
+  public type: string = 'Device'
   public id: string
   public name: string
   public isConnected: boolean
@@ -79,6 +80,7 @@ export class DeviceDbDto {
 }
 
 export class DeviceRestDto {
+  public type: string = 'Device'
   public id: string
   public name: string
   public isConnected: boolean
