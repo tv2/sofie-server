@@ -1,4 +1,3 @@
-import { Device } from '../device'
 import { INewsDevice } from '../inews-device'
 import { TelemetricsDevice } from '../telemetrics-device'
 import { mock } from '@typestrong/ts-mockito'
