@@ -4,17 +4,17 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
-import { Device } from '../../../model/entities/device'
+import { CoreDevice } from '../../../model/entities/core-device'
 import { Logger } from '../../../logger/logger'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
-export class MongoDeviceChangedListener extends BaseMongoRepository implements DataChangedListener<Device> {
+export class MongoDeviceChangedListener extends BaseMongoRepository implements DataChangedListener<CoreDevice> {
 
   private readonly logger: Logger
-  private onCreatedCallback: (device: Device) => void
-  private onUpdatedCallback: (device: Device) => void
+  private onCreatedCallback: (device: CoreDevice) => void
+  private onUpdatedCallback: (device: CoreDevice) => void
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter, logger: Logger) {
     super(mongoDatabase)
@@ -33,7 +33,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
         const mongoDevice: MongoDevice = change.fullDocument
-        this.onCreatedCallback(this.mongoEntityConverter.convertToDevice(mongoDevice))
+        this.onCreatedCallback(this.mongoEntityConverter.convertToCoreDevice(mongoDevice))
         return
       }
       case MongoChangeEvent.UPDATE: {
@@ -41,7 +41,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
         if (!mongoDevice) {
           return
         }
-        this.onUpdatedCallback(this.mongoEntityConverter.convertToDevice(mongoDevice))
+        this.onUpdatedCallback(this.mongoEntityConverter.convertToCoreDevice(mongoDevice))
         return
       }
     }
@@ -51,11 +51,11 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
     return DEVICE_COLLECTION_NAME
   }
 
-  public onCreated(onCreatedCallback: (data: Device) => void): void {
+  public onCreated(onCreatedCallback: (data: CoreDevice) => void): void {
     this.onCreatedCallback = onCreatedCallback
   }
 
-  public onUpdated(onUpdatedCallback: (data: Device) => void): void {
+  public onUpdated(onUpdatedCallback: (data: CoreDevice) => void): void {
     this.onUpdatedCallback = onUpdatedCallback
   }
 

@@ -3,7 +3,7 @@ import { Segment, SegmentInterface } from '../segment'
 import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
-import { Device } from '../device'
+import { CoreDevice } from '../core-device'
 import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
@@ -63,7 +63,7 @@ export class EntityTestFactory {
     } as PieceInterface)
   }
 
-  public static createDevice(device: Partial<Device> = {}): Device {
+  public static createDevice(device: Partial<CoreDevice> = {}): CoreDevice {
     return {
       id: 'deviceId',
       name: 'deviceName',

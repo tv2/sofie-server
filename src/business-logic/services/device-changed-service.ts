@@ -1,9 +1,9 @@
 import { DataChangeService } from './interfaces/data-change-service'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
-import { Device } from '../../model/entities/device'
+import { CoreDevice } from '../../model/entities/core-device'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
-import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
+import { CoreDeviceRepository } from '../../data-access/repositories/interfaces/core-device-repository'
 import { Logger } from '../../logger/logger'
 import { StatusMessageService } from './interfaces/status-message-service'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
@@ -16,8 +16,8 @@ export class DeviceChangedService implements DataChangeService {
 
   public static getInstance(
     statusMessageService: StatusMessageService,
-    deviceRepository: DeviceRepository,
-    deviceChangedListener: DataChangedListener<Device>,
+    deviceRepository: CoreDeviceRepository,
+    deviceChangedListener: DataChangedListener<CoreDevice>,
     logger: Logger
   ): DataChangeService {
     if (!this.instance) {
@@ -35,8 +35,8 @@ export class DeviceChangedService implements DataChangeService {
 
   constructor(
     private readonly statusMessageService: StatusMessageService,
-    private readonly deviceRepository: DeviceRepository,
-    deviceChangedListener: DataChangedListener<Device>,
+    private readonly deviceRepository: CoreDeviceRepository,
+    deviceChangedListener: DataChangedListener<CoreDevice>,
     logger: Logger
   ) {
     this.logger = logger.tag(DeviceChangedService.name)
@@ -50,11 +50,11 @@ export class DeviceChangedService implements DataChangeService {
   }
 
   private async updateStatusMessageFromCurrentDeviceStatus(): Promise<void> {
-    const devices: Device[] = await this.deviceRepository.getDevices()
+    const devices: CoreDevice[] = await this.deviceRepository.getDevices()
     await Promise.all(devices.map(device => this.onDeviceUpdated(device)))
   }
 
-  private listenForStatusMessageChanges(deviceChangedListener: DataChangedListener<Device>): void {
+  private listenForStatusMessageChanges(deviceChangedListener: DataChangedListener<CoreDevice>): void {
     deviceChangedListener.onCreated(device => {
       this.onDeviceUpdated(device).catch(error => this.logger.data(error).error(`Failed processing device created event for device '${device.name}' with id '${device.id}'.`))
     })
@@ -63,7 +63,7 @@ export class DeviceChangedService implements DataChangeService {
     })
   }
 
-  private async onDeviceUpdated(device: Device): Promise<void> {
+  private async onDeviceUpdated(device: CoreDevice): Promise<void> {
     if (!device.isConnected) {
       device.statusCode = StatusCode.BAD
       device.statusMessage = NOT_CONNECTED_MESSAGE
@@ -72,7 +72,7 @@ export class DeviceChangedService implements DataChangeService {
     await this.statusMessageService.updateStatusMessage(this.convertDeviceToStatusMessage(device))
   }
 
-  private convertDeviceToStatusMessage(device: Device): StatusMessage {
+  private convertDeviceToStatusMessage(device: CoreDevice): StatusMessage {
     return {
       id: device.id,
       statusCode: device.statusCode,

@@ -26,7 +26,7 @@ import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
 import { SystemInformation } from '../../../model/entities/system-information'
-import { Device } from '../../../model/entities/device'
+import { CoreDevice } from '../../../model/entities/core-device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { Invalidity } from '../../../model/value-objects/invalidity'
@@ -493,7 +493,7 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDevice(mongoDevice: MongoDevice): Device {
+  public convertToCoreDevice(mongoDevice: MongoDevice): CoreDevice {
     const statusMessage: string = mongoDevice.status.messages && mongoDevice.status.messages.length > 0
       ? mongoDevice.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
       : ''
@@ -525,7 +525,7 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDevices(mongoDevices: MongoDevice[]): Device[] {
-    return mongoDevices.map(mongoDevice => this.convertToDevice(mongoDevice))
+  public convertToCoreDevices(mongoDevices: MongoDevice[]): CoreDevice[] {
+    return mongoDevices.map(mongoDevice => this.convertToCoreDevice(mongoDevice))
   }
 }

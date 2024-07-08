@@ -1,14 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BaseMongoRepository } from './base-mongo-repository'
 import { DeviceRepository } from '../interfaces/device-repository'
 import { Device } from '../../../model/entities/device'
 import { MongoDatabase } from './mongo-database'
-import { MongoDevice, MongoEntityConverter } from './mongo-entity-converter'
 
-const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
+const DEVICE_COLLECTION_NAME: string = 'externalDevices'
 
-export class MongoCoreDeviceRepository extends BaseMongoRepository implements DeviceRepository {
+export class MongoDeviceRepository extends BaseMongoRepository implements DeviceRepository {
 
-  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+  constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
   }
 
@@ -16,9 +16,24 @@ export class MongoCoreDeviceRepository extends BaseMongoRepository implements De
     return DEVICE_COLLECTION_NAME
   }
 
-  public async getDevices(): Promise<Device[]> {
-    this.assertDatabaseConnection(MongoCoreDeviceRepository.prototype.getDevices.name)
-    const mongoDevices: MongoDevice[] = await this.getCollection().find<MongoDevice>({}).toArray()
-    return this.mongoEntityConverter.convertToDevices(mongoDevices)
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async findAllDevices(): Promise<Device[]> {
+    throw new Error('NOT IMPLEMENTED')
+  }
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async findById(_deviceId: string): Promise<Device> {
+    throw new Error('NOT IMPLEMENTED')
+  }
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async create(_device: Device): Promise<Device[]> {
+    throw new Error('NOT IMPLEMENTED')
+  }
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async update(_deviceId: string, _device: Device): Promise<Device[]> {
+    throw new Error('NOT IMPLEMENTED')
+  }
+  // eslint-disable-next-line @typescript-eslint/require-await
+  public async delete(_deviceId: string): Promise<Device[]> {
+    throw new Error('NOT IMPLEMENTED')
   }
 }
