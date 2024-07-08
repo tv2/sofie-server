@@ -1,14 +1,12 @@
 import { StatusCode } from '../enums/status-code'
-import { CoreDevice } from './core-device'
 
-export class Device implements CoreDevice {
+export abstract class Device {
   public type: string = 'Device'
-  private _id: string = 'Device'
+  private _id: string
   private _name: string
   private _isConnected: boolean
   private _statusCode: StatusCode
   private _statusMessage: string
-
 
   constructor(id: string, name: string, isConnected: boolean, statusCode: StatusCode, statusMessage: string) {
     this._id = id
@@ -17,11 +15,9 @@ export class Device implements CoreDevice {
     this._statusCode = statusCode
     this._statusMessage = statusMessage
   }
-  
-  public connect(): void{
-    console.log('connecting')
-  }
 
+  public abstract connect(): void
+  
   // Getters
   public get id(): string {
     return this._id
@@ -65,7 +61,7 @@ export class Device implements CoreDevice {
   }
 }
 
-export class DeviceDBDTO {
+export class DeviceDbDto {
   public id: string
   public name: string
   public isConnected: boolean
@@ -80,12 +76,9 @@ export class DeviceDBDTO {
     this.statusMessage = device.statusMessage
   }
 
-  public toDevice(): Device {
-    return new Device(this.id, this.name, this.isConnected, this.statusCode, this.statusMessage)
-  }
 }
 
-export class DeviceRestDTO {
+export class DeviceRestDto {
   public id: string
   public name: string
   public isConnected: boolean

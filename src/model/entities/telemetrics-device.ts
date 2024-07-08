@@ -1,5 +1,5 @@
 import { StatusCode } from '../enums/status-code'
-import { Device, DeviceDBDTO, DeviceRestDTO } from './device'
+import { Device, DeviceDbDto, DeviceRestDto } from './device'
 
 export class TelemetricsDevice extends Device {
   public type: string = 'TelemetricsDevice'
@@ -26,7 +26,7 @@ export class TelemetricsDevice extends Device {
 }
 
 
-export class TelemetricsDeviceDBDTO extends DeviceDBDTO {
+export class TelemetricsDeviceDBDTO extends DeviceDbDto {
   private _host: string
 
   constructor(device: Device, host: string) {
@@ -45,7 +45,7 @@ export class TelemetricsDeviceDBDTO extends DeviceDBDTO {
   }
 }
 
-export class TelemetricsDeviceRestDTO extends DeviceRestDTO {
+export class TelemetricsDeviceRestDTO extends DeviceRestDto {
   private _host: string
 
   constructor(device: Device, host: string) {

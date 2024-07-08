@@ -1,5 +1,5 @@
 import { StatusCode } from '../enums/status-code'
-import { Device, DeviceDBDTO, DeviceRestDTO } from './device'
+import { Device, DeviceDbDto, DeviceRestDto } from './device'
 
 export class INewsDevice extends Device {
   public type: string = 'iNewsDevice'
@@ -35,7 +35,7 @@ export class INewsDevice extends Device {
   }
 }
 
-export class INewsDeviceDBDTO extends DeviceDBDTO {
+export class INewsDeviceDBDTO extends DeviceDbDto {
   private _username: string
   private _password: string
 
@@ -64,7 +64,7 @@ export class INewsDeviceDBDTO extends DeviceDBDTO {
   }
 }
 
-export class INewsDeviceRestDTO extends DeviceRestDTO {
+export class INewsDeviceRestDTO extends DeviceRestDto {
   private _username: string
   private _password: string
 

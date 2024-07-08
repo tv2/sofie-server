@@ -32,7 +32,7 @@ export class DeviceController extends BaseController{
     }
   }
 
-  @GetRequest('/devices')
+  @GetRequest('/')
   public async getAllDeviceConfigurations(response: Response): Promise<void> {
     try {
       const configs = await this.deviceService.readAllConfigurations()

@@ -1,13 +1,15 @@
-import { DeviceService } from '../interfaces/device-service'
+import { DeviceServiceImplementation } from '../device-service-implementation'
 import { Device } from '../../../model/entities/device'
 import { mock, instance, when, verify, reset } from '@typestrong/ts-mockito'
+import { StatusCode } from '../../../model/enums/status-code'
+import { INewsDevice } from '../../../model/entities/inews-device'
 
 describe('DeviceService', () => {
-  let service: DeviceService
-  let mockedService: DeviceService
+  let service: DeviceServiceImplementation
+  let mockedService: DeviceServiceImplementation
 
   beforeEach(() => {
-    mockedService = mock<DeviceService>()
+    mockedService = mock<DeviceServiceImplementation>()
     service = instance(mockedService)
   })
 
@@ -18,7 +20,6 @@ describe('DeviceService', () => {
   it('should read all configurations', async () => {
     const devices: Device[] = [/* create sample devices */]
     when(mockedService.readAllConfigurations()).thenReturn(Promise.resolve(devices))
-
     const result = await service.readAllConfigurations()
 
     expect(result).toEqual(devices)
@@ -26,13 +27,14 @@ describe('DeviceService', () => {
   })
 
   it('should read configuration for a specific device', async () => {
-    const device = mock<Device>()
+    const device = new INewsDevice('my-device', 'My Device', false, StatusCode.GOOD, 'A message', 'JohnDoe', 'JohnsPassword')
+
     when(mockedService.readConfiguration(device.id)).thenReturn(Promise.resolve(device))
 
     await service.readConfiguration(device.id)
     
     verify(mockedService.readConfiguration(device.id)).called()
-  }, 100)
+  })
 
   it('should create a new configuration', async () => {
     const device: Device = mock<Device>()
