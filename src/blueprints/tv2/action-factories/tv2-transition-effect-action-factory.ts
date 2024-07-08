@@ -3,7 +3,7 @@ import {
   ActionArgumentType,
   MutateActionMethods,
   MutateActionType,
-  MutateActionWithPieceMethods
+  MutateActionWithOnAirAndNextPiecesMethods
 } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
@@ -147,9 +147,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       }
     }
 
-    const updateTransitionMutateAction: MutateActionWithPieceMethods = {
+    const updateTransitionMutateAction: MutateActionWithOnAirAndNextPiecesMethods = {
       type: MutateActionType.PIECE,
-      updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
+      updateActionWithPiece: (action: Action, onAirPiece: Piece | undefined, nextPiece: Piece | undefined) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, onAirPiece, nextPiece),
       piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
     }
     mutateActionMethods.push(updateTransitionMutateAction)
@@ -360,26 +360,30 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return breakerDsk
   }
 
-  private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, piece: Piece): Tv2TransitionEffectAction {
-    const sourceInput: number | undefined = this.videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(piece)
-    if (!sourceInput) {
-      this.logger.data({ action, piece }).warn('Can\'t find a Program SourceInput to put the Transition Effect on')
+  private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, onAirPiece: Piece | undefined, nextPiece: Piece | undefined): Tv2TransitionEffectAction {
+    if (!nextPiece) {
+      return action
+    }
+
+    const nextSourceInput: number | undefined = this.videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(nextPiece)
+    if (!nextSourceInput) {
+      this.logger.data({ action, nextPiece }).warn('Can\'t find a Program SourceInput to put the Transition Effect on')
       return action
     }
 
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
-        const cutTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObjects(sourceInput)
+        const cutTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObjects(nextSourceInput)
         action.data.pieceInterface.timelineObjects.push(...cutTransitionTimelineObjects)
         break
       }
       case TransitionEffectType.MIX: {
-        const mixTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames)
+        const mixTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(nextSourceInput, action.metadata.durationInFrames)
         action.data.pieceInterface.timelineObjects.push(...mixTransitionTimelineObjects)
         break
       }
       case TransitionEffectType.DIP: {
-        const dipTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
+        const dipTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObjects(nextSourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
         action.data.pieceInterface.timelineObjects.push(...dipTransitionTimelineObjects)
         break
       }
@@ -389,9 +393,14 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         break
       }
       case TransitionEffectType.T_BAR: {
-        // TODO: Find PROGRAM and NEXT inputs
-        // TODO: "SourceInput" is currently next
-        const tBarTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createTBarTransitionEffectTimelineObject(sourceInput, action.metadata.tBarPosition)
+        if (!onAirPiece) {
+          break
+        }
+        const onAirSourceInput: number | undefined = this.videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(onAirPiece)
+        if (!onAirSourceInput) {
+          break
+        }
+        const tBarTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createTBarTransitionEffectTimelineObject(onAirSourceInput, nextSourceInput, action.metadata.tBarPosition)
         action.data.pieceInterface.timelineObjects.push(tBarTimelineObject)
         break
       }
