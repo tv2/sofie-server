@@ -17,7 +17,6 @@ export abstract class Device {
 
   public abstract connect(): void
   
-  // Getters
   public get id(): string {
     return this._id
   }
@@ -38,7 +37,6 @@ export abstract class Device {
     return this._statusMessage
   }
 
-  // Setters
   public set id(value: string) {
     this._id = value
   }

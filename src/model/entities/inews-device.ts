@@ -12,7 +12,6 @@ export class INewsDevice extends Device {
     this._password = password
   }
 
-  // Getters
   public get username(): string {
     return this._username
   }
@@ -21,7 +20,6 @@ export class INewsDevice extends Device {
     return this._password
   }
 
-  //Setters
   public set username(value: string){
     this._username = value
   }
@@ -46,7 +44,6 @@ export class INewsDeviceDBDTO extends DeviceDbDto {
     this._password = password
   }
 
-  // Getters
   public get username(): string {
     return this._username
   }
@@ -55,7 +52,6 @@ export class INewsDeviceDBDTO extends DeviceDbDto {
     return this._password
   }
 
-  //Setters
   public set username(value: string){
     this._username = value
   }
@@ -76,7 +72,6 @@ export class INewsDeviceRestDTO extends DeviceRestDto {
     this._password = device.password
   }
 
-  // Getters
   public get username(): string {
     return this._username
   }
@@ -85,7 +80,6 @@ export class INewsDeviceRestDTO extends DeviceRestDto {
     return this._password
   }
 
-  //Setters
   public set username(value: string){
     this._username = value
   }

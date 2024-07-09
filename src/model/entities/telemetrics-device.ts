@@ -9,12 +9,10 @@ export class TelemetricsDevice extends Device {
     this._host = host
   }
 
-  // Getter
   public get host(): string {
     return this._host
   }
 
-  // Setter
   public set host(value: string) {
     this._host = value
   }
@@ -33,12 +31,10 @@ export class TelemetricsDeviceDBDTO extends DeviceDbDto {
     this._host = device.host
   }
 
-  // Getter
   public get host(): string {
     return this._host
   }
 
-  // Setter
   public set host(value: string) {
     this._host = value
   }
@@ -53,12 +49,10 @@ export class TelemetricsDeviceRestDTO extends DeviceRestDto {
     this._host = device.host
   }
 
-  // Getter
   public get host(): string {
     return this._host
   }
 
-  // Setter
   public set host(value: string) {
     this._host = value
   }
