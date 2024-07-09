@@ -57,7 +57,6 @@ export class DeviceServiceImplementation implements DeviceService {
     if (!deviceConfig) {
       throw new Error(`Device with id ${deviceId} not found`)
     }
-    // Simulate reconnecting the device
     console.log(`Connecting to device ${deviceId}`)
     await new Promise((resolve) => setTimeout(resolve, 1000))
   }
