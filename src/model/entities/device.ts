@@ -58,24 +58,6 @@ export abstract class Device {
   }
 }
 
-export class DeviceDbDto {
-  public type: string = 'Device'
-  public id: string
-  public name: string
-  public isConnected: boolean
-  public statusCode: StatusCode
-  public statusMessage: string
-
-  constructor(device: Device) {
-    this.id = device.id
-    this.name = device.name
-    this.isConnected = device.isConnected
-    this.statusCode = device.statusCode
-    this.statusMessage = device.statusMessage
-  }
-
-}
-
 export class DeviceRestDto {
   public type: string = 'Device'
   public id: string

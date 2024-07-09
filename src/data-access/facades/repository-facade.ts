@@ -267,7 +267,9 @@ export class RepositoryFacade {
   }
 
   public static createDeviceRepository(): MongoDeviceRepository {
-    return new MongoDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
+    return new MongoDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), 
+      new MongoEntityConverter(LoggerFacade.createLogger()),
+      this.createUuidGenerator() )
   }
 
   private static createUuidGenerator(): UuidGenerator {

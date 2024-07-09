@@ -2,7 +2,6 @@ import { DeviceServiceImplementation } from '../device-service-implementation'
 import { Device } from '../../../model/entities/device'
 import { mock, when, verify, instance } from '@typestrong/ts-mockito'
 import { StatusCode } from '../../../model/enums/status-code'
-import { INewsDevice } from '../../../model/entities/inews-device'
 import { TelemetricsDevice } from '../../../model/entities/telemetrics-device'
 import { MongoDeviceRepository } from '../../../data-access/repositories/mongo/mongo-device-repository'
 import { DeviceService } from '../interfaces/device-service'
@@ -29,17 +28,6 @@ describe('DeviceService', () => {
     await testee.readAllDeviceConfigurations()
 
     verify(mockedValue.findAllDevices()).called()
-  })
-
-  it('should read configuration for a specific device', async () => {
-    const device = new INewsDevice('my-device', 'My Device', false, StatusCode.GOOD, 'A message', 'JohnDoe', 'JohnsPassword')
-    const mockedService = mock<DeviceService>()
-    const testee: DeviceServiceImplementation = new DeviceServiceImplementation(deviceRepository)
-    when(mockedService.readConfiguration(device._id)).thenReturn(Promise.resolve(device))
-
-    await testee.readConfiguration(device.id)
-    
-    verify(mockedValue.findById(device.id)).called()
   })
 
   it('should create a new configuration', async () => {

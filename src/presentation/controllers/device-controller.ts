@@ -10,6 +10,7 @@ import { INewsDevice, INewsDeviceRestDTO } from '../../model/entities/inews-devi
 import { TelemetricsDevice, TelemetricsDeviceRestDTO } from '../../model/entities/telemetrics-device'
 import { Logger } from '../../logger/logger'
 import { BadRequestException } from '../../model/exceptions/bad-request-exception'
+import { StatusCode } from '../../model/enums/status-code'
 
 @RestController('/devices')
 export class DeviceController extends BaseController{
@@ -28,6 +29,7 @@ export class DeviceController extends BaseController{
     try {
       const devices: Device[] = await this.deviceService.readAllDeviceConfigurations()
       const deviceDtos: (TelemetricsDeviceRestDTO | INewsDeviceRestDTO | undefined)[] = devices.map(device => {
+        console.log(device)
         if(device instanceof INewsDevice){
           return new INewsDeviceRestDTO(device)
         }
@@ -59,10 +61,11 @@ export class DeviceController extends BaseController{
       const deviceDto: DeviceRestDto = request.body as DeviceRestDto
       switch(deviceDto.type){
         case 'INewsDevice':
-          await this.deviceService.create(request.body as INewsDevice)
+          
+          await this.deviceService.create(this.dtoToINewsDevice(request.body as INewsDeviceRestDTO))
           break
         case 'TelemetricsDevice':
-          await this.deviceService.create(request.body as TelemetricsDevice)
+          await this.deviceService.create(this.dtoToTelemetricsDevice(request.body as TelemetricsDeviceRestDTO))
           break
         default:
           throw new BadRequestException('Unsupported device format or malformed JSON')
@@ -97,15 +100,38 @@ export class DeviceController extends BaseController{
     }
   }
 
-  @PostRequest('/:id/reconnect')
-  public async manualReconnectDevice(request: Request, response: Response): Promise<void> {
+  @PostRequest('/:deviceId/reconnect')
+  public async reconnectDevice(request: Request, response: Response): Promise<void> {
     try {
-      const deviceId = request.params.id
+      const deviceId = request.params.deviceId
       await this.deviceService.disconnect(deviceId)
       await this.deviceService.connect(deviceId)
       response.status(200).send()
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
+  }
+
+  private dtoToINewsDevice(dvcs: INewsDeviceRestDTO): INewsDevice{
+    return new INewsDevice(
+      dvcs.id,
+      dvcs.name,
+      dvcs.isConnected,
+      StatusCode.UNKNOWN,
+      dvcs.status,
+      dvcs.username,
+      dvcs.password
+    )
+  }
+
+  private dtoToTelemetricsDevice(dvcs: TelemetricsDeviceRestDTO): TelemetricsDevice{
+    return new TelemetricsDevice(
+      dvcs.id,
+      dvcs.name,
+      dvcs.isConnected,
+      StatusCode.UNKNOWN,
+      dvcs.status,
+      dvcs.host
+    )
   }
 }

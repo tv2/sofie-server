@@ -5,12 +5,15 @@ import { Device } from '../../../model/entities/device'
 import { MongoDatabase } from './mongo-database'
 import { INewsDevice } from '../../../model/entities/inews-device'
 import { TelemetricsDevice } from '../../../model/entities/telemetrics-device'
+import { UuidGenerator } from '../interfaces/uuid-generator'
+import { MongoEntityConverter, MongoINewsDevice, MongoTelemetricsDevice } from './mongo-entity-converter'
+
 
 const DEVICE_COLLECTION_NAME: string = 'externalDevices'
 
 export class MongoDeviceRepository extends BaseMongoRepository implements DeviceRepository {
 
-  constructor(mongoDatabase: MongoDatabase) {
+  constructor(mongoDatabase: MongoDatabase, private readonly entityConverter: MongoEntityConverter, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
 
@@ -20,8 +23,8 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
 
   public async findAllDevices(): Promise<(Device | INewsDevice | TelemetricsDevice)[]> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.findAllDevices.name)
-    const devices: Device[] = await this.getCollection().find<(Device | INewsDevice | TelemetricsDevice)>({}).toArray() 
-    return devices
+    const devices: (MongoINewsDevice | MongoTelemetricsDevice )[] = await this.getCollection().find<(MongoINewsDevice | MongoTelemetricsDevice)>({}).toArray() 
+    return this.entityConverter.convertToDevices(devices)
   }
 
   public async findById(_deviceId: string): Promise<Device | null> {
@@ -35,12 +38,26 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
     }
   }
 
-  public async create(_device: Device | INewsDevice | TelemetricsDevice): Promise<void> {
-    try{
+  public async create(_deviceWithoutId: Device): Promise<void> {
+    let dbDto: MongoINewsDevice | MongoTelemetricsDevice  = {
+      username: '',
+      password: '',
+      _id: '',
+      name: '',
+      connected: false,
+      status: {
+        statusCode: 0,
+        messages: []
+      }
+    }
+
+    try {
       this.assertDatabaseConnection(MongoDeviceRepository.prototype.create.name)
-      await this.getCollection().insertOne(_device)
+      const uuid = this.uuidGenerator.generateUuid()
+      dbDto = this.entityConverter.convertToDbDevice(_deviceWithoutId, uuid)
+      await this.getCollection().insertOne({...dbDto, _id: dbDto._id})
     } catch (error) {
-      console.error(`Error creating new device by id ${_device.id}:`, error)
+      console.error(`Error creating new device by id ${dbDto._id}:`, error)
     }
   }
 
@@ -51,4 +68,11 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
   public delete(_deviceId: string): Promise<Device[]> {
     throw new Error('NOT IMPLEMENTED')
   }
+
+
+}
+
+export interface DevicesDbDto {
+  _id: string
+   
 }
