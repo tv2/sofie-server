@@ -70,10 +70,10 @@ export class INewsDeviceRestDTO extends DeviceRestDto {
   private _username: string
   private _password: string
 
-  constructor(device: Device, username: string, password: string) {
+  constructor(device: INewsDevice) {
     super(device)
-    this._username = username
-    this._password = password
+    this._username = device.username
+    this._password = device.password
   }
 
   // Getters

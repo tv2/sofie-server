@@ -1,47 +1,54 @@
 import { DeviceServiceImplementation } from '../device-service-implementation'
 import { Device } from '../../../model/entities/device'
-import { mock, instance, when, verify, reset } from '@typestrong/ts-mockito'
+import { mock, when, verify, instance } from '@typestrong/ts-mockito'
 import { StatusCode } from '../../../model/enums/status-code'
 import { INewsDevice } from '../../../model/entities/inews-device'
+import { TelemetricsDevice } from '../../../model/entities/telemetrics-device'
+import { MongoDeviceRepository } from '../../../data-access/repositories/mongo/mongo-device-repository'
+import { DeviceService } from '../interfaces/device-service'
 
 describe('DeviceService', () => {
-  let service: DeviceServiceImplementation
-  let mockedService: DeviceServiceImplementation
+  let testDevice: TelemetricsDevice
+  let deviceRepository: MongoDeviceRepository
+  const mockedValue = mock<MongoDeviceRepository>() 
 
   beforeEach(() => {
-    mockedService = mock<DeviceServiceImplementation>()
-    service = instance(mockedService)
+    testDevice = new TelemetricsDevice('', 'testDevice', true, StatusCode.GOOD, 'All good', 'https://localhost:22544')
+    deviceRepository = instance(mockedValue)
   })
 
   afterEach(() => {
-    reset(mockedService)
   })
 
   it('should read all configurations', async () => {
-    const devices: Device[] = [/* create sample devices */]
-    when(mockedService.readAllConfigurations()).thenReturn(Promise.resolve(devices))
-    const result = await service.readAllConfigurations()
+    const devices: Device[] = [testDevice]
+    const mockedService = mock<DeviceService>()
+    const testee: DeviceServiceImplementation = new DeviceServiceImplementation(deviceRepository)
+    when(mockedService.readAllDeviceConfigurations()).thenReturn(Promise.resolve(devices))
+    
+    await testee.readAllDeviceConfigurations()
 
-    expect(result).toEqual(devices)
-    verify(mockedService.readAllConfigurations()).called()
+    verify(mockedValue.findAllDevices()).called()
   })
 
   it('should read configuration for a specific device', async () => {
     const device = new INewsDevice('my-device', 'My Device', false, StatusCode.GOOD, 'A message', 'JohnDoe', 'JohnsPassword')
+    const mockedService = mock<DeviceService>()
+    const testee: DeviceServiceImplementation = new DeviceServiceImplementation(deviceRepository)
+    when(mockedService.readConfiguration(device._id)).thenReturn(Promise.resolve(device))
 
-    when(mockedService.readConfiguration(device.id)).thenReturn(Promise.resolve(device))
-
-    await service.readConfiguration(device.id)
+    await testee.readConfiguration(device.id)
     
-    verify(mockedService.readConfiguration(device.id)).called()
+    verify(mockedValue.findById(device.id)).called()
   })
 
   it('should create a new configuration', async () => {
-    const device: Device = mock<Device>()
-    when(mockedService.create(device)).thenReturn(Promise.resolve())
+    const mockedService = mock<DeviceService>()
+    const testee: DeviceServiceImplementation = new DeviceServiceImplementation(deviceRepository)
+    when(mockedService.create(testDevice)).thenReturn(Promise.resolve())
 
-    await service.create(device)
+    await testee.create(testDevice)
 
-    verify(mockedService.create(device)).called()
+    verify(mockedValue.create(testDevice)).called()
   })
 })

@@ -6,7 +6,7 @@ import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { DeviceDto } from '../dtos/device-dto'
 import { HealthDto } from '../dtos/health-dto'
-import { DeviceRestDto } from '../../model/entities/device'
+import { Device, DeviceRestDto } from '../../model/entities/device'
 import { INewsDevice, INewsDeviceRestDTO } from '../../model/entities/inews-device'
 import { TelemetricsDevice, TelemetricsDeviceRestDTO } from '../../model/entities/telemetrics-device'
 
@@ -37,23 +37,33 @@ export class DeviceController extends BaseController{
   @GetRequest('/')
   public async getAllDeviceConfigurations(_request: Request, response: Response): Promise<void> {
     try {
-      const configs = await this.deviceService.readAllConfigurations()
-      response.send(this.httpResponseFormatter.formatSuccessResponse(
-        configs.map(config => {
-          switch (config.type) {
-            case 'INewsDevice':
-              // eslint-disable-next-line no-case-declarations
-              const incfg = config as INewsDevice
-              return new INewsDeviceRestDTO(config, incfg.username, incfg.password)
-            case 'TelemetricsDevice': // Corrected case label
-              // eslint-disable-next-line no-case-declarations
-              const tmcfg = config as TelemetricsDevice
-              return new TelemetricsDeviceRestDTO(config, tmcfg.host)
-            default:
-              throw new Error(`Unknown device type: ${config.type}`)
-          }
-        })
-      ))
+      const devices: Device[] = await this.deviceService.readAllDeviceConfigurations()
+      const deviceDtos: (TelemetricsDeviceRestDTO | INewsDeviceRestDTO)[] = devices.map(device => {
+        if(device instanceof INewsDevice){
+          return new INewsDeviceRestDTO(device)
+        }
+        if(device instanceof TelemetricsDevice){
+          return new TelemetricsDeviceRestDTO(device)
+        }
+        throw new Error('Unknown device type')
+      })
+      response.send(this.httpResponseFormatter.formatSuccessResponse(deviceDtos))
+      // response.send(this.httpResponseFormatter.formatSuccessResponse(
+      //   configs.map(config => {
+      //     switch (config.type) {
+      //       case 'INewsDevice':
+      //         // eslint-disable-next-line no-case-declarations
+      //         const incfg = config as INewsDevice
+      //         return new INewsDeviceRestDTO(config, incfg.username, incfg.password)
+      //       case 'TelemetricsDevice': // Corrected case label
+      //         // eslint-disable-next-line no-case-declarations
+      //         const tmcfg = config as TelemetricsDevice
+      //         return new TelemetricsDeviceRestDTO(config, tmcfg.host)
+      //       default:
+      //         throw new Error(`Unknown device type: ${config.type}`)
+      //     }
+      //   })
+      // ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }

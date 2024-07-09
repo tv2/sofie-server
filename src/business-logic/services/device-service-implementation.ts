@@ -7,7 +7,7 @@ import { TelemetricsDevice } from '../../model/entities/telemetrics-device'
 export class DeviceServiceImplementation implements DeviceService {
   constructor(private readonly deviceRepository: MongoDeviceRepository) {}
   
-  public async readAllConfigurations(): Promise<(Device | INewsDevice | TelemetricsDevice)[]> {
+  public async readAllDeviceConfigurations(): Promise<(Device | INewsDevice | TelemetricsDevice)[]> {
     return await this.deviceRepository.findAllDevices()
   }
 

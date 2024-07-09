@@ -2,7 +2,6 @@ import { StatusCode } from '../enums/status-code'
 import { Device, DeviceDbDto, DeviceRestDto } from './device'
 
 export class TelemetricsDevice extends Device {
-  public type: string = 'TelemetricsDevice'
   private _host: string
 
   constructor(id: string, name: string, isConnected: boolean, statusCode: StatusCode, statusMessage: string, host: string) {
@@ -25,14 +24,13 @@ export class TelemetricsDevice extends Device {
   }
 }
 
-
 export class TelemetricsDeviceDBDTO extends DeviceDbDto {
   public type: string = 'TelemetricsDevice'
   private _host: string
 
-  constructor(device: Device, host: string) {
+  constructor(device: TelemetricsDevice) {
     super(device)
-    this._host = host
+    this._host = device.host
   }
 
   // Getter
@@ -50,9 +48,9 @@ export class TelemetricsDeviceRestDTO extends DeviceRestDto {
   public type: string = 'TelemetricsDevice'
   private _host: string
 
-  constructor(device: Device, host: string) {
+  constructor(device: TelemetricsDevice) {
     super(device)
-    this._host = host
+    this._host = device.host
   }
 
   // Getter

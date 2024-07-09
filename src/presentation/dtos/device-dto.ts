@@ -14,7 +14,6 @@ export class DeviceDto {
     this.name = device.name
     this.isConnected = device.isConnected
     this.statusCode = device.statusCode
-    this.type = device.type
   }
 }
 

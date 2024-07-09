@@ -1,7 +1,6 @@
 import { StatusCode } from '../enums/status-code'
 
 export abstract class Device {
-  public type: string = 'Device'
   public _id: string
   private _name: string
   private _isConnected: boolean
