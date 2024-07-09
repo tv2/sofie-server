@@ -53,7 +53,7 @@ export class DeviceController extends BaseController{
     }
   }
 
-  @PostRequest('/')
+  @PostRequest()
   public async createDeviceConfiguration(request: Request, response: Response): Promise<void> {
     try {
       const deviceDto: DeviceRestDto = request.body as DeviceRestDto
