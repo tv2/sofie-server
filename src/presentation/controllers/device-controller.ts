@@ -5,10 +5,11 @@ import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { DeviceDto } from '../dtos/device-dto'
-import { HealthDto } from '../dtos/health-dto'
 import { Device, DeviceRestDto } from '../../model/entities/device'
 import { INewsDevice, INewsDeviceRestDTO } from '../../model/entities/inews-device'
 import { TelemetricsDevice, TelemetricsDeviceRestDTO } from '../../model/entities/telemetrics-device'
+import { Logger } from '../../logger/logger'
+import { BadRequestException } from '../../model/exceptions/bad-request-exception'
 
 @RestController('/devices')
 export class DeviceController extends BaseController{
@@ -16,59 +17,30 @@ export class DeviceController extends BaseController{
   constructor(
     private readonly deviceService: DeviceService,
     private readonly httpErrorHandler: HttpErrorHandler,
-    private readonly httpResponseFormatter: HttpResponseFormatter
+    private readonly httpResponseFormatter: HttpResponseFormatter,
+    private readonly logger: Logger
   ) {
     super()
   }
 
-  @GetRequest('/health')
-  public health(_request: Request, response: Response): void {
-    try {
-      const healthcheck = {
-        statusCode: 200,
-        state: 'Healthy'
-      }
-      response.send(this.httpResponseFormatter.formatSuccessResponse(new HealthDto(healthcheck.statusCode, healthcheck.state)))
-    } catch (error) {
-      this.httpErrorHandler.handleError(response, error as Exception)
-    }
-  }
-
-  @GetRequest('/')
+  @GetRequest()
   public async getAllDeviceConfigurations(_request: Request, response: Response): Promise<void> {
     try {
       const devices: Device[] = await this.deviceService.readAllDeviceConfigurations()
-      const deviceDtos: (TelemetricsDeviceRestDTO | INewsDeviceRestDTO)[] = devices.map(device => {
+      const deviceDtos: (TelemetricsDeviceRestDTO | INewsDeviceRestDTO | undefined)[] = devices.map(device => {
         if(device instanceof INewsDevice){
           return new INewsDeviceRestDTO(device)
         }
         if(device instanceof TelemetricsDevice){
           return new TelemetricsDeviceRestDTO(device)
         }
-        throw new Error('Unknown device type')
+        this.logger.warn('Unsupported device ${device.name} found in the dataset. ')     
       })
       response.send(this.httpResponseFormatter.formatSuccessResponse(deviceDtos))
-      // response.send(this.httpResponseFormatter.formatSuccessResponse(
-      //   configs.map(config => {
-      //     switch (config.type) {
-      //       case 'INewsDevice':
-      //         // eslint-disable-next-line no-case-declarations
-      //         const incfg = config as INewsDevice
-      //         return new INewsDeviceRestDTO(config, incfg.username, incfg.password)
-      //       case 'TelemetricsDevice': // Corrected case label
-      //         // eslint-disable-next-line no-case-declarations
-      //         const tmcfg = config as TelemetricsDevice
-      //         return new TelemetricsDeviceRestDTO(config, tmcfg.host)
-      //       default:
-      //         throw new Error(`Unknown device type: ${config.type}`)
-      //     }
-      //   })
-      // ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
-
 
   @GetRequest('/:id')
   public async getDeviceConfiguration(request: Request, response: Response): Promise<void> {
@@ -84,8 +56,7 @@ export class DeviceController extends BaseController{
   @PostRequest('/')
   public async createDeviceConfiguration(request: Request, response: Response): Promise<void> {
     try {
-      const deviceDto: DeviceRestDto = request.body as DeviceRestDto //discriminator field
-
+      const deviceDto: DeviceRestDto = request.body as DeviceRestDto
       switch(deviceDto.type){
         case 'INewsDevice':
           await this.deviceService.create(request.body as INewsDevice)
@@ -94,8 +65,7 @@ export class DeviceController extends BaseController{
           await this.deviceService.create(request.body as TelemetricsDevice)
           break
         default:
-          console.log('createDeviceConfiguration rececived a malformed request') //Help, replace me with a proper logger
-          break
+          throw new BadRequestException('Unsupported device format or malformed JSON')
       }
   
       response.send(this.httpResponseFormatter.formatSuccessResponse())

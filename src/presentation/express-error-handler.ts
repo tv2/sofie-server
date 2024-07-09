@@ -31,6 +31,9 @@ export class ExpressErrorHandler implements HttpErrorHandler {
       case ErrorCode.NOT_FOUND: {
         return HttpStatusCode.NOT_FOUND
       }
+      case ErrorCode.BAD_REQUEST: {
+        return HttpStatusCode.BAD_REQUEST
+      }
       case ErrorCode.MISCONFIGURATION:
       case ErrorCode.DELETION_FAILED: {
         return HttpStatusCode.INTERNAL_SERVER_ERROR

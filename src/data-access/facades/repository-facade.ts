@@ -268,7 +268,6 @@ export class RepositoryFacade {
 
   public static createDeviceRepository(): MongoDeviceRepository {
     return new MongoDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
-    //throw new Error('Method not implemented.')
   }
 
   private static createUuidGenerator(): UuidGenerator {

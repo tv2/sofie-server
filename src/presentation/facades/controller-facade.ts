@@ -97,9 +97,9 @@ export class ControllerFacade {
   private static createDeviceController(): DeviceController {
     return new DeviceController(
       ServiceFacade.createDeviceService(),
-      //RepositoryFacade.createDeviceRepository(),
       ControllerFacade.createExpressErrorHandler(),
-      new JsendResponseFormatter()
+      new JsendResponseFormatter(),
+      LoggerFacade.createLogger()
     )
   }
 }
