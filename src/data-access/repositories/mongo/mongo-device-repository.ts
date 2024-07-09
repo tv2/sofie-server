@@ -38,19 +38,17 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
   public async create(_device: Device | INewsDevice | TelemetricsDevice): Promise<void> {
     try{
       this.assertDatabaseConnection(MongoDeviceRepository.prototype.create.name)
-      // const result: InsertOneResult<unknown> = 
       await this.getCollection().insertOne(_device)
     } catch (error) {
       console.error(`Error creating new device by id ${_device.id}:`, error)
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  public async update(_deviceId: string, _device: Device): Promise<Device[]> {
+  public update(_deviceId: string, _device: Device): Promise<Device[]> {
     throw new Error('NOT IMPLEMENTED')
   }
-  // eslint-disable-next-line @typescript-eslint/require-await
-  public async delete(_deviceId: string): Promise<Device[]> {
+  
+  public delete(_deviceId: string): Promise<Device[]> {
     throw new Error('NOT IMPLEMENTED')
   }
 }
