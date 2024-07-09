@@ -71,7 +71,6 @@ export class DeviceServiceImplementation implements DeviceService {
     devices.forEach(device => {
       device.connect()
     })
-    // Simulate reconnecting the device
     console.log('Connecting to devices')
     await new Promise((resolve) => setTimeout(resolve, 1000))
   }
