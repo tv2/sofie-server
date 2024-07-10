@@ -38,7 +38,7 @@ export class DeviceController extends BaseController{
     try {
       const { deviceId } = request.params
       const device: Device = await this.deviceService.getDevice(deviceId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(device))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(this.toDto(device)))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -61,8 +61,6 @@ export class DeviceController extends BaseController{
   }
 
   private toDto(device: Device): DeviceDtoInterface | undefined {
-    console.log('test1', device)
-
     if (this.isINewsDevice(device)) {
       return new INewsDeviceDto(device)
     }
@@ -73,7 +71,6 @@ export class DeviceController extends BaseController{
   }
 
   private isINewsDevice(device: Device): device is INewsDevice {
-    console.log('test2', device.type, DeviceType.INEWS)
     return device.type === DeviceType.INEWS
   }
 
