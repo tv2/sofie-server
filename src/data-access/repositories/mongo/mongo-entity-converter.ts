@@ -26,15 +26,12 @@ import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
 import { SystemInformation } from '../../../model/entities/system-information'
-import { CoreDevice } from '../../../model/entities/core-device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { Invalidity } from '../../../model/value-objects/invalidity'
 import { Logger } from '../../../logger/logger'
-import { TelemetricsDevice } from '../../../model/entities/telemetrics-device'
-import { INewsDevice } from '../../../model/entities/inews-device'
 import { Device } from '../../../model/entities/device'
-import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { DeviceType } from '../../../model/enums/device-type'
 
 
 export interface MongoId {
@@ -182,6 +179,7 @@ export interface MongoSystemInformation extends MongoId {
 
 export interface MongoDevice extends MongoId {
   name: string
+  type: DeviceType
   status: {
     statusCode: number,
     messages: string[]
@@ -189,14 +187,14 @@ export interface MongoDevice extends MongoId {
   connected: boolean
 }
 
-export interface MongoINewsDevice extends MongoDevice {
-  username: string
-  password: string
-}
+// export interface MongoINewsDevice extends MongoDevice {
+//   username: string
+//   password: string
+// }
 
-export interface MongoTelemetricsDevice extends MongoDevice {
-  host: string
-}
+// export interface MongoTelemetricsDevice extends MongoDevice {
+//   host: string
+// }
 
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 
@@ -513,116 +511,20 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToCoreDevice(mongoDevice: MongoDevice): CoreDevice {
+  public convertToDeviceInterface(mongoDevice: MongoDevice): Device {
     const statusMessage: string = mongoDevice.status.messages && mongoDevice.status.messages.length > 0
       ? mongoDevice.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
       : ''
+
     return {
       id: mongoDevice._id,
       name: mongoDevice.name,
       isConnected: mongoDevice.connected,
       statusCode: this.getStatusCode(mongoDevice.status.statusCode),
-      statusMessage
+      statusMessage,
+      type: mongoDevice.type
     }
   }
-
-  public convertToDbDevice(deviceWithoutId: Device, uuid: string): MongoINewsDevice | MongoTelemetricsDevice {
-    if(this.isInewsDevice(deviceWithoutId)){
-      const mongoINewsDevice = this.convertToDbINewsDevice(deviceWithoutId)
-      mongoINewsDevice._id = uuid
-      return mongoINewsDevice
-    }
-    if(this.isTelematricsDevice(deviceWithoutId)){
-      const mongoTelemetricsDevice = this.convertToDbTelemetricsDevice(deviceWithoutId)
-      mongoTelemetricsDevice._id = uuid
-      return mongoTelemetricsDevice
-    }
-    throw new UnsupportedOperationException('Unsupported device format: ${deviceWithoutId}')
-  }
-
-  public convertToDbINewsDevice(device: INewsDevice): MongoINewsDevice  {
-    return {
-      username: device.username,
-      password: device.password,  
-      _id: device._id,
-      name: device.name,
-      connected: device.isConnected,
-      status: {
-        statusCode: this.StatusCodeToNumber[device.statusCode],
-        messages: [device.statusMessage]
-      }
-    }
-  }
-
-  public convertToDbTelemetricsDevice(device: TelemetricsDevice): MongoTelemetricsDevice  {
-    return {
-      host: device.host,  
-      _id: device._id,
-      name: device.name,
-      connected: device.isConnected,
-      status: {
-        statusCode: this.StatusCodeToNumber[device.statusCode],
-        messages: [device.statusMessage]
-      }
-    }
-  }
-
-  public convertToDevices(mongoDevices: (MongoINewsDevice | MongoTelemetricsDevice)[]): (INewsDevice | TelemetricsDevice)[]{
-    return mongoDevices.map(mongoDevice => this.convertToDevice(mongoDevice))
-  }
-
-  public convertToDevice(mongoDevice: MongoINewsDevice | MongoTelemetricsDevice): INewsDevice | TelemetricsDevice {
-    if(this.isMongoINewsDeviceObject(mongoDevice)){
-      return new INewsDevice(
-        mongoDevice._id,
-        mongoDevice.name,
-        mongoDevice.connected,
-        this.getStatusCode( mongoDevice.status.statusCode),
-        mongoDevice.status.messages[0],
-        mongoDevice.username,
-        mongoDevice.password
-      )  
-    }
-    if(this.isMongoTelemetricsDeviceObject(mongoDevice)) {
-      return new TelemetricsDevice(
-        mongoDevice._id,
-        mongoDevice.name,
-        mongoDevice.connected,
-        this.getStatusCode( mongoDevice.status.statusCode),
-        mongoDevice.status.messages[0],
-        mongoDevice.host
-      ) 
-    }
-    throw new Error('Mapping failed')
-  }
-
-  private isInewsDevice(device: unknown): device is INewsDevice {
-    return device instanceof INewsDevice
-  }
-
-  private isTelematricsDevice(device: unknown): device is TelemetricsDevice {
-    return device instanceof TelemetricsDevice
-  }
-
-  private isMongoINewsDeviceObject(obj: any): obj is INewsDevice {
-    return typeof obj.username === 'string' &&
-           typeof obj.password === 'string' &&
-           typeof obj.name === 'string' &&
-           typeof obj.connected === 'boolean' &&
-           obj.status &&
-           typeof obj.status.statusCode === 'number' &&
-           Array.isArray(obj.status.messages)
-  }
-
-  private isMongoTelemetricsDeviceObject(obj: any): obj is TelemetricsDevice {
-    return typeof obj.host === 'string' &&
-           typeof obj.name === 'string' &&
-           typeof obj.connected === 'boolean' &&
-           obj.status &&
-           typeof obj.status.statusCode === 'number' &&
-           Array.isArray(obj.status.messages)
-  }
-
 
   private getStatusCode(value: number): StatusCode {
     switch (value) {
@@ -643,7 +545,7 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToCoreDevices(mongoDevices: MongoDevice[]): CoreDevice[] {
-    return mongoDevices.map(mongoDevice => this.convertToCoreDevice(mongoDevice))
+  public convertToDeviceInterfaces(mongoDevices: MongoDevice[]): Device[] {
+    return mongoDevices.map(mongoDevice => this.convertToDeviceInterface(mongoDevice))
   }
 }

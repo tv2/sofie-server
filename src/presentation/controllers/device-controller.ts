@@ -1,16 +1,11 @@
-import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
+import { BaseController, GetRequest, PostRequest, RestController } from './base-controller'
 import { Request, Response } from 'express'
 import { DeviceService } from '../../business-logic/services/interfaces/device-service'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { DeviceDto } from '../dtos/device-dto'
-import { Device, DeviceRestDto } from '../../model/entities/device'
-import { INewsDevice, INewsDeviceRestDTO } from '../../model/entities/inews-device'
-import { TelemetricsDevice, TelemetricsDeviceRestDTO } from '../../model/entities/telemetrics-device'
 import { Logger } from '../../logger/logger'
-import { BadRequestException } from '../../model/exceptions/bad-request-exception'
-import { StatusCode } from '../../model/enums/status-code'
+import { Device } from '../../model/entities/device'
 
 @RestController('/devices')
 export class DeviceController extends BaseController{
@@ -25,113 +20,37 @@ export class DeviceController extends BaseController{
   }
 
   @GetRequest()
-  public async getAllDeviceConfigurations(_request: Request, response: Response): Promise<void> {
+  public async getAllDevices(_request: Request, response: Response): Promise<void> {
     try {
-      const devices: Device[] = await this.deviceService.readAllDeviceConfigurations()
-      const deviceDtos: (TelemetricsDeviceRestDTO | INewsDeviceRestDTO | undefined)[] = devices.map(device => {
-        console.log(device)
-        if(device instanceof INewsDevice){
-          return new INewsDeviceRestDTO(device)
-        }
-        if(device instanceof TelemetricsDevice){
-          return new TelemetricsDeviceRestDTO(device)
-        }
-        this.logger.warn('Unsupported device ${device.name} found in the dataset. ')     
-      })
-      response.send(this.httpResponseFormatter.formatSuccessResponse(deviceDtos))
+      const devices: Device[] = await this.deviceService.getDevices()
+      response.send(this.httpResponseFormatter.formatSuccessResponse(devices))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
-  @GetRequest('/:id')
-  public async getDeviceConfiguration(request: Request, response: Response): Promise<void> {
+  @GetRequest('/:deviceId')
+  public async getDevice(request: Request, response: Response): Promise<void> {
     try {
-      const deviceId = request.params.id
-      const config = await this.deviceService.readConfiguration(deviceId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(new DeviceDto(config)))
+      const deviceId = request.params.deviceId
+      const device: Device = await this.deviceService.getDevice(deviceId)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(device))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
   @PostRequest()
-  public async createDeviceConfiguration(request: Request, response: Response): Promise<void> {
+  public async createDevice(request: Request, response: Response): Promise<void> {
     try {
-      const deviceDto: DeviceRestDto = request.body as DeviceRestDto
-      switch(deviceDto.type){
-        case 'INewsDevice':
-          
-          await this.deviceService.create(this.dtoToINewsDevice(request.body as INewsDeviceRestDTO))
-          break
-        case 'TelemetricsDevice':
-          await this.deviceService.create(this.dtoToTelemetricsDevice(request.body as TelemetricsDeviceRestDTO))
-          break
-        default:
-          throw new BadRequestException('Unsupported device format or malformed JSON')
-      }
+      const device: Device = await request.body
+      console.log(device)
+     
+      await this.deviceService.create(device)
   
       response.send(this.httpResponseFormatter.formatSuccessResponse())
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
-  }
-
-  @PutRequest('/:id')
-  public async updateDeviceConfiguration(request: Request, response: Response): Promise<void> {
-    try {
-      const deviceId = request.params.id
-      const config = request.body
-      await this.deviceService.update(deviceId, config)
-      response.status(200).json(config)
-    } catch (error) {
-      this.httpErrorHandler.handleError(response, error as Exception)
-    }
-  }
-
-  @DeleteRequest('/:id')
-  public async deleteDeviceConfiguration(request: Request, response: Response): Promise<void> {
-    try {
-      const deviceId = request.params.id
-      await this.deviceService.delete(deviceId)
-      response.status(204).send()
-    } catch (error) {
-      this.httpErrorHandler.handleError(response, error as Exception)
-    }
-  }
-
-  @PostRequest('/:deviceId/reconnect')
-  public async reconnectDevice(request: Request, response: Response): Promise<void> {
-    try {
-      const deviceId = request.params.deviceId
-      await this.deviceService.disconnect(deviceId)
-      await this.deviceService.connect(deviceId)
-      response.status(200).send()
-    } catch (error) {
-      this.httpErrorHandler.handleError(response, error as Exception)
-    }
-  }
-
-  private dtoToINewsDevice(dvcs: INewsDeviceRestDTO): INewsDevice{
-    return new INewsDevice(
-      dvcs.id,
-      dvcs.name,
-      dvcs.isConnected,
-      StatusCode.UNKNOWN,
-      dvcs.status,
-      dvcs.username,
-      dvcs.password
-    )
-  }
-
-  private dtoToTelemetricsDevice(dvcs: TelemetricsDeviceRestDTO): TelemetricsDevice{
-    return new TelemetricsDevice(
-      dvcs.id,
-      dvcs.name,
-      dvcs.isConnected,
-      StatusCode.UNKNOWN,
-      dvcs.status,
-      dvcs.host
-    )
   }
 }

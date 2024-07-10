@@ -20,4 +20,5 @@ export enum DeviceType {
   OBS = 21,
   TELEMETRICS = 22,
   TRICASTER = 24,
+  INEWS = 25
 }

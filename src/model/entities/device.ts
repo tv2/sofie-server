@@ -1,74 +1,28 @@
+import { DeviceType } from '../enums/device-type'
 import { StatusCode } from '../enums/status-code'
 
-export abstract class Device {
-  public _id: string
-  private _name: string
-  private _isConnected: boolean
-  private _statusCode: StatusCode
-  private _statusMessage: string
+export type Device = CoreDevice | INewsDevice | TelemetricsDevice 
 
-  constructor(id: string, name: string, isConnected: boolean, statusCode: StatusCode, statusMessage: string) {
-    this._id = id
-    this._name = name
-    this._isConnected = isConnected
-    this._statusCode = statusCode
-    this._statusMessage = statusMessage
-  }
-
-  public abstract connect(): void
-  
-  public get id(): string {
-    return this._id
-  }
-
-  public get name(): string {
-    return this._name
-  }
-
-  public get isConnected(): boolean {
-    return this._isConnected
-  }
-
-  public get statusCode(): StatusCode {
-    return this._statusCode
-  }
-
-  public get statusMessage(): string {
-    return this._statusMessage
-  }
-
-  public set id(value: string) {
-    this._id = value
-  }
-
-  public set name(value: string) {
-    this._name = value
-  }
-
-  public set isConnected(value: boolean) {
-    this._isConnected = value
-  }
-
-  public set statusCode(value: StatusCode) {
-    this._statusCode = value
-  }
-
-  public set statusMessage(value: string) {
-    this._statusMessage = value
-  }
+interface BasicDevice {
+  type: DeviceType
+  id: string
+  name: string
+  isConnected: boolean
+  statusCode: StatusCode
+  statusMessage: string
 }
 
-export class DeviceRestDto {
-  public type: string = 'Device'
-  public id: string
-  public name: string
-  public isConnected: boolean
-  public status: string 
+export interface CoreDevice extends BasicDevice {
+  type: DeviceType
+}
 
-  constructor(device: Device) {
-    this.id = device.id
-    this.name = device.name
-    this.isConnected = device.isConnected
-    this.status = device.statusMessage
-  }
+export interface INewsDevice extends BasicDevice {
+  type: DeviceType.INEWS
+  username: string
+  password: string
+}
+
+export interface TelemetricsDevice extends BasicDevice {
+  type: DeviceType.TELEMETRICS
+  host: string
 }
