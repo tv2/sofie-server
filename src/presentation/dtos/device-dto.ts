@@ -64,11 +64,4 @@ export class TelemetricsDeviceDto extends DeviceDto implements TelemetricsDevice
   }
 }
 
-// StatusCodeToNumber: Record<StatusCode, number> = {
-//   [StatusCode.GOOD]: 1,
-//   [StatusCode.WARNING]: 2,
-//   [StatusCode.BAD]: 3,
-//   [StatusCode.UNKNOWN]: 4
-// }
-
 export type ApiFilter = INewsDeviceDto | TelemetricsDeviceDto | undefined
