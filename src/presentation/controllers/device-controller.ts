@@ -5,7 +5,11 @@ import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { Logger } from '../../logger/logger'
-import { Device } from '../../model/entities/device'
+import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
+import { DeviceType } from '../../model/enums/device-type'
+import { DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
+import { UnprocessableEntityException } from '../../model/exceptions/unprocessable-entity-exception'
+
 
 @RestController('/devices')
 export class DeviceController extends BaseController{
@@ -23,7 +27,9 @@ export class DeviceController extends BaseController{
   public async getAllDevices(_request: Request, response: Response): Promise<void> {
     try {
       const devices: Device[] = await this.deviceService.getDevices()
-      response.send(this.httpResponseFormatter.formatSuccessResponse(devices))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(devices.map(device => {
+        return this.toDto(device)
+      })))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -32,7 +38,7 @@ export class DeviceController extends BaseController{
   @GetRequest('/:deviceId')
   public async getDevice(request: Request, response: Response): Promise<void> {
     try {
-      const deviceId = request.params.deviceId
+      const { deviceId } = request.params
       const device: Device = await this.deviceService.getDevice(deviceId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(device))
     } catch (error) {
@@ -44,13 +50,36 @@ export class DeviceController extends BaseController{
   public async createDevice(request: Request, response: Response): Promise<void> {
     try {
       const device: Device = await request.body
-      console.log(device)
-     
+      if(!Object.values(DeviceType).includes(device.type)){
+        throw new UnprocessableEntityException('device type was not in the correct numerical format')
+      }
+
       await this.deviceService.create(device)
   
       response.send(this.httpResponseFormatter.formatSuccessResponse())
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
+  }
+
+  private toDto(device: Device): DeviceDtoInterface | undefined {
+    console.log('test1', device)
+
+    if (this.isINewsDevice(device)) {
+      return new INewsDeviceDto(device)
+    }
+    if (this.isTelemetricsDevice(device)) {
+      return new TelemetricsDeviceDto(device)
+    }
+    return undefined
+  }
+
+  private isINewsDevice(device: Device): device is INewsDevice {
+    console.log('test2', device.type, DeviceType.INEWS)
+    return device.type === DeviceType.INEWS
+  }
+
+  private isTelemetricsDevice(device: Device): device is TelemetricsDevice {
+    return device.type === DeviceType.TELEMETRICS
   }
 }
