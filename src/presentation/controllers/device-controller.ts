@@ -4,7 +4,6 @@ import { DeviceService } from '../../business-logic/services/interfaces/device-s
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { Logger } from '../../logger/logger'
 import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
 import { DeviceType } from '../../model/enums/device-type'
 import { DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
@@ -18,7 +17,6 @@ export class DeviceController extends BaseController{
     private readonly deviceService: DeviceService,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter,
-    private readonly logger: Logger
   ) {
     super()
   }

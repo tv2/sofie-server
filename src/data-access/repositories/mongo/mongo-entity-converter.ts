@@ -201,13 +201,6 @@ const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 export class MongoEntityConverter {
   private readonly logger: Logger
 
-  private readonly StatusCodeToNumber: Record<StatusCode, number> = {
-    [StatusCode.GOOD]: 1,
-    [StatusCode.WARNING]: 2,
-    [StatusCode.BAD]: 3,
-    [StatusCode.UNKNOWN]: 4
-  }
-
   constructor(logger: Logger) {
     this.logger = logger.tag(MongoEntityConverter.name)
   }

@@ -3,11 +3,12 @@ import { Segment, SegmentInterface } from '../segment'
 import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
-import { CoreDevice } from '../core-device'
 import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
+import { Device } from '../device'
+import { DeviceType } from '../../enums/device-type'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -63,13 +64,14 @@ export class EntityTestFactory {
     } as PieceInterface)
   }
 
-  public static createDevice(device: Partial<CoreDevice> = {}): CoreDevice {
+  public static createDevice(device: Partial<Device> = {}): Device {
     return {
       id: 'deviceId',
       name: 'deviceName',
       statusCode: StatusCode.UNKNOWN,
       statusMessage: '',
       isConnected: false,
+      type: DeviceType.ABSTRACT,
       ...device
     }
   }

@@ -1,8 +1,6 @@
 import { DeviceServiceImplementation } from '../device-service-implementation'
-import { Device } from '../../../model/entities/device'
+import { Device, TelemetricsDevice } from '../../../model/entities/device'
 import { mock, when, verify, instance } from '@typestrong/ts-mockito'
-import { StatusCode } from '../../../model/enums/status-code'
-import { TelemetricsDevice } from '../../../model/entities/telemetrics-device'
 import { MongoDeviceRepository } from '../../../data-access/repositories/mongo/mongo-device-repository'
 import { DeviceService } from '../interfaces/device-service'
 
@@ -12,7 +10,7 @@ describe('DeviceService', () => {
   const mockedValue = mock<MongoDeviceRepository>() 
 
   beforeEach(() => {
-    testDevice = new TelemetricsDevice('', 'testDevice', true, StatusCode.GOOD, 'All good', 'https://localhost:22544')
+    testDevice = mock<TelemetricsDevice>()
     deviceRepository = instance(mockedValue)
   })
 
@@ -23,11 +21,11 @@ describe('DeviceService', () => {
     const devices: Device[] = [testDevice]
     const mockedService = mock<DeviceService>()
     const testee: DeviceServiceImplementation = new DeviceServiceImplementation(deviceRepository)
-    when(mockedService.readAllDeviceConfigurations()).thenReturn(Promise.resolve(devices))
+    when(mockedService.getDevices()).thenReturn(Promise.resolve(devices))
     
-    await testee.readAllDeviceConfigurations()
+    await testee.getDevices()
 
-    verify(mockedValue.findAllDevices()).called()
+    verify(mockedValue.getDevices()).called()
   })
 
   it('should create a new configuration', async () => {
@@ -37,6 +35,6 @@ describe('DeviceService', () => {
 
     await testee.create(testDevice)
 
-    verify(mockedValue.create(testDevice)).called()
+    verify(mockedValue.save(testDevice)).called()
   })
 })

@@ -99,7 +99,6 @@ export class ControllerFacade {
       ServiceFacade.createDeviceService(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter(),
-      LoggerFacade.createLogger()
     )
   }
 }

@@ -1,7 +1,6 @@
-import { INewsDevice } from '../inews-device'
-import { TelemetricsDevice } from '../telemetrics-device'
-import { mock } from '@typestrong/ts-mockito'
 
+import { mock } from '@typestrong/ts-mockito'
+import { INewsDevice, TelemetricsDevice } from '../device'
 describe('INewsDevice and TelemetricsDevice', () => {
   it('should have correct properties and methods', () => {
     const newsDevice = mock<INewsDevice>()
@@ -22,7 +21,5 @@ describe('INewsDevice and TelemetricsDevice', () => {
     expect(telemetryDevice).toHaveProperty('statusMessage')
     expect(telemetryDevice).toHaveProperty('type')
     expect(telemetryDevice).toHaveProperty('host')
-    expect(typeof newsDevice.connect).toBe('function')
-    expect(typeof telemetryDevice.connect).toBe('function')
   })
 })
