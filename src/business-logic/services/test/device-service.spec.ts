@@ -14,8 +14,6 @@ describe('DeviceService', () => {
     deviceRepository = instance(mockedValue)
   })
 
-  afterEach(() => {
-  })
 
   it('should read all configurations', async () => {
     const devices: Device[] = [testDevice]
