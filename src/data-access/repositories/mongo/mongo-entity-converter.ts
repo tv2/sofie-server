@@ -187,15 +187,6 @@ export interface MongoDevice extends MongoId {
   connected: boolean
 }
 
-// export interface MongoINewsDevice extends MongoDevice {
-//   username: string
-//   password: string
-// }
-
-// export interface MongoTelemetricsDevice extends MongoDevice {
-//   host: string
-// }
-
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 
 export class MongoEntityConverter {
