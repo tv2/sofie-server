@@ -5,8 +5,10 @@ import { MongoId } from './mongo-entity-converter'
 import { Logger } from '../../../logger/logger'
 import { Database } from '../interfaces/database'
 
-const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
-const MONGO_DB_NAME: string = getMongoDatabaseName()
+const MONGO_CONNECTION_STRING: string = 'mongodb://localhost:27017?directConnection=true'
+const MONGO_DB_NAME: string = 'sofie'
+// const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
+// const MONGO_DB_NAME: string = getMongoDatabaseName()
 
 function getMongoDatabaseName(): string {
   const mongoUrlPattern: RegExp = /^mongodb:\/\/\w+(:\d+)?\/(?<databaseName>[^/]+)/i
