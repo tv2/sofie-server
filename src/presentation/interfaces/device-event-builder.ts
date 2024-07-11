@@ -1,6 +1,7 @@
 import { Device } from '../../model/entities/device'
-import { DeviceCreatedEvent } from '../value-objects/device-event'
+import { DeviceCreatedEvent, DeviceUpdatedEvent } from '../value-objects/device-event'
 
 export interface DeviceEventBuilder {
   buildDeviceCreatedEvent(device: Device): DeviceCreatedEvent
+  buildDeviceUpdatedEvent(device: Device): DeviceUpdatedEvent
 }

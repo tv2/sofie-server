@@ -1,4 +1,4 @@
-import { BaseController, GetRequest, PostRequest, RestController } from './base-controller'
+import { BaseController, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
 import { Request, Response } from 'express'
 import { DeviceService } from '../../business-logic/services/interfaces/device-service'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
@@ -8,7 +8,7 @@ import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/dev
 import { DeviceType } from '../../model/enums/device-type'
 import { DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
 import { UnprocessableEntityException } from '../../model/exceptions/unprocessable-entity-exception'
-
+import { ConflictException } from '../../model/exceptions/conflict-exception'
 
 @RestController('/devices')
 export class DeviceController extends BaseController{
@@ -31,6 +31,24 @@ export class DeviceController extends BaseController{
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
+  }
+
+  private toDto(device: Device): DeviceDtoInterface | undefined {
+    if (this.isINewsDevice(device)) {
+      return new INewsDeviceDto(device)
+    }
+    if (this.isTelemetricsDevice(device)) {
+      return new TelemetricsDeviceDto(device)
+    }
+    return undefined
+  }
+
+  private isINewsDevice(device: Device): device is INewsDevice {
+    return device.type === DeviceType.INEWS
+  }
+
+  private isTelemetricsDevice(device: Device): device is TelemetricsDevice {
+    return device.type === DeviceType.TELEMETRICS
   }
 
   @GetRequest('/:deviceId')
@@ -60,21 +78,18 @@ export class DeviceController extends BaseController{
     }
   }
 
-  private toDto(device: Device): DeviceDtoInterface | undefined {
-    if (this.isINewsDevice(device)) {
-      return new INewsDeviceDto(device)
-    }
-    if (this.isTelemetricsDevice(device)) {
-      return new TelemetricsDeviceDto(device)
-    }
-    return undefined
-  }
+  @PutRequest('/:deviceId')
+  public async updateDevice(request: Request, response: Response): Promise<void> {
+    try{
+      const device: Device = await request.body
+      const { deviceId } = request.params
 
-  private isINewsDevice(device: Device): device is INewsDevice {
-    return device.type === DeviceType.INEWS
-  }
+      if(device.id !== deviceId) throw new ConflictException('Conflict: The ID in the URL path does not match the ID in the request body.')  //to be in compliance with the REST convention (it is not a strict rule) we pass in the ID, and then we validate it against the body ID to stop IDOR attacks 
+      await this.deviceService.update(device)
+      response.send(this.httpResponseFormatter.formatSuccessResponse())
 
-  private isTelemetricsDevice(device: Device): device is TelemetricsDevice {
-    return device.type === DeviceType.TELEMETRICS
+    } catch(error){
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
   }
 }

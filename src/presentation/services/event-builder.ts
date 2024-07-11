@@ -66,7 +66,7 @@ import { ActionsUpdatedEvent } from '../value-objects/action-event'
 import { ActionDto } from '../dtos/action-dto'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import { Device } from '../../model/entities/device'
-import { DeviceCreatedEvent } from '../value-objects/device-event'
+import { DeviceCreatedEvent, DeviceUpdatedEvent } from '../value-objects/device-event'
 
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
@@ -355,6 +355,14 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
   public buildDeviceCreatedEvent(device: Device): DeviceCreatedEvent {
     return {
       type: DeviceEventType.DEVICE_CREATED,
+      timestamp: Date.now(),
+      device
+    }
+  }
+
+  public buildDeviceUpdatedEvent(device: Device): DeviceUpdatedEvent {
+    return {
+      type: DeviceEventType.DEVICE_UPDATED,
       timestamp: Date.now(),
       device
     }

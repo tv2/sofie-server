@@ -5,7 +5,6 @@ import { DeviceEventEmitter } from './interfaces/device-event-emitter'
 
 export class DeviceServiceImplementation implements DeviceService {
   constructor(private readonly deviceRepository: DeviceRepository, private readonly deviceEventEmitter: DeviceEventEmitter) {}
-  
   public async getDevices(): Promise<Device[]> {
     return await this.deviceRepository.getDevices()
   }
@@ -21,5 +20,10 @@ export class DeviceServiceImplementation implements DeviceService {
   public async create(device: Device): Promise<void> {
     await this.deviceRepository.save(device)
     this.deviceEventEmitter.emitDeviceCreatedEvent(device)
+  }
+
+  public async update(device: Device): Promise<void> {
+    await this.deviceRepository.update(device)
+    this.deviceEventEmitter.emitDeviceUpdatedEvent(device) // Change to updated
   }
 }

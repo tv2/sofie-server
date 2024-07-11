@@ -37,6 +37,9 @@ export class ExpressErrorHandler implements HttpErrorHandler {
       case ErrorCode.UNPROCESSABLE_ENTITY: {
         return HttpStatusCode.UNPROCESSABLE_ENTITY
       }
+      case ErrorCode.CONFLICT:{
+        return HttpStatusCode.CONFLICT
+      }
       case ErrorCode.MISCONFIGURATION:
       case ErrorCode.DELETION_FAILED: {
         return HttpStatusCode.INTERNAL_SERVER_ERROR

@@ -28,8 +28,9 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.getDevice.name)
     
     const device: Device | null = await this.getCollection().findOne<Device>({ id: deviceId })
+
     if (!device) {
-      throw new NotFoundException('') // TODO: Better error message
+      throw new NotFoundException(`device ${deviceId} not found`)
     }
     return device
   }
@@ -40,6 +41,11 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
       device.id = this.uuidGenerator.generateUuid() // TODO: Remove side effect
     }
 
+    await this.getCollection().updateOne({ id: device.id }, { $set: device }, { upsert: true })
+  }
+
+  public async update(device: Device): Promise<void> {
+    this.assertDatabaseConnection(MongoDeviceRepository.prototype.update.name)  
     await this.getCollection().updateOne({ id: device.id }, { $set: device }, { upsert: true })
   }
 }
