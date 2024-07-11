@@ -328,7 +328,7 @@ export class Rundown extends BasicRundown {
   private findFirstPartOfValidSegmentSkippingUnsyncedSegments(indexToSearchFrom: number): Part {
     while (indexToSearchFrom < this.segments.length) {
       if (!this.segments[indexToSearchFrom].isUnsynced() && this.isSegmentValidForRundownExecution(this.segments[indexToSearchFrom])) {
-        return this.segments[indexToSearchFrom].findFirstPartNotOnAir()
+        return this.segments[indexToSearchFrom].findFirstPart()
       }
       indexToSearchFrom++
     }
@@ -591,13 +591,23 @@ export class Rundown extends BasicRundown {
     const currentNextSegment: Segment = this.nextCursor?.segment
 
     const currentNextSegmentIndex: number = this.segments.findIndex(segment => segment.id === currentNextSegment.id)
-    if (currentNextSegmentIndex === this.segments.length - 1) {
+    this.setFirstPartInSegmentAfterSegmentIndexAsNext(currentNextSegmentIndex, owner)
+  }
+
+  private setFirstPartInSegmentAfterSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
+    if (segmentIndex === this.segments.length - 1) {
       throw new LastSegmentInRundownException('')
     }
-
-    const nextSegment: Segment = this.findFirstValidSegmentAfterIndex(currentNextSegmentIndex)
-    const nextPart: Part = nextSegment.findFirstPartNotOnAir()
-    this.setNextFromIds(nextSegment.id, nextPart.id, owner)
+    try {
+      const nextSegment: Segment = this.findFirstValidSegmentAfterIndex(segmentIndex)
+      const nextPart: Part = nextSegment.findFirstPartNotOnAir()
+      this.setNextFromIds(nextSegment.id, nextPart.id, owner)
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error
+      }
+      this.setFirstPartInSegmentAfterSegmentIndexAsNext(segmentIndex + 1, owner)
+    }
   }
 
   private findFirstValidSegmentAfterIndex(searchIndex: number): Segment {
@@ -615,12 +625,23 @@ export class Rundown extends BasicRundown {
     const currentNextSegment: Segment = this.nextCursor?.segment
 
     const currentNextSegmentIndex: number = this.segments.findIndex(segment => segment.id === currentNextSegment.id)
-    if (currentNextSegmentIndex === 0) {
+    this.setFirstPartInSegmentBeforeSegmentIndexAsNext(currentNextSegmentIndex, owner)
+  }
+
+  private setFirstPartInSegmentBeforeSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
+    if (segmentIndex === 0) {
       throw new FirstSegmentInRundownException('')
     }
-    const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(currentNextSegmentIndex)
-    const nextPart: Part = previousSegment.findFirstPartNotOnAir()
-    this.setNextFromIds(previousSegment.id, nextPart.id, owner)
+    try {
+      const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(segmentIndex)
+      const nextPart: Part = previousSegment.findFirstPartNotOnAir()
+      this.setNextFromIds(previousSegment.id, nextPart.id, owner)
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error
+      }
+      this.setFirstPartInSegmentBeforeSegmentIndexAsNext(segmentIndex - 1, owner)
+    }
   }
 
   private findFirstValidSegmentBeforeIndex(searchIndex: number): Segment {
@@ -638,12 +659,23 @@ export class Rundown extends BasicRundown {
     const currentNextSegment: Segment = this.nextCursor?.segment
 
     const currentNextSegmentIndex: number = this.segments.findIndex(segment => segment.id === currentNextSegment.id)
-    if (currentNextSegmentIndex === 0) {
+    this.setLastPartInSegmentBeforeSegmentIndexAsNext(currentNextSegmentIndex, owner)
+  }
+
+  private setLastPartInSegmentBeforeSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
+    if (segmentIndex === 0) {
       throw new FirstSegmentInRundownException('')
     }
-    const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(currentNextSegmentIndex)
-    const nextPart: Part = previousSegment.findLastPart()
-    this.setNextFromIds(previousSegment.id, nextPart.id, owner)
+    try {
+      const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(segmentIndex)
+      const nextPart: Part = previousSegment.findLastPartNotOnAir()
+      this.setNextFromIds(previousSegment.id, nextPart.id, owner)
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error
+      }
+      this.setLastPartInSegmentBeforeSegmentIndexAsNext(segmentIndex - 1, owner)
+    }
   }
 
   private findSegment(segmentId: string): Segment {

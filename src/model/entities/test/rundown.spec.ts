@@ -2682,7 +2682,7 @@ describe(Rundown.name, () => {
         describe('Rundown has another Segment following the Segment of the Part', () => {
           it('returns the first Part of the following Segment', () => {
             const firstSegmentId: string = 'firstSegmentId'
-            const part: Part = EntityMockFactory.createPart({ segmentId: firstSegmentId })
+            const part: Part = EntityTestFactory.createPart({ segmentId: firstSegmentId })
             const firstSegmentMock: Segment = EntityMockFactory.createSegmentMock({
               id: firstSegmentId,
               parts: [part],

@@ -64,18 +64,26 @@ export class Segment {
     this.setParts(segment.parts ?? [])
   }
 
-  public findFirstPartNotOnAir(): Part {
-    const part: Part | undefined = this.parts.find(part => !part.invalidity && !part.isOnAir())
+  public findFirstPart(): Part {
+    const part: Part | undefined = this.parts.find(part => !part.invalidity)
     if (!part) {
       throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid parts.`)
     }
     return part
   }
 
-  public findLastPart(): Part {
+  public findFirstPartNotOnAir(): Part {
+    const part: Part | undefined = this.parts.find(part => !part.invalidity && !part.isOnAir())
+    if (!part) {
+      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid parts that is not on air.`)
+    }
+    return part
+  }
+
+  public findLastPartNotOnAir(): Part {
     // Array.reverse() reverse the array in place. In order to mess with the original array we make a "copy" of it.
     // Array.findLast() would be preferred by that requires a higher node version that what we currently support.
-    const part: Part | undefined = this.parts.map(part => part).reverse().find(part => !part.invalidity)
+    const part: Part | undefined = this.parts.map(part => part).reverse().find(part => !part.invalidity && !part.isOnAir())
 
     if (!part) {
       throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid parts.`)
