@@ -60,7 +60,7 @@ export enum MutateActionType {
 
 export interface MutateActionWithOnAirAndNextPiecesMethods {
   type: MutateActionType.PIECE
-  updateActionWithPiece: (action: Action, onAirPiece: Piece | undefined, nextPiece: Piece | undefined) => Action
+  updateActionWithPiece: (action: Action, onAirPiece?: Piece, nextPiece?: Piece) => Action
   piecePredicate: (piece: Piece) => boolean
 }
 

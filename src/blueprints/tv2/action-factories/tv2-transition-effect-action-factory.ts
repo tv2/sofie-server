@@ -149,7 +149,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
     const updateTransitionMutateAction: MutateActionWithOnAirAndNextPiecesMethods = {
       type: MutateActionType.PIECE,
-      updateActionWithPiece: (action: Action, onAirPiece: Piece | undefined, nextPiece: Piece | undefined) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, onAirPiece, nextPiece),
+      updateActionWithPiece: (action: Action, onAirPiece?: Piece, nextPiece?: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, onAirPiece, nextPiece),
       piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
     }
     mutateActionMethods.push(updateTransitionMutateAction)
@@ -360,7 +360,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return breakerDsk
   }
 
-  private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, onAirPiece: Piece | undefined, nextPiece: Piece | undefined): Tv2TransitionEffectAction {
+  private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, onAirPiece?: Piece, nextPiece?: Piece): Tv2TransitionEffectAction {
     if (!nextPiece) {
       return action
     }

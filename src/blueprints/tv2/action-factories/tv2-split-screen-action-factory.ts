@@ -107,7 +107,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
           updateActionWithPiece: (action: Action, onAirPiece: Piece | undefined, nextPiece: Piece | undefined): Action => {
             if (onAirPiece)
               return this.updateInsertToInputAction(action, onAirPiece)
-            else if (nextPiece)
+            if (nextPiece)
               return this.updateInsertToInputAction(action, nextPiece)
             return action
           },
@@ -133,7 +133,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
             updateActionWithPiece: (action: Action, onAirPiece: Piece | undefined, nextPiece: Piece | undefined): Action => {
               if (onAirPiece)
                 return this.updateInsertToInputAction(action, onAirPiece)
-              else if (nextPiece)
+              if (nextPiece)
                 return this.updateInsertToInputAction(action, nextPiece)
               return action
             },
