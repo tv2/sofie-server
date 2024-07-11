@@ -49,3 +49,7 @@ export enum ActionTriggerEventType {
 export enum StatusMessageEventType {
   STATUS_MESSAGE = 'STATUS_MESSAGE'
 }
+
+export enum DeviceEventType {
+  DEVICE_CREATED = 'DEVICE_CREATED'
+}

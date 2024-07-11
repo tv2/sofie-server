@@ -150,7 +150,8 @@ export class ServiceFacade {
 
   public static createDeviceService(): DeviceService {
     return new DeviceServiceImplementation(
-      RepositoryFacade.createDeviceRepository()
+      RepositoryFacade.createDeviceRepository(),
+      EventEmitterFacade.createDeviceEventEmitter()
     )
   }
 }

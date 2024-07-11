@@ -1,9 +1,10 @@
 import { DeviceService } from './interfaces/device-service'
 import { Device } from '../../model/entities/device'
 import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
+import { DeviceEventEmitter } from './interfaces/device-event-emitter'
 
 export class DeviceServiceImplementation implements DeviceService {
-  constructor(private readonly deviceRepository: DeviceRepository) {}
+  constructor(private readonly deviceRepository: DeviceRepository, private readonly deviceEventEmitter: DeviceEventEmitter) {}
   
   public async getDevices(): Promise<Device[]> {
     return await this.deviceRepository.getDevices()
@@ -18,11 +19,7 @@ export class DeviceServiceImplementation implements DeviceService {
   }
 
   public async create(device: Device): Promise<void> {
-    // TODO: Implement emit DeviceCreatedEvent
-    // const existingDevice = await this.deviceRepository.findById(device.id)
-    // if (existingDevice) {
-    //   throw new Error(`Device with id ${device.id} already exists`)
-    // }
     await this.deviceRepository.save(device)
+    this.deviceEventEmitter.emitDeviceCreatedEvent(device)
   }
 }
