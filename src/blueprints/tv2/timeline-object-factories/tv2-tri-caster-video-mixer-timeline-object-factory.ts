@@ -354,8 +354,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     ]
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public createTBarTransitionEffectTimelineObject(_sourceInput: number, _tBarPosition: number): Tv2BlueprintTimelineObject {
+  public createTBarTransitionEffectTimelineObject(_fromSourceInput: number, _toSourceInput: number, _tBarPosition: number): Tv2BlueprintTimelineObject {
     throw new Error('Not implemented!')
   }
 

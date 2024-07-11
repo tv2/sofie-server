@@ -6,7 +6,7 @@ import {
   MutateActionWithArgumentsMethods,
   MutateActionWithHistoricPartMethods,
   MutateActionWithMedia,
-  MutateActionWithPieceMethods,
+  MutateActionWithOnAirAndNextPiecesMethods,
   PartAction,
   PieceAction
 } from '../../model/entities/action'
@@ -87,7 +87,7 @@ export class ExecuteActionService implements ActionService {
   private async executeMutateActionMethods(action: Action, mutateActionMethods: MutateActionMethods, rundownId: string, actionArguments: unknown): Promise<Action> {
     switch (mutateActionMethods.type) {
       case MutateActionType.PIECE: {
-        return await this.mutateActionWithPieceFromNextPart(rundownId, mutateActionMethods, action)
+        return await this.mutateActionWithOnAirAndNextPiece(rundownId, mutateActionMethods, action)
       }
       case MutateActionType.MEDIA: {
         return this.mutateActionWithMedia(mutateActionMethods, action)
@@ -111,13 +111,11 @@ export class ExecuteActionService implements ActionService {
     return this.blueprint.getMutateActionMethods(action)
   }
 
-  private async mutateActionWithPieceFromNextPart(rundownId: string, mutateActionMethods: MutateActionWithPieceMethods, action: Action): Promise<Action> {
+  private async mutateActionWithOnAirAndNextPiece(rundownId: string, mutateActionMethods: MutateActionWithOnAirAndNextPiecesMethods, action: Action): Promise<Action> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const piece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
-    if (!piece) {
-      return action
-    }
-    return mutateActionMethods.updateActionWithPiece(action, piece)
+    const onAirPiece: Piece | undefined = rundown.getActivePart().getPieces().find(mutateActionMethods.piecePredicate)
+    const nextPiece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
+    return mutateActionMethods.updateActionWithPiece(action, onAirPiece, nextPiece)
   }
 
   private async mutateActionWithMedia(mutateActionMethods: MutateActionWithMedia, action: Action): Promise<Action> {
@@ -184,7 +182,8 @@ export class ExecuteActionService implements ActionService {
   private async replacePiece(action: Action, rundownId: string, actionArguments: unknown): Promise<void> {
     const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
 
-    let pieceFromRundown: Piece | undefined
+    let onAirPiece: Piece | undefined
+    let nextPiece: Piece | undefined
 
     for (let i = 0; i < mutateActionMethodsArray.length; i++) {
       const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
@@ -194,21 +193,18 @@ export class ExecuteActionService implements ActionService {
       }
 
       const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      pieceFromRundown = rundown.getActivePart().getPieces().find(mutateActionMethods.piecePredicate)
-        ?? rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
+      onAirPiece = rundown.getActivePart().getPieces().find(mutateActionMethods.piecePredicate)
+      nextPiece = rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
 
-      if (!pieceFromRundown) {
-        continue
-      }
-
-      action = mutateActionMethods.updateActionWithPiece(action, pieceFromRundown)
-    }
-
-    if (!pieceFromRundown) {
-      return
+      action = mutateActionMethods.updateActionWithPiece(action, onAirPiece, nextPiece)
     }
 
     const piece: Piece = this.createPieceFromAction(action as PieceAction)
-    await this.rundownService.replacePieceOnAirOnNextPart(rundownId, pieceFromRundown, piece)
+    if (onAirPiece) {
+      await this.rundownService.replacePieceOnAirOnNextPart(rundownId, onAirPiece, piece)
+    }
+    if (nextPiece) {
+      await this.rundownService.replacePieceOnAirOnNextPart(rundownId, nextPiece, piece)
+    }
   }
 }

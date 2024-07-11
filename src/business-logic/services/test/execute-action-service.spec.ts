@@ -2,7 +2,7 @@ import { ExecuteActionService } from '../execute-action-service'
 import {
   Action,
   MutateActionType,
-  MutateActionWithPieceMethods,
+  MutateActionWithOnAirAndNextPiecesMethods,
   PartAction,
   PieceAction
 } from '../../../model/entities/action'
@@ -196,7 +196,7 @@ describe(ExecuteActionService.name, () => {
 
           const action: PieceAction = createPieceAction(PieceActionType.REPLACE_PIECE)
 
-          const mutateActionMethods: MutateActionWithPieceMethods = {
+          const mutateActionMethods: MutateActionWithOnAirAndNextPiecesMethods = {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.id === activePiece.id
@@ -254,9 +254,9 @@ describe(ExecuteActionService.name, () => {
 
           const action: PieceAction = createPieceAction(PieceActionType.REPLACE_PIECE)
 
-          const mutateActionMethods: MutateActionWithPieceMethods = {
+          const mutateActionMethods: MutateActionWithOnAirAndNextPiecesMethods = {
             type: MutateActionType.PIECE,
-            updateActionWithPiece: (action) => action,
+            updateActionWithPiece: (action: Action, _onAirPiece?: Piece, _nextPiece?: Piece) => action,
             piecePredicate: (piece) => piece.id === nextPiece.id
           }
 
@@ -318,7 +318,7 @@ describe(ExecuteActionService.name, () => {
 
           const action: PieceAction = createPieceAction(PieceActionType.REPLACE_PIECE)
 
-          const mutateActionMethods: MutateActionWithPieceMethods = {
+          const mutateActionMethods: MutateActionWithOnAirAndNextPiecesMethods = {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.name === name

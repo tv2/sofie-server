@@ -349,7 +349,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     ]
   }
 
-  public createTBarTransitionEffectTimelineObject(toSourceInput: number, tBarPosition: number): AtemTBarTransitionTimelineObject {
+  public createTBarTransitionEffectTimelineObject(fromSourceInput: number, toSourceInput: number, tBarPosition: number): AtemTBarTransitionTimelineObject {
     return {
       id: `${Tv2AtemLayer.PROGRAM}_t_bar_transition_${tBarPosition}`,
       enable: {
@@ -361,7 +361,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         deviceType: DeviceType.ATEM,
         type: AtemType.ME,
         me: {
-          // programInput: 2,
+          programInput: fromSourceInput,
           previewInput: toSourceInput,
           transitionPreview: false,
           transitionPosition: {
