@@ -39,6 +39,7 @@ export class TimeoutCallbackScheduler implements CallbackScheduler {
     }
     const durationToNextSchedulingInMs: number = durationToExecuteCallbackInMs / SCHEDULE_RESOLUTION
     this.timeoutIdentifier = setTimeout(() => {
+      this.stop()
       this.timeoutIdentifier = undefined
       this.scheduleCallback(epochTimeToExecuteCallback, callback)
     }, durationToNextSchedulingInMs)
