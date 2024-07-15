@@ -7,7 +7,7 @@ import {
   SplitScreenBoxProperties,
   SplitScreenConfiguration
 } from '../value-objects/tv2-show-style-blueprint-configuration'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import {
@@ -216,7 +216,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       id: `${partId}_piece_${Date.now()}`,
       partId,
       name,
-      layer: Tv2SourceLayer.SPLIT_SCREEN,
+      layer: Tv2PieceLayer.SPLIT_SCREEN,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
@@ -236,7 +236,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       id: `${piece.getPartId()}_piece_${Date.now()}`,
       partId: piece.getPartId(),
       name: piece.name,
-      layer: Tv2SourceLayer.SPLIT_SCREEN,
+      layer: Tv2PieceLayer.SPLIT_SCREEN,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
