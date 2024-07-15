@@ -6,9 +6,7 @@
     "sourceType": "module",
     "project": ["./tsconfig.lint.json"]
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -41,6 +39,15 @@
           "properties": "explicit",
           "parameterProperties": "explicit"
         }
+      }
+    ],
+    "@typescript-eslint/typedef": [
+      "error",
+      {
+        "memberVariableDeclaration": true,
+        "parameter": true,
+        "propertyDeclaration": true,
+        "variableDeclaration": true
       }
     ],
     "@typescript-eslint/array-type": "error",

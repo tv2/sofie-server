@@ -581,7 +581,7 @@ function createTestee(params?: {
 }): Tv2OnTimelineGenerateService {
   let sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder | undefined = params?.sisyfosPersistentLayerFinder
   if (!params?.sisyfosPersistentLayerFinder) {
-    const sisyfosPersistentLayerFinderMock = mock(Tv2SisyfosPersistentLayerFinder)
+    const sisyfosPersistentLayerFinderMock: Tv2SisyfosPersistentLayerFinder = mock(Tv2SisyfosPersistentLayerFinder)
     when(sisyfosPersistentLayerFinderMock.findLayersToPersist(anything(), anything(), anything())).thenReturn([])
     sisyfosPersistentLayerFinder = instance(sisyfosPersistentLayerFinderMock)
   }
