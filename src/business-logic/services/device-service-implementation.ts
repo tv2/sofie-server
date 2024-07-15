@@ -8,15 +8,11 @@ export class DeviceServiceImplementation implements DeviceService {
   }
 
   public async getDevices(): Promise<Device[]> {
-    return await this.deviceRepository.getDevices()
+    return this.deviceRepository.getDevices()
   }
 
   public async getDevice(deviceId: string): Promise<Device> {
-    const deviceConfig = await this.deviceRepository.getDevice(deviceId)
-    if (!deviceConfig) {
-      throw new Error(`Device with id ${deviceId} not found`)
-    }
-    return deviceConfig
+    return this.deviceRepository.getDevice(deviceId)
   }
 
   public async create(device: Device): Promise<void> {
