@@ -36,11 +36,11 @@ class SofieServer {
   }
 
   private configureErrorHandling(): void {
-    this.server.use((err: any, req: Request, res: Response, next: NextFunction) => {
-      if (err.status === 400) {
+    this.server.use((err: object, _req: Request, res: Response, next: NextFunction): Response<Express> | void => {
+      if ('status' in err && err.status === 400 && 'message' in err) {
         return res.status(err.status).json({error: err.message})
       }
-      return next(err) // Pass the error to the default error handler
+      return next(err)
     })
   }
 
