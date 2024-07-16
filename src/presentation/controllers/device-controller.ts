@@ -1,16 +1,14 @@
-import { BaseController, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
-import { Request, Response } from 'express'
-import { DeviceService } from '../../business-logic/services/interfaces/device-service'
-import { HttpErrorHandler } from '../interfaces/http-error-handler'
-import { Exception } from '../../model/exceptions/exception'
-import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
-import { DeviceType } from '../../model/enums/device-type'
-import { DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
-import { UnprocessableEntityException } from '../../model/exceptions/unprocessable-entity-exception'
-import { ConflictException } from '../../model/exceptions/conflict-exception'
+import {BaseController, GetRequest, PostRequest, PutRequest, RestController} from './base-controller'
+import {Request, Response} from 'express'
+import {DeviceService} from '../../business-logic/services/interfaces/device-service'
+import {HttpErrorHandler} from '../interfaces/http-error-handler'
+import {Exception} from '../../model/exceptions/exception'
+import {HttpResponseFormatter} from '../interfaces/http-response-formatter'
+import {Device, INewsDevice, TelemetricsDevice} from '../../model/entities/device'
+import {DeviceType} from '../../model/enums/device-type'
+import {DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto} from '../dtos/device-dto'
+import {ConflictException} from '../../model/exceptions/conflict-exception'
 import {HttpStatusCode} from '../http-status-code'
-
 
 @RestController('/devices')
 export class DeviceController extends BaseController {
@@ -88,15 +86,14 @@ export class DeviceController extends BaseController {
 
   @PutRequest('/:deviceId')
   public async updateDevice(request: Request, response: Response): Promise<void> {
-    try{
+    try {
       const device: Device = await request.body
-      const { deviceId } = request.params
+      const {deviceId} = request.params
 
-      if(device.id !== deviceId) throw new ConflictException('Conflict: The ID in the URL path does not match the ID in the request body.')  //to be in compliance with the REST convention (it is not a strict rule) we pass in the ID, and then we validate it against the body ID to stop IDOR attacks 
+      if (device.id !== deviceId) throw new ConflictException('Conflict: The ID in the URL path does not match the ID in the request body.')  //to be in compliance with the REST convention (it is not a strict rule) we pass in the ID, and then we validate it against the body ID to stop IDOR attacks 
       await this.deviceService.update(device)
       response.send(this.httpResponseFormatter.formatSuccessResponse())
-
-    } catch(error){
+    } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
