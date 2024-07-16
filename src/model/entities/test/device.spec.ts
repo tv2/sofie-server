@@ -1,10 +1,10 @@
+import {mock} from '@typestrong/ts-mockito'
+import {INewsDevice, TelemetricsDevice} from '../device'
 
-import { mock } from '@typestrong/ts-mockito'
-import { INewsDevice, TelemetricsDevice } from '../device'
 describe('INewsDevice and TelemetricsDevice', () => {
   it('should have correct properties and methods', () => {
-    const newsDevice = mock<INewsDevice>()
-    const telemetryDevice = mock<TelemetricsDevice>()
+    const newsDevice: INewsDevice = mock<INewsDevice>()
+    const telemetryDevice: TelemetricsDevice = mock<TelemetricsDevice>()
 
     expect(newsDevice).toHaveProperty('id')
     expect(newsDevice).toHaveProperty('name')
