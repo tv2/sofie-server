@@ -269,7 +269,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], insertedContentType: Tv2ActionContentType, name: string = '', audioMode: Tv2AudioMode = Tv2AudioMode.FULL): Tv2SplitScreenInsertSourceInputAction[] {
     const actions: Tv2SplitScreenInsertSourceInputAction[] = []
-    for (let inputIndex = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
+    for (let inputIndex: number = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
       const actionsForInput: Tv2SplitScreenInsertSourceInputAction[] = sources
         .map(source => {
           const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, audioMode)
@@ -545,7 +545,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private createInsertLastVideoClipToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2SplitScreenInsertLastVideoClipInputAction[] {
     const actions: Tv2SplitScreenInsertLastVideoClipInputAction[] = []
-    for (let inputIndex = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
+    for (let inputIndex: number = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
       actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.FULL))
       actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.VOICE_OVER))
     }
