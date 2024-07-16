@@ -1,6 +1,6 @@
-import { INewsDevice, TelemetricsDevice } from '../../model/entities/device'
-import { DeviceType } from '../../model/enums/device-type'
-import { StatusCode } from '../../model/enums/status-code'
+import {INewsDevice, TelemetricsDevice} from '../../model/entities/device'
+import {DeviceType} from '../../model/enums/device-type'
+import {StatusCode} from '../../model/enums/status-code'
 
 export interface DeviceDtoInterface {
   type: DeviceType
@@ -12,12 +12,12 @@ export interface DeviceDtoInterface {
 }
 
 export abstract class DeviceDto implements DeviceDtoInterface {
-  public type: DeviceType
-  public id: string
-  public name: string
-  public isConnected: boolean
-  public statusCode: StatusCode
-  public statusMessage: string
+  public readonly type: DeviceType
+  public readonly id: string
+  public readonly name: string
+  public readonly isConnected: boolean
+  public readonly statusCode: StatusCode
+  public readonly statusMessage: string
 
   constructor(device: DeviceDtoInterface) {
     this.type = device.type
@@ -36,9 +36,9 @@ export interface INewsDeviceDtoInterface extends DeviceDtoInterface {
 }
 
 export class INewsDeviceDto extends DeviceDto implements INewsDeviceDtoInterface {
-  public type: DeviceType.INEWS
-  public username: string
-  public password: string
+  public readonly type: DeviceType.INEWS
+  public readonly username: string
+  public readonly password: string
 
   constructor(device: INewsDevice) {
     super(device)
@@ -54,8 +54,8 @@ export interface TelemetricsDeviceDtoInterface extends DeviceDtoInterface {
 }
 
 export class TelemetricsDeviceDto extends DeviceDto implements TelemetricsDeviceDtoInterface {
-  public type: DeviceType.TELEMETRICS
-  public host: string
+  public readonly type: DeviceType.TELEMETRICS
+  public readonly host: string
 
   constructor(device: TelemetricsDevice) {
     super(device)
@@ -63,5 +63,3 @@ export class TelemetricsDeviceDto extends DeviceDto implements TelemetricsDevice
     this.host = device.host
   }
 }
-
-export type ApiFilter = INewsDeviceDto | TelemetricsDeviceDto | undefined

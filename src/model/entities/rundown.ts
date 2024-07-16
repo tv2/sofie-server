@@ -478,7 +478,7 @@ export class Rundown extends BasicRundown {
 
   private addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces: Map<string, Piece>): Map<string, Piece> {
     const indexOfActiveSegment: number = this.segments.findIndex((segment) => segment.id === this.activeCursor?.segment?.id)
-    for (let i = indexOfActiveSegment - 1; i >= 0; i--) {
+    for (let i: number = indexOfActiveSegment - 1; i >= 0; i--) {
       const piecesSpanningSegment: Piece[] = this.segments[i]
         .getFirstSpanningRundownPieceForEachLayerForAllParts(new Set(layersWithPieces.keys()))
         .map(this.setExecutedAtIfMissing)

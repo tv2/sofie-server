@@ -9,9 +9,11 @@ import { DeviceType } from '../../model/enums/device-type'
 import { DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
 import { UnprocessableEntityException } from '../../model/exceptions/unprocessable-entity-exception'
 import { ConflictException } from '../../model/exceptions/conflict-exception'
+import {HttpStatusCode} from '../http-status-code'
+
 
 @RestController('/devices')
-export class DeviceController extends BaseController{
+export class DeviceController extends BaseController {
 
   constructor(
     private readonly deviceService: DeviceService,
@@ -25,15 +27,15 @@ export class DeviceController extends BaseController{
   public async getAllDevices(_request: Request, response: Response): Promise<void> {
     try {
       const devices: Device[] = await this.deviceService.getDevices()
-      response.send(this.httpResponseFormatter.formatSuccessResponse(devices.map(device => {
-        return this.toDto(device)
-      })))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(
+        devices.map(device => this.toDeviceDto(device))
+      ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
-  private toDto(device: Device): DeviceDtoInterface | undefined {
+  private toDeviceDto(device: Device): DeviceDtoInterface | undefined {
     if (this.isINewsDevice(device)) {
       return new INewsDeviceDto(device)
     }
@@ -54,9 +56,9 @@ export class DeviceController extends BaseController{
   @GetRequest('/:deviceId')
   public async getDevice(request: Request, response: Response): Promise<void> {
     try {
-      const { deviceId } = request.params
+      const {deviceId} = request.params
       const device: Device = await this.deviceService.getDevice(deviceId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(this.toDto(device)))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(this.toDeviceDto(device)))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -66,12 +68,18 @@ export class DeviceController extends BaseController{
   public async createDevice(request: Request, response: Response): Promise<void> {
     try {
       const device: Device = await request.body
-      if(!Object.values(DeviceType).includes(device.type)){
-        throw new UnprocessableEntityException('device type was not in the correct numerical format')
+      if (!Object.values(DeviceType).includes(device.type)) {
+        response
+          .status(HttpStatusCode.UNPROCESSABLE_CONTENT)
+          .header('Content-Type', 'application/json')
+          .send(`{
+              "error": {
+                "message": "Unprocessable Content: device type is not in the correct format"
+              }
+            }`)
+        return
       }
-
       await this.deviceService.create(device)
-  
       response.send(this.httpResponseFormatter.formatSuccessResponse())
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
