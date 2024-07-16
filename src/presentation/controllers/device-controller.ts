@@ -9,6 +9,7 @@ import {DeviceType} from '../../model/enums/device-type'
 import {DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto} from '../dtos/device-dto'
 import {ConflictException} from '../../model/exceptions/conflict-exception'
 import {HttpStatusCode} from '../http-status-code'
+import {ApiError} from '../value-objects/ApiError'
 
 @RestController('/devices')
 export class DeviceController extends BaseController {
@@ -25,30 +26,12 @@ export class DeviceController extends BaseController {
   public async getAllDevices(_request: Request, response: Response): Promise<void> {
     try {
       const devices: Device[] = await this.deviceService.getDevices()
-      response.send(this.httpResponseFormatter.formatSuccessResponse(
-        devices.map(device => this.toDeviceDto(device))
-      ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(devices.map(device => {
+        return this.toDeviceDto(device)
+      })))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
-  }
-
-  private toDeviceDto(device: Device): DeviceDtoInterface | undefined {
-    if (this.isINewsDevice(device)) {
-      return new INewsDeviceDto(device)
-    }
-    if (this.isTelemetricsDevice(device)) {
-      return new TelemetricsDeviceDto(device)
-    }
-    return undefined
-  }
-
-  private isINewsDevice(device: Device): device is INewsDevice {
-    return device.type === DeviceType.INEWS
-  }
-
-  private isTelemetricsDevice(device: Device): device is TelemetricsDevice {
-    return device.type === DeviceType.TELEMETRICS
   }
 
   @GetRequest('/:deviceId')
@@ -70,11 +53,7 @@ export class DeviceController extends BaseController {
         response
           .status(HttpStatusCode.UNPROCESSABLE_CONTENT)
           .header('Content-Type', 'application/json')
-          .send(`{
-              "error": {
-                "message": "Unprocessable Content: device type is not in the correct format"
-              }
-            }`)
+          .send(new ApiError('Unprocessable Content: device type is not in the correct format').toJson())
         return
       }
       await this.deviceService.create(device)
@@ -82,6 +61,24 @@ export class DeviceController extends BaseController {
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
+  }
+
+  private toDeviceDto(device: Device): DeviceDtoInterface | undefined {
+    if (this.isINewsDevice(device)) {
+      return new INewsDeviceDto(device)
+    }
+    if (this.isTelemetricsDevice(device)) {
+      return new TelemetricsDeviceDto(device)
+    }
+    return undefined
+  }
+
+  private isINewsDevice(device: Device): device is INewsDevice {
+    return device.type === DeviceType.INEWS
+  }
+
+  private isTelemetricsDevice(device: Device): device is TelemetricsDevice {
+    return device.type === DeviceType.TELEMETRICS
   }
 
   @PutRequest('/:deviceId')
