@@ -63,14 +63,14 @@ export class DeviceController extends BaseController {
     }
   }
 
-  private toDeviceDto(device: Device): DeviceDtoInterface | undefined {
+  private toDeviceDto(device: Device): DeviceDtoInterface {
     if (this.isINewsDevice(device)) {
       return new INewsDeviceDto(device)
     }
     if (this.isTelemetricsDevice(device)) {
       return new TelemetricsDeviceDto(device)
     }
-    return undefined
+    return device
   }
 
   private isINewsDevice(device: Device): device is INewsDevice {
