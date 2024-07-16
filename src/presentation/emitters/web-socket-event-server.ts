@@ -16,6 +16,8 @@ import { MediaEvent } from '../value-objects/media-event'
 import { RundownEvent } from '../value-objects/rundown-event'
 import { StatusMessageEvent } from '../value-objects/status-message-event'
 import { EventServer } from './interfaces/event-server'
+import { DeviceEventObserver } from '../interfaces/device-event-observer'
+import { DeviceEvent } from '../value-objects/device-event'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer
@@ -27,6 +29,7 @@ export class WebSocketEventServer implements EventServer {
     mediaEventObserver: MediaEventObserver,
     configurationEventObserver: ConfigurationEventObserver,
     statusMessageEventObserver: StatusMessageEventObserver,
+    deviceEventObserver: DeviceEventObserver,
     logger: Logger
   ): EventServer {
     if (!this.instance) {
@@ -37,6 +40,7 @@ export class WebSocketEventServer implements EventServer {
         mediaEventObserver,
         configurationEventObserver,
         statusMessageEventObserver,
+        deviceEventObserver,
         logger
       )
     }
@@ -53,6 +57,7 @@ export class WebSocketEventServer implements EventServer {
     private readonly mediaEventObserver: MediaEventObserver,
     private readonly configurationEventObserver: ConfigurationEventObserver,
     private readonly statusMessageEventObserver: StatusMessageEventObserver,
+    private readonly deviceEventObserver: DeviceEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -114,6 +119,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.statusMessageEventObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => {
       webSocket.send(JSON.stringify(statusMessageEvent))
+    })
+    this.deviceEventObserver.subscribeToDeviceEvents((deviceEvent: DeviceEvent) => {
+      webSocket.send(JSON.stringify(deviceEvent))
     })
   }
 
