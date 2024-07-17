@@ -12,9 +12,7 @@ export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserv
   constructor(private readonly deviceEventBuilder: DeviceEventBuilder) { }
 
   public static getInstance(deviceBuilder: DeviceEventBuilder): DeviceEventService {
-    if(!this.instance) {
-      this.instance = new DeviceEventService(deviceBuilder)
-    }
+    this.instance ??= new DeviceEventService(deviceBuilder)
     return this.instance
   }
   
