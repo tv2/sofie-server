@@ -1,7 +1,7 @@
-import {DeviceService} from './interfaces/device-service'
-import {Device} from '../../model/entities/device'
-import {DeviceRepository} from '../../data-access/repositories/interfaces/device-repository'
-import {DeviceEventEmitter} from './interfaces/device-event-emitter'
+import { DeviceService } from './interfaces/device-service'
+import { Device } from '../../model/entities/device'
+import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
+import { DeviceEventEmitter } from './interfaces/device-event-emitter'
 
 export class DeviceServiceImplementation implements DeviceService {
   constructor(private readonly deviceRepository: DeviceRepository, private readonly deviceEventEmitter: DeviceEventEmitter) {
@@ -23,5 +23,10 @@ export class DeviceServiceImplementation implements DeviceService {
   public async update(device: Device): Promise<void> {
     await this.deviceRepository.update(device)
     this.deviceEventEmitter.emitDeviceUpdatedEvent(device)
+  }
+
+  public async delete(deviceId: string): Promise<void> {
+    await this.deviceRepository.delete(deviceId)
+    this.deviceEventEmitter.emitDeviceDeletedEvent(deviceId)
   }
 }

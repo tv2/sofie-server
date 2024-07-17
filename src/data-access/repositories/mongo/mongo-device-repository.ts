@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {BaseMongoRepository} from './base-mongo-repository'
-import {DeviceRepository} from '../interfaces/device-repository'
-import {Device} from '../../../model/entities/device'
-import {MongoDatabase} from './mongo-database'
-import {UuidGenerator} from '../interfaces/uuid-generator'
-import {NotFoundException} from '../../../model/exceptions/not-found-exception'
+import { BaseMongoRepository } from './base-mongo-repository'
+import { DeviceRepository } from '../interfaces/device-repository'
+import { Device } from '../../../model/entities/device'
+import { MongoDatabase } from './mongo-database'
+import { UuidGenerator } from '../interfaces/uuid-generator'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 
 const DEVICE_COLLECTION_NAME: string = 'externalDevices'
@@ -35,15 +35,24 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
 
   public async save(device: Device): Promise<void> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.save.name)
+    let pureDevice: Device = {} as Device
     if (!device.id) {
-      device.id = this.uuidGenerator.generateUuid() // TODO: Remove side effect
+      pureDevice = {
+        ...device,
+        id: this.uuidGenerator.generateUuid(),
+      }
     }
 
-    await this.getCollection().updateOne({id: device.id}, {$set: device}, {upsert: true})
+    await this.getCollection().updateOne({id: pureDevice.id}, {$set: pureDevice}, {upsert: true})
   }
 
   public async update(device: Device): Promise<void> {
-    this.assertDatabaseConnection(MongoDeviceRepository.prototype.update.name)  
-    await this.getCollection().updateOne({ id: device.id }, { $set: device }, { upsert: true })
+    this.assertDatabaseConnection(MongoDeviceRepository.prototype.update.name)
+    await this.getCollection().updateOne({id: device.id}, {$set: device}, {upsert: true})
+  }
+
+  public async delete(deviceId: string): Promise<void> {
+    this.assertDatabaseConnection(MongoDeviceRepository.prototype.delete.name)
+    await this.getCollection().deleteOne({id: deviceId})
   }
 }
