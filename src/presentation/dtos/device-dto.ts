@@ -1,17 +1,17 @@
-import {INewsDevice, TelemetricsDevice} from '../../model/entities/device'
-import {DeviceType} from '../../model/enums/device-type'
-import {StatusCode} from '../../model/enums/status-code'
+import { CoreDevice, Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
+import { DeviceType } from '../../model/enums/device-type'
+import { StatusCode } from '../../model/enums/status-code'
 
-export interface DeviceDtoInterface {
-  type: DeviceType
-  id: string
-  name: string
-  isConnected: boolean
-  statusCode: StatusCode
-  statusMessage: string
-}
+// export interface DeviceDtoInterface {
+//   type: DeviceType
+//   id: string
+//   name: string
+//   isConnected: boolean
+//   statusCode: StatusCode
+//   statusMessage: string
+// }
 
-export abstract class DeviceDto implements DeviceDtoInterface {
+export abstract class DeviceDto implements CoreDevice {
   public readonly type: DeviceType
   public readonly id: string
   public readonly name: string
@@ -19,7 +19,7 @@ export abstract class DeviceDto implements DeviceDtoInterface {
   public readonly statusCode: StatusCode
   public readonly statusMessage: string
 
-  constructor(device: DeviceDtoInterface) {
+  constructor(device: Device) {
     this.type = device.type
     this.id = device.id
     this.name = device.name
@@ -29,7 +29,7 @@ export abstract class DeviceDto implements DeviceDtoInterface {
   }
 }
 
-export interface INewsDeviceDtoInterface extends DeviceDtoInterface {
+export interface INewsDeviceDtoInterface extends CoreDevice {
   type: DeviceType.INEWS
   username: string
   password: string
@@ -48,7 +48,7 @@ export class INewsDeviceDto extends DeviceDto implements INewsDeviceDtoInterface
   }
 }
 
-export interface TelemetricsDeviceDtoInterface extends DeviceDtoInterface {
+export interface TelemetricsDeviceDtoInterface extends CoreDevice {
   type: DeviceType.TELEMETRICS
   host: string
 }

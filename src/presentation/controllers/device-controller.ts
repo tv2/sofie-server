@@ -1,13 +1,13 @@
-import {BaseController, GetRequest, PostRequest, RestController} from './base-controller'
-import {Request, Response} from 'express'
-import {DeviceService} from '../../business-logic/services/interfaces/device-service'
-import {HttpErrorHandler} from '../interfaces/http-error-handler'
-import {Exception} from '../../model/exceptions/exception'
-import {HttpResponseFormatter} from '../interfaces/http-response-formatter'
-import {Device, INewsDevice, TelemetricsDevice} from '../../model/entities/device'
-import {DeviceType} from '../../model/enums/device-type'
-import {DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto} from '../dtos/device-dto'
-import {HttpStatusCode} from '../http-status-code'
+import { BaseController, GetRequest, PostRequest, RestController } from './base-controller'
+import { Request, Response } from 'express'
+import { DeviceService } from '../../business-logic/services/interfaces/device-service'
+import { HttpErrorHandler } from '../interfaces/http-error-handler'
+import { Exception } from '../../model/exceptions/exception'
+import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
+import { DeviceType } from '../../model/enums/device-type'
+import { INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
+import { HttpStatusCode } from '../http-status-code'
 
 
 @RestController('/devices')
@@ -66,7 +66,7 @@ export class DeviceController extends BaseController {
     }
   }
 
-  private toDeviceDto(device: Device): DeviceDtoInterface | undefined {
+  private toDeviceDto(device: Device): Device | undefined {
     if (this.isINewsDevice(device)) return new INewsDeviceDto(device)
     if (this.isTelemetricsDevice(device)) return new TelemetricsDeviceDto(device)
     return undefined
