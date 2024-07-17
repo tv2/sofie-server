@@ -9,13 +9,14 @@ export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserv
   private static instance: DeviceEventService
   private readonly callbacks: ((deviceEvent: DeviceEvent) => void)[] = []
 
-  constructor(private readonly deviceEventBuilder: DeviceEventBuilder) { }
+  constructor(private readonly deviceEventBuilder: DeviceEventBuilder) {
+  }
 
   public static getInstance(deviceBuilder: DeviceEventBuilder): DeviceEventService {
     this.instance ??= new DeviceEventService(deviceBuilder)
     return this.instance
   }
-  
+
   private emitDeviceEvent(deviceEvent: DeviceEvent): void {
     this.callbacks.forEach(callback => callback(deviceEvent))
   }
@@ -23,6 +24,7 @@ export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserv
   public subscribeToDeviceEvents(onDeviceEventCallback: (deviceEvent: DeviceEvent) => void): void {
     this.callbacks.push(onDeviceEventCallback)
   }
+
   public emitDeviceCreatedEvent(device: Device): void {
     const event: DeviceCreatedEvent = this.deviceEventBuilder.buildDeviceCreatedEvent(device)
     this.emitDeviceEvent(event)
