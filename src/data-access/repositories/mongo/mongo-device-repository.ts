@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {BaseMongoRepository} from './base-mongo-repository'
 import {DeviceRepository} from '../interfaces/device-repository'
 import {Device} from '../../../model/entities/device'
