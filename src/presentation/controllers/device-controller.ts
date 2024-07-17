@@ -36,7 +36,7 @@ export class DeviceController extends BaseController {
   @GetRequest('/:deviceId')
   public async getDevice(request: Request, response: Response): Promise<void> {
     try {
-      const {deviceId} = request.params
+      const deviceId: string = request.params.deviceId
       const device: Device = await this.deviceService.getDevice(deviceId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(this.toDeviceDto(device)))
     } catch (error) {
