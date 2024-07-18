@@ -6,10 +6,10 @@ export type DeviceEvent = DeviceCreatedEvent | DeviceUpdatedEvent
 
 export interface DeviceCreatedEvent extends TypedEvent {
   type: DeviceEventType.DEVICE_CREATED
-  device: DeviceDtoInterface
+  device: Device
 }
 
 export interface DeviceUpdatedEvent extends TypedEvent {
   type: DeviceEventType.DEVICE_UPDATED
-  device: DeviceDtoInterface
+  device: Device
 }
