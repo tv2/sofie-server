@@ -1,17 +1,8 @@
-import { CoreDevice, Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
+import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
 import { DeviceType } from '../../model/enums/device-type'
 import { StatusCode } from '../../model/enums/status-code'
 
-// export interface DeviceDtoInterface {
-//   type: DeviceType
-//   id: string
-//   name: string
-//   isConnected: boolean
-//   statusCode: StatusCode
-//   statusMessage: string
-// }
-
-export abstract class DeviceDto implements CoreDevice {
+export abstract class DeviceDto {
   public readonly type: DeviceType
   public readonly id: string
   public readonly name: string
@@ -29,7 +20,7 @@ export abstract class DeviceDto implements CoreDevice {
   }
 }
 
-export interface INewsDeviceDtoInterface extends CoreDevice {
+export interface INewsDeviceDtoInterface {
   type: DeviceType.INEWS
   username: string
   password: string
@@ -48,7 +39,7 @@ export class INewsDeviceDto extends DeviceDto implements INewsDeviceDtoInterface
   }
 }
 
-export interface TelemetricsDeviceDtoInterface extends CoreDevice {
+export interface TelemetricsDeviceDtoInterface {
   type: DeviceType.TELEMETRICS
   host: string
 }
