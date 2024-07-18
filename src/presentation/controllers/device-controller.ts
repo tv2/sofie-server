@@ -1,15 +1,15 @@
-import {BaseController, GetRequest, PostRequest, PutRequest, RestController} from './base-controller'
-import {Request, Response} from 'express'
-import {DeviceService} from '../../business-logic/services/interfaces/device-service'
-import {HttpErrorHandler} from '../interfaces/http-error-handler'
-import {Exception} from '../../model/exceptions/exception'
-import {HttpResponseFormatter} from '../interfaces/http-response-formatter'
-import {Device, INewsDevice, TelemetricsDevice} from '../../model/entities/device'
-import {DeviceType} from '../../model/enums/device-type'
-import {DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto} from '../dtos/device-dto'
-import {ConflictException} from '../../model/exceptions/conflict-exception'
-import {HttpStatusCode} from '../http-status-code'
-import {ApiError} from '../value-objects/ApiError'
+import { BaseController, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
+import { Request, Response } from 'express'
+import { DeviceService } from '../../business-logic/services/interfaces/device-service'
+import { HttpErrorHandler } from '../interfaces/http-error-handler'
+import { Exception } from '../../model/exceptions/exception'
+import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
+import { DeviceType } from '../../model/enums/device-type'
+import { INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
+import { ConflictException } from '../../model/exceptions/conflict-exception'
+import { HttpStatusCode } from '../http-status-code'
+import { ApiError } from '../value-objects/ApiError'
 
 @RestController('/devices')
 export class DeviceController extends BaseController {
@@ -37,7 +37,7 @@ export class DeviceController extends BaseController {
   @GetRequest('/:deviceId')
   public async getDevice(request: Request, response: Response): Promise<void> {
     try {
-      const {deviceId} = request.params
+      const deviceId: string = request.params.deviceId
       const device: Device = await this.deviceService.getDevice(deviceId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(this.toDeviceDto(device)))
     } catch (error) {
@@ -63,13 +63,9 @@ export class DeviceController extends BaseController {
     }
   }
 
-  private toDeviceDto(device: Device): DeviceDtoInterface {
-    if (this.isINewsDevice(device)) {
-      return new INewsDeviceDto(device)
-    }
-    if (this.isTelemetricsDevice(device)) {
-      return new TelemetricsDeviceDto(device)
-    }
+  private toDeviceDto(device: Device): Device {
+    if (this.isINewsDevice(device)) return new INewsDeviceDto(device)
+    if (this.isTelemetricsDevice(device)) return new TelemetricsDeviceDto(device)
     return device
   }
 
