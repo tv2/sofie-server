@@ -1,13 +1,13 @@
 import cors from 'cors'
-import express, {Express, NextFunction, Request, Response, Router} from 'express'
-import {BaseController} from './controllers/base-controller'
-import {ControllerFacade} from './facades/controller-facade'
-import {EventServerFacade} from './facades/event-server-facade'
-import {ServiceFacade} from '../business-logic/facades/service-facade'
-import {Logger} from '../logger/logger'
-import {LoggerFacade} from '../logger/logger-facade'
-import {RepositoryFacade} from '../data-access/facades/repository-facade'
-import bodyparser from 'body-parser'
+import express, { Express, NextFunction, Request, Response, Router } from 'express'
+import { BaseController } from './controllers/base-controller'
+import { ControllerFacade } from './facades/controller-facade'
+import { EventServerFacade } from './facades/event-server-facade'
+import { ServiceFacade } from '../business-logic/facades/service-facade'
+import { Logger } from '../logger/logger'
+import { LoggerFacade } from '../logger/logger-facade'
+import { RepositoryFacade } from '../data-access/facades/repository-facade'
+import bodyParser from 'body-parser'
 
 export * from './controllers/rundown-controller'
 
@@ -27,7 +27,7 @@ class SofieServer {
   }
 
   public configureServer(): void {
-    this.server.use(bodyparser.json())
+    this.server.use(bodyParser.json())
     this.server.use(cors())
   }
 
