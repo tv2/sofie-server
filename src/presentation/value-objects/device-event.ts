@@ -1,6 +1,6 @@
-import { DeviceDtoInterface } from '../dtos/device-dto'
 import { DeviceEventType } from '../enums/event-type'
 import { TypedEvent } from './typed-event'
+import { Device } from '../../model/entities/device'
 
 export type DeviceEvent = DeviceCreatedEvent | DeviceUpdatedEvent
 

@@ -37,7 +37,7 @@ export class DeviceController extends BaseController {
   @GetRequest('/:deviceId')
   public async getDevice(request: Request, response: Response): Promise<void> {
     try {
-      const {deviceId} = request.params
+      const deviceId: string = request.params.deviceId
       const device: Device = await this.deviceService.getDevice(deviceId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(this.toDeviceDto(device)))
     } catch (error) {
@@ -63,13 +63,9 @@ export class DeviceController extends BaseController {
     }
   }
 
-  private toDeviceDto(device: Device): DeviceDtoInterface | undefined {
-    if (this.isINewsDevice(device)) {
-      return new INewsDeviceDto(device)
-    }
-    if (this.isTelemetricsDevice(device)) {
-      return new TelemetricsDeviceDto(device)
-    }
+  private toDeviceDto(device: Device): Device | undefined {
+    if (this.isINewsDevice(device)) return new INewsDeviceDto(device)
+    if (this.isTelemetricsDevice(device)) return new TelemetricsDeviceDto(device)
     return undefined
   }
 

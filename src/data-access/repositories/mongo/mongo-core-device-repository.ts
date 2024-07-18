@@ -18,12 +18,10 @@ export class MongoCoreDeviceRepository extends BaseMongoRepository implements De
     throw new UnsupportedOperationException(this.getDevice.name)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getDevice(_deviceId: string): Promise<Device> {
     throw new UnsupportedOperationException(this.getDevice.name)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public save(_device: Device): Promise<void> {
     throw new UnsupportedOperationException(this.save.name)
   }
