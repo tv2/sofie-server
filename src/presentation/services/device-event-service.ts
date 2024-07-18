@@ -1,4 +1,4 @@
-import { DeviceCreatedEvent, DeviceEvent } from '../value-objects/device-event'
+import { DeviceCreatedEvent, DeviceEvent, DeviceUpdatedEvent } from '../value-objects/device-event'
 import { DeviceEventEmitter } from '../../business-logic/services/interfaces/device-event-emitter'
 import { DeviceEventObserver } from '../interfaces/device-event-observer'
 import { Device } from '../../model/entities/device'
@@ -27,6 +27,11 @@ export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserv
 
   public emitDeviceCreatedEvent(device: Device): void {
     const event: DeviceCreatedEvent = this.deviceEventBuilder.buildDeviceCreatedEvent(device)
+    this.emitDeviceEvent(event)
+  }
+
+  public emitDeviceUpdatedEvent(device: Device): void {
+    const event: DeviceUpdatedEvent = this.deviceEventBuilder.buildDeviceUpdatedEvent(device)
     this.emitDeviceEvent(event)
   }
 }

@@ -187,7 +187,6 @@ export interface MongoDevice extends MongoId {
   connected: boolean
 }
 
-
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 
 export class MongoEntityConverter {

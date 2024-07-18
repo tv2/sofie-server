@@ -12,6 +12,11 @@ export class MongoCoreDeviceRepository extends BaseMongoRepository implements De
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)
   }
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public update(_device: Device): Promise<void> {
+    throw new UnsupportedOperationException(this.getDevice.name)
+  }
 
   public getDevice(_deviceId: string): Promise<Device> {
     throw new UnsupportedOperationException(this.getDevice.name)

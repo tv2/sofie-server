@@ -19,4 +19,9 @@ export class DeviceServiceImplementation implements DeviceService {
     await this.deviceRepository.save(device)
     this.deviceEventEmitter.emitDeviceCreatedEvent(device)
   }
+
+  public async update(device: Device): Promise<void> {
+    await this.deviceRepository.update(device)
+    this.deviceEventEmitter.emitDeviceUpdatedEvent(device)
+  }
 }

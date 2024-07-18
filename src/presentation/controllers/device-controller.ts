@@ -1,4 +1,4 @@
-import { BaseController, GetRequest, PostRequest, RestController } from './base-controller'
+import { BaseController, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
 import { Request, Response } from 'express'
 import { DeviceService } from '../../business-logic/services/interfaces/device-service'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
@@ -7,8 +7,9 @@ import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
 import { DeviceType } from '../../model/enums/device-type'
 import { INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
+import { ConflictException } from '../../model/exceptions/conflict-exception'
 import { HttpStatusCode } from '../http-status-code'
-
+import { ApiError } from '../value-objects/ApiError'
 
 @RestController('/devices')
 export class DeviceController extends BaseController {
@@ -25,9 +26,9 @@ export class DeviceController extends BaseController {
   public async getAllDevices(_request: Request, response: Response): Promise<void> {
     try {
       const devices: Device[] = await this.deviceService.getDevices()
-      response.send(this.httpResponseFormatter.formatSuccessResponse(
-        devices.map(device => this.toDeviceDto(device))
-      ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(devices.map(device => {
+        return this.toDeviceDto(device)
+      })))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -52,11 +53,7 @@ export class DeviceController extends BaseController {
         response
           .status(HttpStatusCode.UNPROCESSABLE_CONTENT)
           .header('Content-Type', 'application/json')
-          .send(`{
-              "error": {
-                "message": "Unprocessable Content: device type is not in the correct format"
-              }
-            }`)
+          .send(new ApiError('Unprocessable Content: device type is not in the correct format').toJson())
         return
       }
       await this.deviceService.create(device)
@@ -78,5 +75,19 @@ export class DeviceController extends BaseController {
 
   private isTelemetricsDevice(device: Device): device is TelemetricsDevice {
     return device.type === DeviceType.TELEMETRICS
+  }
+
+  @PutRequest('/:deviceId')
+  public async updateDevice(request: Request, response: Response): Promise<void> {
+    try {
+      const device: Device = await request.body
+      const {deviceId} = request.params
+
+      if (device.id !== deviceId) throw new ConflictException('Conflict: The ID in the URL path does not match the ID in the request body.')  //to be in compliance with the REST convention (it is not a strict rule) we pass in the ID, and then we validate it against the body ID to stop IDOR attacks 
+      await this.deviceService.update(device)
+      response.send(this.httpResponseFormatter.formatSuccessResponse())
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
   }
 }

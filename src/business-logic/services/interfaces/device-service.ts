@@ -6,4 +6,5 @@ export interface DeviceService {
   getDevice(deviceId: string): Promise<Device>
 
   create(device: Device): Promise<void>
+  update(device: Device): Promise<void>
 }
