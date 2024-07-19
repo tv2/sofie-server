@@ -31,18 +31,15 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
     return device
   }
 
-  public async save(device: Device): Promise<void> {
+  public async save(device: Device | Omit<Device, 'id'>): Promise<void> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.save.name)
-    let pureDevice: Device = {} as Device
-    if (!device.id) {
-      pureDevice = {
-        ...device,
-        id: this.uuidGenerator.generateUuid(),
-      }
+    const deviceWithId: Device = {
+      ...device,
+      id: this.uuidGenerator.generateUuid(),
     }
-
-    await this.getCollection().updateOne({id: pureDevice.id}, {$set: pureDevice}, {upsert: true})
+    await this.getCollection().updateOne({id: deviceWithId.id}, {$set: deviceWithId}, {upsert: true})
   }
+
 
   public async update(device: Device): Promise<void> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.update.name)
