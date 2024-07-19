@@ -6,7 +6,7 @@ import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
 import { DeviceType } from '../../model/enums/device-type'
-import { DeviceDtoInterface, INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
+import { INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
 import { ConflictException } from '../../model/exceptions/conflict-exception'
 import { HttpStatusCode } from '../http-status-code'
 import { ApiError } from '../value-objects/ApiError'
@@ -63,13 +63,9 @@ export class DeviceController extends BaseController {
     }
   }
 
-  private toDeviceDto(device: Device): DeviceDtoInterface {
-    if (this.isINewsDevice(device)) {
-      return new INewsDeviceDto(device)
-    }
-    if (this.isTelemetricsDevice(device)) {
-      return new TelemetricsDeviceDto(device)
-    }
+  private toDeviceDto(device: Device): Device {
+    if (this.isINewsDevice(device)) return new INewsDeviceDto(device)
+    if (this.isTelemetricsDevice(device)) return new TelemetricsDeviceDto(device)
     return device
   }
 

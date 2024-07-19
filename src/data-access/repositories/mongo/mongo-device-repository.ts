@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BaseMongoRepository } from './base-mongo-repository'
 import { DeviceRepository } from '../interfaces/device-repository'
 import { Device } from '../../../model/entities/device'
 import { MongoDatabase } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-
 
 const DEVICE_COLLECTION_NAME: string = 'externalDevices'
 
