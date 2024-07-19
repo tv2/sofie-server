@@ -81,7 +81,7 @@ export class DeviceController extends BaseController {
   public async updateDevice(request: Request, response: Response): Promise<void> {
     try {
       const device: Device = await request.body
-      const {deviceId} = request.params
+      const deviceId: string = request.params.deviceId
 
       if (device.id !== deviceId) throw new ConflictException('Conflict: The ID in the URL path does not match the ID in the request body.')  //to be in compliance with the REST convention (it is not a strict rule) we pass in the ID, and then we validate it against the body ID to stop IDOR attacks 
       await this.deviceService.update(device)
@@ -94,7 +94,7 @@ export class DeviceController extends BaseController {
   @DeleteRequest('/:deviceId')
   public async deleteDevice(request: Request, response: Response): Promise<void> {
     try {
-      const {deviceId} = request.params
+      const deviceId: string = request.params.deviceId
       await this.deviceService.delete(deviceId)
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
