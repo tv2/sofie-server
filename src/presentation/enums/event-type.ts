@@ -52,5 +52,6 @@ export enum StatusMessageEventType {
 
 export enum DeviceEventType {
   DEVICE_CREATED = 'DEVICE_CREATED',
-  DEVICE_UPDATED = 'DEVICE_UPDATED'
+  DEVICE_UPDATED = 'DEVICE_UPDATED',
+  DEVICE_DELETED = 'DEVICE_DELETED',
 }

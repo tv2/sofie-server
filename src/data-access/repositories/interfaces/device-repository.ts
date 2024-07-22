@@ -5,4 +5,5 @@ export interface DeviceRepository {
   getDevice(deviceId: string): Promise<Device>
   save(device: Device): Promise<void>
   update(device: Device): Promise<void>
+  delete(deviceId: string): Promise<void>
 }
