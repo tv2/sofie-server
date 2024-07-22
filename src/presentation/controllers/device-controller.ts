@@ -96,6 +96,7 @@ export class DeviceController extends BaseController {
     try {
       const deviceId: string = request.params.deviceId
       await this.deviceService.delete(deviceId)
+      response.send(this.httpResponseFormatter.formatSuccessResponse())
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
