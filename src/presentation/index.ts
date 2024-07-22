@@ -20,13 +20,13 @@ class SofieServer {
   public server: Express
 
   constructor() {
-    this.server = express()
     this.configureServer()
     this.configureRoutes()
     this.configureErrorHandling()
   }
 
   public configureServer(): void {
+    this.server = express()
     this.server.use(bodyParser.json())
     this.server.use(cors())
   }
@@ -39,6 +39,17 @@ class SofieServer {
     this.server.use((err: object, _req: Request, res: Response, next: NextFunction): Response<Express> | void => {
       if ('status' in err && err.status === 400 && 'message' in err) {
         return res.status(err.status).json({error: err.message})
+      }
+      return next(err)
+    })
+
+    this.server.use((_req: Request, res: Response): Response => {
+      return res.status(404).json({error: 'Not Found'})
+    })
+
+    this.server.use((err: object, _req: Request, res: Response, next: NextFunction): Response<Express> | void => {
+      if ('status' in err && err.status === 500 && 'message' in err) {
+        return res.status(500).json({error: 'Internal Server Error'})
       }
       return next(err)
     })
