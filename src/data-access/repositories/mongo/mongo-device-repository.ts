@@ -1,10 +1,9 @@
-import {BaseMongoRepository} from './base-mongo-repository'
-import {DeviceRepository} from '../interfaces/device-repository'
-import {Device} from '../../../model/entities/device'
-import {MongoDatabase} from './mongo-database'
-import {UuidGenerator} from '../interfaces/uuid-generator'
-import {NotFoundException} from '../../../model/exceptions/not-found-exception'
-
+import { BaseMongoRepository } from './base-mongo-repository'
+import { DeviceRepository } from '../interfaces/device-repository'
+import { Device } from '../../../model/entities/device'
+import { MongoDatabase } from './mongo-database'
+import { UuidGenerator } from '../interfaces/uuid-generator'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const DEVICE_COLLECTION_NAME: string = 'externalDevices'
 
@@ -32,17 +31,23 @@ export class MongoDeviceRepository extends BaseMongoRepository implements Device
     return device
   }
 
-  public async save(device: Device): Promise<void> {
+  public async save(device: Device | Omit<Device, 'id'>): Promise<void> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.save.name)
-    if (!device.id) {
-      device.id = this.uuidGenerator.generateUuid() // TODO: Remove side effect
+    const deviceWithId: Device = {
+      ...device,
+      id: this.uuidGenerator.generateUuid(),
     }
+    await this.getCollection().updateOne({id: deviceWithId.id}, {$set: deviceWithId}, {upsert: true})
+  }
 
+
+  public async update(device: Device): Promise<void> {
+    this.assertDatabaseConnection(MongoDeviceRepository.prototype.update.name)
     await this.getCollection().updateOne({id: device.id}, {$set: device}, {upsert: true})
   }
 
-  public async update(device: Device): Promise<void> {
-    this.assertDatabaseConnection(MongoDeviceRepository.prototype.update.name)  
-    await this.getCollection().updateOne({ id: device.id }, { $set: device }, { upsert: true })
+  public async delete(deviceId: string): Promise<void> {
+    this.assertDatabaseConnection(MongoDeviceRepository.prototype.delete.name)
+    await this.getCollection().deleteOne({id: deviceId})
   }
 }
