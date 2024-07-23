@@ -26,12 +26,11 @@ import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
 import { SystemInformation } from '../../../model/entities/system-information'
+import { Device } from '../../../model/entities/device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { Invalidity } from '../../../model/value-objects/invalidity'
 import { Logger } from '../../../logger/logger'
-import { Device } from '../../../model/entities/device'
-import { DeviceType } from '../../../model/enums/device-type'
 
 
 export interface MongoId {
@@ -179,7 +178,6 @@ export interface MongoSystemInformation extends MongoId {
 
 export interface MongoDevice extends MongoId {
   name: string
-  type: DeviceType
   status: {
     statusCode: number,
     messages: string[]
@@ -495,18 +493,16 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDeviceInterface(mongoDevice: MongoDevice): Device {
+  public convertToDevice(mongoDevice: MongoDevice): Device {
     const statusMessage: string = mongoDevice.status.messages && mongoDevice.status.messages.length > 0
       ? mongoDevice.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
       : ''
-
     return {
       id: mongoDevice._id,
       name: mongoDevice.name,
       isConnected: mongoDevice.connected,
       statusCode: this.getStatusCode(mongoDevice.status.statusCode),
-      statusMessage,
-      type: mongoDevice.type
+      statusMessage
     }
   }
 
@@ -529,7 +525,7 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDeviceInterfaces(mongoDevices: MongoDevice[]): Device[] {
-    return mongoDevices.map(mongoDevice => this.convertToDeviceInterface(mongoDevice))
+  public convertToDevices(mongoDevices: MongoDevice[]): Device[] {
+    return mongoDevices.map(mongoDevice => this.convertToDevice(mongoDevice))
   }
 }

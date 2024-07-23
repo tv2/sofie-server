@@ -51,7 +51,7 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository implements Ac
         name: adLibPiece.name,
         rank: adLibPiece._rank,
         expectedDuration: adLibPiece.expectedDuration ?? undefined,
-        pieceLayer: adLibPiece.sourceLayerId,
+        sourceLayerId: adLibPiece.sourceLayerId,
         lifespan: adLibPiece.lifespan ?? undefined,
         content: adLibPiece.content
       },

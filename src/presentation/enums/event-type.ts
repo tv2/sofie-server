@@ -49,9 +49,3 @@ export enum ActionTriggerEventType {
 export enum StatusMessageEventType {
   STATUS_MESSAGE = 'STATUS_MESSAGE'
 }
-
-export enum DeviceEventType {
-  DEVICE_CREATED = 'DEVICE_CREATED',
-  DEVICE_UPDATED = 'DEVICE_UPDATED',
-  DEVICE_DELETED = 'DEVICE_DELETED',
-}

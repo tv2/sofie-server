@@ -92,9 +92,9 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       const nonExistingId: string = 'nonExistingId'
       const mongoPart: MongoPart = createMongoPart({})
       await testDatabase.populateCollection(COLLECTION_NAME, [mongoPart])
-      const db: Db = testDatabase.getDatabase()
+      const db = testDatabase.getDatabase()
 
-      const testee: MongoPartRepository = createTestee()
+      const testee = createTestee()
       await testee.deletePartsForSegment(nonExistingId)
 
       await expect(db.collection(COLLECTION_NAME).countDocuments()).resolves.toBe(1)
@@ -110,7 +110,7 @@ export function runMongoPartRepositoryTests(testDatabase: MongoTestDatabase): vo
       await testDatabase.populateCollection(COLLECTION_NAME, [mongoPart])
       const db: Db = testDatabase.getDatabase()
       const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
-      const spiedCollection: Collection<MongoId> = spy(collection)
+      const spiedCollection = spy(collection)
 
       when(mongoConverter.convertToParts(anything())).thenReturn([part])
       when(pieceRepository.getPieces(anything())).thenResolve([])

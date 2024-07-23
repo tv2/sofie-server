@@ -115,7 +115,7 @@ export function runMongoSegmentRepositoryTests(testDatabase: MongoTestDatabase):
       const segment: Segment = EntityMockFactory.createSegment({ rundownId: rundownId })
       await testDatabase.populateCollection(COLLECTION_NAME, [mongoSegment])
       const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
-      const spiedCollection: Collection<MongoId> = spy(collection)
+      const spiedCollection = spy(collection)
 
       when(mongoConverter.convertToSegments(anything())).thenReturn([segment])
       when(partRepository.getParts(anything())).thenResolve([])

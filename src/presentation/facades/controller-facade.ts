@@ -11,7 +11,6 @@ import { ActionTriggerController } from '../controllers/action-trigger-controlle
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaController } from '../controllers/media-controller'
 import { SystemInformationController } from '../controllers/system-information-controller'
-import { DeviceController } from '../controllers/device-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -22,8 +21,7 @@ export class ControllerFacade {
       this.createActionTriggerController(),
       this.createConfigurationController(),
       this.createMediaController(),
-      this.createSystemInformationController(),
-      this.createDeviceController()
+      this.createSystemInformationController()
     ]
   }
 
@@ -91,14 +89,6 @@ export class ControllerFacade {
       RepositoryFacade.createStatusMessageRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
-    )
-  }
-
-  private static createDeviceController(): DeviceController {
-    return new DeviceController(
-      ServiceFacade.createDeviceService(),
-      ControllerFacade.createExpressErrorHandler(),
-      new JsendResponseFormatter(),
     )
   }
 }
