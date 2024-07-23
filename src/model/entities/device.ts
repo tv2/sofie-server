@@ -1,7 +1,7 @@
 import { DeviceType } from '../enums/device-type'
 import { StatusCode } from '../enums/status-code'
 
-export type Device = CoreDevice | INewsDevice | TelemetricsDevice 
+export type Device = CoreDevice | INewsGatewayDevice | TelemetricsDevice
 
 interface BasicDevice {
   type: DeviceType
@@ -16,8 +16,8 @@ export interface CoreDevice extends BasicDevice {
   type: DeviceType
 }
 
-export interface INewsDevice extends BasicDevice {
-  type: DeviceType.INEWS
+export interface INewsGatewayDevice extends BasicDevice {
+  type: DeviceType.INEWSGATEWAY
   username: string
   password: string
 }

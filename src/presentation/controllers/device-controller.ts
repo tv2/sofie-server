@@ -4,12 +4,12 @@ import { DeviceService } from '../../business-logic/services/interfaces/device-s
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
+import { Device, INewsGatewayDevice, TelemetricsDevice } from '../../model/entities/device'
 import { DeviceType } from '../../model/enums/device-type'
 import { INewsDeviceDto, TelemetricsDeviceDto } from '../dtos/device-dto'
 import { ConflictException } from '../../model/exceptions/conflict-exception'
 import { HttpStatusCode } from '../http-status-code'
-import { ApiError } from '../value-objects/ApiError'
+import { ApiError } from '../value-objects/api-error'
 
 @RestController('/devices')
 export class DeviceController extends BaseController {
@@ -69,8 +69,8 @@ export class DeviceController extends BaseController {
     return device
   }
 
-  private isINewsDevice(device: Device): device is INewsDevice {
-    return device.type === DeviceType.INEWS
+  private isINewsDevice(device: Device): device is INewsGatewayDevice {
+    return device.type === DeviceType.INEWSGATEWAY
   }
 
   private isTelemetricsDevice(device: Device): device is TelemetricsDevice {

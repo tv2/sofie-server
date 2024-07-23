@@ -1,4 +1,4 @@
-import { Device, INewsDevice, TelemetricsDevice } from '../../model/entities/device'
+import { Device, INewsGatewayDevice, TelemetricsDevice } from '../../model/entities/device'
 import { DeviceType } from '../../model/enums/device-type'
 import { StatusCode } from '../../model/enums/status-code'
 
@@ -21,19 +21,19 @@ export abstract class DeviceDto {
 }
 
 export interface INewsDeviceDtoInterface {
-  type: DeviceType.INEWS
+  type: DeviceType.INEWSGATEWAY
   username: string
   password: string
 }
 
 export class INewsDeviceDto extends DeviceDto implements INewsDeviceDtoInterface {
-  public readonly type: DeviceType.INEWS
+  public readonly type: DeviceType.INEWSGATEWAY
   public readonly username: string
   public readonly password: string
 
-  constructor(device: INewsDevice) {
+  constructor(device: INewsGatewayDevice) {
     super(device)
-    this.type = DeviceType.INEWS
+    this.type = DeviceType.INEWSGATEWAY
     this.username = device.username
     this.password = device.password
   }
