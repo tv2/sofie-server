@@ -5,7 +5,7 @@ export class Tv2AssetPathHelper {
     extensionWithLeadingDot: string,
     folderPath: string
   ): string {
-    const extension = this.removeLeadingDot(extensionWithLeadingDot)
+    const extension: string = this.removeLeadingDot(extensionWithLeadingDot)
     const assetFilePath: string = `${assetFilePathWithoutExtension}.${extension}`
     return this.createWindowsPath(networkPath, folderPath, assetFilePath)
   }

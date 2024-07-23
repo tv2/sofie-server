@@ -452,7 +452,7 @@ describe(Rundown.name, () => {
             const numberToExceedHistory: number = 5
 
             const history: Part[] = []
-            for (let i = 0; i < maximumHistoryEntries + numberToExceedHistory; i++) {
+            for (let i: number = 0; i < maximumHistoryEntries + numberToExceedHistory; i++) {
               history.push(EntityTestFactory.createPart({id: `${historyPartIdPrefix}${i}`}))
             }
 
@@ -476,7 +476,7 @@ describe(Rundown.name, () => {
             } as RundownInterface)
 
             expect(testee.getHistory()).toHaveLength(maximumHistoryEntries + numberToExceedHistory)
-            for (let i = 0; i < numberToExceedHistory; i++) {
+            for (let i: number = 0; i < numberToExceedHistory; i++) {
               expect(testee.getHistory()[i].id).toBe(`${historyPartIdPrefix}${i}`)
             }
 
@@ -484,7 +484,7 @@ describe(Rundown.name, () => {
 
             expect(testee.getHistory()).toHaveLength(maximumHistoryEntries)
 
-            for (let i = 0; i < numberToExceedHistory; i++) {
+            for (let i: number = 0; i < numberToExceedHistory; i++) {
               expect(testee.getHistory()[i].id).not.toBe(`${historyPartIdPrefix}${i}`)
             }
 
