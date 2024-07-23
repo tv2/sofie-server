@@ -4,9 +4,10 @@ import { DeviceConnectionStatus } from '../device-connection-service-implementat
 export interface DeviceConnectionService {
   createConnection(device: Device): Promise<DeviceConnectionStatus>
   getConnectionStatusById(deviceId: string): DeviceConnectionStatus
+  disconnectConnectionById(deviceId: string): Promise<DeviceConnectionStatus>
   removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus>
   connectionExists(deviceId: string): boolean
-  listAllConnectionIds(): string[]
+  listAllNetworkedDevices(): Device[]
 }
 
 export interface DeviceConnection {
@@ -36,12 +37,14 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   constructor(_device: Device) { this.device = _device }
 
   public connect(): Promise<boolean> {
+    // insert guard clause here, in case device is already (dis)connecting
     this.device.isConnected = true
 
     throw new Error('Method not implemented.')
   }
 
   public disconnect(): Promise<boolean> {
+    // insert guard clause here, in case device is already (dis)connecting
     this.device.isConnected = false
 
     throw new Error('Method not implemented.')

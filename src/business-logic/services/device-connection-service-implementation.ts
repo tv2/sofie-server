@@ -2,49 +2,58 @@ import { DeviceConnection, DeviceConnectionService } from './interfaces/device-c
 import { Device } from '../../model/entities/device'
 import { DeviceConnectionFactory } from './interfaces/device-connection-factory'
 
+type DeviceAggregate = {
+  deviceConnection: DeviceConnection,
+  device: Device
+}
+
 export class DeviceConnectionServiceImplementation implements DeviceConnectionService {
-  private connectedDevices: {  
-    [deviceId: string]: DeviceConnection  
-  } = {} 
+  private readonly connectedDevices: Map<string, DeviceAggregate> = new Map()
 
   constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory) {
   }
 
   public async createConnection(device: Device): Promise<DeviceConnectionStatus> {
-    if (device.id in this.connectedDevices) throw new DeviceAlreadyConnectedError(device.id)
+    if (this.connectedDevices.has(device.id)) throw new DeviceAlreadyConnectedError(device.id)
     const deviceConnection: DeviceConnection = this.deviceConnectionFactory.createDeviceConnection(device)
     
     await deviceConnection.connect()
-    this.connectedDevices[device.id] = deviceConnection
     
+    this.connectedDevices.set(device.id, { deviceConnection, device })
+
     return DeviceConnectionStatus.CONNECTED
   }
 
-  public getConnectionStatusById(_deviceId: string): DeviceConnectionStatus {
-    return _deviceId in this.connectedDevices ? DeviceConnectionStatus.CONNECTED : DeviceConnectionStatus.DISCONNECTED  
+  public getConnectionStatusById(deviceId: string): DeviceConnectionStatus {
+    return this.connectedDevices.has(deviceId) ? DeviceConnectionStatus.CONNECTED : DeviceConnectionStatus.DISCONNECTED  
+  }
+
+  public async disconnectConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
+    await this.connectedDevices.get(deviceId)?.deviceConnection.disconnect()
+    return DeviceConnectionStatus.DISCONNECTED
   }
 
   public async removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
-    if(!(deviceId in this.connectedDevices)) throw new DeviceAlreadyRemovedError(deviceId)
+    const device: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
+    if(! device?.deviceConnection) throw new DeviceAlreadyRemovedError(deviceId)
     
-    await this.connectedDevices[deviceId].disconnect()
-    this.connectedDevices[deviceId]
-    const { [deviceId]: _, ...remainingDevices } = this.connectedDevices
-    this.connectedDevices = remainingDevices
+    await device.deviceConnection.disconnect()
+    
+    this.connectedDevices.delete(deviceId)
 
     return DeviceConnectionStatus.DISCONNECTED
   }
 
   public connectionExists(deviceId: string): boolean {
-    return deviceId in this.connectedDevices
+    return this.connectedDevices.has(deviceId)
   }
 
-  public listAllConnectionIds(): string[] {
-    const ids: string[] = []
-    Object.entries(this.connectedDevices).forEach(([deviceId, _deviceConnection]) => {
-      ids.push(deviceId)
+  public listAllNetworkedDevices(): Device[] {
+    const networkedDevices: Device[] = []
+    this.connectedDevices.forEach((deviceAggregate, _key) => {
+      networkedDevices.push(deviceAggregate.device)
     })
-    return ids
+    return networkedDevices
   }
 }
 
