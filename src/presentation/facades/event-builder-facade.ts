@@ -5,7 +5,6 @@ import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
-import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 
 export class EventBuilderFacade {
 
@@ -30,10 +29,6 @@ export class EventBuilderFacade {
   }
 
   public static createStatusMessageEventBuilder(): StatusMessageEventBuilder {
-    return new EventBuilder()
-  }
-
-  public static createDeviceEventBuilder(): DeviceEventBuilder {
     return new EventBuilder()
   }
 }

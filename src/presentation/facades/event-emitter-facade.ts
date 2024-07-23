@@ -17,9 +17,6 @@ import { StatusMessageEventEmitter } from '../../business-logic/services/interfa
 import { ActionEventObserver } from '../interfaces/action-event-observer'
 import { ActionEventService } from '../services/action-event-service'
 import { ActionEventEmitter } from '../../business-logic/services/interfaces/action-event-emitter'
-import { DeviceEventEmitter } from '../../business-logic/services/interfaces/device-event-emitter'
-import { DeviceEventService } from '../services/device-event-service'
-import { DeviceEventObserver } from '../interfaces/device-event-observer'
 
 export class EventEmitterFacade {
 
@@ -69,13 +66,5 @@ export class EventEmitterFacade {
 
   public static createStatusMessageEventObserver(): StatusMessageEventObserver {
     return StatusMessageEventService.getInstance(EventBuilderFacade.createStatusMessageEventBuilder())
-  }
-
-  public static createDeviceEventEmitter(): DeviceEventEmitter {
-    return DeviceEventService.getInstance(EventBuilderFacade.createDeviceEventBuilder())
-  }
-
-  public static createDeviceEventObserver(): DeviceEventObserver {
-    return DeviceEventService.getInstance(EventBuilderFacade.createDeviceEventBuilder())
   }
 }

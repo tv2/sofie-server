@@ -1,6 +1,6 @@
 import { parseArgs } from 'node:util'
 import { exec } from 'node:child_process'
-import { ChangeStream, MongoClient } from 'mongodb'
+import { MongoClient } from 'mongodb'
 
 const {
   positionals,
@@ -160,7 +160,7 @@ function dropMongoContainer(): void {
 function spyOnDatabase(): void {
   new MongoClient('mongodb://localhost:3001/sofie?replicaSet=rs0')
     .connect().then( (client) => {
-      const changeStream: ChangeStream = client.watch()
+      const changeStream = client.watch()
       changeStream.on('change', (change) => console.dir(change))
     })
     .catch(error => console.error('Failed connecting to database.', error))

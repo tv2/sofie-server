@@ -93,7 +93,7 @@ export function runMongoRundownRepositoryTests(testDatabase: MongoTestDatabase):
       await testDatabase.populateCollection(COLLECTION_NAME, [mongoRundown])
       const db: Db = testDatabase.getDatabase()
       const collection: Collection<MongoId> = db.collection(COLLECTION_NAME)
-      const spiedCollection: Collection<MongoId> = spy(collection)
+      const spiedCollection = spy(collection)
 
       when(mongoDb.getCollection(anything())).thenReturn(collection)
       const testee: MongoRundownRepository = createTestee({

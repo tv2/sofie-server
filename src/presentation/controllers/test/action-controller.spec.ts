@@ -25,7 +25,7 @@ describe(ActionController.name, () => {
 
     it('receives an object as ActionArguments, it doesnt modify the object', async () => {
       const actionService: ActionService = mock<ActionService>()
-      const actionArguments: { [key: string]: string } = {
+      const actionArguments = {
         some: 'argument'
       }
       const request: Request = {

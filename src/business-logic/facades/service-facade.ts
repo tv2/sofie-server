@@ -28,8 +28,6 @@ import { ThrottledRundownService } from '../services/throttled-rundown-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
-import { DeviceServiceImplementation } from '../services/device-service-implementation'
-import { DeviceService } from '../services/interfaces/device-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -124,7 +122,7 @@ export class ServiceFacade {
   public static createDeviceDataChangedService(): DataChangeService {
     return DeviceChangedService.getInstance(
       ServiceFacade.createStatusMessageService(),
-      RepositoryFacade.createCoreDeviceRepository(),
+      RepositoryFacade.createDeviceRepository(),
       RepositoryFacade.createDeviceDataChangedListener(),
       LoggerFacade.createLogger()
     )
@@ -145,13 +143,6 @@ export class ServiceFacade {
     return new StatusMessageServiceImplementation(
       EventEmitterFacade.createStatusMessageEventEmitter(),
       RepositoryFacade.createStatusMessageRepository()
-    )
-  }
-
-  public static createDeviceService(): DeviceService {
-    return new DeviceServiceImplementation(
-      RepositoryFacade.createDeviceRepository(),
-      EventEmitterFacade.createDeviceEventEmitter()
     )
   }
 }

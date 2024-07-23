@@ -6,7 +6,7 @@ import {
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { Tv2PieceLayer } from '../value-objects/tv2-layers'
+import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
@@ -36,7 +36,7 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
     const pieceInterface: Tv2PieceInterface = this.createVideoSwitcherPieceInterface({
       id: this.sanitizeStringForId(`downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`),
       name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
-      layer: `${Tv2PieceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
+      layer: `${Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       timelineObjects: [
         this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn)
@@ -60,7 +60,7 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
   private createVideoSwitcherPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>): Tv2PieceInterface {
     return {
       partId: '',
-      layer: Tv2PieceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
+      layer: Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: false,

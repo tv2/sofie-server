@@ -1,6 +1,6 @@
 import { Tv2SourceMappingWithSound } from './tv2-studio-blueprint-configuration'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2PieceLayer } from './tv2-layers'
+import { Tv2SourceLayer } from './tv2-layers'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
@@ -67,7 +67,7 @@ export interface Tv2ActionManifestFullscreenGraphicsData {
  */
 export interface Tv2ActionManifestOverlayGraphicsData {
   rank: number
-  pieceLayer: Tv2PieceLayer
+  sourceLayerId: Tv2SourceLayer
   name: string,
   expectedDuration?: number
   lifespan?: string
@@ -122,7 +122,7 @@ export interface Tv2FullscreenGraphicsManifestData {
 
 export interface Tv2OverlayGraphicsManifestData {
   rundownId: string
-  pieceLayer: Tv2PieceLayer
+  sourceLayerId: Tv2SourceLayer
   name: string
   rank: number
   templateName: string

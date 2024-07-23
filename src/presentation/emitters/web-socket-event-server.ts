@@ -1,23 +1,20 @@
-import express, { Express } from 'express'
+import WebSocket, { WebSocketServer } from 'ws'
+import express from 'express'
 import * as http from 'http'
-import { Server } from 'http'
-import WebSocket, { WebSocketServer, Server as WsServer } from 'ws'
-import { Logger } from '../../logger/logger'
-import { ActionEventObserver } from '../interfaces/action-event-observer'
-import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
-import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
-import { MediaEventObserver } from '../interfaces/media-event-observer'
-import { RundownEventObserver } from '../interfaces/rundown-event-observer'
-import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
-import { ActionEvent } from '../value-objects/action-event'
-import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
-import { ConfigurationEvent } from '../value-objects/configuration-event'
-import { MediaEvent } from '../value-objects/media-event'
 import { RundownEvent } from '../value-objects/rundown-event'
-import { StatusMessageEvent } from '../value-objects/status-message-event'
 import { EventServer } from './interfaces/event-server'
-import { DeviceEventObserver } from '../interfaces/device-event-observer'
-import { DeviceEvent } from '../value-objects/device-event'
+import { RundownEventObserver } from '../interfaces/rundown-event-observer'
+import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
+import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
+import { Logger } from '../../logger/logger'
+import { MediaEventObserver } from '../interfaces/media-event-observer'
+import { MediaEvent } from '../value-objects/media-event'
+import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
+import { ConfigurationEvent } from '../value-objects/configuration-event'
+import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
+import { StatusMessageEvent } from '../value-objects/status-message-event'
+import { ActionEventObserver } from '../interfaces/action-event-observer'
+import { ActionEvent } from '../value-objects/action-event'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer
@@ -29,7 +26,6 @@ export class WebSocketEventServer implements EventServer {
     mediaEventObserver: MediaEventObserver,
     configurationEventObserver: ConfigurationEventObserver,
     statusMessageEventObserver: StatusMessageEventObserver,
-    deviceEventObserver: DeviceEventObserver,
     logger: Logger
   ): EventServer {
     if (!this.instance) {
@@ -40,7 +36,6 @@ export class WebSocketEventServer implements EventServer {
         mediaEventObserver,
         configurationEventObserver,
         statusMessageEventObserver,
-        deviceEventObserver,
         logger
       )
     }
@@ -57,7 +52,6 @@ export class WebSocketEventServer implements EventServer {
     private readonly mediaEventObserver: MediaEventObserver,
     private readonly configurationEventObserver: ConfigurationEventObserver,
     private readonly statusMessageEventObserver: StatusMessageEventObserver,
-    private readonly deviceEventObserver: DeviceEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -90,9 +84,9 @@ export class WebSocketEventServer implements EventServer {
   }
 
   private createWebSocketServer(port: number): WebSocketServer {
-    const app: Express = express()
-    const server: Server = http.createServer(app)
-    const webSocketServer: WsServer = new WebSocketServer({ server })
+    const app = express()
+    const server = http.createServer(app)
+    const webSocketServer = new WebSocketServer({ server })
 
     server.listen(port, () => {
       this.logger.info(`WebSocket server started on port: ${port}`)
@@ -119,9 +113,6 @@ export class WebSocketEventServer implements EventServer {
     })
     this.statusMessageEventObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => {
       webSocket.send(JSON.stringify(statusMessageEvent))
-    })
-    this.deviceEventObserver.subscribeToDeviceEvents((deviceEvent: DeviceEvent) => {
-      webSocket.send(JSON.stringify(deviceEvent))
     })
   }
 

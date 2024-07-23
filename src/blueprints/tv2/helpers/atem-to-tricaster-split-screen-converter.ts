@@ -18,12 +18,12 @@ export class AtemToTriCasterSplitScreenConverter {
   }
 
   private convertPositionX(atemX: number): number {
-    const positionPercentage: number = atemX / ATEM_WIDTH
+    const positionPercentage = atemX / ATEM_WIDTH
     return (positionPercentage * TRICASTER_WIDTH) / 100
   }
 
   private convertPositionY(atemY: number): number {
-    const positionPercentage: number = atemY / ATEM_HEIGHT
+    const positionPercentage = atemY / ATEM_HEIGHT
     return ((positionPercentage * 2) / 100) * -1
   }
 

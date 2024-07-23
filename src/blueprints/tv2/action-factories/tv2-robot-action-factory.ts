@@ -9,7 +9,7 @@ import { PieceActionType } from '../../../model/enums/action-type'
 import { PieceInterface } from '../../../model/entities/piece'
 import { Action, ActionArgumentType, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
-import { Tv2PieceLayer } from '../value-objects/tv2-layers'
+import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
@@ -96,7 +96,7 @@ export class Tv2RobotActionFactory extends ActionFactory {
       id: `callRobotPreset_${this.sanitizeStringForId(preset + '')}`,
       name: `Call Preset ${preset}`,
       partId: '',
-      layer: Tv2PieceLayer.ROBOT_CAMERA,
+      layer: Tv2SourceLayer.ROBOT_CAMERA,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,

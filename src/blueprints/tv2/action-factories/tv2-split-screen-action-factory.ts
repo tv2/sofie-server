@@ -7,7 +7,7 @@ import {
   SplitScreenBoxProperties,
   SplitScreenConfiguration
 } from '../value-objects/tv2-show-style-blueprint-configuration'
-import { Tv2PieceLayer } from '../value-objects/tv2-layers'
+import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import {
@@ -216,7 +216,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       id: `${partId}_piece_${Date.now()}`,
       partId,
       name,
-      layer: Tv2PieceLayer.SPLIT_SCREEN,
+      layer: Tv2SourceLayer.SPLIT_SCREEN,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
@@ -236,7 +236,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       id: `${piece.getPartId()}_piece_${Date.now()}`,
       partId: piece.getPartId(),
       name: piece.name,
-      layer: Tv2PieceLayer.SPLIT_SCREEN,
+      layer: Tv2SourceLayer.SPLIT_SCREEN,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
@@ -269,7 +269,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithSound[], insertedContentType: Tv2ActionContentType, name: string = '', audioMode: Tv2AudioMode = Tv2AudioMode.FULL): Tv2SplitScreenInsertSourceInputAction[] {
     const actions: Tv2SplitScreenInsertSourceInputAction[] = []
-    for (let inputIndex: number = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
+    for (let inputIndex = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
       const actionsForInput: Tv2SplitScreenInsertSourceInputAction[] = sources
         .map(source => {
           const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source, audioMode)
@@ -545,7 +545,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private createInsertLastVideoClipToInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2SplitScreenInsertLastVideoClipInputAction[] {
     const actions: Tv2SplitScreenInsertLastVideoClipInputAction[] = []
-    for (let inputIndex: number = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
+    for (let inputIndex = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
       actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.FULL))
       actions.push(this.createInsertLastVideoClipToInputAction(blueprintConfiguration, inputIndex, Tv2AudioMode.VOICE_OVER))
     }
