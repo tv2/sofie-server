@@ -1,17 +1,16 @@
-import { DeviceConnection, INewsGatewayDeviceConnection, TelemetriceDeviceConnection } from '../services/interfaces/device-connection-service'
 import { DeviceType } from '../../model/enums/device-type'
 import { Device } from '../../model/entities/device'
+import { DeviceConnection } from '../services/interfaces/inewsgateway-device-connection'
+import { INewsGatewayDeviceConnection } from '../services/inews-gateway-connection-implementation'
 
 export class DeviceConnectionFactory implements DeviceConnectionFactory {
-  public createDeviceConnection(device: Device): DeviceConnection {
-    const deviceConnection: DeviceConnection = this.mapDeviceToDeviceConnection(device)
+  public createDeviceConnection(device: Device): DeviceConnection<unknown> {
+    const deviceConnection: DeviceConnection<unknown> = this.mapDeviceToDeviceConnection(device)
     return deviceConnection
   }
 
-  public mapDeviceToDeviceConnection(device: Device): DeviceConnection {
+  public mapDeviceToDeviceConnection(device: Device): DeviceConnection<unknown> {
     switch (device.type) {
-      case DeviceType.TELEMETRICS:
-        return new TelemetriceDeviceConnection(device)
       case DeviceType.INEWSGATEWAY:
         return new INewsGatewayDeviceConnection(device)
       default:

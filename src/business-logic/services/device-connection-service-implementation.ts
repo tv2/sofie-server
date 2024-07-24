@@ -1,13 +1,14 @@
-import { DeviceConnection, DeviceConnectionService } from './interfaces/device-connection-service'
+import { DeviceConnectionService } from './interfaces/device-connection-service'
 import { Device } from '../../model/entities/device'
 import { DeviceConnectionFactory } from './interfaces/device-connection-factory'
+import { DeviceConnection, ParamsList } from './interfaces/inewsgateway-device-connection'
 
 type DeviceAggregate = {
-  deviceConnection: DeviceConnection,
+  deviceConnection: DeviceConnection<unknown>,
   device: Device
 }
 
-export class DeviceConnectionServiceImplementation implements DeviceConnectionService {
+export class DeviceConnectionServiceImplementation implements DeviceConnectionService<unknown> {
   private readonly connectedDevices: Map<string, DeviceAggregate> = new Map()
 
   constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory) {
@@ -15,17 +16,26 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   public async createConnection(device: Device): Promise<DeviceConnectionStatus> {
     if (this.connectedDevices.has(device.id)) throw new DeviceAlreadyConnectedError(device.id)
-    const deviceConnection: DeviceConnection = this.deviceConnectionFactory.createDeviceConnection(device)
-    
+    const deviceConnection: DeviceConnection<unknown> = this.deviceConnectionFactory.createDeviceConnection(device)
+
     await deviceConnection.connect()
-    
-    this.connectedDevices.set(device.id, { deviceConnection, device })
+
+    this.connectedDevices.set(device.id, {deviceConnection, device})
 
     return DeviceConnectionStatus.CONNECTED
   }
 
+
+  public send(_deviceId: string, _params: ParamsList): void {
+    throw new Error('Method not implemented.')
+  }
+
+  public listen(_deviceId: string, _callback: (data: unknown) => void): void {
+    throw new Error('Method not implemented.')
+  }
+
   public getConnectionStatusById(deviceId: string): DeviceConnectionStatus {
-    return this.connectedDevices.has(deviceId) ? (this.connectedDevices.get(deviceId)?.device.isConnected ? DeviceConnectionStatus.CONNECTED : DeviceConnectionStatus.DISCONNECTED) : DeviceConnectionStatus.DISCONNECTED 
+    return this.connectedDevices.has(deviceId) ? (this.connectedDevices.get(deviceId)?.device.isConnected ? DeviceConnectionStatus.CONNECTED : DeviceConnectionStatus.DISCONNECTED) : DeviceConnectionStatus.DISCONNECTED
   }
 
   public async disconnectConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
@@ -35,10 +45,10 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   public async removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
     const device: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
-    if(! device?.deviceConnection) throw new DeviceAlreadyRemovedError(deviceId)
-    
+    if (!device?.deviceConnection) throw new DeviceAlreadyRemovedError(deviceId)
+
     await device.deviceConnection.disconnect()
-    
+
     this.connectedDevices.delete(deviceId)
 
     return DeviceConnectionStatus.DISCONNECTED
