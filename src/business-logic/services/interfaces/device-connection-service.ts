@@ -8,6 +8,6 @@ export interface DeviceConnectionService<TParams> {
   removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus>
   connectionExists(deviceId: string): boolean
   listAllNetworkedDevices(): Device[]
-  send(deviceId: string, params: TParams): void
-  listen(deviceId: string, callback: (data: unknown) => void): void
+  send(deviceId: string, params: TParams): Promise<void>
+  listen(deviceId: string, callback: (data: unknown) => void): Promise<void>
 }

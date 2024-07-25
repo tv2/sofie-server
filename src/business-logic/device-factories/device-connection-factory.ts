@@ -1,15 +1,16 @@
 import { DeviceType } from '../../model/enums/device-type'
 import { Device } from '../../model/entities/device'
-import { DeviceConnection } from '../services/interfaces/inewsgateway-device-connection'
+import { DeviceConnection, INewsGatewayParams } from '../services/interfaces/inewsgateway-device-connection'
 import { INewsGatewayDeviceConnection } from '../services/inews-gateway-connection-implementation'
+import { DeviceConnectionFactory } from '../services/interfaces/device-connection-factory'
 
-export class DeviceConnectionFactory implements DeviceConnectionFactory {
-  public createDeviceConnection(device: Device): DeviceConnection<unknown> {
+export class DeviceConnectionFactoryImplementation implements DeviceConnectionFactory {
+  public createDeviceConnection<INewsGatewayParams>(device: Device): DeviceConnection<INewsGatewayParams> {
     const deviceConnection: DeviceConnection<unknown> = this.mapDeviceToDeviceConnection(device)
     return deviceConnection
   }
 
-  public mapDeviceToDeviceConnection(device: Device): DeviceConnection<unknown> {
+  public mapDeviceToDeviceConnection(device: Device): DeviceConnection<INewsGatewayParams> {
     switch (device.type) {
       case DeviceType.INEWSGATEWAY:
         return new INewsGatewayDeviceConnection(device)

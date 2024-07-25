@@ -5,22 +5,26 @@ export class INewsGatewayDeviceConnection implements DeviceConnection<INewsGatew
   private readonly device: Device
   private isConnectingOrDisconnecting: boolean = false
 
-  constructor(_device: Device) { this.device = _device }
-  
-  public send(_deviceId: string, _params: INewsGatewayParams): void {
-    throw new Error('Method not implemented.')
+  constructor(_device: Device) {
+    this.device = _device
   }
-  
-  public listen(_deviceId: string, _callback: (data: unknown) => void): void {
-    throw new Error('Method not implemented.')
+
+  public async send(_deviceId: string, _params: INewsGatewayParams): Promise<void> {
+    // For now: Simulate an async operation, e.g., network request
+    await new Promise(resolve => setTimeout(resolve, 1000))
   }
-  
+
+  public async listen(_deviceId: string, _callback: (data: unknown) => void): Promise<void> {
+    // For now: Simulate an async operation, e.g., network request
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  }
+
   public async connect(): Promise<boolean> {
     if (this.isConnectingOrDisconnecting) {
       throw new Error('Device is already connecting or disconnecting.')
     }
     this.isConnectingOrDisconnecting = true
-    
+
     try {
       // Implement connection logic here
 
@@ -35,13 +39,13 @@ export class INewsGatewayDeviceConnection implements DeviceConnection<INewsGatew
       this.isConnectingOrDisconnecting = false
     }
   }
-  
+
   public async disconnect(): Promise<boolean> {
     if (this.isConnectingOrDisconnecting) {
       throw new Error('Device is already connecting or disconnecting.')
     }
     this.isConnectingOrDisconnecting = true
-    
+
     try {
       // Implement disconnection logic here
 
