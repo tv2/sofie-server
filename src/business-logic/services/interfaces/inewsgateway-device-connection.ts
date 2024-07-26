@@ -1,9 +1,9 @@
 import { INewsGatewayDeviceConnection } from '../inews-gateway-connection-implementation'
 
-export interface DeviceConnection<TParams> {
+export interface DeviceConnection {
   connect(): Promise<boolean>
   disconnect(): Promise<boolean>
-  send(deviceId: string, params: TParams): Promise<void>
+  send(deviceId: string, params: string[]): Promise<void>
   listen(deviceId: string, callback: (data: unknown) => void): Promise<void>
 }
 

@@ -1,7 +1,7 @@
 import { Device } from '../../model/entities/device'
-import { DeviceConnection, INewsGatewayParams } from './interfaces/inewsgateway-device-connection'
+import { DeviceConnection } from './interfaces/inewsgateway-device-connection'
 
-export class INewsGatewayDeviceConnection implements DeviceConnection<INewsGatewayParams> {
+export class INewsGatewayDeviceConnection implements DeviceConnection {
   private readonly device: Device
   private isConnectingOrDisconnecting: boolean = false
 
@@ -9,7 +9,7 @@ export class INewsGatewayDeviceConnection implements DeviceConnection<INewsGatew
     this.device = _device
   }
 
-  public async send(_deviceId: string, _params: INewsGatewayParams): Promise<void> {
+  public async send(_deviceId: string, _params: string[]): Promise<void> {
     // For now: Simulate an async operation, e.g., network request
     await new Promise(resolve => setTimeout(resolve, 1000))
   }
