@@ -94,7 +94,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
 
   describe(DeviceConnectionServiceImplementation.prototype.getConnectionStatusById.name, () => {
     it('should get a connection status for the given device', async () => {
-      const device: Device = EntityTestFactory.createINewsGatewayDevice()
+      const device: Device = EntityTestFactory.createINewsGatewayDevice({ id: 'test-case-id-01' })
       const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
       const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
       when(deviceConnection.connect()).thenResolve(true) 

@@ -40,7 +40,8 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
   }
 
   public getConnectionStatusById(deviceId: string): DeviceConnectionStatus {
-    return this.connectedDevices.has(deviceId) ? (this.connectedDevices.get(deviceId)?.device.isConnected ? DeviceConnectionStatus.CONNECTED : DeviceConnectionStatus.DISCONNECTED) : DeviceConnectionStatus.DISCONNECTED
+    // we don't do thorough testing of both actual connection and the isConnected field since isConnected is an inheritance from CoreDevice and not needed here.
+    return this.connectedDevices.has(deviceId) ? DeviceConnectionStatus.CONNECTED : DeviceConnectionStatus.DISCONNECTED 
   }
 
   public async disconnectConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
