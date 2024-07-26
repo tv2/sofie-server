@@ -4,9 +4,9 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
-import { Device } from '../../../model/entities/device'
 import { Logger } from '../../../logger/logger'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { Device } from '../../../model/entities/device'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
@@ -33,7 +33,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
         const mongoDevice: MongoDevice = change.fullDocument
-        this.onCreatedCallback(this.mongoEntityConverter.convertToDevice(mongoDevice))
+        this.onCreatedCallback(this.mongoEntityConverter.convertToDeviceInterface(mongoDevice))
         return
       }
       case MongoChangeEvent.UPDATE: {
@@ -41,7 +41,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
         if (!mongoDevice) {
           return
         }
-        this.onUpdatedCallback(this.mongoEntityConverter.convertToDevice(mongoDevice))
+        this.onUpdatedCallback(this.mongoEntityConverter.convertToDeviceInterface(mongoDevice))
         return
       }
     }
@@ -59,7 +59,6 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onDeleted(_onDeletedCallback: (id: string) => void): void {
     throw new UnsupportedOperationException(`${MongoDeviceChangedListener.name} does not support ${MongoDeviceChangedListener.prototype.onDeleted.name}`)
   }

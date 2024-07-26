@@ -76,7 +76,7 @@ export class ExecuteActionService implements ActionService {
       return action
     }
 
-    for (let i = 0; i < mutateActionMethodsArray.length; i++) {
+    for (let i: number = 0; i < mutateActionMethodsArray.length; i++) {
       const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
       action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
     }
@@ -186,7 +186,7 @@ export class ExecuteActionService implements ActionService {
 
     let pieceFromRundown: Piece | undefined
 
-    for (let i = 0; i < mutateActionMethodsArray.length; i++) {
+    for (let i: number = 0; i < mutateActionMethodsArray.length; i++) {
       const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
       if (mutateActionMethods.type !== MutateActionType.PIECE) {
         action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
