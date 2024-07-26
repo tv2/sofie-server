@@ -94,31 +94,87 @@ describe(DeviceConnectionServiceImplementation.name, () => {
 
   describe(DeviceConnectionServiceImplementation.prototype.getConnectionStatusById.name, () => {
     it('should get a connection status for the given device', async () => {
-
+      const device: Device = EntityTestFactory.createINewsGatewayDevice()
+      const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+      const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+      when(deviceConnection.connect()).thenResolve(true) 
+      when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
+      const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock})
+        
+      await testee.createConnection(device)
+      const statusRetrievedAfterCreation: DeviceConnectionStatus = testee.getConnectionStatusById(device.id)
+  
+      expect(statusRetrievedAfterCreation).toBe(DeviceConnectionStatus.CONNECTED)
     })
 
-    it('should throw an error if the device is not in the collection', async () => {
+    it('should throw an error if the device is not in the collection', () => {
+      const device: Device = EntityTestFactory.createINewsGatewayDevice()
+      const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+      const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+      when(deviceConnection.connect()).thenResolve(true) 
+      when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
+      const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock})
+      
+      const statusRetrievedAfterCreation: DeviceConnectionStatus = testee.getConnectionStatusById(device.id)
 
+      expect(statusRetrievedAfterCreation).toBe(DeviceConnectionStatus.DISCONNECTED)
     })
-
   })
 
   describe(DeviceConnectionServiceImplementation.prototype.disconnectConnectionById.name, () => {
     it('should disconnect the given device', async () => {
+      const device: Device = EntityTestFactory.createINewsGatewayDevice()
+      const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+      const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+      when(deviceConnection.connect()).thenResolve(true) 
+      when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
+      const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock})
+      
+      await testee.createConnection(device)
+      const connectionStatus: DeviceConnectionStatus = await testee.disconnectConnectionById(device.id)
 
+      expect(connectionStatus).toBe(DeviceConnectionStatus.DISCONNECTED)
     })
 
-    it('should throw an error if the given error is not connected', async () => {
+    it('should return DeviceConnectionStatus.DISCONNECTED if the given device is already not connected', async () => {
+      const device: Device = EntityTestFactory.createINewsGatewayDevice()
+      const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+      const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+      when(deviceConnection.connect()).thenResolve(true) 
+      when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
+      const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock})
+      
+      const connectionStatus: DeviceConnectionStatus = await testee.disconnectConnectionById(device.id)
 
+      expect(connectionStatus).toBe(DeviceConnectionStatus.DISCONNECTED)
     })    
   })
 
   describe(DeviceConnectionServiceImplementation.prototype.removeConnectionById.name, () => {
     it('should remove a connection for the given device id', async () => {
+      const device: Device = EntityTestFactory.createINewsGatewayDevice()
+      const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+      const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+      when(deviceConnection.connect()).thenResolve(true) 
+      when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
+      const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock})
+      
+      await testee.createConnection(device)
+      const connectionStatus: DeviceConnectionStatus = await testee.removeConnectionById(device.id)
 
+      expect(connectionStatus).toBe(DeviceConnectionStatus.DISCONNECTED)
     })
 
-    it('should throw an error if the device is not in the collection', async () => {})
+    it('should throw a DeviceAlreadyRemovedError if the device is not in the collection', async () => {
+      const device: Device = EntityTestFactory.createINewsGatewayDevice()
+      const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+      const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+      when(deviceConnection.connect()).thenResolve(true) 
+      when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
+      const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock})
+      
+      await expect(testee.removeConnectionById(device.id)).rejects.toThrow(`Device with ID '${device.id}' is already removed.`)
+    })
 
   })
 
