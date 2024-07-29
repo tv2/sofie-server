@@ -17,7 +17,7 @@ export interface CoreDevice extends BasicDevice {
 }
 
 export interface INewsGatewayDevice extends BasicDevice {
-  type: DeviceType.INEWSGATEWAY
+  type: DeviceType.INEWS_GATEWAY
   username: string
   password: string
 }

@@ -11,7 +11,7 @@ export class DeviceConnectionFactoryImplementation implements DeviceConnectionFa
 
   public mapDeviceToDeviceConnection(device: Device): DeviceConnection {
     switch (device.type) {
-      case DeviceType.INEWSGATEWAY:
+      case DeviceType.INEWS_GATEWAY:
         return new INewsGatewayDeviceConnection(device)
       default:
         throw new Error(`Unknown device type: ${device.type}`)

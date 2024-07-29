@@ -70,7 +70,7 @@ export class DeviceController extends BaseController {
   }
 
   private isINewsDevice(device: Device): device is INewsGatewayDevice {
-    return device.type === DeviceType.INEWSGATEWAY
+    return device.type === DeviceType.INEWS_GATEWAY
   }
 
   private isTelemetricsDevice(device: Device): device is TelemetricsDevice {

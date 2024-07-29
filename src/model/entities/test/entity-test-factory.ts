@@ -83,7 +83,7 @@ export class EntityTestFactory {
       statusCode: StatusCode.UNKNOWN,
       statusMessage: '',
       isConnected: false,
-      type: DeviceType.INEWSGATEWAY,
+      type: DeviceType.INEWS_GATEWAY,
       username: 'testuser',
       password: 'testpassword',
       ...device

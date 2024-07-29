@@ -21,19 +21,19 @@ export abstract class DeviceDto {
 }
 
 export interface INewsDeviceDtoInterface {
-  type: DeviceType.INEWSGATEWAY
+  type: DeviceType.INEWS_GATEWAY
   username: string
   password: string
 }
 
 export class INewsDeviceDto extends DeviceDto implements INewsDeviceDtoInterface {
-  public readonly type: DeviceType.INEWSGATEWAY
+  public readonly type: DeviceType.INEWS_GATEWAY
   public readonly username: string
   public readonly password: string
 
   constructor(device: INewsGatewayDevice) {
     super(device)
-    this.type = DeviceType.INEWSGATEWAY
+    this.type = DeviceType.INEWS_GATEWAY
     this.username = device.username
     this.password = device.password
   }

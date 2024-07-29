@@ -27,22 +27,22 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     return DeviceConnectionStatus.CONNECTED
   }
 
-  public async send(_deviceId: string, _params: string[]): Promise<void> {
-    const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(_deviceId)
+  public async send(deviceId: string, params: string[]): Promise<void> {
+    const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
     if(connectedDevice === undefined) {
-      throw new DeviceNotFoundError(_deviceId)
+      throw new DeviceNotFoundError(deviceId)
     }
 
-    await connectedDevice.deviceConnection.send(_deviceId, _params)
+    await connectedDevice.deviceConnection.send(deviceId, params)
   }
 
-  public async listen(_deviceId: string, _callback: (data: unknown) => void): Promise<void> {
-    const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(_deviceId)
+  public async listen(deviceId: string, _callback: (data: unknown) => void): Promise<void> {
+    const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
     if(connectedDevice === undefined){
-      throw new DeviceNotFoundError(_deviceId)
+      throw new DeviceNotFoundError(deviceId)
     }
 
-    await connectedDevice.deviceConnection.listen(_deviceId, _callback)
+    await connectedDevice.deviceConnection.listen(deviceId, _callback)
   }
 
   public getConnectionStatusById(deviceId: string): DeviceConnectionStatus {
@@ -72,12 +72,8 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     return this.connectedDevices.has(deviceId)
   }
 
-  public listAllNetworkedDevices(): Device[] {
-    const networkedDevices: Device[] = []
-    this.connectedDevices.forEach((deviceAggregate, _key) => {
-      networkedDevices.push(deviceAggregate.device)
-    })
-    return networkedDevices
+  public getConnectedDevices(): Device[] {
+    return Array.from(this.connectedDevices.values()).map(deviceAggregate => deviceAggregate.device)
   }
 }
 

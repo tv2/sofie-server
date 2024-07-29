@@ -218,7 +218,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
     })
 
     describe('when the device is not connected', () => {
-      it('should return false', async () => {
+      it('should return false', () => {
         const device: Device = EntityTestFactory.createINewsGatewayDevice()
         const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
         const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock})
@@ -230,7 +230,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
     })
   })
 
-  describe(DeviceConnectionServiceImplementation.prototype.listAllNetworkedDevices.name, () => {
+  describe(DeviceConnectionServiceImplementation.prototype.getConnectedDevices.name, () => {
     it('should retrieve a list of connected devices', async () => {
       const device: Device = EntityTestFactory.createINewsGatewayDevice()
       const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
@@ -240,7 +240,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
       const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock})
       
       await testee.createConnection(device)
-      const devices: Device[] = testee.listAllNetworkedDevices()
+      const devices: Device[] = testee.getConnectedDevices()
 
       expect(devices.length).toBeGreaterThan(0)
     })

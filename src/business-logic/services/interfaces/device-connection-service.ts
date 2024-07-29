@@ -7,7 +7,7 @@ export interface DeviceConnectionService {
   disconnectConnectionById(deviceId: string): Promise<DeviceConnectionStatus>
   removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus>
   connectionExists(deviceId: string): boolean
-  listAllNetworkedDevices(): Device[]
+  getConnectedDevices(): Device[]
   send(deviceId: string, params: string[]): Promise<void>
   listen(deviceId: string, callback: (data: unknown) => void): Promise<void>
 }
