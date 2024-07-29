@@ -30,6 +30,9 @@ import { StatusMessageService } from '../services/interfaces/status-message-serv
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
 import { DeviceServiceImplementation } from '../services/device-service-implementation'
 import { DeviceService } from '../services/interfaces/device-service'
+import { DeviceConnectionService } from '../services/interfaces/device-connection-service'
+import { DeviceConnectionServiceImplementation } from '../services/device-connection-service-implementation'
+import { FactoryFacade } from './factory-facade'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -152,6 +155,13 @@ export class ServiceFacade {
     return new DeviceServiceImplementation(
       RepositoryFacade.createDeviceRepository(),
       EventEmitterFacade.createDeviceEventEmitter()
+    )
+  }
+
+  public static createDeviceConnectionService(): DeviceConnectionService {
+    return new DeviceConnectionServiceImplementation(
+      FactoryFacade.createDeviceConnectionFactory(), 
+      LoggerFacade.createLogger()
     )
   }
 }

@@ -3,6 +3,10 @@ import { Device } from '../../model/entities/device'
 import { DeviceConnectionFactory } from './interfaces/device-connection-factory'
 import { DeviceConnection } from './interfaces/device-connection'
 import { DeviceConnectionStatus } from '../../model/enums/device-connection-status'
+import { DeviceAlreadyConnectedException } from '../../model/exceptions/device-already-connected-exception'
+import { DeviceNotFoundException } from '../../model/exceptions/device-not-found-exception'
+import { DeviceAlreadyRemovedException } from '../../model/exceptions/device-already-removed-exception'
+import { Logger } from '@tv2media/logger/*'
 
 type DeviceAggregate = {
   deviceConnection: DeviceConnection,
@@ -12,18 +16,20 @@ type DeviceAggregate = {
 export class DeviceConnectionServiceImplementation implements DeviceConnectionService {
   private readonly connectedDevices: Map<string, DeviceAggregate> = new Map()
 
-  constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory) {
+  constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory, private readonly logger: Logger) {
   }
 
   public async createConnection(device: Device): Promise<DeviceConnectionStatus> {
     if (this.connectedDevices.has(device.id)) {
-      throw new DeviceAlreadyConnectedError(device.id)
+      throw new DeviceAlreadyConnectedException(device.id)
     }
     const deviceConnection: DeviceConnection = this.deviceConnectionFactory.createDeviceConnection(device)
 
     await deviceConnection.connect()
 
     this.connectedDevices.set(device.id, {deviceConnection, device})
+    this.logger.info(`Device ${device.id} of type ${device.type} connected`)
+
 
     return DeviceConnectionStatus.CONNECTED
   }
@@ -31,7 +37,7 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
   public async send(deviceId: string, params: string[]): Promise<void> {
     const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
     if(connectedDevice === undefined) {
-      throw new DeviceNotFoundError(deviceId)
+      throw new DeviceNotFoundException(deviceId)
     }
 
     await connectedDevice.deviceConnection.send(deviceId, params)
@@ -40,7 +46,7 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
   public async listen(deviceId: string, _callback: (data: unknown) => void): Promise<void> {
     const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
     if(connectedDevice === undefined){
-      throw new DeviceNotFoundError(deviceId)
+      throw new DeviceNotFoundException(deviceId)
     }
 
     await connectedDevice.deviceConnection.listen(deviceId, _callback)
@@ -53,18 +59,23 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   public async disconnectConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
     await this.connectedDevices.get(deviceId)?.deviceConnection.disconnect()
+    this.logger.info(`Device ${deviceId} disconnected`)
     return DeviceConnectionStatus.DISCONNECTED
   }
 
   public async removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
     const device: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
     if (!device?.deviceConnection) {
-      throw new DeviceAlreadyRemovedError(deviceId)
+      throw new DeviceAlreadyRemovedException(deviceId)
     }
 
     await device.deviceConnection.disconnect()
+    this.logger.info(`Device ${deviceId} disconnected`)
+
 
     this.connectedDevices.delete(deviceId)
+    this.logger.info(`Device ${deviceId} removed`)
+
 
     return DeviceConnectionStatus.DISCONNECTED
   }
@@ -77,25 +88,3 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     return Array.from(this.connectedDevices.values()).map(deviceAggregate => deviceAggregate.device)
   }
 }
-
-class DeviceAlreadyConnectedError extends Error {
-  constructor(deviceId: string) {
-    super(`Device with ID '${deviceId}' is already connected.`)
-    this.name = 'DeviceAlreadyConnectedError'
-  }
-}
-
-class DeviceAlreadyRemovedError extends Error {
-  constructor(deviceId: string) {
-    super(`Device with ID '${deviceId}' is already removed.`)
-    this.name = 'DeviceAlreadyRemovedError'
-  }
-}
-
-class DeviceNotFoundError extends Error {
-  constructor(deviceId: string) {
-    super(`Device with ID '${deviceId}' is not in the collection. Have you forgot to create the connection?`)
-    this.name = 'DeviceAlreadyRemovedError'
-  }
-}
-

@@ -5,6 +5,7 @@ import { DeviceConnectionFactory } from '../interfaces/device-connection-factory
 import { instance, mock, verify, when, capture, anyFunction } from '@typestrong/ts-mockito'
 import { INewsGatewayDeviceConnection } from '../inews-gateway-connection-implementation'
 import { DeviceConnectionStatus } from '../../../model/enums/device-connection-status'
+import { Logger } from '@tv2media/logger'
 
 type CallbackType = (data: unknown) => void
 
@@ -252,6 +253,8 @@ function createTestee(params?: {
   deviceConnectionFactory?: DeviceConnectionFactory
 }): DeviceConnectionServiceImplementation {
   return new DeviceConnectionServiceImplementation(
-    instance(params?.deviceConnectionFactory ?? mock<DeviceConnectionFactory>())
+    instance(params?.deviceConnectionFactory ?? mock<DeviceConnectionFactory>()),
+    instance(mock<Logger>()
+    )
   )
 }
