@@ -10,8 +10,8 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   private pingTimeout: NodeJS.Timeout
   private isConnectingOrDisconnecting: boolean = false
 
-  constructor(_device: Device) {
-    this.device = _device
+  constructor(device: Device) {
+    this.device = device
   }
 
   public async send(_deviceId: string, _params: string[]): Promise<void> {

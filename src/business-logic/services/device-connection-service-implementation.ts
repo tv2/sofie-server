@@ -2,6 +2,7 @@ import { DeviceConnectionService } from './interfaces/device-connection-service'
 import { Device } from '../../model/entities/device'
 import { DeviceConnectionFactory } from './interfaces/device-connection-factory'
 import { DeviceConnection } from './interfaces/device-connection'
+import { DeviceConnectionStatus } from '../../model/enums/device-connection-status'
 
 type DeviceAggregate = {
   deviceConnection: DeviceConnection,
@@ -98,7 +99,3 @@ class DeviceNotFoundError extends Error {
   }
 }
 
-export enum DeviceConnectionStatus {
-  DISCONNECTED = 0,
-  CONNECTED = 1
-}

@@ -1,9 +1,10 @@
-import { DeviceConnectionServiceImplementation, DeviceConnectionStatus } from '../device-connection-service-implementation'
+import { DeviceConnectionServiceImplementation } from '../device-connection-service-implementation'
 import { Device } from '../../../model/entities/device'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { DeviceConnectionFactory } from '../interfaces/device-connection-factory'
 import { instance, mock, verify, when, capture, anyFunction } from '@typestrong/ts-mockito'
 import { INewsGatewayDeviceConnection } from '../inews-gateway-connection-implementation'
+import { DeviceConnectionStatus } from '../../../model/enums/device-connection-status'
 
 type CallbackType = (data: unknown) => void
 

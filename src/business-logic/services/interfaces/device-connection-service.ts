@@ -1,5 +1,5 @@
 import { Device } from '../../../model/entities/device'
-import { DeviceConnectionStatus } from '../device-connection-service-implementation'
+import { DeviceConnectionStatus } from '../../../model/enums/device-connection-status'
 
 export interface DeviceConnectionService {
   createConnection(device: Device): Promise<DeviceConnectionStatus>
