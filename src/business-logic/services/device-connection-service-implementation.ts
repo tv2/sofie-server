@@ -1,7 +1,7 @@
 import { DeviceConnectionService } from './interfaces/device-connection-service'
 import { Device } from '../../model/entities/device'
 import { DeviceConnectionFactory } from './interfaces/device-connection-factory'
-import { DeviceConnection } from './interfaces/inewsgateway-device-connection'
+import { DeviceConnection } from './interfaces/device-connection'
 
 type DeviceAggregate = {
   deviceConnection: DeviceConnection,
@@ -15,7 +15,9 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
   }
 
   public async createConnection(device: Device): Promise<DeviceConnectionStatus> {
-    if (this.connectedDevices.has(device.id)) throw new DeviceAlreadyConnectedError(device.id)
+    if (this.connectedDevices.has(device.id)) {
+      throw new DeviceAlreadyConnectedError(device.id)
+    }
     const deviceConnection: DeviceConnection = this.deviceConnectionFactory.createDeviceConnection(device)
 
     await deviceConnection.connect()
@@ -26,17 +28,21 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
   }
 
   public async send(_deviceId: string, _params: string[]): Promise<void> {
-    const conDevice: DeviceAggregate | undefined = this.connectedDevices.get(_deviceId)
-    if(conDevice === undefined) throw new DeviceNotFoundError(_deviceId)
+    const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(_deviceId)
+    if(connectedDevice === undefined) {
+      throw new DeviceNotFoundError(_deviceId)
+    }
 
-    await conDevice?.deviceConnection.send(_deviceId, _params)
+    await connectedDevice.deviceConnection.send(_deviceId, _params)
   }
 
   public async listen(_deviceId: string, _callback: (data: unknown) => void): Promise<void> {
-    const conDevice: DeviceAggregate | undefined = this.connectedDevices.get(_deviceId)
-    if(conDevice === undefined) throw new DeviceNotFoundError(_deviceId)
+    const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(_deviceId)
+    if(connectedDevice === undefined){
+      throw new DeviceNotFoundError(_deviceId)
+    }
 
-    await conDevice?.deviceConnection.listen(_deviceId, _callback)
+    await connectedDevice.deviceConnection.listen(_deviceId, _callback)
   }
 
   public getConnectionStatusById(deviceId: string): DeviceConnectionStatus {
@@ -51,7 +57,9 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   public async removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
     const device: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
-    if (!device?.deviceConnection) throw new DeviceAlreadyRemovedError(deviceId)
+    if (!device?.deviceConnection) {
+      throw new DeviceAlreadyRemovedError(deviceId)
+    }
 
     await device.deviceConnection.disconnect()
 

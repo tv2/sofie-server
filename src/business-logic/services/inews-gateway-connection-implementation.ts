@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws'
 import { Device } from '../../model/entities/device'
-import { DeviceConnection } from './interfaces/inewsgateway-device-connection'
+import { DeviceConnection } from './interfaces/device-connection'
 
 export class INewsGatewayDeviceConnection implements DeviceConnection {
   private readonly device: Device

@@ -12,4 +12,4 @@ export interface INewsGatewayParams {
   content: string
 }
 
-export type ParamsList = INewsGatewayDeviceConnection
+export type ParamsList = INewsGatewayDeviceConnection //TODO: Fix this mess
