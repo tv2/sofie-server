@@ -7,6 +7,7 @@ import { DeviceAlreadyConnectedException } from '../../model/exceptions/device-a
 import { DeviceNotFoundException } from '../../model/exceptions/device-not-found-exception'
 import { DeviceAlreadyRemovedException } from '../../model/exceptions/device-already-removed-exception'
 import { Logger } from '@tv2media/logger/*'
+import { DeviceService } from './interfaces/device-service'
 
 type DeviceAggregate = {
   deviceConnection: DeviceConnection,
@@ -16,7 +17,9 @@ type DeviceAggregate = {
 export class DeviceConnectionServiceImplementation implements DeviceConnectionService {
   private readonly connectedDevices: Map<string, DeviceAggregate> = new Map()
 
-  constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory, private readonly logger: Logger) {
+  constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory, private readonly deviceService: DeviceService, private readonly logger: Logger) {
+    this.deviceService = deviceService
+    this.initialize(this.deviceService).then
   }
 
   public async createConnection(device: Device): Promise<DeviceConnectionStatus> {
@@ -86,5 +89,10 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   public getConnectedDevices(): Device[] {
     return Array.from(this.connectedDevices.values()).map(deviceAggregate => deviceAggregate.device)
+  }
+
+  private async initialize(deviceService: DeviceService): Promise<void> {
+    const devices: Device[] = await deviceService.getDevices()
+    await Promise.all(devices.map(device => this.createConnection(device)))
   }
 }

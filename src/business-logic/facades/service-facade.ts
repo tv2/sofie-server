@@ -161,6 +161,7 @@ export class ServiceFacade {
   public static createDeviceConnectionService(): DeviceConnectionService {
     return new DeviceConnectionServiceImplementation(
       FactoryFacade.createDeviceConnectionFactory(), 
+      ServiceFacade.createDeviceService(),
       LoggerFacade.createLogger()
     )
   }
