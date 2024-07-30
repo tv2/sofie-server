@@ -5,6 +5,7 @@ import { DeviceType } from '../../../model/enums/device-type'
 
 export class Tv2EmptyGraphicsCommandTimelineObjectFactory implements Tv2GraphicsCommandTimelineObjectFactory {
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createAllOutGraphicsTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration): EmptyTimelineObject {
     return this.createNeverTimelineObject()
   }
@@ -21,6 +22,7 @@ export class Tv2EmptyGraphicsCommandTimelineObjectFactory implements Tv2Graphics
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createClearGraphicsTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration): EmptyTimelineObject {
     return this.createNeverTimelineObject()
   }
@@ -33,6 +35,7 @@ export class Tv2EmptyGraphicsCommandTimelineObjectFactory implements Tv2Graphics
     return this.createNeverTimelineObject()
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createThemeOutTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration): EmptyTimelineObject {
     return this.createNeverTimelineObject()
   }

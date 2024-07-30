@@ -14,6 +14,7 @@ import { Studio } from '../../../model/entities/studio'
 import { StudioLayer } from '../../../model/value-objects/studio-layer'
 import { LookaheadMode } from '../../../model/enums/lookahead-mode'
 import { LastPartInRundownException } from '../../../model/exceptions/last-part-in-rundown-exception'
+import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -183,7 +184,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         })
       })
 
-      describe('active Part has one Piece', () => {
+      describe('when the active part has one piece', () => {
         describe('creates a Piece control group on the active group', () => {
           it('sets correct control group id for Piece on active group', async () => {
             const piece: Piece = EntityMockFactory.createPiece({
@@ -489,31 +490,63 @@ describe(SuperflyTimelineBuilder.name, () => {
                 )
               })
 
-              it('sets the TimelineEnable.start for unplanned piece to Piece.start', async () => {
-                const piece: Piece = EntityMockFactory.createPiece({
-                  transitionType: TransitionType.NO_TRANSITION,
-                  isPlanned: false,
-                  start: 10,
+              describe('when piece is unplanned', () => {
+                describe('when piece is inserted on air', () => {
+                  it('ignores the piece start delay duration for TimelineEnable.start', async () => {
+                    const piece: Piece = EntityTestFactory.createPiece({
+                      transitionType: TransitionType.NO_TRANSITION,
+                      isPlanned: false,
+                      isInsertedOnAir: true,
+                      start: 10,
+                    })
+                    const activePart: Part = EntityMockFactory.createPart(
+                      {pieces: [piece]},
+                      {partTimings: {delayStartOfPiecesDuration: 50}}
+                    )
+                    const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+
+                    const testee: TimelineBuilder = createTestee()
+                    const timeline: Timeline = await testee.buildTimeline(rundown, createBasicStudioMock())
+
+                    const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find((group) =>
+                      group.id.includes(ACTIVE_GROUP_PREFIX)
+                    )!
+                    const controlObject: TimelineObject = activeGroup.children.find((child) =>
+                      child.id.includes(PIECE_CONTROL_INFIX)
+                    )!
+
+                    expect(controlObject.enable.start).toBe(10)
+                  })
                 })
-                const activePart: Part = EntityMockFactory.createPart(
-                  {pieces: [piece]},
-                  {partTimings: {delayStartOfPiecesDuration: 50}}
-                )
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
 
-                const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline = await testee.buildTimeline(rundown, createBasicStudioMock())
+                describe('when piece is inserted off air', () => {
+                  it('adds the piece start delay duration for TimelineEnable.start', async () => {
+                    const piece: Piece = EntityMockFactory.createPiece({
+                      transitionType: TransitionType.NO_TRANSITION,
+                      isPlanned: false,
+                      isInsertedOnAir: false,
+                      start: 10,
+                    })
+                    const activePart: Part = EntityMockFactory.createPart(
+                      {pieces: [piece]},
+                      {partTimings: {delayStartOfPiecesDuration: 50}}
+                    )
+                    const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
 
-                const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find((group) =>
-                  group.id.includes(ACTIVE_GROUP_PREFIX)
-                )!
-                const controlObject: TimelineObject = activeGroup.children.find((child) =>
-                  child.id.includes(PIECE_CONTROL_INFIX)
-                )!
+                    const testee: TimelineBuilder = createTestee()
+                    const timeline: Timeline = await testee.buildTimeline(rundown, createBasicStudioMock())
 
-                expect(controlObject.enable.start).toBe(piece.getStart())
+                    const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find((group) =>
+                      group.id.includes(ACTIVE_GROUP_PREFIX)
+                    )!
+                    const controlObject: TimelineObject = activeGroup.children.find((child) =>
+                      child.id.includes(PIECE_CONTROL_INFIX)
+                    )!
+
+                    expect(controlObject.enable.start).toBe(60)
+                  })
+                })
               })
-
             })
 
             describe('Piece has a duration', () => {

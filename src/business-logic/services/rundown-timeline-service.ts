@@ -240,7 +240,6 @@ export class RundownTimelineService implements RundownService {
     await this.buildAndPersistTimeline(rundown)
 
     this.rundownEventEmitter.emitResetEvent(rundown)
-    this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.saveRundown(rundown)
   }

@@ -24,6 +24,7 @@ export interface PieceInterface {
   content?: unknown
   tags: string[]
   isUnsynced: boolean
+  isInsertedOnAir?: boolean
 }
 
 export class Piece {
@@ -46,6 +47,7 @@ export class Piece {
   private duration?: number
   private executedAt: number
   private isUnsyncedPiece: boolean = false
+  private isPieceInsertedOnAir: boolean // TODO: Add getter and setter to make it better feta
 
   constructor(piece: PieceInterface) {
     this.id = piece.id
@@ -65,6 +67,7 @@ export class Piece {
     this.content = piece.content
     this.tags = piece.tags
     this.isUnsyncedPiece = piece.isUnsynced
+    this.isPieceInsertedOnAir = piece.isInsertedOnAir ?? false
 
     this.setExecutedAt(piece.executedAt ?? 0)
   }
@@ -133,6 +136,14 @@ export class Piece {
 
   public getDuration(): number | undefined {
     return this.duration
+  }
+
+  public isInsertedOnAir(): boolean {
+    return this.isPieceInsertedOnAir
+  }
+
+  public markAsInsertedOnAir(): void {
+    this.isPieceInsertedOnAir = true
   }
 
   public getUnsyncedCopy(): Piece {

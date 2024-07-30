@@ -8,6 +8,7 @@ import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
+import { TransitionType } from '../../enums/transition-type'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -55,12 +56,20 @@ export class EntityTestFactory {
     return new Piece({
       id: 'pieceId' + Math.floor(Math.random() * 1000),
       partId: 'partId',
+      layer: 'some_layer',
       name: 'pieceName',
-      duration: 420,
       start: 0,
       pieceLifespan: PieceLifespan.WITHIN_PART,
+      isPlanned: false,
+      preRollDuration: 0,
+      postRollDuration: 0,
+      transitionType: TransitionType.NO_TRANSITION,
+      timelineObjects: [],
+
+      tags: [],
+      isUnsynced: false,
       ...pieceInterface
-    } as PieceInterface)
+    })
   }
 
   public static createDevice(device: Partial<Device> = {}): Device {

@@ -202,6 +202,7 @@ export class Part {
     if (this.isPartOnAir) {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
+      unPlannedPiece.markAsInsertedOnAir()
     }
     this.pieces.push(unPlannedPiece)
   }

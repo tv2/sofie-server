@@ -1,38 +1,34 @@
-name: 'Check'
-run-name: 'Test, build, lint and validate'
+name: "Check"
+run-name: "Test, build, lint and validate"
+
 on:
   pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-
-  test:
-    runs-on: 'ubuntu-latest'
-    name: 'Checking code and dependencies'
+  build-test-lint-validate:
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - { name: "Build", action: "build" }
+          - { name: "Test", action: "test" }
+          - { name: "Lint", action: "lint" }
+          - { name: "Validate", action: "validate" }
+    name: "${{ matrix.job.name }}"
     steps:
-      - uses: 'actions/checkout@v3'
+      - uses: actions/checkout@v4
 
-      - name: 'Get Yarn cache directory path'
-        id: 'yarn-cache-directory-path'
-        run: 'echo "directory=$(yarn cache dir)" >> $GITHUB_OUTPUT'
-
-      - name: 'Cache Yarn cache directory'
-        uses: 'actions/cache@v3'
+      - uses: actions/setup-node@v4
         with:
-          path: ${{ steps.yarn-cache-directory-path.outputs.directory }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: "yarn"
 
-      - name: 'Install dependencies'
-        run: 'yarn install'
+      - name: "Install dependencies"
+        run: "yarn install"
 
-      - name: 'Build'
-        run: 'yarn build'
-
-      - name: 'Test'
-        run: 'yarn test'
-
-      - name: 'Lint'
-        run: 'yarn lint'
-
-      - name: 'Validate dependencies'
-        run: 'yarn validate'
+      - name: "${{ matrix.job.name }}"
+        run: "yarn ${{ matrix.job.action }}"
