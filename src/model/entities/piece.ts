@@ -47,7 +47,7 @@ export class Piece {
   private duration?: number
   private executedAt: number
   private isUnsyncedPiece: boolean = false
-  private isPieceInsertedOnAir: boolean // TODO: Add getter and setter to make it better feta
+  private isPieceInsertedOnAir: boolean
 
   constructor(piece: PieceInterface) {
     this.id = piece.id
