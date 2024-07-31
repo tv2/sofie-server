@@ -65,7 +65,6 @@ export class EntityTestFactory {
       postRollDuration: 0,
       transitionType: TransitionType.NO_TRANSITION,
       timelineObjects: [],
-
       tags: [],
       isUnsynced: false,
       ...pieceInterface
