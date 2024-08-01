@@ -26,7 +26,12 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     if (this.connectedDevices.has(device.id)) {
       throw new DeviceAlreadyConnectedException(device.id)
     }
-    const deviceConnection: DeviceConnection = this.deviceConnectionFactory.createDeviceConnection(device)
+    const deviceConnection: DeviceConnection | undefined = this.deviceConnectionFactory.createDeviceConnection(device)
+
+    if(typeof deviceConnection === 'undefined'){
+      this.logger.debug(`createConnection exited due to unsupported device ${device}`)
+      return DeviceConnectionStatus.DISCONNECTED
+    }
 
     await deviceConnection.connect()
 

@@ -12,3 +12,5 @@ dist/
 # Ignore VSCode specifics
 .vscode
 
+# Custom ingores
+**/*-integration-tests.spec.ts
