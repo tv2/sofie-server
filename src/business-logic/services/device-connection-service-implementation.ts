@@ -38,7 +38,6 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     this.connectedDevices.set(device.id, {deviceConnection, device})
     this.logger.info(`Device ${device.id} of type ${device.type} connected`)
 
-
     return DeviceConnectionStatus.CONNECTED
   }
 
