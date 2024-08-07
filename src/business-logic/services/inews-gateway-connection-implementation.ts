@@ -45,8 +45,7 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   
       } catch (error) {
         INewsGatewayDeviceConnection.device.isConnected = false
-        reject(new Error('WebSocket connection failed: ' + error))
-        return false
+        reject(error)
       } finally {
         this.isConnectingOrDisconnecting = false
       }
@@ -99,7 +98,7 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   }
 
   public async disconnect(): Promise<boolean> {
-    return new Promise<boolean>((_resolve, reject) => { 
+    return new Promise<boolean>((resolve, reject) => { 
       if (this.isConnectingOrDisconnecting) {
         return reject(new Error('Device is already connecting or disconnecting.'))
       }
@@ -111,10 +110,10 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
         }
      
         INewsGatewayDeviceConnection.device.isConnected = false
-        return true
+        resolve
       } catch (error) {
         INewsGatewayDeviceConnection.device.isConnected = true
-        return false
+        reject(error)
       } finally {
         this.isConnectingOrDisconnecting = false
       }
