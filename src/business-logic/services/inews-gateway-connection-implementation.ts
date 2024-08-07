@@ -1,5 +1,5 @@
 import { WebSocket } from 'ws'
-import { Device, INewsGatewayDevice } from '../../model/entities/device'
+import { Device } from '../../model/entities/device'
 import { DeviceConnection } from './interfaces/device-connection'
 import { DeviceType } from '../../model/enums/device-type'
 import { Logger } from '@tv2media/logger/*'
