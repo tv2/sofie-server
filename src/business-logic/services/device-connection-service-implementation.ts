@@ -18,7 +18,13 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory, private readonly deviceService: DeviceService, private readonly logger: Logger) {
     this.deviceService = deviceService
-    this.initialize(this.deviceService).then
+    this.initialize(this.deviceService)
+      .then(() => {
+        logger.debug('Initialization of DeviceConnectionService done')
+      })
+      .catch((error) => {
+        logger.error(`Initialization of DeviceConnectionService failed with error: ${error}`)
+      })
   }
 
   public async createConnection(device: Device): Promise<void> {
