@@ -68,10 +68,6 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
     })
 
     this.client.on('close', (code, reason) => {
-      if (this.pingTimeout !== null) {
-        clearTimeout(this.pingTimeout)
-      }
-
       if (INewsGatewayDeviceConnection.device.isConnected) {
         INewsGatewayDeviceConnection.device.isConnected = false
       }

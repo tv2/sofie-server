@@ -17,7 +17,6 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
   private readonly connectedDevices: Map<string, DeviceAggregate> = new Map()
 
   constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory, private readonly deviceService: DeviceService, private readonly logger: Logger) {
-    this.deviceService = deviceService
     this.initialize(this.deviceService)
       .then(() => {
         logger.debug('Initialization of DeviceConnectionService done')
@@ -25,6 +24,11 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
       .catch((error) => {
         logger.error(`Initialization of DeviceConnectionService failed with error: ${error}`)
       })
+  }
+
+  private async initialize(deviceService: DeviceService): Promise<void> {
+    const devices: Device[] = await deviceService.getDevices()
+    await Promise.all(devices.map(device => this.createConnection(device)))
   }
 
   public async createConnection(device: Device): Promise<void> {
@@ -98,10 +102,5 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   public getConnectedDevices(): Device[] {
     return Array.from(this.connectedDevices.values()).map(deviceAggregate => deviceAggregate.device)
-  }
-
-  private async initialize(deviceService: DeviceService): Promise<void> {
-    const devices: Device[] = await deviceService.getDevices()
-    await Promise.all(devices.map(device => this.createConnection(device)))
   }
 }
