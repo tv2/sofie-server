@@ -7,6 +7,7 @@ import { INewsGatewayDeviceConnection } from '../inews-gateway-connection-implem
 import { DeviceConnectionStatus } from '../../../model/enums/device-connection-status'
 import { Logger } from '@tv2media/logger'
 import { DeviceService } from '../interfaces/device-service'
+import { DeviceNotFoundException } from '../../../model/exceptions/device-not-found-exception'
 
 type CallbackType = (data: unknown) => void
 
@@ -24,9 +25,8 @@ describe(DeviceConnectionServiceImplementation.name, () => {
         when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
         const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
         
-        const deviceConnectionStatus: DeviceConnectionStatus = await testee.createConnection(device)
+        expect(await testee.createConnection(device)).resolves
   
-        expect(deviceConnectionStatus).toBe(DeviceConnectionStatus.CONNECTED)
         verify(factoryMock.createDeviceConnection(device)).called()
       })
     })
@@ -172,9 +172,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
         const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
       
         await testee.createConnection(device)
-        const connectionStatus: DeviceConnectionStatus = await testee.disconnectConnectionById(device.id)
-
-        expect(connectionStatus).toBe(DeviceConnectionStatus.DISCONNECTED)
+        expect(await testee.disconnectConnectionById(device.id)).resolves
       })
     })
 
@@ -190,9 +188,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
         when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
         const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
       
-        const connectionStatus: DeviceConnectionStatus = await testee.disconnectConnectionById(device.id)
-
-        expect(connectionStatus).toBe(DeviceConnectionStatus.DISCONNECTED)
+        expect(await testee.disconnectConnectionById(device.id)).resolves
       })    
     })
   })
@@ -211,9 +207,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
         const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
       
         await testee.createConnection(device)
-        const connectionStatus: DeviceConnectionStatus = await testee.removeConnectionById(device.id)
-
-        expect(connectionStatus).toBe(DeviceConnectionStatus.DISCONNECTED)
+        expect(await testee.removeConnectionById(device.id)).resolves
       })
     })
 
@@ -229,7 +223,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
         when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
         const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
       
-        await expect(testee.removeConnectionById(device.id)).rejects.toThrow(`Device with ID '${device.id}' is already removed.`)
+        await expect(testee.removeConnectionById(device.id)).rejects.toThrow(DeviceNotFoundException)
       })
     })
   })
@@ -286,9 +280,9 @@ describe(DeviceConnectionServiceImplementation.name, () => {
       const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
     
       await testee.createConnection(device)
-      const devices2: Device[] = testee.getConnectedDevices()
+      const connectedDevices: Device[] = testee.getConnectedDevices()
 
-      expect(devices2.length).toBeGreaterThan(0)
+      expect(connectedDevices.length).toBeGreaterThan(0)
     })
   })
 })

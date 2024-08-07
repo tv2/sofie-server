@@ -5,7 +5,6 @@ import { DeviceConnection } from './interfaces/device-connection'
 import { DeviceConnectionStatus } from '../../model/enums/device-connection-status'
 import { DeviceAlreadyConnectedException } from '../../model/exceptions/device-already-connected-exception'
 import { DeviceNotFoundException } from '../../model/exceptions/device-not-found-exception'
-import { DeviceAlreadyRemovedException } from '../../model/exceptions/device-already-removed-exception'
 import { Logger } from '@tv2media/logger/*'
 import { DeviceService } from './interfaces/device-service'
 
@@ -22,7 +21,7 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     this.initialize(this.deviceService).then
   }
 
-  public async createConnection(device: Device): Promise<DeviceConnectionStatus> {
+  public async createConnection(device: Device): Promise<void> {
     if (this.connectedDevices.has(device.id)) {
       throw new DeviceAlreadyConnectedException(device.id)
     }
@@ -30,7 +29,7 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
     if(typeof deviceConnection === 'undefined'){
       this.logger.debug(`createConnection exited due to unsupported device ${device}`)
-      return DeviceConnectionStatus.DISCONNECTED
+      return 
     }
 
     await deviceConnection.connect()
@@ -38,7 +37,7 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     this.connectedDevices.set(device.id, {deviceConnection, device})
     this.logger.info(`Device ${device.id} of type ${device.type} connected`)
 
-    return DeviceConnectionStatus.CONNECTED
+    return
   }
 
   public async send(deviceId: string, params: string[]): Promise<void> {
@@ -64,16 +63,16 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     return this.connectedDevices.has(deviceId) ? DeviceConnectionStatus.CONNECTED : DeviceConnectionStatus.DISCONNECTED 
   }
 
-  public async disconnectConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
+  public async disconnectConnectionById(deviceId: string): Promise<void> {
     await this.connectedDevices.get(deviceId)?.deviceConnection.disconnect()
     this.logger.info(`Device ${deviceId} disconnected`)
-    return DeviceConnectionStatus.DISCONNECTED
+    return
   }
 
-  public async removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus> {
+  public async removeConnectionById(deviceId: string): Promise<void> {
     const device: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
-    if (!device?.deviceConnection) {
-      throw new DeviceAlreadyRemovedException(deviceId)
+    if (!device) {
+      throw new DeviceNotFoundException(deviceId)
     }
 
     await device.deviceConnection.disconnect()
@@ -84,7 +83,7 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     this.logger.info(`Device ${deviceId} removed`)
 
 
-    return DeviceConnectionStatus.DISCONNECTED
+    return
   }
 
   public connectionExists(deviceId: string): boolean {

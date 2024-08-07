@@ -7,9 +7,4 @@ export interface DeviceConnection {
   listen(deviceId: string, callback: (data: unknown) => void): Promise<void>
 }
 
-export interface INewsGatewayParams {
-  headline?: string
-  content: string
-}
-
 export type ParamsList = INewsGatewayDeviceConnection //TODO: Fix this mess

@@ -2,10 +2,10 @@ import { Device } from '../../../model/entities/device'
 import { DeviceConnectionStatus } from '../../../model/enums/device-connection-status'
 
 export interface DeviceConnectionService {
-  createConnection(device: Device): Promise<DeviceConnectionStatus>
+  createConnection(device: Device): Promise<void>
   getConnectionStatusById(deviceId: string): DeviceConnectionStatus
-  disconnectConnectionById(deviceId: string): Promise<DeviceConnectionStatus>
-  removeConnectionById(deviceId: string): Promise<DeviceConnectionStatus>
+  disconnectConnectionById(deviceId: string): Promise<void>
+  removeConnectionById(deviceId: string): Promise<void>
   connectionExists(deviceId: string): boolean
   getConnectedDevices(): Device[]
   send(deviceId: string, params: string[]): Promise<void>
