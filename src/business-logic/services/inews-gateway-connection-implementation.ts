@@ -68,9 +68,12 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
     })
 
     this.client.on('close', (code, reason) => {
-      if (INewsGatewayDeviceConnection.device.isConnected) {
-        INewsGatewayDeviceConnection.device.isConnected = false
+      if (this.pingTimeout !== null) {
+        clearTimeout(this.pingTimeout)
       }
+
+      INewsGatewayDeviceConnection.device.isConnected = false
+
       this.logger.info(`WebSocket closed: Code ${code}, Reason: ${reason}`)
 
       // reconnection logic
@@ -106,10 +109,7 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
         if (this.client.readyState === WebSocket.OPEN) {
           this.client.close()
         }
-    
-        if (this.pingTimeout !== null) {
-          clearTimeout(this.pingTimeout)
-        }      
+     
         INewsGatewayDeviceConnection.device.isConnected = false
         return true
       } catch (error) {
