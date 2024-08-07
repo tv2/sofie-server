@@ -17,7 +17,7 @@ export class DeviceConnectionFactoryImplementation implements DeviceConnectionFa
   public mapDeviceToDeviceConnection(device: Device): DeviceConnection | undefined {
     switch (device.type) {
       case DeviceType.INEWS_GATEWAY:
-        return new INewsGatewayDeviceConnection(device, LoggerFacade.createLogger())
+        return  INewsGatewayDeviceConnection.getInstance(device, LoggerFacade.createLogger())
       default:
         this.logger.info(`Unknown device type: ${device.type}`)
         return undefined
