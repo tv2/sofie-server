@@ -15,7 +15,6 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   private pingTimeout: NodeJS.Timeout | null = null
   private isConnectingOrDisconnecting: boolean = false
 
-  // Private constructor to enforce singleton pattern
   private constructor(private readonly device: Device, private readonly logger: Logger) {
     if (device?.type !== DeviceType.INEWS_GATEWAY) {
       throw new Error('Invalid device type')
@@ -25,7 +24,6 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
     console.log('ReconnectStrategy initialized:', this.reconnectStrategy)
   }
 
-  // Static method to get the singleton instance
   public static getInstance(device: Device, logger: Logger): INewsGatewayDeviceConnection {
     if (!INewsGatewayDeviceConnection.instance) {
       INewsGatewayDeviceConnection.instance = new INewsGatewayDeviceConnection(device, logger)
@@ -105,7 +103,6 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
 
       this.logger.info(`WebSocket closed: Code ${code}, Reason: ${reason}`)
 
-      // Reconnection logic
       this.reconnectStrategy.disconnected(() => {
         this.reconnect().catch(error => {
           this.logger.error('Error re-connecting:', error)
