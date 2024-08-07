@@ -9,6 +9,7 @@ import { LoggerFacade } from '../../logger/logger-facade'
 export class DeviceConnectionFactoryImplementation implements DeviceConnectionFactory {
   constructor(private readonly logger: Logger){
   }
+  
   public createDeviceConnection(device: Device): DeviceConnection | undefined {
     return this.mapDeviceToDeviceConnection(device)
   }
