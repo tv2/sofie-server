@@ -7,6 +7,7 @@ import { DeviceAlreadyConnectedException } from '../../model/exceptions/device-a
 import { DeviceNotFoundException } from '../../model/exceptions/device-not-found-exception'
 import { Logger } from '@tv2media/logger/*'
 import { DeviceService } from './interfaces/device-service'
+import { DeviceType } from '../../model/enums/device-type'
 
 type DeviceAggregate = {
   deviceConnection: DeviceConnection,
@@ -28,8 +29,23 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   private async initialize(deviceService: DeviceService): Promise<void> {
     const devices: Device[] = await deviceService.getDevices()
-    await Promise.all(devices.map(device => this.createConnection(device)))
+    
+    for (const device of devices) {
+      if (!this.connectionExists(device.type)) {
+        await this.createConnection(device)
+      }
+    }
   }
+
+  // Promise.all creates a race condition. Commented out until fixed.
+  // private async initialize(deviceService: DeviceService): Promise<void> {
+  //   const devices: Device[] = await deviceService.getDevices()
+  //   await Promise.all(devices.map(async device => {
+  //     if(!this.connectionExists(device.type)){
+  //       await this.createConnection(device)
+  //     }
+  //   }))
+  // }
 
   public async createConnection(device: Device): Promise<void> {
     if (this.connectedDevices.has(device.id)) {
@@ -96,9 +112,20 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     return
   }
 
-  public connectionExists(deviceId: string): boolean {
-    return this.connectedDevices.has(deviceId)
-  }
+  // Race conduition refactor
+  // public connectionExists(deviceType: DeviceType): boolean {
+  //   for (const value of this.connectedDevices.values()) {
+  //     const device: Device = value.device
+  //     if (device.type === deviceType) {
+  //       return true
+  //     }
+  //   }
+  //   return false  
+  // }
+
+  public connectionExists(deviceType: DeviceType): boolean {
+    return Array.from(this.connectedDevices.values()).some(deviceAggregate => deviceAggregate.device.type === deviceType)
+  }  
 
   public getConnectedDevices(): Device[] {
     return Array.from(this.connectedDevices.values()).map(deviceAggregate => deviceAggregate.device)

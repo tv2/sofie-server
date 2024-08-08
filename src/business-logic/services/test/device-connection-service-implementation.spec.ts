@@ -242,7 +242,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
         const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
 
         await testee.createConnection(device)
-        const isConnected: boolean = testee.connectionExists(device.id)
+        const isConnected: boolean = testee.connectionExists(device.type)
 
         expect(isConnected).toBeTruthy()
       })
@@ -260,7 +260,7 @@ describe(DeviceConnectionServiceImplementation.name, () => {
         when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
         const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
       
-        const isConnected: boolean = testee.connectionExists(device.id)
+        const isConnected: boolean = testee.connectionExists(device.type)
 
         expect(isConnected).toBeFalsy()
       })
