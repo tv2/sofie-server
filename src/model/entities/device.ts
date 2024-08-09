@@ -18,8 +18,10 @@ export interface CoreDevice extends BasicDevice {
 
 export interface INewsGatewayDevice extends BasicDevice {
   type: DeviceType.INEWS_GATEWAY
-  username: string
-  password: string
+  queues: string[] 
+  host: string
+  port: number
+  password?: string
 }
 
 export interface TelemetricsDevice extends BasicDevice {

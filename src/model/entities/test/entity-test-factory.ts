@@ -84,8 +84,10 @@ export class EntityTestFactory {
       statusMessage: '',
       isConnected: false,
       type: DeviceType.INEWS_GATEWAY,
-      username: 'testuser',
       password: 'testpassword',
+      host: 'ws://localhost',
+      port: 3008,
+      queues: ['NYHEDERNE-TEST.SOFIE.STAGING.GALLERY'],
       ...device
     }
   }

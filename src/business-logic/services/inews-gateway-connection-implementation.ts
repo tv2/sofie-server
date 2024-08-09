@@ -1,5 +1,5 @@
 import { WebSocket } from 'ws'
-import { Device } from '../../model/entities/device'
+import { Device, INewsGatewayDevice } from '../../model/entities/device'
 import { DeviceConnection } from './interfaces/device-connection'
 import { DeviceType } from '../../model/enums/device-type'
 import { Logger } from '@tv2media/logger/*'
@@ -18,6 +18,10 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   private constructor(private readonly device: Device, private readonly logger: Logger) {
     if (device?.type !== DeviceType.INEWS_GATEWAY) {
       throw new Error('Invalid device type')
+    }
+
+    if ((device as INewsGatewayDevice).queues === undefined) {
+      throw new Error('iNewsGatewayDevice not configured correctly. Remember to set up host, port and queues to listen to.')
     }
 
     this.reconnectStrategy = new FixedIntervalReconnectStrategy(this.logger)
@@ -66,8 +70,7 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
       this.isConnectingOrDisconnecting = true
 
       try {
-        this.client = new WebSocket(this.INEWS_GATEWAY_HOST)
-        this.initializeClientEvents()
+        this.initializeClientEvents(this.device as INewsGatewayDevice)
         resolve(true)
       } catch (error) {
         this.client = null
@@ -78,14 +81,29 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
     })
   }
 
-  private initializeClientEvents(): void {
+  private initializeClientEvents(iDevice: INewsGatewayDevice): void {
+    if (!iDevice || !iDevice.host || !iDevice.port) {
+      throw new Error('Invalid device parameters')
+    }
+
+    const queuesString: string = iDevice.queues.join(',')
+    const encodedQueues: string = encodeURIComponent(queuesString)
+    const url: string = `ws://${iDevice.host}:${iDevice.port}?queues=${encodedQueues}`
+
+
+    console.log('Queue Parameter:', queuesString)
+    console.log('WebSocket Parameter List:', encodedQueues)      
+    console.log('url:',url)
+    
+    this.client = new WebSocket(url)
+
     if (!this.client) return
 
     this.client.on('error', (error) => {
       this.logger.error('WebSocket error:', error)
       INewsGatewayDeviceConnection.instance!.device.isConnected = false
     })
-  
+
     this.client.on('open', () => {
       this.heartbeat()
     })
@@ -95,6 +113,8 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
     })
 
     this.client.on('close', (code, reason) => {
+      this.logger.info(`WebSocket closed. Code: ${code}, Reason: ${reason}`)
+
       if (this.pingTimeout !== null) {
         clearTimeout(this.pingTimeout)
       }

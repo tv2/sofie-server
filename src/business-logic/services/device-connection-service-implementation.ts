@@ -32,7 +32,11 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
     
     for (const device of devices) {
       if (!this.connectionExists(device.type)) {
-        await this.createConnection(device)
+        try {
+          await this.createConnection(device)
+        } catch(error) {
+          this.logger.error(error)
+        }
       }
     }
   }

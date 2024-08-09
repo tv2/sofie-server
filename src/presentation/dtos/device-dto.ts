@@ -22,20 +22,26 @@ export abstract class DeviceDto {
 
 export interface INewsDeviceDtoInterface {
   type: DeviceType.INEWS_GATEWAY
-  username: string
-  password: string
+  password: string | undefined
+  host: string
+  port: number
+  queues: string[]
 }
 
 export class INewsDeviceDto extends DeviceDto implements INewsDeviceDtoInterface {
   public readonly type: DeviceType.INEWS_GATEWAY
-  public readonly username: string
-  public readonly password: string
+  public readonly password: string | undefined
+  public readonly host: string
+  public readonly port: number
+  public readonly queues: string[]
 
   constructor(device: INewsGatewayDevice) {
     super(device)
     this.type = DeviceType.INEWS_GATEWAY
-    this.username = device.username
     this.password = device.password
+    this.host = device.host
+    this.port = device.port
+    this.queues = device.queues
   }
 }
 
