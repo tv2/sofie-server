@@ -9,8 +9,6 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   private static instance: INewsGatewayDeviceConnection | null = null
   private readonly reconnectStrategy: FixedIntervalReconnectStrategy
 
-  private readonly INEWS_GATEWAY_HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'ws://localhost:3008'
-
   private client: WebSocket | null = null
   private pingTimeout: NodeJS.Timeout | null = null
   private isConnectingOrDisconnecting: boolean = false
