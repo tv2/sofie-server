@@ -4,6 +4,10 @@ import { DeviceConnection } from './interfaces/device-connection'
 import { DeviceType } from '../../model/enums/device-type'
 import { Logger } from '@tv2media/logger/*'
 import { FixedIntervalReconnectStrategy } from './fixed-interval-reconnect-strategy'
+import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
+import { DeviceEventObserver } from '../../presentation/interfaces/device-event-observer'
+import {  DeviceEvent, DeviceReconnectingEvent } from '../../presentation/value-objects/device-event'
+import { DeviceEventType } from '../../presentation/enums/event-type'
 
 export class INewsGatewayDeviceConnection implements DeviceConnection {
   private static instance: INewsGatewayDeviceConnection | null = null
@@ -12,6 +16,8 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   private client: WebSocket | null = null
   private pingTimeout: NodeJS.Timeout | null = null
   private isConnectingOrDisconnecting: boolean = false
+
+  private readonly deviceEventObserver: DeviceEventObserver = EventEmitterFacade.createDeviceEventObserver()
 
   private constructor(private readonly device: Device, private readonly logger: Logger) {
     if (device?.type !== DeviceType.INEWS_GATEWAY) {
@@ -127,6 +133,26 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
         })
       })
     })
+    
+    this.deviceEventObserver.subscribeToDeviceEvents((deviceEvent) => {
+      if(this.isDeviceReconnectingEvent(deviceEvent)){
+        if(this.device.id === deviceEvent.deviceId) {
+          this.disconnect()
+            .then(()=> {
+              this.connect()
+                .catch(error => this.logger.error(error))
+            })
+            .catch(error => {
+              this.logger.error(error)
+            })
+          
+        }
+      }
+    })
+  }
+
+  private isDeviceReconnectingEvent(event: DeviceEvent): event is DeviceReconnectingEvent {
+    return event.type === DeviceEventType.DEVICE_RECONNECTING
   }
 
   private heartbeat(): void {
@@ -136,10 +162,11 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
 
     this.pingTimeout = setTimeout(() => {
       this.terminate()
-    }, 30000 + 1000)
+    }, 300_000 + 1_000)
   }
 
   private terminate(): void {
+    this.logger.debug('terminate() called on the websocket')
     if (this.client?.readyState === WebSocket.OPEN) {
       this.client.terminate()
     }  
@@ -154,7 +181,10 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
 
     try {
       if (this.client?.readyState === WebSocket.OPEN) {
-        this.client.close()
+        if (this.pingTimeout !== null) {
+          clearTimeout(this.pingTimeout)
+        }        
+        this.client.terminate()
       }
    
       INewsGatewayDeviceConnection.instance!.device.isConnected = false

@@ -6,4 +6,6 @@ export interface DeviceEventEmitter {
   emitDeviceUpdatedEvent(device: Device): void
 
   emitDeviceDeletedEvent(deviceId: string): void
+
+  emitDeviceReconnectingEvent(deviceId: string): void
 }

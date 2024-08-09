@@ -4,7 +4,10 @@ import { DeviceRepository } from '../../data-access/repositories/interfaces/devi
 import { DeviceEventEmitter } from './interfaces/device-event-emitter'
 
 export class DeviceServiceImplementation implements DeviceService {
-  constructor(private readonly deviceRepository: DeviceRepository, private readonly deviceEventEmitter: DeviceEventEmitter) {
+  constructor(
+    private readonly deviceRepository: DeviceRepository, 
+    private readonly deviceEventEmitter: DeviceEventEmitter
+  ) {
   }
 
   public async getDevices(): Promise<Device[]> {
@@ -28,5 +31,9 @@ export class DeviceServiceImplementation implements DeviceService {
   public async delete(deviceId: string): Promise<void> {
     await this.deviceRepository.delete(deviceId)
     this.deviceEventEmitter.emitDeviceDeletedEvent(deviceId)
+  }
+
+  public reconnect(deviceId: string): void {
+    this.deviceEventEmitter.emitDeviceReconnectingEvent(deviceId)
   }
 }

@@ -101,4 +101,17 @@ export class DeviceController extends BaseController {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
+
+  @PostRequest('/:deviceId/reconnect')
+  public reconnectDevice(request: Request, response: Response): void {
+    try {
+      const deviceId: string = request.params.deviceId
+
+      this.deviceService.reconnect(deviceId)
+      
+      response.send(this.httpResponseFormatter.formatSuccessResponse({ message: 'Device reconnected successfully.' }))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
 }

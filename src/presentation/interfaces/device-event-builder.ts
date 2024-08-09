@@ -1,5 +1,5 @@
 import {Device} from '../../model/entities/device'
-import {DeviceCreatedEvent, DeviceDeletedEvent, DeviceUpdatedEvent} from '../value-objects/device-event'
+import {DeviceCreatedEvent, DeviceDeletedEvent, DeviceReconnectingEvent, DeviceUpdatedEvent} from '../value-objects/device-event'
 
 export interface DeviceEventBuilder {
   buildDeviceCreatedEvent(device: Device): DeviceCreatedEvent
@@ -7,4 +7,6 @@ export interface DeviceEventBuilder {
   buildDeviceUpdatedEvent(device: Device): DeviceUpdatedEvent
 
   buildDeviceDeletedEvent(deviceId: string): DeviceDeletedEvent
+
+  buildDeviceReconnectingEvent(deviceId: string): DeviceReconnectingEvent
 }

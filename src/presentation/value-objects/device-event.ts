@@ -2,7 +2,7 @@ import { DeviceEventType } from '../enums/event-type'
 import { TypedEvent } from './typed-event'
 import { Device } from '../../model/entities/device'
 
-export type DeviceEvent = DeviceCreatedEvent | DeviceUpdatedEvent | DeviceDeletedEvent
+export type DeviceEvent = DeviceCreatedEvent | DeviceUpdatedEvent | DeviceDeletedEvent | DeviceReconnectingEvent
 
 export interface DeviceIdEvent extends TypedEvent {
   type: DeviceEventType,
@@ -21,5 +21,10 @@ export interface DeviceUpdatedEvent extends TypedEvent {
 
 export interface DeviceDeletedEvent extends DeviceIdEvent {
   type: DeviceEventType.DEVICE_DELETED
+  deviceId: string
+}
+
+export interface DeviceReconnectingEvent extends DeviceIdEvent {
+  type: DeviceEventType.DEVICE_RECONNECTING
   deviceId: string
 }
