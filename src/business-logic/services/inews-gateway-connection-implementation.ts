@@ -75,8 +75,6 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
     }
 
     const url: string = this.buildWebSocketUrl(iDevice)
-    console.log('WebSocket Parameter List:', encodeURIComponent(iDevice.queues.join(',')))
-    console.log('url:', url)
 
     this.client = new WebSocket(url)
 
