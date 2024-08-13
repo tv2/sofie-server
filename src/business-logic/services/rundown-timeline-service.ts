@@ -22,6 +22,7 @@ import { IngestedRundownRepository } from '../../data-access/repositories/interf
 import { RundownMode } from '../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../model/exceptions/already-rehearsal-exception'
 import { IngestService } from './interfaces/ingest-service'
+import got from 'got'
 
 export class RundownTimelineService implements RundownService {
   constructor(
@@ -94,6 +95,7 @@ export class RundownTimelineService implements RundownService {
   private async buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
     const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
     await this.timelineRepository.saveTimeline(timeline)
+    got.post('http://localhost:6666/timeline', { json: timeline.timelineGroups }).then(() => console.log('Timeline is sent.')).catch(error => console.log('Failed sending timeline:', error))
     return timeline
   }
 
