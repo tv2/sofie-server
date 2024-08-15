@@ -125,6 +125,7 @@ export interface MongoPiece extends MongoId {
   content?: unknown
   tags: string[]
   isUnsynced: boolean
+  isInsertedOnAir?: boolean
 }
 
 export interface MongoTimeline extends MongoId {
@@ -376,7 +377,8 @@ export class MongoEntityConverter {
   public convertToPiece(mongoPiece: MongoPiece): Piece {
     return new Piece({
       ...mongoPiece,
-      id: mongoPiece._id
+      id: mongoPiece._id,
+      isInsertedOnAir: mongoPiece.isInsertedOnAir,
     })
   }
 
@@ -402,7 +404,8 @@ export class MongoEntityConverter {
       metadata: piece.metadata,
       content: piece.content,
       isUnsynced: piece.isUnsynced(),
-      tags: piece.tags
+      tags: piece.tags,
+      isInsertedOnAir: piece.isInsertedOnAir(),
     }
   }
 
