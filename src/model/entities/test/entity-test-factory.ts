@@ -7,7 +7,7 @@ import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
-import { Device, INewsGatewayDevice, TelemetricsDevice } from '../device'
+import { Device } from '../device'
 import { DeviceType } from '../../enums/device-type'
 
 export class EntityTestFactory {
@@ -72,33 +72,6 @@ export class EntityTestFactory {
       statusMessage: '',
       isConnected: false,
       type: DeviceType.ABSTRACT,
-      ...device
-    }
-  }
-
-  public static createINewsGatewayDevice(device: Partial<INewsGatewayDevice> = {}): INewsGatewayDevice {
-    return {
-      id: 'deviceId',
-      name: 'deviceName',
-      statusCode: StatusCode.UNKNOWN,
-      statusMessage: '',
-      isConnected: false,
-      type: DeviceType.INEWS_GATEWAY,
-      username: 'testuser',
-      password: 'testpassword',
-      ...device
-    }
-  }
-
-  public static createTelemetricsDevice(device: Partial<TelemetricsDevice> = {}): TelemetricsDevice {
-    return {
-      id: 'deviceId',
-      name: 'deviceName',
-      statusCode: StatusCode.UNKNOWN,
-      statusMessage: '',
-      isConnected: false,
-      type: DeviceType.TELEMETRICS,
-      host: 'testhost',
       ...device
     }
   }

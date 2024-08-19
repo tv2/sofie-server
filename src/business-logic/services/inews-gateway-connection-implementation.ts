@@ -1,23 +1,24 @@
 import { WebSocket } from 'ws'
-import { Device } from '../../model/entities/device'
+import { INewsGatewayDevice } from '../../model/entities/device'
 import { DeviceConnection } from './interfaces/device-connection'
 import { DeviceType } from '../../model/enums/device-type'
 import { Logger } from '@tv2media/logger/*'
+import {DeviceAlreadyConnectedException} from '../../model/exceptions/device-already-connected-exception'
 
 export class INewsGatewayDeviceConnection implements DeviceConnection {
-  private static device: Device
+  private readonly device: INewsGatewayDevice
   private readonly INEWS_GATEWAY_HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'ws://localhost:3008'
 
   private client: WebSocket
   private pingTimeout: NodeJS.Timeout
   private isConnectingOrDisconnecting: boolean = false
 
-  constructor(device: Device, private readonly logger: Logger) {
-    if(INewsGatewayDeviceConnection.device?.type === DeviceType.INEWS_GATEWAY){
-      return 
+  constructor(device: INewsGatewayDevice, private readonly logger: Logger) {
+    if(this.device?.type === DeviceType.INEWS_GATEWAY){
+      return
     }
 
-    INewsGatewayDeviceConnection.device = device
+    this.device = device
   }
 
   public async send(_deviceId: string, _params: string[]): Promise<void> {
@@ -34,17 +35,17 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   public async connect(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       if (this.isConnectingOrDisconnecting) {
-        return reject(new Error('Device is already connecting or disconnecting.'))
+        throw new DeviceAlreadyConnectedException('Tried to connecting device but it was already connecting/disconnecting.')
       }
 
       try {
         this.client = new WebSocket(this.INEWS_GATEWAY_HOST)
         this.initializeClientEvents()
-        INewsGatewayDeviceConnection.device.isConnected = true
+        this.device.isConnected = true
         resolve(true)
-  
+
       } catch (error) {
-        INewsGatewayDeviceConnection.device.isConnected = false
+        this.device.isConnected = false
         reject(error)
       } finally {
         this.isConnectingOrDisconnecting = false
@@ -55,9 +56,9 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   private initializeClientEvents(): boolean {
     this.client.on('error', (error) => {
       this.logger.error('WebSocket error:', error)
-      INewsGatewayDeviceConnection.device.isConnected = false
+      this.device.isConnected = false
     })
-  
+
     this.client.on('open', () => {
       this.heartbeat()
     })
@@ -71,14 +72,14 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
         clearTimeout(this.pingTimeout)
       }
 
-      INewsGatewayDeviceConnection.device.isConnected = false
+      this.device.isConnected = false
 
       this.logger.info(`WebSocket closed: Code ${code}, Reason: ${reason}`)
 
       // reconnection logic
     })
 
-    return INewsGatewayDeviceConnection.device.isConnected
+    return this.device.isConnected
   }
 
   private heartbeat(): void {
@@ -92,13 +93,13 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
   }
 
   private terminate(): void {
-    if (this.client.readyState === WebSocket.OPEN) {
+    if (this.client.readyState !== WebSocket.OPEN) {
       this.client.terminate()
-    }  
+    }
   }
 
   public async disconnect(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => { 
+    return new Promise<boolean>((resolve, reject) => {
       if (this.isConnectingOrDisconnecting) {
         return reject(new Error('Device is already connecting or disconnecting.'))
       }
@@ -108,11 +109,11 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
         if (this.client.readyState === WebSocket.OPEN) {
           this.client.close()
         }
-     
-        INewsGatewayDeviceConnection.device.isConnected = false
-        resolve
+
+        this.device.isConnected = false
+        resolve(true)
       } catch (error) {
-        INewsGatewayDeviceConnection.device.isConnected = true
+        this.device.isConnected = true
         reject(error)
       } finally {
         this.isConnectingOrDisconnecting = false
@@ -120,4 +121,3 @@ export class INewsGatewayDeviceConnection implements DeviceConnection {
     })
   }
 }
-  
