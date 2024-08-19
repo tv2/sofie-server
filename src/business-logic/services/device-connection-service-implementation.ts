@@ -67,7 +67,6 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
   public async disconnectConnectionById(deviceId: string): Promise<void> {
     await this.connectedDevices.get(deviceId)?.deviceConnection.disconnect()
     this.logger.info(`Device ${deviceId} disconnected`)
-    return
   }
 
   public async removeConnectionById(deviceId: string): Promise<void> {
@@ -82,9 +81,6 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
     this.connectedDevices.delete(deviceId)
     this.logger.info(`Device ${deviceId} removed`)
-
-
-    return
   }
 
   public connectionExists(deviceId: string): boolean {
