@@ -1,34 +1,35 @@
-import {DeviceConnectionServiceImplementation} from '../device-connection-service-implementation'
+import { DeviceConnectionServiceImplementation } from '../device-connection-service-implementation'
 import { Device } from '../../../model/entities/device'
-import {EntityTestFactory} from '../../../model/entities/test/entity-test-factory'
-import {DeviceConnectionFactory} from '../interfaces/device-connection-factory'
-import {anyFunction, capture, instance, mock, verify, when} from '@typestrong/ts-mockito'
-import {INewsGatewayDeviceConnection} from '../inews-gateway-connection-implementation'
-import {DeviceConnectionStatus} from '../../../model/enums/device-connection-status'
-import {DeviceService} from '../interfaces/device-service'
-import {DeviceNotFoundException} from '../../../model/exceptions/device-not-found-exception'
-import {DeviceType} from '../../../model/enums/device-type'
-import {Logger} from '../../../logger/logger'
+import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
+import { DeviceConnectionFactory } from '../interfaces/device-connection-factory'
+import { anyFunction, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { INewsGatewayDeviceConnection } from '../inews-gateway-connection-implementation'
+import { DeviceConnectionStatus } from '../../../model/enums/device-connection-status'
+import { DeviceService } from '../interfaces/device-service'
+import { DeviceNotFoundException } from '../../../model/exceptions/device-not-found-exception'
+import { DeviceType } from '../../../model/enums/device-type'
+import { Logger } from '../../../logger/logger'
+import { DummyLogger } from '../../../logger/dummy-logger'
 
 type CallbackType = (data: unknown) => void
 
 describe(DeviceConnectionServiceImplementation.name, () => {
-  describe(DeviceConnectionServiceImplementation.prototype.createConnection.name, () => {
+  describe(DeviceConnectionServiceImplementation.prototype.init.name, () => {
     describe('when the device is not connected', () => {
       it('should create a connected device', async () => {
         const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
         const devices: Device[] = [iNewsDevice]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(iNewsDevice)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        expect(await testee.createConnection(iNewsDevice)).resolves
+        await testee.init()
 
-        verify(factoryMock.createDeviceConnection(iNewsDevice)).called()
+        verify(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).called()
       })
     })
   })
@@ -36,41 +37,41 @@ describe(DeviceConnectionServiceImplementation.name, () => {
   describe(DeviceConnectionServiceImplementation.prototype.send.name, () => {
     describe('when the device is connected', () => {
       it('should send a message', async () => {
-        const iNewsGatewayDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-        const devices: Device[] = [iNewsGatewayDevice]
+        const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
+        const devices: Device[] = [iNewsDevice]
         const paramsList:string[] = [ 'Some message']
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>() //new INewsGatewayDeviceConnection(device)
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.send(iNewsGatewayDevice.id, paramsList)).thenResolve()
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(iNewsGatewayDevice)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>() //new INewsGatewayDeviceConnection(device)
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.send(iNewsDevice.id, paramsList)).thenResolve()
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await testee.createConnection(iNewsGatewayDevice)
-        await testee.send(iNewsGatewayDevice.id, paramsList)
+        await testee.init()
+        await testee.send(iNewsDevice.id, paramsList)
 
-        verify(factoryMock.createDeviceConnection(iNewsGatewayDevice)).called()
-        verify(deviceConnection.send(iNewsGatewayDevice.id, paramsList)).called()
+        verify(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).called()
+        verify(mockedDeviceConnection.send(iNewsDevice.id, paramsList)).called()
       })
     })
 
     describe('when the device is not connected', () => {
       it('should throw an error when you send a message', async () => {
         const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-        const devices: Device[] = [iNewsDevice]
+        const devices: Device[] = []
         const paramsList:string[] = [ 'Some message']
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>() //new INewsGatewayDeviceConnection(device)
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.send(iNewsDevice.id, paramsList)).thenResolve()
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(iNewsDevice)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>() //new INewsGatewayDeviceConnection(device)
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await expect(testee.send(iNewsDevice.id, (iNewsDevice.id, paramsList))).rejects.toThrow(`Device with ID '${iNewsDevice.id}' is not in the collection. Have you forgot to create the connection?`)
+        await testee.init()
+        await expect(testee.send(iNewsDevice.id, paramsList)).rejects.toThrow(DeviceNotFoundException)
 
-        verify(deviceConnection.listen(iNewsDevice.id, anyFunction())).never()
+        verify(mockedDeviceConnection.listen(iNewsDevice.id, anyFunction())).never()
       })
     })
   })
@@ -80,21 +81,21 @@ describe(DeviceConnectionServiceImplementation.name, () => {
       it('should listen to the correct device', async () => {
         const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
         const devices: Device[] = [iNewsDevice]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
         const mockCallback: jest.Mock<CallbackType> = jest.fn()
-        when(deviceConnection.listen(iNewsDevice.id, anyFunction())).thenResolve()
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(iNewsDevice)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        when(mockedDeviceConnection.listen(iNewsDevice.id, anyFunction())).thenResolve()
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await testee.createConnection(iNewsDevice)
+        await testee.init()
         await testee.listen(iNewsDevice.id, mockCallback)
 
-        verify(factoryMock.createDeviceConnection(iNewsDevice)).called()
-        verify(deviceConnection.listen(iNewsDevice.id, anyFunction())).called()
-        const capturedCallback: (arg: unknown) => void = capture(deviceConnection.listen).last()[1]
+        verify(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).called()
+        verify(mockedDeviceConnection.listen(iNewsDevice.id, anyFunction())).called()
+        const capturedCallback: (arg: unknown) => void = capture(mockedDeviceConnection.listen).last()[1]
         capturedCallback('sample data')
         expect(mockCallback).toHaveBeenCalledWith('sample data')
       })
@@ -103,19 +104,19 @@ describe(DeviceConnectionServiceImplementation.name, () => {
     describe('when the device is not connected', () => {
       it('should throw an error when you listen', async () => {
         const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-        const devices: Device[] = [iNewsDevice]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
+        const devices: Device[] = []
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
         const mockCallback: jest.Mock<CallbackType> = jest.fn()
-        when(deviceConnection.listen(iNewsDevice.id, anyFunction())).thenResolve()
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(iNewsDevice)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await expect(testee.listen(iNewsDevice.id, mockCallback)).rejects.toThrow(`Device with ID '${iNewsDevice.id}' is not in the collection. Have you forgot to create the connection?`)
+        await testee.init()
+        await expect(testee.listen(iNewsDevice.id, mockCallback)).rejects.toThrow()
 
-        verify(deviceConnection.listen(iNewsDevice.id, anyFunction())).never()
+        verify(mockedDeviceConnection.listen(iNewsDevice.id, anyFunction())).never()
       })
     })
   })
@@ -125,15 +126,15 @@ describe(DeviceConnectionServiceImplementation.name, () => {
       it('should get a connection status device connected', async () => {
         const iNewsDevice: Device = EntityTestFactory.createDevice({ id: 'test-case-id-01', type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
         const devices: Device[] = [iNewsDevice]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(iNewsDevice)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await testee.createConnection(iNewsDevice)
+        await testee.init()
         const statusRetrievedAfterCreation: DeviceConnectionStatus = testee.getConnectionStatusById(iNewsDevice.id)
 
         expect(statusRetrievedAfterCreation).toBe(DeviceConnectionStatus.CONNECTED)
@@ -144,13 +145,13 @@ describe(DeviceConnectionServiceImplementation.name, () => {
       it('should return connection status device disconnected', () => {
         const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
         const devices: Device[] = [iNewsDevice]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(iNewsDevice)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
         const statusRetrievedAfterCreation: DeviceConnectionStatus = testee.getConnectionStatusById(iNewsDevice.id)
 
@@ -164,32 +165,32 @@ describe(DeviceConnectionServiceImplementation.name, () => {
       it('should disconnect the given device', async () => {
         const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
         const devices: Device[] = [iNewsDevice]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(iNewsDevice)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await testee.createConnection(iNewsDevice)
+        await testee.init()
         expect(await testee.disconnectConnectionById(iNewsDevice.id)).resolves
       })
     })
 
     describe('when the device is not connected', () => {
       it('should return DeviceConnectionStatus.DISCONNECTED', async () => {
-        const device: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-        const devices: Device[] = [device]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
+        const devices: Device[] = [iNewsDevice]
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        expect(await testee.disconnectConnectionById(device.id)).resolves
+        expect(await testee.disconnectConnectionById(iNewsDevice.id)).resolves
       })
     })
   })
@@ -197,34 +198,34 @@ describe(DeviceConnectionServiceImplementation.name, () => {
   describe(DeviceConnectionServiceImplementation.prototype.removeConnectionById.name, () => {
     describe('when the device is connected', () => {
       it('should remove the connection', async () => {
-        const device: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-        const devices: Device[] = [device]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
+        const devices: Device[] = [iNewsDevice]
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await testee.createConnection(device)
-        expect(await testee.removeConnectionById(device.id)).resolves
+        await testee.init()
+        expect(await testee.removeConnectionById(iNewsDevice.id)).resolves
       })
     })
 
     describe('when the device is not connected', () => {
-      it('should throw a DeviceAlreadyRemovedError', async () => {
-        const device: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-        const devices: Device[] = [device]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+      it('should throw a DeviceNotFoundException', async () => {
+        const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
+        const devices: Device[] = [iNewsDevice]
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await expect(testee.removeConnectionById(device.id)).rejects.toThrow(DeviceNotFoundException)
+        await expect(testee.removeConnectionById(iNewsDevice.id)).rejects.toThrow(DeviceNotFoundException)
       })
     })
   })
@@ -232,18 +233,18 @@ describe(DeviceConnectionServiceImplementation.name, () => {
   describe(DeviceConnectionServiceImplementation.prototype.connectionExists.name, () => {
     describe('when the device is connected', () => {
       it('should return true', async () => {
-        const device: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-        const devices: Device[] = [device]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
+        const devices: Device[] = [iNewsDevice]
+        const mockedDeviceConntectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockeddDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockeddDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConntectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockeddDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConntectionFactory), deviceService: instance(mockedDeviceService) })
 
-        await testee.createConnection(device)
-        const isConnected: boolean = testee.connectionExists(device.id)
+        await testee.init()
+        const isConnected: boolean = testee.connectionExists(iNewsDevice.id)
 
         expect(isConnected).toBeTruthy()
       })
@@ -251,17 +252,17 @@ describe(DeviceConnectionServiceImplementation.name, () => {
 
     describe('when the device is not connected', () => {
       it('should return false', () => {
-        const device: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-        const devices: Device[] = [device]
-        const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-        const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-        const deviceServiceMock: DeviceService = mock<DeviceService>()
-        when(deviceConnection.connect()).thenResolve(true)
-        when(deviceServiceMock.getDevices()).thenResolve(devices)
-        when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
-        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+        const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
+        const devices: Device[] = [iNewsDevice]
+        const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+        const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+        const mockedDeviceService: DeviceService = mock<DeviceService>()
+        when(mockedDeviceConnection.connect()).thenResolve(true)
+        when(mockedDeviceService.getDevices()).thenResolve(devices)
+        when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+        const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-        const isConnected: boolean = testee.connectionExists(device.id)
+        const isConnected: boolean = testee.connectionExists(iNewsDevice.id)
 
         expect(isConnected).toBeFalsy()
       })
@@ -270,17 +271,17 @@ describe(DeviceConnectionServiceImplementation.name, () => {
 
   describe(DeviceConnectionServiceImplementation.prototype.getConnectedDevices.name, () => {
     it('should retrieve a list of connected devices', async () => {
-      const device: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
-      const devices: Device[] = [device]
-      const factoryMock: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
-      const deviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
-      const deviceServiceMock: DeviceService = mock<DeviceService>()
-      when(deviceConnection.connect()).thenResolve(true)
-      when(deviceServiceMock.getDevices()).thenResolve(devices)
-      when(factoryMock.createDeviceConnection(device)).thenReturn(instance(deviceConnection))
-      const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: factoryMock, deviceService: deviceServiceMock })
+      const iNewsDevice: Device = EntityTestFactory.createDevice({ type: DeviceType.INEWS_GATEWAY, username: 'somerUserName', password: 'somePassword'})
+      const devices: Device[] = [iNewsDevice]
+      const mockedDeviceConnectionFactory: DeviceConnectionFactory = mock<DeviceConnectionFactory>()
+      const mockedDeviceConnection: INewsGatewayDeviceConnection = mock<INewsGatewayDeviceConnection>()
+      const mockedDeviceService: DeviceService = mock<DeviceService>()
+      when(mockedDeviceConnection.connect()).thenResolve(true)
+      when(mockedDeviceService.getDevices()).thenResolve(devices)
+      when(mockedDeviceConnectionFactory.createDeviceConnection(iNewsDevice)).thenReturn(instance(mockedDeviceConnection))
+      const testee: DeviceConnectionServiceImplementation = createTestee({deviceConnectionFactory: instance(mockedDeviceConnectionFactory), deviceService: instance(mockedDeviceService) })
 
-      await testee.createConnection(device)
+      await testee.init()
       const connectedDevices: Device[] = testee.getConnectedDevices()
 
       expect(connectedDevices.length).toBeGreaterThan(0)
@@ -292,13 +293,13 @@ function createTestee(params?: {
   deviceConnectionFactory?: DeviceConnectionFactory,
   deviceService?: DeviceService
 }): DeviceConnectionServiceImplementation {
-  const factory: DeviceConnectionFactory = instance(params?.deviceConnectionFactory ?? mock<DeviceConnectionFactory>())
-  const mockLogger: Logger = instance(mock<Logger>())
-  const service: DeviceService = instance(params?.deviceService ?? mock<DeviceService>())
+  const factory: DeviceConnectionFactory = params?.deviceConnectionFactory ?? instance(mock<DeviceConnectionFactory>())
+  const service: DeviceService = params?.deviceService ?? instance(mock<DeviceService>())
+  const logger: Logger = new DummyLogger()
 
   return new DeviceConnectionServiceImplementation(
-    mockLogger,
     factory,
-    service
+    service,
+    logger,
   )
 }

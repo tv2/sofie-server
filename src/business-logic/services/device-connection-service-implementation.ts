@@ -15,24 +15,18 @@ type DeviceAggregate = {
 
 export class DeviceConnectionServiceImplementation implements DeviceConnectionService {
   private readonly connectedDevices: Map<string, DeviceAggregate> = new Map()
+  private readonly logger: Logger
 
-  constructor(private readonly logger: Logger, private readonly deviceConnectionFactory: DeviceConnectionFactory, private readonly deviceService: DeviceService) {
-    logger.tag(DeviceConnectionServiceImplementation.name)
-    this.initialize(this.deviceService)
-      .then(() => {
-        this.logger.debug('Initialization of DeviceConnectionService done')
-      })
-      .catch((error) => {
-        this.logger.error(`Initialization of DeviceConnectionService failed with error: ${error}`)
-      })
+  constructor(private readonly deviceConnectionFactory: DeviceConnectionFactory, private readonly deviceService: DeviceService,logger: Logger) {
+    this.logger = logger.tag(DeviceConnectionServiceImplementation.name)
   }
 
-  private async initialize(deviceService: DeviceService): Promise<void> {
-    const devices: Device[] = await deviceService.getDevices()
+  public async init(): Promise<void> {
+    const devices: Device[] = await this.deviceService.getDevices()
     await Promise.all(devices.map(device => this.createConnection(device)))
   }
 
-  public async createConnection(device: Device): Promise<void> {
+  private async createConnection(device: Device): Promise<void> {
     if (this.connectedDevices.has(device.id)) {
       throw new DeviceAlreadyConnectedException(device.id)
     }
@@ -58,7 +52,7 @@ export class DeviceConnectionServiceImplementation implements DeviceConnectionSe
 
   public async listen(deviceId: string, callback: (data: unknown) => void): Promise<void> {
     const connectedDevice: DeviceAggregate | undefined = this.connectedDevices.get(deviceId)
-    if(connectedDevice === undefined){
+    if(!connectedDevice){
       throw new DeviceNotFoundException(deviceId)
     }
 
