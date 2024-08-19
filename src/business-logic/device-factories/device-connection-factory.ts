@@ -1,5 +1,5 @@
 import { DeviceType } from '../../model/enums/device-type'
-import { Device } from '../../model/entities/device'
+import {Device, INewsGatewayDevice} from '../../model/entities/device'
 import { DeviceConnection } from '../services/interfaces/device-connection'
 import { INewsGatewayDeviceConnection } from '../services/inews-gateway-connection-implementation'
 import { DeviceConnectionFactory } from '../services/interfaces/device-connection-factory'
@@ -16,7 +16,7 @@ export class DeviceConnectionFactoryImplementation implements DeviceConnectionFa
   private mapDeviceToDeviceConnection(device: Device): DeviceConnection {
     switch (device.type) {
       case DeviceType.INEWS_GATEWAY:
-        return new INewsGatewayDeviceConnection(device, LoggerFacade.createLogger())
+        return new INewsGatewayDeviceConnection(device as INewsGatewayDevice, LoggerFacade.createLogger())
       default:
         throw new DeviceNotFoundException('Unable to map connected device to known devices.')
     }
