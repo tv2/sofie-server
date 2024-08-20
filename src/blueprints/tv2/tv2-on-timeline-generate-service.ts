@@ -13,7 +13,7 @@ import { Timeline } from '../../model/entities/timeline'
 import { DeviceType } from '../../model/enums/device-type'
 import {
   AtemAuxTimelineObject,
-  AtemMeTimelineObject,
+  AtemMixEffectTimelineObject,
   AtemSuperSourceTimelineObject,
   AtemType
 } from '../timeline-state-resolver-types/atem-types'
@@ -270,7 +270,11 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     if (timelineObject.content.deviceType !== DeviceType.ATEM || timelineObject.content.type !== AtemType.ME) {
       return
     }
-    const atemMeTimelineObject: AtemMeTimelineObject = timelineObject as AtemMeTimelineObject
+    const atemMeTimelineObject: AtemMixEffectTimelineObject = timelineObject as AtemMixEffectTimelineObject
+    if ('programInput' in atemMeTimelineObject.content.me) {
+      atemMeTimelineObject.content.me.programInput = mediaPlayer.videoMixerSource
+      return
+    }
     atemMeTimelineObject.content.me.input = mediaPlayer.videoMixerSource
   }
 
