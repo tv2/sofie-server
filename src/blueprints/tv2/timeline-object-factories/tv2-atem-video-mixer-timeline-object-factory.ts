@@ -293,9 +293,8 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     const atemMeTimelineObject: AtemMixEffectTimelineObject = blueprintTimelineObject as AtemMixEffectTimelineObject
     if (atemMeTimelineObject.content.me.type === AtemMixEffectType.TRANSITION) {
       return atemMeTimelineObject.content.me.input
-    } else {
-      return atemMeTimelineObject.content.me.programInput
     }
+    return atemMeTimelineObject.content.me.programInput
   }
 
   public createCutTransitionEffectTimelineObjects(sourceInput: number): AtemMixEffectTimelineObject[] {
