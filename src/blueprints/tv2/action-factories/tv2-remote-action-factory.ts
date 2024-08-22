@@ -26,7 +26,7 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 export class Tv2RemoteActionFactory extends ActionFactory {
 

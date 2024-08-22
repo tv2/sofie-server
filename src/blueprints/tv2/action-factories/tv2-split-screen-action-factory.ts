@@ -52,7 +52,7 @@ import {
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 

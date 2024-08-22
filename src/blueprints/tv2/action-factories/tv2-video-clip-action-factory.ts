@@ -26,7 +26,7 @@ import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 

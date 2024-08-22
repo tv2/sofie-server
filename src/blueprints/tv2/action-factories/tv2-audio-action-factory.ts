@@ -22,7 +22,7 @@ import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const FRAME_RATE: number = 25
 

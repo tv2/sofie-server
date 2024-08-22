@@ -41,7 +41,7 @@ import {
 } from '../timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const TV2_GRAPHICS_LAYERS: Tv2SourceLayer[] = [
   Tv2SourceLayer.GRAPHICS_IDENT,

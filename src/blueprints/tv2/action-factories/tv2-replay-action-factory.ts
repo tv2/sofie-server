@@ -19,7 +19,7 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
