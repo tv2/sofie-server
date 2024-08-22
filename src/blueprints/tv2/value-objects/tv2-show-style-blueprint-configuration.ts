@@ -9,6 +9,7 @@ export interface Tv2ShowStyleBlueprintConfiguration {
   splitScreenConfigurations: SplitScreenConfiguration[]
   breakerTransitionEffectConfigurations: BreakerTransitionEffect[]
   breakers: Breaker[]
+  audioBedConfigurations: AudioBedConfiguration[]
 }
 
 export interface GraphicsDefault {
@@ -117,6 +118,14 @@ export interface Breaker {
   endAlpha: number
   autoNext: boolean,
   shouldLoadFirstFrame: boolean
+}
+
+export interface AudioBedConfiguration {
+  id: string
+  name: string
+  filename: string
+  fadeInDurationInMs: number
+  fadeOutDurationInMs: number
 }
 
 export interface Tv2ShowStyleVariantBlueprintConfiguration {

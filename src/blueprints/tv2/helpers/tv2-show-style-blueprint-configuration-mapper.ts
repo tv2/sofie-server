@@ -1,4 +1,5 @@
 import {
+  AudioBedConfiguration,
   Breaker,
   BreakerTransitionEffect,
   GraphicsDefault,
@@ -23,6 +24,7 @@ interface CoreShowStyleBlueprintConfiguration {
   BreakerConfig: CoreBreaker[]
   Transitions: Transition[]
   ShowstyleTransition: string
+  LYDConfig: CoreAudioBedConfiguration[]
 }
 
 interface Transition {
@@ -77,6 +79,14 @@ interface CoreBreaker {
   LoadFirstFrame: boolean
 }
 
+interface CoreAudioBedConfiguration {
+  _id: string
+  INewsName: string
+  FileName: string
+  FadeIn: number
+  FadeOut: number
+}
+
 export interface CoreShowStyleVariantBlueprintConfiguration {
   GfxDefaults?: CoreGraphicsDefault[]
 }
@@ -94,10 +104,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       graphicsSchemas: this.mapGraphicsSchemas(coreConfiguration.GfxSchemaTemplates),
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(showStyleVariantBlueprintConfiguration, coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
       splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
-      breakerTransitionEffectConfigurations: this.mapBreakerTransitionEffectConfigurations( 
+      breakerTransitionEffectConfigurations: this.mapBreakerTransitionEffectConfigurations(
         coreConfiguration.ShowstyleTransition,
         coreConfiguration.Transitions),
-      breakers: this.mapToBreakers(coreConfiguration.BreakerConfig)
+      breakers: this.mapBreakers(coreConfiguration.BreakerConfig),
+      audioBedConfigurations: this.mapAudioBedConfigurations(coreConfiguration.LYDConfig)
     }
   }
 
@@ -108,9 +119,9 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
 
     const transitions: string[] = coreTransitions.map(transition => transition.Transition).filter(transition => transition !== undefined)
 
-    return this.mapTransitionEffectConfigurations([...transitions, showstyleTransition])  
+    return this.mapTransitionEffectConfigurations([...transitions, showstyleTransition])
   }
-    
+
   private findShowStyleVariantBlueprintConfiguration(showStyleVariantId: string, showStyle: ShowStyle): Tv2ShowStyleVariantBlueprintConfiguration | undefined {
     const showStyleVariant: ShowStyleVariant | undefined = showStyle.variants.find(variant => variant.id === showStyleVariantId)
     if (!showStyleVariant) {
@@ -137,7 +148,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     if (!coreGraphicsSetups) {
       return []
     }
-    
+
     return coreGraphicsSetups.map(setup => {
       return {
         id: setup._id,
@@ -209,7 +220,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     if(!coreSplitScreenConfigurations) {
       return []
     }
-    
+
     return coreSplitScreenConfigurations.map(coreSplitScreenConfiguration => {
       return {
         id: coreSplitScreenConfiguration._id,
@@ -234,7 +245,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapToBreakers(coreBreakers?: CoreBreaker[]): Breaker[] {
+  private mapBreakers(coreBreakers?: CoreBreaker[]): Breaker[] {
     if(!coreBreakers) {
       return []
     }
@@ -251,5 +262,19 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
         shouldLoadFirstFrame: coreBreaker.LoadFirstFrame
       }
     })
+  }
+
+  private mapAudioBedConfigurations(coreAudioBedConfigurations?: CoreAudioBedConfiguration[]): AudioBedConfiguration[] {
+    if (!Array.isArray(coreAudioBedConfigurations)) {
+      return []
+    }
+
+    return coreAudioBedConfigurations.map(coreAudioBedConfiguration => ({
+      id: coreAudioBedConfiguration._id,
+      name: coreAudioBedConfiguration.INewsName,
+      filename: coreAudioBedConfiguration.FileName,
+      fadeInDurationInMs: coreAudioBedConfiguration.FadeIn,
+      fadeOutDurationInMs: coreAudioBedConfiguration.FadeOut
+    }))
   }
 }
