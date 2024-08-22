@@ -338,7 +338,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         loop: true,
         noStarttime: true,
         mixer: {
-          volume: audioBedSettings.volume,
+          volume: audioBedSettings.volume / 100,
         },
         transitions: {
           inTransition: {
