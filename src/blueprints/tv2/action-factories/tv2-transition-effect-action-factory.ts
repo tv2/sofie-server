@@ -60,7 +60,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper,
     logger: Tv2Logger
   ) {
@@ -396,7 +396,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
       this.videoClipTimelineObjectFactory.createBreakerTimelineObject(fileName),
-      this.audioTimelineObjectFactory.createBreakerAudioTimelineObject()
+      this.audioMixerTimelineObjectFactory.createBreakerAudioTimelineObject()
     ]
   }
 

@@ -21,14 +21,14 @@ describe(Tv2GraphicsActionFactory.name, () => {
 function createTestee(params?: {
   actionManifestMapper?: Tv2ActionManifestMapper,
   graphicsTimelineObjectFactoryFactory?: Tv2GraphicsTimelineObjectFactoryFactory,
-  audioTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
+  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
   stringHashConverter?: Tv2StringHashConverter
 }): Tv2GraphicsActionFactory {
   return new Tv2GraphicsActionFactory(
     params?.actionManifestMapper ?? instance(mock(Tv2ActionManifestMapper)),
     params?.graphicsTimelineObjectFactoryFactory ?? instance(mock<Tv2GraphicsTimelineObjectFactoryFactory>()),
-    params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
+    params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.stringHashConverter ?? instance(mock<Tv2StringHashConverter>()),
   )

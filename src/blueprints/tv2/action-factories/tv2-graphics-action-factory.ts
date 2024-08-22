@@ -57,7 +57,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly stringHashConverter: Tv2StringHashConverter
   ) {
@@ -288,7 +288,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       timelineObjects: [
         elementTimelineObjectFactory.createFullscreenGraphicsTimelineObject(blueprintConfiguration, graphicsData),
-        this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration),
+        this.audioMixerTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration),
         ...videoMixerTimelineObjects
       ],
       metadata: {

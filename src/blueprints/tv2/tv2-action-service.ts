@@ -80,7 +80,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     return [
       ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
       ...this.remoteActionFactory.createRemoteActions(blueprintConfiguration),
-      ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
+      ...this.audioActionFactory.createAudioActions(blueprintConfiguration, actionManifests),
       ...this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration),
       ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, actionManifests),
       ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, actionManifests),

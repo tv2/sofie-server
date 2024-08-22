@@ -124,8 +124,8 @@ export interface AudioBedConfiguration {
   id: string
   name: string
   filename: string
-  fadeInDurationInMs: number
-  fadeOutDurationInMs: number
+  fadeInDurationInFrames: number
+  fadeOutDurationInFrames: number
 }
 
 export interface Tv2ShowStyleVariantBlueprintConfiguration {

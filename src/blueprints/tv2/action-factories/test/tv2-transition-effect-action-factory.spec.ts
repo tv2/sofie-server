@@ -19,14 +19,14 @@ describe(Tv2TransitionEffectActionFactory.name, () => {
 function createTestee(params?: {
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
   casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory,
-  audioTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
+  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
   assetPathHelper?: Tv2AssetPathHelper,
   logger?: Tv2Logger
 }): Tv2TransitionEffectActionFactory {
   return new Tv2TransitionEffectActionFactory(
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.casparCgTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory)),
-    params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
+    params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
     params?.logger ?? instance(mock<Tv2Logger>()))
 }

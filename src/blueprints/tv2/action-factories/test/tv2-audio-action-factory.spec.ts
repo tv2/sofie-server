@@ -12,11 +12,11 @@ describe(Tv2AudioActionFactory.name, () => {
 })
 
 function createTestee(params?: {
-  audioTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
+  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
   casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory
 }): Tv2AudioActionFactory {
   return new Tv2AudioActionFactory(
-    params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
+    params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.casparCgTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory))
   )
 }

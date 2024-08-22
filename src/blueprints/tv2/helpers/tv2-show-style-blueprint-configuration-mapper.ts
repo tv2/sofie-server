@@ -273,8 +273,8 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       id: coreAudioBedConfiguration._id,
       name: coreAudioBedConfiguration.INewsName,
       filename: coreAudioBedConfiguration.FileName,
-      fadeInDurationInMs: coreAudioBedConfiguration.FadeIn,
-      fadeOutDurationInMs: coreAudioBedConfiguration.FadeOut
+      fadeInDurationInFrames: coreAudioBedConfiguration.FadeIn,
+      fadeOutDurationInFrames: coreAudioBedConfiguration.FadeOut
     }))
   }
 }

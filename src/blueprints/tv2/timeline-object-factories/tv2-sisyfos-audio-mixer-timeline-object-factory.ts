@@ -155,6 +155,22 @@ export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerT
     }
   }
 
+  public createAudioBedAudioTimelineObject(): SisyfosChannelTimelineObject {
+    return {
+      id: 'audio_bed_sisyfos',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2SisyfosLayer.AUDIO_BED,
+      content: {
+        deviceType: DeviceType.SISYFOS,
+        type: SisyfosType.CHANNEL,
+        isPgm: 1
+      }
+    }
+  }
+
   public getAudioDeviceType(): DeviceType {
     return DeviceType.SISYFOS
   }

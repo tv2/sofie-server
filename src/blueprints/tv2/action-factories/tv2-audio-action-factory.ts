@@ -1,4 +1,10 @@
-import { Action, ActionArgumentType, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import {
+  Action,
+  ActionArgumentType,
+  ActionManifest,
+  MutateActionMethods,
+  MutateActionType
+} from '../../../model/entities/action'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -9,7 +15,6 @@ import {
   Tv2ActionSubtype,
   Tv2AudioAction,
   Tv2FadeAudioBedAction,
-  Tv2PieceAction
 } from '../value-objects/tv2-action'
 import {
   Tv2AudioMixerTimelineObjectFactory
@@ -23,14 +28,21 @@ import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { ActionFactory } from './action-factory'
+import {
+  Tv2AudioBedTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-bed-timeline-object-factory'
+import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
+import { Tv2ActionManifestAudioBedData } from '../value-objects/tv2-action-manifest-data'
 
 const FRAME_RATE: number = 25
+const AUDIO_BED_ACTION_ID: string = Tv2SourceLayer.AUDIO_BED
 
 export class Tv2AudioActionFactory extends ActionFactory {
 
   constructor(
-    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
-    private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
+    private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
+    private readonly audioBedTimelineObjectFactory: Tv2AudioBedTimelineObjectFactory,
   ) {
     super()
   }
@@ -52,11 +64,12 @@ export class Tv2AudioActionFactory extends ActionFactory {
     return []
   }
 
-  public createAudioActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
+  public createAudioActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Action[] {
     return [
       this.createFadePersistedAudioAction(),
       this.createStudioMicrophonesUpAction(blueprintConfiguration),
       this.createStudioMicrophonesDownAction(blueprintConfiguration),
+      ...this.createAudioBedActionsFromActionManifests(blueprintConfiguration, actionManifests.filter(this.isAudioBedActionManifest.bind(this))),
       this.createStopAudioBedAction(),
       this.createFadeAudioBedAction(blueprintConfiguration),
       this.createResynchronizeAudioAction(),
@@ -100,7 +113,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
       id: 'studioMicrophonesUpPiece',
       name: 'Studio Microphones Up',
       timelineObjects: [
-        this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration)
+        this.audioMixerTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration)
       ]
     })
     return {
@@ -144,7 +157,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
       id: 'studioMicrophonesDownPiece',
       name: 'Studio Microphones Down',
       timelineObjects: [
-        this.audioTimelineObjectFactory.createStudioMicrophonesDownTimelineObject(blueprintConfiguration)
+        this.audioMixerTimelineObjectFactory.createStudioMicrophonesDownTimelineObject(blueprintConfiguration)
       ]
     })
     return {
@@ -161,14 +174,51 @@ export class Tv2AudioActionFactory extends ActionFactory {
     }
   }
 
-  private createStopAudioBedAction(): Tv2PieceAction {
+
+  private createAudioBedActionsFromActionManifests(blueprintsConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2AudioAction[] {
+    return actionManifests
+      .filter(this.isAudioBedActionManifest.bind(this))
+      .map(audioBedActionManifest => this.createAudioBedActionsFromActionManifest(blueprintsConfiguration, audioBedActionManifest))
+  }
+
+  private isAudioBedActionManifest(actionManifest: Tv2ActionManifest): actionManifest is ActionManifest<Tv2ActionManifestAudioBedData> {
+    return actionManifest.actionId === AUDIO_BED_ACTION_ID
+  }
+
+  private createAudioBedActionsFromActionManifest(blueprintsConfiguration: Tv2BlueprintConfiguration, actionManifest: ActionManifest<Tv2ActionManifestAudioBedData>): Tv2AudioAction {
+    const audioBedName: string = actionManifest.data.name
+    return {
+      id: `audioBed_${audioBedName}`,
+      name: audioBedName,
+      rundownId: actionManifest.rundownId,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+      rank: 0,
+      description: `Start ${audioBedName}.`,
+      data: {
+        pieceInterface: this.createAudioBedPieceInterface({
+          id: `audioBed_${audioBedName}`,
+          name: audioBedName,
+          pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+          timelineObjects: [
+            this.audioBedTimelineObjectFactory.createAudioBedTimelineObject(audioBedName, blueprintsConfiguration),
+            this.audioMixerTimelineObjectFactory.createAudioBedAudioTimelineObject(),
+          ]
+        })
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.AUDIO
+      },
+    }
+  }
+
+  private createStopAudioBedAction(): Tv2AudioAction {
     const duration: number = 1000
     const pieceInterface: Tv2PieceInterface = this.createAudioBedPieceInterface({
       id: 'stopAudioBedPiece',
       name: 'Stop audio bed',
       duration,
       timelineObjects: [
-        this.audioTimelineObjectFactory.createStopAudioBedTimelineObject(duration)
+        this.audioMixerTimelineObjectFactory.createStopAudioBedTimelineObject(duration)
       ]
     })
     return {
@@ -195,7 +245,6 @@ export class Tv2AudioActionFactory extends ActionFactory {
       isPlanned: false,
       isUnsynced: false,
       start: 0,
-      duration: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
@@ -212,6 +261,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
     const pieceInterface: Tv2PieceInterface = this.createAudioBedPieceInterface({
       id: 'fadeAudioBedPiece',
       name: 'Fade Audio bed',
+      duration: 0,
     })
     return {
       id: 'fadeAudioBedAction',
@@ -262,7 +312,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
       name: 'Resynchronize Audio',
       duration,
       timelineObjects: [
-        this.audioTimelineObjectFactory.createResynchronizeTimelineObject()
+        this.audioMixerTimelineObjectFactory.createResynchronizeTimelineObject()
       ]
     })
     return {
