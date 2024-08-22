@@ -6,9 +6,12 @@ import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-config
 import {
   AtemAuxTimelineObject,
   AtemDownstreamKeyerTimelineObject,
-  AtemMeTimelineObject,
-  AtemMeUpstreamKeyersTimelineObject,
   AtemMeWipePattern,
+  AtemMixEffectTimelineObject,
+  AtemMixEffectType,
+  AtemMixEffectUpstreamKeyersTimelineObject,
+  AtemMixEffectWithPreview,
+  AtemMixEffectWithTransition,
   AtemSourceIndex,
   AtemSuperSourcePropertiesTimelineObject,
   AtemSuperSourceTimelineObject,
@@ -76,7 +79,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return percentage * 10
   }
 
-  public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMeUpstreamKeyersTimelineObject {
+  public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMixEffectUpstreamKeyersTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.index + 1
     return {
       id: `${ATEM_PREFIX}upstreamKeyer${downstreamKeyerNumber}`,
@@ -107,14 +110,14 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMixEffectTimelineObject {
     return this.createAtemMeTimelineObjectForLayer(
       `${ATEM_PREFIX}program`,
       Tv2AtemLayer.PROGRAM,
       enable,
       {
-        input: sourceInput,
-        transition: AtemTransition.CUT
+        type: AtemMixEffectType.PREVIEW,
+        programInput: sourceInput
       })
   }
 
@@ -125,13 +128,14 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       Tv2AtemLayer.PROGRAM,
       enable,
       {
+        type: AtemMixEffectType.TRANSITION,
         input: sourceInput,
         transition: AtemTransition.WIPE,
         transitionSettings: this.createAtemMeWipeTransitionSettings(transitionSettings)
       })
   }
 
-  private createAtemMeWipeTransitionSettings(transitionSettings: VideoMixerWipeTransitionSettings): AtemMeTimelineObject['content']['me']['transitionSettings'] {
+  private createAtemMeWipeTransitionSettings(transitionSettings: VideoMixerWipeTransitionSettings): AtemMixEffectWithTransition['transitionSettings'] {
     return {
       wipe: {
         rate: transitionSettings.durationInFrames,
@@ -142,7 +146,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMeTimelineObject['content']['me']): AtemMeTimelineObject {
+  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMixEffectWithTransition | AtemMixEffectWithPreview): AtemMixEffectTimelineObject {
     return {
       id,
       enable,
@@ -156,14 +160,14 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMixEffectTimelineObject {
     return this.createAtemMeTimelineObjectForLayer(
       `${ATEM_PREFIX}clean_feed`,
       Tv2AtemLayer.CLEAN_FEED,
       enable,
       {
-        input: sourceInput,
-        transition: AtemTransition.CUT,
+        type: AtemMixEffectType.PREVIEW,
+        programInput: sourceInput
       })
   }
 
@@ -173,6 +177,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       Tv2AtemLayer.CLEAN_FEED,
       enable,
       {
+        type: AtemMixEffectType.TRANSITION,
         input: sourceInput,
         transition: AtemTransition.WIPE,
         transitionSettings: this.createAtemMeWipeTransitionSettings(transitionSettings)
@@ -285,12 +290,16 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       return
     }
 
-    const atemMeTimelineObject: AtemMeTimelineObject = blueprintTimelineObject as AtemMeTimelineObject
-    return  atemMeTimelineObject.content.me.input
+    const atemMeTimelineObject: AtemMixEffectTimelineObject = blueprintTimelineObject as AtemMixEffectTimelineObject
+    if (atemMeTimelineObject.content.me.type === AtemMixEffectType.TRANSITION) {
+      return atemMeTimelineObject.content.me.input
+    }
+    return atemMeTimelineObject.content.me.programInput
   }
 
-  public createCutTransitionEffectTimelineObjects(sourceInput: number): AtemMeTimelineObject[] {
-    const meContent: AtemMeTimelineObject['content']['me'] = {
+  public createCutTransitionEffectTimelineObjects(sourceInput: number): AtemMixEffectTimelineObject[] {
+    const meContent: AtemMixEffectWithTransition = {
+      type: AtemMixEffectType.TRANSITION,
       input: sourceInput,
       transition: AtemTransition.CUT
     }
@@ -300,7 +309,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     ]
   }
 
-  private createTransitionEffectTimelineObject(layer: Tv2AtemLayer, meContent: AtemMeTimelineObject['content']['me']): AtemMeTimelineObject {
+  private createTransitionEffectTimelineObject(layer: Tv2AtemLayer, meContent: AtemMixEffectWithTransition): AtemMixEffectTimelineObject {
     return {
       id: `${layer}_${meContent.transition}`,
       enable: {
@@ -316,8 +325,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number): AtemMeTimelineObject[] {
-    const meContent: AtemMeTimelineObject['content']['me'] = {
+  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number): AtemMixEffectTimelineObject[] {
+    const meContent: AtemMixEffectWithTransition = {
+      type: AtemMixEffectType.TRANSITION,
       input: sourceInput,
       transition: AtemTransition.MIX,
       transitionSettings: {
@@ -332,8 +342,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     ]
   }
 
-  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number): AtemMeTimelineObject[] {
-    const meContent: AtemMeTimelineObject['content']['me'] = {
+  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number): AtemMixEffectTimelineObject[] {
+    const meContent: AtemMixEffectWithTransition = {
+      type: AtemMixEffectType.TRANSITION,
       input: sourceInput,
       transition: AtemTransition.DIP,
       transitionSettings: {
