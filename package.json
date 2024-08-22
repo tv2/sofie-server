@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist",
     "build": "tsc --build",
+    "build-watch": "tsc --noEmit --watch",
     "watch": "nodemon",
     "test": "jest",
     "test-watch": "jest --watch --coverage",
