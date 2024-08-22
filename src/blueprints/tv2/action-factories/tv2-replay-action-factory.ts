@@ -13,8 +13,8 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
@@ -27,7 +27,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
+    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
   ) {
     super()
   }

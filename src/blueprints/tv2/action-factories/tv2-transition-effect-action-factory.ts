@@ -30,8 +30,8 @@ import {
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
 import { InTransition } from '../../../model/value-objects/in-transition'
@@ -60,7 +60,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper,
     logger: Tv2Logger
   ) {

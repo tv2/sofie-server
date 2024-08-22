@@ -5,7 +5,7 @@ import { DeviceType } from '../../../../model/enums/device-type'
 import { Tv2AudioMode } from '../../enums/tv2-audio-mode'
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
 
-export interface Tv2AudioTimelineObjectFactory {
+export interface Tv2AudioMixerTimelineObjectFactory {
   createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, audioMode?: Tv2AudioMode): Tv2BlueprintTimelineObject[]
   createStudioMicrophonesUpTimelineObject(configuration: Tv2BlueprintConfiguration): Tv2BlueprintTimelineObject
   createStudioMicrophonesDownTimelineObject(configuration: Tv2BlueprintConfiguration): Tv2BlueprintTimelineObject

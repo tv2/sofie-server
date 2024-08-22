@@ -12,8 +12,8 @@ import {
 import { PartInterface } from '../../../model/entities/part'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory,
   VideoMixerWipeTransitionSettings
@@ -57,7 +57,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly stringHashConverter: Tv2StringHashConverter
   ) {

@@ -12,8 +12,8 @@ import {
   Tv2PieceAction
 } from '../value-objects/tv2-action'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
@@ -29,7 +29,7 @@ const FRAME_RATE: number = 25
 export class Tv2AudioActionFactory extends ActionFactory {
 
   constructor(
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory
   ) {
     super()

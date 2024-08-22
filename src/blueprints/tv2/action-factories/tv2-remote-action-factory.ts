@@ -16,8 +16,8 @@ import {
   Tv2RemoteAction
 } from '../value-objects/tv2-action'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
   Tv2VideoMixerTimelineObjectFactory
@@ -32,7 +32,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
+    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
   ) {
     super()
   }

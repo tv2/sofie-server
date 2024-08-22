@@ -9,8 +9,8 @@ import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/t
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
@@ -35,7 +35,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
   ) {
     super()

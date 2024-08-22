@@ -27,8 +27,8 @@ import {
 } from '../value-objects/tv2-action'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import {
   SplitScreenBoxInput,
@@ -69,7 +69,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper

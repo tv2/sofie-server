@@ -3,8 +3,8 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { instance, mock } from '@typestrong/ts-mockito'
 import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
 import {
@@ -24,7 +24,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
 function createTestee(params?: {
   actionManifestMapper?: Tv2ActionManifestMapper,
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
-  audioTimelineObjectFactory?: Tv2AudioTimelineObjectFactory,
+  audioTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
   graphicsSplitScreenTimelineObjectFactory?: Tv2GraphicsSplitScreenTimelineObjectFactory,
   videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory,
   assetPathHelper?: Tv2AssetPathHelper
@@ -32,7 +32,7 @@ function createTestee(params?: {
   return new Tv2SplitScreenActionFactory(
     params?.actionManifestMapper ?? instance(mock(Tv2ActionManifestMapper)),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
-    params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioTimelineObjectFactory>()),
+    params?.audioTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.graphicsSplitScreenTimelineObjectFactory ?? instance(mock<Tv2GraphicsSplitScreenTimelineObjectFactory>()),
     params?.videoClipTimelineObjectFactory ?? instance(mock<Tv2VideoClipTimelineObjectFactory>()),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper))

@@ -16,8 +16,8 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2LoggerFacade } from '../tv2-logger-facade'
 import {
@@ -26,8 +26,8 @@ import {
 import { AtemToTriCasterSplitScreenConverter } from '../helpers/atem-to-tricaster-split-screen-converter'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import {
-  Tv2SisyfosAudioTimelineObjectFactory
-} from '../timeline-object-factories/tv2-sisyfos-audio-timeline-object-factory'
+  Tv2SisyfosAudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/tv2-sisyfos-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
@@ -123,8 +123,8 @@ export class Tv2ActionFactoryProvider {
     }
   }
 
-  private createAudioTimelineObjectFactory(): Tv2AudioTimelineObjectFactory {
-    return new Tv2SisyfosAudioTimelineObjectFactory()
+  private createAudioTimelineObjectFactory(): Tv2AudioMixerTimelineObjectFactory {
+    return new Tv2SisyfosAudioMixerTimelineObjectFactory()
   }
 
   public createRemoteActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2RemoteActionFactory {
