@@ -24,9 +24,6 @@ import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/t
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
-import {
-  Tv2VideoClipTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { ActionFactory } from './action-factory'
 import {
   Tv2AudioBedTimelineObjectFactory
@@ -41,7 +38,6 @@ export class Tv2AudioActionFactory extends ActionFactory {
 
   constructor(
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
-    private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly audioBedTimelineObjectFactory: Tv2AudioBedTimelineObjectFactory,
   ) {
     super()
@@ -289,7 +285,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
     const audioAction: Tv2FadeAudioBedAction = action as Tv2FadeAudioBedAction
 
     const fadeDurationInMilliseconds: number =  this.getTimeFromFrames(this.isInteger(fadeDurationInFrames) ? fadeDurationInFrames : audioAction.metadata.defaultFadeDurationInFrames)
-    const fadeAudioBedTimelineObject: Tv2BlueprintTimelineObject = this.videoClipTimelineObjectFactory.createFadeAudioBedTimelineObject(fadeDurationInMilliseconds)
+    const fadeAudioBedTimelineObject: Tv2BlueprintTimelineObject = this.audioBedTimelineObjectFactory.createFadeAudioBedTimelineObject(fadeDurationInMilliseconds)
 
     audioAction.data.pieceInterface.timelineObjects.push(fadeAudioBedTimelineObject)
     audioAction.data.pieceInterface.duration = fadeDurationInMilliseconds

@@ -183,7 +183,6 @@ export class Tv2ActionFactoryProvider {
       () => {
         return new Tv2AudioActionFactory(
           this.createAudioMixerTimelineObjectFactory(),
-          this.createVideoClipTimelineObjectFactory(),
           this.createAudioBedTimelineObjectFactory(),
         )
       },
