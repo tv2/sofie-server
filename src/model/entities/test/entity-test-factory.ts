@@ -9,6 +9,8 @@ import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
 import { TransitionType } from '../../enums/transition-type'
+import { ActionManifest } from '../action'
+import { IngestedPart } from '../ingested-part'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -33,23 +35,60 @@ export class EntityTestFactory {
         rundownId: 'rundownId',
         name: 'segmentName',
         isNext: false,
+        definesShowStyleVariant: false,
+        isHidden: false,
+        isUnsynced: false,
+        rank: 0,
         isOnAir: false,
         parts: [],
-        ...segmentInterface
-      } as SegmentInterface)
+        ...segmentInterface,
+      })
   }
 
   public static createPart(partInterface: Partial<PartInterface> = {}): Part {
     return new Part({
+      disableNextInTransition: false,
+      inTransition: {
+        keepPreviousPartAliveDuration: 0,
+        delayPiecesDuration: 0,
+      },
+      isUnsynced: false,
+      isUntimed: false,
+      outTransition: {
+        keepAliveDuration: 0,
+      },
+      rank: 0,
+      rundownId: '',
       id: 'partId' + Math.floor(Math.random() * 1000),
       segmentId: 'segmentId',
       name: 'partName',
       isNext: false,
       isOnAir: false,
-      ingestedPart: {},
+      ingestedPart: this.createIngestedPart(),
       pieces: [],
-      ...partInterface
-    } as PartInterface)
+      ...partInterface,
+    })
+  }
+
+  public static createIngestedPart(ingestedPart: Partial<IngestedPart> = {}): IngestedPart {
+    return {
+      disableNextInTransition: false,
+      id: '',
+      inTransition: {
+        keepPreviousPartAliveDuration: 0,
+        delayPiecesDuration: 0,
+      },
+      ingestedPieces: [],
+      isUntimed: false,
+      name: '',
+      outTransition: {
+        keepAliveDuration: 0,
+      },
+      rank: 0,
+      rundownId: '',
+      segmentId: '',
+      ...ingestedPart,
+    }
   }
 
   public static createPiece(pieceInterface: Partial<PieceInterface> = {}): Piece {
@@ -89,6 +128,15 @@ export class EntityTestFactory {
       message: 'someMessage',
       statusCode: StatusCode.UNKNOWN,
       ...statusMessage
+    }
+  }
+
+  public static createActionManifest(actionManifest: Partial<ActionManifest> = {}): ActionManifest {
+    return {
+      actionId: `action-manifest-${process.hrtime.bigint()}`,
+      rundownId: 'rundownId',
+      data: {},
+      ...actionManifest,
     }
   }
 }

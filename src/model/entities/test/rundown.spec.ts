@@ -163,7 +163,7 @@ describe(Rundown.name, () => {
           describe('when there is a valid part after the on air part', () => {
             it('sets the first valid part after the on air part as next', () => {
               const segmentId: string = 'segment-id'
-              const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', segmentId, isOnAir: true })
+              const activePart: Part = EntityTestFactory.createPart({ id: 'active-part-id', segmentId, isOnAir: true })
               activePart.calculateTimings()
               const invalidity: Invalidity = { reason: 'some reason' }
               const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId, isNext: true, invalidity })
