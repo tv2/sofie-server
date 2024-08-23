@@ -64,8 +64,8 @@ describe(Tv2AudioActionFactory.name, () => {
         })
       })
 
-      describe('when some audio bed actions are not configured', () => {
-        it('creates audio bed actions for all configured audio bed action manifests', () => {
+      describe('when some audio beds are not configured', () => {
+        it('creates audio bed actions for all action manifests with a audio bed configuration', () => {
           const actionManifests: Tv2ActionManifest[] = [
             EntityTestFactory.createActionManifest({
               actionId: Tv2SourceLayer.AUDIO_BED,
