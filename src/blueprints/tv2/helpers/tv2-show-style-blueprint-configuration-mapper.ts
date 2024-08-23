@@ -235,10 +235,10 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapTransitionEffectConfigurations(transitions: string[]): BreakerTransitionEffect[] {
-    return transitions.map(this.mapToVideoClipTransitionEffect)
+    return transitions.map(this.mapVideoClipTransitionEffect)
   }
 
-  private mapToVideoClipTransitionEffect(transition: string): BreakerTransitionEffect {
+  private mapVideoClipTransitionEffect(transition: string): BreakerTransitionEffect {
     return {
       type: TransitionEffectType.BREAKER,
       name: transition
