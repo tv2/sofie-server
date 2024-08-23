@@ -333,7 +333,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
       content: {
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
-        file: audioBedSettings.mediaDirectory ? `${audioBedSettings.mediaDirectory}/${audioBedConfiguration.filename}` : audioBedConfiguration.filename,
+        file: this.assetPathHelper.joinAssetToFolder(audioBedConfiguration.filename, audioBedSettings.mediaDirectory),
         channelLayout: AUDIO_CHANNEL_LAYOUT,
         loop: true,
         noStarttime: true,

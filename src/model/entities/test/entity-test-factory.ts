@@ -131,11 +131,10 @@ export class EntityTestFactory {
     }
   }
 
-  public static createActionManifest(actionManifest: Partial<ActionManifest> = {}): ActionManifest {
+  public static createActionManifest<ActionManifestData>(actionManifest: Partial<ActionManifest> & { data: ActionManifestData }): ActionManifest<ActionManifestData> {
     return {
       actionId: `action-manifest-${process.hrtime.bigint()}`,
       rundownId: 'rundownId',
-      data: {},
       ...actionManifest,
     }
   }

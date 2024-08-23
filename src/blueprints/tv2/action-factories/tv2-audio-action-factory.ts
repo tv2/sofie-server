@@ -60,12 +60,12 @@ export class Tv2AudioActionFactory extends ActionFactory {
     return []
   }
 
-  public createAudioActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Action[] {
+  public createAudioActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2AudioAction[] {
     return [
       this.createFadePersistedAudioAction(),
       this.createStudioMicrophonesUpAction(blueprintConfiguration),
       this.createStudioMicrophonesDownAction(blueprintConfiguration),
-      ...this.createAudioBedActionsFromActionManifests(blueprintConfiguration, actionManifests.filter(this.isAudioBedActionManifest.bind(this))),
+      ...this.createAudioBedActionsFromActionManifests(blueprintConfiguration, actionManifests),
       this.createStopAudioBedAction(),
       this.createFadeAudioBedAction(blueprintConfiguration),
       this.createResynchronizeAudioAction(),
@@ -171,17 +171,22 @@ export class Tv2AudioActionFactory extends ActionFactory {
   }
 
 
-  private createAudioBedActionsFromActionManifests(blueprintsConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2AudioAction[] {
+  private createAudioBedActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2AudioAction[] {
     return actionManifests
       .filter(this.isAudioBedActionManifest.bind(this))
-      .map(audioBedActionManifest => this.createAudioBedActionsFromActionManifest(blueprintsConfiguration, audioBedActionManifest))
+      .filter(audioBedActionManifest => this.isAudioBedConfigured(audioBedActionManifest.data.name, blueprintConfiguration))
+      .map(audioBedActionManifest => this.createAudioBedActionsFromActionManifest(blueprintConfiguration, audioBedActionManifest))
   }
 
   private isAudioBedActionManifest(actionManifest: Tv2ActionManifest): actionManifest is ActionManifest<Tv2ActionManifestAudioBedData> {
     return actionManifest.actionId === AUDIO_BED_ACTION_ID
   }
 
-  private createAudioBedActionsFromActionManifest(blueprintsConfiguration: Tv2BlueprintConfiguration, actionManifest: ActionManifest<Tv2ActionManifestAudioBedData>): Tv2AudioAction {
+  private isAudioBedConfigured(audioBedName: string, blueprintConfiguration: Tv2BlueprintConfiguration): boolean {
+    return blueprintConfiguration.showStyle.audioBedConfigurations.some(audioBedConfiguration => audioBedConfiguration.name === audioBedName)
+  }
+
+  private createAudioBedActionsFromActionManifest(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifest: ActionManifest<Tv2ActionManifestAudioBedData>): Tv2AudioAction {
     const audioBedName: string = actionManifest.data.name
     return {
       id: `audioBed_${audioBedName}`,
@@ -196,7 +201,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
           name: audioBedName,
           pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           timelineObjects: [
-            this.audioBedTimelineObjectFactory.createAudioBedTimelineObject(audioBedName, blueprintsConfiguration),
+            this.audioBedTimelineObjectFactory.createAudioBedTimelineObject(audioBedName, blueprintConfiguration),
             this.audioMixerTimelineObjectFactory.createAudioBedAudioTimelineObject(),
           ]
         })
