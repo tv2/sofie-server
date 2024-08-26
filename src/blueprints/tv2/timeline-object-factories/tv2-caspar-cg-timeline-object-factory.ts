@@ -355,7 +355,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
           },
         }
       },
-      classes: ['lyd_on_air'],
+      classes: ['lyd_on_air'], // TODO: Check if this is necessary.
     }
   }
 
