@@ -9,6 +9,7 @@ import {
 import { instance, mock } from '@typestrong/ts-mockito'
 import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
 import { Tv2Logger } from '../../tv2-logger'
+import { FrameTimeConverter } from '../../helpers/frame-time-converter'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   it('compiles', () => {
@@ -21,6 +22,7 @@ function createTestee(params?: {
   casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory,
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
   assetPathHelper?: Tv2AssetPathHelper,
+  frameTimeConverter?: FrameTimeConverter,
   logger?: Tv2Logger
 }): Tv2TransitionEffectActionFactory {
   return new Tv2TransitionEffectActionFactory(
@@ -28,5 +30,6 @@ function createTestee(params?: {
     params?.casparCgTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory)),
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
+    params?.frameTimeConverter ?? instance(mock(FrameTimeConverter)),
     params?.logger ?? instance(mock<Tv2Logger>()))
 }

@@ -35,15 +35,15 @@ import {
 import { Tv2AudioBedTimelineObjectFactory } from './interfaces/tv2-audio-bed-timeline-object-factory'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { AudioBedSettings } from '../value-objects/tv2-studio-blueprint-configuration'
+import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
 const HTML_GRAPHICS_INDEX_FILENAME: string = 'index'
 const ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR: string = '\n - '
 const AUDIO_CHANNEL_LAYOUT: string = 'bed'
-const FRAME_RATE: number = 25
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory, Tv2AudioBedTimelineObjectFactory {
 
-  constructor(private readonly assetPathHelper: Tv2AssetPathHelper) {}
+  constructor(private readonly assetPathHelper: Tv2AssetPathHelper, private readonly frameTimeConverter: FrameTimeConverter) {}
 
   public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
     const fileName: string = this.prependGraphicsFolder(blueprintConfiguration, fullscreenGraphicsData.name)
@@ -345,22 +345,18 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
             type: CasparCgTransitionType.MIX,
             easing: CasparCgTransitionEase.LINEAR,
             direction: CasparCgTransitionDirection.LEFT,
-            duration: this.convertFramesToMilliseconds(audioBedConfiguration.fadeInDurationInFrames),
+            duration: this.frameTimeConverter.convertFramesToMilliseconds(audioBedConfiguration.fadeInDurationInFrames),
           },
           outTransition: {
             type: CasparCgTransitionType.MIX,
             easing: CasparCgTransitionEase.LINEAR,
             direction: CasparCgTransitionDirection.LEFT,
-            duration: this.convertFramesToMilliseconds(audioBedConfiguration.fadeOutDurationInFrames),
+            duration: this.frameTimeConverter.convertFramesToMilliseconds(audioBedConfiguration.fadeOutDurationInFrames),
           },
         }
       },
       classes: ['lyd_on_air'], // TODO: Check if this is necessary.
     }
-  }
-
-  private convertFramesToMilliseconds(frames: number): number {
-    return 1000 * frames / FRAME_RATE
   }
 
   public createFadeAudioBedTimelineObject(fadeDurationInMilliseconds: number): CasparCgMediaTimelineObject {
