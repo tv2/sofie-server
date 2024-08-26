@@ -30,8 +30,8 @@ import {
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
 import { InTransition } from '../../../model/value-objects/in-transition'
@@ -44,7 +44,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { Tv2Logger } from '../tv2-logger'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
@@ -60,7 +60,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper,
     logger: Tv2Logger
   ) {
@@ -396,7 +396,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
       this.videoClipTimelineObjectFactory.createBreakerTimelineObject(fileName),
-      this.audioTimelineObjectFactory.createBreakerAudioTimelineObject()
+      this.audioMixerTimelineObjectFactory.createBreakerAudioTimelineObject()
     ]
   }
 

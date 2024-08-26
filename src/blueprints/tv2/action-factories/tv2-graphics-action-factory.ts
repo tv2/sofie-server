@@ -12,8 +12,8 @@ import {
 import { PartInterface } from '../../../model/entities/part'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory,
   VideoMixerWipeTransitionSettings
@@ -41,7 +41,7 @@ import {
 } from '../timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
 import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const TV2_GRAPHICS_LAYERS: Tv2SourceLayer[] = [
   Tv2SourceLayer.GRAPHICS_IDENT,
@@ -57,7 +57,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly stringHashConverter: Tv2StringHashConverter
   ) {
@@ -288,7 +288,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       layer: Tv2SourceLayer.PILOT_GRAPHICS,
       timelineObjects: [
         elementTimelineObjectFactory.createFullscreenGraphicsTimelineObject(blueprintConfiguration, graphicsData),
-        this.audioTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration),
+        this.audioMixerTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration),
         ...videoMixerTimelineObjects
       ],
       metadata: {

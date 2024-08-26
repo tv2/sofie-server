@@ -95,6 +95,7 @@ export enum Tv2DownstreamKeyerRole {
 }
 
 export interface AudioBedSettings {
+  mediaDirectory: string
   fadeInDurationFrames: number
   fadeOutDurationInFrames: number
   volume: number

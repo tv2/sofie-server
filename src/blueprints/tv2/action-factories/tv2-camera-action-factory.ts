@@ -12,19 +12,19 @@ import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 export class Tv2CameraActionFactory extends ActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
   ) {
     super()
   }
@@ -61,7 +61,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
 
   private createCameraPieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2PieceInterface {
     const videoMixerTimelineObjects: Tv2BlueprintTimelineObject[] = this.createVideoMixerTimelineObjects(source)
-    const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
+    const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.CAMERA,
