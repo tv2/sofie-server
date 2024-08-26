@@ -12,6 +12,7 @@ import { Tv2SourceLayer } from '../../value-objects/tv2-layers'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2AudioAction } from '../../value-objects/tv2-action'
+import { FrameTimeConverter } from '../../helpers/frame-time-converter'
 
 describe(Tv2AudioActionFactory.name, () => {
   describe(Tv2AudioActionFactory.prototype.createAudioActions.name, () => {
@@ -123,9 +124,11 @@ describe(Tv2AudioActionFactory.name, () => {
 function createTestee(params?: {
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
   audioBedTimelineObjectFactory?: Tv2AudioBedTimelineObjectFactory,
+  frameTimeConverter?: FrameTimeConverter,
 }): Tv2AudioActionFactory {
   return new Tv2AudioActionFactory(
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
-    params?.audioBedTimelineObjectFactory ?? instance(mock<Tv2AudioBedTimelineObjectFactory>())
+    params?.audioBedTimelineObjectFactory ?? instance(mock<Tv2AudioBedTimelineObjectFactory>()),
+    params?.frameTimeConverter ?? instance(mock(FrameTimeConverter)),
   )
 }

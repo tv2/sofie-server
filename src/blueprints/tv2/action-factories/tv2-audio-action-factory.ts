@@ -30,8 +30,8 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-audio-bed-timeline-object-factory'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2ActionManifestAudioBedData } from '../value-objects/tv2-action-manifest-data'
+import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
-const FRAME_RATE: number = 25
 const AUDIO_BED_ACTION_ID: string = Tv2SourceLayer.AUDIO_BED
 
 export class Tv2AudioActionFactory extends ActionFactory {
@@ -39,6 +39,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
   constructor(
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly audioBedTimelineObjectFactory: Tv2AudioBedTimelineObjectFactory,
+    private readonly frameTimeConverter: FrameTimeConverter,
   ) {
     super()
   }
@@ -289,7 +290,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
   private applyFadeArgumentToFadeAction(action: Action, fadeDurationInFrames: unknown): Action {
     const audioAction: Tv2FadeAudioBedAction = action as Tv2FadeAudioBedAction
 
-    const fadeDurationInMilliseconds: number =  this.getTimeFromFrames(this.isInteger(fadeDurationInFrames) ? fadeDurationInFrames : audioAction.metadata.defaultFadeDurationInFrames)
+    const fadeDurationInMilliseconds: number =  this.frameTimeConverter.convertFramesToMilliseconds(this.isInteger(fadeDurationInFrames) ? fadeDurationInFrames : audioAction.metadata.defaultFadeDurationInFrames)
     const fadeAudioBedTimelineObject: Tv2BlueprintTimelineObject = this.audioBedTimelineObjectFactory.createFadeAudioBedTimelineObject(fadeDurationInMilliseconds)
 
     audioAction.data.pieceInterface.timelineObjects.push(fadeAudioBedTimelineObject)
@@ -300,10 +301,6 @@ export class Tv2AudioActionFactory extends ActionFactory {
 
   private isInteger(obj: unknown): obj is number {
     return Number.isInteger(obj)
-  }
-
-  private getTimeFromFrames(frames: number): number {
-    return (1000 / FRAME_RATE) * frames
   }
 
   private createResynchronizeAudioAction(): Tv2AudioAction {

@@ -45,8 +45,8 @@ import {
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { Tv2Logger } from '../tv2-logger'
 import { ActionFactory } from './action-factory'
+import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
-const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
 
 enum SpecialEffectName {
@@ -62,6 +62,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper,
+    private readonly frameTimeConverter: FrameTimeConverter,
     logger: Tv2Logger
   ) {
     super()
@@ -159,7 +160,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       transitionType: TransitionType.IN_TRANSITION,
       isPlanned: false,
       start: 0,
-      duration: Math.max(this.getTimeFromFrames(durationFrames), MINIMUM_DURATION_IN_MS),
+      duration: Math.max(this.frameTimeConverter.convertFramesToMilliseconds(durationFrames), MINIMUM_DURATION_IN_MS),
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
@@ -170,10 +171,6 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         outputLayer: Tv2OutputLayer.SECONDARY
       }
     }
-  }
-
-  private getTimeFromFrames(frames: number): number {
-    return (1000 / FRAME_RATE) * frames
   }
 
   private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: Tv2PieceInterface): Tv2TransitionEffectAction {
@@ -384,8 +381,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const casparCgPreRollDuration: number = breakerActionMetadata.casparCgPreRollDuration
 
     const videoMixerTimelineEnable: TimelineEnable = {
-      start: this.getTimeFromFrames(breaker.startAlpha) + casparCgPreRollDuration,
-      duration: this.getTimeFromFrames(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
+      start: this.frameTimeConverter.convertFramesToMilliseconds(breaker.startAlpha) + casparCgPreRollDuration,
+      duration: this.frameTimeConverter.convertFramesToMilliseconds(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
     }
 
     const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.videoMixerFillSource
@@ -402,8 +399,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createPartInTransitionForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): InTransition {
     return {
-      keepPreviousPartAliveDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
-      delayPiecesDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
+      keepPreviousPartAliveDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
+      delayPiecesDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
     }
   }
 }
