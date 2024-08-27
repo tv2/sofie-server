@@ -203,8 +203,36 @@ export class Part {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
       unPlannedPiece.markAsInsertedOnAir()
+
+      this.stopPiecesOnLayer(unPlannedPiece.layer)
+    } else {
+      this.removePieceOnLayer(unPlannedPiece.layer)
     }
     this.pieces.push(unPlannedPiece)
+  }
+
+  private stopPiecesOnLayer(layer: string): void {
+    const existingPiecesOnLayer: Piece[] = this.pieces.filter(piece => piece.layer === layer)
+    existingPiecesOnLayer.forEach(piece => {
+      if (piece.getDuration()) {
+        return
+      }
+      piece.stop()
+    })
+  }
+
+  private removePieceOnLayer(layer: string): void {
+    const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === layer)
+    if (indexOfExistingPieceOnLayer < 0) {
+      return
+    }
+    const removedPieces: Piece[] = this.pieces.splice(indexOfExistingPieceOnLayer, 1)
+    removedPieces.forEach(piece => {
+      if (!piece.isPlanned) {
+        return
+      }
+      this.replacedPlannedPieces.push(piece)
+    })
   }
 
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
