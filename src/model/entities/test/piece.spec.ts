@@ -1,6 +1,9 @@
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { Piece, PieceInterface } from '../piece'
 import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
+import { EntityTestFactory } from './entity-test-factory'
+import { IngestedPiece } from '../ingested-piece'
+import { TimelineObject } from '../timeline-object'
 
 describe(Piece.name, () => {
   describe(Piece.prototype.setExecutedAt.name, () => {
@@ -93,6 +96,71 @@ describe(Piece.name, () => {
       const testee: Piece = new Piece({ partId: partIdWithoutPostfix } as PieceInterface)
       testee.markAsUnsyncedWithUnsyncedPart()
       expect(testee.getPartId()).toBe(`${partIdWithoutPostfix}${UNSYNCED_ID_POSTFIX}`)
+    })
+  })
+
+  describe(Piece.prototype.resetFromIngestedPiece.name, () => {
+    it('sets Piece.start to the same as the IngestedPiece', () => {
+      const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ start: 4321 })
+
+      const testee: Piece = new Piece({ start: 1234 } as PieceInterface)
+
+      expect(testee.getStart()).not.toBe(ingestedPiece.start)
+      testee.resetFromIngestedPiece(ingestedPiece)
+      expect(testee.getStart()).toBe(ingestedPiece.start)
+    })
+
+    it('sets Piece.duration to the same as the IngestedPiece', () => {
+      const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ duration: 4321 })
+
+      const testee: Piece = new Piece({ duration: 1234 } as PieceInterface)
+
+      expect(testee.getDuration()).not.toBe(ingestedPiece.duration)
+      testee.resetFromIngestedPiece(ingestedPiece)
+      expect(testee.getDuration()).toBe(ingestedPiece.duration)
+    })
+
+    it('sets Piece.timelineObjects to the same as the IngestedPiece', () => {
+      const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ timelineObjects: [
+        { id: 'object1' } as TimelineObject,
+        { id: 'object2' } as TimelineObject,
+      ] })
+
+      const testee: Piece = new Piece({ timelineObjects: [
+        { id: 'object3' } as TimelineObject,
+        { id: 'object4' } as TimelineObject,
+        { id: 'object5' } as TimelineObject,
+      ] } as PieceInterface)
+
+      expect(testee.getTimelineObjects()).not.toStrictEqual(ingestedPiece.timelineObjects)
+      testee.resetFromIngestedPiece(ingestedPiece)
+      expect(testee.getTimelineObjects()).toStrictEqual(ingestedPiece.timelineObjects)
+    })
+
+    describe('the Piece is infinite Piece', () => {
+      it('it does not reset Piece.executedAt', () => {
+        const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({})
+        const executedAt: number = Date.now()
+
+        const testee: Piece = new Piece({ executedAt, pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE } as PieceInterface)
+
+        expect(testee.getExecutedAt()).not.toBe(0)
+        testee.resetFromIngestedPiece(ingestedPiece)
+        expect(testee.getExecutedAt()).toBe(executedAt)
+      })
+    })
+
+    describe('the Piece is not an infinite Piece', () => {
+      it('sets Piece.executedAt to zero', () => {
+        const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ })
+        const executedAt: number = Date.now()
+
+        const testee: Piece = new Piece({ executedAt, pieceLifespan: PieceLifespan.WITHIN_PART } as PieceInterface)
+
+        expect(testee.getExecutedAt()).not.toBe(0)
+        testee.resetFromIngestedPiece(ingestedPiece)
+        expect(testee.getExecutedAt()).toBe(0)
+      })
     })
   })
 })

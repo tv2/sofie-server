@@ -254,7 +254,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       metadata: piece.metadata as Tv2PieceMetadata,
       tags: [],
       isUnsynced: false,
-      timelineObjects: piece.timelineObjects,
+      timelineObjects: piece.getTimelineObjects()
     }))
 
     const recallLastPlannedRemoteAction: Tv2RecallLastPlannedRemoteAsNextAction = action as Tv2RecallLastPlannedRemoteAsNextAction

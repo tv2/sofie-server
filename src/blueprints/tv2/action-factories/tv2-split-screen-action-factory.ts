@@ -313,7 +313,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       return action
     }
 
-    const splitScreenBoxTimelineObject: Tv2BlueprintTimelineObject | undefined = splitScreenPieceFromRundown.timelineObjects
+    const splitScreenBoxTimelineObject: Tv2BlueprintTimelineObject | undefined = splitScreenPieceFromRundown.getTimelineObjects()
       .find(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getSplitScreenBoxesLayer()) as Tv2BlueprintTimelineObject
     if (!splitScreenBoxTimelineObject) {
       return action
@@ -358,7 +358,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   }
 
   private findTimelineObjectsToKeepForSplitScreenInsertSource(splitScreenPieceFromRundown: Piece): Tv2BlueprintTimelineObject[] {
-    return splitScreenPieceFromRundown.timelineObjects.filter(timelineObject => {
+    return splitScreenPieceFromRundown.getTimelineObjects().filter(timelineObject => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
       return blueprintTimelineObject.content.deviceType !== this.audioMixerTimelineObjectFactory.getAudioDeviceType()
         && blueprintTimelineObject.layer !== this.videoMixerTimelineObjectFactory.getSplitScreenBoxesLayer()
@@ -366,7 +366,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   }
 
   private doesPieceHaveSplitScreenBoxesTimelineObject(piece: Piece): boolean {
-    return piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getSplitScreenBoxesLayer())
+    return piece.getTimelineObjects().some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getSplitScreenBoxesLayer())
   }
 
   private createSplitScreenActionsFromSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenManifestData: Tv2SplitScreenManifestData[]): Tv2SplitScreenAction[] {
@@ -520,7 +520,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         metadata: piece.metadata as Tv2PieceMetadata,
         tags: [],
         isUnsynced: false,
-        timelineObjects: piece.timelineObjects
+        timelineObjects: piece.getTimelineObjects()
       }
     })
 
