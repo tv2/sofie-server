@@ -1,14 +1,10 @@
 name: 'Publish Image'
 
-env:
-  node-version: '18'
-  node-package-manager: 'yarn'
-
 on:
   workflow_dispatch:
     inputs:
       versionTag:
-        description: 'Version tag (e.g. 46.3.1-staging)'
+        description: 'Version tag (e.g. 0.0.1-staging)'
         required: true
         type: 'string'
 

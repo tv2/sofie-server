@@ -24,6 +24,9 @@
     "spy-database": "ts-node ./database/manager/mongo.ts --spy",
     "dump-database": "ts-node ./database/manager/mongo.ts --dump"
   },
+  "engines": {
+    "node": ">=14 <=22.6"
+  },
   "devDependencies": {
     "@types/cors": "^2.8.14",
     "@types/express": "^4.17.17",
