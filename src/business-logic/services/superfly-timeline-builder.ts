@@ -158,7 +158,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       controlForPiece.enable.start = `#${preRollControlForPiece.id} + ${piece.preRollDuration}`
     }
 
-    childGroupForPiece.children = piece.timelineObjects.map((timelineObject) =>
+    childGroupForPiece.children = piece.getTimelineObjects().map((timelineObject) =>
       this.mapToTimelineObjectForPieceGroup(timelineObject, childGroupForPiece, piece)
     )
 
@@ -383,7 +383,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return part
       .getPieces()
       .filter((piece) => piece.pieceLifespan === PieceLifespan.WITHIN_PART)
-      .flatMap((piece) => piece.timelineObjects)
+      .flatMap((piece) => piece.getTimelineObjects())
       .filter((timelineObject) => timelineObject.layer === layer.name)
       .map((timelineObject) => this.mapTimelineObjectToLookAheadTimelineObject(timelineObject, enable, layer, idPostFix))
   }
@@ -500,7 +500,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           content: {}
         }
 
-        infiniteGroup.children = piece.timelineObjects.flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))
+        infiniteGroup.children = piece.getTimelineObjects().flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))
         infinitePieceTimelineObjectGroups.push(infiniteGroup)
       })
 

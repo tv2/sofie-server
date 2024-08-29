@@ -30,8 +30,8 @@ import {
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
 import { InTransition } from '../../../model/value-objects/in-transition'
@@ -44,9 +44,9 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
 import { Tv2Logger } from '../tv2-logger'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
+import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
-const FRAME_RATE: number = 25
 const MINIMUM_DURATION_IN_MS: number = 1000
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
@@ -62,8 +62,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper,
+    private readonly frameTimeConverter: FrameTimeConverter,
     logger: Tv2Logger
   ) {
     super()
@@ -138,7 +139,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const updateTransitionMutateAction: MutateActionWithPieceMethods = {
       type: MutateActionType.PIECE,
       updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
-      piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
+      piecePredicate: (piece: Piece) => piece.getTimelineObjects().some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
     }
     mutateActionMethods.push(updateTransitionMutateAction)
     return mutateActionMethods
@@ -161,7 +162,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       transitionType: TransitionType.IN_TRANSITION,
       isPlanned: false,
       start: 0,
-      duration: Math.max(this.getTimeFromFrames(durationFrames), MINIMUM_DURATION_IN_MS),
+      duration: Math.max(this.frameTimeConverter.convertFramesToMilliseconds(durationFrames), MINIMUM_DURATION_IN_MS),
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
@@ -172,10 +173,6 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         outputLayer: Tv2OutputLayer.SECONDARY
       }
     }
-  }
-
-  private getTimeFromFrames(frames: number): number {
-    return (1000 / FRAME_RATE) * frames
   }
 
   private createTransitionEffectAction(actionType: PieceActionType, effectName: string, metadata: Tv2TransitionEffectActionMetadata, pieceInterface: Tv2PieceInterface): Tv2TransitionEffectAction {
@@ -358,22 +355,34 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
         const cutTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObjects(sourceInput)
-        action.data.pieceInterface.timelineObjects.push(...cutTransitionTimelineObjects)
+        action.data.pieceInterface.timelineObjects.push(
+          ...cutTransitionTimelineObjects
+        )
+        // We need to insert TimelineObjects into the original Piece, so we can "cancel out" the TimelineObject that contains a planned transition.
+        // If we don't, then planned transitions that are longer than these unplanned transitions will be executed after the unplanned transition is done.
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, 0))
         break
       }
       case TransitionEffectType.MIX: {
         const mixTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames)
-        action.data.pieceInterface.timelineObjects.push(...mixTransitionTimelineObjects)
+        action.data.pieceInterface.timelineObjects.push(
+          ...mixTransitionTimelineObjects
+        )
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, action.metadata.durationInFrames))
         break
       }
       case TransitionEffectType.DIP: {
         const dipTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
-        action.data.pieceInterface.timelineObjects.push(...dipTransitionTimelineObjects)
+        action.data.pieceInterface.timelineObjects.push(
+          ...dipTransitionTimelineObjects
+        )
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, action.metadata.durationInFrames))
         break
       }
       case TransitionEffectType.BREAKER: {
         action.data.pieceInterface.timelineObjects.push(...this.createTimelineObjectsForBreakerTransitionEffect(action.metadata))
         action.data.partInTransition = this.createPartInTransitionForBreakerTransitionEffect(action.metadata)
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, 0))
         break
       }
     }
@@ -381,13 +390,22 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return action
   }
 
+  private createProgramWithoutTransitionTimelineObjects(sourceInput: number, transitionDurationInFrames: number): Tv2BlueprintTimelineObject[] {
+    const enable: TimelineEnable = {
+      start: this.frameTimeConverter.convertFramesToMilliseconds(transitionDurationInFrames)
+    }
+    const programWithoutTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable)
+    const cleanFeedWithoutTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable)
+    return [programWithoutTransitionTimelineObject, cleanFeedWithoutTransitionTimelineObject]
+  }
+
   private createTimelineObjectsForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): Tv2BlueprintTimelineObject[] {
     const breaker: Breaker = breakerActionMetadata.breaker
     const casparCgPreRollDuration: number = breakerActionMetadata.casparCgPreRollDuration
 
     const videoMixerTimelineEnable: TimelineEnable = {
-      start: this.getTimeFromFrames(breaker.startAlpha) + casparCgPreRollDuration,
-      duration: this.getTimeFromFrames(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
+      start: this.frameTimeConverter.convertFramesToMilliseconds(breaker.startAlpha) + casparCgPreRollDuration,
+      duration: this.frameTimeConverter.convertFramesToMilliseconds(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
     }
 
     const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.videoMixerFillSource
@@ -398,14 +416,14 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
       this.videoClipTimelineObjectFactory.createBreakerTimelineObject(fileName),
-      this.audioTimelineObjectFactory.createBreakerAudioTimelineObject()
+      this.audioMixerTimelineObjectFactory.createBreakerAudioTimelineObject()
     ]
   }
 
   private createPartInTransitionForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): InTransition {
     return {
-      keepPreviousPartAliveDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
-      delayPiecesDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
+      keepPreviousPartAliveDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
+      delayPiecesDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
     }
   }
 }

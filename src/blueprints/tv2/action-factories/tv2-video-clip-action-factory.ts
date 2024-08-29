@@ -9,8 +9,8 @@ import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/t
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
@@ -26,7 +26,7 @@ import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -35,7 +35,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
   ) {
     super()
@@ -140,7 +140,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoClipTimelineObjectFactory.createVideoClipTimelineObject(videoClipData),
-        ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
+        ...this.audioMixerTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
       ]
     }
   }

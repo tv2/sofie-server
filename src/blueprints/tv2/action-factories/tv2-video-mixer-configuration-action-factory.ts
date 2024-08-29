@@ -12,7 +12,7 @@ import { Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-actio
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
 

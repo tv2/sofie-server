@@ -8,10 +8,11 @@ import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 import {
   Tv2EmptyGraphicsCommandTimelineObjectFactory
 } from './tv2-empty-graphics-command-timeline-object-factory'
+import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
 export class Tv2GraphicsTimelineObjectFactoryFactory {
 
-  constructor(private readonly assetPathHelper: Tv2AssetPathHelper) {}
+  constructor(private readonly assetPathHelper: Tv2AssetPathHelper, private readonly frameTimeConverter: FrameTimeConverter) {}
 
   public createGraphicsCommandTimelineObjectFactory(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2GraphicsCommandTimelineObjectFactory {
     return this.isUsingHtmlGraphics(blueprintConfiguration)
@@ -25,7 +26,7 @@ export class Tv2GraphicsTimelineObjectFactoryFactory {
 
   public createGraphicsElementTimelineObjectFactory(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2GraphicsElementTimelineObjectFactory {
     return this.isUsingHtmlGraphics(blueprintConfiguration)
-      ? new Tv2CasparCgTimelineObjectFactory(this.assetPathHelper)
+      ? new Tv2CasparCgTimelineObjectFactory(this.assetPathHelper, this.frameTimeConverter)
       : new Tv2VizTimelineObjectFactory()
   }
 }

@@ -148,9 +148,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
 
   private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMixEffectWithTransition | AtemMixEffectWithPreview): AtemMixEffectTimelineObject {
     return {
-      id,
+      id: `${id}_${Math.floor(Math.random() * 100)}`,
       enable,
-      priority: 1,
+      priority: 2, // Old Blueprints uses priority 1. By setting it to 2 we know our TimelineObjects always take priority.
       layer,
       content: {
         deviceType: DeviceType.ATEM,
@@ -279,7 +279,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
   }
 
   public findProgramSourceInputFromPiece(piece: Piece): number | undefined {
-    const timelineObject: TimelineObject | undefined = piece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
+    const timelineObject: TimelineObject | undefined = piece.getTimelineObjects().find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
     if (!timelineObject) {
       this.logger.data({ piece }).warn(`Unable to update the ATEM ME input, since no timeline object was found on the layer '${Tv2AtemLayer.PROGRAM}' on the piece with id '${piece.id}'.`)
       return

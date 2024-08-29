@@ -1,34 +1,35 @@
-name: "Check"
-run-name: "Test, build, lint and validate"
+name: 'Check'
+run-name: 'Test, build, lint and validate'
 
 on:
   pull_request:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
 jobs:
   build-test-lint-validate:
-    runs-on: "ubuntu-latest"
+    runs-on: 'ubuntu-latest'
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { name: "Build", action: "build" }
-          - { name: "Test", action: "test" }
-          - { name: "Lint", action: "lint" }
-          - { name: "Validate", action: "validate" }
-    name: "${{ matrix.job.name }}"
+          - { name: 'Build', action: 'build' }
+          - { name: 'Test', action: 'test' }
+          - { name: 'Lint', action: 'lint' }
+          - { name: 'Validate', action: 'validate' }
+    name: '${{ matrix.job.name }}'
     steps:
-      - uses: actions/checkout@v4
+      - uses: 'actions/checkout@v4'
 
-      - uses: actions/setup-node@v4
+      - uses: 'actions/setup-node@v4'
         with:
-          cache: "yarn"
+          node-version: '22.6'
+          cache: 'yarn'
 
-      - name: "Install dependencies"
-        run: "yarn install"
+      - name: 'Install dependencies'
+        run: 'yarn install'
 
-      - name: "${{ matrix.job.name }}"
-        run: "yarn ${{ matrix.job.action }}"
+      - name: '${{ matrix.job.name }}'
+        run: 'yarn ${{ matrix.job.action }}'

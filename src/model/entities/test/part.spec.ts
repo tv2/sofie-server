@@ -183,20 +183,50 @@ describe(Part.name, () => {
       })
 
       describe('there is already a Piece on the layer of the inserted Piece', () => {
-        it('does not remove the existing Piece from the Part', () => {
-          const layer: string = 'someLayer'
-          const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
-          const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
+        describe('the Part is On Air', () => {
+          it('keeps the existing Piece on the Part', () => {
+            const layer: string = 'someLayer'
+            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
+            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
 
-          const testee: Part = new Part({ id: 'partId', pieces: [existingPiece] } as PartInterface)
+            const testee: Part = new Part({ id: 'partId', isOnAir: true, pieces: [existingPiece] } as PartInterface)
 
-          expect(testee.getPieces()).toContain(existingPiece)
-          expect(testee.getPieces()).not.toContain(unplannedPiece)
+            expect(testee.getPieces()).toContain(existingPiece)
 
-          testee.insertPiece(unplannedPiece)
+            testee.insertPiece(unplannedPiece)
 
-          expect(testee.getPieces()).toContain(existingPiece)
-          expect(testee.getPieces()).toContain(unplannedPiece)
+            expect(testee.getPieces()).toContain(existingPiece)
+          })
+
+          it('stops the existing Piece', () => {
+            const layer: string = 'someLayer'
+            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
+            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
+
+            const testee: Part = new Part({ id: 'partId', isOnAir: true, pieces: [existingPiece] } as PartInterface)
+
+            expect(existingPiece.getDuration()).toBeUndefined()
+
+            testee.insertPiece(unplannedPiece)
+
+            expect(existingPiece.getDuration()).not.toBeUndefined()
+          })
+        })
+
+        describe('the Part is not On Air', () => {
+          it('removes the existing Piece from the Part', () => {
+            const layer: string = 'someLayer'
+            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
+            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
+
+            const testee: Part = new Part({ id: 'partId', isOnAir: false, pieces: [existingPiece] } as PartInterface)
+
+            expect(testee.getPieces()).toContain(existingPiece)
+
+            testee.insertPiece(unplannedPiece)
+
+            expect(testee.getPieces()).not.toContain(existingPiece)
+          })
         })
       })
 

@@ -590,9 +590,14 @@ export class Rundown extends BasicRundown {
 
     const oldSegment: Segment = this.segments[segmentIndex]
     if (oldSegment.isOnAir()) {
-      segment.setParts(oldSegment.getParts())
+      const newOnAirPart: Part | undefined = segment.getParts().find(part => part.isOnAir())
+      if (newOnAirPart) {
+        this.activeCursor = this.createCursor(this.activeCursor, { part: newOnAirPart })
+      }
+
       segment.putOnAir()
       this.activeCursor = this.createCursor(this.activeCursor, { segment })
+      this.updateInfinitePieces()
     }
 
     this.segments[segmentIndex] = segment

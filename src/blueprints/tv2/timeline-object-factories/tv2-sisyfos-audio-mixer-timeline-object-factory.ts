@@ -1,4 +1,4 @@
-import { Tv2AudioTimelineObjectFactory } from './interfaces/tv2-audio-timeline-object-factory'
+import { Tv2AudioMixerTimelineObjectFactory } from './interfaces/tv2-audio-mixer-timeline-object-factory'
 import {
   SisyfosChannelsTimelineObject,
   SisyfosChannelTimelineObject,
@@ -14,7 +14,7 @@ import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-d
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
-export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObjectFactory {
+export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerTimelineObjectFactory {
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, audioMode?: Tv2AudioMode): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.sisyfosLayers.map(sisyfosLayer => {
       return {
@@ -147,6 +147,22 @@ export class Tv2SisyfosAudioTimelineObjectFactory implements Tv2AudioTimelineObj
       },
       priority: 1,
       layer: Tv2SisyfosLayer.BREAKER,
+      content: {
+        deviceType: DeviceType.SISYFOS,
+        type: SisyfosType.CHANNEL,
+        isPgm: 1
+      }
+    }
+  }
+
+  public createAudioBedAudioTimelineObject(): SisyfosChannelTimelineObject {
+    return {
+      id: 'audio_bed_sisyfos',
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2SisyfosLayer.AUDIO_BED,
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNEL,

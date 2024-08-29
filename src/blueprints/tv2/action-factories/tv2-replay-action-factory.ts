@@ -13,13 +13,13 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -27,7 +27,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
   ) {
     super()
   }
@@ -178,7 +178,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.videoMixerSource, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.videoMixerSource, videoMixerEnable),
-      ...this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source, audioMode)
+      ...this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source, audioMode)
     ]
 
     const metadata: Tv2PieceMetadata = {
