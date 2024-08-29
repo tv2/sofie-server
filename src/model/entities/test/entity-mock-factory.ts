@@ -222,7 +222,7 @@ export class EntityMockFactory {
     when(mockedPiece.getStart()).thenReturn(pieceInterface.start ?? 0)
     when(mockedPiece.getDuration()).thenReturn(pieceInterface.duration ?? 0)
     when(mockedPiece.pieceLifespan).thenReturn(pieceInterface.pieceLifespan ?? PieceLifespan.WITHIN_PART)
-    when(mockedPiece.timelineObjects).thenReturn(pieceInterface.timelineObjects ?? [])
+    when(mockedPiece.getTimelineObjects()).thenReturn(pieceInterface.timelineObjects ?? [])
     when(mockedPiece.preRollDuration).thenReturn(pieceInterface.preRollDuration ?? 0)
     when(mockedPiece.postRollDuration).thenReturn(pieceInterface.postRollDuration ?? 0)
     when(mockedPiece.transitionType).thenReturn(pieceInterface.transitionType ?? TransitionType.NO_TRANSITION)

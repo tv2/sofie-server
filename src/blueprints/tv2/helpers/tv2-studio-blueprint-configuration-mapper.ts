@@ -51,6 +51,7 @@ interface CoreStudioBlueprintConfiguration {
   PreventOverlayWithFull: boolean
 
   AudioBedSettings: CoreAudioBedSettings
+  AudioBedFolder: string
 }
 
 interface CoreSourceMapping {
@@ -59,7 +60,7 @@ interface CoreSourceMapping {
   SwitcherSource: number
 }
 
-interface CoreMediaPlayer extends CoreSourceMapping { }
+interface CoreMediaPlayer extends CoreSourceMapping {}
 
 interface CoreSourceMappingWithSound extends CoreSourceMapping {
   SisyfosLayers: string[]
@@ -139,7 +140,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
       vizPilotGraphics: this.mapVizPilotGraphics(coreConfiguration.VizPilotGraphics),
       htmlGraphics: coreConfiguration.HTMLGraphics ? this.mapHtmlGraphics(coreConfiguration.HTMLGraphics) : undefined,
       shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: coreConfiguration.PreventOverlayWithFull,
-      audioBedSettings: this.mapAudioBedSettings(coreConfiguration.AudioBedSettings)
+      audioBedSettings: this.mapAudioBedSettings(coreConfiguration.AudioBedSettings, coreConfiguration.AudioBedFolder)
     }
   }
 
@@ -269,8 +270,9 @@ export class Tv2StudioBlueprintConfigurationMapper {
     }
   }
 
-  private mapAudioBedSettings(coreAudioBed: CoreAudioBedSettings): AudioBedSettings {
+  private mapAudioBedSettings(coreAudioBed: CoreAudioBedSettings, coreAudioBedFolder: string): AudioBedSettings {
     return {
+      mediaDirectory: coreAudioBedFolder,
       fadeInDurationFrames: coreAudioBed.fadeIn,
       fadeOutDurationInFrames: coreAudioBed.fadeOut,
       volume: coreAudioBed.volume

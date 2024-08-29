@@ -18,7 +18,7 @@ import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import {
   Tv2RobotTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-robot-timeline-object-factory'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 export class Tv2RobotActionFactory extends ActionFactory {
 

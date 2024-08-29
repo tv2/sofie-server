@@ -163,7 +163,7 @@ describe(Rundown.name, () => {
           describe('when there is a valid part after the on air part', () => {
             it('sets the first valid part after the on air part as next', () => {
               const segmentId: string = 'segment-id'
-              const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', segmentId, isOnAir: true })
+              const activePart: Part = EntityTestFactory.createPart({ id: 'active-part-id', segmentId, isOnAir: true })
               activePart.calculateTimings()
               const invalidity: Invalidity = { reason: 'some reason' }
               const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId, isNext: true, invalidity })
@@ -3182,28 +3182,87 @@ describe(Rundown.name, () => {
       })
 
       describe('the old Segment is on Air', () => {
-        it('takes the Parts of the old Segment and gives them to the new Segment', () => {
+        it('update the active cursor with the OnAir Part of the new Segment', () => {
           const segmentId: string = 'segmentId'
-          const parts: Part[] = [
-            EntityTestFactory.createPart({ id: 'partOne' }),
-            EntityTestFactory.createPart({ id: 'partTwo' })
-          ]
-          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts })
-          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId })
+          const oldPart: Part = EntityTestFactory.createPart()
+          const newSegmentOnAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts: [oldPart] })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false, parts: [newSegmentOnAirPart] })
 
-          const testee: Rundown = new Rundown({ segments: [oldSegment] } as RundownInterface)
+          const activeCursor: RundownCursor = {
+            part: oldPart,
+            segment: oldSegment,
+            owner: Owner.SYSTEM
+          }
 
-          expect(newSegment.getParts()).not.toBe(parts)
+          const testee: Rundown = new Rundown({ segments: [oldSegment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor
+          } } as RundownInterface)
+
+          expect(testee.getActiveCursor()?.part).not.toBe(newSegmentOnAirPart)
           testee.updateSegment(newSegment)
-          expect(newSegment.getParts()).toBe(parts)
+          expect(testee.getActiveCursor()?.part).toBe(newSegmentOnAirPart)
+        })
+
+        it('does not put the Parts of the old Segment in the new Segment', () => {
+          const segmentId: string = 'segmentId'
+          const oldPart: Part = EntityTestFactory.createPart()
+          const newSegmentOnAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts: [oldPart] })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false, parts: [newSegmentOnAirPart] })
+
+          const activeCursor: RundownCursor = {
+            part: oldPart,
+            segment: oldSegment,
+            owner: Owner.SYSTEM
+          }
+
+          const testee: Rundown = new Rundown({ segments: [oldSegment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor
+          } } as RundownInterface)
+
+          testee.updateSegment(newSegment)
+
+          expect(newSegment.getParts().includes(oldPart)).toBeFalsy()
+        })
+
+        it('new Segment has infinite Pieces - updates infinite Pieces', () => {
+          const segmentId: string = 'segmentId'
+          const oldPart: Part = EntityTestFactory.createPart()
+          const infinitePiece: Piece = EntityTestFactory.createPiece({ pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+          const newSegmentOnAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, pieces: [infinitePiece] })
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts: [oldPart] })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false, parts: [newSegmentOnAirPart] })
+
+          const activeCursor: RundownCursor = {
+            part: oldPart,
+            segment: oldSegment,
+            owner: Owner.SYSTEM
+          }
+
+          const testee: Rundown = new Rundown({ segments: [oldSegment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor,
+            infinitePieces: new Map()
+          } } as RundownInterface)
+
+          expect(testee.getInfinitePieces()).toHaveLength(0)
+          testee.updateSegment(newSegment)
+          expect(testee.getInfinitePieces()).toContain(infinitePiece)
         })
 
         it('puts the new Segment on Air', () => {
           const segmentId: string = 'segmentId'
-          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true })
-          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false })
+          const oldPart: Part = EntityTestFactory.createPart()
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts: [oldPart] })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false, parts: [onAirPart] })
 
-          const testee: Rundown = new Rundown({ segments: [oldSegment] } as RundownInterface)
+          const testee: Rundown = new Rundown({ segments: [oldSegment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              part: oldPart,
+              segment: oldSegment
+            },
+          } } as RundownInterface)
 
           expect(newSegment.isOnAir()).toBeFalsy()
           testee.updateSegment(newSegment)

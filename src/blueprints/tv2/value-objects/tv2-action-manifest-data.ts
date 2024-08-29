@@ -8,6 +8,7 @@ export type Tv2ActionManifestData = Tv2ActionManifestVideoClipData
 | Tv2ActionManifestSplitScreenData
 | Tv2ActionManifestFullscreenGraphicsData
 | Tv2ActionManifestOverlayGraphicsData
+| Tv2ActionManifestAudioBedData
 /**
  * The 'userData' field corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Video Clips.
  * The attributes need to match the attributes in the database
@@ -74,6 +75,11 @@ export interface Tv2ActionManifestOverlayGraphicsData {
   content?: {
     path: string // This is the VcpId for Pilot graphics
   }
+}
+
+export interface Tv2ActionManifestAudioBedData {
+  rank: number
+  name: string
 }
 
 export enum SplitScreenBoxInput {
