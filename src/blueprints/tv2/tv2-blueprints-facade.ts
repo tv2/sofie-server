@@ -20,7 +20,7 @@ export class Tv2BlueprintsFacade {
 
     const actionService: Tv2ActionService = Tv2ActionService.getInstance(
       configurationMapper,
-      new Tv2ActionFactoryProvider()
+      new Tv2ActionFactoryProvider(configurationMapper)
     )
 
     return new Tv2Blueprint(

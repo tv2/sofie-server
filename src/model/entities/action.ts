@@ -3,6 +3,7 @@ import { Part, PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
 import { Media } from './media'
 import { InTransition } from '../value-objects/in-transition'
+import { Configuration } from './configuration'
 
 export interface Action {
   id: string
@@ -49,13 +50,14 @@ export interface PieceAction extends Action {
   }
 }
 
-export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods | MutateActionWithArgumentsMethods
+export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods | MutateActionWithArgumentsMethods | MutateActionWithConfiguration
 
 export enum MutateActionType {
   PIECE = 'PIECE',
   MEDIA = 'MEDIA',
   HISTORIC_PART= 'HISTORIC_PART',
-  APPLY_ARGUMENTS = 'APPLY_ARGUMENTS'
+  APPLY_ARGUMENTS = 'APPLY_ARGUMENTS',
+  CONFIGURATION = 'CONFIGURATION'
 }
 
 export interface MutateActionWithPieceMethods {
@@ -79,6 +81,11 @@ export interface MutateActionWithHistoricPartMethods {
 export interface MutateActionWithArgumentsMethods {
   type: MutateActionType.APPLY_ARGUMENTS,
   updateActionWithArguments: (action: Action, actionArguments: unknown) => Action
+}
+
+export interface MutateActionWithConfiguration {
+  type: MutateActionType.CONFIGURATION,
+  updateWithConfiguration: (action: Action, configuration: Configuration, showStyleVariantId: string) => Action
 }
 
 /**
