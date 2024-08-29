@@ -36,7 +36,6 @@ export class Piece {
   public readonly preRollDuration: number
   public readonly postRollDuration: number
   public readonly transitionType: TransitionType
-  public readonly timelineObjects: TimelineObject[]
 
   public readonly metadata?: unknown
   public readonly content?: unknown
@@ -48,6 +47,7 @@ export class Piece {
   private executedAt: number
   private isUnsyncedPiece: boolean = false
   private isPieceInsertedOnAir: boolean
+  private timelineObjects: TimelineObject[]
 
   constructor(piece: PieceInterface) {
     this.id = piece.id
@@ -61,13 +61,13 @@ export class Piece {
     this.preRollDuration = piece.preRollDuration
     this.postRollDuration = piece.postRollDuration
     this.transitionType = piece.transitionType
-    this.timelineObjects = piece.timelineObjects
 
     this.metadata = piece.metadata
     this.content = piece.content
     this.tags = piece.tags
     this.isUnsyncedPiece = piece.isUnsynced
     this.isPieceInsertedOnAir = piece.isInsertedOnAir ?? false
+    this.timelineObjects = piece.timelineObjects ? [...piece.timelineObjects] : []
 
     this.setExecutedAt(piece.executedAt ?? 0)
   }
@@ -79,6 +79,7 @@ export class Piece {
       // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
       this.executedAt = 0
     }
+    this.timelineObjects = [...ingestedPiece.timelineObjects]
   }
 
   public setExecutedAt(executedAt: number): void {
@@ -149,5 +150,13 @@ export class Piece {
   public getUnsyncedCopy(): Piece {
     const unsyncedId: string = this.id.endsWith(UNSYNCED_ID_POSTFIX) ? this.id : `${this.id}${UNSYNCED_ID_POSTFIX}`
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: unsyncedId})
+  }
+
+  public getTimelineObjects(): TimelineObject[] {
+    return [...this.timelineObjects]
+  }
+
+  public insertTimelineObjects(timelineObjects: TimelineObject[]): void {
+    this.timelineObjects.push(...timelineObjects)
   }
 }

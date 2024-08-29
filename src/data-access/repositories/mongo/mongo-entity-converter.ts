@@ -398,7 +398,7 @@ export class MongoEntityConverter {
       postRollDuration: piece.postRollDuration,
       executedAt: piece.getExecutedAt(),
       transitionType: piece.transitionType,
-      timelineObjects: piece.timelineObjects,
+      timelineObjects: piece.getTimelineObjects(),
       metadata: piece.metadata,
       content: piece.content,
       isUnsynced: piece.isUnsynced(),

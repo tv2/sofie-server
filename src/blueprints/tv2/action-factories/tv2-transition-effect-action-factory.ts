@@ -137,7 +137,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const updateTransitionMutateAction: MutateActionWithPieceMethods = {
       type: MutateActionType.PIECE,
       updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
-      piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
+      piecePredicate: (piece: Piece) => piece.getTimelineObjects().some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
     }
     mutateActionMethods.push(updateTransitionMutateAction)
     return mutateActionMethods
@@ -353,27 +353,48 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
         const cutTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObjects(sourceInput)
-        action.data.pieceInterface.timelineObjects.push(...cutTransitionTimelineObjects)
+        action.data.pieceInterface.timelineObjects.push(
+          ...cutTransitionTimelineObjects
+        )
+        // We need to insert TimelineObjects into the original Piece, so we can "cancel out" the TimelineObject that contains a planned transition.
+        // If we don't, then planned transitions that are longer than these unplanned transitions will be executed after the unplanned transition is done.
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, 0))
         break
       }
       case TransitionEffectType.MIX: {
         const mixTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames)
-        action.data.pieceInterface.timelineObjects.push(...mixTransitionTimelineObjects)
+        action.data.pieceInterface.timelineObjects.push(
+          ...mixTransitionTimelineObjects
+        )
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, action.metadata.durationInFrames))
         break
       }
       case TransitionEffectType.DIP: {
         const dipTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
-        action.data.pieceInterface.timelineObjects.push(...dipTransitionTimelineObjects)
+        action.data.pieceInterface.timelineObjects.push(
+          ...dipTransitionTimelineObjects
+        )
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, action.metadata.durationInFrames))
         break
       }
       case TransitionEffectType.BREAKER: {
         action.data.pieceInterface.timelineObjects.push(...this.createTimelineObjectsForBreakerTransitionEffect(action.metadata))
         action.data.partInTransition = this.createPartInTransitionForBreakerTransitionEffect(action.metadata)
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, 0))
         break
       }
     }
 
     return action
+  }
+
+  private createProgramWithoutTransitionTimelineObjects(sourceInput: number, transitionDurationInFrames: number): Tv2BlueprintTimelineObject[] {
+    const enable: TimelineEnable = {
+      start: this.frameTimeConverter.convertFramesToMilliseconds(transitionDurationInFrames)
+    }
+    const programWithoutTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createProgramTimelineObject(sourceInput, enable)
+    const cleanFeedWithoutTransitionTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, enable)
+    return [programWithoutTransitionTimelineObject, cleanFeedWithoutTransitionTimelineObject]
   }
 
   private createTimelineObjectsForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): Tv2BlueprintTimelineObject[] {

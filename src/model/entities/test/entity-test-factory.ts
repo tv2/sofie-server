@@ -11,6 +11,7 @@ import { RundownTimingType } from '../../enums/rundown-timing-type'
 import { TransitionType } from '../../enums/transition-type'
 import { ActionManifest } from '../action'
 import { IngestedPart } from '../ingested-part'
+import { IngestedPiece } from '../ingested-piece'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -108,6 +109,23 @@ export class EntityTestFactory {
       isUnsynced: false,
       ...pieceInterface
     })
+  }
+
+  public static createIngestedPiece(ingestedPiece: Partial<IngestedPiece>): IngestedPiece {
+    return {
+      id: '',
+      partId: '',
+      name: '',
+      start: 0,
+      layer: '',
+      duration: 0,
+      pieceLifespan: PieceLifespan.WITHIN_PART,
+      transitionType: TransitionType.NO_TRANSITION,
+      preRollDuration: 0,
+      postRollDuration: 0,
+      timelineObjects: [],
+      ...ingestedPiece
+    }
   }
 
   public static createDevice(device: Partial<Device> = {}): Device {
