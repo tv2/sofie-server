@@ -212,13 +212,8 @@ export class Part {
   }
 
   private stopPiecesOnLayer(layer: string): void {
-    const existingPiecesOnLayer: Piece[] = this.pieces.filter(piece => piece.layer === layer)
-    existingPiecesOnLayer.forEach(piece => {
-      if (piece.getDuration()) {
-        return
-      }
-      piece.stop()
-    })
+    this.pieces.filter(piece => piece.layer === layer && !piece.getDuration())
+      .forEach(stoppablePiece => stoppablePiece.stop())
   }
 
   private removePieceOnLayer(layer: string): void {
