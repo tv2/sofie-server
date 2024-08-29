@@ -55,9 +55,9 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
 
   private createTriCasterMeTimelineObjectForLayer(id: string, layer: Tv2TriCasterLayer, enable: TimelineEnable, me: TriCasterMixEffectProgramContent): TriCasterMixEffectTimelineObject {
     return {
-      id,
+      id: `${id}_${Math.floor(Math.random() * 100)}`,
       enable,
-      priority: 1,
+      priority: 2, // Old Blueprints uses priority 1. By setting it to 2 we know our TimelineObjects always take priority.
       layer,
       content: {
         deviceType: DeviceType.TRICASTER,
@@ -370,7 +370,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
   }
 
   public findProgramSourceInputFromPiece(piece: Piece): number | undefined {
-    const timelineObject: TimelineObject | undefined = piece.timelineObjects.find(timelineObject => timelineObject.layer === Tv2TriCasterLayer.PROGRAM)
+    const timelineObject: TimelineObject | undefined = piece.getTimelineObjects().find(timelineObject => timelineObject.layer === Tv2TriCasterLayer.PROGRAM)
     if (!timelineObject) {
       this.logger.data(piece).warn(`Unable to update the TriCaster input, since no timeline object was found on the layer '${Tv2TriCasterLayer.PROGRAM}' on the piece with id '${piece.id}'`)
       return
