@@ -1,30 +1,30 @@
-import { Segment } from './segment'
-import { Part } from './part'
-import { LastPartInSegmentException } from '../exceptions/last-part-in-segment-exception'
-import { NotFoundException } from '../exceptions/not-found-exception'
-import { NotActivatedException } from '../exceptions/not-activated-exception'
-import { AlreadyActivatedException } from '../exceptions/already-activated-exception'
-import { Piece } from './piece'
-import { BasicRundown } from './basic-rundown'
-import { PieceLifespan } from '../enums/piece-lifespan'
-import { MisconfigurationException } from '../exceptions/misconfiguration-exception'
-import { ExhaustiveCaseChecker } from '../../business-logic/exhaustive-case-checker'
-import { TimelineObject } from './timeline-object'
-import { LastPartInRundownException } from '../exceptions/last-part-in-rundown-exception'
-import { RundownPersistentState } from '../value-objects/rundown-persistent-state'
-import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
-import { RundownCursor } from '../value-objects/rundown-cursor'
-import { Owner } from '../enums/owner'
-import { AlreadyExistException } from '../exceptions/already-exist-exception'
-import { LastSegmentInRundownException } from '../exceptions/last-segment-in-rundown-exception'
-import { NoPartInHistoryException } from '../exceptions/no-part-in-history-exception'
-import { OnAirException } from '../exceptions/on-air-exception'
-import { RundownTiming } from '../value-objects/rundown-timing'
-import { InTransition } from '../value-objects/in-transition'
-import { RundownMode } from '../enums/rundown-mode'
-import { AlreadyRehearsalException } from '../exceptions/already-rehearsal-exception'
-import { InvalidSegmentException } from '../exceptions/invalid-segment-exception'
-import { InvalidPartException } from '../exceptions/invalid-part-exception'
+import {Segment} from './segment'
+import {Part} from './part'
+import {LastPartInSegmentException} from '../exceptions/last-part-in-segment-exception'
+import {NotFoundException} from '../exceptions/not-found-exception'
+import {NotActivatedException} from '../exceptions/not-activated-exception'
+import {AlreadyActivatedException} from '../exceptions/already-activated-exception'
+import {Piece} from './piece'
+import {BasicRundown} from './basic-rundown'
+import {PieceLifespan} from '../enums/piece-lifespan'
+import {MisconfigurationException} from '../exceptions/misconfiguration-exception'
+import {ExhaustiveCaseChecker} from '../../business-logic/exhaustive-case-checker'
+import {TimelineObject} from './timeline-object'
+import {LastPartInRundownException} from '../exceptions/last-part-in-rundown-exception'
+import {RundownPersistentState} from '../value-objects/rundown-persistent-state'
+import {UnsupportedOperationException} from '../exceptions/unsupported-operation-exception'
+import {RundownCursor} from '../value-objects/rundown-cursor'
+import {Owner} from '../enums/owner'
+import {AlreadyExistException} from '../exceptions/already-exist-exception'
+import {LastSegmentInRundownException} from '../exceptions/last-segment-in-rundown-exception'
+import {NoPartInHistoryException} from '../exceptions/no-part-in-history-exception'
+import {OnAirException} from '../exceptions/on-air-exception'
+import {RundownTiming} from '../value-objects/rundown-timing'
+import {InTransition} from '../value-objects/in-transition'
+import {RundownMode} from '../enums/rundown-mode'
+import {AlreadyRehearsalException} from '../exceptions/already-rehearsal-exception'
+import {InvalidSegmentException} from '../exceptions/invalid-segment-exception'
+import {InvalidPartException} from '../exceptions/invalid-part-exception'
 
 export interface RundownInterface {
   id: string
@@ -109,7 +109,10 @@ export class Rundown extends BasicRundown {
 
   private initializeRundown(mode: RundownMode): void {
     this.mode = mode
+    this.setFirstSegmentAndPartNextCursor()
+  }
 
+  private setFirstSegmentAndPartNextCursor(): void {
     const firstSegment: Segment = this.findFirstSegment()
     firstSegment.setAsNext()
     const firstPart: Part = firstSegment.findFirstPart()
@@ -150,8 +153,15 @@ export class Rundown extends BasicRundown {
 
   private setNextFromActive(owner: Owner): void {
     this.unmarkNextPart()
-
     if (!this.activeCursor) {
+      try {
+        this.unmarkNextSegment()
+        this.setFirstSegmentAndPartNextCursor()
+      } catch (exception) {
+        if (!(exception instanceof NotFoundException)) {
+          throw exception
+        }
+      }
       return
     }
 
