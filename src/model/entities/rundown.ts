@@ -109,7 +109,10 @@ export class Rundown extends BasicRundown {
 
   private initializeRundown(mode: RundownMode): void {
     this.mode = mode
+    this.setFirstSegmentAndPartNextCursor()
+  }
 
+  private setFirstSegmentAndPartNextCursor(): void {
     const firstSegment: Segment = this.findFirstSegment()
     firstSegment.setAsNext()
     const firstPart: Part = firstSegment.findFirstPart()
@@ -150,8 +153,18 @@ export class Rundown extends BasicRundown {
 
   private setNextFromActive(owner: Owner): void {
     this.unmarkNextPart()
-
     if (!this.activeCursor) {
+      try {
+        this.unmarkNextSegment()
+        if (this.getSegments().length === 0) {
+          this.nextCursor = undefined
+        }
+        this.setFirstSegmentAndPartNextCursor()
+      } catch (exception) {
+        if (!(exception instanceof NotFoundException)) {
+          throw exception
+        }
+      }
       return
     }
 
