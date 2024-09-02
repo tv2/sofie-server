@@ -3066,6 +3066,20 @@ describe(Rundown.name, () => {
         expect(testee.getSegments()[1]).toBe(segmentToAdd)
         expect(testee.getSegments()[2]).toBe(segmentTwo)
       })
+
+      describe('the Rundown is on air and has no active part', () => {
+        describe('there are no other Segments in the Rundown', () => {
+          it('sets the Segment as next', () => {
+            const part: Part = EntityTestFactory.createPart()
+            const segment: Segment = EntityTestFactory.createSegment( {parts: [part]})
+            const testee: Rundown = new Rundown({mode: RundownMode.ACTIVE, alreadyActiveProperties: {activeCursor: undefined, nextCursor: undefined}} as RundownInterface)
+
+            testee.addSegment(segment)
+
+            expect(testee.getNextCursor()?.segment.id).toBe(segment.id)
+          })
+        })
+      })
     })
 
     // This describe block is to the test functionality of how to update the next cursor. It's a private method so we are using 'addSegment()'
@@ -3374,13 +3388,27 @@ describe(Rundown.name, () => {
     })
 
     describe('Segment exist on Rundown', () => {
-      it('removes the Segment from the Rundown', () => {
-        const segment: Segment = EntityTestFactory.createSegment()
-        const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
+      describe('Segment is not on air', () => {
+        it('removes the Segment from the Rundown', () => {
+          const segment: Segment = EntityTestFactory.createSegment()
+          const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
 
-        expect(testee.getSegments()).toContain(segment)
-        testee.removeSegment(segment.id)
-        expect(testee.getSegments()).not.toContain(segment)
+          expect(testee.getSegments()).toContain(segment)
+          testee.removeSegment(segment.id)
+          expect(testee.getSegments()).not.toContain(segment)
+        })
+        describe('the Rundown is active and has no active part', () => {
+          describe('Segment is the only Segment in the Rundown', () => {
+            it('removes the next cursor', () => {
+              const part: Part = EntityTestFactory.createPart()
+              const segment: Segment = EntityTestFactory.createSegment( {parts: [part]})
+              const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {activeCursor: undefined, nextCursor: {segment, part}} } as RundownInterface)
+
+              testee.removeSegment(segment.id)
+              expect(testee.getNextCursor()).toBe(undefined)
+            })
+          })
+        })
       })
 
       describe('Segment is on Air', () => {
