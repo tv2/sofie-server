@@ -51,6 +51,7 @@ import {
   Tv2AudioBedTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-bed-timeline-object-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
+import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
 
 
 interface ActionFactoryInstance<T> {
@@ -71,6 +72,8 @@ export class Tv2ActionFactoryProvider {
   private splitScreenActionFactoryInstance: ActionFactoryInstance<Tv2SplitScreenActionFactory>
   private replayActionFactoryInstance: ActionFactoryInstance<Tv2ReplayActionFactory>
   private robotActionFactoryInstance: ActionFactoryInstance<Tv2RobotActionFactory>
+
+  constructor(private readonly configurationMapper: Tv2ConfigurationMapper) { }
 
   public createCameraActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2CameraActionFactory {
     this.cameraActionFactoryInstance = this.getUpdatedActionFactoryInstance(
@@ -216,7 +219,8 @@ export class Tv2ActionFactoryProvider {
           this.createGraphicsTimelineObjectFactoryFactory(),
           this.createAudioMixerTimelineObjectFactory(),
           this.createVideoMixerTimelineObjectFactory(configuration),
-          this.createStringHashConverter()
+          this.createStringHashConverter(),
+          this.configurationMapper
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {

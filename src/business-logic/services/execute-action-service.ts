@@ -4,6 +4,7 @@ import {
   MutateActionMethods,
   MutateActionType,
   MutateActionWithArgumentsMethods,
+  MutateActionWithConfiguration,
   MutateActionWithHistoricPartMethods,
   MutateActionWithMedia,
   MutateActionWithPieceMethods,
@@ -21,12 +22,15 @@ import { RundownRepository } from '../../data-access/repositories/interfaces/run
 import { Rundown } from '../../model/entities/rundown'
 import { MediaRepository } from '../../data-access/repositories/interfaces/MediaRepository'
 import { Media } from '../../model/entities/media'
+import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
+import { Configuration } from '../../model/entities/configuration'
 
 export class ExecuteActionService implements ActionService {
   constructor(
     private readonly actionRepository: ActionRepository,
     private readonly rundownRepository: RundownRepository,
     private readonly mediaRepository: MediaRepository,
+    private readonly configurationRepository: ConfigurationRepository,
     private readonly rundownService: RundownService,
     private readonly blueprint: Blueprint
   ) {}
@@ -98,6 +102,9 @@ export class ExecuteActionService implements ActionService {
       case MutateActionType.APPLY_ARGUMENTS: {
         return this.mutateActionWithArgument(mutateActionMethods, action, actionArguments)
       }
+      case MutateActionType.CONFIGURATION: {
+        return this.mutateActionWithConfiguration(mutateActionMethods, action, rundownId)
+      }
       default: {
         return action
       }
@@ -135,6 +142,12 @@ export class ExecuteActionService implements ActionService {
 
   private mutateActionWithArgument(mutateActionsMethods: MutateActionWithArgumentsMethods, action: Action, actionArguments: unknown): Action {
     return mutateActionsMethods.updateActionWithArguments(action, actionArguments)
+  }
+
+  private async mutateActionWithConfiguration(mutateActionsMethods: MutateActionWithConfiguration, action: Action, rundownId: string): Promise<Action> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    return mutateActionsMethods.updateWithConfiguration(action, configuration, rundown.getShowStyleVariantId())
   }
 
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
