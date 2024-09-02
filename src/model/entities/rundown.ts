@@ -825,4 +825,29 @@ export class Rundown extends BasicRundown {
     }
     return segmentForPart.findPart(partId)
   }
+
+  /**
+   * Removes 'old' unplanned Parts on the active Segment.
+   * When called, if there are more Parts on the active Segment than the given threshold, then all old unplanned Parts will be removed from the Segment.
+   * Default prune threshold is 100 Parts.
+   * An unplanned Part is old if it's not the active, previous or next Part.
+   * Pruning is necessary if Parts are continued to be inserted into the same Segment. (Requires 400+ Parts in a Segment to be noticeable)
+   * Returns a list of PartIds of the Part that was pruned. Returns an empty list of no Parts where pruned.
+   */
+  public pruneOldUnplannedPartsOnActiveSegment(pruneThreshold: number = 100): string[] {
+    if (this.getActiveSegment().getParts().length < pruneThreshold) {
+      return []
+    }
+
+    const activePartIndex: number = this.getActiveSegment().getParts().findIndex(part => part.isOnAir())
+    const partsToPruneIds: string[] = this.getActiveSegment().getParts().filter((part: Part, index: number) => {
+      if (index >= activePartIndex || part.id === this.previousPart?.id) {
+        return false
+      }
+      return !part.isPlanned
+    }).map(part => part.id)
+
+    partsToPruneIds.forEach(partId => this.getActiveSegment().removePart(partId))
+    return partsToPruneIds
+  }
 }
