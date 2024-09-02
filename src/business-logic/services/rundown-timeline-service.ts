@@ -258,7 +258,12 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    this.rundownEventEmitter.emitPartInsertedAsOnAirEvent(rundown, part)
+    const prunedPartIds: string[] = rundown.pruneOldUnplannedPartsOnActiveSegment()
+    if (prunedPartIds.length > 0) {
+      this.rundownEventEmitter.emitSegmentUpdated(rundown, rundown.getActiveSegment())
+    } else if (rundown.getActivePart().id === part.id) {
+      this.rundownEventEmitter.emitPartInsertedAsOnAirEvent(rundown, part)
+    }
 
     await this.saveRundown(rundown)
   }

@@ -1,27 +1,28 @@
-import {Segment, SegmentInterface} from '../segment'
-import {Rundown, RundownInterface} from '../rundown'
-import {Part} from '../part'
-import {Piece} from '../piece'
-import {PieceLifespan} from '../../enums/piece-lifespan'
-import {EntityMockFactory} from './entity-mock-factory'
-import {capture, instance, mock, spy, verify, when} from '@typestrong/ts-mockito'
-import {NotActivatedException} from '../../exceptions/not-activated-exception'
-import {NotFoundException} from '../../exceptions/not-found-exception'
-import {LastPartInSegmentException} from '../../exceptions/last-part-in-segment-exception'
-import {LastPartInRundownException} from '../../exceptions/last-part-in-rundown-exception'
-import {AlreadyActivatedException} from '../../exceptions/already-activated-exception'
-import {Owner} from '../../enums/owner'
-import {EntityTestFactory} from './entity-test-factory'
-import {AlreadyExistException} from '../../exceptions/already-exist-exception'
-import {RundownCursor} from '../../value-objects/rundown-cursor'
-import {UNSYNCED_ID_POSTFIX} from '../../value-objects/unsynced_constants'
-import {OnAirException} from '../../exceptions/on-air-exception'
-import {NoPartInHistoryException} from '../../exceptions/no-part-in-history-exception'
-import {RundownMode} from '../../enums/rundown-mode'
-import {AlreadyRehearsalException} from '../../exceptions/already-rehearsal-exception'
-import {InvalidSegmentException} from '../../exceptions/invalid-segment-exception'
-import {Invalidity} from '../../value-objects/invalidity'
-import {InvalidPartException} from '../../exceptions/invalid-part-exception'
+import { Segment, SegmentInterface } from '../segment'
+import { Rundown, RundownInterface } from '../rundown'
+import { Part } from '../part'
+import { Piece } from '../piece'
+import { PieceLifespan } from '../../enums/piece-lifespan'
+import { EntityMockFactory } from './entity-mock-factory'
+import { capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
+import { NotActivatedException } from '../../exceptions/not-activated-exception'
+import { NotFoundException } from '../../exceptions/not-found-exception'
+import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
+import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
+import { AlreadyActivatedException } from '../../exceptions/already-activated-exception'
+import { Owner } from '../../enums/owner'
+import { EntityTestFactory } from './entity-test-factory'
+import { AlreadyExistException } from '../../exceptions/already-exist-exception'
+import { RundownCursor } from '../../value-objects/rundown-cursor'
+import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
+import { OnAirException } from '../../exceptions/on-air-exception'
+import { NoPartInHistoryException } from '../../exceptions/no-part-in-history-exception'
+import { RundownMode } from '../../enums/rundown-mode'
+import { AlreadyRehearsalException } from '../../exceptions/already-rehearsal-exception'
+import { InvalidSegmentException } from '../../exceptions/invalid-segment-exception'
+import { Invalidity } from '../../value-objects/invalidity'
+import { InvalidPartException } from '../../exceptions/invalid-part-exception'
+import { PartTimings } from '../../value-objects/part-timings'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -4187,6 +4188,334 @@ describe(Rundown.name, () => {
 
             expect(partToBeInserted.getRank()).toBe(expectedRank)
           })
+        })
+      })
+    })
+  })
+
+  describe(Rundown.prototype.pruneOldUnplannedPartsOnActiveSegment.name, () => {
+    describe('there are less Parts on the active Segment than the threshold', () => {
+      it('does not remove any Parts from the active Segment', () => {
+        const part: Part = EntityTestFactory.createPart()
+        const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
+        const threshold: number = 3
+
+        const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+          activeCursor: {
+            segment
+          }
+        } } as RundownInterface)
+
+        expect(testee.getActiveSegment().getParts()).toHaveLength(1)
+        testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+        expect(testee.getActiveSegment().getParts()).toHaveLength(1)
+      })
+
+      it('returns an empty array', () => {
+        const part: Part = EntityTestFactory.createPart()
+        const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
+        const threshold: number = 3
+
+        const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+          activeCursor: {
+            segment
+          }
+        } } as RundownInterface)
+
+        const result: string[] = testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+        expect(result).toHaveLength(0)
+      })
+    })
+
+    describe('there are more Parts on the active Segment than the threshold', () => {
+      describe('there is no active Part on the Segment', () => {
+        it('does not remove any Parts', () => {
+          const partOne: Part = EntityTestFactory.createPart()
+          const partTwo: Part = EntityTestFactory.createPart()
+          const partThree: Part = EntityTestFactory.createPart()
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [partOne, partTwo, partThree] })
+          const threshold: number = 2
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment
+            }
+          } } as RundownInterface)
+
+          expect(testee.getActivePart()).toBeUndefined()
+          expect(testee.getActiveSegment().getParts()).toHaveLength(3)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(testee.getActiveSegment().getParts()).toHaveLength(3)
+        })
+
+        it('returns an empty array', () => {
+          const partOne: Part = EntityTestFactory.createPart()
+          const partTwo: Part = EntityTestFactory.createPart()
+          const partThree: Part = EntityTestFactory.createPart()
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [partOne, partTwo, partThree] })
+          const threshold: number = 2
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment
+            }
+          } } as RundownInterface)
+
+          const result: string[] = testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(result).toHaveLength(0)
+        })
+      })
+
+      describe('there is an active Part on the Segment', () => {
+        it('active Part is planned - does not remove the active Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const onAirPlannedPart: Part = EntityTestFactory.createPart({ isOnAir: true, ingestedPart: EntityTestFactory.createIngestedPart() })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirPlannedPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPlannedPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(onAirPlannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(onAirPlannedPart)
+        })
+
+        it('active Part is not planned - does not remove the active Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const onAirUnplannedPart: Part = EntityTestFactory.createPart({ isOnAir: true, ingestedPart: undefined })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirUnplannedPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirUnplannedPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(onAirUnplannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(onAirUnplannedPart)
+        })
+
+        it('next Part is planned - does not remove the next Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const nextPlannedPart: Part = EntityTestFactory.createPart({ isNext: true, ingestedPart: EntityTestFactory.createIngestedPart() })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirPart, nextPlannedPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPart
+            },
+            nextCursor: {
+              segment,
+              part: nextPlannedPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(nextPlannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(nextPlannedPart)
+        })
+
+        it('next Part is not planned - does not remove the next Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const nextUnplannedPart: Part = EntityTestFactory.createPart({ isNext: true, ingestedPart: undefined })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirPart, nextUnplannedPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPart
+            },
+            nextCursor: {
+              segment,
+              part: nextUnplannedPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(nextUnplannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(nextUnplannedPart)
+        })
+
+        it('previous Part is planned - does not remove the previous Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const previousPlannedPart: Part = EntityTestFactory.createPart({ ingestedPart: EntityTestFactory.createIngestedPart() })
+          const onAirPart: Part = EntityTestFactory.createPart({ })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, previousPlannedPart, onAirPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: previousPlannedPart // To set the previous Part we need to set it as the active and do a Take.
+            },
+            nextCursor: {
+              segment,
+              part: onAirPart // When we do the Take, this will become the onAir Part.
+            }
+          } } as RundownInterface)
+          testee.takeNext() // Necessary to set the previous Part.
+
+          expect(segment.getParts()).toContain(previousPlannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(previousPlannedPart)
+        })
+
+        it('previous Part is not planned - does not remove the previous Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const previousUnplannedPart: Part = EntityTestFactory.createPart({ isOnAir: true, ingestedPart: undefined, timings: {} as PartTimings })
+          const onAirPart: Part = EntityTestFactory.createPart({ })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, previousUnplannedPart, onAirPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: previousUnplannedPart // To set the previous Part we need to set it as the active and do a Take.
+            },
+            nextCursor: {
+              segment,
+              part: onAirPart // When we do the Take, this will become the onAir Part.
+            }
+          } } as RundownInterface)
+          testee.takeNext() // Necessary to set the previous Part.
+
+          expect(segment.getParts()).toContain(previousUnplannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(previousUnplannedPart)
+        })
+
+        it('does not remove any planned Parts', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const unplannedPartTwo: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const plannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: EntityTestFactory.createIngestedPart() })
+          const plannedPartTwo: Part = EntityTestFactory.createPart({ ingestedPart: EntityTestFactory.createIngestedPart() })
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, unplannedPartTwo, plannedPartOne, plannedPartTwo, onAirPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(unplannedPartOne)
+          expect(segment.getParts()).toContain(unplannedPartTwo)
+          expect(segment.getParts()).toContain(plannedPartOne)
+          expect(segment.getParts()).toContain(plannedPartTwo)
+
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+
+          expect(segment.getParts()).not.toContain(unplannedPartOne)
+          expect(segment.getParts()).not.toContain(unplannedPartTwo)
+          expect(segment.getParts()).toContain(plannedPartOne)
+          expect(segment.getParts()).toContain(plannedPartTwo)
+        })
+
+        it('does not remove any unplanned Parts after the active Part', () => {
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const unplannedPartOneAfterActivePart: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const unplannedPartTwoAfterActivePart: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, unplannedPartOneAfterActivePart, unplannedPartTwoAfterActivePart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(onAirPart)
+          expect(segment.getParts()).toContain(unplannedPartOneAfterActivePart)
+          expect(segment.getParts()).toContain(unplannedPartTwoAfterActivePart)
+
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+
+          expect(segment.getParts()).toContain(onAirPart)
+          expect(segment.getParts()).toContain(unplannedPartOneAfterActivePart)
+          expect(segment.getParts()).toContain(unplannedPartTwoAfterActivePart)
+        })
+
+        it('removes all unplanned Parts before the previous Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const unplannedPartTwo: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const unplannedPartThree: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const previousPart: Part = EntityTestFactory.createPart( { ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const unplannedPartAfterActivePart: Part = EntityTestFactory.createPart({ id: 'unplannedPartAfterActivePart', ingestedPart: undefined })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, unplannedPartTwo, unplannedPartThree, previousPart, onAirPart, unplannedPartAfterActivePart] })
+          const threshold: number = 2
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: previousPart // To set the previous Part we need to set it as the active and do a Take.
+            },
+            nextCursor: {
+              segment,
+              part: onAirPart // When we do the Take, this will become the onAir Part.
+            }
+          } } as RundownInterface)
+          testee.takeNext() // Necessary to set the previous Part.
+
+
+          expect(segment.getParts()).toContain(unplannedPartOne)
+          expect(segment.getParts()).toContain(unplannedPartTwo)
+          expect(segment.getParts()).toContain(unplannedPartThree)
+          expect(segment.getParts()).toContain(unplannedPartAfterActivePart)
+
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+
+          expect(segment.getParts()).not.toContain(unplannedPartOne)
+          expect(segment.getParts()).not.toContain(unplannedPartTwo)
+          expect(segment.getParts()).not.toContain(unplannedPartThree)
+          expect(segment.getParts()).toContain(unplannedPartAfterActivePart)
+        })
+
+
+        it('returns all PartIds of the removed Parts', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ id: 'unplannedPartOne', ingestedPart: undefined })
+          const unplannedPartTwo: Part = EntityTestFactory.createPart({ id: 'unplannedPartTwo', ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, unplannedPartTwo, onAirPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPart
+            }
+          } } as RundownInterface)
+
+          const result: string[] = testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(result).toHaveLength(2)
+          expect(result).toContain(unplannedPartOne.id)
+          expect(result).toContain(unplannedPartTwo.id)
         })
       })
     })
