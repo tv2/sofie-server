@@ -11,6 +11,7 @@ import {
   Tv2GraphicsTimelineObjectFactoryFactory
 } from '../../timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
 import { Tv2ActionManifestMapper } from '../../helpers/tv2-action-manifest-mapper'
+import { Tv2ConfigurationMapper } from '../../helpers/tv2-configuration-mapper'
 
 describe(Tv2GraphicsActionFactory.name, () => {
   it('compiles', () => {
@@ -23,7 +24,8 @@ function createTestee(params?: {
   graphicsTimelineObjectFactoryFactory?: Tv2GraphicsTimelineObjectFactoryFactory,
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
-  stringHashConverter?: Tv2StringHashConverter
+  stringHashConverter?: Tv2StringHashConverter,
+  configurationMapper?: Tv2ConfigurationMapper
 }): Tv2GraphicsActionFactory {
   return new Tv2GraphicsActionFactory(
     params?.actionManifestMapper ?? instance(mock(Tv2ActionManifestMapper)),
@@ -31,5 +33,6 @@ function createTestee(params?: {
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.stringHashConverter ?? instance(mock<Tv2StringHashConverter>()),
+    params?.configurationMapper ?? instance(mock<Tv2ConfigurationMapper>())
   )
 }

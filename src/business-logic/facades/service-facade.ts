@@ -64,6 +64,7 @@ export class ServiceFacade {
       RepositoryFacade.createActionRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createMediaRepository(),
+      RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createRundownService(),
       BlueprintsFacade.createBlueprint()
     )
