@@ -39,7 +39,7 @@ import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
 const HTML_GRAPHICS_INDEX_FILENAME: string = 'index'
 const ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR: string = '\n - '
-const AUDIO_CHANNEL_LAYOUT: string = 'bed'
+const AUDIO_BED_CHANNEL_LAYOUT: string = 'bed'
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory, Tv2AudioBedTimelineObjectFactory {
 
@@ -334,7 +334,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
         file: this.assetPathHelper.joinAssetToFolder(audioBedConfiguration.filename, audioBedSettings.mediaDirectory),
-        channelLayout: AUDIO_CHANNEL_LAYOUT,
+        channelLayout: AUDIO_BED_CHANNEL_LAYOUT,
         loop: true,
         noStarttime: true,
         mixer: {
@@ -372,6 +372,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
         file,
+        channelLayout: AUDIO_BED_CHANNEL_LAYOUT,
         transitions: {
           inTransition: {
             type: CasparCgTransitionType.MIX,
