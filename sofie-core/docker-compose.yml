@@ -1,0 +1,14 @@
+services:
+  sofie-core:
+    image: 'tv2media/sofie-server-core:v46.3.4-staging'
+    ports:
+      - '3000:80'
+    volumes:
+      - '${PWD}/coredisk:/opt/coredisk'
+      - '${PWD}/core-settings.json:/opt/core-settings.json:ro'
+    environment:
+      MONGO_URL: 'mongodb://host.docker.internal:3001/meteor?directConnection=true'
+      MONGO_OPLOG_URL: 'mongodb://host.docker.internal:3001/local?directConnection=true'
+      ROOT_URL: 'http://localhost:3000'
+      PORT: '80'
+      LOG_LEVEL: 'debug'

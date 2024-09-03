@@ -15,6 +15,7 @@
     "validate": "yarn audit --level moderate --groups dependencies --recursive",
     "clean": "rimraf dist",
     "reset": "rimraf --glob dist node_modules coverage *.log",
+    "start-sofie-core": "cross-env-shell \"cd sofie-core && docker compose up\"",
     "start-database": "ts-node ./database/manager/mongo.ts --start",
     "stop-database": "ts-node ./database/manager/mongo.ts --stop",
     "restart-database": "ts-node ./database/manager/mongo.ts --restart",
