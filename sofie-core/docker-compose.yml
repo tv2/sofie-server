@@ -1,6 +1,8 @@
 services:
   sofie-core:
     image: 'tv2media/sofie-server-core:v46.3.4-staging'
+    platform: 'linux/amd64'
+    container_name: 'sofie-core'
     ports:
       - '3000:80'
     volumes:
@@ -11,4 +13,19 @@ services:
       MONGO_OPLOG_URL: 'mongodb://host.docker.internal:3001/local?directConnection=true'
       ROOT_URL: 'http://localhost:3000'
       PORT: '80'
+      NODE_ENV: 'local'
       LOG_LEVEL: 'debug'
+
+  playout-gateway:
+    image: 'tv2media/sofie-playout-gateway:v46.3.4-staging'
+    platform: 'linux/amd64'
+    container_name: 'playout-gateway'
+    environment:
+      CORE_HOST: 'server-core'
+      CORE_PORT: '80'
+      DEVICE_ID: 'playout-gateway-localhost'
+      DEVICE_TOKEN: 'playout-gateway-token'
+      NODE_ENV: 'local'
+      LOG_LEVEL: 'debug'
+
+    
