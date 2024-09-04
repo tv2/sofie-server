@@ -1,0 +1,7 @@
+{
+  "name": "sofie-stack",
+  "private": true,
+  "scripts": {
+    "start": "docker compose up"
+  }
+}
