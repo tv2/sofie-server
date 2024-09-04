@@ -27,7 +27,7 @@ import {
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Piece } from '../../../model/entities/piece'
 import { TimelineObject } from '../../../model/entities/timeline-object'
-import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../value-objects/tv2-metadata'
 import { Tv2Logger } from '../tv2-logger'
 
 const ATEM_PREFIX: string = 'atem_'
@@ -107,7 +107,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: Tv2TimelineObjectMetadata): AtemMeTimelineObject {
     return this.createAtemMeTimelineObjectForLayer(
       `${ATEM_PREFIX}program`,
       Tv2AtemLayer.PROGRAM,
@@ -115,7 +115,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       {
         input: sourceInput,
         transition: AtemTransition.CUT
-      })
+      },
+      metadata
+    )
   }
 
 
@@ -142,12 +144,13 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMeTimelineObject['content']['me']): AtemMeTimelineObject {
+  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMeTimelineObject['content']['me'], metadata?: Tv2TimelineObjectMetadata): AtemMeTimelineObject {
     return {
       id: `${id}_${Math.floor(Math.random() * 100)}`,
       enable,
       priority: 2, // Old Blueprints uses priority 1. By setting it to 2 we know our TimelineObjects always take priority.
       layer,
+      metaData: metadata,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.ME,
@@ -156,7 +159,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): AtemMeTimelineObject {
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: Tv2TimelineObjectMetadata): AtemMeTimelineObject {
     return this.createAtemMeTimelineObjectForLayer(
       `${ATEM_PREFIX}clean_feed`,
       Tv2AtemLayer.CLEAN_FEED,
@@ -164,7 +167,9 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       {
         input: sourceInput,
         transition: AtemTransition.CUT,
-      })
+      },
+      metadata
+    )
   }
 
   public createCleanFeedTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject {
@@ -289,18 +294,18 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     return atemMeTimelineObject.content.me.input
   }
 
-  public createCutTransitionEffectTimelineObjects(sourceInput: number): AtemMeTimelineObject[] {
+  public createCutTransitionEffectTimelineObjects(sourceInput: number, metadata?: Tv2TimelineObjectMetadata): AtemMeTimelineObject[] {
     const meContent: AtemMeTimelineObject['content']['me'] = {
       input: sourceInput,
       transition: AtemTransition.CUT
     }
     return [
-      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent),
-      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent)
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent, metadata),
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent, metadata)
     ]
   }
 
-  private createTransitionEffectTimelineObject(layer: Tv2AtemLayer, meContent: AtemMeTimelineObject['content']['me']): AtemMeTimelineObject {
+  private createTransitionEffectTimelineObject(layer: Tv2AtemLayer, meContent: AtemMeTimelineObject['content']['me'], metadata?: Tv2TimelineObjectMetadata): AtemMeTimelineObject {
     return {
       id: `${layer}_${meContent.transition}`,
       enable: {
@@ -308,6 +313,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       },
       layer,
       priority: 10,
+      metaData: metadata,
       content: {
         deviceType: DeviceType.ATEM,
         type: AtemType.ME,
@@ -316,7 +322,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number): AtemMeTimelineObject[] {
+  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: Tv2TimelineObjectMetadata): AtemMeTimelineObject[] {
     const meContent: AtemMeTimelineObject['content']['me'] = {
       input: sourceInput,
       transition: AtemTransition.MIX,
@@ -327,12 +333,12 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       }
     }
     return [
-      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent),
-      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent)
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent, metadata),
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent, metadata)
     ]
   }
 
-  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number): AtemMeTimelineObject[] {
+  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number, metadata?: Tv2TimelineObjectMetadata): AtemMeTimelineObject[] {
     const meContent: AtemMeTimelineObject['content']['me'] = {
       input: sourceInput,
       transition: AtemTransition.DIP,
@@ -344,8 +350,8 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       }
     }
     return [
-      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent),
-      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent)
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent, metadata),
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent, metadata)
     ]
   }
 
