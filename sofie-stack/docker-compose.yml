@@ -35,6 +35,8 @@ services:
     platform: 'linux/amd64'
     container_name: 'inews-gateway'
     restart: 'always'
+    ports:
+      - '3007:3007'
     environment:
       CORE_HOST: 'server-core'
       CORE_PORT: '80'
