@@ -351,7 +351,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     }
 
     const metadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
-    const mediaPlayerSession: string | undefined = metadata.mediaPlayerSessions && metadata.mediaPlayerSessions.length > 0 ? metadata.mediaPlayerSessions[0] : undefined
+    const mediaPlayerSession: string | undefined = metadata.mediaPlayerSessions?.[0]
 
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
