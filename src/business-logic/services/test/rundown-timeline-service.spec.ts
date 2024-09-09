@@ -541,7 +541,7 @@ describe(RundownTimelineService.name, () => {
         const rundownRepository: RundownRepository = mock<RundownRepository>()
         when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
-        const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+        const testee: RundownTimelineService = createTestee({ rundownRepository })
         rundown.enterRehearsal()
         expect(rundown.isRehearsal()).toBeTruthy()
 
@@ -563,7 +563,7 @@ describe(RundownTimelineService.name, () => {
         const rundownRepository: RundownRepository = mock<RundownRepository>()
         when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
-        const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository) })
+        const testee: RundownTimelineService = createTestee({ rundownRepository })
         rundown.activate()
         expect(rundown.isActive()).toBeTruthy()
 
@@ -586,7 +586,7 @@ describe(RundownTimelineService.name, () => {
 
       const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
 
-      const testee: RundownTimelineService = createTestee({ rundownRepository: instance(rundownRepository), rundownEventEmitter: instance(rundownEventEmitter) })
+      const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
       rundown.activate()
 
       await testee.resetRundown(rundown.id)

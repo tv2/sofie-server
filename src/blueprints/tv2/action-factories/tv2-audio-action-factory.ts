@@ -291,9 +291,12 @@ export class Tv2AudioActionFactory extends ActionFactory {
     const audioAction: Tv2FadeAudioBedAction = action as Tv2FadeAudioBedAction
 
     const fadeDurationInMilliseconds: number =  this.frameTimeConverter.convertFramesToMilliseconds(this.isInteger(fadeDurationInFrames) ? fadeDurationInFrames : audioAction.metadata.defaultFadeDurationInFrames)
-    const fadeAudioBedTimelineObject: Tv2BlueprintTimelineObject = this.audioBedTimelineObjectFactory.createFadeAudioBedTimelineObject(fadeDurationInMilliseconds)
+    const fadeAudioBedTimelineObjects: Tv2BlueprintTimelineObject[] = [
+      this.audioBedTimelineObjectFactory.createFadeAudioBedTimelineObject(fadeDurationInMilliseconds),
+      this.audioMixerTimelineObjectFactory.createAudioBedAudioTimelineObject(),
+    ]
 
-    audioAction.data.pieceInterface.timelineObjects.push(fadeAudioBedTimelineObject)
+    audioAction.data.pieceInterface.timelineObjects.push(...fadeAudioBedTimelineObjects)
     audioAction.data.pieceInterface.duration = fadeDurationInMilliseconds
 
     return audioAction
