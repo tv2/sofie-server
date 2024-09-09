@@ -42,7 +42,8 @@ export class ServiceFacade {
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createIngestService(),
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
-      BlueprintsFacade.createBlueprint()
+      BlueprintsFacade.createBlueprint(),
+      LoggerFacade.createLogger(),
     )
 
     return ThrottledRundownService.getInstance(rundownTimelineService)

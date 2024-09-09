@@ -22,8 +22,11 @@ import { IngestedRundownRepository } from '../../data-access/repositories/interf
 import { RundownMode } from '../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../model/exceptions/already-rehearsal-exception'
 import { IngestService } from './interfaces/ingest-service'
+import { Logger } from '../../logger/logger'
 
 export class RundownTimelineService implements RundownService {
+  private readonly logger: Logger
+
   constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
@@ -35,8 +38,11 @@ export class RundownTimelineService implements RundownService {
     private readonly timelineBuilder: TimelineBuilder,
     private readonly ingestService: IngestService,
     private readonly callbackScheduler: CallbackScheduler,
-    private readonly blueprint: Blueprint
-  ) {}
+    private readonly blueprint: Blueprint,
+    logger: Logger,
+  ) {
+    this.logger = logger.tag(this.constructor.name)
+  }
 
   public async activateRundown(rundownId: string): Promise<void> {
     await this.assertNoRundownIsActive()
@@ -202,7 +208,10 @@ export class RundownTimelineService implements RundownService {
 
   private startAutoNext(timeline: Timeline, rundownId: string): void {
     if (timeline.autoNext) {
-      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
+      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, () => {
+        this.takeNext(rundownId)
+          .catch(error => this.logger.data(error).error('Failed executing take with auto next:'))
+      })
     }
   }
 
