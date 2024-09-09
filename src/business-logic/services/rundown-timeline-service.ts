@@ -307,8 +307,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const segmentId: string = rundown.getNextSegment().id
-    this.rundownEventEmitter.emitPieceInsertedEvent(rundown, segmentId, piece)
+    this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getNextPart())
 
     await this.saveRundown(rundown)
   }
