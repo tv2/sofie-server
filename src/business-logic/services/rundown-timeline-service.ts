@@ -202,9 +202,7 @@ export class RundownTimelineService implements RundownService {
 
   private startAutoNext(timeline: Timeline, rundownId: string): void {
     if (timeline.autoNext) {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
-      this.rundownEventEmitter.emitAutoNextStarted(rundownId)
     }
   }
 
