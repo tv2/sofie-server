@@ -3,7 +3,7 @@ import {
   VideoMixerWipeTransitionSettings
 } from './interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2TriCasterLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
-import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../value-objects/tv2-metadata'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import {
   SplitScreenBoxProperties,
@@ -31,6 +31,12 @@ import { AtemToTriCasterSplitScreenConverter } from '../helpers/atem-to-tricaste
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2Logger } from '../tv2-logger'
 
+interface TriCasterTransitionEffectProperties {
+  input: number
+  transitionEffect: TriCasterTransition
+  durationInFrames?: number
+}
+
 const TRI_CASTER_PREFIX: string = 'triCaster_'
 
 export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
@@ -41,7 +47,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     this.logger = logger.tag(Tv2TriCasterVideoMixerTimelineObjectFactory.name)
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable): TriCasterMixEffectTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return this.createTriCasterMeTimelineObjectForLayer(
       `${TRI_CASTER_PREFIX}program`,
       Tv2TriCasterLayer.PROGRAM,
@@ -50,15 +56,18 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
         type: TriCasterMixEffectContentType.PROGRAM,
         programInput: this.mapInputToTriCasterInput(sourceInput),
         transitionEffect: TriCasterTransition.CUT
-      })
+      },
+      metadata
+    )
   }
 
-  private createTriCasterMeTimelineObjectForLayer(id: string, layer: Tv2TriCasterLayer, enable: TimelineEnable, me: TriCasterMixEffectProgramContent): TriCasterMixEffectTimelineObject {
+  private createTriCasterMeTimelineObjectForLayer(id: string, layer: Tv2TriCasterLayer, enable: TimelineEnable, me: TriCasterMixEffectProgramContent, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return {
       id: `${id}_${Math.floor(Math.random() * 100)}`,
       enable,
       priority: 2, // Old Blueprints uses priority 1. By setting it to 2 we know our TimelineObjects always take priority.
       layer,
+      metaData: metadata,
       content: {
         deviceType: DeviceType.TRICASTER,
         type: TriCasterType.ME,
@@ -107,7 +116,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable): TriCasterMixEffectTimelineObject {
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return this.createTriCasterMeTimelineObjectForLayer(
       `${TRI_CASTER_PREFIX}clean_feed`,
       Tv2TriCasterLayer.CLEAN_FEED,
@@ -116,7 +125,8 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
         type: TriCasterMixEffectContentType.PROGRAM,
         programInput: this.mapInputToTriCasterInput(sourceInput),
         transitionEffect: TriCasterTransition.CUT
-      }
+      },
+      metadata
     )
   }
 
@@ -312,45 +322,60 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createCutTransitionEffectTimelineObjects(sourceInput: number): TriCasterMixEffectTimelineObject[] {
+  public createCutTransitionEffectTimelineObjects(sourceInput: number, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
+    const transitionEffectProperties: TriCasterTransitionEffectProperties = {
+      input: sourceInput,
+      transitionEffect: TriCasterTransition.CUT
+    }
     return [
-      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, sourceInput, TriCasterTransition.CUT),
-      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, sourceInput, TriCasterTransition.CUT)
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, transitionEffectProperties, metadata),
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, transitionEffectProperties, metadata)
     ]
   }
 
-  private createTransitionEffectTimelineObject(layer: Tv2TriCasterLayer, sourceInput: number, transitionEffect: TriCasterTransition, durationInFrames?: number): TriCasterMixEffectTimelineObject {
+  private createTransitionEffectTimelineObject(layer: Tv2TriCasterLayer, transitionEffectProperties: TriCasterTransitionEffectProperties, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return {
-      id: `${layer}_${transitionEffect}`,
+      id: `${layer}_${transitionEffectProperties.transitionEffect}`,
       enable: {
         start: 0
       },
       layer,
       priority: 10,
+      metaData: metadata,
       content: {
         deviceType: DeviceType.TRICASTER,
         type: TriCasterType.ME,
         me: {
           type: TriCasterMixEffectContentType.PROGRAM,
-          programInput: this.mapInputToTriCasterInput(sourceInput),
-          transitionEffect,
-          transitionDuration: this.convertFramesToSeconds(durationInFrames ?? 0)
+          programInput: this.mapInputToTriCasterInput(transitionEffectProperties.input),
+          transitionEffect: transitionEffectProperties.transitionEffect,
+          transitionDuration: this.convertFramesToSeconds(transitionEffectProperties.durationInFrames ?? 0)
         }
       }
     }
   }
 
-  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number): TriCasterMixEffectTimelineObject[] {
+  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
+    const transitionEffectProperties: TriCasterTransitionEffectProperties = {
+      input: sourceInput,
+      transitionEffect: TriCasterTransition.FADE,
+      durationInFrames
+    }
     return [
-      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, sourceInput, TriCasterTransition.FADE, durationInFrames),
-      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, sourceInput, TriCasterTransition.FADE, durationInFrames)
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, transitionEffectProperties, metadata),
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, transitionEffectProperties, metadata)
     ]
   }
 
-  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, _dipInput: number): TriCasterMixEffectTimelineObject[] {
+  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, _dipInput: number, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
+    const transitionEffectProperties: TriCasterTransitionEffectProperties = {
+      input: sourceInput,
+      transitionEffect: TriCasterTransition.DIP,
+      durationInFrames
+    }
     return [
-      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, sourceInput, TriCasterTransition.DIP, durationInFrames),
-      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, sourceInput, TriCasterTransition.DIP, durationInFrames)
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, transitionEffectProperties, metadata),
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, transitionEffectProperties, metadata)
     ]
   }
 
