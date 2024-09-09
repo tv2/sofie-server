@@ -403,4 +403,8 @@ export class Part {
       delayPiecesDuration: Math.max(inTransition.delayPiecesDuration, this.inTransition.delayPiecesDuration)
     }
   }
+
+  public getReplacedPlannedPieces(): readonly Piece[] {
+    return this.replacedPlannedPieces
+  }
 }
