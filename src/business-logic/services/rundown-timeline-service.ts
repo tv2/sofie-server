@@ -22,9 +22,12 @@ import { IngestedRundownRepository } from '../../data-access/repositories/interf
 import { RundownMode } from '../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../model/exceptions/already-rehearsal-exception'
 import { IngestService } from './interfaces/ingest-service'
+import { Logger } from '../../logger/logger'
 import { PlayoutService } from './interfaces/playoutService'
 
 export class RundownTimelineService implements RundownService {
+  private readonly logger: Logger
+
   constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
@@ -37,8 +40,11 @@ export class RundownTimelineService implements RundownService {
     private readonly ingestService: IngestService,
     private readonly playoutService: PlayoutService,
     private readonly callbackScheduler: CallbackScheduler,
-    private readonly blueprint: Blueprint
-  ) {}
+    private readonly blueprint: Blueprint,
+    logger: Logger,
+  ) {
+    this.logger = logger.tag(this.constructor.name)
+  }
 
   public async activateRundown(rundownId: string): Promise<void> {
     await this.assertNoRundownIsActive()
@@ -213,9 +219,10 @@ export class RundownTimelineService implements RundownService {
 
   private startAutoNext(timeline: Timeline, rundownId: string): void {
     if (timeline.autoNext) {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, async () => this.takeNext(rundownId))
-      this.rundownEventEmitter.emitAutoNextStarted(rundownId)
+      this.callbackScheduler.start(timeline.autoNext.epochTimeToTakeNext, () => {
+        this.takeNext(rundownId)
+          .catch(error => this.logger.data(error).error('Failed executing take with auto next:'))
+      })
     }
   }
 
@@ -311,8 +318,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.buildAndPersistTimeline(rundown)
 
-    const segmentId: string = rundown.getNextSegment().id
-    this.rundownEventEmitter.emitPieceInsertedEvent(rundown, segmentId, piece)
+    this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getNextPart())
 
     await this.saveRundown(rundown)
   }

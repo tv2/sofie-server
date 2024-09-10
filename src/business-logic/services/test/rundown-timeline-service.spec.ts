@@ -1,4 +1,4 @@
-import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown } from '../../../model/entities/rundown'
 import { RundownEventEmitter } from '../interfaces/rundown-event-emitter'
 import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
@@ -25,6 +25,7 @@ import { RundownMode } from '../../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../../model/exceptions/already-rehearsal-exception'
 import { IngestService } from '../interfaces/ingest-service'
 import { RundownService } from '../interfaces/rundown-service'
+import { Logger } from '../../../logger/logger'
 import { PlayoutService } from '../interfaces/playoutService'
 
 describe(RundownTimelineService.name, () => {
@@ -604,6 +605,7 @@ function createTestee(params?: {
   playoutService?: PlayoutService,
   callbackScheduler?: CallbackScheduler
   blueprint?: Blueprint
+  logger?: Logger
 }): RundownTimelineService {
   return new RundownTimelineService(
     instance(params?.rundownEventEmitter ?? mock<RundownEventEmitter>()),
@@ -617,6 +619,15 @@ function createTestee(params?: {
     instance(params?.ingestService ?? mock<IngestService>()),
     instance(params?.playoutService ?? mock<PlayoutService>()) ,
     instance(params?.callbackScheduler ?? mock<CallbackScheduler>()),
-    instance(params?.blueprint ?? mock<Blueprint>())
+    instance(params?.blueprint ?? mock<Blueprint>()),
+    instance(params?.logger ?? createMockOfLogger()),
   )
+}
+
+function createMockOfLogger(): Logger {
+  const mockedLogger: Logger = mock<Logger>()
+  when(mockedLogger.tag(anyString())).thenCall(() => createMockOfLogger())
+  when(mockedLogger.data(anything())).thenCall(() => createMockOfLogger())
+  when(mockedLogger.metadata(anything())).thenCall(() => createMockOfLogger())
+  return mockedLogger
 }

@@ -1,6 +1,5 @@
 import { Rundown } from '../../model/entities/rundown'
 import {
-  AutoNextStartedEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -54,6 +53,4 @@ export interface RundownEventBuilder {
   buildPartUpdatedEvent(rundown: Rundown, part: Part): PartUpdatedEvent
   buildPartDeletedEvent(rundown: Rundown, segmentId: string, partId: string): PartDeletedEvent
   buildPartUnsyncedEvent(rundown: Rundown, part: Part): PartUnsyncedEvent
-
-  buildAutoNextStartedEvent(rundownId: string): AutoNextStartedEvent
 }
