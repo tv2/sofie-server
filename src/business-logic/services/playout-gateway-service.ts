@@ -18,7 +18,7 @@ export class PlayoutGatewayService implements PlayoutService {
     try {
       await this.httpService.post(`http://${PLAYOUT_GATEWAY_HOST}/devicesMakeReady?${okToDestroyStuffParameterName}=${okToDestroyStuff}&${activeRundownIdParameterName}=${activeRundownId}`, null)
     } catch (error) {
-      this.logger.error(`Error happened while calling 'makeDevicesReady' in PlayoutGateway: ${JSON.stringify(error)}`)
+      this.logger.data(error).error('Error happened while calling \'makeDevicesReady\' in PlayoutGateway')
     }
   }
 
@@ -26,7 +26,7 @@ export class PlayoutGatewayService implements PlayoutService {
     try {
       await this.httpService.post(`http://${PLAYOUT_GATEWAY_HOST}/devicesStandDown`, null)
     } catch (error) {
-      this.logger.error(`Error happened while calling 'makeDevicesStandDown' in PlayoutGateway: ${JSON.stringify(error)}`)
+      this.logger.data(error).error('Error happened while calling \'makeDevicesStandDown\' in PlayoutGateway')
     }
   }
 }
