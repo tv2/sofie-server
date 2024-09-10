@@ -29,6 +29,20 @@ import { ActionEventEmitter } from './interfaces/action-event-emitter'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
+enum IngestEventPriority {
+  RUNDOWN_CREATE = 1,
+  SEGMENT_CREATE = 2,
+  PART_CREATE = 3,
+
+  PART_UPDATE = 4,
+  SEGMENT_UPDATE = 5,
+  RUNDOWN_UPDATE = 6,
+
+  PART_DELETE = 7,
+  SEGMENT_DELETE = 8,
+  RUNDOWN_DELETE = 9
+}
+
 export class IngestDataChangedService implements DataChangeService {
 
   private static instance: DataChangeService
@@ -118,21 +132,21 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private listenForRundownChanges(rundownChangeListener: DataChangedListener<IngestedRundown>): void {
-    rundownChangeListener.onCreated(rundown => this.enqueueEvent(1, () => this.createRundown(rundown)))
-    rundownChangeListener.onUpdated(rundown => this.enqueueEvent(6, () => this.updateRundown(rundown)))
-    rundownChangeListener.onDeleted(rundownId => this.enqueueEvent(9, () => this.deleteRundown(rundownId)))
+    rundownChangeListener.onCreated(rundown => this.enqueueEvent(IngestEventPriority.RUNDOWN_CREATE, () => this.createRundown(rundown)))
+    rundownChangeListener.onUpdated(rundown => this.enqueueEvent(IngestEventPriority.RUNDOWN_UPDATE, () => this.updateRundown(rundown)))
+    rundownChangeListener.onDeleted(rundownId => this.enqueueEvent(IngestEventPriority.RUNDOWN_DELETE, () => this.deleteRundown(rundownId)))
   }
 
   private listenForSegmentChanges(segmentChangedListener: DataChangedListener<IngestedSegment>): void {
-    segmentChangedListener.onCreated(segment => this.enqueueEvent(2, () => this.createSegment(segment)))
-    segmentChangedListener.onUpdated(segment => this.enqueueEvent(5, () => this.updateSegment(segment)))
-    segmentChangedListener.onDeleted(segmentId => this.enqueueEvent(8, () => this.deleteSegment(segmentId)))
+    segmentChangedListener.onCreated(segment => this.enqueueEvent(IngestEventPriority.SEGMENT_CREATE, () => this.createSegment(segment)))
+    segmentChangedListener.onUpdated(segment => this.enqueueEvent(IngestEventPriority.SEGMENT_UPDATE, () => this.updateSegment(segment)))
+    segmentChangedListener.onDeleted(segmentId => this.enqueueEvent(IngestEventPriority.SEGMENT_DELETE, () => this.deleteSegment(segmentId)))
   }
 
   private listenForPartChanges(partChangedListener: DataChangedListener<IngestedPart>): void {
-    partChangedListener.onCreated(part => this.enqueueEvent(3, () => this.createPart(part)))
-    partChangedListener.onUpdated(part => this.enqueueEvent(4, () => this.updatePart(part)))
-    partChangedListener.onDeleted(partId => this.enqueueEvent(7, () => this.deletePart(partId)))
+    partChangedListener.onCreated(part => this.enqueueEvent(IngestEventPriority.PART_CREATE, () => this.createPart(part)))
+    partChangedListener.onUpdated(part => this.enqueueEvent(IngestEventPriority.PART_UPDATE, () => this.updatePart(part)))
+    partChangedListener.onDeleted(partId => this.enqueueEvent(IngestEventPriority.PART_DELETE, () => this.deletePart(partId)))
   }
 
   public async initialize(): Promise<void> {
@@ -385,6 +399,12 @@ export class IngestDataChangedService implements DataChangeService {
     await this.persistRundown(rundown)
   }
 
+  private async persistRundown(rundown: Rundown): Promise<void> {
+    this.rundownIdsToBuildFor.add(rundown.id)
+    this.rundownIdsToGenerateActionsFor.add(rundown.id)
+    await this.rundownRepository.saveRundown(rundown)
+  }
+
   private async updateRundown(ingestedRundown: IngestedRundown): Promise<void> {
     const rundownToBeUpdated: Rundown = await this.rundownRepository.getRundown(ingestedRundown.id)
     const updatedRundown: Rundown = this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(rundownToBeUpdated, ingestedRundown)
@@ -409,15 +429,15 @@ export class IngestDataChangedService implements DataChangeService {
     await this.persistRundown(rundown)
   }
 
-  private async persistRundown(rundown: Rundown): Promise<void> {
-    this.rundownIdsToBuildFor.add(rundown.id)
-    this.rundownIdsToGenerateActionsFor.add(rundown.id)
-    await this.rundownRepository.saveRundown(rundown)
-  }
-
   private async updateSegment(ingestedSegment: IngestedSegment): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedSegment.rundownId)
-    const segmentToBeUpdated: Segment = await this.segmentRepository.getSegment(ingestedSegment.id)
+    const segmentToBeUpdated: Segment | undefined = await this.segmentRepository.getSegment(ingestedSegment.id).catch(() => undefined)
+
+    if (!segmentToBeUpdated) {
+      this.logger.warn(`IngestUpdateSegment: No Segment found for Segment id: ${ingestedSegment.id} - creating new Segment instead`)
+      await this.createSegment(ingestedSegment)
+      return
+    }
 
     const pieceIdsBeforeUpdate: string[] = segmentToBeUpdated.getParts().flatMap(part => part.getPieces()).map(piece => piece.id)
 
@@ -460,7 +480,13 @@ export class IngestDataChangedService implements DataChangeService {
 
   private async updatePart(ingestedPart: IngestedPart): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedPart.rundownId)
-    const partToBeUpdated: Part = await this.partRepository.getPart(ingestedPart.id)
+    const partToBeUpdated: Part | undefined = await this.partRepository.getPart(ingestedPart.id).catch(() => undefined)
+
+    if (!partToBeUpdated) {
+      this.logger.warn(`IngestUpdatePart: No Part found for Part id: ${ingestedPart.id} - creating new Part instead`)
+      await this.createPart(ingestedPart)
+      return
+    }
 
     const updatedPart: Part = this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(partToBeUpdated, ingestedPart)
     rundown.updatePart(updatedPart)
