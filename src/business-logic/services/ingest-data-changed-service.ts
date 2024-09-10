@@ -29,7 +29,7 @@ import { ActionEventEmitter } from './interfaces/action-event-emitter'
 
 const BULK_EXECUTION_TIMESPAN_IN_MS: number = 500
 
-const enum IngestEventPriority {
+enum IngestEventPriority {
   RUNDOWN_CREATE = 1,
   SEGMENT_CREATE = 2,
   PART_CREATE = 3,
@@ -431,7 +431,7 @@ export class IngestDataChangedService implements DataChangeService {
 
   private async updateSegment(ingestedSegment: IngestedSegment): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedSegment.rundownId)
-    const segmentToBeUpdated: Segment | undefined = await this.fetchSegmentIfExist(ingestedSegment.id)
+    const segmentToBeUpdated: Segment | undefined = await this.segmentRepository.getSegment(ingestedSegment.id).catch(() => undefined)
 
     if (!segmentToBeUpdated) {
       this.logger.warn(`IngestUpdateSegment: No Segment found for Segment id: ${ingestedSegment.id} - creating new Segment instead`)
@@ -451,14 +451,6 @@ export class IngestDataChangedService implements DataChangeService {
     await this.pieceRepository.deletePieces(pieceIdsToBeDelete)
 
     await this.persistRundown(rundown)
-  }
-
-  private async fetchSegmentIfExist(segmentId: string): Promise<Segment | undefined> {
-    try {
-      return this.segmentRepository.getSegment(segmentId)
-    } catch (error) {
-      return Promise.resolve(undefined)
-    }
   }
 
   private async deleteSegment(segmentId: string): Promise<void> {
@@ -488,7 +480,7 @@ export class IngestDataChangedService implements DataChangeService {
 
   private async updatePart(ingestedPart: IngestedPart): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(ingestedPart.rundownId)
-    const partToBeUpdated: Part | undefined = await this.fetchPartIfExist(ingestedPart.id)
+    const partToBeUpdated: Part | undefined = await this.partRepository.getPart(ingestedPart.id).catch(() => undefined)
 
     if (!partToBeUpdated) {
       this.logger.warn(`IngestUpdatePart: No Part found for Part id: ${ingestedPart.id} - creating new Part instead`)
@@ -501,14 +493,6 @@ export class IngestDataChangedService implements DataChangeService {
 
     this.eventEmitter.emitPartUpdated(rundown, updatedPart)
     await this.persistRundown(rundown)
-  }
-
-  private async fetchPartIfExist(partId: string): Promise<Part | undefined> {
-    try {
-      return this.partRepository.getPart(partId)
-    } catch (error) {
-      return Promise.resolve(undefined)
-    }
   }
 
   private async deletePart(partId: string): Promise<void> {
