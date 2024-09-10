@@ -434,7 +434,7 @@ export class IngestDataChangedService implements DataChangeService {
     const segmentToBeUpdated: Segment | undefined = await this.fetchSegmentIfExist(ingestedSegment.id)
 
     if (!segmentToBeUpdated) {
-      this.logger.debug(`IngestUpdateSegment: No Segment found for Segment id: ${ingestedSegment.id} - creating new Segment instead`)
+      this.logger.warn(`IngestUpdateSegment: No Segment found for Segment id: ${ingestedSegment.id} - creating new Segment instead`)
       await this.createSegment(ingestedSegment)
       return
     }
@@ -491,7 +491,7 @@ export class IngestDataChangedService implements DataChangeService {
     const partToBeUpdated: Part | undefined = await this.fetchPartIfExist(ingestedPart.id)
 
     if (!partToBeUpdated) {
-      this.logger.debug(`IngestUpdatePart: No Part found for Part id: ${ingestedPart.id} - creating new Part instead`)
+      this.logger.warn(`IngestUpdatePart: No Part found for Part id: ${ingestedPart.id} - creating new Part instead`)
       await this.createPart(ingestedPart)
       return
     }
