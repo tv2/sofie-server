@@ -23,6 +23,7 @@ import { RundownMode } from '../../model/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../model/exceptions/already-rehearsal-exception'
 import { IngestService } from './interfaces/ingest-service'
 import { Logger } from '../../logger/logger'
+import { PlayoutService } from './interfaces/playoutService'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -37,6 +38,7 @@ export class RundownTimelineService implements RundownService {
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly ingestService: IngestService,
+    private readonly playoutService: PlayoutService,
     private readonly callbackScheduler: CallbackScheduler,
     private readonly blueprint: Blueprint,
     logger: Logger,
@@ -49,6 +51,8 @@ export class RundownTimelineService implements RundownService {
     await this.assertNoRundownIsInRehearsal(rundownId)
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBeforeActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    const rundownModeBeforeActivation: RundownMode = rundown.getMode()
+
     rundown.activate()
 
     await this.buildAndPersistTimeline(rundown)
@@ -57,6 +61,9 @@ export class RundownTimelineService implements RundownService {
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.saveRundown(rundown)
+
+    const okToDestroyStuff: boolean = rundownModeBeforeActivation !== RundownMode.REHEARSAL
+    await this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id)
   }
 
   public async enterRehearsal(rundownId: string): Promise<void> {
@@ -72,6 +79,9 @@ export class RundownTimelineService implements RundownService {
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.saveRundown(rundown)
+
+    const okToDestroyStuff: boolean = true // It's always "ok to destroy stuff" when we enter rehearsal.
+    await this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id)
   }
 
   private async saveRundown(rundown: Rundown): Promise<void> {
@@ -131,6 +141,7 @@ export class RundownTimelineService implements RundownService {
     await this.saveRundown(rundown)
 
     await this.deleteAllUnsyncedAndUnplanned()
+    await this.playoutService.makeDevicesStandDown()
   }
 
   private async deleteAllUnsyncedAndUnplanned(): Promise<void> {
