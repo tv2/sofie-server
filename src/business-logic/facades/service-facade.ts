@@ -28,6 +28,8 @@ import { ThrottledRundownService } from '../services/throttled-rundown-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
+import { PlayoutService } from '../services/interfaces/playoutService'
+import { PlayoutGatewayService } from '../services/playout-gateway-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -41,6 +43,7 @@ export class ServiceFacade {
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createIngestService(),
+      ServiceFacade.createPlayoutService(),
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint()
     )
@@ -107,6 +110,10 @@ export class ServiceFacade {
 
   public static createIngestService(): IngestService {
     return new Tv2INewsIngestService(ServiceFacade.createHttpService(), RepositoryFacade.createRundownRepository())
+  }
+
+  public static createPlayoutService(): PlayoutService {
+    return new PlayoutGatewayService(ServiceFacade.createHttpService(), LoggerFacade.createLogger())
   }
 
   private static createHttpService(): HttpService {
