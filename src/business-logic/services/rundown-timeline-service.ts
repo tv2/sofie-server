@@ -196,7 +196,7 @@ export class RundownTimelineService implements RundownService {
       return
     }
     const now: number = Date.now()
-    if (now - onAirPart.getExecutedAt() <= onAirPart.getInTransition().blockTakeDuration) {
+    if (now - onAirPart.getExecutedAt() < onAirPart.getInTransition().blockTakeDuration) {
       throw new TakeIsBlockedException('Unable to do Take while in a Transition')
     }
   }
@@ -283,6 +283,8 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    this.assertTakeIsNotBlocked(rundown)
+
     const unplannedNextPartToKeepAsNextPart: Part | undefined = !rundown.getNextPart().isPlanned ? rundown.getNextPart() : undefined
 
     rundown.insertPartAsNext(part)
