@@ -298,25 +298,27 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   }
 
   private createFullscreenGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[]): Tv2PartAction[] {
-    return fullscreenGraphicsData.map((graphicsData) => {
-      const partInterface: PartInterface = this.createFullscreenGraphicsPartInterface(graphicsData, blueprintConfiguration)
-      const pieceInterface: Tv2PieceInterface = this.createFullscreenGraphicsPieceInterface(blueprintConfiguration, graphicsData, partInterface, elementTimelineObjectFactory)
+    return this.removeDuplicateActions(
+      fullscreenGraphicsData.map((graphicsData) => {
+        const partInterface: PartInterface = this.createFullscreenGraphicsPartInterface(graphicsData, blueprintConfiguration)
+        const pieceInterface: Tv2PieceInterface = this.createFullscreenGraphicsPieceInterface(blueprintConfiguration, graphicsData, partInterface, elementTimelineObjectFactory)
 
-      return {
-        id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
-        rundownId: graphicsData.rundownId,
-        name: `Fullscreen Graphics - ${graphicsData.name}`,
-        rank: graphicsData.rank,
-        type: PartActionType.INSERT_PART_AS_NEXT,
-        data: {
-          partInterface: partInterface,
-          pieceInterfaces: [pieceInterface]
-        },
-        metadata: {
-          contentType: Tv2ActionContentType.GRAPHICS
+        return {
+          id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}_${graphicsData.rank}`,
+          rundownId: graphicsData.rundownId,
+          name: `Fullscreen Graphics - ${graphicsData.name}`,
+          rank: graphicsData.rank,
+          type: PartActionType.INSERT_PART_AS_NEXT,
+          data: {
+            partInterface: partInterface,
+            pieceInterfaces: [pieceInterface]
+          },
+          metadata: {
+            contentType: Tv2ActionContentType.GRAPHICS
+          }
         }
-      }
-    })
+      })
+    )
   }
 
   private createFullscreenGraphicsPartInterface(graphicsData: Tv2FullscreenGraphicsManifestData, blueprintConfiguration: Tv2BlueprintConfiguration): PartInterface {
@@ -447,17 +449,23 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   }
 
   private createOverlayGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2OverlayGraphicsManifestData[]): Tv2PieceAction[] {
-    const identActions: Tv2PieceAction[] = graphicsData
-      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_IDENT)
-      .map(data => this.createIdentGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
+    const identActions: Tv2PieceAction[] = this.removeDuplicateActions(
+      graphicsData
+        .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_IDENT)
+        .map(data => this.createIdentGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
+    )
 
-    const lowerThirdActions: Tv2PieceAction[] = graphicsData
-      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_LOWER_THIRD)
-      .map((data) => this.createLowerThirdGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
+    const lowerThirdActions: Tv2PieceAction[] = this.removeDuplicateActions(
+      graphicsData
+        .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_LOWER_THIRD)
+        .map((data) => this.createLowerThirdGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
+    )
 
-    const pilotOverlayActions: Tv2PieceAction[] = graphicsData
-      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY)
-      .map(data => this.createPilotOverlayAction(blueprintConfiguration, elementTimelineObjectFactory, data))
+    const pilotOverlayActions: Tv2PieceAction[] = this.removeDuplicateActions(
+      graphicsData
+        .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY)
+        .map(data => this.createPilotOverlayAction(blueprintConfiguration, elementTimelineObjectFactory, data))
+    )
 
     return [...identActions, ...lowerThirdActions, ...pilotOverlayActions]
   }

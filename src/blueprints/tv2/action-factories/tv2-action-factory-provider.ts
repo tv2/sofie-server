@@ -291,6 +291,7 @@ export class Tv2ActionFactoryProvider {
           this.createAudioMixerTimelineObjectFactory(),
           this.createGraphicsSplitScreenTimelineObjectFactory(),
           this.createVideoClipTimelineObjectFactory(),
+          this.createStringHashConverter(),
           this.createAssetPathHelper()
         )
       },

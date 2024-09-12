@@ -26,7 +26,7 @@ const OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS: string[] = ['studio0_graphicsLower',
 
 export class Tv2ActionManifestMapper {
 
-  public mapToSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: ActionManifest[]): Tv2SplitScreenManifestData[] {
+  public getSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: ActionManifest[]): Tv2SplitScreenManifestData[] {
     return actionManifests
       .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestSplitScreenData> => actionManifest.actionId === SPLIT_SCREEN_ACTION_MANIFEST_ID)
       .map(actionManifest => {
@@ -67,14 +67,14 @@ export class Tv2ActionManifestMapper {
         sources = blueprintConfiguration.studio.cameraSources
         break
       }
-      case TvActionManifestSplitScreenSourceType.LIVE: {
+      case TvActionManifestSplitScreenSourceType.REMOTE: {
         sources = blueprintConfiguration.studio.remoteSources
         break
       }
     }
     const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.name === splitScreenSource.id)
     if (!source) {
-      throw new Tv2MisconfigurationException(`No Source Mapping found for split screen source ${splitScreenSource.sourceType} ${splitScreenSource.id}`)
+      throw new Tv2MisconfigurationException(`No Source Mapping found for split screen source ${splitScreenSource.sourceType} ${splitScreenSource.id}.`)
     }
     return source
   }
