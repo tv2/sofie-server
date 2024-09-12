@@ -369,6 +369,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         action.data.pieceInterface.timelineObjects.push(
           ...mixTransitionTimelineObjects
         )
+        action.data.partInTransition = this.createPartInTransitionForEffect(action.metadata.durationInFrames)
         piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, action.metadata.durationInFrames, mediaPlayerSession))
         break
       }
@@ -377,6 +378,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         action.data.pieceInterface.timelineObjects.push(
           ...dipTransitionTimelineObjects
         )
+        action.data.partInTransition = this.createPartInTransitionForEffect(action.metadata.durationInFrames)
         piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, action.metadata.durationInFrames, mediaPlayerSession))
         break
       }
@@ -421,8 +423,18 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     ]
   }
 
+  private createPartInTransitionForEffect(durationInFrames: number): InTransition {
+    const durationInMilliseconds: number = this.frameTimeConverter.convertFramesToMilliseconds(durationInFrames)
+    return {
+      blockTakeDuration: durationInMilliseconds,
+      keepPreviousPartAliveDuration: durationInMilliseconds,
+      delayPiecesDuration: 0
+    }
+  }
+
   private createPartInTransitionForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): InTransition {
     return {
+      blockTakeDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames + breakerActionMetadata.casparCgPreRollDuration),
       keepPreviousPartAliveDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
       delayPiecesDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
     }

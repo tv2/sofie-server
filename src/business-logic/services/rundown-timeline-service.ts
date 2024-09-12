@@ -24,6 +24,7 @@ import { AlreadyRehearsalException } from '../../model/exceptions/already-rehear
 import { IngestService } from './interfaces/ingest-service'
 import { Logger } from '../../logger/logger'
 import { PlayoutService } from './interfaces/playoutService'
+import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-exception'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -159,9 +160,12 @@ export class RundownTimelineService implements RundownService {
   }
 
   public async takeNext(rundownId: string): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+
+    this.assertTakeIsNotBlocked(rundown)
+
     this.stopAutoNext()
 
-    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBeforeTakeNext: Map<string, Piece> = rundown.getInfinitePiecesMap()
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
@@ -179,6 +183,20 @@ export class RundownTimelineService implements RundownService {
 
     if (rundown.getActiveSegment().definesShowStyleVariant) {
       await this.ingestService.reloadIngestData(rundown.id)
+    }
+  }
+
+  private assertTakeIsNotBlocked(rundown: Rundown): void {
+    let onAirPart: Part
+
+    try {
+      onAirPart = rundown.getActivePart()
+    } catch (error) {
+      // If 'getActivePart()' throws it means that we don't have any active Part yet which means the Take is not blocked - hence we can simply return.
+      return
+    }
+    if (Date.now() < onAirPart.getExecutedAt() + onAirPart.getInTransition().blockTakeDuration) {
+      throw new TakeIsBlockedException('Unable to do Take while in a Transition')
     }
   }
 
@@ -264,6 +282,8 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    this.assertTakeIsNotBlocked(rundown)
+
     const unplannedNextPartToKeepAsNextPart: Part | undefined = !rundown.getNextPart().isPlanned ? rundown.getNextPart() : undefined
 
     rundown.insertPartAsNext(part)
