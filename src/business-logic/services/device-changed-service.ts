@@ -11,6 +11,8 @@ import { UnsupportedOperationException } from '../../model/exceptions/unsupporte
 // TODO: Find a way to translate
 const NOT_CONNECTED_MESSAGE: string = 'Not connected'
 
+const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
+
 export class DeviceChangedService implements DataChangeService {
   private static instance: DataChangeService
 
@@ -52,6 +54,9 @@ export class DeviceChangedService implements DataChangeService {
   private async updateStatusMessageFromCurrentDeviceStatus(): Promise<void> {
     const devices: Device[] = await this.deviceRepository.getDevices()
     await Promise.all(devices.map(device => this.onDeviceUpdated(device)))
+
+    const statusMessagesForDevices: StatusMessage[] = devices.map(device => this.convertDeviceToStatusMessage(device))
+    await this.statusMessageService.deleteStatusMessagesWithIdPrefixNotInCollection(DEVICE_STATUS_MESSAGE_PREFIX, statusMessagesForDevices)
   }
 
   private listenForStatusMessageChanges(deviceChangedListener: DataChangedListener<Device>): void {
@@ -60,6 +65,9 @@ export class DeviceChangedService implements DataChangeService {
     })
     deviceChangedListener.onUpdated(device => {
       this.onDeviceUpdated(device).catch(error => this.logger.data(error).error(`Failed processing device updated event for device '${device.name}' with id '${device.id}'.`))
+    })
+    deviceChangedListener.onDeleted(deviceId => {
+      this.onDeviceDeleted(deviceId).catch(error => this.logger.data(error).error(`Failed processing device deleted event for device ${deviceId}`))
     })
   }
 
@@ -74,10 +82,22 @@ export class DeviceChangedService implements DataChangeService {
 
   private convertDeviceToStatusMessage(device: Device): StatusMessage {
     return {
-      id: device.id,
+      id: `${DEVICE_STATUS_MESSAGE_PREFIX}${device.id}`,
       statusCode: device.statusCode,
       title: device.name,
       message: device.statusMessage
     }
+  }
+
+  private async onDeviceDeleted(deviceId: string): Promise<void> {
+    const deletedDevice: Device = {
+      id: deviceId,
+      name: '',
+      statusMessage: 'Device was deleted',
+      statusCode: StatusCode.GOOD,
+      isConnected: false
+    }
+
+    await this.statusMessageService.updateStatusMessage(this.convertDeviceToStatusMessage(deletedDevice))
   }
 }
