@@ -392,7 +392,6 @@ describe(RundownTimelineService.name, () => {
 
     describe('no Part has been Taken yet', () => {
       it('does a Take', async () => {
-        // const rundownMock: Rundown = EntityMockFactory.createRundownMock()
         const rundownMock: Rundown = mock(Rundown)
         when(rundownMock.getActivePart()).thenThrow(new UnsupportedOperationException(''))
         const rundown: Rundown = instance(rundownMock)
@@ -404,7 +403,7 @@ describe(RundownTimelineService.name, () => {
 
         try {
           await testee.takeNext(rundown.id)
-        } catch (error) {
+        } catch {
           // We need to catch the error, else we will never reach the verify below
         }
 
@@ -443,7 +442,7 @@ describe(RundownTimelineService.name, () => {
 
           try {
             await testee.takeNext(rundown.id)
-          } catch (error) {
+          } catch {
             // expected error - ignore
           }
 
@@ -477,7 +476,7 @@ describe(RundownTimelineService.name, () => {
 
           try {
             await testee.takeNext(rundown.id)
-          } catch (error) {
+          } catch {
             // expected error - ignore
           }
 
@@ -539,7 +538,7 @@ describe(RundownTimelineService.name, () => {
 
           const callbackScheduler: CallbackScheduler = mock<CallbackScheduler>()
 
-          const testee: RundownTimelineService = createTestee({rundownRepository, callbackScheduler})
+          const testee: RundownTimelineService = createTestee({ rundownRepository, callbackScheduler })
 
           await testee.takeNext(rundown.id)
 

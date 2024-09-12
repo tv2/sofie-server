@@ -424,10 +424,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private createPartInTransitionForEffect(durationInFrames: number): InTransition {
-    const durationInMilliSeconds: number = this.frameTimeConverter.convertFramesToMilliseconds(durationInFrames)
+    const durationInMilliseconds: number = this.frameTimeConverter.convertFramesToMilliseconds(durationInFrames)
     return {
-      blockTakeDuration: durationInMilliSeconds,
-      keepPreviousPartAliveDuration: durationInMilliSeconds,
+      blockTakeDuration: durationInMilliseconds,
+      keepPreviousPartAliveDuration: durationInMilliseconds,
       delayPiecesDuration: 0
     }
   }
