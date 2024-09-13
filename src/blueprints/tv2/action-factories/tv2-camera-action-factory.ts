@@ -115,6 +115,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
       isUntimed: false,
       isUnsynced: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },

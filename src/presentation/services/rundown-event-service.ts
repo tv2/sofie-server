@@ -1,5 +1,4 @@
 import {
-  AutoNextStartedEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -157,11 +156,6 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   public emitPartUnsynced(rundown: Rundown, part: Part): void {
     const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, part)
-    this.emitRundownEvent(event)
-  }
-
-  public emitAutoNextStarted(rundownId: string): void {
-    const event: AutoNextStartedEvent = this.rundownEventBuilder.buildAutoNextStartedEvent(rundownId)
     this.emitRundownEvent(event)
   }
 

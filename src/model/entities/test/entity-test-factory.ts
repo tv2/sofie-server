@@ -51,6 +51,7 @@ export class EntityTestFactory {
     return new Part({
       disableNextInTransition: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0,
       },
@@ -77,6 +78,7 @@ export class EntityTestFactory {
       disableNextInTransition: false,
       id: '',
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0,
       },

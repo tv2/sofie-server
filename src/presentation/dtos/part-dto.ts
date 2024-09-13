@@ -20,6 +20,7 @@ export class PartDto {
   public readonly isPlanned: boolean
   public readonly metadata?: PartMetadata
   public readonly pieces: PieceDto[]
+  public readonly replacedPlannedPieces: readonly PieceDto[]
 
   constructor(part: Part) {
     this.id = part.id
@@ -38,5 +39,6 @@ export class PartDto {
     this.isPlanned = part.isPlanned
     this.metadata = part.metadata
     this.pieces = part.getPieces().map((piece) => new PieceDto(piece))
+    this.replacedPlannedPieces = part.getReplacedPlannedPieces().map((piece) => new PieceDto(piece))
   }
 }

@@ -159,6 +159,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       isUnsynced: false,
       isUntimed: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },

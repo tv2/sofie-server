@@ -74,6 +74,7 @@ export interface MongoIngestedPart extends MongoId {
   isUnsynced?: boolean
   untimed: boolean
   inTransition?: {
+    blockTakeDuration: number
     previousPartKeepaliveDuration: number
     partContentDelayDuration: number
   }
@@ -190,6 +191,7 @@ export class MongoIngestedEntityConverter {
       expectedDuration: mongoPart.expectedDuration,
       ingestedPieces: [],
       inTransition: {
+        blockTakeDuration: mongoPart.inTransition?.blockTakeDuration ?? 0,
         keepPreviousPartAliveDuration: mongoPart.inTransition?.previousPartKeepaliveDuration ?? 0,
         delayPiecesDuration: mongoPart.inTransition?.partContentDelayDuration ?? 0,
       },
