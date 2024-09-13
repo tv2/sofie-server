@@ -81,7 +81,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
 
   public createSplitScreenActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2Action[] {
-    const splitScreenManifestData: Tv2SplitScreenManifestData[] = this.actionManifestMapper.getSplitScreenManifestData(blueprintConfiguration, actionManifests)
+    const splitScreenManifestData: Tv2SplitScreenManifestData[] = this.actionManifestMapper.filterAndMapToSplitScreenManifestData(blueprintConfiguration, actionManifests)
     return [
       ...this.createSplitScreenLayoutActions(blueprintConfiguration),
       ...this.createInsertSplitScreenInputActions(blueprintConfiguration),
