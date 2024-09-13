@@ -163,7 +163,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     })
   }
 
-  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Action[] {
+  public createGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2Action[] {
     const commandTimelineObjectFactory: Tv2GraphicsCommandTimelineObjectFactory = this.graphicsTimelineObjectFactoryFactory.createGraphicsCommandTimelineObjectFactory(blueprintConfiguration)
     const elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory = this.graphicsTimelineObjectFactoryFactory.createGraphicsElementTimelineObjectFactory(blueprintConfiguration)
 
@@ -304,7 +304,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         const pieceInterface: Tv2PieceInterface = this.createFullscreenGraphicsPieceInterface(blueprintConfiguration, graphicsData, partInterface, elementTimelineObjectFactory)
 
         return {
-          id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}_${graphicsData.rank}`,
+          id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
           rundownId: graphicsData.rundownId,
           name: `Fullscreen Graphics - ${graphicsData.name}`,
           rank: graphicsData.rank,
