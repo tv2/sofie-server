@@ -298,27 +298,27 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   }
 
   private createFullscreenGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[]): Tv2PartAction[] {
-    return this.removeDuplicateActions(
-      fullscreenGraphicsData.map((graphicsData) => {
-        const partInterface: PartInterface = this.createFullscreenGraphicsPartInterface(graphicsData, blueprintConfiguration)
-        const pieceInterface: Tv2PieceInterface = this.createFullscreenGraphicsPieceInterface(blueprintConfiguration, graphicsData, partInterface, elementTimelineObjectFactory)
+    return this.removeDuplicateActions(fullscreenGraphicsData.map((graphicsData) => this.createFullscreenGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, graphicsData)))
+  }
 
-        return {
-          id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
-          rundownId: graphicsData.rundownId,
-          name: `Fullscreen Graphics - ${graphicsData.name}`,
-          rank: graphicsData.rank,
-          type: PartActionType.INSERT_PART_AS_NEXT,
-          data: {
-            partInterface: partInterface,
-            pieceInterfaces: [pieceInterface]
-          },
-          metadata: {
-            contentType: Tv2ActionContentType.GRAPHICS
-          }
-        }
-      })
-    )
+  private createFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
+    const partInterface: PartInterface = this.createFullscreenGraphicsPartInterface(graphicsData, blueprintConfiguration)
+    const pieceInterface: Tv2PieceInterface = this.createFullscreenGraphicsPieceInterface(blueprintConfiguration, graphicsData, partInterface, elementTimelineObjectFactory)
+
+    return {
+      id: `fullscreen_graphics_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
+      rundownId: graphicsData.rundownId,
+      name: `Fullscreen Graphics - ${graphicsData.name}`,
+      rank: graphicsData.rank,
+      type: PartActionType.INSERT_PART_AS_NEXT,
+      data: {
+        partInterface: partInterface,
+        pieceInterfaces: [pieceInterface]
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.GRAPHICS
+      }
+    }
   }
 
   private createFullscreenGraphicsPartInterface(graphicsData: Tv2FullscreenGraphicsManifestData, blueprintConfiguration: Tv2BlueprintConfiguration): PartInterface {

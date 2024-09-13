@@ -173,12 +173,12 @@ export class Tv2AudioActionFactory extends ActionFactory {
 
 
   private createAudioBedActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2AudioAction[] {
-    return this.removeDuplicateActions(
-      actionManifests
-        .filter(this.isAudioBedActionManifest.bind(this))
-        .filter(audioBedActionManifest => this.isAudioBedConfigured(audioBedActionManifest.data.name, blueprintConfiguration))
-        .map(audioBedActionManifest => this.createAudioBedActionFromActionManifest(blueprintConfiguration, audioBedActionManifest))
-    )
+    const audioBedActions: Tv2AudioAction[] = actionManifests
+      .filter(this.isAudioBedActionManifest.bind(this))
+      .filter(audioBedActionManifest => this.isAudioBedConfigured(audioBedActionManifest.data.name, blueprintConfiguration))
+      .map(audioBedActionManifest => this.createAudioBedActionFromActionManifest(blueprintConfiguration, audioBedActionManifest))
+
+    return this.removeDuplicateActions(audioBedActions)
   }
 
   private isAudioBedActionManifest(actionManifest: Tv2ActionManifest): actionManifest is ActionManifest<Tv2ActionManifestAudioBedData> {
