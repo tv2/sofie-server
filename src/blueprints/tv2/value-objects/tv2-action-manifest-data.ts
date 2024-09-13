@@ -4,11 +4,12 @@ import { Tv2SourceLayer } from './tv2-layers'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
-export type Tv2ActionManifestData = Tv2ActionManifestVideoClipData
-| Tv2ActionManifestSplitScreenData
-| Tv2ActionManifestFullscreenGraphicsData
-| Tv2ActionManifestOverlayGraphicsData
-| Tv2ActionManifestAudioBedData
+export type Tv2ActionManifestData =
+  | Tv2ActionManifestVideoClipData
+  | Tv2ActionManifestSplitScreenData
+  | Tv2ActionManifestFullscreenGraphicsData
+  | Tv2ActionManifestOverlayGraphicsData
+  | Tv2ActionManifestAudioBedData
 /**
  * The 'userData' field corresponds to the 'userData' field on the 'adLibActions' collection in the database when dealing with Video Clips.
  * The attributes need to match the attributes in the database
@@ -97,7 +98,7 @@ export interface Tv2ActionManifestSplitScreenSource {
 
 export enum TvActionManifestSplitScreenSourceType {
   CAMERA = 'KAM',
-  LIVE = 'REMOTE'
+  REMOTE = 'REMOTE'
 }
 
 export interface Tv2VideoClipManifestData {
