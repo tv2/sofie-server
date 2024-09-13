@@ -6,4 +6,5 @@ export interface Device {
   isConnected: boolean
   statusCode: StatusCode
   statusMessage: string
+  lastSeenTimestamp: number
 }

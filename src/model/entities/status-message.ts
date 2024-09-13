@@ -5,5 +5,5 @@ export interface StatusMessage {
   statusCode: StatusCode
   title: string
   message: string
-  lastUpdatedTimestamp?: number
+  lastUpdatedTimestamp: number
 }

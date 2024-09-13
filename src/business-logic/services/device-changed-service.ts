@@ -85,7 +85,8 @@ export class DeviceChangedService implements DataChangeService {
       id: `${DEVICE_STATUS_MESSAGE_PREFIX}${device.id}`,
       statusCode: device.statusCode,
       title: device.name,
-      message: device.statusMessage
+      message: device.statusMessage,
+      lastUpdatedTimestamp: device.lastSeenTimestamp
     }
   }
 
@@ -95,7 +96,8 @@ export class DeviceChangedService implements DataChangeService {
       name: '',
       statusMessage: 'Device was deleted',
       statusCode: StatusCode.GOOD,
-      isConnected: false
+      isConnected: false,
+      lastSeenTimestamp: Date.now()
     }
 
     await this.statusMessageService.updateStatusMessage(this.convertDeviceToStatusMessage(deletedDevice))

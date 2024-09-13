@@ -184,6 +184,7 @@ export interface MongoDevice extends MongoId {
     messages: string[]
   }
   connected: boolean
+  lastSeen: number
 }
 
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
@@ -505,7 +506,8 @@ export class MongoEntityConverter {
       name: mongoDevice.name,
       isConnected: mongoDevice.connected,
       statusCode: this.getStatusCode(mongoDevice.status.statusCode),
-      statusMessage
+      statusMessage,
+      lastSeenTimestamp: mongoDevice.lastSeen
     }
   }
 

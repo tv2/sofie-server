@@ -137,6 +137,7 @@ export class EntityTestFactory {
       statusCode: StatusCode.UNKNOWN,
       statusMessage: '',
       isConnected: false,
+      lastSeenTimestamp: Date.now(),
       ...device
     }
   }
@@ -147,6 +148,7 @@ export class EntityTestFactory {
       title: 'statusMessageTitle',
       message: 'someMessage',
       statusCode: StatusCode.UNKNOWN,
+      lastUpdatedTimestamp: Date.now(),
       ...statusMessage
     }
   }

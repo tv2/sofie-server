@@ -38,19 +38,21 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
             id: `${schema.iNewsName}_${schema.iNewsSchemaColumn}`,
             title: `${schema.iNewsName} Schema Configuration`,
             message: `The Schema ${schema.iNewsName} has an invalid CasparCg design value, since the design name '${designValue.name}' must not contain whitespace`,
-            statusCode: StatusCode.BAD
+            statusCode: StatusCode.BAD,
+            lastUpdatedTimestamp: Date.now()
           }
         })
     })
   }
 
-  private validateGraphicsDefaults(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {  
+  private validateGraphicsDefaults(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     if (!showStyleConfiguration.graphicsDefault) {
       return [{
         id: 'GraphicsDefaultMissing',
         title: 'Graphics Default Configuration',
         message: 'Graphics default configuration is missing',
-        statusCode: StatusCode.BAD
+        statusCode: StatusCode.BAD,
+        lastUpdatedTimestamp: Date.now()
       }]
     }
 
@@ -60,25 +62,28 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
         id: 'DefaultSetupName',
         title: 'Default Setup Name Configuration',
         message: 'The Default Setup Name is missing or empty',
-        statusCode: StatusCode.BAD
+        statusCode: StatusCode.BAD,
+        lastUpdatedTimestamp: Date.now()
       }]
     }
-  
+
     if (!showStyleConfiguration.graphicsDefault.schema?.value) {
       return [{
         id: 'DefaultSchema',
         title: 'Default Schema Configuration',
         message: 'The Default Schema is missing or empty',
-        statusCode: StatusCode.BAD
+        statusCode: StatusCode.BAD,
+        lastUpdatedTimestamp: Date.now()
       }]
     }
-  
+
     if (!showStyleConfiguration.graphicsDefault.design?.value) {
       return [{
         id: 'DefaultDesign',
         title: 'Default Design Configuration',
         message: 'The Default Design is missing or empty',
-        statusCode: StatusCode.BAD
+        statusCode: StatusCode.BAD,
+        lastUpdatedTimestamp: Date.now()
       }]
     }
     return []
@@ -92,7 +97,8 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
           id: `${variant.id}_noGraphicsDefault`,
           title: `Misconfigured ShowStyleVariant ${variant.name}`,
           message: `ShowStyleVariant ${variant.name} does not have a 'GraphicsDefault' configured.`,
-          statusCode: StatusCode.BAD
+          statusCode: StatusCode.BAD,
+          lastUpdatedTimestamp: Date.now()
         }
       })
   }
