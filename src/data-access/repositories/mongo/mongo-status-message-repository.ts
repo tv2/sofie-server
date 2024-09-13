@@ -39,12 +39,14 @@ export class MongoStatusMessageRepository extends BaseMongoRepository implements
 
   public async createStatusMessage(statusMessage: StatusMessage): Promise<StatusMessage> {
     this.assertDatabaseConnection(this.createStatusMessage.name)
+    statusMessage.lastUpdatedTimestamp = Date.now()
     await this.getCollection().updateOne({ id: statusMessage.id }, { $set: statusMessage }, { upsert: true})
     return statusMessage
   }
 
   public async updateStatusMessage(statusMessage: StatusMessage): Promise<StatusMessage> {
     this.assertDatabaseConnection(this.updateStatusMessage.name)
+    statusMessage.lastUpdatedTimestamp = Date.now()
     await this.getCollection().updateOne({ id: statusMessage.id }, { $set: statusMessage })
     return statusMessage
   }

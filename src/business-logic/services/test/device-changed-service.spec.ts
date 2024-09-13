@@ -8,6 +8,8 @@ import { StatusMessageService } from '../interfaces/status-message-service'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { StatusCode } from '../../../model/enums/status-code'
 
+const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
+
 describe(DeviceChangedService.name, () => {
   it('calls the StatusMessageService with a StatusMessage that has the same id as the Device', () => {
     const device: Device = EntityTestFactory.createDevice({ id: 'deviceId' })
@@ -19,7 +21,7 @@ describe(DeviceChangedService.name, () => {
     createTestee({ statusMessageService, deviceDataChangedListener })
 
     const [statusMessage] = capture(statusMessageService.updateStatusMessage).last()
-    expect(statusMessage.id).toBe(device.id)
+    expect(statusMessage.id).toBe(`${DEVICE_STATUS_MESSAGE_PREFIX}${device.id}`)
   })
 
   it('calls the StatusMessageService with a StatusMessage that has the Device name as title', () => {
