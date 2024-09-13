@@ -70,7 +70,7 @@ describe(Tv2GraphicsActionFactory.name, () => {
     })
 
     describe('when multiple equivalent ident graphics action manifests are given', () => {
-      it('returns one action for the action manifest with the lowest rank', () => {
+      it('returns one action for each action manifest', () => {
         const testee: Tv2GraphicsActionFactory = createTestee()
 
         const actionManifests: Tv2ActionManifest<Tv2ActionManifestOverlayGraphicsData>[] = [
@@ -96,13 +96,15 @@ describe(Tv2GraphicsActionFactory.name, () => {
 
         const result: Tv2Action[] = testee.createGraphicsActions(blueprintConfiguration, actionManifests)
 
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'Some ident', rank: 5 })]))
-        expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ name: 'Some ident', rank: 10 })]))
+        expect(result).toEqual(expect.arrayContaining([
+          expect.objectContaining({ name: 'Some ident', rank: 5 }),
+          expect.objectContaining({ name: 'Some ident', rank: 10 }),
+        ]))
       })
     })
 
     describe('when multiple equivalent lower third graphics action manifests are given', () => {
-      it('returns one action for the action manifest with the lowest rank', () => {
+      it('returns one action for each action manifest', () => {
         const testee: Tv2GraphicsActionFactory = createTestee()
 
         const actionManifests: Tv2ActionManifest<Tv2ActionManifestOverlayGraphicsData>[] = [
@@ -128,13 +130,15 @@ describe(Tv2GraphicsActionFactory.name, () => {
 
         const result: Tv2Action[] = testee.createGraphicsActions(blueprintConfiguration, actionManifests)
 
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'Some lower third', rank: 5 })]))
-        expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ name: 'Some lower third', rank: 10 })]))
+        expect(result).toEqual(expect.arrayContaining([
+          expect.objectContaining({ name: 'Some lower third', rank: 5 }),
+          expect.objectContaining({ name: 'Some lower third', rank: 10 })
+        ]))
       })
     })
 
     describe('when multiple equivalent pilot graphics action manifests are given', () => {
-      it('returns one action for the action manifest with the lowest rank', () => {
+      it('returns one action for each action manifest', () => {
         const testee: Tv2GraphicsActionFactory = createTestee()
 
         const actionManifests: Tv2ActionManifest<Tv2ActionManifestOverlayGraphicsData>[] = [
@@ -160,8 +164,10 @@ describe(Tv2GraphicsActionFactory.name, () => {
 
         const result: Tv2Action[] = testee.createGraphicsActions(blueprintConfiguration, actionManifests)
 
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'Some pilot graphics', rank: 5 })]))
-        expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ name: 'Some pilot graphics', rank: 10 })]))
+        expect(result).toEqual(expect.arrayContaining([
+          expect.objectContaining({ name: 'Some pilot graphics', rank: 5 }),
+          expect.objectContaining({ name: 'Some pilot graphics', rank: 10 })
+        ]))
       })
     })
   })

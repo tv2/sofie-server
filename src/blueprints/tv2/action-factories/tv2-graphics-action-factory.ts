@@ -450,31 +450,26 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   }
 
   private createOverlayGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2OverlayGraphicsManifestData[]): Tv2PieceAction[] {
-    const identActions: Tv2PieceAction[] = this.removeDuplicateActions(
-      graphicsData
-        .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_IDENT)
-        .map(data => this.createIdentGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
-    )
+    const identActions: Tv2PieceAction[] = graphicsData
+      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_IDENT)
+      .map(data => this.createIdentGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
 
-    const lowerThirdActions: Tv2PieceAction[] = this.removeDuplicateActions(
-      graphicsData
-        .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_LOWER_THIRD)
-        .map((data) => this.createLowerThirdGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
-    )
+    const lowerThirdActions: Tv2PieceAction[] = graphicsData
+      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_LOWER_THIRD)
+      .map((data) => this.createLowerThirdGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
 
-    const pilotOverlayActions: Tv2PieceAction[] = this.removeDuplicateActions(
-      graphicsData
-        .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY)
-        .map(data => this.createPilotOverlayAction(blueprintConfiguration, elementTimelineObjectFactory, data))
-    )
+    const pilotOverlayActions: Tv2PieceAction[] = graphicsData
+      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY)
+      .map(data => this.createPilotOverlayAction(blueprintConfiguration, elementTimelineObjectFactory, data))
 
     return [...identActions, ...lowerThirdActions, ...pilotOverlayActions]
   }
 
   private createIdentGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
+    const identifier: string = this.stringHashConverter.getHashedValue(`${overlayGraphicsData.name}_${overlayGraphicsData.rank}`)
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
-      id: `${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}_piece`,
+      id: `${identifier}_piece`,
       name: overlayGraphicsData.name,
       layer: Tv2SourceLayer.GRAPHICS_IDENT,
       duration: overlayGraphicsData.expectedDuration,
@@ -489,7 +484,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       }
     })
     return {
-      id: `ident_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
+      id: `ident_${identifier}`,
       name: overlayGraphicsData.name,
       rank: overlayGraphicsData.rank,
       rundownId: overlayGraphicsData.rundownId,
@@ -505,8 +500,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
 
   private createLowerThirdGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
     const downstreamKeyer: Tv2DownstreamKeyer = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.OVERLAY_GRAPHICS)
+    const identifier: string = this.stringHashConverter.getHashedValue(`${overlayGraphicsData.name}_${overlayGraphicsData.rank}`)
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
-      id: `${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}_piece`,
+      id: `${identifier}_piece`,
       name: overlayGraphicsData.name,
       layer: Tv2SourceLayer.GRAPHICS_LOWER_THIRD,
       duration: overlayGraphicsData.expectedDuration,
@@ -522,7 +518,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     })
 
     return {
-      id: `lower_third_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
+      id: `lower_third_${identifier}`,
       name: overlayGraphicsData.name,
       rank: overlayGraphicsData.rank,
       rundownId: overlayGraphicsData.rundownId,
@@ -537,8 +533,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   }
 
   private createPilotOverlayAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, overlayGraphicsData: Tv2OverlayGraphicsManifestData): Tv2PieceAction {
+    const identifier: string = this.stringHashConverter.getHashedValue(`${overlayGraphicsData.name}_${overlayGraphicsData.rank}`)
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
-      id: `${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}_piece`,
+      id: `${identifier}_piece`,
       name: overlayGraphicsData.name,
       layer: Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY,
       preRollDuration: this.getPreRollDuration(blueprintConfiguration),
@@ -551,7 +548,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     })
 
     return {
-      id: `pilot_overlay_${this.stringHashConverter.getHashedValue(overlayGraphicsData.name)}`,
+      id: `pilot_overlay_${identifier}`,
       name: overlayGraphicsData.name,
       rank: overlayGraphicsData.rank,
       rundownId: overlayGraphicsData.rundownId,
