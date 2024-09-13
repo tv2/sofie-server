@@ -27,6 +27,9 @@ import { IngestService } from '../interfaces/ingest-service'
 import { RundownService } from '../interfaces/rundown-service'
 import { Logger } from '../../../logger/logger'
 import { PlayoutService } from '../interfaces/playoutService'
+import { InTransition } from '../../../model/value-objects/in-transition'
+import { TakeIsBlockedException } from '../../../model/exceptions/take-is-blocked-exception'
+import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -269,9 +272,9 @@ describe(RundownTimelineService.name, () => {
     const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
     const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
     const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [activePiece] })
-    const activeSegment: Segment = EntityTestFactory.createSegment({parts: [activePart], definesShowStyleVariant: false})
-    const nextSegment: Segment = EntityTestFactory.createSegment({parts: [nextPart], definesShowStyleVariant: false})
-    const nextShowStyleVariantSegment: Segment = EntityTestFactory.createSegment( { parts: [nextPart], definesShowStyleVariant: true})
+    const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart], definesShowStyleVariant: false })
+    const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart], definesShowStyleVariant: false })
+    const nextShowStyleVariantSegment: Segment = EntityTestFactory.createSegment( { parts: [nextPart], definesShowStyleVariant: true })
 
     const rundownRepository: RundownRepository = mock<RundownRepository>()
     const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
@@ -385,6 +388,193 @@ describe(RundownTimelineService.name, () => {
       await testee.takeNext(rundown.id)
 
       verify(ingestService.reloadIngestData(rundown.id)).never()
+    })
+
+    describe('no Part has been Taken yet', () => {
+      it('does a Take', async () => {
+        const rundownMock: Rundown = mock(Rundown)
+        when(rundownMock.getActivePart()).thenThrow(new UnsupportedOperationException(''))
+        const rundown: Rundown = instance(rundownMock)
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+        const testee: RundownTimelineService = createTestee({rundownRepository})
+
+        try {
+          await testee.takeNext(rundown.id)
+        } catch {
+          // We need to catch the error, else we will never reach the verify below
+        }
+
+        verify(rundownMock.takeNext()).once()
+      })
+    })
+
+    describe('active Part has an inTransition', () => {
+      describe('enough time has not yet passed for the block duration', () => {
+        it('does not stop the callbackScheduler', async () => {
+          const now: number = Date.now()
+          jest.useFakeTimers({ now })
+
+          const blockTakeDuration: number = 100
+
+          const onAirInTransition: InTransition = {
+            blockTakeDuration,
+            delayPiecesDuration: 0,
+            keepPreviousPartAliveDuration: 0
+          }
+          const onAirPart: Part = EntityTestFactory.createPart({
+            id: 'onAirPart',
+            executedAt: now - blockTakeDuration / 2,
+            inTransition: onAirInTransition
+          })
+          const rundownMock: Rundown = EntityMockFactory.createRundownMock()
+          when(rundownMock.getActivePart()).thenReturn(onAirPart)
+          const rundown: Rundown = instance(rundownMock)
+
+          const rundownRepository: RundownRepository = mock<RundownRepository>()
+          when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+          const callbackScheduler: CallbackScheduler = mock<CallbackScheduler>()
+
+          const testee: RundownTimelineService = createTestee({ rundownRepository, callbackScheduler })
+
+          try {
+            await testee.takeNext(rundown.id)
+          } catch {
+            // expected error - ignore
+          }
+
+          verify(callbackScheduler.stop()).never()
+        })
+
+        it('does not do a Take', async () => {
+          const now: number = Date.now()
+          jest.useFakeTimers({ now })
+
+          const blockTakeDuration: number = 100
+
+          const onAirInTransition: InTransition = {
+            blockTakeDuration,
+            delayPiecesDuration: 0,
+            keepPreviousPartAliveDuration: 0
+          }
+          const onAirPart: Part = EntityTestFactory.createPart({
+            id: 'onAirPart',
+            executedAt: now - blockTakeDuration / 2,
+            inTransition: onAirInTransition
+          })
+          const rundownMock: Rundown = EntityMockFactory.createRundownMock()
+          when(rundownMock.getActivePart()).thenReturn(onAirPart)
+          const rundown: Rundown = instance(rundownMock)
+
+          const rundownRepository: RundownRepository = mock<RundownRepository>()
+          when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+          const testee: RundownTimelineService = createTestee({ rundownRepository })
+
+          try {
+            await testee.takeNext(rundown.id)
+          } catch {
+            // expected error - ignore
+          }
+
+          verify(rundownMock.takeNext()).never()
+        })
+
+        it('throws a TakeIsBlockedException', async () => {
+          const now: number = Date.now()
+          jest.useFakeTimers({ now })
+
+          const blockTakeDuration: number = 100
+
+          const onAirInTransition: InTransition = {
+            blockTakeDuration,
+            delayPiecesDuration: 0,
+            keepPreviousPartAliveDuration: 0
+          }
+          const onAirPart: Part = EntityTestFactory.createPart({
+            id: 'onAirPart',
+            executedAt: now - blockTakeDuration / 2,
+            inTransition: onAirInTransition
+          })
+          const rundownMock: Rundown = EntityMockFactory.createRundownMock()
+          when(rundownMock.getActivePart()).thenReturn(onAirPart)
+          const rundown: Rundown = instance(rundownMock)
+
+          const rundownRepository: RundownRepository = mock<RundownRepository>()
+          when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+          const testee: RundownTimelineService = createTestee({ rundownRepository })
+
+          await expect(() => testee.takeNext(rundown.id)).rejects.toThrow(TakeIsBlockedException)
+        })
+      })
+
+      describe('enough time has passed for the block duration', () => {
+        it('stops the callbackScheduler', async () => {
+          const now: number = Date.now()
+          jest.useFakeTimers({ now })
+
+          const blockTakeDuration: number = 100
+
+          const onAirInTransition: InTransition = {
+            blockTakeDuration,
+            delayPiecesDuration: 0,
+            keepPreviousPartAliveDuration: 0
+          }
+          const onAirPart: Part = EntityTestFactory.createPart({
+            id: 'onAirPart',
+            executedAt: now - blockTakeDuration * 2,
+            inTransition: onAirInTransition
+          })
+          const rundownMock: Rundown = EntityMockFactory.createRundownMock()
+          when(rundownMock.getActivePart()).thenReturn(onAirPart)
+          const rundown: Rundown = instance(rundownMock)
+
+          const rundownRepository: RundownRepository = mock<RundownRepository>()
+          when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+          const callbackScheduler: CallbackScheduler = mock<CallbackScheduler>()
+
+          const testee: RundownTimelineService = createTestee({ rundownRepository, callbackScheduler })
+
+          await testee.takeNext(rundown.id)
+
+          verify(callbackScheduler.stop()).once()
+        })
+
+        it('does a Take', async () => {
+          const now: number = Date.now()
+          jest.useFakeTimers({ now })
+
+          const blockTakeDuration: number = 100
+
+          const onAirInTransition: InTransition = {
+            blockTakeDuration,
+            delayPiecesDuration: 0,
+            keepPreviousPartAliveDuration: 0
+          }
+          const onAirPart: Part = EntityTestFactory.createPart({
+            id: 'onAirPart',
+            executedAt: now - blockTakeDuration * 2,
+            inTransition: onAirInTransition
+          })
+          const rundownMock: Rundown = EntityMockFactory.createRundownMock()
+          when(rundownMock.getActivePart()).thenReturn(onAirPart)
+          const rundown: Rundown = instance(rundownMock)
+
+          const rundownRepository: RundownRepository = mock<RundownRepository>()
+          when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+          const testee: RundownTimelineService = createTestee({ rundownRepository })
+
+          await testee.takeNext(rundown.id)
+
+          verify(rundownMock.takeNext()).once()
+        })
+      })
     })
   })
 
@@ -607,6 +797,9 @@ function createTestee(params?: {
   blueprint?: Blueprint
   logger?: Logger
 }): RundownTimelineService {
+  const timelineBuilderMock: TimelineBuilder = mock<TimelineBuilder>()
+  when(timelineBuilderMock.buildTimeline(anything())).thenReturn(Promise.resolve({ timelineGroups: [] }))
+
   return new RundownTimelineService(
     instance(params?.rundownEventEmitter ?? mock<RundownEventEmitter>()),
     instance(params?.ingestedRundownRepository ?? mock<IngestedRundownRepository>()),
@@ -615,7 +808,7 @@ function createTestee(params?: {
     instance(params?.partRepository ?? mock<PartRepository>()),
     instance(params?.pieceRepository ?? mock<PieceRepository>()),
     instance(params?.timelineRepository ?? mock<TimelineRepository>()),
-    instance(params?.timelineBuilder ?? mock<TimelineBuilder>()),
+    instance(params?.timelineBuilder ?? timelineBuilderMock),
     instance(params?.ingestService ?? mock<IngestService>()),
     instance(params?.playoutService ?? mock<PlayoutService>()) ,
     instance(params?.callbackScheduler ?? mock<CallbackScheduler>()),

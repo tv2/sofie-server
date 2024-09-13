@@ -32,6 +32,8 @@ export class EntityMockFactory {
     when(mockedRundown.getInfinitePieces()).thenReturn([])
     when(mockedRundown.getActivePart()).thenReturn(this.createPart())
     when(mockedRundown.getNextPart()).thenReturn(this.createPart())
+    when(mockedRundown.getActiveSegment()).thenReturn(this.createSegment())
+    when(mockedRundown.getInfinitePiecesMap()).thenReturn(new Map())
 
     return mockedRundown
   }

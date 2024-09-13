@@ -203,6 +203,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       isUntimed: false,
       isUnsynced: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },
@@ -499,6 +500,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       isUntimed: false,
       isUnsynced: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },

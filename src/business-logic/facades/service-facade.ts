@@ -24,12 +24,12 @@ import { MediaDatabaseChangedService } from '../services/media-database-changed-
 import { ConfigurationService } from '../services/interfaces/configuration-service'
 import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
 import { DeviceChangedService } from '../services/device-changed-service'
-import { ThrottledRundownService } from '../services/throttled-rundown-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
 import { PlayoutService } from '../services/interfaces/playoutService'
 import { PlayoutGatewayService } from '../services/playout-gateway-service'
+import { ThrottledRundownService } from '../services/throttled-rundown-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
