@@ -12,6 +12,7 @@ import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-con
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2AudioAction } from '../../value-objects/tv2-action'
 import { FrameTimeConverter } from '../../helpers/frame-time-converter'
+import { Tv2ActionManifestAudioBedData } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
 
 describe(Tv2AudioActionFactory.name, () => {
@@ -19,18 +20,18 @@ describe(Tv2AudioActionFactory.name, () => {
     describe('when audio bed action manifests are given', () => {
       describe('when all audio bed actions are configured', () => {
         it('creates audio bed actions for all audio bed action manifests', () => {
-          const actionManifests: Tv2ActionManifest[] = [
+          const actionManifests: Tv2ActionManifest<Tv2ActionManifestAudioBedData>[] = [
             EntityTestFactory.createActionManifest({
               actionId: Tv2PieceLayer.AUDIO_BED,
               data: {
-                rank: 0,
+                rank: 5,
                 name: 'Audio bed A'
               }
             }),
             EntityTestFactory.createActionManifest({
               actionId: Tv2PieceLayer.AUDIO_BED,
               data: {
-                rank: 0,
+                rank: 10,
                 name: 'Audio bed B'
               }
             }),
@@ -62,6 +63,45 @@ describe(Tv2AudioActionFactory.name, () => {
             expect.objectContaining({name: 'Audio bed A'}),
             expect.objectContaining({name: 'Audio bed B'}),
           ]))
+        })
+
+        describe('when the same audio bed is defined multiple times', () => {
+          it('returns one action with the lowest rank', () => {
+            const actionManifests: Tv2ActionManifest<Tv2ActionManifestAudioBedData>[] = [
+              EntityTestFactory.createActionManifest({
+                actionId: Tv2PieceLayer.AUDIO_BED,
+                data: {
+                  rank: 5,
+                  name: 'Audio bed A'
+                }
+              }),
+              EntityTestFactory.createActionManifest({
+                actionId: Tv2PieceLayer.AUDIO_BED,
+                data: {
+                  rank: 10,
+                  name: 'Audio bed A'
+                }
+              }),
+            ]
+            const testee: Tv2AudioActionFactory = createTestee()
+            const blueprintConfiguration: Tv2BlueprintConfiguration = Tv2BlueprintConfigurationTestFactory.createTv2BlueprintConfiguration({
+              showStyle: {
+                audioBedConfigurations: [
+                  {
+                    id: 'audio-bed-a-configuration-id',
+                    name: 'Audio bed A',
+                    filename: 'audio-bed-a.mp4',
+                    fadeInDurationInFrames: 0,
+                    fadeOutDurationInFrames: 0,
+                  },
+                ]
+              }
+            })
+            const result: Tv2AudioAction[] = testee.createAudioActions(blueprintConfiguration, actionManifests)
+
+            expect(result).toEqual(expect.arrayContaining([expect.objectContaining({name: 'Audio bed A', rank: 5 })]))
+            expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({name: 'Audio bed A', rank: 10 })]))
+          })
         })
       })
 
