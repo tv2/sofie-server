@@ -6,8 +6,8 @@ export abstract class ActionFactory {
   }
 
   protected removeDuplicateActions<ActionType extends Action>(actions: ActionType[]): ActionType[] {
-    return actions
-      .toSorted((actionA, actionB) => actionA.rank - actionB.rank)
+    return [...actions]
+      .sort((actionA, actionB) => actionA.rank - actionB.rank)
       .reduce<ActionType[]>((actions, actionToAdd) => actions.some(action => action.id === actionToAdd.id) ? actions : [...actions, actionToAdd], [])
   }
 }
