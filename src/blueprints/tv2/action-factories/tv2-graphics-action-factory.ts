@@ -326,6 +326,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       name: `Full ${graphicsData.name}`,
       segmentId: '',
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: this.getKeepOldPartAliveDuration(blueprintConfiguration),
         delayPiecesDuration: 0
       },

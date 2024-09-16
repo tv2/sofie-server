@@ -145,6 +145,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       isUntimed: false,
       isUnsynced: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },
@@ -227,6 +228,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       isUnsynced: false,
       isUntimed: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0,
       },

@@ -1,7 +1,6 @@
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
-  AutoNextStartedEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -168,14 +167,6 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
       partId: newPiece.getPartId(),
       replacedPieceId: replacedPieceId,
       newPiece: new PieceDto(newPiece)
-    }
-  }
-
-  public buildAutoNextStartedEvent(rundownId: string): AutoNextStartedEvent {
-    return {
-      type: RundownEventType.AUTO_NEXT_STARTED,
-      timestamp: Date.now(),
-      rundownId: rundownId,
     }
   }
 

@@ -194,7 +194,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
       name: audioBedName,
       rundownId: actionManifest.rundownId,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
-      rank: 0,
+      rank: actionManifest.data.rank,
       description: `Start ${audioBedName}.`,
       data: {
         pieceInterface: this.createAudioBedPieceInterface({
