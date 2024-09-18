@@ -137,10 +137,17 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const updateTransitionMutateAction: MutateActionWithPieceMethods = {
       type: MutateActionType.PIECE,
       updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
-      piecePredicate: (piece: Piece) => piece.getTimelineObjects().some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
+      piecePredicate: (piece: Piece) => this.isPieceProgramPiece(piece),
     }
     mutateActionMethods.push(updateTransitionMutateAction)
     return mutateActionMethods
+  }
+
+  private isPieceProgramPiece(piece: Piece): boolean {
+    const metadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
+    const isPieceOnProgramOutputLayer: boolean = metadata.outputLayer === Tv2OutputLayer.PROGRAM
+    const containsProgramTimelineObject: boolean = piece.getTimelineObjects().some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer())
+    return isPieceOnProgramOutputLayer && containsProgramTimelineObject
   }
 
   private isTransitionDurationArgumentInteger(transitionDurationInFrames: unknown): transitionDurationInFrames is number {
