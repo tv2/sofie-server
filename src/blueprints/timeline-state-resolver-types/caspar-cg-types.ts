@@ -14,6 +14,7 @@ export interface CasparCgTemplateTimelineObject<T> extends TimelineObject {
 }
 
 interface Mixer {
+  // Has to be a value between 0 and 1 to work correctly with CasparCG
   opacity?: number
   keyer?: boolean
   volume?: number
