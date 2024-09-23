@@ -121,3 +121,8 @@ export interface PartUnsyncedEvent extends RundownEvent {
   type: IngestEventType.PART_UNSYNCED
   part: PartDto
 }
+
+export interface BulkIngestEvent extends RundownEvent {
+  type: IngestEventType.BULK_INGEST_UPDATES,
+  ingestEvents: RundownEvent[]
+}

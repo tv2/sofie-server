@@ -1,5 +1,6 @@
 import { Rundown } from '../../model/entities/rundown'
 import {
+  BulkIngestEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -14,6 +15,7 @@ import {
   RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
+  RundownEvent,
   RundownInfinitePiecesUpdatedEvent,
   RundownRehearseEvent,
   RundownResetEvent,
@@ -39,6 +41,8 @@ export interface RundownEventBuilder {
   buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent
   buildPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPieceId: string, newPiece: Piece): PieceReplacedEvent
   buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePiecesUpdatedEvent
+
+  buildBulkIngestEvent(rundownId: string, ingestEvents: RundownEvent[]): BulkIngestEvent
 
   buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent
   buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent

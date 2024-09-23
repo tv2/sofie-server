@@ -1,6 +1,7 @@
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
+  BulkIngestEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -15,6 +16,7 @@ import {
   RundownCreatedEvent,
   RundownDeactivatedEvent,
   RundownDeletedEvent,
+  RundownEvent,
   RundownInfinitePiecesUpdatedEvent,
   RundownRehearseEvent,
   RundownResetEvent,
@@ -163,6 +165,15 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
       partId: newPiece.getPartId(),
       replacedPieceId: replacedPieceId,
       newPiece: new PieceDto(newPiece)
+    }
+  }
+
+  public buildBulkIngestEvent(rundownId: string, ingestEvents: RundownEvent[]): BulkIngestEvent {
+    return {
+      type: IngestEventType.BULK_INGEST_UPDATES,
+      timestamp: Date.now(),
+      rundownId,
+      ingestEvents
     }
   }
 
