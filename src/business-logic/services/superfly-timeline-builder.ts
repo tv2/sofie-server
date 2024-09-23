@@ -339,8 +339,23 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         this.findLookaheadTimelineObjectsForActivePart(rundown, layer, activeGroup)
       lookaheadObjects.push(...activePartLookaheadObjects)
 
-      return lookaheadObjects
+      return this.postFixRandomIdToDuplicateObjects(lookaheadObjects)
     })
+  }
+
+  private postFixRandomIdToDuplicateObjects(timelineObjects: LookaheadTimelineObject[]): LookaheadTimelineObject[] {
+    return timelineObjects.reduce((timelineObjects: LookaheadTimelineObject[], timelineObject: LookaheadTimelineObject) => {
+      const timelineObjectIdAlreadyExist: boolean = timelineObjects.some(to => to.id === timelineObject.id)
+      if (timelineObjectIdAlreadyExist) {
+        timelineObjects.push({
+          ...timelineObject,
+          id: `${timelineObject.id}_${Math.round(Math.random() * 1000)}`
+        })
+      } else {
+        timelineObjects.push(timelineObject)
+      }
+      return timelineObjects
+    }, [] as LookaheadTimelineObject[])
   }
 
   private findLookaheadTimelineObjectsForFutureParts(
