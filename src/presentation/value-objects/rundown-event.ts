@@ -11,6 +11,10 @@ export interface RundownEvent extends TypedEvent {
   rundownId: string
 }
 
+export interface IngestEvent<Type extends IngestEventType> extends RundownEvent {
+  type: Type
+}
+
 export interface PartEvent extends RundownEvent {
   segmentId: string
   partId: string
@@ -66,63 +70,51 @@ export interface RundownInfinitePiecesUpdatedEvent extends RundownEvent {
   infinitePieces: PieceDto[]
 }
 
-export interface RundownCreatedEvent extends RundownEvent {
-  type: IngestEventType.RUNDOWN_CREATED
+export interface BulkIngestEvent extends IngestEvent<IngestEventType.BULK_INGEST_UPDATES> {
+  ingestEvents: IngestEvent<IngestEventType>[]
+}
+
+export interface RundownCreatedEvent extends IngestEvent<IngestEventType.RUNDOWN_CREATED> {
   rundown: RundownDto
 }
 
-export interface RundownUpdatedEvent extends RundownEvent {
-  type: IngestEventType.RUNDOWN_UPDATED
+export interface RundownUpdatedEvent extends IngestEvent<IngestEventType.RUNDOWN_UPDATED> {
   basicRundown: BasicRundownDto
 }
 
-export interface RundownDeletedEvent extends RundownEvent {
-  type: IngestEventType.RUNDOWN_DELETED
+export interface RundownDeletedEvent extends IngestEvent<IngestEventType.RUNDOWN_DELETED> {
 }
 
-export interface SegmentCreatedEvent extends RundownEvent {
-  type: IngestEventType.SEGMENT_CREATED
+export interface SegmentCreatedEvent extends IngestEvent<IngestEventType.SEGMENT_CREATED> {
   segment: SegmentDto
 }
 
-export interface SegmentUpdatedEvent extends RundownEvent {
-  type: IngestEventType.SEGMENT_UPDATED
+export interface SegmentUpdatedEvent extends IngestEvent<IngestEventType.SEGMENT_UPDATED> {
   segment: SegmentDto
 }
 
-export interface SegmentDeletedEvent extends RundownEvent {
-  type: IngestEventType.SEGMENT_DELETED
+export interface SegmentDeletedEvent extends IngestEvent<IngestEventType.SEGMENT_DELETED> {
   segmentId: string
 }
 
-export interface SegmentUnsyncedEvent extends RundownEvent {
-  type: IngestEventType.SEGMENT_UNSYNCED
+export interface SegmentUnsyncedEvent extends IngestEvent<IngestEventType.SEGMENT_UNSYNCED> {
   unsyncedSegment: SegmentDto
   originalSegmentId: string
 }
 
-export interface PartCreatedEvent extends RundownEvent {
-  type: IngestEventType.PART_CREATED
+export interface PartCreatedEvent extends IngestEvent<IngestEventType.PART_CREATED> {
   part: PartDto
 }
 
-export interface PartUpdatedEvent extends RundownEvent {
-  type: IngestEventType.PART_UPDATED
+export interface PartUpdatedEvent extends IngestEvent<IngestEventType.PART_UPDATED> {
   part: PartDto
 }
 
-export interface PartDeletedEvent extends RundownEvent {
-  type: IngestEventType.PART_DELETED
+export interface PartDeletedEvent extends IngestEvent<IngestEventType.PART_DELETED> {
   segmentId: string
   partId: string
 }
 
-export interface PartUnsyncedEvent extends RundownEvent {
-  type: IngestEventType.PART_UNSYNCED
+export interface PartUnsyncedEvent extends IngestEvent<IngestEventType.PART_UNSYNCED> {
   part: PartDto
-}
-
-export interface BulkIngestEvent extends RundownEvent {
-  type: IngestEventType.BULK_INGEST_UPDATES,
-  ingestEvents: RundownEvent[]
 }
