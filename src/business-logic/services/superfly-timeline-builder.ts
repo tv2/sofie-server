@@ -349,7 +349,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       if (existingIds.has(timelineObject.id)) {
         return {
           ...timelineObject,
-          id: `${timelineObject.id}_${Math.round(Math.random() * 1000)}`
+          id: `${timelineObject.id}_${process.hrtime.bigint()}`
         }
       }
       existingIds.add(timelineObject.id)
