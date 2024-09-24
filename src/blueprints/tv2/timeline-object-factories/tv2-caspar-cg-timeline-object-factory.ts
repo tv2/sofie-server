@@ -63,7 +63,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         data: this.createFullscreenGraphicsTemplateData(blueprintConfiguration, fileName),
         useStopCommand: false,
         mixer: {
-          opacity: 100
+          opacity: 1
         }
       }
     }
@@ -122,7 +122,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
         useStopCommand: false,
         mixer: {
-          opacity: 100
+          opacity: 1
         },
         data: {
           display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
@@ -177,7 +177,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
       name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
       useStopCommand: false,
       mixer: {
-        opacity: 100
+        opacity: 1
       },
       data: templateData
     }
@@ -278,7 +278,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         name: `${graphicsSetup.htmlPackageFolder}/${HTML_GRAPHICS_INDEX_FILENAME}`,
         useStopCommand: false,
         mixer: {
-          opacity: 100
+          opacity: 1
         },
         data: {
           display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
