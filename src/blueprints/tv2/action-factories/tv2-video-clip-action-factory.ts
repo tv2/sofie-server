@@ -67,13 +67,18 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       : videoClipAction.data.partInterface.expectedDuration
 
     const mediaPlayerSession: string = `${action.id}_${Date.now()}`
-    videoClipAction.data.pieceInterfaces.map(pieceInterface => pieceInterface.timelineObjects.map(timelineObject => {
-      const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-      blueprintTimelineObject.metaData = {
-        ...blueprintTimelineObject.metaData,
-        mediaPlayerSession
-      }
-    }))
+    videoClipAction.data.pieceInterfaces.map(pieceInterface => {
+      const pieceMetadata: Tv2PieceMetadata = pieceInterface.metadata as Tv2PieceMetadata
+      pieceMetadata.mediaPlayerSessions = [mediaPlayerSession]
+
+      pieceInterface.timelineObjects.map(timelineObject => {
+        const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
+        blueprintTimelineObject.metaData = {
+          ...blueprintTimelineObject.metaData,
+          mediaPlayerSession
+        }
+      })
+    })
 
     return videoClipAction
   }
