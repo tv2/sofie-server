@@ -70,6 +70,10 @@ export class Tv2ActionManifestMapper {
         sources = blueprintConfiguration.studio.remoteSources
         break
       }
+      case TvActionManifestSplitScreenSourceType.REPLAY: {
+        sources = blueprintConfiguration.studio.replaySources
+        break
+      }
     }
     const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.name === splitScreenSource.id)
     if (!source) {

@@ -98,7 +98,8 @@ export interface Tv2ActionManifestSplitScreenSource {
 
 export enum TvActionManifestSplitScreenSourceType {
   CAMERA = 'KAM',
-  REMOTE = 'REMOTE'
+  REMOTE = 'REMOTE',
+  REPLAY = 'REPLAY',
 }
 
 export interface Tv2VideoClipManifestData {
