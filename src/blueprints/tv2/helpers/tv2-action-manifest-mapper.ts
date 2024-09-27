@@ -81,7 +81,7 @@ export class Tv2ActionManifestMapper {
     }
     const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.name === splitScreenSource.id)
     if (!source) {
-      throw new Tv2MisconfigurationException(`No Source Mapping found for split screen source ${splitScreenSource.sourceType} ${splitScreenSource.id}.`)
+      throw new Tv2MisconfigurationException(`No source mapping found for the '${splitScreenSource.sourceType}' split screen source with id '${splitScreenSource.id}'.`)
     }
     return source
   }
