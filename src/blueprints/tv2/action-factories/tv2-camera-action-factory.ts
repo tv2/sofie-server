@@ -7,7 +7,6 @@ import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
-import { Action } from '../../../model/entities/action'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
@@ -29,7 +28,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
     super()
   }
 
-  public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Action[] {
+  public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2CameraAction[] {
     return blueprintConfiguration.studio.cameraSources
       .slice(0, 5)
       .flatMap(source => [
@@ -126,7 +125,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
     }
   }
 
-  public createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
+  private createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
     const sanitizedId: string = this.sanitizeStringForId(cameraSource.id)
     const partId: string = `cameraInsertAndTakeActionPart_${sanitizedId}`
     const cameraPieceInterface: Tv2PieceInterface = this.createCameraPieceInterface(configuration, cameraSource, partId)

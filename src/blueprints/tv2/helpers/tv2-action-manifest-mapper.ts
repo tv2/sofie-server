@@ -31,6 +31,7 @@ export class Tv2ActionManifestMapper {
       .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestSplitScreenData> => actionManifest.actionId === SPLIT_SCREEN_ACTION_MANIFEST_ID)
       .map(actionManifest => {
         const data: Tv2ActionManifestSplitScreenData = actionManifest.data
+        // TODO: Ensure that failed mapping doesn't break the loop for remaining action manifests. Consider to reduce to a list of failed an successive.
         const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
         return {
           name: data.userData.name,

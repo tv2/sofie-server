@@ -47,7 +47,11 @@ export class EntityTestFactory {
   }
 
   public static createPart(partInterface: Partial<PartInterface> = {}): Part {
-    return new Part({
+    return new Part(this.createPartInterface(partInterface))
+  }
+
+  public static createPartInterface(partInterface: Partial<PartInterface> = {}): PartInterface {
+    return {
       disableNextInTransition: false,
       inTransition: {
         blockTakeDuration: 0,
@@ -69,7 +73,7 @@ export class EntityTestFactory {
       ingestedPart: this.createIngestedPart(),
       pieces: [],
       ...partInterface,
-    })
+    }
   }
 
   public static createIngestedPart(ingestedPart: Partial<IngestedPart> = {}): IngestedPart {
@@ -95,7 +99,11 @@ export class EntityTestFactory {
   }
 
   public static createPiece(pieceInterface: Partial<PieceInterface> = {}): Piece {
-    return new Piece({
+    return new Piece(this.createPieceInterface(pieceInterface))
+  }
+
+  public static createPieceInterface(pieceInterface: Partial<PieceInterface> = {}): PieceInterface {
+    return {
       id: 'pieceId' + Math.floor(Math.random() * 1000),
       partId: 'partId',
       layer: 'some_layer',
@@ -110,7 +118,7 @@ export class EntityTestFactory {
       tags: [],
       isUnsynced: false,
       ...pieceInterface
-    })
+    }
   }
 
   public static createIngestedPiece(ingestedPiece: Partial<IngestedPiece>): IngestedPiece {

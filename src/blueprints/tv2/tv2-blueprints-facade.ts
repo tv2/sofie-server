@@ -9,8 +9,11 @@ import { Tv2StudioBlueprintConfigurationMapper } from './helpers/tv2-studio-blue
 import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
 import { Tv2BlueprintConfigurationValidator } from './tv2-blueprint-configuration-validator'
 import { Tv2ActionFactoryProvider } from './action-factories/tv2-action-factory-provider'
+import { Tv2LoggerFacade } from './tv2-logger-facade'
 
 export class Tv2BlueprintsFacade {
+  private static actionService?: Tv2ActionService
+
   public static createBlueprint(): Blueprint {
     const configurationMapper: Tv2ConfigurationMapper = new Tv2ConfigurationMapper(
       new Tv2StudioBlueprintConfigurationMapper(),
@@ -18,16 +21,20 @@ export class Tv2BlueprintsFacade {
     )
     const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
 
-    const actionService: Tv2ActionService = Tv2ActionService.getInstance(
-      configurationMapper,
-      new Tv2ActionFactoryProvider(configurationMapper)
-    )
-
     return new Tv2Blueprint(
       new Tv2EndStateForPartService(sisyfosPersistentLayerFinder),
       new Tv2OnTimelineGenerateService(configurationMapper, sisyfosPersistentLayerFinder),
-      actionService,
+      this.getTv2ActionService(configurationMapper),
       new Tv2BlueprintConfigurationValidator(configurationMapper)
     )
+  }
+
+  private static getTv2ActionService(configurationMapper: Tv2ConfigurationMapper): Tv2ActionService {
+    this.actionService ??= new Tv2ActionService(
+      configurationMapper,
+      new Tv2ActionFactoryProvider(configurationMapper),
+      Tv2LoggerFacade.createLogger(),
+    )
+    return this.actionService
   }
 }

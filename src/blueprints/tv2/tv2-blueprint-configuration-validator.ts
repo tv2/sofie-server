@@ -11,7 +11,7 @@ import { CoreShowStyleVariantBlueprintConfiguration } from './helpers/tv2-show-s
 export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConfiguration {
 
   constructor(private readonly configurationMapper: Tv2ConfigurationMapper) { }
-
+  // TODO: Add check that transitions are configured in breaker configuration
 
   public validateConfiguration(configuration: Configuration): StatusMessage[] {
     const tv2BlueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, '')
@@ -44,7 +44,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
     })
   }
 
-  private validateGraphicsDefaults(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {  
+  private validateGraphicsDefaults(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     if (!showStyleConfiguration.graphicsDefault) {
       return [{
         id: 'GraphicsDefaultMissing',
@@ -63,7 +63,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
         statusCode: StatusCode.BAD
       }]
     }
-  
+
     if (!showStyleConfiguration.graphicsDefault.schema?.value) {
       return [{
         id: 'DefaultSchema',
@@ -72,7 +72,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
         statusCode: StatusCode.BAD
       }]
     }
-  
+
     if (!showStyleConfiguration.graphicsDefault.design?.value) {
       return [{
         id: 'DefaultDesign',
