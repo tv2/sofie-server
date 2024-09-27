@@ -18,6 +18,7 @@ import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { ExhaustiveCaseChecker } from '../../../business-logic/exhaustive-case-checker'
 
 const SPLIT_SCREEN_ACTION_MANIFEST_ID: string = 'select_dve'
 const VIDEO_CLIP_ACTION_MANIFEST_ID: string = 'select_server_clip'
@@ -73,6 +74,9 @@ export class Tv2ActionManifestMapper {
       case TvActionManifestSplitScreenSourceType.REPLAY: {
         sources = blueprintConfiguration.studio.replaySources
         break
+      }
+      default: {
+        ExhaustiveCaseChecker.assertAllCases(splitScreenSource.sourceType, 'action manifest split screen source type')
       }
     }
     const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.name === splitScreenSource.id)
