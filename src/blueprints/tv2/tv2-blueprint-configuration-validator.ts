@@ -100,7 +100,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
   private validateTransitions(showStyleVariant: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     const configuredBreakerNames: Set<string> = new Set(showStyleVariant.breakers.map(breaker => breaker.name))
     return showStyleVariant.breakerTransitionEffectConfigurations
-      .filter(breakerTransitionEffect => configuredBreakerNames.has(breakerTransitionEffect.name))
+      .filter(breakerTransitionEffect => !configuredBreakerNames.has(breakerTransitionEffect.name))
       .map(breakerTransitionEffect => ({
         id: `missingBreakerConfigurationEntry_${this.sanitizeStringForId(breakerTransitionEffect.name)}`,
         title: 'Missing breaker configuration',
