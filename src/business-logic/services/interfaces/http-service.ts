@@ -7,5 +7,5 @@ export enum HttpErrorResponseCode {
 }
 
 export interface HttpService {
-  post(url: string, body: unknown): unknown
+  post(url: string, body?: string): unknown
 }
