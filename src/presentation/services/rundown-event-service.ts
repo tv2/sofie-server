@@ -49,7 +49,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   private ingestEventQueue: Map<string, RundownEvent[]> = new Map()
 
-  private ingestTimeoutIdentifier?: NodeJS.Timeout
+  private timeoutIdentifier?: NodeJS.Timeout
   private callbackStartedTimestamp: number
   private lastBulkEmittedTimestamp: number
 
@@ -71,7 +71,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
   }
 
   private startBulkEventCallback(): void {
-    const isTimeoutStarted: boolean = !!this.ingestTimeoutIdentifier
+    const isTimeoutStarted: boolean = !!this.timeoutIdentifier
     const isBulkEmitEventOverdue: boolean = Date.now() > this.lastBulkEmittedTimestamp + MAX_TIME_BEFORE_SENDING_BULK_EVENT_IN_MS
     const isTooLateToDelayBulkEvent: boolean = Date.now() > this.callbackStartedTimestamp + BULK_EVENT_THRESHOLD_IN_MS
 
@@ -79,10 +79,10 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
       return
     }
 
-    clearTimeout(this.ingestTimeoutIdentifier)
+    clearTimeout(this.timeoutIdentifier)
     this.callbackStartedTimestamp = Date.now()
-    this.ingestTimeoutIdentifier = setTimeout(() => {
-      this.ingestTimeoutIdentifier = undefined
+    this.timeoutIdentifier = setTimeout(() => {
+      this.timeoutIdentifier = undefined
       this.sendBulkIngestEvent()
     }, BULK_EVENT_THRESHOLD_IN_MS)
   }
@@ -144,7 +144,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   public emitSetNextEvent(rundown: Rundown): void {
     const event: PartSetAsNextEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-    if (this.ingestTimeoutIdentifier) { // We are currently ingesting
+    if (this.timeoutIdentifier) { // We are currently ingesting
       if (this.lastSetNextEventReceivedDuringIngest?.segmentId === event.segmentId && this.lastSetNextEventReceivedDuringIngest.partId === event.partId) {
         // The next Segment and Part did not change, so we don't need to send a new SetNext event.
         return
