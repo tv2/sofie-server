@@ -365,8 +365,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       return action
     }
 
-    const metadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
-    const mediaPlayerSession: string | undefined = metadata.mediaPlayerSessions?.[0]
+    const programTimelineObject: Tv2BlueprintTimelineObject | undefined = piece.getTimelineObjects().find(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()) as Tv2BlueprintTimelineObject | undefined
+    const mediaPlayerSession: string | undefined = programTimelineObject?.metaData?.mediaPlayerSession
 
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
