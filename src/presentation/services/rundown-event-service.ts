@@ -33,8 +33,8 @@ import { Segment } from '../../model/entities/segment'
 import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 import { IngestEventType } from '../enums/event-type'
 
-const INGEST_EVENT_DEBOUNCE_DURATION_IN_MS: number = 500
-const MAX_INGEST_EVENT_DEBOUNCE_DURATION_IN_MS: number = 5000
+const BULK_EVENT_THRESHOLD_IN_MS: number = 500
+const MAX_TIME_BEFORE_SENDING_BULK_EVENT_IN_MS: number = 5000
 
 export class RundownEventService implements RundownEventEmitter, RundownEventObserver {
   private static instance: RundownEventService
@@ -51,8 +51,8 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
   private ingestEventQueue: Map<string, IngestEvent<IngestEventType>[]> = new Map()
 
   private ingestTimeoutIdentifier?: NodeJS.Timeout
-  private lastQueuedIngestEventTimestamp: number
-  private firstQueuedIngestEventTimestamp: number
+  private callbackStartedTimestamp: number
+  private lastBulkEmittedTimestamp: number
 
   private lastSetNextEventReceivedDuringIngest?: PartSetAsNextEvent
 
@@ -73,19 +73,19 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   private startBulkEventCallback(): void {
     const isTimeoutStarted: boolean = !!this.ingestTimeoutIdentifier
-    const hasReachedMaxDebounceDuration: boolean = Date.now() > this.firstQueuedIngestEventTimestamp + MAX_INGEST_EVENT_DEBOUNCE_DURATION_IN_MS
-    const isPastDebouncePeriod: boolean = Date.now() > this.lastQueuedIngestEventTimestamp + INGEST_EVENT_DEBOUNCE_DURATION_IN_MS
+    const isBulkEmitEventOverdue: boolean = Date.now() > this.lastBulkEmittedTimestamp + MAX_TIME_BEFORE_SENDING_BULK_EVENT_IN_MS
+    const isTooLateToDelayBulkEvent: boolean = Date.now() > this.callbackStartedTimestamp + BULK_EVENT_THRESHOLD_IN_MS
 
-    if (isTimeoutStarted && (hasReachedMaxDebounceDuration || isPastDebouncePeriod)) {
+    if (isTimeoutStarted && (isBulkEmitEventOverdue || isTooLateToDelayBulkEvent)) {
       return
     }
 
     clearTimeout(this.ingestTimeoutIdentifier)
-    this.lastQueuedIngestEventTimestamp = Date.now()
+    this.callbackStartedTimestamp = Date.now()
     this.ingestTimeoutIdentifier = setTimeout(() => {
       this.ingestTimeoutIdentifier = undefined
       this.sendBulkIngestEvent()
-    }, INGEST_EVENT_DEBOUNCE_DURATION_IN_MS)
+    }, BULK_EVENT_THRESHOLD_IN_MS)
   }
 
   private sendBulkIngestEvent(): void {
@@ -94,7 +94,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
       bulkIngestEvents.push(this.rundownEventBuilder.buildBulkIngestEvent(rundownId, ingestEvents))
     }
     this.ingestEventQueue = new Map()
-    this.firstQueuedIngestEventTimestamp = Date.now()
+    this.lastBulkEmittedTimestamp = Date.now()
     this.callbacks.forEach(callback => bulkIngestEvents.forEach(bulkEvent => callback(bulkEvent)))
   }
 
