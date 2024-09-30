@@ -1,4 +1,5 @@
 name: 'Publish Image'
+run-name: 'Publish image as version {{ inputs.versionTag }}'
 
 on:
   workflow_dispatch:
