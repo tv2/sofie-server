@@ -61,6 +61,8 @@ const TV2_GRAPHICS_LAYERS: Tv2SourceLayer[] = [
   Tv2SourceLayer.GRAPHICS_TELEPHONE
 ]
 
+const FULLSCREEN_GRAPHICS_SOURCE_NAME_PREFIX: string = 'PILOT_'
+
 export class Tv2GraphicsActionFactory extends ActionFactory {
 
   constructor(
@@ -370,7 +372,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       ],
       metadata: {
         type: Tv2PieceType.GRAPHICS,
-        outputLayer: Tv2OutputLayer.PROGRAM
+        outputLayer: Tv2OutputLayer.PROGRAM,
+        sourceName: `${FULLSCREEN_GRAPHICS_SOURCE_NAME_PREFIX}${graphicsData.vcpId}`
       }
     })
   }

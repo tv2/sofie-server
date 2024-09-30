@@ -120,7 +120,8 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioMode === Tv2AudioMode.VOICE_OVER
-      }
+      },
+      sourceName: videoClipData.fileName
     }
 
     const videoMixerEnable: TimelineEnable = {
