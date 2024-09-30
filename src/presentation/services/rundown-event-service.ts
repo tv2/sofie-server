@@ -1,5 +1,5 @@
 import {
-  BulkIngestEvent, IngestEvent,
+  BulkIngestEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -31,7 +31,6 @@ import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 import { Segment } from '../../model/entities/segment'
 import { RundownEventObserver } from '../interfaces/rundown-event-observer'
-import { IngestEventType } from '../enums/event-type'
 
 const BULK_EVENT_THRESHOLD_IN_MS: number = 500
 const MAX_TIME_BEFORE_SENDING_BULK_EVENT_IN_MS: number = 5000
@@ -48,7 +47,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   private readonly callbacks: ((rundownEvent: RundownEvent) => void)[] = []
 
-  private ingestEventQueue: Map<string, IngestEvent<IngestEventType>[]> = new Map()
+  private ingestEventQueue: Map<string, RundownEvent[]> = new Map()
 
   private ingestTimeoutIdentifier?: NodeJS.Timeout
   private callbackStartedTimestamp: number
@@ -62,7 +61,7 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
     this.callbacks.forEach(callback => callback(rundownEvent))
   }
 
-  private queueIngestEvent(rundownEvent: IngestEvent<IngestEventType>): void {
+  private queueIngestEvent(rundownEvent: RundownEvent): void {
     if (!this.ingestEventQueue.get(rundownEvent.rundownId)) {
       this.ingestEventQueue.set(rundownEvent.rundownId, [])
     }
