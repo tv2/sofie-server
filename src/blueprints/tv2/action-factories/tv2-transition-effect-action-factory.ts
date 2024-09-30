@@ -82,10 +82,18 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource,
       ),
       ...blueprintConfiguration.showStyle.breakerTransitionEffectConfigurations.flatMap(transitionEffect => {
-        return [
-          this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
-          this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
-        ]
+        try {
+          return [
+            this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
+            this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
+          ]
+        } catch (exception) {
+          if (exception instanceof Tv2MisconfigurationException) {
+            this.logger.data(exception).warn(exception.message)
+            return []
+          }
+          throw exception
+        }
       })]
   }
 
@@ -315,7 +323,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
-    const breaker: Breaker | undefined = this.findBreakerFromConfiguration(transitionEffect, configuration)
+    const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
 
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
