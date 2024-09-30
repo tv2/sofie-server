@@ -24,7 +24,8 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
   private validateShowStyleConfiguration(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     return [
       ...this.validateGraphicsSchemas(showStyleConfiguration),
-      ...this.validateGraphicsDefaults(showStyleConfiguration)
+      ...this.validateGraphicsDefaults(showStyleConfiguration),
+      ...this.validateTransitions(showStyleConfiguration),
     ]
   }
 
@@ -94,5 +95,22 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
           statusCode: StatusCode.BAD
         }
       })
+  }
+
+  private validateTransitions(showStyleVariant: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
+    const configuredBreakerNames: Set<string> = new Set(showStyleVariant.breakers.map(breaker => breaker.name))
+    return showStyleVariant.breakerTransitionEffectConfigurations
+      .filter(breakerTransitionEffect => configuredBreakerNames.has(breakerTransitionEffect.name))
+      .map(breakerTransitionEffect => ({
+        id: `missingBreakerConfigurationEntry_${this.sanitizeStringForId(breakerTransitionEffect.name)}`,
+        title: 'Missing breaker configuration',
+        message: `No breaker configuration found for the transition '${breakerTransitionEffect.name}'.`,
+        statusCode: StatusCode.WARNING,
+        lastUpdatedTimestamp: Date.now()
+      }))
+  }
+
+  private sanitizeStringForId(value: string): string {
+    return Buffer.from(value).toString('hex')
   }
 }
