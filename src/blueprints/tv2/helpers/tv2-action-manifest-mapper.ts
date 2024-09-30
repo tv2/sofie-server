@@ -12,7 +12,7 @@ import {
   Tv2OverlayGraphicsManifestData,
   Tv2SplitScreenManifestData,
   Tv2VideoClipManifestData,
-  TvActionManifestSplitScreenSourceType
+  Tv2ActionManifestSplitScreenSourceType
 } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
@@ -31,7 +31,6 @@ export class Tv2ActionManifestMapper {
       .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestSplitScreenData> => actionManifest.actionId === SPLIT_SCREEN_ACTION_MANIFEST_ID)
       .map(actionManifest => {
         const data: Tv2ActionManifestSplitScreenData = actionManifest.data
-        // TODO: Ensure that failed mapping doesn't break the loop for remaining action manifests. Consider to reduce to a list of failed an successive.
         const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
         return {
           name: data.userData.name,
@@ -64,15 +63,15 @@ export class Tv2ActionManifestMapper {
   private mapActionManifestSplitScreenSourceToSource(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenSource: Tv2ActionManifestSplitScreenSource): Tv2SourceMappingWithSound {
     let sources: Tv2SourceMappingWithSound[] = []
     switch (splitScreenSource.sourceType) {
-      case TvActionManifestSplitScreenSourceType.CAMERA: {
+      case Tv2ActionManifestSplitScreenSourceType.CAMERA: {
         sources = blueprintConfiguration.studio.cameraSources
         break
       }
-      case TvActionManifestSplitScreenSourceType.REMOTE: {
+      case Tv2ActionManifestSplitScreenSourceType.REMOTE: {
         sources = blueprintConfiguration.studio.remoteSources
         break
       }
-      case TvActionManifestSplitScreenSourceType.REPLAY: {
+      case Tv2ActionManifestSplitScreenSourceType.REPLAY: {
         sources = blueprintConfiguration.studio.replaySources
         break
       }

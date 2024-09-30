@@ -11,7 +11,6 @@ import { CoreShowStyleVariantBlueprintConfiguration } from './helpers/tv2-show-s
 export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConfiguration {
 
   constructor(private readonly configurationMapper: Tv2ConfigurationMapper) { }
-  // TODO: Add check that transitions are configured in breaker configuration
 
   public validateConfiguration(configuration: Configuration): StatusMessage[] {
     const tv2BlueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, '')
