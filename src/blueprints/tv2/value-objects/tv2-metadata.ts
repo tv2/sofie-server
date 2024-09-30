@@ -36,6 +36,7 @@ export interface Tv2PieceMetadata {
     audioTimelineObjectsForBoxes: { [inputIndex: number]: Tv2BlueprintTimelineObject[] }
   }
   mediaPlayerSessions?: string[]
+  sourceName?: string
 }
 
 export interface Tv2BlueprintTimelineObject extends TimelineObject {

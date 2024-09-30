@@ -20,6 +20,19 @@ import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-fac
 import { Tv2RobotActionFactory } from './action-factories/tv2-robot-action-factory'
 import { Tv2Logger } from './tv2-logger'
 
+enum ActionTypeName {
+  CAMERA = 'camera',
+  REMOTE = 'remote',
+  AUDIO = 'audio',
+  TRANSITION_EFFECT = 'transition effect',
+  GRAPHICS = 'graphics',
+  VIDEO_CLIP = 'video clip',
+  VIDEO_MIXER = 'video mixer',
+  SPLIT_SCREEN = 'split screen',
+  REPLAY = 'replay',
+  ROBOT = 'robot',
+}
+
 export class Tv2ActionService implements BlueprintGenerateActions {
 
   private cameraActionFactory: Tv2CameraActionFactory
@@ -72,17 +85,17 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, showStyleVariantId)
     this.setFactories(blueprintConfiguration)
 
-    const actionGenerators: [string, () => Action[]][] = [
-      ['camera', (): Action[] => this.cameraActionFactory.createCameraActions(blueprintConfiguration)],
-      ['remote', (): Action[] => this.remoteActionFactory.createRemoteActions(blueprintConfiguration)],
-      ['audio', (): Action[] => this.audioActionFactory.createAudioActions(blueprintConfiguration, actionManifests)],
-      ['transition effect', (): Action[] => this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration)],
-      ['graphics', (): Action[] => this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, actionManifests)],
-      ['video clip', (): Action[] => this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, actionManifests)],
-      ['video mixer', (): Action[] => this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration)],
-      ['split screen', (): Action[] => this.splitScreenActionFactory.createSplitScreenActions(blueprintConfiguration, actionManifests)],
-      ['replay', (): Action[] => this.replayActionFactory.createReplayActions(blueprintConfiguration)],
-      ['robot', (): Action[] => this.robotActionFactory.createRobotActions()],
+    const actionGenerators: [ActionTypeName, () => Action[]][] = [
+      [ActionTypeName.CAMERA, (): Action[] => this.cameraActionFactory.createCameraActions(blueprintConfiguration)],
+      [ActionTypeName.REMOTE, (): Action[] => this.remoteActionFactory.createRemoteActions(blueprintConfiguration)],
+      [ActionTypeName.AUDIO, (): Action[] => this.audioActionFactory.createAudioActions(blueprintConfiguration, actionManifests)],
+      [ActionTypeName.TRANSITION_EFFECT, (): Action[] => this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration)],
+      [ActionTypeName.GRAPHICS, (): Action[] => this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, actionManifests)],
+      [ActionTypeName.VIDEO_CLIP, (): Action[] => this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, actionManifests)],
+      [ActionTypeName.VIDEO_MIXER, (): Action[] => this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration)],
+      [ActionTypeName.SPLIT_SCREEN, (): Action[] => this.splitScreenActionFactory.createSplitScreenActions(blueprintConfiguration, actionManifests)],
+      [ActionTypeName.REPLAY, (): Action[] => this.replayActionFactory.createReplayActions(blueprintConfiguration)],
+      [ActionTypeName.ROBOT, (): Action[] => this.robotActionFactory.createRobotActions()],
     ]
 
     return actionGenerators.flatMap(([actionKind, actionGenerator]: [string, () => Action[]]): Action[] => {
