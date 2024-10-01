@@ -2,7 +2,10 @@ import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
 import {
   Tv2ActionManifestSplitScreenData,
-  Tv2ActionManifestSplitScreenSourceType, Tv2SplitScreenManifestData
+  Tv2ActionManifestSplitScreenSourceType,
+  Tv2ActionManifestVideoClipData,
+  Tv2SplitScreenManifestData,
+  Tv2VideoClipManifestData
 } from '../../value-objects/tv2-action-manifest-data'
 import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
 import { Tv2PieceType } from '../../enums/tv2-piece-type'
@@ -25,7 +28,9 @@ describe(Tv2ActionManifestMapper.name, () => {
             data: {
               rank: 5,
               userData: {
-                name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+                name: 'DVE Sommerfugl',
+                pieceType: Tv2PieceType.SPLIT_SCREEN,
+                config: {
                   template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                     INP1: {
                       sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -71,6 +76,46 @@ describe(Tv2ActionManifestMapper.name, () => {
         ]
 
         const result: Tv2SplitScreenManifestData[] = testee.filterAndMapToSplitScreenManifestData(blueprintConfiguration, actionManifests)
+
+        expect(result.length).toBe(1)
+        expect(result[0].rank).toBe(5)
+      })
+    })
+  })
+
+  describe(Tv2ActionManifestMapper.prototype.filterAndMapToVideoClipManifestData.name, () => {
+    describe('when a malformed video clip action manifest is given', () => {
+      it('ignores the malformed action manifest', () => {
+        const testee: Tv2ActionManifestMapper = createTestee()
+
+        const actionManifests: Tv2ActionManifest<Tv2ActionManifestVideoClipData>[] = [
+          EntityTestFactory.createActionManifest({
+            actionId: 'select_server_clip',
+            data: {
+              rank: 5,
+              userData: {
+                adLibPix: false,
+                voLevels: false,
+                duration: 5000,
+                partDefinition: {
+                  storyName: 'STORY NAME',
+                  fields: {
+                    videoId: 'videoid'
+                  }
+                }
+              }
+            }
+          }),
+          EntityTestFactory.createActionManifest({
+            actionId: 'select_server_clip',
+            data: {
+              rank: 10,
+              userData: undefined as unknown as Tv2ActionManifestVideoClipData['userData'],
+            }
+          }),
+        ]
+
+        const result: Tv2VideoClipManifestData[] = testee.filterAndMapToVideoClipManifestData(actionManifests)
 
         expect(result.length).toBe(1)
         expect(result[0].rank).toBe(5)

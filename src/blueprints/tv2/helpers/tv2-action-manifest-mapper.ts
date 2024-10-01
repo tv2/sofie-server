@@ -41,7 +41,7 @@ export class Tv2ActionManifestMapper {
         try {
           return [...manifestDataSequence, this.mapSplitScreenManifestData(blueprintConfiguration, actionManifest)]
         } catch (error) {
-          this.logger.data({ error, actionManifest }).error('Failed mapping split screen action manifest.')
+          this.logger.data(error).error('Failed mapping split screen action manifest.')
           return manifestDataSequence
         }
       }, [])
@@ -110,7 +110,7 @@ export class Tv2ActionManifestMapper {
         try {
           return [...manifestDataSequence, this.mapToVideoClipManifestData(actionManifest)]
         } catch (error) {
-          this.logger.data({ error, actionManifest }).error('Failed mapping split screen action manifest.')
+          this.logger.data(error).error('Failed mapping video clip action manifest.')
           return manifestDataSequence
         }
       }, [])
