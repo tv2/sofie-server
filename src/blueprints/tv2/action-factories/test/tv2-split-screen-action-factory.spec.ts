@@ -227,7 +227,7 @@ function createTestee(params?: {
   logger?: Tv2Logger,
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
-    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(),
+    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfTv2Logger())),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.graphicsSplitScreenTimelineObjectFactory ?? instance(mock<Tv2GraphicsSplitScreenTimelineObjectFactory>()),

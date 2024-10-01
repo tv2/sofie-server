@@ -233,7 +233,7 @@ export class Tv2ActionFactoryProvider {
   }
 
   private createActionManifestMapper(): Tv2ActionManifestMapper {
-    return new Tv2ActionManifestMapper()
+    return new Tv2ActionManifestMapper(Tv2LoggerFacade.createLogger())
   }
 
   private createGraphicsTimelineObjectFactoryFactory(): Tv2GraphicsTimelineObjectFactoryFactory {

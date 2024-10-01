@@ -19,6 +19,7 @@ import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { ExhaustiveCaseChecker } from '../../../business-logic/exhaustive-case-checker'
+import { Tv2Logger } from '../tv2-logger'
 
 const SPLIT_SCREEN_ACTION_MANIFEST_ID: string = 'select_dve'
 const VIDEO_CLIP_ACTION_MANIFEST_ID: string = 'select_server_clip'
@@ -26,21 +27,37 @@ const FULLSCREEN_GRAPHICS_ACTION_MANIFEST_ID: string = 'select_full_grafik'
 const OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS: string[] = ['studio0_graphicsLower', 'studio0_graphicsIdent', 'studio0_overlay', 'studio0_pilotOverlay']
 
 export class Tv2ActionManifestMapper {
+
+  private readonly logger: Tv2Logger
+
+  constructor(logger: Tv2Logger) {
+    this.logger = logger.tag(this.constructor.name)
+  }
+
   public filterAndMapToSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: ActionManifest[]): Tv2SplitScreenManifestData[] {
     return actionManifests
       .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestSplitScreenData> => actionManifest.actionId === SPLIT_SCREEN_ACTION_MANIFEST_ID)
-      .map(actionManifest => {
-        const data: Tv2ActionManifestSplitScreenData = actionManifest.data
-        const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
-        return {
-          name: data.userData.name,
-          rank: data.rank,
-          rundownId: actionManifest.rundownId,
-          template: data.userData.config.template,
-          locatorLabels: data.userData.config.labels,
-          sources
+      .reduce((manifestDataSequence: Tv2SplitScreenManifestData[], actionManifest: ActionManifest<Tv2ActionManifestSplitScreenData>) => {
+        try {
+          return [...manifestDataSequence, this.mapSplitScreenManifestData(blueprintConfiguration, actionManifest)]
+        } catch (error) {
+          this.logger.data({ error, actionManifest }).error('Failed mapping split screen action manifest.')
+          return manifestDataSequence
         }
-      })
+      }, [])
+  }
+
+  private mapSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifest: ActionManifest<Tv2ActionManifestSplitScreenData>): Tv2SplitScreenManifestData {
+    const data: Tv2ActionManifestSplitScreenData = actionManifest.data
+    const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
+    return {
+      name: data.userData.name,
+      rank: data.rank,
+      rundownId: actionManifest.rundownId,
+      template: data.userData.config.template,
+      locatorLabels: data.userData.config.labels,
+      sources
+    }
   }
 
   private getSplitScreenSourcesFromActionManifestData(data: Tv2ActionManifestSplitScreenData, blueprintConfiguration: Tv2BlueprintConfiguration): Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> {
@@ -86,21 +103,30 @@ export class Tv2ActionManifestMapper {
     return source
   }
 
-  public mapToVideoClipManifestData(actionManifests: ActionManifest<Tv2ActionManifestData>[]): Tv2VideoClipManifestData[] {
+  public filterAndMapToVideoClipManifestData(actionManifests: ActionManifest<Tv2ActionManifestData>[]): Tv2VideoClipManifestData[] {
     return actionManifests
       .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestVideoClipData> => actionManifest.actionId === VIDEO_CLIP_ACTION_MANIFEST_ID)
-      .map(actionManifest => {
-        const data: Tv2ActionManifestVideoClipData = actionManifest.data
-        return {
-          name: data.userData.partDefinition.storyName,
-          rank: data.rank,
-          fileName: data.userData.partDefinition.fields.videoId,
-          durationFromIngest: data.userData.duration,
-          adLibPix: data.userData.adLibPix,
-          audioMode: data.userData.voLevels ? Tv2AudioMode.VOICE_OVER : Tv2AudioMode.FULL,
-          rundownId: actionManifest.rundownId
+      .reduce((manifestDataSequence: Tv2VideoClipManifestData[], actionManifest: ActionManifest<Tv2ActionManifestVideoClipData>) => {
+        try {
+          return [...manifestDataSequence, this.mapToVideoClipManifestData(actionManifest)]
+        } catch (error) {
+          this.logger.data({ error, actionManifest }).error('Failed mapping split screen action manifest.')
+          return manifestDataSequence
         }
-      })
+      }, [])
+  }
+
+  private mapToVideoClipManifestData(actionManifest: ActionManifest<Tv2ActionManifestVideoClipData>): Tv2VideoClipManifestData {
+    const data: Tv2ActionManifestVideoClipData = actionManifest.data
+    return {
+      name: data.userData.partDefinition.storyName,
+      rank: data.rank,
+      fileName: data.userData.partDefinition.fields.videoId,
+      durationFromIngest: data.userData.duration,
+      adLibPix: data.userData.adLibPix,
+      audioMode: data.userData.voLevels ? Tv2AudioMode.VOICE_OVER : Tv2AudioMode.FULL,
+      rundownId: actionManifest.rundownId
+    }
   }
 
   public mapToFullscreenGraphicsManifestData(actionManifests: ActionManifest[]): Tv2FullscreenGraphicsManifestData[] {
