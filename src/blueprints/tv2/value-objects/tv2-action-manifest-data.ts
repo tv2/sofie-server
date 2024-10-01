@@ -91,14 +91,15 @@ export enum SplitScreenBoxInput {
 }
 
 export interface Tv2ActionManifestSplitScreenSource {
-  sourceType: TvActionManifestSplitScreenSourceType,
+  sourceType: Tv2ActionManifestSplitScreenSourceType,
   id: string,
   name: string
 }
 
-export enum TvActionManifestSplitScreenSourceType {
+export enum Tv2ActionManifestSplitScreenSourceType {
   CAMERA = 'KAM',
-  REMOTE = 'REMOTE'
+  REMOTE = 'REMOTE',
+  REPLAY = 'REPLAY',
 }
 
 export interface Tv2VideoClipManifestData {

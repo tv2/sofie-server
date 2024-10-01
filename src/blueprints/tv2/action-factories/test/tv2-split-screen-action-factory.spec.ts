@@ -21,7 +21,7 @@ import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
 import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
 import {
   Tv2ActionManifestSplitScreenData,
-  TvActionManifestSplitScreenSourceType
+  Tv2ActionManifestSplitScreenSourceType
 } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2PieceType } from '../../enums/tv2-piece-type'
 import { Tv2Action, Tv2ActionContentType } from '../../value-objects/tv2-action'
@@ -45,12 +45,12 @@ describe(Tv2SplitScreenActionFactory.name, () => {
                   name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
-                        sourceType: TvActionManifestSplitScreenSourceType.CAMERA,
+                        sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
                         id: 'KAM 1',
                         name: 'KAM 1'
                       },
                       INP2: {
-                        sourceType: TvActionManifestSplitScreenSourceType.CAMERA,
+                        sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
                         id: 'KAM 1',
                         name: 'KAM 1'
                       }
@@ -67,12 +67,12 @@ describe(Tv2SplitScreenActionFactory.name, () => {
                   name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
                     template: 'sommerfugl', labels: ['Locator 1', 'Locator2alt'], sources: {
                       INP1: {
-                        sourceType: TvActionManifestSplitScreenSourceType.CAMERA,
+                        sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
                         id: 'KAM 1',
                         name: 'KAM 1',
                       },
                       INP2: {
-                        sourceType: TvActionManifestSplitScreenSourceType.CAMERA,
+                        sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
                         id: 'KAM 1',
                         name: 'KAM 1',
                       }
@@ -104,12 +104,12 @@ describe(Tv2SplitScreenActionFactory.name, () => {
                   name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
-                        sourceType: TvActionManifestSplitScreenSourceType.CAMERA,
+                        sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
                         id: 'KAM 1',
                         name: 'KAM 1',
                       },
                       INP2: {
-                        sourceType: TvActionManifestSplitScreenSourceType.CAMERA,
+                        sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
                         id: 'KAM 1',
                         name: 'KAM 1',
                       }
@@ -126,12 +126,12 @@ describe(Tv2SplitScreenActionFactory.name, () => {
                   name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
-                        sourceType: TvActionManifestSplitScreenSourceType.CAMERA,
+                        sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
                         id: 'KAM 1',
                         name: 'KAM 1'
                       },
                       INP2: {
-                        sourceType: TvActionManifestSplitScreenSourceType.CAMERA,
+                        sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
                         id: 'KAM 1',
                         name: 'KAM 1'
                       }

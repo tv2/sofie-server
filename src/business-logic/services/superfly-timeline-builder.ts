@@ -182,7 +182,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         return this.createNoTransitionTimelineEnable(partCalculatedTimings, piece, parentGroup)
       }
       default: {
-        ExhaustiveCaseChecker.assertAllCases(piece.transitionType)
+        ExhaustiveCaseChecker.assertAllCases(piece.transitionType, 'piece transition type')
       }
     }
   }
