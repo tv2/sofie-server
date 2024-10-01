@@ -27,6 +27,7 @@ import {
   Tv2Action,
   Tv2ActionContentType,
   Tv2ActionSubtype,
+  Tv2FullscreenGraphicsAction,
   Tv2PartAction,
   Tv2PieceAction
 } from '../value-objects/tv2-action'
@@ -60,6 +61,8 @@ const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
   Tv2PieceLayer.GRAPHICS_TEMA,
   Tv2PieceLayer.GRAPHICS_TELEPHONE
 ]
+
+const FULLSCREEN_GRAPHICS_SOURCE_NAME_PREFIX: string = 'PILOT_'
 
 export class Tv2GraphicsActionFactory extends ActionFactory {
 
@@ -301,7 +304,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     return this.removeDuplicateActions(fullscreenGraphicsData.map((graphicsData) => this.createFullscreenGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, graphicsData)))
   }
 
-  private createFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2PartAction {
+  private createFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2FullscreenGraphicsAction {
     const partInterface: PartInterface = this.createFullscreenGraphicsPartInterface(graphicsData, blueprintConfiguration)
     const pieceInterface: Tv2PieceInterface = this.createFullscreenGraphicsPieceInterface(blueprintConfiguration, graphicsData, partInterface, elementTimelineObjectFactory)
 
@@ -316,9 +319,14 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterfaces: [pieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
+        contentType: Tv2ActionContentType.GRAPHICS,
+        sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
       }
     }
+  }
+
+  private getFullscreenGraphicsSourceName(graphicsData: Tv2FullscreenGraphicsManifestData): string {
+    return `${FULLSCREEN_GRAPHICS_SOURCE_NAME_PREFIX}${graphicsData.vcpId}`
   }
 
   private createFullscreenGraphicsPartInterface(graphicsData: Tv2FullscreenGraphicsManifestData, blueprintConfiguration: Tv2BlueprintConfiguration): PartInterface {
@@ -370,7 +378,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       ],
       metadata: {
         type: Tv2PieceType.GRAPHICS,
-        outputLayer: Tv2OutputLayer.PROGRAM
+        outputLayer: Tv2OutputLayer.PROGRAM,
+        sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
       }
     })
   }

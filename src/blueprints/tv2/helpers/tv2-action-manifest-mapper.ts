@@ -12,12 +12,13 @@ import {
   Tv2OverlayGraphicsManifestData,
   Tv2SplitScreenManifestData,
   Tv2VideoClipManifestData,
-  TvActionManifestSplitScreenSourceType
+  Tv2ActionManifestSplitScreenSourceType
 } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { ExhaustiveCaseChecker } from '../../../business-logic/exhaustive-case-checker'
 
 const SPLIT_SCREEN_ACTION_MANIFEST_ID: string = 'select_dve'
 const VIDEO_CLIP_ACTION_MANIFEST_ID: string = 'select_server_clip'
@@ -62,18 +63,25 @@ export class Tv2ActionManifestMapper {
   private mapActionManifestSplitScreenSourceToSource(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenSource: Tv2ActionManifestSplitScreenSource): Tv2SourceMappingWithSound {
     let sources: Tv2SourceMappingWithSound[] = []
     switch (splitScreenSource.sourceType) {
-      case TvActionManifestSplitScreenSourceType.CAMERA: {
+      case Tv2ActionManifestSplitScreenSourceType.CAMERA: {
         sources = blueprintConfiguration.studio.cameraSources
         break
       }
-      case TvActionManifestSplitScreenSourceType.REMOTE: {
+      case Tv2ActionManifestSplitScreenSourceType.REMOTE: {
         sources = blueprintConfiguration.studio.remoteSources
         break
+      }
+      case Tv2ActionManifestSplitScreenSourceType.REPLAY: {
+        sources = blueprintConfiguration.studio.replaySources
+        break
+      }
+      default: {
+        ExhaustiveCaseChecker.assertAllCases(splitScreenSource.sourceType, 'action manifest split screen source type')
       }
     }
     const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.name === splitScreenSource.id)
     if (!source) {
-      throw new Tv2MisconfigurationException(`No Source Mapping found for split screen source ${splitScreenSource.sourceType} ${splitScreenSource.id}.`)
+      throw new Tv2MisconfigurationException(`No source mapping found for the '${splitScreenSource.sourceType}' split screen source with id '${splitScreenSource.id}'.`)
     }
     return source
   }

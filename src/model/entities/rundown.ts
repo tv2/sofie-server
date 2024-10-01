@@ -449,7 +449,7 @@ export class Rundown extends BasicRundown {
         return true
       }
       default: {
-        ExhaustiveCaseChecker.assertAllCases(piece.pieceLifespan)
+        ExhaustiveCaseChecker.assertAllCases(piece.pieceLifespan, 'piece lifespan')
       }
     }
   }

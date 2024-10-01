@@ -182,7 +182,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         return this.createNoTransitionTimelineEnable(partCalculatedTimings, piece, parentGroup)
       }
       default: {
-        ExhaustiveCaseChecker.assertAllCases(piece.transitionType)
+        ExhaustiveCaseChecker.assertAllCases(piece.transitionType, 'piece transition type')
       }
     }
   }
@@ -339,7 +339,21 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         this.findLookaheadTimelineObjectsForActivePart(rundown, layer, activeGroup)
       lookaheadObjects.push(...activePartLookaheadObjects)
 
-      return lookaheadObjects
+      return this.postFixRandomIdToDuplicateObjects(lookaheadObjects)
+    })
+  }
+
+  private postFixRandomIdToDuplicateObjects(timelineObjects: LookaheadTimelineObject[]): LookaheadTimelineObject[] {
+    const existingIds: Set<string> = new Set<string>()
+    return timelineObjects.map(timelineObject => {
+      if (existingIds.has(timelineObject.id)) {
+        return {
+          ...timelineObject,
+          id: `${timelineObject.id}_${process.hrtime.bigint()}`
+        }
+      }
+      existingIds.add(timelineObject.id)
+      return timelineObject
     })
   }
 

@@ -193,3 +193,10 @@ export interface Tv2RobotAction extends Tv2PieceAction {
     actionSubtype: Tv2ActionSubtype.CALL_PRESET
   }
 }
+
+export interface Tv2FullscreenGraphicsAction extends Tv2PartAction {
+  metadata: {
+    contentType: Tv2ActionContentType.GRAPHICS,
+    sourceName: string
+  }
+}

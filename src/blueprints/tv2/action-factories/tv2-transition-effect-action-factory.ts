@@ -84,10 +84,18 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource,
       ),
       ...blueprintConfiguration.showStyle.breakerTransitionEffectConfigurations.flatMap(transitionEffect => {
-        return [
-          this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
-          this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
-        ]
+        try {
+          return [
+            this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
+            this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
+          ]
+        } catch (exception) {
+          if (exception instanceof Tv2MisconfigurationException) {
+            this.logger.data(exception).warn(exception.message)
+            return []
+          }
+          throw exception
+        }
       })]
   }
 
@@ -317,7 +325,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
-    const breaker: Breaker | undefined = this.findBreakerFromConfiguration(transitionEffect, configuration)
+    const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
 
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
@@ -359,8 +367,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       return action
     }
 
-    const metadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
-    const mediaPlayerSession: string | undefined = metadata.mediaPlayerSessions?.[0]
+    const programTimelineObject: Tv2BlueprintTimelineObject | undefined = piece.getTimelineObjects().find(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()) as Tv2BlueprintTimelineObject | undefined
+    const mediaPlayerSession: string | undefined = programTimelineObject?.metaData?.mediaPlayerSession
 
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {

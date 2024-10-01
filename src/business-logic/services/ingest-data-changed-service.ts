@@ -159,19 +159,27 @@ export class IngestDataChangedService implements DataChangeService {
     await this.deleteRundownsNotPresentInIngestedRundowns(ingestedRundowns)
 
     await Promise.all(ingestedRundowns.map(async (ingestedRundown) => {
-      const oldRundown: Rundown | undefined = await this.loadRundown(ingestedRundown.id)
-
-      // If the Rundown isn't active or in rehearsal, we can simply just "re-ingest" it into our database collection as a fresh Rundown.
-      const updatedRundown: Rundown = oldRundown?.isActive() || oldRundown?.isRehearsal()
-        ? this.updateActiveRundownFromIngestedRundown(ingestedRundown, oldRundown)
-        : this.createNewRundownFromIngestedRundown(ingestedRundown)
-
-      await this.rundownRepository.deleteRundown(ingestedRundown.id) // Delete the old Rundown to get rid of deleted Entities
-      await this.rundownRepository.saveRundown(updatedRundown) // Save the new Rundown
-      this.eventEmitter.emitRundownUpdated(updatedRundown)
-      this.rundownIdsToGenerateActionsFor.add(updatedRundown.id)
-      await this.generateActions()
+      try {
+        await this.synchronizeEntitiesWithIngestedEntitiesForIngestedRundown(ingestedRundown)
+      } catch (error) {
+        this.logger.data(error).error(`Failed synchronizing rundown with the ingested rundown '${ingestedRundown.name}' with id '${ingestedRundown.id}'.`)
+      }
     }))
+  }
+
+  private async synchronizeEntitiesWithIngestedEntitiesForIngestedRundown(ingestedRundown: IngestedRundown): Promise<void> {
+    const oldRundown: Rundown | undefined = await this.loadRundown(ingestedRundown.id)
+
+    // If the Rundown isn't active or in rehearsal, we can simply just "re-ingest" it into our database collection as a fresh Rundown.
+    const updatedRundown: Rundown = oldRundown?.isActive() || oldRundown?.isRehearsal()
+      ? this.updateActiveRundownFromIngestedRundown(ingestedRundown, oldRundown)
+      : this.createNewRundownFromIngestedRundown(ingestedRundown)
+
+    await this.rundownRepository.deleteRundown(ingestedRundown.id) // Delete the old Rundown to get rid of deleted Entities
+    await this.rundownRepository.saveRundown(updatedRundown) // Save the new Rundown
+    this.eventEmitter.emitRundownUpdated(updatedRundown)
+    this.rundownIdsToGenerateActionsFor.add(updatedRundown.id)
+    await this.generateActions().catch(error => this.logger.data(error).error(('Failed generating actions when synchronizing entities with ingested entities.')))
   }
 
   private async deleteRundownsNotPresentInIngestedRundowns(ingestedRundowns: IngestedRundown[]): Promise<void> {
