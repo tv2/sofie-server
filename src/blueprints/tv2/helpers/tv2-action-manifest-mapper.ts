@@ -41,7 +41,7 @@ export class Tv2ActionManifestMapper {
         try {
           return [...manifestDataSequence, this.mapSplitScreenManifestData(blueprintConfiguration, actionManifest)]
         } catch (error) {
-          this.logger.data(error).error('Failed mapping split screen action manifest.')
+          this.logger.data(error).error('Failed converting split screen action manifest.')
           return manifestDataSequence
         }
       }, [])
@@ -110,7 +110,7 @@ export class Tv2ActionManifestMapper {
         try {
           return [...manifestDataSequence, this.mapToVideoClipManifestData(actionManifest)]
         } catch (error) {
-          this.logger.data(error).error('Failed mapping video clip action manifest.')
+          this.logger.data(error).error('Failed converting video clip action manifest.')
           return manifestDataSequence
         }
       }, [])
@@ -129,18 +129,27 @@ export class Tv2ActionManifestMapper {
     }
   }
 
-  public mapToFullscreenGraphicsManifestData(actionManifests: ActionManifest[]): Tv2FullscreenGraphicsManifestData[] {
+  public filterAndMapToFullscreenGraphicsManifestData(actionManifests: ActionManifest[]): Tv2FullscreenGraphicsManifestData[] {
     return actionManifests
       .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestFullscreenGraphicsData> => actionManifest.actionId === FULLSCREEN_GRAPHICS_ACTION_MANIFEST_ID)
-      .map(actionManifest => {
-        const data: Tv2ActionManifestFullscreenGraphicsData = actionManifest.data
-        return {
-          name: data.userData.name,
-          rank: data.rank,
-          rundownId: actionManifest.rundownId,
-          vcpId: data.userData.vcpid
+      .reduce((manifestDataSequence: Tv2FullscreenGraphicsManifestData[], actionManifest) => {
+        try {
+          return [...manifestDataSequence, this.mapToFullscreenGraphicsManifestData(actionManifest)]
+        } catch (error) {
+          this.logger.data(error).error('Failed converting fullscreen graphics action manifest.')
+          return manifestDataSequence
         }
-      })
+      }, [])
+  }
+
+  private mapToFullscreenGraphicsManifestData(actionManifest: ActionManifest<Tv2ActionManifestFullscreenGraphicsData>): Tv2FullscreenGraphicsManifestData {
+    const data: Tv2ActionManifestFullscreenGraphicsData = actionManifest.data
+    return {
+      name: data.userData.name,
+      rank: data.rank,
+      rundownId: actionManifest.rundownId,
+      vcpId: data.userData.vcpid
+    }
   }
 
   public mapToOverlayGraphicsData(actionManifests: ActionManifest[]): Tv2OverlayGraphicsManifestData[] {

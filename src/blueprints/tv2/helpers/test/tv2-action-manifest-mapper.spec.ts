@@ -1,9 +1,10 @@
 import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
 import {
+  Tv2ActionManifestFullscreenGraphicsData,
   Tv2ActionManifestSplitScreenData,
   Tv2ActionManifestSplitScreenSourceType,
-  Tv2ActionManifestVideoClipData,
+  Tv2ActionManifestVideoClipData, Tv2FullscreenGraphicsManifestData,
   Tv2SplitScreenManifestData,
   Tv2VideoClipManifestData
 } from '../../value-objects/tv2-action-manifest-data'
@@ -116,6 +117,39 @@ describe(Tv2ActionManifestMapper.name, () => {
         ]
 
         const result: Tv2VideoClipManifestData[] = testee.filterAndMapToVideoClipManifestData(actionManifests)
+
+        expect(result.length).toBe(1)
+        expect(result[0].rank).toBe(5)
+      })
+    })
+  })
+
+  describe(Tv2ActionManifestMapper.prototype.filterAndMapToFullscreenGraphicsManifestData, () => {
+    describe('when a malformed fullscreen graphics action manifest is given', () => {
+      it('ignores the malformed action manifest', () => {
+        const testee: Tv2ActionManifestMapper = createTestee()
+
+        const actionManifests: Tv2ActionManifest<Tv2ActionManifestFullscreenGraphicsData>[] = [
+          EntityTestFactory.createActionManifest({
+            actionId: 'select_full_grafik',
+            data: {
+              rank: 5,
+              userData: {
+                name: 'fullscreen graphics A',
+                vcpid: 1234,
+              }
+            }
+          }),
+          EntityTestFactory.createActionManifest({
+            actionId: 'select_full_grafik',
+            data: {
+              rank: 10,
+              userData: undefined as unknown as Tv2ActionManifestFullscreenGraphicsData['userData'],
+            }
+          }),
+        ]
+
+        const result: Tv2FullscreenGraphicsManifestData[] = testee.filterAndMapToFullscreenGraphicsManifestData(actionManifests)
 
         expect(result.length).toBe(1)
         expect(result[0].rank).toBe(5)
