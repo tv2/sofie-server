@@ -1,7 +1,5 @@
 import { Rundown } from '../../model/entities/rundown'
 import {
-  BulkIngestEvent,
-  IngestEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -28,7 +26,6 @@ import {
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 import { Segment } from '../../model/entities/segment'
-import { IngestEventType } from '../enums/event-type'
 
 export interface RundownEventBuilder {
   buildActivateEvent(rundown: Rundown): RundownActivatedEvent
@@ -42,8 +39,6 @@ export interface RundownEventBuilder {
   buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent
   buildPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPieceId: string, newPiece: Piece): PieceReplacedEvent
   buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePiecesUpdatedEvent
-
-  buildBulkIngestEvent(rundownId: string, ingestEvents: IngestEvent<IngestEventType>[]): BulkIngestEvent
 
   buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent
   buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent

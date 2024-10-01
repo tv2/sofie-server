@@ -1,5 +1,4 @@
 import {
-  BulkIngestEvent, IngestEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -31,10 +30,6 @@ import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
 import { Segment } from '../../model/entities/segment'
 import { RundownEventObserver } from '../interfaces/rundown-event-observer'
-import { IngestEventType } from '../enums/event-type'
-
-const INGEST_EVENT_DEBOUNCE_DURATION_IN_MS: number = 500
-const MAX_INGEST_EVENT_DEBOUNCE_DURATION_IN_MS: number = 5000
 
 export class RundownEventService implements RundownEventEmitter, RundownEventObserver {
   private static instance: RundownEventService
@@ -48,54 +43,10 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   private readonly callbacks: ((rundownEvent: RundownEvent) => void)[] = []
 
-  private ingestEventQueue: Map<string, IngestEvent<IngestEventType>[]> = new Map()
-
-  private ingestTimeoutIdentifier?: NodeJS.Timeout
-  private lastQueuedIngestEventTimestamp: number
-  private firstQueuedIngestEventTimestamp: number
-
-  private lastSetNextEventReceivedDuringIngest?: PartSetAsNextEvent
-
   private constructor(private readonly rundownEventBuilder: RundownEventBuilder) {}
 
   private emitRundownEvent(rundownEvent: RundownEvent): void {
     this.callbacks.forEach(callback => callback(rundownEvent))
-  }
-
-  private queueIngestEvent(rundownEvent: IngestEvent<IngestEventType>): void {
-    if (!this.ingestEventQueue.get(rundownEvent.rundownId)) {
-      this.ingestEventQueue.set(rundownEvent.rundownId, [])
-    }
-    this.ingestEventQueue.get(rundownEvent.rundownId)?.push(rundownEvent)
-
-    this.startBulkEventCallback()
-  }
-
-  private startBulkEventCallback(): void {
-    const isTimeoutStarted: boolean = !!this.ingestTimeoutIdentifier
-    const hasReachedMaxDebounceDuration: boolean = Date.now() > this.firstQueuedIngestEventTimestamp + MAX_INGEST_EVENT_DEBOUNCE_DURATION_IN_MS
-    const isPastDebouncePeriod: boolean = Date.now() > this.lastQueuedIngestEventTimestamp + INGEST_EVENT_DEBOUNCE_DURATION_IN_MS
-
-    if (isTimeoutStarted && (hasReachedMaxDebounceDuration || isPastDebouncePeriod)) {
-      return
-    }
-
-    clearTimeout(this.ingestTimeoutIdentifier)
-    this.lastQueuedIngestEventTimestamp = Date.now()
-    this.ingestTimeoutIdentifier = setTimeout(() => {
-      this.ingestTimeoutIdentifier = undefined
-      this.sendBulkIngestEvent()
-    }, INGEST_EVENT_DEBOUNCE_DURATION_IN_MS)
-  }
-
-  private sendBulkIngestEvent(): void {
-    const bulkIngestEvents: BulkIngestEvent[] = []
-    for (const [rundownId, ingestEvents] of this.ingestEventQueue) {
-      bulkIngestEvents.push(this.rundownEventBuilder.buildBulkIngestEvent(rundownId, ingestEvents))
-    }
-    this.ingestEventQueue = new Map()
-    this.firstQueuedIngestEventTimestamp = Date.now()
-    this.callbacks.forEach(callback => bulkIngestEvents.forEach(bulkEvent => callback(bulkEvent)))
   }
 
   public emitActivateEvent(rundown: Rundown): void {
@@ -145,14 +96,6 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   public emitSetNextEvent(rundown: Rundown): void {
     const event: PartSetAsNextEvent = this.rundownEventBuilder.buildSetNextEvent(rundown)
-    if (this.ingestTimeoutIdentifier) { // We are currently ingesting
-      if (this.lastSetNextEventReceivedDuringIngest?.segmentId === event.segmentId && this.lastSetNextEventReceivedDuringIngest.partId === event.partId) {
-        // The next Segment and Part did not change, so we don't need to send a new SetNext event.
-        return
-      }
-      this.lastSetNextEventReceivedDuringIngest = event
-    }
-
     this.emitRundownEvent(event)
   }
 
@@ -163,57 +106,57 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   public emitRundownCreated(rundown: Rundown): void {
     const event: RundownCreatedEvent = this.rundownEventBuilder.buildRundownCreatedEvent(rundown)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitRundownUpdated(rundown: Rundown): void {
     const event: RundownUpdatedEvent = this.rundownEventBuilder.buildRundownUpdatedEvent(rundown)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitRundownDeleted(rundownId: string): void {
     const event: RundownDeletedEvent = this.rundownEventBuilder.buildRundownDeletedEvent(rundownId)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitSegmentCreated(rundown: Rundown, segment: Segment): void {
     const event: SegmentCreatedEvent = this.rundownEventBuilder.buildSegmentCreatedEvent(rundown, segment)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitSegmentUpdated(rundown: Rundown, segment: Segment): void {
     const event: SegmentUpdatedEvent = this.rundownEventBuilder.buildSegmentUpdatedEvent(rundown, segment)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitSegmentDeleted(rundown: Rundown, segmentId: string): void {
     const event: SegmentDeletedEvent = this.rundownEventBuilder.buildSegmentDeletedEvent(rundown, segmentId)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitSegmentUnsynced(rundown: Rundown, unsyncedSegment: Segment, originalSegmentId: string): void {
     const event: SegmentUnsyncedEvent = this.rundownEventBuilder.buildSegmentUnsyncedEvent(rundown, unsyncedSegment, originalSegmentId)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitPartCreated(rundown: Rundown, part: Part): void {
     const event: PartCreatedEvent = this.rundownEventBuilder.buildPartCreatedEvent(rundown, part)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitPartUpdated(rundown: Rundown, part: Part): void {
     const event: PartUpdatedEvent = this.rundownEventBuilder.buildPartUpdatedEvent(rundown, part)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitPartDeleted(rundown: Rundown, segmentId: string, partId: string): void {
     const event: PartDeletedEvent = this.rundownEventBuilder.buildPartDeletedEvent(rundown, segmentId, partId)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public emitPartUnsynced(rundown: Rundown, part: Part): void {
     const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, part)
-    this.queueIngestEvent(event)
+    this.emitRundownEvent(event)
   }
 
   public subscribeToRundownEvents(onRundownEventCallback: (rundownEvent: RundownEvent) => void): void {
