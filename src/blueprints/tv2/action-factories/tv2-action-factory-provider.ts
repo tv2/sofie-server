@@ -292,7 +292,8 @@ export class Tv2ActionFactoryProvider {
           this.createGraphicsSplitScreenTimelineObjectFactory(),
           this.createVideoClipTimelineObjectFactory(),
           this.createStringHashConverter(),
-          this.createAssetPathHelper()
+          this.createAssetPathHelper(),
+          Tv2LoggerFacade.createLogger(),
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {

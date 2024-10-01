@@ -5,7 +5,7 @@ import {
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
-import { instance, mock } from '@typestrong/ts-mockito'
+import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
 import {
   Tv2GraphicsSplitScreenTimelineObjectFactory
@@ -26,6 +26,7 @@ import {
 import { Tv2PieceType } from '../../enums/tv2-piece-type'
 import { Tv2Action, Tv2ActionContentType } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../model/enums/action-type'
+import { Tv2Logger } from '../../tv2-logger'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   describe(Tv2SplitScreenActionFactory.prototype.createSplitScreenActions.name, () => {
@@ -151,6 +152,68 @@ describe(Tv2SplitScreenActionFactory.name, () => {
       })
     })
   })
+
+  describe('when a split screen is set to an unknown template', () => {
+    it('ignores the misconfigured split screen', () => {
+      const testee: Tv2SplitScreenActionFactory = createTestee()
+
+      const blueprintConfiguration: Tv2BlueprintConfiguration = createConfiguredBlueprintConfiguration()
+
+      const actionManifests: Tv2ActionManifest<Tv2ActionManifestSplitScreenData>[] = [
+        EntityTestFactory.createActionManifest({
+          actionId: 'select_dve',
+          data: {
+            rank: 5,
+            userData: {
+              name: 'DVE UNKNOWN', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+                template: 'some-unknown-template', labels: ['Locator1', 'Locator2'], sources: {
+                  INP1: {
+                    sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
+                    id: 'KAM 1',
+                    name: 'KAM 1',
+                  },
+                  INP2: {
+                    sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
+                    id: 'KAM 1',
+                    name: 'KAM 1',
+                  }
+                }
+              }
+            }
+          }
+        }),
+        EntityTestFactory.createActionManifest({
+          actionId: 'select_dve',
+          data: {
+            rank: 10,
+            userData: {
+              name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+                template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
+                  INP1: {
+                    sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
+                    id: 'KAM 1',
+                    name: 'KAM 1'
+                  },
+                  INP2: {
+                    sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
+                    id: 'KAM 1',
+                    name: 'KAM 1'
+                  }
+                }
+              }
+            }
+          }
+        })
+      ]
+
+
+      const result: Tv2Action[] = testee.createSplitScreenActions(blueprintConfiguration, actionManifests)
+      const splitScreenActions: Tv2Action[] = result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.contentType === Tv2ActionContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)
+
+      expect(splitScreenActions).toHaveLength(1)
+      expect(splitScreenActions[0].rank).toBe(10)
+    })
+  })
 })
 
 function createTestee(params?: {
@@ -160,7 +223,8 @@ function createTestee(params?: {
   graphicsSplitScreenTimelineObjectFactory?: Tv2GraphicsSplitScreenTimelineObjectFactory,
   videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory,
   stringHashConverter?: Tv2StringHashConverter,
-  assetPathHelper?: Tv2AssetPathHelper
+  assetPathHelper?: Tv2AssetPathHelper,
+  logger?: Tv2Logger,
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
     params?.actionManifestMapper ?? new Tv2ActionManifestMapper(),
@@ -169,8 +233,17 @@ function createTestee(params?: {
     params?.graphicsSplitScreenTimelineObjectFactory ?? instance(mock<Tv2GraphicsSplitScreenTimelineObjectFactory>()),
     params?.videoClipTimelineObjectFactory ?? instance(mock<Tv2VideoClipTimelineObjectFactory>()),
     params?.stringHashConverter ?? new Tv2StringHashConverter(),
-    params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper))
+    params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
+    params?.logger ?? instance(createMockOfTv2Logger()),
   )
+}
+
+function createMockOfTv2Logger(): Tv2Logger {
+  const mockedLogger: Tv2Logger = mock<Tv2Logger>()
+  when(mockedLogger.tag(anyString())).thenCall(() => instance(mockedLogger))
+  when(mockedLogger.data(anything())).thenCall(() => instance(mockedLogger))
+  when(mockedLogger.metadata(anything())).thenCall(() => instance(mockedLogger))
+  return mockedLogger
 }
 
 function createConfiguredBlueprintConfiguration(): Tv2BlueprintConfiguration {
