@@ -171,7 +171,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     const elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory = this.graphicsTimelineObjectFactoryFactory.createGraphicsElementTimelineObjectFactory(blueprintConfiguration)
 
     const fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[] = this.actionManifestMapper.filterAndMapToFullscreenGraphicsManifestData(actionManifests)
-    const overlayGraphicsData: Tv2OverlayGraphicsManifestData[] = this.actionManifestMapper.mapToOverlayGraphicsData(actionManifests)
+    const overlayGraphicsData: Tv2OverlayGraphicsManifestData[] = this.actionManifestMapper.filterAndMapToOverlayGraphicsData(actionManifests)
 
     return [
       this.createEmptyThemeOutAction(),

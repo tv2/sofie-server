@@ -152,23 +152,32 @@ export class Tv2ActionManifestMapper {
     }
   }
 
-  public mapToOverlayGraphicsData(actionManifests: ActionManifest[]): Tv2OverlayGraphicsManifestData[] {
+  public filterAndMapToOverlayGraphicsData(actionManifests: ActionManifest[]): Tv2OverlayGraphicsManifestData[] {
     return actionManifests
       .filter((actionManifest): actionManifest is ActionManifest<Tv2ActionManifestOverlayGraphicsData> => OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS.includes(actionManifest.actionId))
-      .map(actionManifest => {
-        const data: Tv2ActionManifestOverlayGraphicsData = actionManifest.data
-        return {
-          name: data.name,
-          rank: data.rank,
-          rundownId: actionManifest.rundownId,
-          sourceLayerId: data.sourceLayerId,
-          templateName: this.getTemplateName(data.name),
-          displayText: this.getDisplayText(data.name),
-          expectedDuration: data.expectedDuration,
-          lifespan: this.getLifespan(data.lifespan),
-          vcpId: Number(data.content?.path)
+      .reduce((manifestDataSequence: Tv2OverlayGraphicsManifestData[], actionManifest: ActionManifest<Tv2ActionManifestOverlayGraphicsData>) => {
+        try {
+          return [...manifestDataSequence, this.mapToOverlayGraphicsData(actionManifest)]
+        } catch (error) {
+          this.logger.data(error).error('Failed converting overlay graphics action manifest.')
+          return manifestDataSequence
         }
-      })
+      }, [])
+  }
+
+  private mapToOverlayGraphicsData(actionManifest: ActionManifest<Tv2ActionManifestOverlayGraphicsData>): Tv2OverlayGraphicsManifestData {
+    const data: Tv2ActionManifestOverlayGraphicsData = actionManifest.data
+    return {
+      name: data.name,
+      rank: data.rank,
+      rundownId: actionManifest.rundownId,
+      sourceLayerId: data.sourceLayerId,
+      templateName: this.getTemplateName(data.name),
+      displayText: this.getDisplayText(data.name),
+      expectedDuration: data.expectedDuration,
+      lifespan: this.getLifespan(data.lifespan),
+      vcpId: Number(data.content?.path)
+    }
   }
 
   private getTemplateName(rawName: string): string {

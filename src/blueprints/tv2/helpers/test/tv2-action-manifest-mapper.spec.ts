@@ -1,7 +1,7 @@
 import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
 import {
-  Tv2ActionManifestFullscreenGraphicsData,
+  Tv2ActionManifestFullscreenGraphicsData, Tv2ActionManifestOverlayGraphicsData,
   Tv2ActionManifestSplitScreenData,
   Tv2ActionManifestSplitScreenSourceType,
   Tv2ActionManifestVideoClipData, Tv2FullscreenGraphicsManifestData,
@@ -14,6 +14,7 @@ import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-con
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2Logger } from '../../tv2-logger'
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
+import { Tv2SourceLayer } from '../../value-objects/tv2-layers'
 
 describe(Tv2ActionManifestMapper.name, () => {
   describe(Tv2ActionManifestMapper.prototype.filterAndMapToSplitScreenManifestData.name, () => {
@@ -150,6 +151,34 @@ describe(Tv2ActionManifestMapper.name, () => {
         ]
 
         const result: Tv2FullscreenGraphicsManifestData[] = testee.filterAndMapToFullscreenGraphicsManifestData(actionManifests)
+
+        expect(result.length).toBe(1)
+        expect(result[0].rank).toBe(5)
+      })
+    })
+  })
+
+  describe(Tv2ActionManifestMapper.prototype.filterAndMapToOverlayGraphicsData.name, () => {
+    describe('when a malformed overlay graphics action manifest is given', () => {
+      it('ignores the malformed action manifest', () => {
+        const testee: Tv2ActionManifestMapper = createTestee()
+
+        const actionManifests: Tv2ActionManifest<Tv2ActionManifestOverlayGraphicsData>[] = [
+          EntityTestFactory.createActionManifest({
+            actionId: 'studio0_overlay',
+            data: {
+              rank: 5,
+              sourceLayerId: Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY,
+              name: 'overlay graphics A',
+            }
+          }),
+          EntityTestFactory.createActionManifest({
+            actionId: 'studio0_overlay',
+            data: undefined as unknown as Tv2ActionManifestOverlayGraphicsData,
+          }),
+        ]
+
+        const result: Tv2FullscreenGraphicsManifestData[] = testee.filterAndMapToOverlayGraphicsData(actionManifests)
 
         expect(result.length).toBe(1)
         expect(result[0].rank).toBe(5)
