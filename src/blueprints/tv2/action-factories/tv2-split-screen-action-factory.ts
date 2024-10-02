@@ -461,7 +461,6 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     }
   }
 
-
   private mapSplitScreenBoxInputToNumber(splitScreenBoxInput: SplitScreenBoxInput): number {
     switch (splitScreenBoxInput) {
       case SplitScreenBoxInput.INPUT_1: {
