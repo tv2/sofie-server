@@ -1,9 +1,10 @@
 import { IngestService } from './interfaces/ingest-service'
-import { HttpErrorResponse, HttpErrorResponseCode, HttpService } from './interfaces/http-service'
+import { HttpService } from './interfaces/http-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
 import { ServiceUnavailableException } from '../../model/exceptions/service-unavailable-exception'
 import { NotFoundException } from '../../model/exceptions/not-found-exception'
+import { HttpError, HttpErrorCode } from '../http-error'
 
 const INEWS_HOST: string = process.env.INEWS_HOST ?? 'localhost:3007'
 
@@ -17,12 +18,13 @@ export class Tv2INewsIngestService implements IngestService {
     try {
       await this.httpService.post(url)
     } catch (error) {
-      const errorResponse: HttpErrorResponse = error as HttpErrorResponse
-      if (errorResponse.code === HttpErrorResponseCode.CONNECTION_REFUSED) {
-        throw new ServiceUnavailableException('Unable to reingest data from iNews. Check your iNews connection...')
-      }
-      if (error instanceof Error && /does not exist in playlist/i.test(error.message)) {
-        throw new NotFoundException('Unable to reingest data, since the rundown is not configured for ingest.')
+      if (error instanceof HttpError) {
+        if (error.code === HttpErrorCode.CONNECTION_REFUSED) {
+          throw new ServiceUnavailableException('Unable to reingest data from iNews. Check your iNews connection.')
+        }
+        if (/does not exist in playlist/i.test(error.message)) {
+          throw new NotFoundException('Unable to reingest data, since the rundown is not configured for ingest.')
+        }
       }
       throw error
     }
