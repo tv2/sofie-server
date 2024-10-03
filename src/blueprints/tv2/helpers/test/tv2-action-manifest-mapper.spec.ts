@@ -18,8 +18,8 @@ import { Tv2SourceLayer } from '../../value-objects/tv2-layers'
 
 describe(Tv2ActionManifestMapper.name, () => {
   describe(Tv2ActionManifestMapper.prototype.filterAndMapToSplitScreenManifestData.name, () => {
-    describe('when an action manifest has a invalid input source is given', () => {
-      it('ignores the invalid action manifest', () => {
+    describe('when an action manifest with an invalid input source is given', () => {
+      it('ignores the action manifest with an invalid input source', () => {
         const testee: Tv2ActionManifestMapper = createTestee()
 
         const blueprintConfiguration: Tv2BlueprintConfiguration = createConfiguredBlueprintConfiguration()
