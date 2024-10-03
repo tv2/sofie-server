@@ -154,7 +154,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
         name: source.SourceName,
         videoMixerSource: source.SwitcherSource,
         sisyfosLayers: source.SisyfosLayers,
-        studioMicrophones: source.StudioMics,
+        useStudioMicrophones: source.StudioMics,
         wantsToPersistAudio: source.WantsToPersistAudio,
         acceptPersistAudio: source.AcceptPersistAudio
       }

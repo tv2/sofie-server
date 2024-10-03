@@ -31,7 +31,7 @@ export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerT
       }
     })
 
-    if (!source.studioMicrophones) {
+    if (!source.useStudioMicrophones) {
       return sisyfosChannelTimelineObjects
     }
 
