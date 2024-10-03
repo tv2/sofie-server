@@ -6,7 +6,7 @@ import {
   Tv2GraphicsType,
   Tv2HtmlGraphics,
   Tv2SourceMapping,
-  Tv2SourceMappingWithSound,
+  Tv2SourceMappingWithAudio,
   Tv2StudioBlueprintConfiguration,
   Tv2VideoMixerBasicConfiguration,
   Tv2VizPilotGraphics,
@@ -144,7 +144,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
     }
   }
 
-  private mapSourcesWithSound(sources: CoreSourceMappingWithSound[] | undefined): Tv2SourceMappingWithSound[] {
+  private mapSourcesWithSound(sources: CoreSourceMappingWithSound[] | undefined): Tv2SourceMappingWithAudio[] {
     if (!sources) {
       return []
     }

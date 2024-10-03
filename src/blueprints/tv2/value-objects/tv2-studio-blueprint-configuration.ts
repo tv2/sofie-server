@@ -1,10 +1,10 @@
 import { DeviceType } from '../../../model/enums/device-type'
 
 export interface Tv2StudioBlueprintConfiguration {
-  cameraSources: Tv2SourceMappingWithSound[]
-  remoteSources: Tv2SourceMappingWithSound[]
-  feedSources: Tv2SourceMappingWithSound[]
-  replaySources: Tv2SourceMappingWithSound[]
+  cameraSources: Tv2SourceMappingWithAudio[]
+  remoteSources: Tv2SourceMappingWithAudio[]
+  feedSources: Tv2SourceMappingWithAudio[]
+  replaySources: Tv2SourceMappingWithAudio[]
   studioMicrophones: string[]
   mediaPlayers: Tv2MediaPlayer[]
   videoMixerType: VideoMixerType
@@ -62,7 +62,7 @@ export interface Tv2SourceMapping {
 
 export interface Tv2MediaPlayer extends Tv2SourceMapping { }
 
-export interface Tv2SourceMappingWithSound extends Tv2SourceMapping {
+export interface Tv2SourceMappingWithAudio extends Tv2SourceMapping {
   sisyfosLayers: string[]
   useStudioMicrophones: boolean
   wantsToPersistAudio?: boolean
