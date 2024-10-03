@@ -63,7 +63,7 @@ export interface Tv2SourceMapping {
 export interface Tv2MediaPlayer extends Tv2SourceMapping { }
 
 export interface Tv2SourceMappingWithAudio extends Tv2SourceMapping {
-  sisyfosLayers: string[]
+  audioLayers: string[]
   useStudioMicrophones: boolean
   wantsToPersistAudio?: boolean
   acceptPersistAudio?: boolean

@@ -16,7 +16,7 @@ import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerTimelineObjectFactory {
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, audioMode?: Tv2AudioMode): SisyfosTimelineObject[] {
-    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.sisyfosLayers.map(sisyfosLayer => {
+    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.audioLayers.map(sisyfosLayer => {
       return {
         id: `${source.id}_${this.generateRandomWholeNumber()}`,
         enable: {

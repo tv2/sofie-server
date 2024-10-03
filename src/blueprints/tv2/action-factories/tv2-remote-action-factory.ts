@@ -96,7 +96,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       type: Tv2PieceType.REMOTE,
       outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
-        sisyfosLayers: source.sisyfosLayers,
+        sisyfosLayers: source.audioLayers,
         wantsToPersistAudio: source.wantsToPersistAudio,
         acceptsPersistedAudio: source.acceptPersistAudio
       }
