@@ -185,6 +185,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.REPLAY,
       outputLayer: Tv2OutputLayer.PROGRAM,
+      audioMode: audioMode,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: audioMode === Tv2AudioMode.VOICE_OVER
