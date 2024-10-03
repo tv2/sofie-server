@@ -31,14 +31,14 @@ export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerT
       }
     })
 
-    if (!source.usesStudioMicrophones) {
-      return sisyfosChannelTimelineObjects
+    if (source.usesStudioMicrophones || audioMode === Tv2AudioMode.VOICE_OVER) {
+      return [
+        ...sisyfosChannelTimelineObjects,
+        this.createStudioMicrophonesTimelineObject(configuration)
+      ]
     }
 
-    return [
-      ...sisyfosChannelTimelineObjects,
-      this.createStudioMicrophonesTimelineObject(configuration)
-    ]
+    return sisyfosChannelTimelineObjects
   }
 
   private generateRandomWholeNumber(): number {
