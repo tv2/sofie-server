@@ -322,7 +322,6 @@ export class IngestDataChangedService implements DataChangeService {
       return
     }
 
-    // this.logger.debug(`Executing ${event.eventType} ${event.entityType} ingest event with id ${event.entityId}.`)
     this.isExecutingEvent = true
     event.callback()
       .catch(error => this.logger.data(error).error(`Error when executing ${event.eventType} ingest event for ${event.entityType} with id '${event.entityId}':`))
