@@ -30,6 +30,7 @@ import { StatusMessageServiceImplementation } from '../services/status-message-s
 import { PlayoutService } from '../services/interfaces/playoutService'
 import { PlayoutGatewayService } from '../services/playout-gateway-service'
 import { ThrottledRundownService } from '../services/throttled-rundown-service'
+import { ImprovedIngestDataChangedService } from '../services/improved-ingest-data-changed-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -80,7 +81,7 @@ export class ServiceFacade {
   }
 
   public static createIngestChangeService(): DataChangeService {
-    return IngestDataChangedService.getInstance(
+    return ImprovedIngestDataChangedService.getInstance(
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createSegmentRepository(),
