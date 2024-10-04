@@ -197,6 +197,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
       const entries = Object.entries(dataChangeEventsGroupedByRundown)
       for (const [rundownId, queue] of entries) {
         try {
+          // TODO: Make the contents of the loop (and outer try catch) a recursive call with setImmediate to make it more responsive.
           // TODO: Allow rundown to be undefined (from a delete rundown event)
           // TODO: Deleted entities needs to be matched against the other dataChangedEvents and removed if they were recreated.
           const { rundown, dataChangedEvents, deletedEntities} = await this.reduceRundownWithDataChangeEvents(rundownId, queue)
@@ -232,7 +233,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
       this.logger.data(error).error('Failed grouping events by rundown.')
     } finally {
       this.isExecutingEvents = false
-      this.logger.trace('Executing events took ms:' + ((Number(process.hrtime.bigint() - startTime) / 1_000_000)) )
+      this.logger.trace(`Executing ${dataChangeEvents.length} events took ms:` + ((Number(process.hrtime.bigint() - startTime) / 1_000_000)) )
       // TODO: Start new timer if not set.
     }
   }
