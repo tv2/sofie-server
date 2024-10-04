@@ -39,11 +39,12 @@ type DataChangeEvent =
   | DeleteEvent<'part'>
 
 type EntityType = 'rundown' |'segment' | 'part'
+type Entity = IngestedRundown | IngestedSegment | IngestedPart
 
-interface CreateEvent<EntityTypeVariant extends EntityType, Entity> {
+interface CreateEvent<EntityTypeVariant extends EntityType, EntityVariant extends Entity> {
   eventType: 'insert'
   entityType: EntityTypeVariant
-  entity: Entity
+  entity: EntityVariant
 }
 
 interface UpdateEvent<EntityTypeVariant extends EntityType, Entity> {
@@ -56,6 +57,12 @@ interface DeleteEvent<EntityTypeVariant extends EntityType> {
   eventType: 'delete'
   entityType: EntityTypeVariant
   entityId: string
+}
+
+interface DataChangeEventContext {
+  rundown: Rundown | undefined
+  dataChangedEvents: object[]
+  deletedEntities: { entityType: EntityType, entityId: string, isUnsynced: boolean }[]
 }
 
 export class ImprovedIngestDataChangedService implements DataChangeService {
@@ -175,6 +182,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
   }
 
   private async executeDataChangeEvents(): Promise<void> {
+    const startTime = process.hrtime.bigint()
     this.logger.trace('EXECUTING SOMETHING: ' + this.isExecutingEvents)
     if (this.isExecutingEvents) {
       return
@@ -186,15 +194,35 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
 
     try {
       const dataChangeEventsGroupedByRundown: Record<string, DataChangeEvent[]> = await this.groupDataChangeEventsByRundown(dataChangeEvents)
-      this.logger.data(Object.values(dataChangeEventsGroupedByRundown).length).trace('Found these groupings')
       const entries = Object.entries(dataChangeEventsGroupedByRundown)
       for (const [rundownId, queue] of entries) {
         try {
-          const {rundown, dataChangedEvents} = await this.reduceRundownWithDataChangeEvents(rundownId, queue)
+          // TODO: Allow rundown to be undefined (from a delete rundown event)
+          // TODO: Deleted entities needs to be matched against the other dataChangedEvents and removed if they were recreated.
+          const { rundown, dataChangedEvents, deletedEntities} = await this.reduceRundownWithDataChangeEvents(rundownId, queue)
+          if (!rundown) {
+            await this.rundownRepository.deleteRundown(rundownId)
+            await this.actionRepository.deleteActionsForRundown(rundownId) // TODO: Check if this can remove actions which have same content in multiple rundowns.
+            continue
+          }
           await this.rundownRepository.saveRundown(rundown)
+          for (const deletedEntity of deletedEntities) {
+            switch (deletedEntity.entityType)  {
+              case 'segment':
+                await this.segmentRepository.delete(deletedEntity.entityId)
+                break
+              case 'part':
+                await this.partRepository.delete(deletedEntity.entityId)
+                break
+            }
+          }
           dataChangedEvents.forEach(dataChangedEvent => this.emitDataChangedEvent(dataChangedEvent))
-          await this.timelineBuilder.buildTimeline(rundown)
           await this.generateActionsForRundown(rundownId)
+          if (rundown.isActive()) {
+            await this.timelineBuilder.buildTimeline(rundown)
+            this.eventEmitter.emitSetNextEvent(rundown)
+            // TODO: Emit set next event if necessary
+          }
         } catch (error) {
           this.logger.data(error).error('Failed updating rundown.')
         }
@@ -204,6 +232,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
       this.logger.data(error).error('Failed grouping events by rundown.')
     } finally {
       this.isExecutingEvents = false
+      this.logger.trace('Executing events took ms:' + ((Number(process.hrtime.bigint() - startTime) / 1_000_000)) )
       // TODO: Start new timer if not set.
     }
   }
@@ -231,7 +260,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
   private async getRundownIdFromDataChangeEvent(dataChangeEvent: DataChangeEvent): Promise<string> {
     switch (dataChangeEvent.eventType) {
       case 'insert':
-      case 'update':
+      case 'update': {
         switch (dataChangeEvent.entityType) {
           case 'rundown':
             return dataChangeEvent.entity.id
@@ -240,25 +269,233 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
             return dataChangeEvent.entity.rundownId
         }
         break
+      }
       case 'delete':
         switch (dataChangeEvent.entityType) {
           case 'rundown':
             return dataChangeEvent.entityId
-          case 'segment':
-            return await Promise.reject('Not implemented')
-          case 'part':
-            return await Promise.reject('Not implemented')
+          case 'segment': {
+            const segment: Segment = await this.segmentRepository.getSegment(dataChangeEvent.entityId)
+            return segment.rundownId
+          }
+          case 'part': {
+            const part: Part = await this.partRepository.getPart(dataChangeEvent.entityId)
+            return part.rundownId
+          }
         }
     }
   }
 
-  private async reduceRundownWithDataChangeEvents(rundownId: string, events: DataChangeEvent[]): Promise<{ rundown: Rundown, dataChangedEvents: object[] }> {
-    //TODO: Reduce rundown with events
-    const rundown: Rundown = await this.getRundown(rundownId)
-    return {
-      rundown,
+  private async reduceRundownWithDataChangeEvents(rundownId: string, events: DataChangeEvent[]): Promise<DataChangeEventContext> {
+    return events.reduce<DataChangeEventContext>(({ rundown, dataChangedEvents, deletedEntities }, event: DataChangeEvent) => {
+      try {
+        const result = this.executeDataChangeEvent(rundown, event)
+        return {
+          rundown: result.rundown,
+          dataChangedEvents: [...dataChangedEvents, ...(result.dataChangedEvents)],
+          deletedEntities: [...deletedEntities, ...(result.deletedEntities)],
+        }
+      } catch (error) {
+        if (event.eventType === 'delete' && error instanceof NotFoundException) {
+          return {
+            rundown,
+            dataChangedEvents,
+            deletedEntities,
+          }
+        }
+        throw error
+      }
+    },{
+      rundown: await this.getRundown(rundownId),
       dataChangedEvents: [],
+      deletedEntities: [],
+    })
+  }
+
+  private executeDataChangeEvent(rundown: Rundown | undefined, event: DataChangeEvent): DataChangeEventContext {
+    switch (event.eventType) {
+      case 'insert':
+        return this.executeCreateEvent(rundown, event)
+      case 'update':
+        return this.executeUpdateEvent(rundown, event)
+      case 'delete':
+        return this.executeDeleteEvent(rundown, event)
     }
+  }
+
+  private executeCreateEvent(maybeRundown: Rundown | undefined, event: CreateEvent<EntityType, Entity> & DataChangeEvent): DataChangeEventContext {
+    switch (event.entityType) {
+      case 'rundown': {
+        return {
+          rundown: maybeRundown ? this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(maybeRundown, event.entity) : this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(event.entity),
+          dataChangedEvents: [], // TODO: Add rundown created event
+          deletedEntities: [],
+        }
+      }
+      case 'segment': {
+        const rundown: Rundown = maybeRundown ?? this.createTemporaryRundown(event.entity.rundownId)
+        const segment: Segment | undefined = rundown.getSegments().find(segment => segment.id === event.entity.id)
+        const updatedSegment: Segment = segment ? this.ingestedEntityToEntityMapper.updateSegmentWithIngestedSegment(segment, event.entity) : this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(event.entity)
+        if (segment) {
+          rundown.updateSegment(updatedSegment)
+        } else {
+          rundown.addSegment(updatedSegment)
+        }
+        return {
+          rundown: rundown,
+          dataChangedEvents: [],  // TODO: Add segment created event
+          deletedEntities: [],
+        }
+      }
+      case 'part': {
+        const rundown: Rundown = maybeRundown ?? this.createTemporaryRundown(event.entity.rundownId)
+        let segment: Segment | undefined = rundown.getSegments().find(segment => segment.id === event.entity.segmentId)
+        if (!segment) {
+          segment = this.createTemporarySegment(event.entity.segmentId, event.entity.rundownId)
+          rundown.addSegment(segment)
+        }
+        const part: Part | undefined = segment.getParts().find(part => part.id === event.entity.id)
+        const updatedPart: Part = part ? this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(part, event.entity) : this.ingestedEntityToEntityMapper.convertIngestedPartToPart(event.entity)
+        if (part) {
+          segment.updatePart(updatedPart)
+        } else {
+          segment.addPart(updatedPart)
+        }
+        return {
+          rundown: rundown,
+          dataChangedEvents: [], // TODO: Add part created event
+          deletedEntities: [],
+        }
+        // TODO: Assert all cases
+      }
+    }
+  }
+
+  private executeUpdateEvent(maybeRundown: Rundown | undefined, event: UpdateEvent<EntityType, Entity> & DataChangeEvent): DataChangeEventContext {
+    switch (event.entityType) {
+      case 'rundown': {
+        return {
+          rundown: maybeRundown ? this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(maybeRundown, event.entity) : this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(event.entity),
+          dataChangedEvents: [], // TODO: Add rundown updated event
+          deletedEntities: [],
+        }
+      }
+      case 'segment': {
+        const rundown: Rundown = maybeRundown ?? this.createTemporaryRundown(event.entity.rundownId)
+        const segment: Segment | undefined = rundown.getSegments().find(segment => segment.id === event.entity.id)
+        const updatedSegment: Segment = segment ? this.ingestedEntityToEntityMapper.updateSegmentWithIngestedSegment(segment, event.entity) : this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(event.entity)
+        if (segment) {
+          rundown.updateSegment(updatedSegment)
+        } else {
+          rundown.addSegment(updatedSegment)
+        }
+        return {
+          rundown: rundown,
+          dataChangedEvents: [],  // TODO: Add segment updated event
+          deletedEntities: [],
+        }
+      }
+      case 'part': {
+        const rundown: Rundown = maybeRundown ?? this.createTemporaryRundown(event.entity.rundownId)
+        let segment: Segment | undefined = rundown.getSegments().find(segment => segment.id === event.entity.segmentId)
+        if (!segment) {
+          segment = this.createTemporarySegment(event.entity.segmentId, event.entity.rundownId)
+          rundown.addSegment(segment)
+        }
+        const part: Part | undefined = segment.getParts().find(part => part.id === event.entity.id)
+        const updatedPart: Part = part ? this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(part, event.entity) : this.ingestedEntityToEntityMapper.convertIngestedPartToPart(event.entity)
+        if (part) {
+          segment.updatePart(updatedPart)
+        } else {
+          segment.addPart(updatedPart)
+        }
+        return {
+          rundown: rundown,
+          dataChangedEvents: [], // TODO: Add part updated event
+          deletedEntities: [],
+        }
+        // TODO: Assert all cases
+      }
+    }
+  }
+
+  private executeDeleteEvent(rundown: Rundown | undefined, event: DeleteEvent<EntityType> & DataChangeEvent): DataChangeEventContext {
+    if (!rundown) {
+      return {
+        rundown: rundown,
+        dataChangedEvents: [],
+        deletedEntities: []
+      }
+    }
+
+    switch (event.entityType) {
+      case 'rundown': {
+        return {
+          rundown: rundown, // TODO: Implement
+          dataChangedEvents: [], // TODO: Add rundown delete event
+          deletedEntities: [],
+        }
+      }
+      case 'segment': {
+        const removedSegment: Segment | undefined = rundown.removeSegment(event.entityId)
+        return {
+          rundown: rundown,
+          dataChangedEvents: [], // TODO: Add segment deleted event
+          deletedEntities: removedSegment ? [{ entityType: 'segment', entityId: removedSegment.id, isUnsynced: removedSegment.isUnsynced() }] : [],
+        }
+      }
+      case 'part': {
+        const removedPart: Part | undefined = rundown.removePartFromSegment(event.entityId)
+        return {
+          rundown: rundown,
+          dataChangedEvents: [], // TODO: Add part deleted event
+          deletedEntities: removedPart ? [{ entityType: 'part', entityId: removedPart.id, isUnsynced: removedPart.isUnsynced() }] : [],
+        }
+        // TODO: Assert all cases
+      }
+    }
+  }
+
+  private createTemporaryRundown(rundownId: string): Rundown {
+    return new Rundown({
+      baselineTimelineObjects: [],
+      history: [],
+      id: rundownId,
+      mode: RundownMode.INACTIVE,
+      modifiedAt: Date.now(),
+      name: 'Dummy rundown',
+      segments: [],
+      showStyleVariantId: '',
+      timing: {
+        type: RundownTimingType.UNSCHEDULED,
+        expectedDurationInMs : 0
+      }
+    })
+  }
+
+  private createTemporarySegment(segmentId: string, rundownId: string): Segment {
+    return new Segment({
+      id: segmentId,
+      rundownId: rundownId,
+      name: '',
+      definesShowStyleVariant: false,
+      isHidden: false,
+      isNext: false,
+      isOnAir: false,
+      isUnsynced: false,
+      parts: [],
+      rank: 0,
+    })
+  }
+
+  private async createSegment(ingestedSegment: IngestedSegment): Promise<void> {
+    const rundown: Rundown = await this.getRundown(ingestedSegment.rundownId)
+    const segment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
+
+    rundown.addSegment(segment)
+
+    this.eventEmitter.emitSegmentCreated(rundown, segment)
+    await this.rundownRepository.saveRundown(rundown)
   }
 
   private emitDataChangedEvent(dataChangedEvent: object): void {
@@ -275,14 +512,6 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
 
     await this.actionRepository.deleteActionsForRundown(rundownId)
     await this.actionRepository.saveActions(actions)
-  }
-
-  private async createRundown(ingestedRundown: IngestedRundown): Promise<void> {
-    const rundown: Rundown = await this.getRundown(ingestedRundown.id)
-    const updatedRundown: Rundown = this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(rundown, ingestedRundown)
-
-    this.eventEmitter.emitRundownCreated(updatedRundown)
-    await this.rundownRepository.saveRundown(updatedRundown)
   }
 
   private async updateRundown(ingestedRundown: IngestedRundown): Promise<void> {
@@ -304,7 +533,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
           id: rundownId,
           mode: RundownMode.INACTIVE,
           modifiedAt: Date.now(),
-          name: '',
+          name: 'Dummy rundown',
           segments: [],
           showStyleVariantId: '',
           timing: {
@@ -342,16 +571,6 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
         entityId: segmentId,
       })
     })
-  }
-
-  private async createSegment(ingestedSegment: IngestedSegment): Promise<void> {
-    const rundown: Rundown = await this.getRundown(ingestedSegment.rundownId)
-    const segment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
-
-    rundown.addSegment(segment)
-
-    this.eventEmitter.emitSegmentCreated(rundown, segment)
-    await this.rundownRepository.saveRundown(rundown)
   }
 
   private async updateSegment(ingestedSegment: IngestedSegment): Promise<void> {
