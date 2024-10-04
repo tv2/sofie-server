@@ -298,6 +298,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
         }
       } catch (error) {
         if (event.eventType === 'delete' && error instanceof NotFoundException) {
+          this.logger.warn(error.message)
           return {
             rundown,
             dataChangedEvents,
@@ -307,7 +308,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
         throw error
       }
     },{
-      rundown: await this.getRundown(rundownId),
+      rundown: await this.rundownRepository.getRundown(rundownId).catch(() => undefined),
       dataChangedEvents: [],
       deletedEntities: [],
     })
@@ -489,16 +490,6 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
     })
   }
 
-  private async createSegment(ingestedSegment: IngestedSegment): Promise<void> {
-    const rundown: Rundown = await this.getRundown(ingestedSegment.rundownId)
-    const segment: Segment = this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment)
-
-    rundown.addSegment(segment)
-
-    this.eventEmitter.emitSegmentCreated(rundown, segment)
-    await this.rundownRepository.saveRundown(rundown)
-  }
-
   private emitDataChangedEvent(dataChangedEvent: object): void {
     // TODO: Big-ass switch case
     this.eventEmitter
@@ -513,38 +504,6 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
 
     await this.actionRepository.deleteActionsForRundown(rundownId)
     await this.actionRepository.saveActions(actions)
-  }
-
-  private async updateRundown(ingestedRundown: IngestedRundown): Promise<void> {
-    const rundown: Rundown = await this.getRundown(ingestedRundown.id)
-    const updatedRundown: Rundown = this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(rundown, ingestedRundown)
-
-    this.eventEmitter.emitRundownUpdated(updatedRundown)
-    await this.rundownRepository.saveRundown(updatedRundown)
-  }
-
-  private async getRundown(rundownId: string): Promise<Rundown> {
-    try {
-      return await this.rundownRepository.getRundown(rundownId)
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        return new Rundown({
-          baselineTimelineObjects: [],
-          history: [],
-          id: rundownId,
-          mode: RundownMode.INACTIVE,
-          modifiedAt: Date.now(),
-          name: 'Dummy rundown',
-          segments: [],
-          showStyleVariantId: '',
-          timing: {
-            type: RundownTimingType.UNSCHEDULED,
-            expectedDurationInMs : 0
-          }
-        })
-      }
-      throw error
-    }
   }
 
   private listenForSegmentChanges(segmentChangedListener: DataChangedListener<IngestedSegment>): void {
@@ -574,58 +533,6 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
     })
   }
 
-  private async updateSegment(ingestedSegment: IngestedSegment): Promise<void> {
-    const rundown: Rundown = await this.getRundown(ingestedSegment.rundownId)
-    const segment: Segment = await this.getSegment(ingestedSegment.id, rundown)
-
-    const updatedSegment: Segment = new Segment({
-      id: ingestedSegment.id,
-      rundownId: ingestedSegment.rundownId,
-      name: ingestedSegment.name,
-      definesShowStyleVariant: ingestedSegment.definesShowStyleVariant,
-      executedAtEpochTime: segment.getExecutedAtEpochTime(),
-      expectedDurationInMs: ingestedSegment.budgetDuration,
-      invalidity: ingestedSegment.invalidity,
-      isHidden: ingestedSegment.isHidden,
-      isNext: segment.isNext(),
-      isOnAir: segment.isOnAir(),
-      isUnsynced: false, // Updated are never unsynced since Core removes and adds new Segments instead of updating them
-      metadata: ingestedSegment.metadata,
-      parts: segment.getParts(),
-      rank: ingestedSegment.rank,
-      referenceTag: ingestedSegment.referenceTag,
-    })
-
-    rundown.updateSegment(updatedSegment)
-
-    this.eventEmitter.emitSegmentUpdated(rundown, segment)
-    await this.rundownRepository.saveRundown(rundown)
-  }
-
-  private async getSegment(segmentId: string, rundown: Rundown): Promise<Segment> {
-    try {
-      return await this.segmentRepository.getSegment(segmentId)
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        const segment = new Segment({
-          id: segmentId,
-          rundownId: rundown.id,
-          name: '',
-          definesShowStyleVariant: false,
-          isHidden: false,
-          isNext: false,
-          isOnAir: false,
-          isUnsynced: false,
-          parts: [],
-          rank: 0,
-        })
-        rundown.addSegment(segment)
-        return segment
-      }
-      throw error
-    }
-  }
-
   private listenForPartChanges(partChangedListener: DataChangedListener<IngestedPart>): void {
     partChangedListener.onCreated(ingestedPart => {
       this.logger.debug(`Create part event for ${ingestedPart.name} with id ${ingestedPart.id}.`)
@@ -651,18 +558,6 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
         entityId: partId,
       })
     })
-  }
-
-  private async createPart(ingestedPart: IngestedPart): Promise<void> {
-    const rundown: Rundown = await this.getRundown(ingestedPart.rundownId)
-    const segment: Segment = await this.getSegment(ingestedPart.id, rundown)
-
-    const part: Part = this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart)
-
-    segment.addPart(part)
-
-    this.eventEmitter.emitPartCreated(rundown, part)
-    await this.rundownRepository.saveRundown(rundown)
   }
 
   public async initialize(): Promise<void> {
