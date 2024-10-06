@@ -10,7 +10,6 @@ import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
 import { DataChangeService } from '../services/interfaces/data-change-service'
-import { IngestDataChangedService } from '../services/ingest-data-changed-service'
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
 import { IngestService } from '../services/interfaces/ingest-service'
 import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
@@ -30,7 +29,9 @@ import { StatusMessageServiceImplementation } from '../services/status-message-s
 import { PlayoutService } from '../services/interfaces/playoutService'
 import { PlayoutGatewayService } from '../services/playout-gateway-service'
 import { ThrottledRundownService } from '../services/throttled-rundown-service'
-import { ImprovedIngestDataChangedService } from '../services/improved-ingest-data-changed-service'
+import { SynchronizeOnlyIngestDataChangedService } from '../services/synchronize-only-ingest-data-changed-service'
+import { IngestRundownSynchronizer } from '../services/ingest-rundown-synchronizer'
+import { IngestEntityDiffer } from '../services/ingest-entity-differ'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -81,26 +82,40 @@ export class ServiceFacade {
   }
 
   public static createIngestChangeService(): DataChangeService {
-    return ImprovedIngestDataChangedService.getInstance(
+    const ingestedEntityToEntityMapper: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
+    return new SynchronizeOnlyIngestDataChangedService(
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPartRepository(),
-      RepositoryFacade.createPieceRepository(),
-      RepositoryFacade.createTimelineRepository(),
-      RepositoryFacade.createActionManifestRepository(),
-      RepositoryFacade.createActionRepository(),
-      RepositoryFacade.createConfigurationRepository(),
-      BlueprintsFacade.createBlueprint(),
-      ServiceFacade.createTimelineBuilder(),
-      EventEmitterFacade.createRundownEventEmitter(),
-      EventEmitterFacade.createActionEventEmitter(),
-      new IngestedEntityToEntityMapper(),
-      LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
-      RepositoryFacade.createIngestedPartChangedListener()
+      RepositoryFacade.createIngestedPartChangedListener(),
+      new IngestRundownSynchronizer(ingestedEntityToEntityMapper, new IngestEntityDiffer()),
+      ingestedEntityToEntityMapper,
+      EventEmitterFacade.createRundownEventEmitter(),
+      LoggerFacade.createLogger(),
     )
+    // return ImprovedIngestDataChangedService.getInstance(
+    //   RepositoryFacade.createIngestedRundownRepository(),
+    //   RepositoryFacade.createRundownRepository(),
+    //   RepositoryFacade.createSegmentRepository(),
+    //   RepositoryFacade.createPartRepository(),
+    //   RepositoryFacade.createPieceRepository(),
+    //   RepositoryFacade.createTimelineRepository(),
+    //   RepositoryFacade.createActionManifestRepository(),
+    //   RepositoryFacade.createActionRepository(),
+    //   RepositoryFacade.createConfigurationRepository(),
+    //   BlueprintsFacade.createBlueprint(),
+    //   ServiceFacade.createTimelineBuilder(),
+    //   EventEmitterFacade.createRundownEventEmitter(),
+    //   EventEmitterFacade.createActionEventEmitter(),
+    //   new IngestedEntityToEntityMapper(),
+    //   LoggerFacade.createLogger(),
+    //   RepositoryFacade.createIngestedRundownChangeListener(),
+    //   RepositoryFacade.createIngestedSegmentChangedListener(),
+    //   RepositoryFacade.createIngestedPartChangedListener()
+    // )
   }
 
   public static createMediaDataChangeService(): DataChangeService {

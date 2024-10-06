@@ -186,7 +186,7 @@ export class Part {
     return this.isPartNext
   }
 
-  public getPieces(): Piece[] {
+  public getPieces(): readonly Piece[] {
     return this.pieces
   }
 

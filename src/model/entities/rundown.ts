@@ -634,7 +634,7 @@ export class Rundown extends BasicRundown {
   public removeSegment(segmentId: string): Segment | undefined {
     const segmentToRemove: Segment | undefined = this.segments.find(segment => !segment.isUnsynced() && segment.id === segmentId)
     if (!segmentToRemove) {
-      return
+      throw new Error()
     }
 
     this.segments = this.segments.filter(segment => segment.id !== segmentId)
@@ -662,7 +662,7 @@ export class Rundown extends BasicRundown {
     return unsyncedSegment
   }
 
-  public getSegments(): Segment[] {
+  public getSegments(): readonly Segment[] {
     return this.segments
   }
 
@@ -849,5 +849,29 @@ export class Rundown extends BasicRundown {
 
     partsToPruneIds.forEach(partId => this.getActiveSegment().removePart(partId))
     return partsToPruneIds
+  }
+
+  public toRundownInterface(): RundownInterface {
+    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = this.isActive()
+      ? {
+        activeCursor: this.getActiveCursor(),
+        nextCursor: this.getNextCursor(),
+        infinitePieces: this.getInfinitePiecesMap(),
+      }
+      : undefined
+    return {
+      id: this.id,
+      name: this.name,
+      mode: this.getMode(),
+      alreadyActiveProperties,
+      baselineTimelineObjects: this.getBaseline(),
+      history: this.getHistory(),
+      modifiedAt: this.getLastTimeModified(),
+      persistentState: undefined,
+      segments: this.getSegments().map(segment => new Segment(segment.toSegmentsInterface())),
+      showStyleVariantId: this.getShowStyleVariantId(),
+      timing: this.timing
+
+    }
   }
 }

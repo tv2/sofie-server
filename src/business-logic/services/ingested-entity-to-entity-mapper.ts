@@ -42,7 +42,7 @@ export class IngestedEntityToEntityMapper {
       history: rundownToUpdate.getHistory(),
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),
-      segments: rundownToUpdate.getSegments(),
+      segments: [...rundownToUpdate.getSegments()],
       alreadyActiveProperties
     })
   }
@@ -61,7 +61,7 @@ export class IngestedEntityToEntityMapper {
       isUnsynced: false,
       expectedDurationInMs: ingestedSegment.budgetDuration,
       definesShowStyleVariant: ingestedSegment.definesShowStyleVariant ?? false,
-      parts: [],
+      parts: ingestedSegment.ingestedParts.map(ingestedPart => this.convertIngestedPartToPart(ingestedPart)),
     })
   }
 

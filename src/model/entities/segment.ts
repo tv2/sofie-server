@@ -162,7 +162,7 @@ export class Segment {
 
     const doesPartAlreadyExistOnSegment: boolean = this.parts.some(part => part.id === partToAdd.id)
     if (doesPartAlreadyExistOnSegment) {
-      throw new AlreadyExistException(`Unable to add Part to Segment. Part ${partToAdd.id} already exist on Segment ${this.id}`)
+      throw new AlreadyExistException(`Unable to add the part '${partToAdd.name}' with id '${partToAdd.id}' to the segment '${this.name}' with id '${this.id}'. Part already exist on segment.`)
     }
     this.parts.push(partToAdd)
     this.parts.sort(this.compareParts)
@@ -199,7 +199,7 @@ export class Segment {
     return partToDelete
   }
 
-  public getParts(): Part[] {
+  public getParts(): readonly Part[] {
     return this.parts
   }
 
@@ -285,5 +285,26 @@ export class Segment {
 
   public isSegmentUntimed(): boolean {
     return !this.getParts().some(part => !part.isUntimed())
+  }
+
+  public toSegmentsInterface(): SegmentInterface {
+    return {
+      definesShowStyleVariant: this.definesShowStyleVariant,
+      executedAtEpochTime: this.getExecutedAtEpochTime(),
+      expectedDurationInMs: this.expectedDurationInMs,
+      id: this.id,
+      invalidity: this.invalidity,
+      isHidden: this.isHidden,
+      isNext: this.isNext(),
+      isOnAir: this.isOnAir(),
+      isUnsynced: this.isUnsynced(),
+      metadata: this.metadata,
+      name: this.name,
+      parts: this.parts.map(part => part.clone()),
+      rank: this.rank,
+      referenceTag: this.referenceTag,
+      rundownId: this.rundownId
+
+    }
   }
 }

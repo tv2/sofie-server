@@ -26,6 +26,8 @@ import { Segment } from '../../model/entities/segment'
 import { Part } from '../../model/entities/part'
 import { Configuration } from '../../model/entities/configuration'
 import { Action, ActionManifest } from '../../model/entities/action'
+import { IngestRundownSynchronizer, RundownSynchronizeResult } from './ingest-rundown-synchronizer'
+import { IngestedSegmentRepository } from '../../data-access/repositories/interfaces/ingested-segment-repository'
 
 type DataChangeEvent =
   | CreateEvent<'rundown', IngestedRundown>
@@ -105,6 +107,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
         rundownEventEmitter,
         actionEventEmitter,
         ingestedEntityToEntityMapper,
+        new IngestRundownSynchronizer(),
         logger,
         rundownChangeListener,
         segmentChangedListener,
@@ -134,6 +137,7 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
     private readonly eventEmitter: RundownEventEmitter,
     private readonly actionEventEmitter: ActionEventEmitter,
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
+    private readonly ingestRundownSynchronizer: IngestRundownSynchronizer,
     logger: Logger,
     rundownChangeListener: DataChangedListener<IngestedRundown>,
     segmentChangedListener: DataChangedListener<IngestedSegment>,
@@ -561,5 +565,54 @@ export class ImprovedIngestDataChangedService implements DataChangeService {
   }
 
   public async initialize(): Promise<void> {
+    await Promise.resolve()
+  }
+
+  private async synchronizeRundown(rundownId: string): Promise<void> {
+    const rundown: Rundown | undefined = await this.rundownRepository.getRundown(rundownId).catch(error => {
+      if (error instanceof NotFoundException) {
+        return undefined
+      }
+      throw error
+    })
+    const ingestedRundown: IngestedRundown = await this.ingestedRundownRepository.getIngestedRundown(rundownId)
+
+    if (!ingestedRundown) {
+      if (rundown) {
+        this.eventEmitter.emitRundownDeleted(rundownId)
+        await this.rundownRepository.deleteRundown(rundownId)
+      }
+      return
+    }
+
+    if (!rundown) {
+      const createdRundown: Rundown = this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(ingestedRundown)
+      this.eventEmitter.emitRundownCreated(createdRundown)
+      await this.rundownRepository.saveRundown(createdRundown)
+      return
+    }
+
+    const {
+      rundown: updatedRundown,
+      createdSegments,
+      updatedSegments,
+      deletedSegments,
+      createdParts,
+      updatedParts,
+      deletedParts,
+    }: RundownSynchronizeResult = this.ingestRundownSynchronizer.synchronizeRundown(rundown, ingestedRundown)
+
+    createdSegments.forEach(segment => this.eventEmitter.emitSegmentCreated(updatedRundown, segment))
+    updatedSegments.forEach(segment => this.eventEmitter.emitSegmentUpdated(updatedRundown, segment))
+    deletedSegments.forEach(({ segment, originalSegmentId }) => segment.isUnsynced() ? this.eventEmitter.emitSegmentUnsynced(updatedRundown, segment, originalSegmentId) : this.eventEmitter.emitSegmentDeleted(updatedRundown, segment.id))
+
+    createdParts.forEach(part => this.eventEmitter.emitPartCreated(updatedRundown, part))
+    updatedParts.forEach(part => this.eventEmitter.emitPartUpdated(updatedRundown, part))
+    deletedParts.forEach(part => part.isUnsynced() ? this.eventEmitter.emitPartUnsynced(updatedRundown, part) : this.eventEmitter.emitPartDeleted(updatedRundown, part.getSegmentId(), part.id))
+
+    await this.rundownRepository.saveRundown(rundown)
+    // TODO: Ensure that deleted segments and parts are deleted in database.
+    // TODO: Build timeline if active
+    // TODO: Generate actions
   }
 }
