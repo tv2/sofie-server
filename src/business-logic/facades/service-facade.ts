@@ -94,6 +94,7 @@ export class ServiceFacade {
       new IngestRundownSynchronizer(ingestedEntityToEntityMapper, new IngestEntityDiffer()),
       ingestedEntityToEntityMapper,
       EventEmitterFacade.createRundownEventEmitter(),
+      ServiceFacade.createTimelineBuilder(),
       LoggerFacade.createLogger(),
     )
     // return ImprovedIngestDataChangedService.getInstance(

@@ -29,25 +29,25 @@ export class IngestEntityDiffer {
       || this.doesPiecesDifferFromIngestPieces(part.getPieces(), ingestPart.ingestedPieces)
   }
 
-  private doesPiecesDifferFromIngestPieces(pieces: readonly Piece[], ingestPieces: readonly IngestedPiece[]): boolean {
-    return pieces.length !== ingestPieces.length
-    || pieces.some((piece, pieceIndex) => {
-      const ingestPiece: IngestedPiece | undefined = ingestPieces[pieceIndex]
-      return !ingestPiece || this.doesPieceDifferFromIngestPiece(piece, ingestPiece)
+  private doesPiecesDifferFromIngestPieces(pieces: readonly Piece[], ingestedPieces: readonly IngestedPiece[]): boolean {
+    return pieces.length !== ingestedPieces.length
+    || pieces.some((piece) => {
+      const ingestedPiece: IngestedPiece | undefined = ingestedPieces.find(ingestedPiece => ingestedPiece.id === piece.id)
+      return !ingestedPiece || this.doesPieceDifferFromIngestPiece(piece, ingestedPiece)
     })
   }
 
   public doesPieceDifferFromIngestPiece(piece: Piece, ingestPiece: IngestedPiece): boolean {
     return piece.name !== ingestPiece.name
-      && piece.layer !== ingestPiece.layer
-      && piece.pieceLifespan !== ingestPiece.pieceLifespan
-      && piece.getStart() !== ingestPiece.start
-      && piece.getDuration() !== ingestPiece.duration
-      && piece.preRollDuration !== ingestPiece.preRollDuration
-      && piece.postRollDuration !== ingestPiece.postRollDuration
-      && piece.transitionType !== ingestPiece.transitionType
-      && JSON.stringify(piece.getTimelineObjects()) !== JSON.stringify(ingestPiece.timelineObjects)
-      && JSON.stringify(piece.metadata) !== JSON.stringify(ingestPiece.metadata)
-      && JSON.stringify(piece.content) !== JSON.stringify(ingestPiece.content)
+      || piece.layer !== ingestPiece.layer
+      || piece.pieceLifespan !== ingestPiece.pieceLifespan
+      || piece.getStart() !== ingestPiece.start
+      || piece.getDuration() !== ingestPiece.duration
+      || piece.preRollDuration !== ingestPiece.preRollDuration
+      || piece.postRollDuration !== ingestPiece.postRollDuration
+      || piece.transitionType !== ingestPiece.transitionType
+      || JSON.stringify(piece.getTimelineObjects()).replaceAll(/"id"\s*:\s*"\d+"/gi, '') !== JSON.stringify(ingestPiece.timelineObjects).replaceAll(/"id"\s*:\s*"\d+"/gi, '')
+      || JSON.stringify(piece.metadata).replaceAll(/"id"\s*:\s*"\d+"/gi, '') !== JSON.stringify(ingestPiece.metadata).replaceAll(/"id"\s*:\s*"\d+"/gi, '')
+      || JSON.stringify(piece.content) !== JSON.stringify(ingestPiece.content)
   }
 }

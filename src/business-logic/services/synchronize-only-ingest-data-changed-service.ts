@@ -1,5 +1,5 @@
 import { DataChangeService } from './interfaces/data-change-service'
-import { DeletedSegment, IngestRundownSynchronizer, RundownSynchronizeResult } from './ingest-rundown-synchronizer'
+import { IngestRundownSynchronizer, RundownSynchronizeResult } from './ingest-rundown-synchronizer'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
@@ -15,6 +15,7 @@ import { BasicRundown } from '../../model/entities/basic-rundown'
 import { RundownEventEmitter } from './interfaces/rundown-event-emitter'
 import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper'
 import { Segment } from '../../model/entities/segment'
+import { TimelineBuilder } from './interfaces/timeline-builder'
 
 export class SynchronizeOnlyIngestDataChangedService implements DataChangeService {
 
@@ -34,6 +35,7 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
     private readonly ingestRundownSynchronizer: IngestRundownSynchronizer,
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     private readonly rundownEventEmitter: RundownEventEmitter,
+    private readonly timelineBuilder: TimelineBuilder,
     logger: Logger,
   ) {
     this.logger = logger.tag(this.constructor.name)
@@ -211,10 +213,11 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
     updatedParts.forEach(part => rundown.updatePart(part))
     deletedParts.forEach(part => rundown.removePartFromSegment(part.id))
     const deletedSegmentInfo: { segment: undefined | Segment, originalSegmentId: string }[] = deletedSegments.map(segment => {
-      const removedSegment: Segment | undefined = rundown.removeSegment(segment.id)
+      const originalSegmentId: string = segment.id
+      rundown.removeSegment(segment.id)
       return {
         segment: segment,
-        originalSegmentId: removedSegment?.id ?? segment.id,
+        originalSegmentId,
       }
     })
     const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
@@ -225,11 +228,21 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
     createdParts.forEach(part => this.rundownEventEmitter.emitPartCreated(updatedRundown, part))
     updatedParts.forEach(part => this.rundownEventEmitter.emitPartUpdated(updatedRundown, part))
     deletedParts.forEach(part => part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(updatedRundown, part) : this.rundownEventEmitter.emitPartDeleted(updatedRundown, part.getSegmentId(), part.id))
-    deletedSegmentInfo.forEach(({ segment, originalSegmentId }) => segment?.isUnsynced() ? this.rundownEventEmitter.emitSegmentUnsynced(updatedRundown, segment, originalSegmentId) : this.rundownEventEmitter.emitSegmentDeleted(updatedRundown, originalSegmentId))
+    deletedSegmentInfo.forEach(({ segment, originalSegmentId }) => {
+      segment?.isUnsynced() ? this.rundownEventEmitter.emitSegmentUnsynced(updatedRundown, segment, originalSegmentId) : this.rundownEventEmitter.emitSegmentDeleted(updatedRundown, originalSegmentId)
+    })
+
+    if (createdSegments.length +  updatedSegments.length + deletedSegments.length + createdParts.length + updatedParts.length + deletedParts.length === 0) {
+      this.logger.debug(`No changes to save for rundown ${rundown.name} with id '${rundown.id}'.`)
+      return
+    }
 
     await this.rundownRepository.saveRundown(updatedRundown)
+    if (rundown.isActive()) {
+      await this.timelineBuilder.buildTimeline(rundown)
+      this.rundownEventEmitter.emitSetNextEvent(rundown)
+    }
     // TODO: Ensure that deleted segments and parts are deleted in database.
-    // TODO: Build timeline if active
     // TODO: Generate actions
   }
 }

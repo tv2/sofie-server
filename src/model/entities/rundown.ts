@@ -634,7 +634,7 @@ export class Rundown extends BasicRundown {
   public removeSegment(segmentId: string): Segment | undefined {
     const segmentToRemove: Segment | undefined = this.segments.find(segment => !segment.isUnsynced() && segment.id === segmentId)
     if (!segmentToRemove) {
-      throw new Error()
+      return
     }
 
     this.segments = this.segments.filter(segment => segment.id !== segmentId)

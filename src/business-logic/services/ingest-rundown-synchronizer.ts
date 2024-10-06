@@ -35,7 +35,7 @@ export class IngestRundownSynchronizer {
 
     const ingestedSegmentIds: ReadonlySet<string> = new Set(ingestedRundown.ingestedSegments.map(ingestedSegment => ingestedSegment.id))
     const deletedSegments: readonly Segment[] = originalRundown.getSegments()
-      .filter(segment => !ingestedSegmentIds.has(segment.id))
+      .filter(segment => !segment.isUnsynced() && !ingestedSegmentIds.has(segment.id))
 
     const segmentIds: ReadonlySet<string> = new Set(originalRundown.getSegments().map(segment => segment.id))
     const createdSegments: readonly Segment[] = ingestedRundown.ingestedSegments
@@ -67,7 +67,8 @@ export class IngestRundownSynchronizer {
     const ingestedParts: readonly IngestedPart[] = ingestedRundown.ingestedSegments.flatMap(ingestedSegment => ingestedSegment.ingestedParts)
     const ingestedPartIds: ReadonlySet<string> = new Set(ingestedParts.map(ingestedPart => ingestedPart.id))
 
-    const deletedParts: readonly Part[] = parts.filter(part => !ingestedPartIds.has(part.id))
+    const deletedSegmentIds: ReadonlySet<string> = new Set(deletedSegments.map(segment => segment.id))
+    const deletedParts: readonly Part[] = parts.filter(part => !part.isUnsynced() && !ingestedPartIds.has(part.id) && !deletedSegmentIds.has(part.getSegmentId()))
 
     const partIds: ReadonlySet<string> = new Set(parts.map(part => part.id))
     const affectedSegmentIds: ReadonlySet<string> = new Set([...createdSegmentIds, ...updatedSegments.map(segment => segment.id), ...deletedSegments.map(segment => segment.id)])
