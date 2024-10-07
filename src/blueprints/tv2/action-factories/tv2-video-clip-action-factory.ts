@@ -84,7 +84,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
   }
 
   public createVideoClipActions(configuration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2VideoClipAction[] {
-    const videoClipManifestData: Tv2VideoClipManifestData[] = this.actionManifestMapper.mapToVideoClipManifestData(actionManifests)
+    const videoClipManifestData: Tv2VideoClipManifestData[] = this.actionManifestMapper.filterAndMapToVideoClipManifestData(actionManifests)
     return this.removeDuplicateActions(
       videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
     )

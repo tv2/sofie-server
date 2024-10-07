@@ -16,7 +16,7 @@ export class PlayoutGatewayService implements PlayoutService {
     const okToDestroyStuffParameterName: string = 'okToDestroyStuff'
     const activeRundownIdParameterName: string = 'activeRundownId'
     try {
-      await this.httpService.post(`http://${PLAYOUT_GATEWAY_HOST}/devicesMakeReady?${okToDestroyStuffParameterName}=${okToDestroyStuff}&${activeRundownIdParameterName}=${activeRundownId}`, null)
+      await this.httpService.post(`http://${PLAYOUT_GATEWAY_HOST}/devicesMakeReady?${okToDestroyStuffParameterName}=${okToDestroyStuff}&${activeRundownIdParameterName}=${activeRundownId}`)
     } catch (error) {
       this.logger.data(error).error('Error happened while calling \'makeDevicesReady\' in PlayoutGateway')
     }
@@ -24,7 +24,7 @@ export class PlayoutGatewayService implements PlayoutService {
 
   public async makeDevicesStandDown(): Promise<void> {
     try {
-      await this.httpService.post(`http://${PLAYOUT_GATEWAY_HOST}/devicesStandDown`, null)
+      await this.httpService.post(`http://${PLAYOUT_GATEWAY_HOST}/devicesStandDown`)
     } catch (error) {
       this.logger.data(error).error('Error happened while calling \'makeDevicesStandDown\' in PlayoutGateway')
     }

@@ -54,6 +54,7 @@ import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
+import { Tv2Logger } from '../tv2-logger'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 
@@ -67,6 +68,8 @@ const REPLAY_SOURCE_NAME: string = 'Replay'
 
 export class Tv2SplitScreenActionFactory extends ActionFactory {
 
+  private readonly logger: Tv2Logger
+
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
@@ -74,9 +77,11 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     private readonly graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly stringHashConverter: Tv2StringHashConverter,
-    private readonly assetPathHelper: Tv2AssetPathHelper
+    private readonly assetPathHelper: Tv2AssetPathHelper,
+    logger: Tv2Logger,
   ) {
     super()
+    this.logger = logger.tag(this.constructor.name)
   }
 
 
@@ -372,79 +377,88 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     return piece.getTimelineObjects().some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getSplitScreenBoxesLayer())
   }
 
-  private createSplitScreenActionsFromSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenManifestData: Tv2SplitScreenManifestData[]): Tv2SplitScreenAction[] {
-    return this.removeDuplicateActions(
-      splitScreenManifestData.map<Tv2SplitScreenAction>(data => {
-        const splitScreenConfiguration: SplitScreenConfiguration | undefined = blueprintConfiguration.showStyle.splitScreenConfigurations.find(splitScreenConfiguration => splitScreenConfiguration.name.toLowerCase() === data.template.toLowerCase())
-        if (!splitScreenConfiguration) {
-          throw new Tv2MisconfigurationException(`No configured split screen found for planned split screen action ${data.name}`)
+  private createSplitScreenActionsFromSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenManifestDataSequence: Tv2SplitScreenManifestData[]): Tv2SplitScreenAction[] {
+    const splitScreenActions: Tv2SplitScreenAction[] = splitScreenManifestDataSequence
+      .reduce((actions: Tv2SplitScreenAction[], splitScreenManifestData: Tv2SplitScreenManifestData) => {
+        try {
+          return [...actions, this.createSplitScreenActionFromSplitScreenManifestData(blueprintConfiguration, splitScreenManifestData)]
+        } catch (error) {
+          this.logger.data(error).error(`Failed creating split screen action for action manifest '${splitScreenManifestData.name}'.`)
+          return actions
         }
+      }, [])
+    return this.removeDuplicateActions(splitScreenActions)
+  }
 
-        const partId: string = `plannedSplitScreenInsertActionPart_${splitScreenConfiguration.name}`
+  private createSplitScreenActionFromSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenManifestData: Tv2SplitScreenManifestData): Tv2SplitScreenAction {
+    const splitScreenConfiguration: SplitScreenConfiguration | undefined = blueprintConfiguration.showStyle.splitScreenConfigurations.find(splitScreenConfiguration => splitScreenConfiguration.name.toLowerCase() === splitScreenManifestData.template.toLowerCase())
+    if (!splitScreenConfiguration) {
+      throw new Tv2MisconfigurationException(`No configured split screen found for planned split screen action ${splitScreenManifestData.name}`)
+    }
 
-        const boxes: SplitScreenBoxProperties[] = Object.entries(splitScreenConfiguration.layoutProperties.boxes).map(([, box]) => {
-          return {
-            ...box,
-            source: blueprintConfiguration.studio.videoMixerBasicConfiguration.defaultVideoMixerSource
-          }
-        })
+    const partId: string = `plannedSplitScreenInsertActionPart_${splitScreenConfiguration.name}`
 
-        const audioTimelineObjectsForBoxes: { [inputIndex: number]: Tv2BlueprintTimelineObject[] } = {}
-        data.sources.forEach((source: Tv2SourceMappingWithSound, input: SplitScreenBoxInput) => {
-          const splitScreenInputIndex: number = this.mapSplitScreenBoxInputToNumber(input)
-          audioTimelineObjectsForBoxes[splitScreenInputIndex] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source)
-          boxes[splitScreenInputIndex].source = source.videoMixerSource
-        })
+    const boxes: SplitScreenBoxProperties[] = Object.entries(splitScreenConfiguration.layoutProperties.boxes).map(([, box]) => {
+      return {
+        ...box,
+        source: blueprintConfiguration.studio.videoMixerBasicConfiguration.defaultVideoMixerSource
+      }
+    })
 
-        const audioTimelineObjects: Tv2BlueprintTimelineObject[] = Object.values(audioTimelineObjectsForBoxes).flat()
+    const audioTimelineObjectsForBoxes: { [inputIndex: number]: Tv2BlueprintTimelineObject[] } = {}
+    splitScreenManifestData.sources.forEach((source: Tv2SourceMappingWithSound, input: SplitScreenBoxInput) => {
+      const splitScreenInputIndex: number = this.mapSplitScreenBoxInputToNumber(input)
+      audioTimelineObjectsForBoxes[splitScreenInputIndex] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source)
+      boxes[splitScreenInputIndex].source = source.videoMixerSource
+    })
 
-        const metadata: Tv2PieceMetadata = {
-          type: Tv2PieceType.SPLIT_SCREEN,
-          outputLayer: Tv2OutputLayer.PROGRAM,
-          splitScreen: {
-            boxes,
-            audioTimelineObjectsForBoxes
-          }
-        }
+    const audioTimelineObjects: Tv2BlueprintTimelineObject[] = Object.values(audioTimelineObjectsForBoxes).flat()
 
-        const videoSwitcherTimelineEnable: TimelineEnable = {
-          start: 0
-        }
+    const metadata: Tv2PieceMetadata = {
+      type: Tv2PieceType.SPLIT_SCREEN,
+      outputLayer: Tv2OutputLayer.PROGRAM,
+      splitScreen: {
+        boxes,
+        audioTimelineObjectsForBoxes
+      }
+    }
 
-        const splitScreenSource: number = this.videoMixerTimelineObjectFactory.getSplitScreenSourceInput()
+    const videoSwitcherTimelineEnable: TimelineEnable = {
+      start: 0
+    }
 
-        const splitScreenTimelineObjects: Tv2BlueprintTimelineObject[] = [
-          this.videoMixerTimelineObjectFactory.createSplitScreenBoxesTimelineObject(boxes, PLANNED_SPLIT_SCREEN_TIMELINE_OBJECT_PRIORITY),
-          this.videoMixerTimelineObjectFactory.createSplitScreenPropertiesTimelineObject(blueprintConfiguration, splitScreenConfiguration.layoutProperties),
-          this.videoMixerTimelineObjectFactory.createProgramTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
-          this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
-          this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
-          this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
-          this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.frame, blueprintConfiguration.studio.splitScreenFolder?.name)),
-          this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenLocatorTimelineObject(blueprintConfiguration.showStyle.selectedGraphicsSetup, splitScreenConfiguration, data.locatorLabels),
-          ...audioTimelineObjects
-        ]
+    const splitScreenSource: number = this.videoMixerTimelineObjectFactory.getSplitScreenSourceInput()
 
-        const name: string = `${data.name} - ${data.locatorLabels.join(' / ')}`
-        const contentHash: string = this.stringHashConverter.getHashedValue(data.locatorLabels.join(''))
+    const splitScreenTimelineObjects: Tv2BlueprintTimelineObject[] = [
+      this.videoMixerTimelineObjectFactory.createSplitScreenBoxesTimelineObject(boxes, PLANNED_SPLIT_SCREEN_TIMELINE_OBJECT_PRIORITY),
+      this.videoMixerTimelineObjectFactory.createSplitScreenPropertiesTimelineObject(blueprintConfiguration, splitScreenConfiguration.layoutProperties),
+      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
+      this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
+      this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
+      this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenFrameTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.frame, blueprintConfiguration.studio.splitScreenFolder?.name)),
+      this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenLocatorTimelineObject(blueprintConfiguration.showStyle.selectedGraphicsSetup, splitScreenConfiguration, splitScreenManifestData.locatorLabels),
+      ...audioTimelineObjects
+    ]
 
-        return {
-          id: `plannedSplitScreenAsNextAction_${this.sanitizeStringForId(data.name)}_${contentHash}`,
-          name: name,
-          rank: data.rank,
-          rundownId: data.rundownId,
-          description: '',
-          type: PartActionType.INSERT_PART_AS_NEXT,
-          metadata: {
-            contentType: Tv2ActionContentType.SPLIT_SCREEN
-          },
-          data: {
-            partInterface: this.createPartInterface(partId, splitScreenConfiguration),
-            pieceInterfaces: [this.createSplitScreenPieceInterface(partId, splitScreenConfiguration.name, metadata, splitScreenTimelineObjects)]
-          }
-        }
-      })
-    )
+    const name: string = `${splitScreenManifestData.name} - ${splitScreenManifestData.locatorLabels.join(' / ')}`
+    const contentHash: string = this.stringHashConverter.getHashedValue(splitScreenManifestData.locatorLabels.join(''))
+
+    return {
+      id: `plannedSplitScreenAsNextAction_${this.sanitizeStringForId(splitScreenManifestData.name)}_${contentHash}`,
+      name: name,
+      rank: splitScreenManifestData.rank,
+      rundownId: splitScreenManifestData.rundownId,
+      description: '',
+      type: PartActionType.INSERT_PART_AS_NEXT,
+      metadata: {
+        contentType: Tv2ActionContentType.SPLIT_SCREEN
+      },
+      data: {
+        partInterface: this.createPartInterface(partId, splitScreenConfiguration),
+        pieceInterfaces: [this.createSplitScreenPieceInterface(partId, splitScreenConfiguration.name, metadata, splitScreenTimelineObjects)]
+      }
+    }
   }
 
   private mapSplitScreenBoxInputToNumber(splitScreenBoxInput: SplitScreenBoxInput): number {
