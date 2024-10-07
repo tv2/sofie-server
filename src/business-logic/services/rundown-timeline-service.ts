@@ -161,7 +161,10 @@ export class RundownTimelineService implements RundownService {
 
   public async takeNext(rundownId: string): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    await this.takeNextBuildEmitAndSave(rundown)
+  }
 
+  private async takeNextBuildEmitAndSave(rundown: Rundown): Promise<void> {
     this.assertTakeIsNotBlocked(rundown)
 
     this.stopAutoNext()
@@ -175,7 +178,7 @@ export class RundownTimelineService implements RundownService {
     this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
     this.rundownEventEmitter.emitSetNextEvent(rundown)
-    this.startAutoNext(timeline, rundownId)
+    this.startAutoNext(timeline, rundown.id)
 
     await this.deleteUnsyncedPreviousPart(rundown)
     await this.deleteUnsyncedSegments(rundown)
@@ -334,13 +337,21 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPieceAsNext(rundownId: string, piece: Piece, partInTransition?: InTransition): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.insertPieceIntoNextPart(piece, partInTransition)
+    this.insertPieceAsNextAndEmit(rundown, piece, partInTransition)
 
     await this.buildAndPersistTimeline(rundown)
-
-    this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getNextPart())
-
     await this.saveRundown(rundown)
+  }
+
+  private insertPieceAsNextAndEmit(rundown: Rundown, piece: Piece, partInTransition?: InTransition): void {
+    rundown.insertPieceIntoNextPart(piece, partInTransition)
+    this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getNextPart())
+  }
+
+  public async insertPieceAsNextAndTake(rundownId: string, piece: Piece, partInTransition?: InTransition): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    this.insertPieceAsNextAndEmit(rundown, piece, partInTransition)
+    await this.takeNextBuildEmitAndSave(rundown)
   }
 
   public async replacePieceOnAirOnNextPart(rundownId: string, pieceToBeReplaced: Piece, newPiece: Piece): Promise<void> {
