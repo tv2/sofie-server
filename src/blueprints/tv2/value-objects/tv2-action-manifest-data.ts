@@ -1,4 +1,4 @@
-import { Tv2SourceMappingWithSound } from './tv2-studio-blueprint-configuration'
+import { Tv2SourceMappingWithAudio } from './tv2-studio-blueprint-configuration'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import { Tv2SourceLayer } from './tv2-layers'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
@@ -118,7 +118,7 @@ export interface Tv2SplitScreenManifestData {
   rank: number
   template: string
   locatorLabels: string[]
-  sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound>
+  sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithAudio>
 }
 
 export interface Tv2FullscreenGraphicsManifestData {
