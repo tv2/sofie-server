@@ -196,13 +196,13 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
     const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
     this.logger.trace(`Synchronizing rundown (without IO) took ${durationInMs}ms.`)
 
-    this.emitEventsFromRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult, deletedSegmentInfoSequence)
-
     if (!this.wasRundownChanged(rundownSynchronizeResult)) {
       this.logger.debug(`No changes to save for rundown ${updatedRundown.name} with id '${updatedRundown.id}'.`)
       return
     }
+
     await this.persistRundown(updatedRundown)
+    this.emitEventsFromRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult, deletedSegmentInfoSequence)
   }
 
   private logRundownSynchronizeResult(rundownSynchronizeResult: RundownSynchronizeResult, message: string): void {
@@ -225,9 +225,9 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
     rundownSynchronizeResult.deletedParts.forEach(part => rundown.removePartFromSegment(part.id))
     return rundownSynchronizeResult.deletedSegments.map(segment => {
       const originalSegmentId: string = segment.id
-      rundown.removeSegment(segment.id)
+      const deletedSegment: Segment | undefined = rundown.removeSegment(segment.id)
       return {
-        segment: segment,
+        segment: deletedSegment,
         originalSegmentId,
       }
     })
