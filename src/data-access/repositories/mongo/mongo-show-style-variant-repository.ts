@@ -32,7 +32,7 @@ export class MongoShowStyleVariantRepository extends BaseMongoRepository impleme
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const mongoShowStyleVariant: MongoShowStyleVariant | null = await this.getCollection().findOne<MongoShowStyleVariant>({ _id: rundown.getShowStyleVariantId() })
     if (!mongoShowStyleVariant) {
-      throw new NotFoundException(`No ShowStyleVariant found for rundownId: ${rundownId}`)
+      throw new NotFoundException(`No show style variant found for rundown '${rundown.name}' with id '${rundownId}'.`)
     }
     return this.mongoEntityConverter.convertShowStyleVariant(mongoShowStyleVariant)
   }

@@ -60,8 +60,7 @@ export class ExecuteActionService implements ActionService {
       }
       case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
         const pieceAction: PieceAction = (await this.mutateAction(action, rundownId, actionArguments)) as PieceAction
-        await this.insertPieceAsNext(pieceAction, rundownId)
-        await this.rundownService.takeNext(rundownId)
+        await this.insertPieceAsNextAndTake(pieceAction, rundownId)
         break
       }
       case PieceActionType.REPLACE_PIECE: {
@@ -192,6 +191,11 @@ export class ExecuteActionService implements ActionService {
   private async insertPieceAsNext(pieceAction: PieceAction, rundownId: string): Promise<void> {
     const piece: Piece = this.createPieceFromAction(pieceAction)
     await this.rundownService.insertPieceAsNext(rundownId, piece, pieceAction.data.partInTransition)
+  }
+
+  private async insertPieceAsNextAndTake(pieceAction: PieceAction, rundownId: string): Promise<void> {
+    const piece: Piece = this.createPieceFromAction(pieceAction)
+    await this.rundownService.insertPieceAsNextAndTake(rundownId, piece, pieceAction.data.partInTransition)
   }
 
   private async replacePiece(action: Action, rundownId: string, actionArguments: unknown): Promise<void> {
