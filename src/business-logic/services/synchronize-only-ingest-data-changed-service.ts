@@ -133,7 +133,7 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
         const timeSpendInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
         this.logger.trace(`Synchronizing changes for rundown with id '${rundownId}' took ${timeSpendInMs}ms.`)
       } catch (error) {
-        this.logger.data(error).error(`Failed synchronzing changes for rundown with id '${rundownId}'.`)
+        this.logger.data(error).error(`Failed synchronizing changes for rundown with id '${rundownId}'.`)
       }
     }
     // TODO: Generate system actions
@@ -234,6 +234,9 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
   }
 
   private emitEventsFromRundownSynchronizeResult(rundown: Rundown, rundownSynchronizeResult: RundownSynchronizeResult, deletedSegmentInfoSequence: DeletedSegmentInfo[]): void {
+    if (rundownSynchronizeResult.updatedRundown) {
+      this.rundownEventEmitter.emitRundownUpdated(rundownSynchronizeResult.updatedRundown)
+    }
     rundownSynchronizeResult.createdSegments.forEach(segment => this.rundownEventEmitter.emitSegmentCreated(rundown, segment))
     rundownSynchronizeResult.updatedSegments.forEach(segment => this.rundownEventEmitter.emitSegmentUpdated(rundown, segment))
     rundownSynchronizeResult.createdParts.forEach(part => this.rundownEventEmitter.emitPartCreated(rundown, part))
