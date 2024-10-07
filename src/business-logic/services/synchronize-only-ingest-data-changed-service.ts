@@ -18,6 +18,7 @@ import { Segment } from '../../model/entities/segment'
 import { TimelineBuilder } from './interfaces/timeline-builder'
 import { Timeline } from '../../model/entities/timeline'
 import { TimelineRepository } from '../../data-access/repositories/interfaces/timeline-repository'
+import { ActionGenerationService } from './action-generation-service'
 
 interface DeletedSegmentInfo {
   segment: Segment | undefined
@@ -44,6 +45,7 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly timelineRepository: TimelineRepository,
+    private readonly actionGenerationService: ActionGenerationService,
     logger: Logger,
   ) {
     this.logger = logger.tag(this.constructor.name)
@@ -136,7 +138,7 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
         this.logger.data(error).error(`Failed synchronizing changes for rundown with id '${rundownId}'.`)
       }
     }
-    // TODO: Generate system actions
+    await this.actionGenerationService.generateActionsForSystem().catch(error => this.logger.data(error).error('Failed generating system actions.'))
   }
 
   private async synchronizeRundown(rundownId: string): Promise<void> {
@@ -157,7 +159,7 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
       if (rundown) {
         this.rundownEventEmitter.emitRundownDeleted(rundownId)
         await this.rundownRepository.deleteRundown(rundownId)
-        // TODO: Delete rundown actions
+        await this.actionGenerationService.removeActionsForRundown(rundownId)
       }
       return
     }
@@ -184,6 +186,7 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
 
     this.rundownEventEmitter.emitRundownCreated(createdRundown)
     await this.persistRundown(createdRundown)
+    await this.actionGenerationService.generateActionsForRundown(createdRundown.id).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${createdRundown.name}' with id ${createdRundown.id}.`))
   }
 
   private async updateEmitAndPersistRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<void> {
@@ -203,6 +206,7 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
 
     await this.persistRundown(updatedRundown)
     this.emitEventsFromRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult, deletedSegmentInfoSequence)
+    await this.actionGenerationService.generateActionsForRundown(updatedRundown.id).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${updatedRundown.name}' with id ${updatedRundown.id}.`))
   }
 
   private logRundownSynchronizeResult(rundownSynchronizeResult: RundownSynchronizeResult, message: string): void {
@@ -253,13 +257,12 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
   }
 
   private async persistRundown(rundown: Rundown): Promise<void> {
+    await this.rundownRepository.deleteRundown(rundown.id) // TODO: Move deletion of in-memory-deleted parts and pieces to the repository.
     await this.rundownRepository.saveRundown(rundown)
     if (rundown.isActive()) {
       const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
       await this.timelineRepository.saveTimeline(timeline)
       this.rundownEventEmitter.emitSetNextEvent(rundown)
     }
-    // TODO: Ensure that deleted segments and parts are deleted in database.
-    // TODO: Ensure somewhere that actions are generated
   }
 }

@@ -32,6 +32,7 @@ import { ThrottledRundownService } from '../services/throttled-rundown-service'
 import { SynchronizeOnlyIngestDataChangedService } from '../services/synchronize-only-ingest-data-changed-service'
 import { IngestRundownSynchronizer } from '../services/ingest-rundown-synchronizer'
 import { IngestEntityDiffer } from '../services/ingest-entity-differ'
+import { ActionGenerationService } from '../services/action-generation-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -96,6 +97,7 @@ export class ServiceFacade {
       EventEmitterFacade.createRundownEventEmitter(),
       ServiceFacade.createTimelineBuilder(),
       RepositoryFacade.createTimelineRepository(),
+      ServiceFacade.createActionGenerationService(),
       LoggerFacade.createLogger(),
     )
     // return ImprovedIngestDataChangedService.getInstance(
@@ -118,6 +120,17 @@ export class ServiceFacade {
     //   RepositoryFacade.createIngestedSegmentChangedListener(),
     //   RepositoryFacade.createIngestedPartChangedListener()
     // )
+  }
+
+  public static createActionGenerationService(): ActionGenerationService {
+    return new ActionGenerationService(
+      RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createConfigurationRepository(),
+      RepositoryFacade.createActionManifestRepository(),
+      RepositoryFacade.createActionRepository(),
+      EventEmitterFacade.createActionEventEmitter(),
+      BlueprintsFacade.createBlueprint(),
+    )
   }
 
   public static createMediaDataChangeService(): DataChangeService {
