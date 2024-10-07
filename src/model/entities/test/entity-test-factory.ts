@@ -12,6 +12,8 @@ import { TransitionType } from '../../enums/transition-type'
 import { ActionManifest } from '../action'
 import { IngestedPart } from '../ingested-part'
 import { IngestedPiece } from '../ingested-piece'
+import { IngestedRundown } from '../ingested-rundown'
+import { IngestedSegment } from '../ingested-segment'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -21,12 +23,25 @@ export class EntityTestFactory {
       segments: [],
       mode: RundownMode.INACTIVE,
       modifiedAt: Date.now(),
-      showStyleVariantId: 'showstyle-variant-id',
+      showStyleVariantId: 'show-style-variant-id',
       baselineTimelineObjects: [],
       history: [],
       timing: { type: RundownTimingType.UNSCHEDULED },
       ...rundownInterface
     })
+  }
+
+  public static createIngestedRundown(ingestedRundown: Partial<IngestedRundown> = {}): IngestedRundown {
+    return {
+      id: 'rundownId' + Math.floor(Math.random() * 1000),
+      name: 'rundownName',
+      modifiedAt: Date.now(),
+      showStyleVariantId: 'show-style-variant-id',
+      timings: { type: RundownTimingType.UNSCHEDULED },
+      ingestedSegments: [],
+      baselineTimelineObjects: [],
+      ...ingestedRundown
+    }
   }
 
   public static createSegment(segmentInterface: Partial<SegmentInterface> = {}): Segment {
@@ -44,6 +59,19 @@ export class EntityTestFactory {
         parts: [],
         ...segmentInterface,
       })
+  }
+
+  public static createIngestedSegment(ingestedSegment: Partial<IngestedSegment> = {}): IngestedSegment {
+    return {
+      id: 'segmentId' + Math.floor(Math.random() * 1000),
+      rundownId: 'rundownId',
+      name: 'segmentName',
+      rank: 0,
+      isHidden: false,
+      ingestedParts: [],
+      definesShowStyleVariant: false,
+      ...ingestedSegment,
+    }
   }
 
   public static createPart(partInterface: Partial<PartInterface> = {}): Part {
@@ -123,12 +151,11 @@ export class EntityTestFactory {
 
   public static createIngestedPiece(ingestedPiece: Partial<IngestedPiece>): IngestedPiece {
     return {
-      id: '',
-      partId: '',
-      name: '',
+      id: 'pieceId' + Math.floor(Math.random() * 1000),
+      partId: 'partId',
+      layer: 'some_layer',
+      name: 'pieceName',
       start: 0,
-      layer: '',
-      duration: 0,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       preRollDuration: 0,
