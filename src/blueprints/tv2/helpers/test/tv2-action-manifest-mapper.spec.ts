@@ -207,8 +207,8 @@ function createConfiguredBlueprintConfiguration(): Tv2BlueprintConfiguration {
           id: 'KAM1',
           name: 'KAM 1',
           videoMixerSource: 0,
-          sisyfosLayers: [],
-          studioMicrophones: true,
+          audioLayers: [],
+          usesStudioMicrophones: true,
         }
       ]
     },

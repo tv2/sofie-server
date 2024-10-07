@@ -14,7 +14,7 @@ import {
   Tv2VideoClipManifestData,
   Tv2ActionManifestSplitScreenSourceType
 } from '../value-objects/tv2-action-manifest-data'
-import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -49,7 +49,7 @@ export class Tv2ActionManifestMapper {
 
   private mapSplitScreenManifestData(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifest: ActionManifest<Tv2ActionManifestSplitScreenData>): Tv2SplitScreenManifestData {
     const data: Tv2ActionManifestSplitScreenData = actionManifest.data
-    const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
+    const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithAudio> = this.getSplitScreenSourcesFromActionManifestData(data, blueprintConfiguration)
     return {
       name: data.userData.name,
       rank: data.rank,
@@ -60,8 +60,8 @@ export class Tv2ActionManifestMapper {
     }
   }
 
-  private getSplitScreenSourcesFromActionManifestData(data: Tv2ActionManifestSplitScreenData, blueprintConfiguration: Tv2BlueprintConfiguration): Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> {
-    const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithSound> = new Map()
+  private getSplitScreenSourcesFromActionManifestData(data: Tv2ActionManifestSplitScreenData, blueprintConfiguration: Tv2BlueprintConfiguration): Map<SplitScreenBoxInput, Tv2SourceMappingWithAudio> {
+    const sources: Map<SplitScreenBoxInput, Tv2SourceMappingWithAudio> = new Map()
     if (data.userData.config.sources.INP1) {
       sources.set(SplitScreenBoxInput.INPUT_1, this.mapActionManifestSplitScreenSourceToSource(blueprintConfiguration, data.userData.config.sources.INP1))
     }
@@ -77,8 +77,8 @@ export class Tv2ActionManifestMapper {
     return sources
   }
 
-  private mapActionManifestSplitScreenSourceToSource(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenSource: Tv2ActionManifestSplitScreenSource): Tv2SourceMappingWithSound {
-    let sources: Tv2SourceMappingWithSound[] = []
+  private mapActionManifestSplitScreenSourceToSource(blueprintConfiguration: Tv2BlueprintConfiguration, splitScreenSource: Tv2ActionManifestSplitScreenSource): Tv2SourceMappingWithAudio {
+    let sources: Tv2SourceMappingWithAudio[] = []
     switch (splitScreenSource.sourceType) {
       case Tv2ActionManifestSplitScreenSourceType.CAMERA: {
         sources = blueprintConfiguration.studio.cameraSources
@@ -96,7 +96,7 @@ export class Tv2ActionManifestMapper {
         ExhaustiveCaseChecker.assertAllCases(splitScreenSource.sourceType, 'action manifest split screen source type')
       }
     }
-    const source: Tv2SourceMappingWithSound | undefined = sources.find(source => source.name === splitScreenSource.id)
+    const source: Tv2SourceMappingWithAudio | undefined = sources.find(source => source.name === splitScreenSource.id)
     if (!source) {
       throw new Tv2MisconfigurationException(`No source mapping found for the '${splitScreenSource.sourceType}' split screen source with id '${splitScreenSource.id}'.`)
     }
