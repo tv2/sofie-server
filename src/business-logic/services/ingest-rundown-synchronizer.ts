@@ -7,19 +7,13 @@ import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestEntityDiffer } from './ingest-entity-differ'
 
 export interface RundownSynchronizeResult {
-  // readonly rundown: Rundown
+  readonly updatedRundown: Rundown | undefined
   readonly createdSegments: readonly Segment[]
   readonly updatedSegments: readonly Segment[]
-  // readonly deletedSegments: readonly DeletedSegment[]
   readonly deletedSegments: readonly Segment[]
   readonly createdParts: readonly Part[]
   readonly updatedParts: readonly Part[]
   readonly deletedParts: readonly Part[]
-}
-// TODO: Maybe move the original id into the entity to have it be part of the unsynced state.
-export interface DeletedSegment {
-  readonly originalSegmentId: string
-  readonly segment: Segment
 }
 
 export class IngestRundownSynchronizer {
@@ -28,16 +22,14 @@ export class IngestRundownSynchronizer {
     private readonly ingestEntityDiffer: IngestEntityDiffer,
   ) {}
 
-  public synchronizeRundown(originalRundown: Rundown, ingestedRundown: IngestedRundown): RundownSynchronizeResult {
-    // const rundown: Rundown = new Rundown(originalRundown.toRundownInterface())
-
-    // TODO: Add check rundown metadata changes.
+  public synchronizeRundown(rundown: Rundown, ingestedRundown: IngestedRundown): RundownSynchronizeResult {
+    const updatedRundown: Rundown | undefined = this.ingestEntityDiffer.doesShallowRundownDifferFromIngestedRundown(rundown, ingestedRundown) ? this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(rundown, ingestedRundown) : undefined
 
     const ingestedSegmentIds: ReadonlySet<string> = new Set(ingestedRundown.ingestedSegments.map(ingestedSegment => ingestedSegment.id))
-    const deletedSegments: readonly Segment[] = originalRundown.getSegments()
+    const deletedSegments: readonly Segment[] = rundown.getSegments()
       .filter(segment => !segment.isUnsynced() && !ingestedSegmentIds.has(segment.id))
 
-    const segmentIds: ReadonlySet<string> = new Set(originalRundown.getSegments().map(segment => segment.id))
+    const segmentIds: ReadonlySet<string> = new Set(rundown.getSegments().map(segment => segment.id))
     const createdSegments: readonly Segment[] = ingestedRundown.ingestedSegments
       .filter(ingestedSegment => !segmentIds.has(ingestedSegment.id))
       .map(ingestedSegment => this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment))
@@ -48,12 +40,12 @@ export class IngestRundownSynchronizer {
       if (createdSegmentIds.has(ingestedSegment.id)) {
         return updatedSegments
       }
-      const segment: Segment | undefined = originalRundown.getSegments().find(segment => segment.id === ingestedSegment.id)
+      const segment: Segment | undefined = rundown.getSegments().find(segment => segment.id === ingestedSegment.id)
       if (!segment) {
         // TODO: Should this throw an error?
         return updatedSegments
       }
-      if (!this.ingestEntityDiffer.doesSegmentDifferFromIngestSegment(segment, ingestedSegment)) {
+      if (!this.ingestEntityDiffer.doesShallowSegmentDifferFromIngestSegment(segment, ingestedSegment)) {
         return updatedSegments
       }
       return [
@@ -62,7 +54,7 @@ export class IngestRundownSynchronizer {
       ]
     }, [])
 
-    const parts: readonly Part[] = originalRundown.getSegments().flatMap(segment => segment.getParts())
+    const parts: readonly Part[] = rundown.getSegments().flatMap(segment => segment.getParts())
 
     const ingestedParts: readonly IngestedPart[] = ingestedRundown.ingestedSegments.flatMap(ingestedSegment => ingestedSegment.ingestedParts)
     const ingestedPartIds: ReadonlySet<string> = new Set(ingestedParts.map(ingestedPart => ingestedPart.id))
@@ -97,6 +89,7 @@ export class IngestRundownSynchronizer {
     }, [])
 
     return {
+      updatedRundown,
       createdSegments,
       updatedSegments,
       deletedSegments,

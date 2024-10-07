@@ -95,6 +95,7 @@ export class ServiceFacade {
       ingestedEntityToEntityMapper,
       EventEmitterFacade.createRundownEventEmitter(),
       ServiceFacade.createTimelineBuilder(),
+      RepositoryFacade.createTimelineRepository(),
       LoggerFacade.createLogger(),
     )
     // return ImprovedIngestDataChangedService.getInstance(

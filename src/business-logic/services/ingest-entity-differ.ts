@@ -4,9 +4,19 @@ import { Part } from '../../model/entities/part'
 import { IngestedPart } from '../../model/entities/ingested-part'
 import { Piece } from '../../model/entities/piece'
 import { IngestedPiece } from '../../model/entities/ingested-piece'
+import { IngestedRundown } from '../../model/entities/ingested-rundown'
+import { Rundown } from '../../model/entities/rundown'
 
 export class IngestEntityDiffer {
-  public doesSegmentDifferFromIngestSegment(segment: Segment, ingestSegment: IngestedSegment): boolean {
+  public doesShallowRundownDifferFromIngestedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): boolean {
+    return rundown.name !== ingestedRundown.name
+      || rundown.getShowStyleVariantId() !== ingestedRundown.showStyleVariantId
+      || rundown.getLastTimeModified() !== ingestedRundown.modifiedAt
+      || JSON.stringify(rundown.timing) !== JSON.stringify(ingestedRundown.timings)
+      || JSON.stringify(rundown.getBaseline()) !== JSON.stringify(ingestedRundown.baselineTimelineObjects)
+  }
+
+  public doesShallowSegmentDifferFromIngestSegment(segment: Segment, ingestSegment: IngestedSegment): boolean {
     return segment.name !== ingestSegment.name
       || segment.rank !== ingestSegment.rank
       || segment.isHidden !== ingestSegment.isHidden

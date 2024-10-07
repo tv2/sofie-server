@@ -16,6 +16,13 @@ import { RundownEventEmitter } from './interfaces/rundown-event-emitter'
 import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper'
 import { Segment } from '../../model/entities/segment'
 import { TimelineBuilder } from './interfaces/timeline-builder'
+import { Timeline } from '../../model/entities/timeline'
+import { TimelineRepository } from '../../data-access/repositories/interfaces/timeline-repository'
+
+interface DeletedSegmentInfo {
+  segment: Segment | undefined
+  originalSegmentId: string
+}
 
 export class SynchronizeOnlyIngestDataChangedService implements DataChangeService {
 
@@ -36,6 +43,7 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly timelineBuilder: TimelineBuilder,
+    private readonly timelineRepository: TimelineRepository,
     logger: Logger,
   ) {
     this.logger = logger.tag(this.constructor.name)
@@ -92,8 +100,8 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
       const startTime: bigint = process.hrtime.bigint()
       this.logger.debug(`Starting to synchronize rundown with id '${rundownId}'.`)
       await this.synchronizeRundown(rundownId)
-      const timeSpendInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
-      this.logger.trace(`Synchronizing changes for rundown with id '${ rundownId }' took ${ timeSpendInMs }ms.`)
+      const timeSpentInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
+      this.logger.trace(`Synchronizing changes for rundown with id '${ rundownId }' took ${ timeSpentInMs }ms.`)
     } catch (error) {
       this.logger.data(error).error(`Failed synchronizing changes for rundown with id '${rundownId}'.`)
     }
@@ -155,64 +163,67 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
     }
 
     if (!rundown) {
-      const startTime: bigint = process.hrtime.bigint()
-      const emptyRundown: Rundown = this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(ingestedRundown)
-      const {
-        createdSegments,
-        updatedSegments,
-        deletedSegments,
-        createdParts,
-        updatedParts,
-        deletedParts,
-      }: RundownSynchronizeResult = this.ingestRundownSynchronizer.synchronizeRundown(emptyRundown, ingestedRundown)
-      const rundown = emptyRundown
-      const createdRundown = rundown
-      createdSegments.forEach(segment => rundown.addSegment(segment))
-      updatedSegments.forEach(segment => rundown.updateSegment(segment))
-      createdParts.forEach(part => rundown.addPart(part))
-      updatedParts.forEach(part => rundown.updatePart(part))
-      deletedParts.forEach(part => rundown.removePartFromSegment(part.id))
-      deletedSegments.map(segment => rundown.removeSegment(segment.id))
-      const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
-      this.logger.trace(`Creating rundown (without IO) took ${durationInMs}ms.`)
-      this.rundownEventEmitter.emitRundownCreated(createdRundown)
-      await this.rundownRepository.saveRundown(createdRundown)
-      this.logger.data({
-        createdSegments: createdSegments.length,
-        updatedSegments: updatedSegments.length,
-        deletedSegments: deletedSegments.length,
-        createdParts: createdParts.length,
-        updatedParts: updatedParts.length,
-        deletedParts: deletedParts.length,
-      }).trace(`Creating rundown '${createdRundown.name}' with id '${createdRundown.id}' had following effects:`)
-
+      await this.createEmitAndPersistRundown(ingestedRundown)
       return
     }
 
+    await this.updateEmitAndPersistRundown(rundown, ingestedRundown)
+  }
+
+  private async createEmitAndPersistRundown(ingestedRundown: IngestedRundown): Promise<void> {
     const startTime: bigint = process.hrtime.bigint()
-    const {
-      createdSegments,
-      updatedSegments,
-      deletedSegments,
-      createdParts,
-      updatedParts,
-      deletedParts,
-    }: RundownSynchronizeResult = this.ingestRundownSynchronizer.synchronizeRundown(rundown, ingestedRundown)
-    const updatedRundown = rundown
+    const emptyRundown: Rundown = this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(ingestedRundown)
+
+    const rundownSynchronizeResult: RundownSynchronizeResult = this.ingestRundownSynchronizer.synchronizeRundown(emptyRundown, ingestedRundown)
+    const createdRundown: Rundown = rundownSynchronizeResult.updatedRundown ?? emptyRundown
+    this.logRundownSynchronizeResult(rundownSynchronizeResult, `Creating rundown '${createdRundown.name}' with id '${createdRundown.id}' had following effects:`)
+    this.applyRundownSynchronizeResult(createdRundown, rundownSynchronizeResult)
+
+    const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
+    this.logger.trace(`Creating rundown (without IO) took ${durationInMs}ms.`)
+
+    this.rundownEventEmitter.emitRundownCreated(createdRundown)
+    await this.persistRundown(createdRundown)
+  }
+
+  private async updateEmitAndPersistRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<void> {
+    const startTime: bigint = process.hrtime.bigint()
+    const rundownSynchronizeResult: RundownSynchronizeResult = this.ingestRundownSynchronizer.synchronizeRundown(rundown, ingestedRundown)
+    const updatedRundown: Rundown = rundownSynchronizeResult.updatedRundown ?? rundown
+    this.logRundownSynchronizeResult(rundownSynchronizeResult, `Synchronizing rundown '${updatedRundown.name}' with id '${updatedRundown.id}' had following effects:`)
+    const deletedSegmentInfoSequence: DeletedSegmentInfo[] = this.applyRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult)
+
+    const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
+    this.logger.trace(`Synchronizing rundown (without IO) took ${durationInMs}ms.`)
+
+    this.emitEventsFromRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult, deletedSegmentInfoSequence)
+
+    if (!this.wasRundownChanged(rundownSynchronizeResult)) {
+      this.logger.debug(`No changes to save for rundown ${updatedRundown.name} with id '${updatedRundown.id}'.`)
+      return
+    }
+    await this.persistRundown(updatedRundown)
+  }
+
+  private logRundownSynchronizeResult(rundownSynchronizeResult: RundownSynchronizeResult, message: string): void {
     this.logger.data({
-      createdSegments: createdSegments.length,
-      updatedSegments: updatedSegments.length,
-      deletedSegments: deletedSegments.length,
-      createdParts: createdParts.length,
-      updatedParts: updatedParts.length,
-      deletedParts: deletedParts.length,
-    }).trace(`Synchronizing for rundown '${rundown.name}' with id '${rundown.id}' had following effects:`)
-    createdSegments.forEach(segment => rundown.addSegment(segment))
-    updatedSegments.forEach(segment => rundown.updateSegment(segment))
-    createdParts.forEach(part => rundown.addPart(part))
-    updatedParts.forEach(part => rundown.updatePart(part))
-    deletedParts.forEach(part => rundown.removePartFromSegment(part.id))
-    const deletedSegmentInfo: { segment: undefined | Segment, originalSegmentId: string }[] = deletedSegments.map(segment => {
+      updatedRundown: rundownSynchronizeResult.updatedRundown ? 1 : 0,
+      createdSegments: rundownSynchronizeResult.createdSegments.length,
+      updatedSegments: rundownSynchronizeResult.updatedSegments.length,
+      deletedSegments: rundownSynchronizeResult.deletedSegments.length,
+      createdParts: rundownSynchronizeResult.createdParts.length,
+      updatedParts: rundownSynchronizeResult.updatedParts.length,
+      deletedParts: rundownSynchronizeResult.deletedParts.length,
+    }).trace(message)
+  }
+
+  private applyRundownSynchronizeResult(rundown: Rundown, rundownSynchronizeResult: RundownSynchronizeResult): DeletedSegmentInfo[] {
+    rundownSynchronizeResult.createdSegments.forEach(segment => rundown.addSegment(segment))
+    rundownSynchronizeResult.updatedSegments.forEach(segment => rundown.updateSegment(segment))
+    rundownSynchronizeResult.createdParts.forEach(part => rundown.addPart(part))
+    rundownSynchronizeResult.updatedParts.forEach(part => rundown.updatePart(part))
+    rundownSynchronizeResult.deletedParts.forEach(part => rundown.removePartFromSegment(part.id))
+    return rundownSynchronizeResult.deletedSegments.map(segment => {
       const originalSegmentId: string = segment.id
       rundown.removeSegment(segment.id)
       return {
@@ -220,29 +231,32 @@ export class SynchronizeOnlyIngestDataChangedService implements DataChangeServic
         originalSegmentId,
       }
     })
-    const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
-    this.logger.trace(`Synchronizing rundown (without IO) took ${durationInMs}ms.`)
+  }
 
-    createdSegments.forEach(segment => this.rundownEventEmitter.emitSegmentCreated(updatedRundown, segment))
-    updatedSegments.forEach(segment => this.rundownEventEmitter.emitSegmentUpdated(updatedRundown, segment))
-    createdParts.forEach(part => this.rundownEventEmitter.emitPartCreated(updatedRundown, part))
-    updatedParts.forEach(part => this.rundownEventEmitter.emitPartUpdated(updatedRundown, part))
-    deletedParts.forEach(part => part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(updatedRundown, part) : this.rundownEventEmitter.emitPartDeleted(updatedRundown, part.getSegmentId(), part.id))
-    deletedSegmentInfo.forEach(({ segment, originalSegmentId }) => {
-      segment?.isUnsynced() ? this.rundownEventEmitter.emitSegmentUnsynced(updatedRundown, segment, originalSegmentId) : this.rundownEventEmitter.emitSegmentDeleted(updatedRundown, originalSegmentId)
+  private emitEventsFromRundownSynchronizeResult(rundown: Rundown, rundownSynchronizeResult: RundownSynchronizeResult, deletedSegmentInfoSequence: DeletedSegmentInfo[]): void {
+    rundownSynchronizeResult.createdSegments.forEach(segment => this.rundownEventEmitter.emitSegmentCreated(rundown, segment))
+    rundownSynchronizeResult.updatedSegments.forEach(segment => this.rundownEventEmitter.emitSegmentUpdated(rundown, segment))
+    rundownSynchronizeResult.createdParts.forEach(part => this.rundownEventEmitter.emitPartCreated(rundown, part))
+    rundownSynchronizeResult.updatedParts.forEach(part => this.rundownEventEmitter.emitPartUpdated(rundown, part))
+    rundownSynchronizeResult.deletedParts.forEach(part => part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(rundown, part) : this.rundownEventEmitter.emitPartDeleted(rundown, part.getSegmentId(), part.id))
+    deletedSegmentInfoSequence.forEach(({ segment, originalSegmentId }) => {
+      segment?.isUnsynced() ? this.rundownEventEmitter.emitSegmentUnsynced(rundown, segment, originalSegmentId) : this.rundownEventEmitter.emitSegmentDeleted(rundown, originalSegmentId)
     })
+  }
 
-    if (createdSegments.length +  updatedSegments.length + deletedSegments.length + createdParts.length + updatedParts.length + deletedParts.length === 0) {
-      this.logger.debug(`No changes to save for rundown ${rundown.name} with id '${rundown.id}'.`)
-      return
-    }
+  private wasRundownChanged({ updatedRundown, createdSegments, updatedSegments, deletedSegments, createdParts, updatedParts, deletedParts }: RundownSynchronizeResult): boolean {
+    const numberOfChanges: number = (updatedRundown ? 1 : 0) + createdSegments.length + updatedSegments.length + deletedSegments.length + createdParts.length + updatedParts.length + deletedParts.length
+    return numberOfChanges > 0
+  }
 
-    await this.rundownRepository.saveRundown(updatedRundown)
+  private async persistRundown(rundown: Rundown): Promise<void> {
+    await this.rundownRepository.saveRundown(rundown)
     if (rundown.isActive()) {
-      await this.timelineBuilder.buildTimeline(rundown)
+      const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
+      await this.timelineRepository.saveTimeline(timeline)
       this.rundownEventEmitter.emitSetNextEvent(rundown)
     }
     // TODO: Ensure that deleted segments and parts are deleted in database.
-    // TODO: Generate actions
+    // TODO: Ensure somewhere that actions are generated
   }
 }

@@ -1,6 +1,6 @@
 services:
   server-core:
-    image: 'tv2media/sofie-server-core:v46.3.4-staging'
+    image: 'tv2media/sofie-server-core:v46.3.5-staging'
     platform: 'linux/amd64'
     container_name: 'server-core'
     ports:
@@ -18,10 +18,12 @@ services:
       LOG_LEVEL: 'debug'
 
   playout-gateway:
-    image: 'tv2media/sofie-playout-gateway:v46.3.4-staging'
+    image: 'tv2media/sofie-playout-gateway:v46.3.5-staging'
     platform: 'linux/amd64'
     container_name: 'playout-gateway'
     restart: 'always'
+    extra_hosts:
+        - 'host.docker.internal:host-gateway'
     environment:
       CORE_HOST: 'server-core'
       CORE_PORT: '80'
