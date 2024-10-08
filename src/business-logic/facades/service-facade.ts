@@ -10,7 +10,6 @@ import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
 import { DataChangeService } from '../services/interfaces/data-change-service'
-import { IngestDataChangedService } from '../services/ingest-data-changed-service'
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
 import { IngestService } from '../services/interfaces/ingest-service'
 import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
@@ -32,6 +31,8 @@ import { PlayoutGatewayService } from '../services/playout-gateway-service'
 import { ThrottledRundownService } from '../services/throttled-rundown-service'
 import { IngestRundownSynchronizer } from '../services/ingest-rundown-synchronizer'
 import { EntityChangeDetector } from '../services/entity-change-detector'
+import { IngestDataChangeService } from '../services/ingest-data-change-service'
+import { ActionGenerationService } from '../services/action-generation-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -82,25 +83,32 @@ export class ServiceFacade {
   }
 
   public static createIngestChangeService(): DataChangeService {
-    return IngestDataChangedService.getInstance(
+    return new IngestDataChangeService(
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPartRepository(),
-      RepositoryFacade.createPieceRepository(),
-      RepositoryFacade.createTimelineRepository(),
-      RepositoryFacade.createActionManifestRepository(),
-      RepositoryFacade.createActionRepository(),
-      RepositoryFacade.createConfigurationRepository(),
-      BlueprintsFacade.createBlueprint(),
-      ServiceFacade.createTimelineBuilder(),
-      EventEmitterFacade.createRundownEventEmitter(),
-      EventEmitterFacade.createActionEventEmitter(),
-      new IngestedEntityToEntityMapper(),
-      LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
-      RepositoryFacade.createIngestedPartChangedListener()
+      RepositoryFacade.createIngestedPartChangedListener(),
+      ServiceFacade.createIngestRundownSynchronizer(),
+      new IngestedEntityToEntityMapper(),
+      EventEmitterFacade.createRundownEventEmitter(),
+      ServiceFacade.createTimelineBuilder(),
+      RepositoryFacade.createTimelineRepository(),
+      ServiceFacade.createActionGenerationService(),
+      LoggerFacade.createLogger(),
+    )
+  }
+
+  public static createActionGenerationService(): ActionGenerationService {
+    return new ActionGenerationService(
+      RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createConfigurationRepository(),
+      RepositoryFacade.createActionManifestRepository(),
+      RepositoryFacade.createActionRepository(),
+      EventEmitterFacade.createActionEventEmitter(),
+      BlueprintsFacade.createBlueprint(),
     )
   }
 

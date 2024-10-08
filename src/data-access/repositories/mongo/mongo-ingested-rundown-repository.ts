@@ -39,6 +39,11 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository implemen
     }
   }
 
+  public getIngestedRundownIds(): Promise<readonly string[]> {
+    this.assertDatabaseConnection(this.getIngestedRundownIds.name)
+    return this.getCollection().find({}, { projection: { _id: 1 } }).map(document => document._id).toArray()
+  }
+
   public async getIngestedRundown(rundownId: string): Promise<IngestedRundown> {
     this.assertDatabaseConnection(this.getIngestedRundown.name)
     const mongoRundown: MongoIngestedRundown | null = await this.getCollection().findOne<MongoIngestedRundown>({
