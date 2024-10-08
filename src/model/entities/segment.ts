@@ -199,7 +199,7 @@ export class Segment {
     return partToDelete
   }
 
-  public getParts(): Part[] {
+  public getParts(): readonly Part[] {
     return this.parts
   }
 

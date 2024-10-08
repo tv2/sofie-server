@@ -42,7 +42,7 @@ export class IngestedEntityToEntityMapper {
       history: rundownToUpdate.getHistory(),
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),
-      segments: rundownToUpdate.getSegments(),
+      segments: [...rundownToUpdate.getSegments()],
       alreadyActiveProperties
     })
   }

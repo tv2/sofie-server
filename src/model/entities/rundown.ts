@@ -662,7 +662,7 @@ export class Rundown extends BasicRundown {
     return unsyncedSegment
   }
 
-  public getSegments(): Segment[] {
+  public getSegments(): readonly Segment[] {
     return this.segments
   }
 
