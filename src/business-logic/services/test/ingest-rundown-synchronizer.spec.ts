@@ -316,6 +316,28 @@ describe(IngestRundownSynchronizer.name, () => {
       })
     })
   })
+
+  describe('when a part is unplanned', () => {
+    it('ignores the part', () => {
+      const rundown: Rundown = EntityTestFactory.createRundown({
+        id: 'rundown-a',
+        segments: [
+          EntityTestFactory.createSegment({ id: 'segment-a', parts: [EntityTestFactory.createPart({ id: 'part-a', segmentId: 'segment-a', name: 'A1' }), EntityTestFactory.createPart({ id: 'part-b', segmentId: 'segment-a', name: 'B1', ingestedPart: undefined })] }),
+        ],
+      })
+      const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({
+        id: 'rundown-a',
+        ingestedSegments: [
+          EntityTestFactory.createIngestedSegment({ id: 'segment-a', ingestedParts: [EntityTestFactory.createIngestedPart({ id: 'part-a', segmentId: 'segment-a', name: 'A1' })] }),
+        ],
+      })
+      const testee: IngestRundownSynchronizer = createTestee()
+
+      const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+
+      expect(result.deletedParts.length).toBe(0)
+    })
+  })
 })
 
 function createTestee(params: { ingestedEntityToEntityMapper?: IngestedEntityToEntityMapper, entityChangeDetector?: EntityChangeDetector } = {}): IngestRundownSynchronizer {

@@ -58,7 +58,7 @@ export class IngestRundownSynchronizer {
     const ingestedPartIds: ReadonlySet<string> = new Set(ingestedParts.map(ingestedPart => ingestedPart.id))
 
     const deletedSegmentIds: ReadonlySet<string> = new Set(deletedSegments.map(segment => segment.id))
-    const deletedParts: readonly Part[] = parts.filter(part => !part.isUnsynced() && !ingestedPartIds.has(part.id) && !deletedSegmentIds.has(part.getSegmentId()))
+    const deletedParts: readonly Part[] = parts.filter(part => part.isPlanned && !part.isUnsynced() && !ingestedPartIds.has(part.id) && !deletedSegmentIds.has(part.getSegmentId()))
 
     const partIds: ReadonlySet<string> = new Set(parts.map(part => part.id))
     const affectedSegmentIds: ReadonlySet<string> = new Set([...createdSegmentIds, ...updatedSegments.map(segment => segment.id), ...deletedSegments.map(segment => segment.id)])
