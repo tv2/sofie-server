@@ -16,9 +16,7 @@ export class CachedConfigurationRepository implements ConfigurationRepository {
   private constructor(private readonly configurationRepository: ConfigurationRepository) {}
 
   public async getConfiguration(): Promise<Configuration> {
-    if (!this.cachedConfiguration) {
-      this.cachedConfiguration = await this.configurationRepository.getConfiguration()
-    }
+    this.cachedConfiguration ??= await this.configurationRepository.getConfiguration()
     return this.cachedConfiguration
   }
 

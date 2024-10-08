@@ -16,11 +16,9 @@ export class CachedSegmentRepository implements SegmentRepository {
   private constructor(private readonly segmentRepository: SegmentRepository) {}
 
   public async getSegment(segmentId: string): Promise<Segment> {
-    if (!this.cachedSegments.has(segmentId)) {
-      const segment: Segment = await this.segmentRepository.getSegment(segmentId)
-      this.cachedSegments.set(segmentId, segment)
-    }
-    return this.cachedSegments.get(segmentId) as Segment
+    const segment: Segment = this.cachedSegments.get(segmentId) ?? await this.segmentRepository.getSegment(segmentId)
+    this.cachedSegments.set(segmentId, segment)
+    return segment
   }
 
   public async getSegments(rundownId: string): Promise<Segment[]> {
@@ -30,18 +28,18 @@ export class CachedSegmentRepository implements SegmentRepository {
   }
 
   public async saveSegment(segment: Segment): Promise<void> {
+    await this.segmentRepository.saveSegment(segment)
     this.cachedSegments.set(segment.id, segment)
-    return this.segmentRepository.saveSegment(segment)
   }
 
   public async delete(segmentId: string): Promise<void> {
+    await this.segmentRepository.delete(segmentId)
     this.cachedSegments.delete(segmentId)
-    return this.segmentRepository.delete(segmentId)
   }
 
   public async deleteSegmentsForRundown(rundownId: string): Promise<void> {
+    await this.segmentRepository.deleteSegmentsForRundown(rundownId)
     this.deleteCachedSegmentsWithPredicate(segment => segment.rundownId === rundownId)
-    return this.segmentRepository.deleteSegmentsForRundown(rundownId)
   }
 
   private deleteCachedSegmentsWithPredicate(predicate: (segment: Segment) => boolean): void {
@@ -54,12 +52,12 @@ export class CachedSegmentRepository implements SegmentRepository {
   }
 
   public async deleteAllUnsyncedSegments(): Promise<void> {
+    await this.segmentRepository.deleteAllUnsyncedSegments()
     this.deleteCachedSegmentsWithPredicate(segment => segment.isUnsynced())
-    return this.segmentRepository.deleteAllUnsyncedSegments()
   }
 
   public async deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
+    await this.segmentRepository.deleteSegmentsForRundown(rundownId)
     this.deleteCachedSegmentsWithPredicate(segment => segment.isUnsynced() && segment.rundownId === rundownId)
-    return this.segmentRepository.deleteSegmentsForRundown(rundownId)
   }
 }
