@@ -113,7 +113,8 @@ export class IngestedEntityToEntityMapper {
       return existingPiece
         ? this.updatePieceWithIngestedPiece(existingPiece, ingestedPiece)
         : this.convertIngestedPieceToPiece(ingestedPiece)
-    })
+    }).concat(partToBeUpdated.getPieces().filter(piece => !piece.isPlanned))
+
 
     return new Part({
       ...ingestedPart,
