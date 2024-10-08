@@ -17,7 +17,11 @@ import { IngestedSegment } from '../ingested-segment'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
-    return new Rundown({
+    return new Rundown(this.createRundownInterface(rundownInterface))
+  }
+
+  public static createRundownInterface(rundownInterface: Partial<RundownInterface> = {}): RundownInterface {
+    return {
       id: 'rundownId' + Math.floor(Math.random() * 1000),
       name: 'rundownName',
       segments: [],
@@ -27,8 +31,8 @@ export class EntityTestFactory {
       baselineTimelineObjects: [],
       history: [],
       timing: { type: RundownTimingType.UNSCHEDULED },
-      ...rundownInterface
-    })
+      ...rundownInterface,
+    }
   }
 
   public static createIngestedRundown(ingestedRundown: Partial<IngestedRundown> = {}): IngestedRundown {
@@ -107,7 +111,7 @@ export class EntityTestFactory {
   public static createIngestedPart(ingestedPart: Partial<IngestedPart> = {}): IngestedPart {
     return {
       disableNextInTransition: false,
-      id: '',
+      id: 'partId' + Math.floor(Math.random() * 1000),
       inTransition: {
         blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,

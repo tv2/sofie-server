@@ -61,7 +61,7 @@ export class IngestedEntityToEntityMapper {
       isUnsynced: false,
       expectedDurationInMs: ingestedSegment.budgetDuration,
       definesShowStyleVariant: ingestedSegment.definesShowStyleVariant ?? false,
-      parts: [],
+      parts: ingestedSegment.ingestedParts.map(ingestedPart => this.convertIngestedPartToPart(ingestedPart)),
     })
   }
 

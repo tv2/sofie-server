@@ -30,6 +30,8 @@ import { StatusMessageServiceImplementation } from '../services/status-message-s
 import { PlayoutService } from '../services/interfaces/playoutService'
 import { PlayoutGatewayService } from '../services/playout-gateway-service'
 import { ThrottledRundownService } from '../services/throttled-rundown-service'
+import { IngestRundownSynchronizer } from '../services/ingest-rundown-synchronizer'
+import { EntityChangeDetector } from '../services/entity-change-detector'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -100,6 +102,14 @@ export class ServiceFacade {
       RepositoryFacade.createIngestedSegmentChangedListener(),
       RepositoryFacade.createIngestedPartChangedListener()
     )
+  }
+
+  public static createIngestRundownSynchronizer(): IngestRundownSynchronizer {
+    return new IngestRundownSynchronizer(new IngestedEntityToEntityMapper(), ServiceFacade.createEntityChangeDetector())
+  }
+
+  public static createEntityChangeDetector(): EntityChangeDetector {
+    return new EntityChangeDetector()
   }
 
   public static createMediaDataChangeService(): DataChangeService {
