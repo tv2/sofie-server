@@ -142,7 +142,7 @@ export class EntityTestFactory {
       name: 'pieceName',
       start: 0,
       pieceLifespan: PieceLifespan.WITHIN_PART,
-      isPlanned: false,
+      isPlanned: true,
       preRollDuration: 0,
       postRollDuration: 0,
       transitionType: TransitionType.NO_TRANSITION,
