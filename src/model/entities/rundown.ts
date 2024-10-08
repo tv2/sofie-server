@@ -681,6 +681,9 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find segment with id '${part.getSegmentId()}' when updating part '${part.name}' with id '${part.id}' in rundown '${this.name}' with id '${this.id}'.`)
     }
     segment.updatePart(part)
+    if (this.activeCursor?.part.id === part.id) {
+      this.activeCursor = this.createCursor(this.activeCursor, { part })
+    }
     this.updateNextCursor()
   }
 
