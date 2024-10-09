@@ -1,14 +1,11 @@
 name: 'Publish Image'
-
-env:
-  node-version: '18'
-  node-package-manager: 'yarn'
+run-name: 'Publish image as version {{ inputs.versionTag }}'
 
 on:
   workflow_dispatch:
     inputs:
       versionTag:
-        description: 'Version tag (e.g. 46.3.1-staging)'
+        description: 'Version tag (e.g. 0.0.1-staging)'
         required: true
         type: 'string'
 
@@ -32,4 +29,4 @@ jobs:
           context: '.'
           push: true
           tags: |
-            tv2media/sofie-server:${{ inputs.versionTag }}
+            tv2media/alba-server:${{ inputs.versionTag }}

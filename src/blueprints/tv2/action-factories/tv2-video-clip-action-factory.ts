@@ -4,13 +4,13 @@ import { PartActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
@@ -26,7 +26,7 @@ import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -35,7 +35,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
   ) {
     super()
@@ -67,20 +67,27 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       : videoClipAction.data.partInterface.expectedDuration
 
     const mediaPlayerSession: string = `${action.id}_${Date.now()}`
-    videoClipAction.data.pieceInterfaces.map(pieceInterface => pieceInterface.timelineObjects.map(timelineObject => {
-      const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-      blueprintTimelineObject.metaData = {
-        ...blueprintTimelineObject.metaData,
-        mediaPlayerSession
-      }
-    }))
+    videoClipAction.data.pieceInterfaces.map(pieceInterface => {
+      const pieceMetadata: Tv2PieceMetadata = pieceInterface.metadata as Tv2PieceMetadata
+      pieceMetadata.mediaPlayerSessions = [mediaPlayerSession]
+
+      pieceInterface.timelineObjects.map(timelineObject => {
+        const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
+        blueprintTimelineObject.metaData = {
+          ...blueprintTimelineObject.metaData,
+          mediaPlayerSession
+        }
+      })
+    })
 
     return videoClipAction
   }
 
   public createVideoClipActions(configuration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2VideoClipAction[] {
     const videoClipManifestData: Tv2VideoClipManifestData[] = this.actionManifestMapper.mapToVideoClipManifestData(actionManifests)
-    return videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
+    return this.removeDuplicateActions(
+      videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
+    )
   }
 
   private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): Tv2VideoClipAction {
@@ -113,7 +120,8 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioMode === Tv2AudioMode.VOICE_OVER
-      }
+      },
+      sourceName: videoClipData.fileName
     }
 
     const videoMixerEnable: TimelineEnable = {
@@ -124,7 +132,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       id: `videoClipActionPiece_${this.sanitizeStringForId(videoClipData.fileName)}`,
       partId,
       name: videoClipData.fileName,
-      layer: Tv2SourceLayer.VIDEO_CLIP,
+      layer: Tv2PieceLayer.VIDEO_CLIP,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       metadata,
@@ -140,7 +148,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoClipTimelineObjectFactory.createVideoClipTimelineObject(videoClipData),
-        ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
+        ...this.audioMixerTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
       ]
     }
   }
@@ -158,6 +166,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       isUntimed: false,
       isUnsynced: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },

@@ -14,8 +14,9 @@ export interface CasparCgTemplateTimelineObject<T> extends TimelineObject {
 }
 
 interface Mixer {
-  opacity?: number
+  opacity?: number // Has to be a value between 0 and 1 to work correctly with CasparCG
   keyer?: boolean
+  volume?: number
   // A lot more to be found in TSR.
 }
 
@@ -36,9 +37,11 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
     length?: number
     playing?: boolean
     noStarttime?: boolean // The typo is used by TSR... :(
+    channelLayout?: string
     mixer?: Mixer
     transitions?: {
       inTransition?: TimelineTransition
+      outTransition?: TimelineTransition
     }
   }
 }

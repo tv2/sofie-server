@@ -19,6 +19,7 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 import { Rundown } from '../../../model/entities/rundown'
 import { Owner } from '../../../model/enums/owner'
 import { RundownMode } from '../../../model/enums/rundown-mode'
+import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
 
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
@@ -127,7 +128,7 @@ describe(ExecuteActionService.name, () => {
       })
 
       it('updates Piece ExecutedAt to be set', async () => {
-        const now = Date.now()
+        const now: number = Date.now()
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
@@ -385,7 +386,8 @@ function createTestee(
   params?: {
     actionRepository?: ActionRepository,
     rundownRepository?: RundownRepository,
-    mediaRepository?: MediaRepository
+    mediaRepository?: MediaRepository,
+    configurationRepository?: ConfigurationRepository,
     rundownService?: RundownService,
     blueprint?: Blueprint
   },
@@ -396,6 +398,7 @@ function createTestee(
   const actionRepository: ActionRepository = params?.actionRepository ?? mock<ActionRepository>()
   const rundownRepository: RundownRepository = params?.rundownRepository ?? mock<RundownRepository>()
   const mediaRepository: MediaRepository = params?.mediaRepository ?? mock<MediaRepository>()
+  const configurationRepository: ConfigurationRepository = params?.configurationRepository ?? mock<ConfigurationRepository>()
   const rundownService: RundownService = params?.rundownService ?? mock<RundownService>()
   const blueprint: Blueprint = params?.blueprint ?? mock<Blueprint>()
 
@@ -407,6 +410,7 @@ function createTestee(
     instance(actionRepository),
     instance(rundownRepository),
     instance(mediaRepository),
+    instance(configurationRepository),
     instance(rundownService),
     instance(blueprint)
   )

@@ -25,7 +25,10 @@ export enum Tv2ActionSubtype {
   SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT = 'SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT',
   RECALL_LAST_PLANNED_REMOTE = 'RECALL_LAST_PLANNED_REMOTE',
   FADE_AUDIO_BED = 'FADE_AUDIO_BED',
-  CALL_PRESET = 'CALL_PRESET'
+  CALL_PRESET = 'CALL_PRESET',
+  GRAPHICS_THEME_OUT = 'GRAPHICS_THEME_OUT',
+  GRAPHICS_CLEAR = 'GRAPHICS_CLEAR',
+  GRAPHICS_ALL_OUT = 'GRAPHICS_ALL_OUT'
 }
 
 export type Tv2Action = Tv2PartAction | Tv2PieceAction
@@ -188,5 +191,12 @@ export interface Tv2RobotAction extends Tv2PieceAction {
   metadata: {
     contentType: Tv2ActionContentType.ROBOT
     actionSubtype: Tv2ActionSubtype.CALL_PRESET
+  }
+}
+
+export interface Tv2FullscreenGraphicsAction extends Tv2PartAction {
+  metadata: {
+    contentType: Tv2ActionContentType.GRAPHICS,
+    sourceName: string
   }
 }

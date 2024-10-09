@@ -22,19 +22,28 @@ import {
   Tv2GraphicsSplitScreenTimelineObjectFactory
 } from './interfaces/tv2-graphics-split-screen-timeline-object-factory'
 import { Tv2VideoClipTimelineObjectFactory } from './interfaces/tv2-video-clip-timeline-object-factory'
-import { GraphicsSetup, SplitScreenConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
+import {
+  AudioBedConfiguration,
+  GraphicsSetup,
+  SplitScreenConfiguration
+} from '../value-objects/tv2-show-style-blueprint-configuration'
 import {
   Tv2CasparCgTemplateData,
   Tv2CasparCgTemplateDisplayMode,
   Tv2CasparCgTemplateSlotType
 } from '../timeline-state-resolver-types/tv2-caspar-cg-types'
+import { Tv2AudioBedTimelineObjectFactory } from './interfaces/tv2-audio-bed-timeline-object-factory'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { AudioBedSettings } from '../value-objects/tv2-studio-blueprint-configuration'
+import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
 const HTML_GRAPHICS_INDEX_FILENAME: string = 'index'
 const ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR: string = '\n - '
+const AUDIO_BED_CHANNEL_LAYOUT: string = 'bed'
 
-export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory {
+export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory, Tv2AudioBedTimelineObjectFactory {
 
-  constructor(private readonly assetPathHelper: Tv2AssetPathHelper) {}
+  constructor(private readonly assetPathHelper: Tv2AssetPathHelper, private readonly frameTimeConverter: FrameTimeConverter) {}
 
   public createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData): CasparCgTemplateTimelineObject<Tv2CasparCgTemplateData> {
     const fileName: string = this.prependGraphicsFolder(blueprintConfiguration, fullscreenGraphicsData.name)
@@ -54,7 +63,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         data: this.createFullscreenGraphicsTemplateData(blueprintConfiguration, fileName),
         useStopCommand: false,
         mixer: {
-          opacity: 100
+          opacity: 1
         }
       }
     }
@@ -113,7 +122,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
         useStopCommand: false,
         mixer: {
-          opacity: 100
+          opacity: 1
         },
         data: {
           display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
@@ -168,7 +177,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
       name: this.assetPathHelper.joinAssetToFolder('index', blueprintConfiguration.showStyle.selectedGraphicsSetup.htmlPackageFolder),
       useStopCommand: false,
       mixer: {
-        opacity: 100
+        opacity: 1
       },
       data: templateData
     }
@@ -269,7 +278,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         name: `${graphicsSetup.htmlPackageFolder}/${HTML_GRAPHICS_INDEX_FILENAME}`,
         useStopCommand: false,
         mixer: {
-          opacity: 100
+          opacity: 1
         },
         data: {
           display: Tv2CasparCgTemplateDisplayMode.PROGRAM,
@@ -308,6 +317,48 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
     }
   }
 
+  public createAudioBedTimelineObject(audioBedName: string, blueprintConfiguration: Tv2BlueprintConfiguration): CasparCgMediaTimelineObject {
+    const audioBedSettings: AudioBedSettings = blueprintConfiguration.studio.audioBedSettings
+    const audioBedConfiguration: AudioBedConfiguration | undefined = blueprintConfiguration.showStyle.audioBedConfigurations.find(audioBedConfiguration => audioBedConfiguration.name === audioBedName)
+    if (!audioBedConfiguration) {
+      throw new NotFoundException(`Unable to find the audio bed configuration for ${audioBedName}.`)
+    }
+    return {
+      id: 'casparCg_audio_bed',
+      enable: {
+        start: 0
+      },
+      layer: Tv2CasparCgLayer.AUDIO,
+      priority: 1,
+      content: {
+        deviceType: DeviceType.CASPAR_CG,
+        type: CasparCgType.MEDIA,
+        file: this.assetPathHelper.joinAssetToFolder(audioBedConfiguration.filename, audioBedSettings.mediaDirectory),
+        channelLayout: AUDIO_BED_CHANNEL_LAYOUT,
+        loop: true,
+        noStarttime: true,
+        mixer: {
+          volume: audioBedSettings.volume / 100,
+        },
+        transitions: {
+          inTransition: {
+            type: CasparCgTransitionType.MIX,
+            easing: CasparCgTransitionEase.LINEAR,
+            direction: CasparCgTransitionDirection.LEFT,
+            duration: this.frameTimeConverter.convertFramesToMilliseconds(audioBedConfiguration.fadeInDurationInFrames),
+          },
+          outTransition: {
+            type: CasparCgTransitionType.MIX,
+            easing: CasparCgTransitionEase.LINEAR,
+            direction: CasparCgTransitionDirection.LEFT,
+            duration: this.frameTimeConverter.convertFramesToMilliseconds(audioBedConfiguration.fadeOutDurationInFrames),
+          },
+        }
+      },
+      classes: ['lyd_on_air'], // TODO: Check if this is necessary.
+    }
+  }
+
   public createFadeAudioBedTimelineObject(fadeDurationInMilliseconds: number): CasparCgMediaTimelineObject {
     const file: string = 'empty'
     return {
@@ -321,6 +372,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
         file,
+        channelLayout: AUDIO_BED_CHANNEL_LAYOUT,
         transitions: {
           inTransition: {
             type: CasparCgTransitionType.MIX,

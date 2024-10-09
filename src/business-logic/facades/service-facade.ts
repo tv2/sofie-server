@@ -24,10 +24,14 @@ import { MediaDatabaseChangedService } from '../services/media-database-changed-
 import { ConfigurationService } from '../services/interfaces/configuration-service'
 import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
 import { DeviceChangedService } from '../services/device-changed-service'
-import { ThrottledRundownService } from '../services/throttled-rundown-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
+import { DeviceServiceImplementation } from '../services/device-service-implementation'
+import { DeviceService } from '../services/interfaces/device-service'
+import { PlayoutService } from '../services/interfaces/playoutService'
+import { PlayoutGatewayService } from '../services/playout-gateway-service'
+import { ThrottledRundownService } from '../services/throttled-rundown-service'
 
 export class ServiceFacade {
   public static createRundownService(): RundownService {
@@ -41,8 +45,10 @@ export class ServiceFacade {
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createIngestService(),
+      ServiceFacade.createPlayoutService(),
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
-      BlueprintsFacade.createBlueprint()
+      BlueprintsFacade.createBlueprint(),
+      LoggerFacade.createLogger(),
     )
 
     return ThrottledRundownService.getInstance(rundownTimelineService)
@@ -62,6 +68,7 @@ export class ServiceFacade {
       RepositoryFacade.createActionRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createMediaRepository(),
+      RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createRundownService(),
       BlueprintsFacade.createBlueprint()
     )
@@ -108,6 +115,10 @@ export class ServiceFacade {
     return new Tv2INewsIngestService(ServiceFacade.createHttpService(), RepositoryFacade.createRundownRepository())
   }
 
+  public static createPlayoutService(): PlayoutService {
+    return new PlayoutGatewayService(ServiceFacade.createHttpService(), LoggerFacade.createLogger())
+  }
+
   private static createHttpService(): HttpService {
     return new GotHttpService()
   }
@@ -122,7 +133,7 @@ export class ServiceFacade {
   public static createDeviceDataChangedService(): DataChangeService {
     return DeviceChangedService.getInstance(
       ServiceFacade.createStatusMessageService(),
-      RepositoryFacade.createDeviceRepository(),
+      RepositoryFacade.createCoreDeviceRepository(),
       RepositoryFacade.createDeviceDataChangedListener(),
       LoggerFacade.createLogger()
     )
@@ -143,6 +154,13 @@ export class ServiceFacade {
     return new StatusMessageServiceImplementation(
       EventEmitterFacade.createStatusMessageEventEmitter(),
       RepositoryFacade.createStatusMessageRepository()
+    )
+  }
+
+  public static createDeviceService(): DeviceService {
+    return new DeviceServiceImplementation(
+      RepositoryFacade.createDeviceRepository(),
+      EventEmitterFacade.createDeviceEventEmitter()
     )
   }
 }

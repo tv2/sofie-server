@@ -4,7 +4,7 @@ import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
 import { Tv2ActionContentType, Tv2ReplayAction, Tv2ReplayAuxAction } from '../value-objects/tv2-action'
-import { Tv2SourceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
@@ -13,13 +13,13 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { ActionFactory } from './ActionFactory'
+import { ActionFactory } from './action-factory'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -27,7 +27,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
   ) {
     super()
   }
@@ -159,6 +159,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       isUnsynced: false,
       isUntimed: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },
@@ -178,7 +179,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(source.videoMixerSource, videoMixerEnable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(source.videoMixerSource, videoMixerEnable),
-      ...this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source, audioMode)
+      ...this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source, audioMode)
     ]
 
     const metadata: Tv2PieceMetadata = {
@@ -193,7 +194,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       id: `replayAction_${this.sanitizeStringForId(source.name)}`,
       partId: parentPartId,
       name: `${source.name}${audioMode === Tv2AudioMode.VOICE_OVER ? ' VO' : ''}`,
-      layer: Tv2SourceLayer.REPLAY,
+      layer: Tv2PieceLayer.REPLAY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
@@ -231,7 +232,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       id: `insert_studio_aux_${sanitizedId}_piece`,
       name: `${source.name} Studio AUX`,
       partId: '',
-      layer: Tv2SourceLayer.REPLAY_STUDIO_AUXILIARY,
+      layer: Tv2PieceLayer.REPLAY_STUDIO_AUXILIARY,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
@@ -274,7 +275,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       id: `insert_viz_aux_${sanitizedId}_piece`,
       name: `${source.name} Viz AUX`,
       partId: '',
-      layer: Tv2SourceLayer.REPLAY_VIZ_AUXILIARY,
+      layer: Tv2PieceLayer.REPLAY_VIZ_AUXILIARY,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,

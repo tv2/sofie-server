@@ -16,8 +16,8 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2LoggerFacade } from '../tv2-logger-facade'
 import {
@@ -26,8 +26,8 @@ import {
 import { AtemToTriCasterSplitScreenConverter } from '../helpers/atem-to-tricaster-split-screen-converter'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import {
-  Tv2SisyfosAudioTimelineObjectFactory
-} from '../timeline-object-factories/tv2-sisyfos-audio-timeline-object-factory'
+  Tv2SisyfosAudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/tv2-sisyfos-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
@@ -47,12 +47,18 @@ import {
 import {
   Tv2TelemetricsTimelineObjectFactory
 } from '../timeline-object-factories/tv2-telemetrics-timeline-object-factory'
+import {
+  Tv2AudioBedTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-bed-timeline-object-factory'
+import { FrameTimeConverter } from '../helpers/frame-time-converter'
+import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
 
 
 interface ActionFactoryInstance<T> {
   factory: T,
   shouldFactoryBeRecreated: (configuration?: Tv2BlueprintConfiguration) => boolean
 }
+const FRAME_RATE: number = 25
 
 export class Tv2ActionFactoryProvider {
 
@@ -67,13 +73,15 @@ export class Tv2ActionFactoryProvider {
   private replayActionFactoryInstance: ActionFactoryInstance<Tv2ReplayActionFactory>
   private robotActionFactoryInstance: ActionFactoryInstance<Tv2RobotActionFactory>
 
+  constructor(private readonly configurationMapper: Tv2ConfigurationMapper) { }
+
   public createCameraActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2CameraActionFactory {
     this.cameraActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.cameraActionFactoryInstance,
       () => {
         return new Tv2CameraActionFactory(
           this.createVideoMixerTimelineObjectFactory(configuration),
-          this.createAudioTimelineObjectFactory()
+          this.createAudioMixerTimelineObjectFactory()
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {
@@ -123,8 +131,8 @@ export class Tv2ActionFactoryProvider {
     }
   }
 
-  private createAudioTimelineObjectFactory(): Tv2AudioTimelineObjectFactory {
-    return new Tv2SisyfosAudioTimelineObjectFactory()
+  private createAudioMixerTimelineObjectFactory(): Tv2AudioMixerTimelineObjectFactory {
+    return new Tv2SisyfosAudioMixerTimelineObjectFactory()
   }
 
   public createRemoteActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2RemoteActionFactory {
@@ -133,7 +141,7 @@ export class Tv2ActionFactoryProvider {
       () => {
         return new Tv2RemoteActionFactory(
           this.createVideoMixerTimelineObjectFactory(configuration),
-          this.createAudioTimelineObjectFactory()
+          this.createAudioMixerTimelineObjectFactory()
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {
@@ -152,8 +160,9 @@ export class Tv2ActionFactoryProvider {
         return new Tv2TransitionEffectActionFactory(
           this.createVideoMixerTimelineObjectFactory(configuration),
           this.createVideoClipTimelineObjectFactory(),
-          this.createAudioTimelineObjectFactory(),
+          this.createAudioMixerTimelineObjectFactory(),
           this.createAssetPathHelper(),
+          this.createFrameTimeConverter(),
           Tv2LoggerFacade.createLogger()
         )
       },
@@ -167,11 +176,15 @@ export class Tv2ActionFactoryProvider {
   }
 
   private createVideoClipTimelineObjectFactory(): Tv2VideoClipTimelineObjectFactory {
-    return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper())
+    return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
   }
 
   private createAssetPathHelper(): Tv2AssetPathHelper {
     return new Tv2AssetPathHelper()
+  }
+
+  private createFrameTimeConverter(): FrameTimeConverter {
+    return new FrameTimeConverter(FRAME_RATE)
   }
 
   public createAudioActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2AudioActionFactory {
@@ -179,8 +192,9 @@ export class Tv2ActionFactoryProvider {
       this.audioActionFactoryInstance,
       () => {
         return new Tv2AudioActionFactory(
-          this.createAudioTimelineObjectFactory(),
-          this.createVideoClipTimelineObjectFactory()
+          this.createAudioMixerTimelineObjectFactory(),
+          this.createAudioBedTimelineObjectFactory(),
+          this.createFrameTimeConverter(),
         )
       },
       (): boolean => {
@@ -192,6 +206,10 @@ export class Tv2ActionFactoryProvider {
     return this.audioActionFactoryInstance.factory
   }
 
+  private createAudioBedTimelineObjectFactory(): Tv2AudioBedTimelineObjectFactory {
+    return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
+  }
+
   public createGraphicsActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2GraphicsActionFactory {
     this.graphicsActionFactoryInstance = this.getUpdatedActionFactoryInstance(
       this.graphicsActionFactoryInstance,
@@ -199,9 +217,10 @@ export class Tv2ActionFactoryProvider {
         return new Tv2GraphicsActionFactory(
           this.createActionManifestMapper(),
           this.createGraphicsTimelineObjectFactoryFactory(),
-          this.createAudioTimelineObjectFactory(),
+          this.createAudioMixerTimelineObjectFactory(),
           this.createVideoMixerTimelineObjectFactory(configuration),
-          this.createStringHashConverter()
+          this.createStringHashConverter(),
+          this.configurationMapper
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {
@@ -218,7 +237,7 @@ export class Tv2ActionFactoryProvider {
   }
 
   private createGraphicsTimelineObjectFactoryFactory(): Tv2GraphicsTimelineObjectFactoryFactory {
-    return new Tv2GraphicsTimelineObjectFactoryFactory(this.createAssetPathHelper())
+    return new Tv2GraphicsTimelineObjectFactoryFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
   }
 
   private createStringHashConverter(): Tv2StringHashConverter {
@@ -232,7 +251,7 @@ export class Tv2ActionFactoryProvider {
         return new Tv2VideoClipActionFactory(
           this.createActionManifestMapper(),
           this.createVideoMixerTimelineObjectFactory(configuration),
-          this.createAudioTimelineObjectFactory(),
+          this.createAudioMixerTimelineObjectFactory(),
           this.createVideoClipTimelineObjectFactory()
         )
       },
@@ -269,9 +288,10 @@ export class Tv2ActionFactoryProvider {
         return new Tv2SplitScreenActionFactory(
           this.createActionManifestMapper(),
           this.createVideoMixerTimelineObjectFactory(configuration),
-          this.createAudioTimelineObjectFactory(),
+          this.createAudioMixerTimelineObjectFactory(),
           this.createGraphicsSplitScreenTimelineObjectFactory(),
           this.createVideoClipTimelineObjectFactory(),
+          this.createStringHashConverter(),
           this.createAssetPathHelper()
         )
       },
@@ -285,7 +305,7 @@ export class Tv2ActionFactoryProvider {
   }
 
   private createGraphicsSplitScreenTimelineObjectFactory(): Tv2GraphicsSplitScreenTimelineObjectFactory {
-    return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper())
+    return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
   }
 
   public createReplayActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2ReplayActionFactory {
@@ -294,7 +314,7 @@ export class Tv2ActionFactoryProvider {
       () => {
         return new Tv2ReplayActionFactory(
           this.createVideoMixerTimelineObjectFactory(configuration),
-          this.createAudioTimelineObjectFactory()
+          this.createAudioMixerTimelineObjectFactory()
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {

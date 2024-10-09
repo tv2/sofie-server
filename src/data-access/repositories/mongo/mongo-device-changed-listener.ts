@@ -2,11 +2,10 @@ import { DataChangedListener } from '../interfaces/data-changed-listener'
 import { MongoDevice, MongoEntityConverter } from './mongo-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
-import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
+import { ChangeStream, ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
-import { Device } from '../../../model/entities/device'
 import { Logger } from '../../../logger/logger'
-import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { Device } from '../../../model/entities/device'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
@@ -15,6 +14,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
   private readonly logger: Logger
   private onCreatedCallback: (device: Device) => void
   private onUpdatedCallback: (device: Device) => void
+  private onDeletedCallback: (deviceId: string) => void
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter, logger: Logger) {
     super(mongoDatabase)
@@ -33,7 +33,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
         const mongoDevice: MongoDevice = change.fullDocument
-        this.onCreatedCallback(this.mongoEntityConverter.convertToDevice(mongoDevice))
+        this.onCreatedCallback(this.mongoEntityConverter.convertToDeviceInterface(mongoDevice))
         return
       }
       case MongoChangeEvent.UPDATE: {
@@ -41,8 +41,13 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
         if (!mongoDevice) {
           return
         }
-        this.onUpdatedCallback(this.mongoEntityConverter.convertToDevice(mongoDevice))
+        this.onUpdatedCallback(this.mongoEntityConverter.convertToDeviceInterface(mongoDevice))
         return
+      }
+      case MongoChangeEvent.DELETE: {
+        const deleteChange: ChangeStreamDeleteDocument<MongoDevice> = change as ChangeStreamDeleteDocument<MongoDevice>
+        const deviceId: string = deleteChange.documentKey._id
+        this.onDeletedCallback(deviceId)
       }
     }
   }
@@ -59,8 +64,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository implements D
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public onDeleted(_onDeletedCallback: (id: string) => void): void {
-    throw new UnsupportedOperationException(`${MongoDeviceChangedListener.name} does not support ${MongoDeviceChangedListener.prototype.onDeleted.name}`)
+  public onDeleted(onDeletedCallback: (id: string) => void): void {
+    this.onDeletedCallback = onDeletedCallback
   }
 }

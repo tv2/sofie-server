@@ -112,7 +112,10 @@ export class Rundown extends BasicRundown {
 
   private initializeRundown(mode: RundownMode): void {
     this.mode = mode
+    this.setFirstSegmentAndPartNextCursor()
+  }
 
+  private setFirstSegmentAndPartNextCursor(): void {
     const firstSegment: Segment = this.findFirstSegment()
     firstSegment.setAsNext()
     const firstPart: Part = firstSegment.findFirstPartNotOnAir()
@@ -153,8 +156,18 @@ export class Rundown extends BasicRundown {
 
   private setNextFromActive(owner: Owner): void {
     this.unmarkNextPart()
-
     if (!this.activeCursor) {
+      try {
+        this.unmarkNextSegment()
+        if (this.getSegments().length === 0) {
+          this.nextCursor = undefined
+        }
+        this.setFirstSegmentAndPartNextCursor()
+      } catch (exception) {
+        if (!(exception instanceof NotFoundException)) {
+          throw exception
+        }
+      }
       return
     }
 
@@ -439,7 +452,7 @@ export class Rundown extends BasicRundown {
         return true
       }
       default: {
-        ExhaustiveCaseChecker.assertAllCases(piece.pieceLifespan)
+        ExhaustiveCaseChecker.assertAllCases(piece.pieceLifespan, 'piece lifespan')
       }
     }
   }
@@ -481,7 +494,7 @@ export class Rundown extends BasicRundown {
 
   private addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces: Map<string, Piece>): Map<string, Piece> {
     const indexOfActiveSegment: number = this.segments.findIndex((segment) => segment.id === this.activeCursor?.segment?.id)
-    for (let i = indexOfActiveSegment - 1; i >= 0; i--) {
+    for (let i: number = indexOfActiveSegment - 1; i >= 0; i--) {
       const piecesSpanningSegment: Piece[] = this.segments[i]
         .getFirstSpanningRundownPieceForEachLayerForAllParts(new Set(layersWithPieces.keys()))
         .map(this.setExecutedAtIfMissing)
@@ -611,7 +624,7 @@ export class Rundown extends BasicRundown {
   }
 
   private findFirstValidSegmentAfterIndex(searchIndex: number): Segment {
-    for (let i = searchIndex + 1; i < this.segments.length; i++) {
+    for (let i: number = searchIndex + 1; i < this.segments.length; i++) {
       const segment: Segment = this.segments[i]
       if (!segment.invalidity && segment.getParts().some(part => !part.invalidity)) {
         return segment
@@ -645,7 +658,7 @@ export class Rundown extends BasicRundown {
   }
 
   private findFirstValidSegmentBeforeIndex(searchIndex: number): Segment {
-    for (let i = searchIndex - 1; i >= 0; i--) {
+    for (let i: number = searchIndex - 1; i >= 0; i--) {
       const segment: Segment = this.segments[i]
       if (!segment.invalidity && segment.getParts().some(part => !part.invalidity)) {
         return segment
@@ -738,9 +751,14 @@ export class Rundown extends BasicRundown {
 
     const oldSegment: Segment = this.segments[segmentIndex]
     if (oldSegment.isOnAir()) {
-      segment.setParts(oldSegment.getParts())
+      const newOnAirPart: Part | undefined = segment.getParts().find(part => part.isOnAir())
+      if (newOnAirPart) {
+        this.activeCursor = this.createCursor(this.activeCursor, { part: newOnAirPart })
+      }
+
       segment.putOnAir()
       this.activeCursor = this.createCursor(this.activeCursor, { segment })
+      this.updateInfinitePieces()
     }
 
     this.segments[segmentIndex] = segment
@@ -954,5 +972,30 @@ export class Rundown extends BasicRundown {
       return
     }
     return segmentForPart.findPart(partId)
+  }
+
+  /**
+   * Removes 'old' unplanned Parts on the active Segment.
+   * When called, if there are more Parts on the active Segment than the given threshold, then all old unplanned Parts will be removed from the Segment.
+   * Default prune threshold is 100 Parts.
+   * An unplanned Part is old if it's not the active, previous or next Part.
+   * Pruning is necessary if Parts are continued to be inserted into the same Segment. (Requires 400+ Parts in a Segment to be noticeable)
+   * Returns a list of PartIds of the Part that was pruned. Returns an empty list of no Parts where pruned.
+   */
+  public pruneOldUnplannedPartsOnActiveSegment(pruneThreshold: number = 100): string[] {
+    if (this.getActiveSegment().getParts().length < pruneThreshold) {
+      return []
+    }
+
+    const activePartIndex: number = this.getActiveSegment().getParts().findIndex(part => part.isOnAir())
+    const partsToPruneIds: string[] = this.getActiveSegment().getParts().filter((part: Part, index: number) => {
+      if (index >= activePartIndex || part.id === this.previousPart?.id) {
+        return false
+      }
+      return !part.isPlanned
+    }).map(part => part.id)
+
+    partsToPruneIds.forEach(partId => this.getActiveSegment().removePart(partId))
+    return partsToPruneIds
   }
 }

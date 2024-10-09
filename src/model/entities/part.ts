@@ -203,8 +203,31 @@ export class Part {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
       unPlannedPiece.markAsInsertedOnAir()
+
+      this.stopPiecesOnLayer(unPlannedPiece.layer)
+    } else {
+      this.removePieceOnLayer(unPlannedPiece.layer)
     }
     this.pieces.push(unPlannedPiece)
+  }
+
+  private stopPiecesOnLayer(layer: string): void {
+    this.pieces.filter(piece => piece.layer === layer && !piece.getDuration())
+      .forEach(stoppablePiece => stoppablePiece.stop())
+  }
+
+  private removePieceOnLayer(layer: string): void {
+    const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === layer)
+    if (indexOfExistingPieceOnLayer < 0) {
+      return
+    }
+    const removedPieces: Piece[] = this.pieces.splice(indexOfExistingPieceOnLayer, 1)
+    removedPieces.forEach(piece => {
+      if (!piece.isPlanned) {
+        return
+      }
+      this.replacedPlannedPieces.push(piece)
+    })
   }
 
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
@@ -271,12 +294,14 @@ export class Part {
         inTransition = {
           keepPreviousPartAliveDuration: previousPart.autoNext.overlap,
           delayPiecesDuration: 0,
+          blockTakeDuration: 0 // BlockTakeDuration is irrelevant for CalculateTimings
         }
       } else if (!previousPart.disableNextInTransition) {
         allowTransition = true
         inTransition = {
           keepPreviousPartAliveDuration: this.inTransition.keepPreviousPartAliveDuration ?? 0,
           delayPiecesDuration: this.inTransition.delayPiecesDuration ?? 0,
+          blockTakeDuration: 0 // BlockTakeDuration is irrelevant for CalculateTimings
         }
       }
     }
@@ -375,9 +400,19 @@ export class Part {
   }
 
   public updateInTransition(inTransition: InTransition): void {
-    this.inTransition = {
-      keepPreviousPartAliveDuration: Math.max(inTransition.keepPreviousPartAliveDuration, this.inTransition.keepPreviousPartAliveDuration),
-      delayPiecesDuration: Math.max(inTransition.delayPiecesDuration, this.inTransition.delayPiecesDuration)
-    }
+    this.inTransition = inTransition
+    // Note: Leaving below code snippet here. I'm not entirely sure if there is any drawbacks by always overriding the InTransition.
+    // If we don't override, then if we change the transition from a Mix200 to Mix25, then the Take would still be blocked for the full 200 frames.
+    // TODO: If no issues has arose from overriding by the 1st of November 2024, this comment and the code snippet should be deleted.
+
+    // this.inTransition = {
+    //   blockTakeDuration: Math.max(inTransition.blockTakeDuration, this.inTransition.blockTakeDuration),
+    //   keepPreviousPartAliveDuration: Math.max(inTransition.keepPreviousPartAliveDuration, this.inTransition.keepPreviousPartAliveDuration),
+    //   delayPiecesDuration: Math.max(inTransition.delayPiecesDuration, this.inTransition.delayPiecesDuration)
+    // }
+  }
+
+  public getReplacedPlannedPieces(): readonly Piece[] {
+    return this.replacedPlannedPieces
   }
 }

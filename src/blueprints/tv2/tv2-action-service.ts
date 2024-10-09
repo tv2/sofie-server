@@ -18,20 +18,22 @@ import {
 import { Tv2SplitScreenActionFactory } from './action-factories/tv2-split-screen-action-factory'
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 import { Tv2RobotActionFactory } from './action-factories/tv2-robot-action-factory'
+import { Tv2Logger } from './tv2-logger'
+
+enum ActionTypeName {
+  CAMERA = 'camera',
+  REMOTE = 'remote',
+  AUDIO = 'audio',
+  TRANSITION_EFFECT = 'transition effect',
+  GRAPHICS = 'graphics',
+  VIDEO_CLIP = 'video clip',
+  VIDEO_MIXER = 'video mixer',
+  SPLIT_SCREEN = 'split screen',
+  REPLAY = 'replay',
+  ROBOT = 'robot',
+}
 
 export class Tv2ActionService implements BlueprintGenerateActions {
-
-  private static instance: Tv2ActionService
-
-  public static getInstance(
-    configurationMapper: Tv2ConfigurationMapper,
-    actionFactoryProvider: Tv2ActionFactoryProvider
-  ): Tv2ActionService {
-    if (!this.instance) {
-      this.instance = new Tv2ActionService(configurationMapper, actionFactoryProvider)
-    }
-    return this.instance
-  }
 
   private cameraActionFactory: Tv2CameraActionFactory
   private remoteActionFactory: Tv2RemoteActionFactory
@@ -43,11 +45,14 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   private splitScreenActionFactory: Tv2SplitScreenActionFactory
   private replayActionFactory: Tv2ReplayActionFactory
   private robotActionFactory: Tv2RobotActionFactory
+  private readonly logger: Tv2Logger
 
-  private constructor(
+  constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
-    private readonly actionFactoryProvider: Tv2ActionFactoryProvider
+    private readonly actionFactoryProvider: Tv2ActionFactoryProvider,
+    logger: Tv2Logger,
   ) {
+    this.logger = logger.tag(this.constructor.name)
     this.setFactories()
   }
 
@@ -70,6 +75,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.robotActionFactory.isRobotAction(action)) {
       return this.robotActionFactory.getMutateActionMethods(action)
     }
+    if (this.graphicsActionFactory.isGraphicsAction(action)) {
+      return this.graphicsActionFactory.getMutateActionMethods(action)
+    }
     return []
   }
 
@@ -77,18 +85,27 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, showStyleVariantId)
     this.setFactories(blueprintConfiguration)
 
-    return [
-      ...this.cameraActionFactory.createCameraActions(blueprintConfiguration),
-      ...this.remoteActionFactory.createRemoteActions(blueprintConfiguration),
-      ...this.audioActionFactory.createAudioActions(blueprintConfiguration),
-      ...this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration),
-      ...this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, actionManifests),
-      ...this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, actionManifests),
-      ...this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration),
-      ...this.splitScreenActionFactory.createSplitScreenActions(blueprintConfiguration, actionManifests),
-      ...this.replayActionFactory.createReplayActions(blueprintConfiguration),
-      ...this.robotActionFactory.createRobotActions()
+    const actionGenerators: [ActionTypeName, () => Action[]][] = [
+      [ActionTypeName.CAMERA, (): Action[] => this.cameraActionFactory.createCameraActions(blueprintConfiguration)],
+      [ActionTypeName.REMOTE, (): Action[] => this.remoteActionFactory.createRemoteActions(blueprintConfiguration)],
+      [ActionTypeName.AUDIO, (): Action[] => this.audioActionFactory.createAudioActions(blueprintConfiguration, actionManifests)],
+      [ActionTypeName.TRANSITION_EFFECT, (): Action[] => this.transitionEffectActionFactory.createTransitionEffectActions(blueprintConfiguration)],
+      [ActionTypeName.GRAPHICS, (): Action[] => this.graphicsActionFactory.createGraphicsActions(blueprintConfiguration, actionManifests)],
+      [ActionTypeName.VIDEO_CLIP, (): Action[] => this.videoClipActionFactory.createVideoClipActions(blueprintConfiguration, actionManifests)],
+      [ActionTypeName.VIDEO_MIXER, (): Action[] => this.videoMixerActionFactory.createVideoMixerActions(blueprintConfiguration)],
+      [ActionTypeName.SPLIT_SCREEN, (): Action[] => this.splitScreenActionFactory.createSplitScreenActions(blueprintConfiguration, actionManifests)],
+      [ActionTypeName.REPLAY, (): Action[] => this.replayActionFactory.createReplayActions(blueprintConfiguration)],
+      [ActionTypeName.ROBOT, (): Action[] => this.robotActionFactory.createRobotActions()],
     ]
+
+    return actionGenerators.flatMap(([actionKind, actionGenerator]: [string, () => Action[]]): Action[] => {
+      try {
+        return actionGenerator()
+      } catch (error) {
+        this.logger.data(error).error(`Failed creating ${actionKind} actions.`)
+        return []
+      }
+    })
   }
 
   private setFactories(blueprintConfiguration?: Tv2BlueprintConfiguration): void {

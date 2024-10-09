@@ -66,10 +66,6 @@ export interface RundownInfinitePiecesUpdatedEvent extends RundownEvent {
   infinitePieces: PieceDto[]
 }
 
-export interface AutoNextStartedEvent extends RundownEvent {
-  type: RundownEventType.AUTO_NEXT_STARTED
-}
-
 export interface RundownCreatedEvent extends RundownEvent {
   type: IngestEventType.RUNDOWN_CREATED
   rundown: RundownDto
