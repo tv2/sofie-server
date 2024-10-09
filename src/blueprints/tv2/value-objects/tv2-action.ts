@@ -78,7 +78,7 @@ export interface Tv2TransitionEffectAction extends Tv2PieceAction {
   metadata: Tv2TransitionEffectActionMetadata
 }
 
-export type Tv2TransitionEffectActionMetadata = Tv2CutTransitionEffectActionMetadata | Tv2MixTransitionEffectActionMetadata | Tv2DipTransitionEffectActionMetadata | Tv2BreakerTransitionEffectActionMetadata | Tv2TBarTransitionEffectActionMetadata
+export type Tv2TransitionEffectActionMetadata = Tv2CutTransitionEffectActionMetadata | Tv2MixTransitionEffectActionMetadata | Tv2DipTransitionEffectActionMetadata | Tv2BreakerTransitionEffectActionMetadata
 
 export interface Tv2CutTransitionEffectActionMetadata {
   contentType: Tv2ActionContentType.TRANSITION,
@@ -105,12 +105,6 @@ export interface Tv2BreakerTransitionEffectActionMetadata {
   downstreamKeyer: Tv2DownstreamKeyer
   breakerFolder: string
   breaker: Breaker
-}
-
-export interface Tv2TBarTransitionEffectActionMetadata {
-  contentType: Tv2ActionContentType.TRANSITION
-  transitionEffectType: TransitionEffectType.T_BAR,
-  tBarPosition: number
 }
 
 export interface Tv2AudioAction extends Tv2PieceAction {

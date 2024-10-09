@@ -58,24 +58,6 @@ export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
   }
 }
 
-export interface AtemTBarTransitionTimelineObject extends TimelineObject {
-  // TODO: Figure how much of this is needed.
-  content: {
-    deviceType: DeviceType.ATEM,
-    type: AtemType.ME,
-    me: {
-      programInput?: number,
-      previewInput?: number,
-      transitionPreview: boolean,
-      transitionPosition: {
-        inTransition: boolean,
-        remainingFrames: number,
-        handlePosition: number
-      }
-    }
-  }
-}
-
 export interface AtemUpstreamKeyer {
   upstreamKeyerId: number,
   onAir: boolean,

@@ -49,7 +49,7 @@ export interface PieceAction extends Action {
   }
 }
 
-export type MutateActionMethods = MutateActionWithOnAirAndNextPiecesMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods | MutateActionWithArgumentsMethods
+export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods | MutateActionWithArgumentsMethods
 
 export enum MutateActionType {
   PIECE = 'PIECE',
@@ -58,9 +58,9 @@ export enum MutateActionType {
   APPLY_ARGUMENTS = 'APPLY_ARGUMENTS'
 }
 
-export interface MutateActionWithOnAirAndNextPiecesMethods {
+export interface MutateActionWithPieceMethods {
   type: MutateActionType.PIECE
-  updateActionWithPiece: (action: Action, onAirPiece?: Piece, nextPiece?: Piece) => Action
+  updateActionWithPiece: (action: Action, piece: Piece) => Action
   piecePredicate: (piece: Piece) => boolean
 }
 

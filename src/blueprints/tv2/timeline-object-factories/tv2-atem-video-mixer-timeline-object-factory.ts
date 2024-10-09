@@ -11,7 +11,7 @@ import {
   AtemMeWipePattern,
   AtemSourceIndex,
   AtemSuperSourcePropertiesTimelineObject,
-  AtemSuperSourceTimelineObject, AtemTBarTransitionTimelineObject,
+  AtemSuperSourceTimelineObject,
   AtemTransition,
   AtemType,
   SuperSourceBorder,
@@ -347,31 +347,6 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent),
       this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent)
     ]
-  }
-
-  public createTBarTransitionEffectTimelineObject(fromSourceInput: number, toSourceInput: number, tBarPosition: number): AtemTBarTransitionTimelineObject {
-    return {
-      id: `${Tv2AtemLayer.PROGRAM}_t_bar_transition_${tBarPosition}`,
-      enable: {
-        start: 0
-      },
-      layer: Tv2AtemLayer.PROGRAM,
-      priority: 10,
-      content: {
-        deviceType: DeviceType.ATEM,
-        type: AtemType.ME,
-        me: {
-          programInput: fromSourceInput,
-          previewInput: toSourceInput,
-          transitionPreview: false,
-          transitionPosition: {
-            inTransition: true,
-            handlePosition: tBarPosition,
-            remainingFrames: 25
-          }
-        }
-      }
-    }
   }
 
   public createAuxTimelineObject(sourceInput: number, layer: Tv2VideoMixerLayer): AtemAuxTimelineObject {

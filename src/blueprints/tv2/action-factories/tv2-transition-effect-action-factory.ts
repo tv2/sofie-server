@@ -2,8 +2,7 @@ import {
   Action,
   ActionArgumentType,
   MutateActionMethods,
-  MutateActionType,
-  MutateActionWithOnAirAndNextPiecesMethods
+  MutateActionType, MutateActionWithPieceMethods,
 } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
@@ -86,7 +85,6 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
           this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE, transitionEffect, blueprintConfiguration)
         ]
       }),
-      this.createEmptyTBarAction()
     ]
   }
 
@@ -133,23 +131,11 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         })
         break
       }
-      case TransitionEffectType.T_BAR: {
-        mutateActionMethods.push({
-          type: MutateActionType.APPLY_ARGUMENTS,
-          updateActionWithArguments: (_action: Action, actionArguments: unknown) => {
-            if (!this.isTransitionDurationArgumentInteger(actionArguments)) {
-              throw new Tv2MisconfigurationException(`TBarTransitionAction expects 'actionArguments' to be an integer. ${actionArguments} is not an integer.`)
-            }
-            return this.createTBarAction(actionArguments)
-          }
-        })
-        break
-      }
     }
 
-    const updateTransitionMutateAction: MutateActionWithOnAirAndNextPiecesMethods = {
+    const updateTransitionMutateAction: MutateActionWithPieceMethods = {
       type: MutateActionType.PIECE,
-      updateActionWithPiece: (action: Action, onAirPiece?: Piece, nextPiece?: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, onAirPiece, nextPiece),
+      updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
       piecePredicate: (piece: Piece) => piece.timelineObjects.some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer()),
     }
     mutateActionMethods.push(updateTransitionMutateAction)
@@ -360,48 +346,36 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return breakerDsk
   }
 
-  private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, onAirPiece?: Piece, nextPiece?: Piece): Tv2TransitionEffectAction {
-    if (!nextPiece) {
+  private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, piece?: Piece): Tv2TransitionEffectAction {
+    if (!piece) {
       return action
     }
 
-    const nextSourceInput: number | undefined = this.videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(nextPiece)
-    if (!nextSourceInput) {
-      this.logger.data({ action, nextPiece }).warn('Can\'t find a Program SourceInput to put the Transition Effect on')
+    const sourceInput: number | undefined = this.videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(piece)
+    if (!sourceInput) {
+      this.logger.data({ action, piece }).warn('Can\'t find a Program SourceInput to put the Transition Effect on')
       return action
     }
 
     switch (action.metadata.transitionEffectType) {
       case TransitionEffectType.CUT: {
-        const cutTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObjects(nextSourceInput)
+        const cutTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createCutTransitionEffectTimelineObjects(sourceInput)
         action.data.pieceInterface.timelineObjects.push(...cutTransitionTimelineObjects)
         break
       }
       case TransitionEffectType.MIX: {
-        const mixTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(nextSourceInput, action.metadata.durationInFrames)
+        const mixTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames)
         action.data.pieceInterface.timelineObjects.push(...mixTransitionTimelineObjects)
         break
       }
       case TransitionEffectType.DIP: {
-        const dipTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObjects(nextSourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
+        const dipTransitionTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createDipTransitionEffectTimelineObjects(sourceInput, action.metadata.durationInFrames, action.metadata.dipInput)
         action.data.pieceInterface.timelineObjects.push(...dipTransitionTimelineObjects)
         break
       }
       case TransitionEffectType.BREAKER: {
         action.data.pieceInterface.timelineObjects.push(...this.createTimelineObjectsForBreakerTransitionEffect(action.metadata))
         action.data.partInTransition = this.createPartInTransitionForBreakerTransitionEffect(action.metadata)
-        break
-      }
-      case TransitionEffectType.T_BAR: {
-        if (!onAirPiece) {
-          break
-        }
-        const onAirSourceInput: number | undefined = this.videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(onAirPiece)
-        if (!onAirSourceInput) {
-          break
-        }
-        const tBarTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createTBarTransitionEffectTimelineObject(onAirSourceInput, nextSourceInput, action.metadata.tBarPosition)
-        action.data.pieceInterface.timelineObjects.push(tBarTimelineObject)
         break
       }
     }
@@ -434,67 +408,6 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return {
       keepPreviousPartAliveDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
       delayPiecesDuration: this.getTimeFromFrames(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
-    }
-  }
-
-  private createEmptyTBarAction(): Tv2TransitionEffectAction {
-    return {
-      id: 't_bar_transition_action',
-      name: 'T-bar transition',
-      description: 'Action to control a transition with a T-bar',
-      rank: 0,
-      type: PieceActionType.INSERT_PIECE_AS_ON_AIR, // TODO: Is this right?
-      data: {
-        pieceInterface: {} as PieceInterface
-      },
-      metadata: {
-        contentType: Tv2ActionContentType.TRANSITION,
-        transitionEffectType: TransitionEffectType.T_BAR,
-        tBarPosition: 0  // Default duration - To be overridden by APPLY ARGUMENTS
-      },
-      argument: {
-        name: 'T-bar position',
-        description: 'The position of the T-bar',
-        type: ActionArgumentType.NUMBER
-      }
-    }
-  }
-
-  private createTBarAction(tBarPosition: number): Tv2TransitionEffectAction {
-    const pieceInterface: PieceInterface = { // TODO: Do I need this Piece?
-      id: `tBarPosition_${tBarPosition}_TransitionActionPiece`,
-      name: 'T-bar transition',
-      partId: '',
-      layer: Tv2SourceLayer.JINGLE,
-      pieceLifespan: PieceLifespan.WITHIN_PART,
-      transitionType: TransitionType.IN_TRANSITION,
-      isPlanned: false,
-      start: 0,
-      postRollDuration: 0,
-      preRollDuration: 0,
-      tags: [],
-      isUnsynced: false,
-      timelineObjects: [],
-      metadata: {
-        type: Tv2PieceType.TRANSITION,
-        outputLayer: Tv2OutputLayer.SECONDARY
-      }
-    }
-
-
-    return {
-      id: 't_bar_transition_action',
-      name: 'Action to control a transition with a T-bar',
-      rank: 0,
-      type: PieceActionType.INSERT_PIECE_AS_ON_AIR, // TODO: Is this right?
-      data: {
-        pieceInterface
-      },
-      metadata: {
-        contentType: Tv2ActionContentType.TRANSITION,
-        transitionEffectType: TransitionEffectType.T_BAR,
-        tBarPosition
-      }
     }
   }
 }

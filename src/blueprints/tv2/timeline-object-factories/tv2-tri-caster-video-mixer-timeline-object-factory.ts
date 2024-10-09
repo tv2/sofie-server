@@ -356,10 +356,6 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     ]
   }
 
-  public createTBarTransitionEffectTimelineObject(_fromSourceInput: number, _toSourceInput: number, _tBarPosition: number): Tv2BlueprintTimelineObject {
-    throw new Error('Not implemented!')
-  }
-
   public getProgramLayer(): string {
     return Tv2TriCasterLayer.PROGRAM
   }

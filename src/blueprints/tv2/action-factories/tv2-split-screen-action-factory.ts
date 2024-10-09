@@ -104,13 +104,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       case Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT: {
         return [{
           type: MutateActionType.PIECE,
-          updateActionWithPiece: (action: Action, onAirPiece: Piece | undefined, nextPiece: Piece | undefined): Action => {
-            if (onAirPiece)
-              return this.updateInsertToInputAction(action, onAirPiece)
-            if (nextPiece)
-              return this.updateInsertToInputAction(action, nextPiece)
-            return action
-          },
+          updateActionWithPiece: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
           piecePredicate: (piece: Piece) => this.doesPieceHaveSplitScreenBoxesTimelineObject(piece)
         }]
       }
@@ -130,13 +124,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
           },
           {
             type: MutateActionType.PIECE,
-            updateActionWithPiece: (action: Action, onAirPiece: Piece | undefined, nextPiece: Piece | undefined): Action => {
-              if (onAirPiece)
-                return this.updateInsertToInputAction(action, onAirPiece)
-              if (nextPiece)
-                return this.updateInsertToInputAction(action, nextPiece)
-              return action
-            },
+            updateActionWithPiece: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
             piecePredicate: (piece: Piece) => this.doesPieceHaveSplitScreenBoxesTimelineObject(piece)
           }
         ]
