@@ -81,7 +81,7 @@ export class Segment {
   }
 
   public findLastPartNotOnAir(): Part {
-    // Array.reverse() reverse the array in place. In order to mess with the original array we make a "copy" of it.
+    // Array.reverse() reverse the array in place. To not mess with the original array, we make a "copy" of it.
     // Array.findLast() would be preferred by that requires a higher node version that what we currently support.
     const part: Part | undefined = this.parts.map(part => part).reverse().find(part => !part.invalidity && !part.isOnAir())
 
