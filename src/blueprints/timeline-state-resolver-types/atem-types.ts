@@ -9,10 +9,6 @@ export interface AtemMeTimelineObject extends TimelineObject {
       input: number
       transition: AtemTransition,
       transitionSettings?: AtemTransitionSettings,
-      // ####
-      inTransition?: boolean,
-      transitionPreview?: boolean,
-      transitionPosition?: number,
     }
   }
 }

@@ -346,11 +346,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return breakerDsk
   }
 
-  private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, piece?: Piece): Tv2TransitionEffectAction {
-    if (!piece) {
-      return action
-    }
-
+  private updateTimelineObjectsWithTransitionEffect(action: Tv2TransitionEffectAction, piece: Piece): Tv2TransitionEffectAction {
     const sourceInput: number | undefined = this.videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(piece)
     if (!sourceInput) {
       this.logger.data({ action, piece }).warn('Can\'t find a Program SourceInput to put the Transition Effect on')

@@ -256,7 +256,7 @@ describe(ExecuteActionService.name, () => {
 
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
-            updateActionWithPiece: (action: Action) => action,
+            updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.id === nextPiece.id
           }
 

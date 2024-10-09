@@ -87,7 +87,7 @@ export class ExecuteActionService implements ActionService {
   private async executeMutateActionMethods(action: Action, mutateActionMethods: MutateActionMethods, rundownId: string, actionArguments: unknown): Promise<Action> {
     switch (mutateActionMethods.type) {
       case MutateActionType.PIECE: {
-        return await this.mutateActionWithOnAirAndNextPiece(rundownId, mutateActionMethods, action)
+        return await this.mutateActionWithPieceFromNextPart(rundownId, mutateActionMethods, action)
       }
       case MutateActionType.MEDIA: {
         return this.mutateActionWithMedia(mutateActionMethods, action)
@@ -111,7 +111,7 @@ export class ExecuteActionService implements ActionService {
     return this.blueprint.getMutateActionMethods(action)
   }
 
-  private async mutateActionWithOnAirAndNextPiece(rundownId: string, mutateActionMethods: MutateActionWithPieceMethods, action: Action): Promise<Action> {
+  private async mutateActionWithPieceFromNextPart(rundownId: string, mutateActionMethods: MutateActionWithPieceMethods, action: Action): Promise<Action> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const piece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
     if (!piece) {
