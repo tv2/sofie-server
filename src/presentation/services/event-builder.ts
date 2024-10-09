@@ -257,12 +257,13 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
     }
   }
 
-  public buildPartUnsyncedEvent(rundown: Rundown, part: Part): PartUnsyncedEvent {
+  public buildPartUnsyncedEvent(rundown: Rundown, unsyncedPart: Part, originalPartId: string): PartUnsyncedEvent {
     return {
       type: IngestEventType.PART_UNSYNCED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: new PartDto(part),
+      part: new PartDto(unsyncedPart),
+      originalPartId,
     }
   }
 

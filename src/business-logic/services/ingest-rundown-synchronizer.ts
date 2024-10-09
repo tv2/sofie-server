@@ -57,9 +57,6 @@ export class IngestRundownSynchronizer {
     const ingestedParts: readonly IngestedPart[] = ingestedRundown.ingestedSegments.flatMap(ingestedSegment => ingestedSegment.ingestedParts)
     const ingestedPartIds: ReadonlySet<string> = new Set(ingestedParts.map(ingestedPart => ingestedPart.id))
 
-    const deletedSegmentIds: ReadonlySet<string> = new Set(deletedSegments.map(segment => segment.id))
-    const deletedParts: readonly Part[] = parts.filter(part => part.isPlanned && !part.isUnsynced() && !ingestedPartIds.has(part.id) && !deletedSegmentIds.has(part.getSegmentId()))
-
     const partIds: ReadonlySet<string> = new Set(parts.map(part => part.id))
     const affectedSegmentIds: ReadonlySet<string> = new Set([...createdSegmentIds, ...updatedSegments.map(segment => segment.id), ...deletedSegments.map(segment => segment.id)])
     const createdParts: readonly Part[] = ingestedParts
@@ -73,7 +70,7 @@ export class IngestRundownSynchronizer {
         return updatedParts
       }
       const part: Part | undefined = parts.find(part => part.id === ingestedPart.id)
-      if (!part) {
+      if (!part || part.isOnAir()) {
         return updatedParts
       }
       if (!this.ingestEntityDiffer.doesPartDifferFromIngestPart(part, ingestedPart)) {
@@ -83,6 +80,23 @@ export class IngestRundownSynchronizer {
         ...updatedParts,
         this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(part, ingestedPart)
       ]
+    }, [])
+
+    const deletedSegmentIds: ReadonlySet<string> = new Set(deletedSegments.map(segment => segment.id))
+    const deletedParts: readonly Part[] = parts.reduce<Part[]>((deletedParts, part) => {
+      if (part.isPlanned && !part.isUnsynced() && !ingestedPartIds.has(part.id) && !deletedSegmentIds.has(part.getSegmentId())) {
+        return [...deletedParts, part]
+      }
+
+      if (!part.isOnAir()) {
+        return deletedParts
+      }
+
+      const ingestedPart: IngestedPart | undefined = ingestedParts.find(ingestedPart => part.id === ingestedPart.id)
+      if (ingestedPart && this.ingestEntityDiffer.doesPartDifferFromIngestPart(part, ingestedPart)) {
+        return [...deletedParts, this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(part, ingestedPart)]
+      }
+      return deletedParts
     }, [])
 
     return {

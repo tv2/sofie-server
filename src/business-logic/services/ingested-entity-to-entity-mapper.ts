@@ -84,7 +84,6 @@ export class IngestedEntityToEntityMapper {
     })
   }
 
-
   public convertIngestedPartToPart(ingestedPart: IngestedPart): Part {
     return new Part({
       id: ingestedPart.id,
@@ -114,7 +113,6 @@ export class IngestedEntityToEntityMapper {
         ? this.updatePieceWithIngestedPiece(existingPiece, ingestedPiece)
         : this.convertIngestedPieceToPiece(ingestedPiece)
     }).concat(partToBeUpdated.getPieces().filter(piece => !piece.isPlanned))
-
 
     return new Part({
       ...ingestedPart,
