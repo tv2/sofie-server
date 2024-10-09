@@ -314,6 +314,32 @@ describe(IngestRundownSynchronizer.name, () => {
         expect(result.updatedParts.length).toBe(1)
         expect(result.updatedParts).toEqual(expect.arrayContaining([expect.objectContaining({ id: 'part-a', name: 'A2' })]))
       })
+
+      describe('when the part is on air', () => {
+        it('marks the on air part for deletion and creates a new part with the updated data', () => {
+          const rundown: Rundown = EntityTestFactory.createRundown({
+            id: 'rundown-a',
+            segments: [
+              EntityTestFactory.createSegment({ id: 'segment-a', parts: [EntityTestFactory.createPart({ id: 'part-a', segmentId: 'segment-a', name: 'A1', isOnAir: true }), EntityTestFactory.createPart({ id: 'part-b', segmentId: 'segment-a', name: 'B1' })] }),
+            ],
+          })
+          const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({
+            id: 'rundown-a',
+            ingestedSegments: [
+              EntityTestFactory.createIngestedSegment({ id: 'segment-a', ingestedParts: [EntityTestFactory.createIngestedPart({ id: 'part-a', segmentId: 'segment-a', name: 'A2' }), EntityTestFactory.createIngestedPart({ id: 'part-b', segmentId: 'segment-a', name: 'B1' })] }),
+            ],
+          })
+          const testee: IngestRundownSynchronizer = createTestee()
+
+          const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+
+          expect(result.updatedParts.length).toBe(0)
+          expect(result.createdParts.length).toBe(1)
+          expect(result.createdParts).toEqual(expect.arrayContaining([expect.objectContaining({ id: 'part-a', name: 'A2' })]))
+          expect(result.deletedParts.length).toBe(1)
+          expect(result.deletedParts).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'A1' })]))
+        })
+      })
     })
   })
 

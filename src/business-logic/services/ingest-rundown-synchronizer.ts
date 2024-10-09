@@ -94,7 +94,7 @@ export class IngestRundownSynchronizer {
 
       const ingestedPart: IngestedPart | undefined = ingestedParts.find(ingestedPart => part.id === ingestedPart.id)
       if (ingestedPart && this.ingestEntityDiffer.doesPartDifferFromIngestPart(part, ingestedPart)) {
-        return [...deletedParts, this.ingestedEntityToEntityMapper.updatePartWithIngestedPart(part, ingestedPart)]
+        return [...deletedParts, part]
       }
       return deletedParts
     }, [])
