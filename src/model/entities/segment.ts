@@ -193,7 +193,9 @@ export class Segment {
 
     if (partToDelete.isOnAir()) {
       partToDelete.markAsUnsynced()
-      return partToDelete
+      const unsyncedPart: Part = partToDelete.getUnsyncedCopy()
+      this.parts = this.parts.map(part => part.id === partId ? unsyncedPart : part)
+      return unsyncedPart
     }
     this.parts = this.parts.filter(part => part.id !== partId)
     return partToDelete

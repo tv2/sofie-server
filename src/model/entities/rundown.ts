@@ -693,6 +693,9 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find segment for part with id '${partId}' in rundown ${this.id}.`)
     }
     const removedPart: Part | undefined = segment.removePart(partId)
+    if (removedPart?.isOnAir()) {
+      this.activeCursor = this.createCursor(this.activeCursor, { part: removedPart })
+    }
 
     this.markInfinitePiecesFromPartUnsynced(partId)
     this.updateNextCursor()

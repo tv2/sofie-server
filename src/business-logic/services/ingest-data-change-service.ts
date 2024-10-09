@@ -234,16 +234,12 @@ export class IngestDataChangeService implements DataChangeService {
   }
 
   private applyRundownSynchronizeResult(rundown: Rundown, rundownSynchronizeResult: RundownSynchronizeResult): { deletedPartsInfo: DeletedPartInfo[], deletedSegmentsInfo: DeletedSegmentInfo[] } {
-    rundownSynchronizeResult.createdSegments.forEach(segment => rundown.addSegment(segment))
-    rundownSynchronizeResult.updatedSegments.forEach(segment => rundown.updateSegment(segment))
-    rundownSynchronizeResult.createdParts.forEach(part => rundown.addPart(part))
-    rundownSynchronizeResult.updatedParts.forEach(part => rundown.updatePart(part))
     const deletedPartsInfo: DeletedPartInfo[] = rundownSynchronizeResult.deletedParts.map(part => {
       const originalPartId: string = part.id
       const originalSegmentId: string = part.getSegmentId()
       const deletedPart: Part | undefined = rundown.removePartFromSegment(part.id)
       return {
-        part: deletedPart?.getUnsyncedCopy(),
+        part: deletedPart,
         originalPartId,
         originalSegmentId,
       }
@@ -256,6 +252,11 @@ export class IngestDataChangeService implements DataChangeService {
         originalSegmentId,
       }
     })
+
+    rundownSynchronizeResult.createdSegments.forEach(segment => rundown.addSegment(segment))
+    rundownSynchronizeResult.updatedSegments.forEach(segment => rundown.updateSegment(segment))
+    rundownSynchronizeResult.createdParts.forEach(part => rundown.addPart(part))
+    rundownSynchronizeResult.updatedParts.forEach(part => rundown.updatePart(part))
 
     return { deletedPartsInfo, deletedSegmentsInfo }
   }

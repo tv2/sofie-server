@@ -60,7 +60,7 @@ export class IngestRundownSynchronizer {
     const partIds: ReadonlySet<string> = new Set(parts.map(part => part.id))
     const affectedSegmentIds: ReadonlySet<string> = new Set([...createdSegmentIds, ...updatedSegments.map(segment => segment.id), ...deletedSegments.map(segment => segment.id)])
     const createdParts: readonly Part[] = ingestedParts
-      .filter(ingestedPart => !partIds.has(ingestedPart.id) && !affectedSegmentIds.has(ingestedPart.segmentId))
+      .filter(ingestedPart => (!partIds.has(ingestedPart.id) || this.isPartOnAirAndUpdated(ingestedPart.id, parts, ingestedParts)) && !affectedSegmentIds.has(ingestedPart.segmentId))
       .map(ingestedPart => this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart))
 
     const createdPartIds: ReadonlySet<string> = new Set(createdParts.map(part => part.id))
@@ -108,5 +108,14 @@ export class IngestRundownSynchronizer {
       updatedParts,
       deletedParts,
     }
+  }
+
+  private isPartOnAirAndUpdated(partId: string, parts: readonly Part[], ingestedParts: readonly IngestedPart[]): boolean {
+    const part: Part | undefined = parts.find(part => part.id === partId)
+    const ingestedPart: IngestedPart | undefined = ingestedParts.find(part => part.id === partId)
+    if (!part || !ingestedPart) {
+      return false
+    }
+    return part.isOnAir() && this.ingestEntityDiffer.doesPartDifferFromIngestPart(part, ingestedPart)
   }
 }
