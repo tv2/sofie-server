@@ -143,7 +143,7 @@ describe(EntityChangeDetector.name, () => {
       ['content', { content: undefined }, { content: { foo: 'bar' } }],
     ]
     testCases.forEach(([attribute, pieceAttributes, ingestedPieceAttributes]) => {
-      describe(`when the ingested piece has a different ${attribute} than the piece`, () => {
+      describe(`when the ingested piece has a different ${attribute} than the original ingested piece`, () => {
         it('returns true', () => {
           const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'piece-a', ...pieceAttributes })
           const updatedIngestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'piece-a', ...ingestedPieceAttributes })
