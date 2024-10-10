@@ -7,7 +7,6 @@ import { Segment, SegmentInterface } from '../../../model/entities/segment'
 import { IngestedSegment } from '../../../model/entities/ingested-segment'
 import { Part, PartInterface } from '../../../model/entities/part'
 import { IngestedPart } from '../../../model/entities/ingested-part'
-import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { IngestedPiece } from '../../../model/entities/ingested-piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -118,19 +117,19 @@ describe(EntityChangeDetector.name, () => {
     })
   })
 
-  describe(EntityChangeDetector.prototype.doesPieceDifferFromIngestPiece.name, () => {
+  describe(EntityChangeDetector.prototype.doesIngestedPiecesDiffer.name, () => {
     describe('when nothing has changed', () => {
       it('returns false', () => {
-        const piece: Piece = EntityTestFactory.createPiece({ id: 'piece-a', name: 'piece-a' })
         const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'piece-a' })
+        const newIngestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'piece-a' })
 
         const testee: EntityChangeDetector = createTestee()
 
-        expect(testee.doesPieceDifferFromIngestPiece(piece, ingestedPiece)).toBeFalsy()
+        expect(testee.doesIngestedPiecesDiffer(ingestedPiece, newIngestedPiece)).toBeFalsy()
       })
     })
 
-    const testCases: [string, Partial<PieceInterface>, Partial<IngestedPiece>][] = [
+    const testCases: [string, Partial<IngestedPiece>, Partial<IngestedPiece>][] = [
       ['name', { name: 'piece-a' }, { name: 'piece-a (updated)' }],
       ['layer', { layer: 'layer-1' }, { layer: 'layer-2' }],
       ['lifespan', { pieceLifespan: PieceLifespan.WITHIN_PART }, { pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN }],
@@ -146,12 +145,12 @@ describe(EntityChangeDetector.name, () => {
     testCases.forEach(([attribute, pieceAttributes, ingestedPieceAttributes]) => {
       describe(`when the ingested piece has a different ${attribute} than the piece`, () => {
         it('returns true', () => {
-          const piece: Piece = EntityTestFactory.createPiece({ id: 'piece-a', name: 'piece-a', ...pieceAttributes })
-          const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'piece-a', ...ingestedPieceAttributes })
+          const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'piece-a', ...pieceAttributes })
+          const updatedIngestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'piece-a', ...ingestedPieceAttributes })
 
           const testee: EntityChangeDetector = createTestee()
 
-          expect(testee.doesPieceDifferFromIngestPiece(piece, ingestedPiece)).toBeTruthy()
+          expect(testee.doesIngestedPiecesDiffer(ingestedPiece, updatedIngestedPiece)).toBeTruthy()
         })
       })
     })
