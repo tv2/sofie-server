@@ -27,19 +27,20 @@ export class IngestRundownSynchronizer {
     const updatedRundown: Rundown | undefined = this.getUpdatedRundown(rundown, ingestedRundown)
 
     const createdSegments: readonly Segment[] = this.getCreatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
-    const updatedSegments: readonly Segment[] = this.getUpdatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments, createdSegments)
+    const updatedSegments: readonly Segment[] = this.getUpdatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
     const deletedSegments: readonly Segment[] = this.getDeletedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
-
-    const parts: readonly Part[] = rundown.getSegments().flatMap(segment => segment.getParts())
-    const ingestedParts: readonly IngestedPart[] = ingestedRundown.ingestedSegments.flatMap(ingestedSegment => ingestedSegment.ingestedParts)
 
     const affectedSegmentIds: ReadonlySet<string> = new Set([
       ...createdSegments.map(segment => segment.id),
       ...updatedSegments.map(segment => segment.id),
       ...deletedSegments.map(segment => segment.id),
     ])
+
+    const parts: readonly Part[] = rundown.getSegments().flatMap(segment => segment.getParts())
+    const ingestedParts: readonly IngestedPart[] = ingestedRundown.ingestedSegments.flatMap(ingestedSegment => ingestedSegment.ingestedParts)
+
     const createdParts: readonly Part[] = this.getCreatedParts(parts, ingestedParts, affectedSegmentIds)
-    const updatedParts: readonly Part[] = this.getUpdatedParts(parts, ingestedParts, createdParts, affectedSegmentIds)
+    const updatedParts: readonly Part[] = this.getUpdatedParts(parts, ingestedParts, affectedSegmentIds)
     const deletedParts: readonly Part[] = this.getDeletedParts(parts, ingestedParts, deletedSegments)
 
     return {
@@ -66,12 +67,8 @@ export class IngestRundownSynchronizer {
       .map(ingestedSegment => this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment))
   }
 
-  public getUpdatedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[], createdSegments: readonly Segment[]): readonly Segment[] {
-    const createdSegmentIds: ReadonlySet<string> = new Set(createdSegments.map(segment => segment.id))
+  public getUpdatedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[]): readonly Segment[] {
     return ingestedSegments.reduce<readonly Segment[]>((updatedSegments, ingestedSegment) => {
-      if (createdSegmentIds.has(ingestedSegment.id)) {
-        return updatedSegments
-      }
       const segment: Segment | undefined = segments.find(segment => segment.id === ingestedSegment.id)
       if (!segment) {
         return updatedSegments
@@ -94,19 +91,15 @@ export class IngestRundownSynchronizer {
   private getCreatedParts(parts: readonly Part[], ingestedParts: readonly IngestedPart[], affectedSegmentIds: ReadonlySet<string>): readonly Part[] {
     const partIds: ReadonlySet<string> = new Set(parts.map(part => part.id))
     return ingestedParts
-      .filter(ingestedPart => (!partIds.has(ingestedPart.id) || this.isPartOnAirAndUpdated(ingestedPart.id, parts, ingestedParts)) && !affectedSegmentIds.has(ingestedPart.segmentId))
+      .filter(ingestedPart => !partIds.has(ingestedPart.id) && !affectedSegmentIds.has(ingestedPart.segmentId) || this.isPartOnAirAndUpdated(ingestedPart.id, parts, ingestedParts))
       .map(ingestedPart => this.ingestedEntityToEntityMapper.convertIngestedPartToPart(ingestedPart))
   }
 
-  private getUpdatedParts(parts: readonly Part[], ingestedParts: readonly IngestedPart[], createdParts: readonly Part[], affectedSegmentIds: ReadonlySet<string>): readonly Part[] {
-    const createdPartIds: ReadonlySet<string> = new Set(createdParts.map(part => part.id))
+  private getUpdatedParts(parts: readonly Part[], ingestedParts: readonly IngestedPart[], affectedSegmentIds: ReadonlySet<string>): readonly Part[] {
     return ingestedParts.reduce<readonly Part[]>(
       (updatedParts, ingestedPart) => {
-        if (createdPartIds.has(ingestedPart.id) || affectedSegmentIds.has(ingestedPart.segmentId)) {
-          return updatedParts
-        }
         const part: Part | undefined = parts.find(part => part.id === ingestedPart.id)
-        if (!part || part.isOnAir()) {
+        if (!part || part.isOnAir() || affectedSegmentIds.has(ingestedPart.segmentId)) {
           return updatedParts
         }
         if (!this.ingestEntityDiffer.doesPartDifferFromIngestPart(part, ingestedPart)) {
@@ -125,7 +118,7 @@ export class IngestRundownSynchronizer {
     const ingestedPartIds: ReadonlySet<string> = new Set(ingestedParts.map(ingestedPart => ingestedPart.id))
     const deletedSegmentIds: ReadonlySet<string> = new Set(deletedSegments.map(segment => segment.id))
     return parts.reduce<Part[]>((deletedParts, part) => {
-      if (part.isPlanned && !part.isUnsynced() && !ingestedPartIds.has(part.id) && !deletedSegmentIds.has(part.getSegmentId())) {
+      if (part.isPlanned && !part.isUnsynced() && !ingestedPartIds.has(part.id) && !deletedSegmentIds.has(part.getSegmentId()) || this.isPartOnAirAndUpdated(part.id, parts, ingestedParts)) {
         return [...deletedParts, part]
       }
 

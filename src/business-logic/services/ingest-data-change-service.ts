@@ -234,6 +234,17 @@ export class IngestDataChangeService implements DataChangeService {
   }
 
   private applyRundownSynchronizeResult(rundown: Rundown, rundownSynchronizeResult: RundownSynchronizeResult): { deletedPartsInfo: DeletedPartInfo[], deletedSegmentsInfo: DeletedSegmentInfo[] } {
+    const deletedSegmentsInfo: DeletedSegmentInfo[] = rundownSynchronizeResult.deletedSegments.map(segment => {
+      const originalSegmentId: string = segment.id
+      const deletedSegment: Segment | undefined = rundown.removeSegment(segment.id)
+      return {
+        segment: deletedSegment,
+        originalSegmentId,
+      }
+    })
+    rundownSynchronizeResult.createdSegments.forEach(segment => rundown.addSegment(segment))
+    rundownSynchronizeResult.updatedSegments.forEach(segment => rundown.updateSegment(segment))
+
     const deletedPartsInfo: DeletedPartInfo[] = rundownSynchronizeResult.deletedParts.map(part => {
       const originalPartId: string = part.id
       const originalSegmentId: string = part.getSegmentId()
@@ -244,17 +255,6 @@ export class IngestDataChangeService implements DataChangeService {
         originalSegmentId,
       }
     })
-    const deletedSegmentsInfo: DeletedSegmentInfo[] = rundownSynchronizeResult.deletedSegments.map(segment => {
-      const originalSegmentId: string = segment.id
-      const deletedSegment: Segment | undefined = rundown.removeSegment(segment.id)
-      return {
-        segment: deletedSegment,
-        originalSegmentId,
-      }
-    })
-
-    rundownSynchronizeResult.createdSegments.forEach(segment => rundown.addSegment(segment))
-    rundownSynchronizeResult.updatedSegments.forEach(segment => rundown.updateSegment(segment))
     rundownSynchronizeResult.createdParts.forEach(part => rundown.addPart(part))
     rundownSynchronizeResult.updatedParts.forEach(part => rundown.updatePart(part))
 
@@ -265,12 +265,6 @@ export class IngestDataChangeService implements DataChangeService {
     if (rundownSynchronizeResult.updatedRundown) {
       this.rundownEventEmitter.emitRundownUpdated(rundownSynchronizeResult.updatedRundown)
     }
-    deletedPartsInfo.forEach(({ part, originalSegmentId, originalPartId }) => {
-      if (!part) {
-        return
-      }
-      part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(rundown, part, originalPartId) : this.rundownEventEmitter.emitPartDeleted(rundown, originalSegmentId, originalPartId)
-    })
     deletedSegmentsInfo.forEach(({ segment, originalSegmentId }) => {
       if (!segment) {
         return
@@ -279,6 +273,13 @@ export class IngestDataChangeService implements DataChangeService {
     })
     rundownSynchronizeResult.createdSegments.forEach(segment => this.rundownEventEmitter.emitSegmentCreated(rundown, segment))
     rundownSynchronizeResult.updatedSegments.forEach(segment => this.rundownEventEmitter.emitSegmentUpdated(rundown, segment))
+
+    deletedPartsInfo.forEach(({ part, originalSegmentId, originalPartId }) => {
+      if (!part) {
+        return
+      }
+      part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(rundown, part, originalPartId) : this.rundownEventEmitter.emitPartDeleted(rundown, originalSegmentId, originalPartId)
+    })
     rundownSynchronizeResult.createdParts.forEach(part => this.rundownEventEmitter.emitPartCreated(rundown, part))
     rundownSynchronizeResult.updatedParts.forEach(part => this.rundownEventEmitter.emitPartUpdated(rundown, part))
   }
