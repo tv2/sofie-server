@@ -9,7 +9,7 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
 export const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
-export class MongoPieceRepository extends BaseMongoRepository implements PieceRepository {
+export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implements PieceRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)

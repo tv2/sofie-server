@@ -3,10 +3,11 @@ import { StatusMessageRepository } from '../interfaces/status-message-repository
 import { StatusMessage } from '../../../model/entities/status-message'
 import { MongoDatabase } from './mongo-database'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { MongoId } from './mongo-entity-converter'
 
 const STATUS_MESSAGE_COLLECTION_NAME: string = 'statusMessages'
 
-export class MongoStatusMessageRepository extends BaseMongoRepository implements StatusMessageRepository {
+export class MongoStatusMessageRepository extends BaseMongoRepository<StatusMessage & MongoId> implements StatusMessageRepository {
 
   constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
@@ -40,7 +41,7 @@ export class MongoStatusMessageRepository extends BaseMongoRepository implements
   public async createStatusMessage(statusMessage: StatusMessage): Promise<StatusMessage> {
     this.assertDatabaseConnection(this.createStatusMessage.name)
     statusMessage.lastUpdatedTimestamp = Date.now()
-    await this.getCollection().updateOne({ id: statusMessage.id }, { $set: statusMessage }, { upsert: true})
+    await this.getCollection().updateOne({ id: statusMessage.id }, { $set: statusMessage }, { upsert: true })
     return statusMessage
   }
 

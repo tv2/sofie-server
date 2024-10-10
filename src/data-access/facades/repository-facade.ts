@@ -65,8 +65,8 @@ import { DeviceRepository } from '../repositories/interfaces/device-repository'
 import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
 import { ShowStyle } from '../../model/entities/show-style'
 import {
-  MongoShowStyleConfigurationChangedListener
-} from '../repositories/mongo/mongo-show-style-configuration-changed-listener'
+  MongoShowStyleChangedListener
+} from '../repositories/mongo/mongo-show-style-changed-listener'
 import { Database } from '../repositories/interfaces/database'
 import { ShowStyleVariant } from '../../model/entities/show-style-variant'
 import {
@@ -199,7 +199,7 @@ export class RepositoryFacade {
   }
 
   public static createShowStyleChangedListener(): DataChangedListener<ShowStyle> {
-    return new MongoShowStyleConfigurationChangedListener(MongoDatabase.getInstance(LoggerFacade.createLogger()), LoggerFacade.createLogger())
+    return new MongoShowStyleChangedListener(MongoDatabase.getInstance(LoggerFacade.createLogger()), LoggerFacade.createLogger())
   }
 
   public static createShowStyleVariantConfigurationListener(): DataChangedListener<ShowStyleVariant> {

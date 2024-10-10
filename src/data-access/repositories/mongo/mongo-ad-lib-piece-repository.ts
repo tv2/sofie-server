@@ -8,6 +8,7 @@ import { MongoId } from './mongo-entity-converter'
 const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
 
 interface MongoAdLibPiece {
+  _id: string
   sourceLayerId: string
   rundownId: string
   name: string
@@ -19,7 +20,7 @@ interface MongoAdLibPiece {
   }
 }
 
-export class MongoAdLibPieceRepository extends BaseMongoRepository implements ActionManifestRepository {
+export class MongoAdLibPieceRepository extends BaseMongoRepository<MongoAdLibPiece> implements ActionManifestRepository {
 
   constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)

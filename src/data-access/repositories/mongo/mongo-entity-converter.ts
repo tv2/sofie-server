@@ -31,6 +31,8 @@ import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { Invalidity } from '../../../model/value-objects/invalidity'
 import { Logger } from '../../../logger/logger'
+import { ActionArgument } from '../../../model/entities/action'
+import { ActionType } from '../../../model/enums/action-type'
 
 
 export interface MongoId {
@@ -134,6 +136,7 @@ export interface MongoTimeline extends MongoId {
 }
 
 export interface MongoStudio {
+  _id: string
   settings: {
     mediaPreviewsUrl: string
   }
@@ -146,6 +149,7 @@ interface MongoLayerMappings {
 }
 
 export interface MongoShowStyle {
+  _id: string
   blueprintConfig: unknown
 }
 
@@ -175,6 +179,18 @@ export interface MongoMedia extends MongoId {
 
 export interface MongoSystemInformation extends MongoId {
   name: string
+}
+
+export interface MongoAction extends MongoId {
+  id: string
+  name: string
+  rank: number
+  description?: string
+  type: ActionType
+  data: unknown
+  metadata?: unknown
+  rundownId?: string | null
+  argument?: ActionArgument
 }
 
 export interface MongoDevice extends MongoId {

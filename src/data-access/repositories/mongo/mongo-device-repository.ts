@@ -6,7 +6,7 @@ import { MongoDevice, MongoEntityConverter } from './mongo-entity-converter'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
-export class MongoDeviceRepository extends BaseMongoRepository implements DeviceRepository {
+export class MongoDeviceRepository extends BaseMongoRepository<MongoDevice> implements DeviceRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)

@@ -11,7 +11,7 @@ import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 
 export const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
 
-export class MongoPartRepository extends BaseMongoRepository implements PartRepository {
+export class MongoPartRepository extends BaseMongoRepository<MongoPart> implements PartRepository {
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoEntityConverter: MongoEntityConverter,

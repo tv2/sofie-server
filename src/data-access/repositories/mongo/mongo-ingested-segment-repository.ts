@@ -8,7 +8,7 @@ import { NotFoundException } from '../../../model/exceptions/not-found-exception
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest rename to "ingestedSegments".
 
-export class MongoIngestedSegmentRepository extends BaseMongoRepository implements IngestedSegmentRepository {
+export class MongoIngestedSegmentRepository extends BaseMongoRepository<MongoIngestedSegment> implements IngestedSegmentRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,

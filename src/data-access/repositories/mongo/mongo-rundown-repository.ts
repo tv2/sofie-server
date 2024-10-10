@@ -15,7 +15,7 @@ import { MongoEntityConverter, MongoRundown } from './mongo-entity-converter'
 
 export const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
-export class MongoRundownRepository extends BaseMongoRepository implements RundownRepository {
+export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> implements RundownRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,

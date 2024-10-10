@@ -12,7 +12,7 @@ import { MongoEntityConverter, MongoSegment } from './mongo-entity-converter'
 
 export const SEGMENT_COLLECTION_NAME: string = 'executedSegments' // TODO: Once we control ingest rename to "segments".
 
-export class MongoSegmentRepository extends BaseMongoRepository implements SegmentRepository {
+export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> implements SegmentRepository {
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoEntityConverter: MongoEntityConverter,

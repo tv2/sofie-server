@@ -5,10 +5,11 @@ import { MongoDatabase } from './mongo-database'
 import { DeleteResult } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { MongoAction } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'actions'
 
-export class MongoActionRepository extends BaseMongoRepository implements ActionRepository {
+export class MongoActionRepository extends BaseMongoRepository<MongoAction> implements ActionRepository {
 
   constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)

@@ -9,7 +9,7 @@ import { Logger } from '../../../logger/logger'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
-export class MongoDeviceChangedListener extends BaseMongoRepository implements DataChangedListener<Device> {
+export class MongoDeviceChangedListener extends BaseMongoRepository<MongoDevice> implements DataChangedListener<Device> {
 
   private readonly logger: Logger
   private onCreatedCallback: (device: Device) => void
