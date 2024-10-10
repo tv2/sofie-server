@@ -684,6 +684,11 @@ export class Rundown extends BasicRundown {
     if (this.activeCursor?.part.id === part.id) {
       this.activeCursor = this.createCursor(this.activeCursor, { part })
     }
+    if (this.nextCursor?.part.id === part.id) {
+      part.setAsNext()
+      this.nextCursor = this.createCursor(this.nextCursor, { part })
+      return
+    }
     this.updateNextCursor()
   }
 
