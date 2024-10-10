@@ -82,9 +82,10 @@ export class RepositoryFacade {
   public static createRundownRepository(): RundownRepository {
     const mongoRundownRepository: RundownRepository = new MongoRundownRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      RepositoryFacade.createMongoSegmentRepository(),
+      RepositoryFacade.createMongoPartRepository(),
+      RepositoryFacade.createMongoPieceRepository(),
       new MongoEntityConverter(LoggerFacade.createLogger()),
-      RepositoryFacade.createSegmentRepository(),
-      RepositoryFacade.createPieceRepository()
     )
     return CachedRundownRepository.getInstance(mongoRundownRepository, LoggerFacade.createLogger())
   }
@@ -111,10 +112,15 @@ export class RepositoryFacade {
   }
 
   public static createSegmentRepository(): SegmentRepository {
+    return this.createMongoSegmentRepository()
+  }
+
+  private static createMongoSegmentRepository(): MongoSegmentRepository {
     return new MongoSegmentRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      RepositoryFacade.createMongoPartRepository(),
+      RepositoryFacade.createMongoPieceRepository(),
       new MongoEntityConverter(LoggerFacade.createLogger()),
-      RepositoryFacade.createPartRepository()
     )
   }
 
@@ -135,10 +141,14 @@ export class RepositoryFacade {
   }
 
   public static createPartRepository(): PartRepository {
+    return this.createMongoPartRepository()
+  }
+
+  private static createMongoPartRepository(): MongoPartRepository {
     return new MongoPartRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      RepositoryFacade.createMongoPieceRepository(),
       new MongoEntityConverter(LoggerFacade.createLogger()),
-      RepositoryFacade.createPieceRepository()
     )
   }
 
@@ -167,6 +177,10 @@ export class RepositoryFacade {
   }
 
   public static createPieceRepository(): PieceRepository {
+    return this.createMongoPieceRepository()
+  }
+
+  private static createMongoPieceRepository(): MongoPieceRepository {
     return new MongoPieceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
   }
 

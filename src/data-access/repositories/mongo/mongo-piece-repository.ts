@@ -3,7 +3,7 @@ import { PieceRepository } from '../interfaces/piece-repository'
 import { Piece } from '../../../model/entities/piece'
 import { MongoDatabase } from './mongo-database'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { DeleteResult } from 'mongodb'
+import { ClientSession, DeleteResult, UpdateOneModel } from 'mongodb'
 import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
@@ -35,6 +35,25 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
       }
     ).toArray()
     return this.mongoEntityConverter.convertToPieces(mongoPieces)
+  }
+
+  public buildSavePieceQueries(pieces: readonly Piece[]): { updateOne: UpdateOneModel<MongoPiece> }[] {
+    return pieces.map(piece => this.buildSavePieceQuery(piece))
+  }
+
+  private buildSavePieceQuery(piece: Piece): { updateOne: UpdateOneModel<MongoPiece> } {
+    const mongoPiece: MongoPiece = this.mongoEntityConverter.convertToMongoPiece(piece)
+    return {
+      updateOne: {
+        filter: { _id: mongoPiece._id },
+        update: { $set: mongoPiece },
+        upsert: true,
+      }
+    }
+  }
+
+  public async executeQueries(queries: readonly { updateOne: UpdateOneModel<MongoPiece> }[], session: ClientSession): Promise<void> {
+    await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
   public async savePiece(piece: Piece): Promise<void> {

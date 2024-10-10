@@ -1,17 +1,19 @@
 import { Rundown } from '../../../model/entities/rundown'
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { MongoDatabase } from './mongo-database'
-import { SegmentRepository } from '../interfaces/segment-repository'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { DeleteResult } from 'mongodb'
+import { DeleteResult, MongoClient, UpdateOneModel } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
-import { PieceRepository } from '../interfaces/piece-repository'
 import { Piece } from '../../../model/entities/piece'
 import { Segment } from '../../../model/entities/segment'
-import { MongoEntityConverter, MongoRundown } from './mongo-entity-converter'
+import { MongoEntityConverter, MongoPart, MongoPiece, MongoRundown, MongoSegment } from './mongo-entity-converter'
+import { MongoSegmentRepository } from './mongo-segment-repository'
+import { MongoPartRepository } from './mongo-part-repository'
+import { MongoPieceRepository } from './mongo-piece-repository'
+import { Part } from '../../../model/entities/part'
 
 export const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
@@ -19,9 +21,10 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
 
   constructor(
     mongoDatabase: MongoDatabase,
+    private readonly mongoSegmentRepository: MongoSegmentRepository,
+    private readonly mongoPartRepository: MongoPartRepository,
+    private readonly mongoPieceRepository: MongoPieceRepository,
     private readonly mongoEntityConverter: MongoEntityConverter,
-    private readonly segmentRepository: SegmentRepository,
-    private readonly pieceRepository: PieceRepository
   ) {
     super(mongoDatabase)
   }
@@ -48,8 +51,8 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
       throw new NotFoundException(`No Rundown found in database for RundownId ${rundownId}`)
     }
 
-    const infinitePieces: Piece[] = await this.pieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
-    const segments: Segment[] = await this.segmentRepository.getSegments(mongoRundown._id)
+    const infinitePieces: Piece[] = await this.mongoPieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
+    const segments: Segment[] = await this.mongoSegmentRepository.getSegments(mongoRundown._id)
     return this.mongoEntityConverter.convertToRundown(mongoRundown, segments, infinitePieces)
   }
 
@@ -59,12 +62,24 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
 
   public async saveRundown(rundown: Rundown): Promise<void> {
     this.assertDatabaseConnection(this.saveRundown.name)
-    const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
-    await this.getCollection().replaceOne({ _id: mongoRundown._id }, mongoRundown, { upsert: true, ignoreUndefined: true })
 
-    await Promise.all([
-      ...rundown.getSegments().map(segment => this.segmentRepository.saveSegment(segment)),
-    ])
+    const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
+    const segments: readonly Segment[] = rundown.getSegments()
+    const saveSegmentQueries: readonly { updateOne: UpdateOneModel<MongoSegment> }[] = this.mongoSegmentRepository.buildSaveSegmentQueries(rundown.getSegments())
+    const parts: readonly Part[] = segments.flatMap(segment => segment.getParts())
+    const savePartQueries: readonly { updateOne: UpdateOneModel<MongoPart> }[] = this.mongoPartRepository.buildSavePartQueries(parts)
+    const pieces: readonly Piece[] = parts.flatMap(part => part.getPieces())
+    const savePieceQueries: readonly { updateOne: UpdateOneModel<MongoPiece> }[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
+
+    const mongoClient: MongoClient = this.mongoDatabase.getClient()
+    await mongoClient.withSession(async (session) => {
+      await session.withTransaction(async (session) => {
+        await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
+        await this.mongoSegmentRepository.executeQueries(saveSegmentQueries, session)
+        await this.mongoPartRepository.executeQueries(savePartQueries, session)
+        await this.mongoPieceRepository.executeQueries(savePieceQueries, session)
+      })
+    })
   }
 
   public async deleteRundown(rundownId: string): Promise<void> {
@@ -74,7 +89,7 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
       return
     }
 
-    await this.segmentRepository.deleteSegmentsForRundown(rundownId)
+    await this.mongoSegmentRepository.deleteSegmentsForRundown(rundownId)
     const rundownDeletionResult: DeleteResult = await this.getCollection().deleteOne({
       _id: rundownId,
     })
