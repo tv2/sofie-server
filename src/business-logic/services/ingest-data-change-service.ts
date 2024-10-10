@@ -27,13 +27,13 @@ interface DeletedInfo {
 }
 
 interface DeletedPartInfo {
-  part: Part | undefined
+  part?: Part
   originalPartId: string
   originalSegmentId: string
 }
 
 interface DeletedSegmentInfo {
-  segment: Segment | undefined
+  segment?: Segment
   originalSegmentId: string
 }
 
@@ -265,21 +265,17 @@ export class IngestDataChangeService implements DataChangeService {
     if (rundownSynchronizeResult.updatedRundown) {
       this.rundownEventEmitter.emitRundownUpdated(rundownSynchronizeResult.updatedRundown)
     }
-    deletedSegmentsInfo.forEach(({ segment, originalSegmentId }) => {
-      if (!segment) {
-        return
-      }
-      segment.isUnsynced() ? this.rundownEventEmitter.emitSegmentUnsynced(rundown, segment, originalSegmentId) : this.rundownEventEmitter.emitSegmentDeleted(rundown, originalSegmentId)
-    })
+    deletedSegmentsInfo.filter((deletedSegmentInfo): deletedSegmentInfo is Required<DeletedSegmentInfo> => deletedSegmentInfo.segment !== undefined)
+      .forEach(({ segment, originalSegmentId }) => {
+        segment.isUnsynced() ? this.rundownEventEmitter.emitSegmentUnsynced(rundown, segment, originalSegmentId) : this.rundownEventEmitter.emitSegmentDeleted(rundown, originalSegmentId)
+      })
     rundownSynchronizeResult.createdSegments.forEach(segment => this.rundownEventEmitter.emitSegmentCreated(rundown, segment))
     rundownSynchronizeResult.updatedSegments.forEach(segment => this.rundownEventEmitter.emitSegmentUpdated(rundown, segment))
 
-    deletedPartsInfo.forEach(({ part, originalSegmentId, originalPartId }) => {
-      if (!part) {
-        return
-      }
-      part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(rundown, part, originalPartId) : this.rundownEventEmitter.emitPartDeleted(rundown, originalSegmentId, originalPartId)
-    })
+    deletedPartsInfo.filter((deletedPartInfo): deletedPartInfo is Required<DeletedPartInfo> => deletedPartInfo.part !== undefined)
+      .forEach(({ part, originalSegmentId, originalPartId }) => {
+        part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(rundown, part, originalPartId) : this.rundownEventEmitter.emitPartDeleted(rundown, originalSegmentId, originalPartId)
+      })
     rundownSynchronizeResult.createdParts.forEach(part => this.rundownEventEmitter.emitPartCreated(rundown, part))
     rundownSynchronizeResult.updatedParts.forEach(part => this.rundownEventEmitter.emitPartUpdated(rundown, part))
   }
