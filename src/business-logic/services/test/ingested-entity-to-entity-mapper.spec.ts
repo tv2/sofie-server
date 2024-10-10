@@ -68,5 +68,18 @@ describe(IngestedEntityToEntityMapper.name, () => {
         expect(result.getPieces()).toHaveLength(0)
       })
     })
+
+    describe('when the part is on air', () => {
+      it('returns the unchanged on air part', () => {
+        const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'Part A', isOnAir: true })
+        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'Part A (updated)' })
+
+        const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
+
+        const result: Part = testee.updatePartWithIngestedPart(part, ingestedPart)
+
+        expect(part).toStrictEqual(result)
+      })
+    })
   })
 })

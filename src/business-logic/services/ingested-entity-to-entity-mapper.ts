@@ -107,6 +107,9 @@ export class IngestedEntityToEntityMapper {
   }
 
   public updatePartWithIngestedPart(partToBeUpdated: Part, ingestedPart: IngestedPart): Part {
+    if (partToBeUpdated.isOnAir()) {
+      return partToBeUpdated
+    }
     const updatedPieces: Piece[] = ingestedPart.ingestedPieces.map(ingestedPiece => {
       const existingPiece: Piece | undefined = partToBeUpdated.getPieces().find(piece => piece.id === ingestedPiece.id)
       return existingPiece
