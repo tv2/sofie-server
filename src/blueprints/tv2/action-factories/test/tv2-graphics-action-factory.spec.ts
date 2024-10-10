@@ -1,5 +1,5 @@
 import { Tv2GraphicsActionFactory } from '../tv2-graphics-action-factory'
-import { anything, instance, mock, when } from '@typestrong/ts-mockito'
+import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
@@ -30,6 +30,7 @@ import {
 } from '../../timeline-object-factories/interfaces/tv2-graphics-element-timeline-object-factory'
 import { DeviceType } from '../../../../model/enums/device-type'
 import { Tv2SourceLayer } from '../../value-objects/tv2-layers'
+import { Tv2Logger } from '../../tv2-logger'
 
 describe(Tv2GraphicsActionFactory.name, () => {
   describe(Tv2GraphicsActionFactory.prototype.createGraphicsActions.name, () => {
@@ -182,13 +183,21 @@ function createTestee(params?: {
   configurationMapper?: Tv2ConfigurationMapper
 }): Tv2GraphicsActionFactory {
   return new Tv2GraphicsActionFactory(
-    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(),
+    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfTv2Logger())),
     params?.graphicsTimelineObjectFactoryFactory ?? instance(createMockedTv2GraphicsTimelineObjectFactoryFactory()),
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.stringHashConverter ?? new Tv2StringHashConverter(),
     params?.configurationMapper ?? instance(mock<Tv2ConfigurationMapper>())
   )
+}
+
+function createMockOfTv2Logger(): Tv2Logger {
+  const mockedLogger: Tv2Logger = mock<Tv2Logger>()
+  when(mockedLogger.tag(anyString())).thenCall(() => instance(mockedLogger))
+  when(mockedLogger.data(anything())).thenCall(() => instance(mockedLogger))
+  when(mockedLogger.metadata(anything())).thenCall(() => instance(mockedLogger))
+  return mockedLogger
 }
 
 function createMockedTv2GraphicsTimelineObjectFactoryFactory(): Tv2GraphicsTimelineObjectFactoryFactory {

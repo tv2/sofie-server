@@ -669,7 +669,7 @@ export class Rundown extends BasicRundown {
   public addPart(part: Part): void {
     const segment: Segment | undefined = this.segments.find(segment => segment.id === part.getSegmentId())
     if (!segment) {
-      throw new NotFoundException(`Unable to find Segment for Part ${part.id} in Rundown ${this.id}`)
+      throw new NotFoundException(`Unable to find segment with id '${part.getSegmentId()}' when adding part '${part.name}' with id '${part.id}' in rundown '${this.name}' with id '${this.id}'.`)
     }
     segment.addPart(part)
     this.updateNextCursor()
@@ -678,7 +678,7 @@ export class Rundown extends BasicRundown {
   public updatePart(part: Part): void {
     const segment: Segment | undefined = this.segments.find(segment => segment.id === part.getSegmentId())
     if (!segment) {
-      throw new NotFoundException(`Unable to find Segment for Part ${part.id} in Rundown ${this.id}`)
+      throw new NotFoundException(`Unable to find segment with id '${part.getSegmentId()}' when updating part '${part.name}' with id '${part.id}' in rundown '${this.name}' with id '${this.id}'.`)
     }
     segment.updatePart(part)
     this.updateNextCursor()
@@ -687,7 +687,7 @@ export class Rundown extends BasicRundown {
   public removePartFromSegment(partId: string): Part | undefined {
     const segment: Segment | undefined = this.segments.find(segment => segment.getParts().some(part => part.id === partId))
     if (!segment) {
-      throw new NotFoundException(`Unable to find Segment for Part ${partId} in Rundown ${this.id}`)
+      throw new NotFoundException(`Unable to find segment for part with id '${partId}' in rundown ${this.id}.`)
     }
     const removedPart: Part | undefined = segment.removePart(partId)
 

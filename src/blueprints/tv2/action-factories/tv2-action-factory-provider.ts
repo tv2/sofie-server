@@ -233,7 +233,7 @@ export class Tv2ActionFactoryProvider {
   }
 
   private createActionManifestMapper(): Tv2ActionManifestMapper {
-    return new Tv2ActionManifestMapper()
+    return new Tv2ActionManifestMapper(Tv2LoggerFacade.createLogger())
   }
 
   private createGraphicsTimelineObjectFactoryFactory(): Tv2GraphicsTimelineObjectFactoryFactory {
@@ -292,7 +292,8 @@ export class Tv2ActionFactoryProvider {
           this.createGraphicsSplitScreenTimelineObjectFactory(),
           this.createVideoClipTimelineObjectFactory(),
           this.createStringHashConverter(),
-          this.createAssetPathHelper()
+          this.createAssetPathHelper(),
+          Tv2LoggerFacade.createLogger(),
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {
