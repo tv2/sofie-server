@@ -115,9 +115,9 @@ export class IngestedEntityToEntityMapper {
       return existingPiece
         ? this.updatePieceWithIngestedPiece(existingPiece, ingestedPiece)
         : this.convertIngestedPieceToPiece(ingestedPiece)
-    }).concat(partToBeUpdated.getPieces().filter(piece => !piece.isPlanned))
+    })
 
-    return new Part({
+    const updatedPart: Part = new Part({
       ...ingestedPart,
       id: partToBeUpdated.id,
       segmentId: partToBeUpdated.getSegmentId(),
@@ -133,6 +133,11 @@ export class IngestedEntityToEntityMapper {
       timings: this.getPartTimings(partToBeUpdated),
       ingestedPart
     })
+
+    const unplannedPiecesToKeep: Piece[] = partToBeUpdated.getPieces().filter(piece => !piece.isPlanned)
+    unplannedPiecesToKeep.forEach(unplannedPiece => updatedPart.insertPiece(unplannedPiece))
+
+    return updatedPart
   }
 
   private getPartTimings(part: Part): PartTimings | undefined {

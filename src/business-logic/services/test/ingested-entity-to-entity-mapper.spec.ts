@@ -10,13 +10,8 @@ describe(IngestedEntityToEntityMapper.name, () => {
       it('adds the Pieces to the Part', () => {
         const partToBeUpdated: Part = EntityTestFactory.createPart()
 
-        const newIngestedPiece: IngestedPiece = {
-          id: 'newIngestedPiece',
-          name: 'New Ingested Piece'
-        } as IngestedPiece
-        const ingestedPart: IngestedPart = {
-          ingestedPieces: [newIngestedPiece] as Readonly<IngestedPiece[]>
-        } as IngestedPart
+        const newIngestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({ id: 'newIngestedPiece', name: 'New Ingested Piece' })
+        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ ingestedPieces: [newIngestedPiece] })
 
         const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
 
@@ -79,6 +74,37 @@ describe(IngestedEntityToEntityMapper.name, () => {
         const result: Part = testee.updatePartWithIngestedPart(part, ingestedPart)
 
         expect(part).toStrictEqual(result)
+      })
+    })
+  })
+
+  describe('when the part has unplanned pieces', () => {
+    describe('when the ingested part has no overlapping pieces on the same layer', () => {
+      it('keeps the unplanned piece', () => {
+        const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'Part A', pieces: [EntityTestFactory.createPiece({ id: 'unplanned-piece-a', name: 'mix 100', isPlanned: false })] })
+        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'Part A', ingestedPieces: [] })
+
+        const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
+
+        const result: Part = testee.updatePartWithIngestedPart(part, ingestedPart)
+
+        expect(result.getPieces().length).toBe(1)
+        expect(result.getPieces()).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'mix 100' })]))
+      })
+    })
+
+    describe('when the ingested part has an overlapping piece on the same layer', () => {
+      it('ignores the ingested overlapping piece', () => {
+        const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'Part A', pieces: [EntityTestFactory.createPiece({ id: 'unplanned-piece-a', name: 'mix 100', layer: 'mix_effect', isPlanned: false })] })
+        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'Part A', ingestedPieces: [EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'mix 50', layer: 'mix_effect' })] })
+
+        const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
+
+        const result: Part = testee.updatePartWithIngestedPart(part, ingestedPart)
+
+        expect(result.getPieces().length).toBe(1)
+        expect(result.getPieces()).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'mix 100' })]))
+        expect(result.getPieces()).toEqual(expect.not.arrayContaining([expect.objectContaining({ name: 'mix 50' })]))
       })
     })
   })

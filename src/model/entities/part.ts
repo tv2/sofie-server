@@ -204,30 +204,28 @@ export class Part {
       unPlannedPiece.setStart(timeSincePutOnAir)
       unPlannedPiece.markAsInsertedOnAir()
 
-      this.stopPiecesOnLayer(unPlannedPiece.layer)
+      this.stopOverlappingPiecesOnSameLayer(unPlannedPiece)
     } else {
-      this.removePieceOnLayer(unPlannedPiece.layer)
+      this.removeOverlappingPiecesOnSameLayer(unPlannedPiece)
     }
     this.pieces.push(unPlannedPiece)
   }
 
-  private stopPiecesOnLayer(layer: string): void {
-    this.pieces.filter(piece => piece.layer === layer && !piece.getDuration())
+  private stopOverlappingPiecesOnSameLayer(referencePiece: Piece): void {
+    this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doesPiecesOverlap(referencePiece, piece))
       .forEach(stoppablePiece => stoppablePiece.stop())
   }
 
-  private removePieceOnLayer(layer: string): void {
-    const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === layer)
-    if (indexOfExistingPieceOnLayer < 0) {
-      return
-    }
-    const removedPieces: Piece[] = this.pieces.splice(indexOfExistingPieceOnLayer, 1)
-    removedPieces.forEach(piece => {
-      if (!piece.isPlanned) {
-        return
-      }
-      this.replacedPlannedPieces.push(piece)
-    })
+  private doesPiecesOverlap(pieceA: Piece, pieceB: Piece): boolean {
+    const pieceAEnd: number = pieceA.getStart() + (pieceA.getDuration() ?? Infinity)
+    const pieceBEnd: number = pieceB.getStart() + (pieceB.getDuration() ?? Infinity)
+    return pieceA.getStart() <= pieceBEnd && pieceAEnd >= pieceB.getStart()
+  }
+
+  private removeOverlappingPiecesOnSameLayer(referencePiece: Piece): void {
+    const piecesToRemove: Piece[] = this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doesPiecesOverlap(referencePiece, piece))
+    this.pieces = this.pieces.filter(piece => !piecesToRemove.includes(piece))
+    this.replacedPlannedPieces.push(...piecesToRemove.filter(piece => piece.isPlanned))
   }
 
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
