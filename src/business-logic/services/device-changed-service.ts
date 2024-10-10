@@ -1,12 +1,12 @@
-import { DataChangeService } from './interfaces/data-change-service'
-import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
-import { Device } from '../../model/entities/device'
-import { StatusMessage } from '../../model/entities/status-message'
-import { StatusCode } from '../../model/enums/status-code'
-import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
-import { Logger } from '../../logger/logger'
-import { StatusMessageService } from './interfaces/status-message-service'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import {DataChangeService} from './interfaces/data-change-service'
+import {DataChangedListener} from '../../data-access/repositories/interfaces/data-changed-listener'
+import {Device} from '../../model/entities/device'
+import {StatusMessage} from '../../model/entities/status-message'
+import {StatusCode} from '../../model/enums/status-code'
+import {DeviceRepository} from '../../data-access/repositories/interfaces/device-repository'
+import {Logger} from '../../logger/logger'
+import {StatusMessageService} from './interfaces/status-message-service'
+import {UnsupportedOperationException} from '../../model/exceptions/unsupported-operation-exception'
 
 // TODO: Find a way to translate
 const NOT_CONNECTED_MESSAGE: string = 'Not connected'
@@ -85,8 +85,18 @@ export class DeviceChangedService implements DataChangeService {
       id: `${DEVICE_STATUS_MESSAGE_PREFIX}${device.id}`,
       statusCode: device.statusCode,
       title: device.name,
-      message: device.statusMessage
+      message: this.getDeviceMessage(device)
     }
+  }
+
+  private getDeviceMessage(device: Device): string {
+    if (device.statusMessage){
+      return device.statusMessage
+    }
+    if (device.statusCode === StatusCode.GOOD) {
+      return 'The device is in a good state.'
+    }
+    return ''
   }
 
   private async onDeviceDeleted(deviceId: string): Promise<void> {
