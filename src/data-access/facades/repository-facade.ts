@@ -46,8 +46,6 @@ import { MongoEntityConverter } from '../repositories/mongo/mongo-entity-convert
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
-import { CachedSegmentRepository } from '../repositories/cache/cached-segment-repository'
-import { CachedPartRepository } from '../repositories/cache/cached-part-repository'
 import { ActionTriggerRepository } from '../repositories/interfaces/action-trigger-repository'
 import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action-trigger-repository'
 import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
@@ -113,12 +111,11 @@ export class RepositoryFacade {
   }
 
   public static createSegmentRepository(): SegmentRepository {
-    const mongoSegmentRepository: SegmentRepository = new MongoSegmentRepository(
+    return new MongoSegmentRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       new MongoEntityConverter(LoggerFacade.createLogger()),
       RepositoryFacade.createPartRepository()
     )
-    return CachedSegmentRepository.getInstance(mongoSegmentRepository)
   }
 
   public static createIngestedSegmentRepository(): IngestedSegmentRepository {
@@ -138,12 +135,11 @@ export class RepositoryFacade {
   }
 
   public static createPartRepository(): PartRepository {
-    const mongoPartRepository: PartRepository = new MongoPartRepository(
+    return new MongoPartRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       new MongoEntityConverter(LoggerFacade.createLogger()),
       RepositoryFacade.createPieceRepository()
     )
-    return CachedPartRepository.getInstance(mongoPartRepository)
   }
 
   public static createIngestedPartRepository(): IngestedPartRepository {
