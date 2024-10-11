@@ -3,7 +3,7 @@ import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { ClientSession, UpdateOneModel } from 'mongodb'
+import { AnyBulkWriteOperation, ClientSession, UpdateOneModel } from 'mongodb'
 import { Piece } from '../../../model/entities/piece'
 import { Segment } from '../../../model/entities/segment'
 import { MongoEntityConverter, MongoPart, MongoPiece, MongoRundown, MongoSegment } from './mongo-entity-converter'
@@ -97,8 +97,19 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     return this.mongoSegmentRepository.getSegment(segmentId)
   }
 
-  public deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
-    return this.mongoSegmentRepository.deleteUnsyncedSegmentsForRundown(rundownId)
+  public async deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deleteUnsyncedSegmentsForRundown.name)
+    const unsyncedFilter: Partial<MongoSegment> = { isUnsynced: true }
+    const segments: Segment[] = await this.mongoSegmentRepository.getSegments(rundownId, unsyncedFilter)
+    const parts: readonly Part[] = segments.flatMap(segment => segment.getParts())
+
+    const deletePartQueries: AnyBulkWriteOperation<MongoPart>[] = segments.map(segment => this.mongoPartRepository.buildDeletePartsForSegmentQuery(segment.id))
+
+    await this.withTransaction(async (session) => {
+      await this.mongoPieceRepository.executeQueries(parts.map(part => this.mongoPieceRepository.buildDeletePiecesForPartQuery(part.id)), session)
+      await this.mongoPartRepository.executeQueries(deletePartQueries, session)
+      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteUnsyncedSegmentsForRundownQuery(rundownId)], session)
+    })
   }
 
   public getPart(partId: string): Promise<Part> {
@@ -124,7 +135,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
   public async deleteAllUnplannedAndUnsyncedContent(): Promise<void> {
     this.assertDatabaseConnection(this.deleteAllUnplannedAndUnsyncedContent.name)
     await this.withTransaction(async (session) => {
-      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteAllUnsyncedSegmentsQuery()], session)
+      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteUnsyncedSegmentsQuery()], session)
       await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeleteUnsyncedPartsQuery(), this.mongoPartRepository.buildDeleteAllUnplannedPartsQuery()], session)
       await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeleteAllUnsyncedPiecesQuery(), this.mongoPieceRepository.buildDeleteAllUnplannedPiecesQuery()], session)
     })

@@ -24,20 +24,18 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
 
   public async getPieces(partId: string): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPieces.name)
-    const mongoPieces: MongoPiece[] = (await this.getCollection()
+    return this.getCollection()
       .find<MongoPiece>({ partId: partId })
-      .toArray())
-    return this.mongoEntityConverter.convertToPieces(mongoPieces)
+      .map(mongoPiece => this.mongoEntityConverter.convertToPiece(mongoPiece))
+      .toArray()
   }
 
   public async getPiecesFromIds(pieceIds: string[] = []): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPiecesFromIds.name)
-    const mongoPieces: MongoPiece[] = await this.getCollection().find<MongoPiece>(
-      {
-        _id: { $in: pieceIds }
-      }
-    ).toArray()
-    return this.mongoEntityConverter.convertToPieces(mongoPieces)
+    return this.getCollection()
+      .find<MongoPiece>({_id: { $in: pieceIds } })
+      .map(mongoPiece => this.mongoEntityConverter.convertToPiece(mongoPiece))
+      .toArray()
   }
 
   public buildSavePieceQueries(pieces: readonly Piece[]): { updateOne: UpdateOneModel<MongoPiece> }[] {
@@ -79,6 +77,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
   }
 
   public async deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {
+    this.assertDatabaseConnection(this.deleteUnsyncedInfinitePiecesNotOnAnyRundown.name)
     const infinitePieceIdsOnRundowns: string[] = await this.getInfinitePieceIdsOnRundowns()
     await this.getCollection().deleteMany({
       _id: { $nin: infinitePieceIdsOnRundowns },
