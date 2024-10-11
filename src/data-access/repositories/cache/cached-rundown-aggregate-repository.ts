@@ -1,7 +1,6 @@
 import { RundownAggregateRepository } from '../interfaces/rundown-aggregate-repository'
 import { Rundown } from '../../../model/entities/rundown'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Logger } from '../../../logger/logger'
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
@@ -33,16 +32,6 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
     return this.cachedRundowns.get(rundownId) as Rundown
   }
 
-  public getRundownBySegmentId(segmentId: string): Promise<Rundown> {
-    for (const rundown of this.cachedRundowns.values()) {
-      const rundownHasSegment: boolean = rundown.getSegments().some(segment => segment.id === segmentId)
-      if (rundownHasSegment) {
-        return Promise.resolve(rundown)
-      }
-    }
-    throw new NotFoundException(`No Rundown found with a Segment for Segment id: ${segmentId}`)
-  }
-
   public async getBasicRundowns(): Promise<BasicRundown[]> {
     return await this.rundownAggregateRepository.getBasicRundowns()
   }
@@ -65,10 +54,6 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
     return this.rundownAggregateRepository.deleteUnsyncedSegmentsForRundown(rundownId)
   }
 
-  public deleteAllUnsyncedSegments(): Promise<void> {
-    return this.rundownAggregateRepository.deleteAllUnsyncedSegments()
-  }
-
   public getPart(partId: string): Promise<Part> {
     return this.rundownAggregateRepository.getPart(partId)
   }
@@ -76,17 +61,12 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
   public deletePart(partId: string): Promise<void> {
     return this.rundownAggregateRepository.deletePart(partId)
   }
+  public deleteParts(partIds: readonly string[]): Promise<void> {
+    return this.rundownAggregateRepository.deleteParts(partIds)
+  }
 
   public deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
     return this.rundownAggregateRepository.deleteUnsyncedPartsForSegment(segmentId)
-  }
-
-  public deleteAllUnsyncedParts(): Promise<void> {
-    throw new Error('Method not implemented.')
-  }
-
-  public deleteAllUnplannedParts(): Promise<void> {
-    throw new Error('Method not implemented.')
   }
 
   public getPiecesFromIds(pieceIds: string[]): Promise<Piece[]> {
@@ -97,11 +77,11 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
     return this.rundownAggregateRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
   }
 
-  public deleteAllUnsyncedPieces(): Promise<void> {
-    return this.rundownAggregateRepository.deleteAllUnsyncedPieces()
+  public deleteAllUnplannedAndUnsyncedContent(): Promise<void> {
+    return this.rundownAggregateRepository.deleteAllUnplannedAndUnsyncedContent()
   }
 
-  public deleteAllUnplannedPieces(): Promise<void> {
-    return this.rundownAggregateRepository.deleteAllUnplannedPieces()
+  public deleteUnplannedPartsForSegment(segmentId: string): Promise<void> {
+    return this.rundownAggregateRepository.deleteUnplannedPartsForSegment(segmentId)
   }
 }

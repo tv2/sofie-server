@@ -3,7 +3,7 @@ import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { DeleteManyModel, MongoClient, UpdateOneModel } from 'mongodb'
+import { ClientSession, UpdateOneModel } from 'mongodb'
 import { Piece } from '../../../model/entities/piece'
 import { Segment } from '../../../model/entities/segment'
 import { MongoEntityConverter, MongoPart, MongoPiece, MongoRundown, MongoSegment } from './mongo-entity-converter'
@@ -65,14 +65,11 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     const pieces: readonly Piece[] = parts.flatMap(part => part.getPieces())
     const savePieceQueries: readonly { updateOne: UpdateOneModel<MongoPiece> }[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
 
-    const mongoClient: MongoClient = this.mongoDatabase.getClient()
-    await mongoClient.withSession(async (session) => {
-      await session.withTransaction(async (session) => {
-        await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
-        await this.mongoSegmentRepository.executeQueries(saveSegmentQueries, session)
-        await this.mongoPartRepository.executeQueries(savePartQueries, session)
-        await this.mongoPieceRepository.executeQueries(savePieceQueries, session)
-      })
+    await this.withTransaction(async (session) => {
+      await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
+      await this.mongoSegmentRepository.executeQueries(saveSegmentQueries, session)
+      await this.mongoPartRepository.executeQueries(savePartQueries, session)
+      await this.mongoPieceRepository.executeQueries(savePieceQueries, session)
     })
   }
 
@@ -83,19 +80,12 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
       return
     }
 
-    const deleteSegmentsQuery: { deleteMany: DeleteManyModel<MongoSegment> } = this.mongoSegmentRepository.buildDeleteSegmentsForRundownQuery(rundownId)
-    const deletePartsQuery: { deleteMany: DeleteManyModel<MongoPart> } = this.mongoPartRepository.buildDeletePartsForRundownQuery(rundownId)
     const partIdsForRundown: readonly string[] = await this.mongoPartRepository.getPartIdsForRundown(rundownId)
-    const deletePiecesQuery: { deleteMany: DeleteManyModel<MongoPiece> } = this.mongoPieceRepository.buildDeletePiecesForRundownQuery(partIdsForRundown)
-
-    const mongoClient: MongoClient = this.mongoDatabase.getClient()
-    await mongoClient.withSession(async (session) => {
-      await session.withTransaction(async (session) => {
-        await this.mongoPieceRepository.executeQueries([deletePiecesQuery], session)
-        await this.mongoPartRepository.executeQueries([deletePartsQuery], session)
-        await this.mongoSegmentRepository.executeQueries([deleteSegmentsQuery], session)
-        await this.getCollection().deleteOne({ _id: rundownId })
-      })
+    await this.withTransaction(async (session) => {
+      await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeletePiecesForRundownQuery(partIdsForRundown)], session)
+      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForRundownQuery(rundownId)], session)
+      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteSegmentsForRundownQuery(rundownId)], session)
+      await this.getCollection().deleteOne({ _id: rundownId })
     })
   }
 
@@ -111,28 +101,54 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     return this.mongoSegmentRepository.deleteUnsyncedSegmentsForRundown(rundownId)
   }
 
-  public deleteAllUnsyncedSegments(): Promise<void> {
-    return this.mongoSegmentRepository.deleteAllUnsyncedSegments()
-  }
-
   public getPart(partId: string): Promise<Part> {
     return this.mongoPartRepository.getPart(partId)
   }
 
-  public deletePart(partId: string): Promise<void> {
-    return this.mongoPartRepository.deletePart(partId)
+  public async deletePart(partId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deletePart.name)
+    await this.withTransaction(async (session) => {
+      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartQuery(partId)], session)
+      await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeletePiecesForPartQuery(partId)], session)
+    })
   }
 
-  public deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
-    return this.mongoPartRepository.deleteUnsyncedPartsForSegment(segmentId)
+  public async deleteParts(partIds: readonly string[]): Promise<void> {
+    this.assertDatabaseConnection(this.deleteParts.name)
+    await this.withTransaction(async (session) => {
+      await this.mongoPartRepository.executeQueries(partIds.map(partId => this.mongoPartRepository.buildDeletePartQuery(partId)), session)
+      await this.mongoPieceRepository.executeQueries(partIds.map(partId => this.mongoPieceRepository.buildDeletePiecesForPartQuery(partId)), session)
+    })
   }
 
-  public deleteAllUnsyncedParts(): Promise<void> {
-    return this.mongoPartRepository.deleteAllUnsyncedParts()
+  public async deleteAllUnplannedAndUnsyncedContent(): Promise<void> {
+    this.assertDatabaseConnection(this.deleteAllUnplannedAndUnsyncedContent.name)
+    await this.withTransaction(async (session) => {
+      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteAllUnsyncedSegmentsQuery()], session)
+      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeleteUnsyncedPartsQuery(), this.mongoPartRepository.buildDeleteAllUnplannedPartsQuery()], session)
+      await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeleteAllUnsyncedPiecesQuery(), this.mongoPieceRepository.buildDeleteAllUnplannedPiecesQuery()], session)
+    })
   }
 
-  public deleteAllUnplannedParts(): Promise<void> {
-    return this.mongoPartRepository.deleteAllUnplannedParts()
+  public async deleteUnplannedPartsForSegment(segmentId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deleteUnplannedPartsForSegment.name)
+    await this.withTransaction(async (session) => {
+      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForSegmentQuery(segmentId, { isPlanned: false })], session)
+      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForSegmentQuery(segmentId, { isPlanned: false })], session)
+    })
+  }
+
+  public async deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deleteUnsyncedPartsForSegment.name)
+    const partIdsInSegment: readonly string[] = await this.mongoPartRepository.getPartIdsForSegment(segmentId)
+    await this.withTransaction(async (session) => {
+      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeleteUnsyncedPartsForSegmentQuery(segmentId)], session)
+      await this.mongoPieceRepository.executeQueries(partIdsInSegment.map(partId => this.mongoPieceRepository.buildDeletePiecesForPartQuery(partId)), session)
+    })
+  }
+
+  private withTransaction(callback: (session: ClientSession) => Promise<void>): Promise<void> {
+    return this.mongoDatabase.getClient().withSession(session => session.withTransaction(session => callback(session)))
   }
 
   public getPiecesFromIds(pieceIds: string[]): Promise<Piece[]> {
@@ -141,13 +157,5 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
 
   public deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {
     return this.mongoPieceRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
-  }
-
-  public deleteAllUnsyncedPieces(): Promise<void> {
-    return this.mongoPieceRepository.deleteAllUnplannedPieces()
-  }
-
-  public deleteAllUnplannedPieces(): Promise<void> {
-    return this.mongoPieceRepository.deleteAllUnplannedPieces()
   }
 }

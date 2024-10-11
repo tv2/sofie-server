@@ -1,13 +1,10 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { PieceRepository } from '../interfaces/piece-repository'
 import { Piece } from '../../../model/entities/piece'
 import { MongoDatabase } from './mongo-database'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import {
   AnyBulkWriteOperation,
   ClientSession,
   DeleteManyModel,
-  DeleteResult,
   UpdateOneModel
 } from 'mongodb'
 import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
@@ -15,7 +12,7 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
 export const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
-export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implements PieceRepository {
+export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)
@@ -59,6 +56,9 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
   }
 
   public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoPiece>[], session: ClientSession): Promise<void> {
+    if (queries.length === 0) {
+      return
+    }
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
@@ -70,12 +70,11 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
     }
   }
 
-  public async deletePiecesForPart(partId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deletePiecesForPart.name)
-    const piecesDeletionResult: DeleteResult = await this.getCollection().deleteMany({ partId: partId })
-
-    if (!piecesDeletionResult.acknowledged) {
-      throw new DeletionFailedException(`Deletion of pieces was not acknowledged, for partId: ${partId}`)
+  public buildDeletePiecesForPartQuery(partId: string): AnyBulkWriteOperation<MongoPiece> {
+    return {
+      deleteOne: {
+        filter: { partId }
+      }
     }
   }
 
@@ -89,7 +88,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
   }
 
   private async getInfinitePieceIdsOnRundowns(): Promise<string[]> {
-    const mongoIds: MongoId[] = await this.getCollection()
+    return this.getCollection()
       .aggregate<MongoPiece>()
       .lookup({
         from: 'rundowns',
@@ -99,27 +98,29 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
       })
       .match({ rundown: { $ne: [] } })
       .project<MongoId>({ _id: 1 })
+      .map(mongoId => mongoId._id)
       .toArray()
-    return mongoIds.map(mongoId => mongoId._id)
   }
 
   /*
   * NOTE: This will delete ALL unsynced Pieces in the database. Should only be used on deactivate or activate Rundown.
   */
-  public async deleteAllUnsyncedPieces(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnsyncedPieces.name)
-    await this.getCollection().deleteMany({
-      isUnsynced: true
-    })
+  public buildDeleteAllUnsyncedPiecesQuery(): AnyBulkWriteOperation<MongoPiece> {
+    return {
+      deleteMany: {
+        filter: { isUnsynced: true }
+      }
+    }
   }
 
   /*
   * NOTE: This will delete ALL unplanned Pieces in the database. Should only be used on deactivate or activate Rundown.
   */
-  public async deleteAllUnplannedPieces(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnsyncedPieces.name)
-    await this.getCollection().deleteMany({
-      isPlanned: false
-    })
+  public buildDeleteAllUnplannedPiecesQuery(): AnyBulkWriteOperation<MongoPiece> {
+    return {
+      deleteMany: {
+        filter: { isPlanned: false }
+      }
+    }
   }
 }

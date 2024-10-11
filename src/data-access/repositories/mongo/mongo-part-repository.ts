@@ -1,11 +1,9 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { Part } from '../../../model/entities/part'
 import { MongoDatabase } from './mongo-database'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import {
   AnyBulkWriteOperation,
   ClientSession, DeleteManyModel,
-  DeleteResult,
   UpdateOneModel
 } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
@@ -57,7 +55,11 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
   }
 
   public getPartIdsForRundown(rundownId: string): Promise<readonly string[]> {
-    return this.getCollection().find({ rundownId }).map(document => document.rundownId).toArray()
+    return this.getCollection().find({ rundownId }).map(document => document._id).toArray()
+  }
+
+  public getPartIdsForSegment(segmentId: string): Promise<readonly string[]> {
+    return this.getCollection().find({ segmentId }).map(document => document._id).toArray()
   }
 
   public buildSavePartQueries(parts: readonly Part[]): { updateOne: UpdateOneModel<MongoPart> }[] {
@@ -76,6 +78,9 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
   }
 
   public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoPart>[], session: ClientSession): Promise<void> {
+    if (queries.length === 0) {
+      return
+    }
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
@@ -87,66 +92,47 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     }
   }
 
-  public buildDeletePartsForSegmentQuery(segmentId: string): { deleteMany: DeleteManyModel<MongoPart> } {
+  public buildDeletePartsForSegmentQuery(segmentId: string, mongoPart: Partial<MongoPart> = {}): { deleteMany: DeleteManyModel<MongoPart> } {
     return {
       deleteMany: {
-        filter: { segmentId },
+        filter: { ...mongoPart, segmentId },
       },
     }
   }
 
-  public async deletePart(partId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deletePart.name)
-    await this.mongoPieceRepository.deletePiecesForPart(partId)
-    await this.getCollection().deleteMany({ _id: partId })
-  }
-
-  public async deletePartsForSegment(segmentId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deletePartsForSegment.name)
-    const parts: Part[] = await this.getParts(segmentId)
-
-    await Promise.all(parts.map(async (part) => this.mongoPieceRepository.deletePiecesForPart(part.id)))
-
-    const partsDeletedResult: DeleteResult = await this.getCollection().deleteMany({ segmentId: segmentId })
-
-    if (!partsDeletedResult.acknowledged) {
-      throw new DeletionFailedException(`Deletion of parts was not acknowledged, for segmentId: ${segmentId}`)
+  public buildDeletePartQuery(partId: string): AnyBulkWriteOperation<MongoPart> {
+    return {
+      deleteOne: {
+        filter: { _id: partId }
+      }
     }
   }
 
-  public async deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deleteUnsyncedPartsForSegment.name)
-    const unsyncedFilter: Partial<MongoPart> = { isUnsynced: true }
-    const unsyncedParts: Part[] = await this.getParts(segmentId, unsyncedFilter)
-
-    await Promise.all(unsyncedParts.map(async (part) => this.mongoPieceRepository.deletePiecesForPart(part.id)))
-
-    const partsDeletedResult: DeleteResult = await this.getCollection().deleteMany({ ...unsyncedFilter, segmentId: segmentId })
-
-    if (!partsDeletedResult.acknowledged) {
-      throw new DeletionFailedException(`Deletion of parts was not acknowledged, for segmentId: ${segmentId}`)
-    }
+  public buildDeleteUnsyncedPartsForSegmentQuery(segmentId: string): AnyBulkWriteOperation<MongoPart> {
+    return this.buildDeleteUnsyncedPartsQuery({ segmentId })
   }
 
   /*
   * NOTE: This will delete ALL unsynced Parts in the database. Should only be used on deactivate or activate Rundown.
   * NOTE: This will NOT delete the associated Pieces.
   */
-  public async deleteAllUnsyncedParts(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnsyncedParts.name)
-    await this.getCollection().deleteMany({
-      isUnsynced: true
-    })
+  public buildDeleteUnsyncedPartsQuery(mongoPart: Partial<MongoPart> = {}): AnyBulkWriteOperation<MongoPart> {
+    return {
+      deleteMany: {
+        filter: { ...mongoPart, isUnsynced: true },
+      }
+    }
   }
 
   /*
   * NOTE: This will delete ALL unplanned Parts in the database. Should only be used on deactivate or activate Rundown.
   * NOTE: This will NOT delete the associated Pieces.
   */
-  public async deleteAllUnplannedParts(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnplannedParts.name)
-    await this.getCollection().deleteMany({
-      isPlanned: false
-    })
+  public buildDeleteAllUnplannedPartsQuery(): AnyBulkWriteOperation<MongoPart> {
+    return {
+      deleteMany: {
+        filter: { isPlanned: false },
+      }
+    }
   }
 }

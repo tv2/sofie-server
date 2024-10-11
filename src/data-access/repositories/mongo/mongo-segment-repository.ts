@@ -1,4 +1,3 @@
-import { SegmentRepository } from '../interfaces/segment-repository'
 import { Segment } from '../../../model/entities/segment'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedSegment } from './mongo-ingested-entity-converter'
@@ -16,7 +15,7 @@ import { MongoPartRepository } from './mongo-part-repository'
 
 export const SEGMENT_COLLECTION_NAME: string = 'executedSegments' // TODO: Once we control ingest rename to "segments".
 
-export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> implements SegmentRepository {
+export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoPartRepository: MongoPartRepository,
@@ -73,6 +72,9 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> im
   }
 
   public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoSegment>[], session: ClientSession): Promise<void> {
+    if (queries.length === 0) {
+      return
+    }
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
@@ -104,10 +106,12 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> im
   * NOTE: This will delete ALL unsynced Segments in the database. Should only be used on deactivate or activate Rundown.
   * NOTE: This will NOT delete the associated Parts.
   */
-  public async deleteAllUnsyncedSegments(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnsyncedSegments.name)
-    await this.getCollection().deleteMany({
-      isUnsynced: true
-    })
+
+  public buildDeleteAllUnsyncedSegmentsQuery(): AnyBulkWriteOperation<MongoSegment> {
+    return {
+      deleteMany: {
+        filter: { isUnsynced: true },
+      }
+    }
   }
 }

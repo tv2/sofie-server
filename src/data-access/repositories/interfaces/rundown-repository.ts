@@ -6,4 +6,6 @@ export interface RundownRepository {
   getRundown(rundownId: string): Promise<Rundown>
   saveRundown(rundown: Rundown): Promise<void>
   deleteRundown(rundownId: string): Promise<void>
+  deleteAllUnplannedAndUnsyncedContent(): Promise<void>
+  deleteUnplannedPartsForSegment(segmentId: string): Promise<void>
 }

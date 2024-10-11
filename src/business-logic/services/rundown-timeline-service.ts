@@ -146,13 +146,7 @@ export class RundownTimelineService implements RundownService {
   }
 
   private async deleteAllUnsyncedAndUnplanned(): Promise<void> {
-    await Promise.all([
-      this.segmentRepository.deleteAllUnsyncedSegments(),
-      this.partRepository.deleteAllUnsyncedParts(),
-      this.pieceRepository.deleteAllUnsyncedPieces(),
-      this.partRepository.deleteAllUnplannedParts(),
-      this.pieceRepository.deleteAllUnplannedPieces(),
-    ])
+    await this.rundownRepository.deleteAllUnplannedAndUnsyncedContent()
   }
 
   private stopAutoNext(): void {
@@ -249,12 +243,16 @@ export class RundownTimelineService implements RundownService {
 
   public async setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const unplannedPartsInSegment: readonly Part[] | undefined = rundown.getSegments().find(segment => segment.id === segmentId)?.getParts().filter(part => !part.isPlanned)
     rundown.setNext(segmentId, partId, owner)
 
     await this.buildAndPersistTimeline(rundown)
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
+    if (!rundown.getNextCursor()!.segment.isOnAir() && unplannedPartsInSegment) {
+      await this.partRepository.deleteParts(unplannedPartsInSegment.map(part => part.id))
+    }
     await this.saveRundown(rundown)
   }
 
