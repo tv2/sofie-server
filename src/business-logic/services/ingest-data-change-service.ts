@@ -144,8 +144,8 @@ export class IngestDataChangeService implements DataChangeService {
       try {
         const startTime: bigint = process.hrtime.bigint()
         await this.synchronizeRundown(rundownId)
-        const timeSpendInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
-        this.logger.trace(`Synchronizing changes for rundown with id '${rundownId}' took ${timeSpendInMs}ms.`)
+        const timeSpentInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
+        this.logger.trace(`Synchronizing changes for rundown with id '${rundownId}' took ${timeSpentInMs}ms.`)
       } catch (error) {
         this.logger.data(error).error(`Failed synchronizing changes for rundown with id '${rundownId}'.`)
       }
@@ -208,8 +208,8 @@ export class IngestDataChangeService implements DataChangeService {
     this.logRundownSynchronizeResult(rundownSynchronizeResult, `Synchronizing rundown '${updatedRundown.name}' with id '${updatedRundown.id}' had following effects:`)
     const { deletedPartsInfo, deletedSegmentsInfo }: DeletedInfo = this.applyRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult)
 
-    const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
-    this.logger.trace(`Synchronizing rundown (without IO) took ${durationInMs}ms.`)
+    const timeSpentInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
+    this.logger.trace(`Synchronizing rundown (without IO) took ${timeSpentInMs}ms.`)
 
     if (!this.wasRundownChanged(rundownSynchronizeResult)) {
       this.logger.debug(`No changes to save for rundown ${updatedRundown.name} with id '${updatedRundown.id}'.`)

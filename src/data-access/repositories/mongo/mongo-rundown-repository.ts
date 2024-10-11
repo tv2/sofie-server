@@ -4,8 +4,7 @@ import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { DeleteResult, MongoClient, UpdateOneModel } from 'mongodb'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
+import { DeleteManyModel, MongoClient, UpdateOneModel } from 'mongodb'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { Piece } from '../../../model/entities/piece'
 import { Segment } from '../../../model/entities/segment'
@@ -41,7 +40,6 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
       .toArray()) as unknown as MongoRundown[]
     return this.mongoEntityConverter.convertToBasicRundowns(basicRundowns)
   }
-
   public async getRundown(rundownId: string): Promise<Rundown> {
     this.assertDatabaseConnection(this.getRundown.name)
     const mongoRundown: MongoRundown | null = await this.getCollection().findOne<MongoRundown>({
@@ -89,13 +87,20 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
       return
     }
 
-    await this.mongoSegmentRepository.deleteSegmentsForRundown(rundownId)
-    const rundownDeletionResult: DeleteResult = await this.getCollection().deleteOne({
-      _id: rundownId,
+    const deleteSegmentsQuery: { deleteMany: DeleteManyModel<MongoSegment> } = this.mongoSegmentRepository.buildDeleteSegmentsForRundownQuery(rundownId)
+    const deletePartsQuery: { deleteMany: DeleteManyModel<MongoPart> } = this.mongoPartRepository.buildDeletePartsForRundownQuery(rundownId)
+    const partIdsForRundown: readonly string[] = await this.mongoPartRepository.getPartIdsForRundown(rundownId)
+    const deletePiecesQuery: { deleteMany: DeleteManyModel<MongoPiece> } = this.mongoPieceRepository.buildDeletePiecesForRundownQuery(partIdsForRundown)
+
+    const mongoClient: MongoClient = this.mongoDatabase.getClient()
+    await mongoClient.withSession(async (session) => {
+      await session.withTransaction(async (session) => {
+        await this.mongoPieceRepository.executeQueries([deletePiecesQuery], session)
+        await this.mongoPartRepository.executeQueries([deletePartsQuery], session)
+        await this.mongoSegmentRepository.executeQueries([deleteSegmentsQuery], session)
+        await this.getCollection().deleteOne({ _id: rundownId })
+      })
     })
-    if (!rundownDeletionResult.acknowledged) {
-      throw new DeletionFailedException(`Deletion of rundown was not acknowledged, for rundownId: ${rundownId}`)
-    }
   }
 
   private async doesRundownExist(rundownId: string): Promise<boolean> {

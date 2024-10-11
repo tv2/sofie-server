@@ -3,7 +3,13 @@ import { PieceRepository } from '../interfaces/piece-repository'
 import { Piece } from '../../../model/entities/piece'
 import { MongoDatabase } from './mongo-database'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { ClientSession, DeleteResult, UpdateOneModel } from 'mongodb'
+import {
+  AnyBulkWriteOperation,
+  ClientSession,
+  DeleteManyModel,
+  DeleteResult,
+  UpdateOneModel
+} from 'mongodb'
 import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
@@ -52,7 +58,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
     }
   }
 
-  public async executeQueries(queries: readonly { updateOne: UpdateOneModel<MongoPiece> }[], session: ClientSession): Promise<void> {
+  public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoPiece>[], session: ClientSession): Promise<void> {
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
@@ -64,6 +70,14 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
       { $set: mongoPiece },
       { upsert: true, ignoreUndefined: true }
     )
+  }
+
+  public buildDeletePiecesForRundownQuery(partIds: readonly string[]): { deleteMany: DeleteManyModel<MongoPiece> } {
+    return {
+      deleteMany: {
+        filter: { partId: { $in: partIds } },
+      },
+    }
   }
 
   public async deletePiecesForPart(partId: string): Promise<void> {

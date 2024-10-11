@@ -3,7 +3,13 @@ import { PartRepository } from '../interfaces/part-repository'
 import { Part } from '../../../model/entities/part'
 import { MongoDatabase } from './mongo-database'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { ClientSession, DeleteResult, MongoClient, UpdateOneModel } from 'mongodb'
+import {
+  AnyBulkWriteOperation,
+  ClientSession, DeleteManyModel,
+  DeleteResult,
+  MongoClient,
+  UpdateOneModel
+} from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Piece } from '../../../model/entities/piece'
 import { MongoEntityConverter, MongoPart, MongoPiece } from './mongo-entity-converter'
@@ -52,6 +58,10 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> implemen
     )
   }
 
+  public getPartIdsForRundown(rundownId: string): Promise<readonly string[]> {
+    return this.getCollection().find({ rundownId }).map(document => document.rundownId).toArray()
+  }
+
   public buildSavePartQueries(parts: readonly Part[]): { updateOne: UpdateOneModel<MongoPart> }[] {
     return parts.map(part => this.buildSavePartQuery(part))
   }
@@ -67,7 +77,7 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> implemen
     }
   }
 
-  public async executeQueries(queries: readonly { updateOne: UpdateOneModel<MongoPart> }[], session: ClientSession): Promise<void> {
+  public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoPart>[], session: ClientSession): Promise<void> {
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
@@ -84,6 +94,22 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> implemen
         await this.mongoPieceRepository.executeQueries(savePieceQueries, session)
       })
     })
+  }
+
+  public buildDeletePartsForRundownQuery(rundownId: string): { deleteMany: DeleteManyModel<MongoPart> } {
+    return {
+      deleteMany: {
+        filter: { rundownId },
+      },
+    }
+  }
+
+  public buildDeletePartsForSegmentQuery(segmentId: string): { deleteMany: DeleteManyModel<MongoPart> } {
+    return {
+      deleteMany: {
+        filter: { segmentId },
+      },
+    }
   }
 
   public async delete(partId: string): Promise<void> {
