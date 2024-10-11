@@ -1,11 +1,9 @@
 import { Rundown } from '../../../model/entities/rundown'
-import { RundownRepository } from '../interfaces/rundown-repository'
 import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { DeleteManyModel, MongoClient, UpdateOneModel } from 'mongodb'
-import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { Piece } from '../../../model/entities/piece'
 import { Segment } from '../../../model/entities/segment'
 import { MongoEntityConverter, MongoPart, MongoPiece, MongoRundown, MongoSegment } from './mongo-entity-converter'
@@ -13,10 +11,11 @@ import { MongoSegmentRepository } from './mongo-segment-repository'
 import { MongoPartRepository } from './mongo-part-repository'
 import { MongoPieceRepository } from './mongo-piece-repository'
 import { Part } from '../../../model/entities/part'
+import { RundownAggregateRepository } from '../interfaces/rundown-aggregate-repository'
 
 export const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
-export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> implements RundownRepository {
+export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRundown> implements RundownAggregateRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,
@@ -40,6 +39,7 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
       .toArray()) as unknown as MongoRundown[]
     return this.mongoEntityConverter.convertToBasicRundowns(basicRundowns)
   }
+
   public async getRundown(rundownId: string): Promise<Rundown> {
     this.assertDatabaseConnection(this.getRundown.name)
     const mongoRundown: MongoRundown | null = await this.getCollection().findOne<MongoRundown>({
@@ -52,10 +52,6 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
     const infinitePieces: Piece[] = await this.mongoPieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
     const segments: Segment[] = await this.mongoSegmentRepository.getSegments(mongoRundown._id)
     return this.mongoEntityConverter.convertToRundown(mongoRundown, segments, infinitePieces)
-  }
-
-  public getRundownBySegmentId(ingestedSegmentId: string): Promise<Rundown> {
-    throw new UnsupportedOperationException(`${MongoRundownRepository.name} does not support getting a Rundown from an Ingested Segment id. Trying to find Rundown with Segment id: ${ingestedSegmentId}`)
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {
@@ -105,5 +101,53 @@ export class MongoRundownRepository extends BaseMongoRepository<MongoRundown> im
 
   private async doesRundownExist(rundownId: string): Promise<boolean> {
     return (await this.getCollection().countDocuments({ _id: rundownId })) === 1
+  }
+
+  public getSegment(segmentId: string): Promise<Segment> {
+    return this.mongoSegmentRepository.getSegment(segmentId)
+  }
+
+  public deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
+    return this.mongoSegmentRepository.deleteUnsyncedSegmentsForRundown(rundownId)
+  }
+
+  public deleteAllUnsyncedSegments(): Promise<void> {
+    return this.mongoSegmentRepository.deleteAllUnsyncedSegments()
+  }
+
+  public getPart(partId: string): Promise<Part> {
+    return this.mongoPartRepository.getPart(partId)
+  }
+
+  public deletePart(partId: string): Promise<void> {
+    return this.mongoPartRepository.deletePart(partId)
+  }
+
+  public deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
+    return this.mongoPartRepository.deleteUnsyncedPartsForSegment(segmentId)
+  }
+
+  public deleteAllUnsyncedParts(): Promise<void> {
+    return this.mongoPartRepository.deleteAllUnsyncedParts()
+  }
+
+  public deleteAllUnplannedParts(): Promise<void> {
+    return this.mongoPartRepository.deleteAllUnplannedParts()
+  }
+
+  public getPiecesFromIds(pieceIds: string[]): Promise<Piece[]> {
+    return this.mongoPieceRepository.getPiecesFromIds(pieceIds)
+  }
+
+  public deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {
+    return this.mongoPieceRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
+  }
+
+  public deleteAllUnsyncedPieces(): Promise<void> {
+    return this.mongoPieceRepository.deleteAllUnplannedPieces()
+  }
+
+  public deleteAllUnplannedPieces(): Promise<void> {
+    return this.mongoPieceRepository.deleteAllUnplannedPieces()
   }
 }

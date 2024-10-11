@@ -1,5 +1,5 @@
 import { RundownRepository } from '../repositories/interfaces/rundown-repository'
-import { MongoRundownRepository } from '../repositories/mongo/mongo-rundown-repository'
+import { MongoRundownAggregateRepository } from '../repositories/mongo/mongo-rundown-aggregate-repository'
 import { MongoDatabase } from '../repositories/mongo/mongo-database'
 import { MongoIngestedEntityConverter } from '../repositories/mongo/mongo-ingested-entity-converter'
 import { SegmentRepository } from '../repositories/interfaces/segment-repository'
@@ -10,7 +10,7 @@ import { MongoPieceRepository } from '../repositories/mongo/mongo-piece-reposito
 import { MongoPartRepository } from '../repositories/mongo/mongo-part-repository'
 import { TimelineRepository } from '../repositories/interfaces/timeline-repository'
 import { MongoTimelineRepository } from '../repositories/mongo/mongo-timeline-repository'
-import { CachedRundownRepository } from '../repositories/cache/cached-rundown-repository'
+import { CachedRundownAggregateRepository } from '../repositories/cache/cached-rundown-aggregate-repository'
 import { RundownBaselineRepository } from '../repositories/interfaces/rundown-baseline-repository'
 import { MongoRundownBaselineRepository } from '../repositories/mongo/mongo-rundown-baseline-repository'
 import { StudioRepository } from '../repositories/interfaces/studio-repository'
@@ -72,6 +72,7 @@ import { ShowStyleVariant } from '../../model/entities/show-style-variant'
 import {
   MongoShowStyleVariantConfigurationListener
 } from '../repositories/mongo/mongo-show-style-variant-configuration-listener'
+import { RundownAggregateRepository } from '../repositories/interfaces/rundown-aggregate-repository'
 
 export class RepositoryFacade {
 
@@ -80,14 +81,18 @@ export class RepositoryFacade {
   }
 
   public static createRundownRepository(): RundownRepository {
-    const mongoRundownRepository: RundownRepository = new MongoRundownRepository(
+    return this.createRundownAggregateRepository()
+  }
+
+  public static createRundownAggregateRepository(): RundownAggregateRepository {
+    const mongoRundownRepository: RundownAggregateRepository = new MongoRundownAggregateRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       RepositoryFacade.createMongoSegmentRepository(),
       RepositoryFacade.createMongoPartRepository(),
       RepositoryFacade.createMongoPieceRepository(),
       new MongoEntityConverter(LoggerFacade.createLogger()),
     )
-    return CachedRundownRepository.getInstance(mongoRundownRepository, LoggerFacade.createLogger())
+    return CachedRundownAggregateRepository.getInstance(mongoRundownRepository, LoggerFacade.createLogger())
   }
 
   public static createIngestedRundownRepository(): IngestedRundownRepository {
@@ -112,14 +117,13 @@ export class RepositoryFacade {
   }
 
   public static createSegmentRepository(): SegmentRepository {
-    return this.createMongoSegmentRepository()
+    return this.createRundownAggregateRepository()
   }
 
   private static createMongoSegmentRepository(): MongoSegmentRepository {
     return new MongoSegmentRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       RepositoryFacade.createMongoPartRepository(),
-      RepositoryFacade.createMongoPieceRepository(),
       new MongoEntityConverter(LoggerFacade.createLogger()),
     )
   }
@@ -141,7 +145,7 @@ export class RepositoryFacade {
   }
 
   public static createPartRepository(): PartRepository {
-    return this.createMongoPartRepository()
+    return this.createRundownAggregateRepository()
   }
 
   private static createMongoPartRepository(): MongoPartRepository {
@@ -177,7 +181,7 @@ export class RepositoryFacade {
   }
 
   public static createPieceRepository(): PieceRepository {
-    return this.createMongoPieceRepository()
+    return this.createRundownAggregateRepository()
   }
 
   private static createMongoPieceRepository(): MongoPieceRepository {

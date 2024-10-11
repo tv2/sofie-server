@@ -62,16 +62,6 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  public async savePiece(piece: Piece): Promise<void> {
-    this.assertDatabaseConnection(this.savePiece.name)
-    const mongoPiece: MongoPiece = this.mongoEntityConverter.convertToMongoPiece(piece)
-    await this.getCollection().updateOne(
-      { _id: mongoPiece._id },
-      { $set: mongoPiece },
-      { upsert: true, ignoreUndefined: true }
-    )
-  }
-
   public buildDeletePiecesForRundownQuery(partIds: readonly string[]): { deleteMany: DeleteManyModel<MongoPiece> } {
     return {
       deleteMany: {
@@ -87,10 +77,6 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> implem
     if (!piecesDeletionResult.acknowledged) {
       throw new DeletionFailedException(`Deletion of pieces was not acknowledged, for partId: ${partId}`)
     }
-  }
-
-  public async deletePieces(pieceIds: string[]): Promise<void> {
-    await this.getCollection().deleteMany({ _id: { $in: pieceIds }})
   }
 
   public async deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {

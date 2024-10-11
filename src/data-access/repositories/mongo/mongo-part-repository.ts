@@ -1,5 +1,4 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { PartRepository } from '../interfaces/part-repository'
 import { Part } from '../../../model/entities/part'
 import { MongoDatabase } from './mongo-database'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
@@ -7,17 +6,16 @@ import {
   AnyBulkWriteOperation,
   ClientSession, DeleteManyModel,
   DeleteResult,
-  MongoClient,
   UpdateOneModel
 } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Piece } from '../../../model/entities/piece'
-import { MongoEntityConverter, MongoPart, MongoPiece } from './mongo-entity-converter'
+import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 import { MongoPieceRepository } from './mongo-piece-repository'
 
 export const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
 
-export class MongoPartRepository extends BaseMongoRepository<MongoPart> implements PartRepository {
+export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoPieceRepository: MongoPieceRepository,
@@ -81,21 +79,6 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> implemen
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  public async savePart(part: Part): Promise<void> {
-    this.assertDatabaseConnection(this.savePart.name)
-
-    const mongoPart: MongoPart = this.mongoEntityConverter.convertToMongoPart(part)
-    const savePieceQueries: readonly { updateOne: UpdateOneModel<MongoPiece> }[] = this.mongoPieceRepository.buildSavePieceQueries(part.getPieces())
-
-    const mongoClient: MongoClient = this.mongoDatabase.getClient()
-    await mongoClient.withSession(async (session) => {
-      await session.withTransaction(async (session) => {
-        await this.getCollection().updateOne({ _id: mongoPart._id }, { $set: mongoPart }, { upsert: true, ignoreUndefined: true })
-        await this.mongoPieceRepository.executeQueries(savePieceQueries, session)
-      })
-    })
-  }
-
   public buildDeletePartsForRundownQuery(rundownId: string): { deleteMany: DeleteManyModel<MongoPart> } {
     return {
       deleteMany: {
@@ -112,8 +95,8 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> implemen
     }
   }
 
-  public async delete(partId: string): Promise<void> {
-    this.assertDatabaseConnection(this.delete.name)
+  public async deletePart(partId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deletePart.name)
     await this.mongoPieceRepository.deletePiecesForPart(partId)
     await this.getCollection().deleteMany({ _id: partId })
   }

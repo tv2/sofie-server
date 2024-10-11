@@ -206,7 +206,7 @@ export class RundownTimelineService implements RundownService {
   private async deleteUnsyncedPreviousPart(rundown: Rundown): Promise<void> {
     const previousPart: Part | undefined = rundown.getPreviousPart()
     if (previousPart && previousPart.isUnsynced()) {
-      await this.partRepository.delete(previousPart.id)
+      await this.partRepository.deletePart(previousPart.id)
       this.rundownEventEmitter.emitPartDeleted(rundown, previousPart.getSegmentId(), previousPart.id)
     }
   }
