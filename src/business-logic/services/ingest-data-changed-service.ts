@@ -34,13 +34,20 @@ enum IngestEventPriority {
   SEGMENT_CREATE = 2,
   PART_CREATE = 3,
 
-  PART_UPDATE = 4,
+  RUNDOWN_UPDATE = 4,
   SEGMENT_UPDATE = 5,
-  RUNDOWN_UPDATE = 6,
+  PART_UPDATE = 6,
 
   PART_DELETE = 7,
   SEGMENT_DELETE = 8,
   RUNDOWN_DELETE = 9
+}
+
+interface CallableDataChangeEvent {
+  entityType: 'rundown' | 'segment' | 'part'
+  entityId: string
+  eventType: 'create' | 'update' | 'delete'
+  callback: () => Promise<void>
 }
 
 export class IngestDataChangedService implements DataChangeService {
@@ -95,7 +102,7 @@ export class IngestDataChangedService implements DataChangeService {
   private isInitialized: boolean = false
 
   // Event Queue Priority: The lower the number, the higher the priority
-  private readonly eventPriorityQueue: Record<number, (() => Promise<void>)[]> = { }
+  private readonly eventPriorityQueue: Record<number, CallableDataChangeEvent[]> = { }
   private readonly logger: Logger
   private isExecutingEvent: boolean = false
   private lastBulkExecutionStartTimestamp: number = 0
@@ -132,21 +139,21 @@ export class IngestDataChangedService implements DataChangeService {
   }
 
   private listenForRundownChanges(rundownChangeListener: DataChangedListener<IngestedRundown>): void {
-    rundownChangeListener.onCreated(rundown => this.enqueueEvent(IngestEventPriority.RUNDOWN_CREATE, () => this.createRundown(rundown)))
-    rundownChangeListener.onUpdated(rundown => this.enqueueEvent(IngestEventPriority.RUNDOWN_UPDATE, () => this.updateRundown(rundown)))
-    rundownChangeListener.onDeleted(rundownId => this.enqueueEvent(IngestEventPriority.RUNDOWN_DELETE, () => this.deleteRundown(rundownId)))
+    rundownChangeListener.onCreated(rundown => this.enqueueEvent(IngestEventPriority.RUNDOWN_CREATE, 'create', 'rundown', rundown.id, () => this.createRundown(rundown)))
+    rundownChangeListener.onUpdated(rundown => this.enqueueEvent(IngestEventPriority.RUNDOWN_UPDATE, 'update', 'rundown', rundown.id, () => this.updateRundown(rundown)))
+    rundownChangeListener.onDeleted(rundownId => this.enqueueEvent(IngestEventPriority.RUNDOWN_DELETE, 'delete', 'rundown', rundownId, () => this.deleteRundown(rundownId)))
   }
 
   private listenForSegmentChanges(segmentChangedListener: DataChangedListener<IngestedSegment>): void {
-    segmentChangedListener.onCreated(segment => this.enqueueEvent(IngestEventPriority.SEGMENT_CREATE, () => this.createSegment(segment)))
-    segmentChangedListener.onUpdated(segment => this.enqueueEvent(IngestEventPriority.SEGMENT_UPDATE, () => this.updateSegment(segment)))
-    segmentChangedListener.onDeleted(segmentId => this.enqueueEvent(IngestEventPriority.SEGMENT_DELETE, () => this.deleteSegment(segmentId)))
+    segmentChangedListener.onCreated(segment => this.enqueueEvent(IngestEventPriority.SEGMENT_CREATE, 'create', 'segment', segment.id, () => this.createSegment(segment)))
+    segmentChangedListener.onUpdated(segment => this.enqueueEvent(IngestEventPriority.SEGMENT_UPDATE, 'update', 'segment', segment.id, () => this.updateSegment(segment)))
+    segmentChangedListener.onDeleted(segmentId => this.enqueueEvent(IngestEventPriority.SEGMENT_DELETE, 'delete', 'segment', segmentId, () => this.deleteSegment(segmentId)))
   }
 
   private listenForPartChanges(partChangedListener: DataChangedListener<IngestedPart>): void {
-    partChangedListener.onCreated(part => this.enqueueEvent(IngestEventPriority.PART_CREATE, () => this.createPart(part)))
-    partChangedListener.onUpdated(part => this.enqueueEvent(IngestEventPriority.PART_UPDATE, () => this.updatePart(part)))
-    partChangedListener.onDeleted(partId => this.enqueueEvent(IngestEventPriority.PART_DELETE, () => this.deletePart(partId)))
+    partChangedListener.onCreated(part => this.enqueueEvent(IngestEventPriority.PART_CREATE, 'create', 'part', part.id, () => this.createPart(part)))
+    partChangedListener.onUpdated(part => this.enqueueEvent(IngestEventPriority.PART_UPDATE, 'update', 'part',part.id, () => this.updatePart(part)))
+    partChangedListener.onDeleted(partId => this.enqueueEvent(IngestEventPriority.PART_DELETE, 'delete', 'part', partId, () => this.deletePart(partId)))
   }
 
   public async initialize(): Promise<void> {
@@ -290,13 +297,13 @@ export class IngestDataChangedService implements DataChangeService {
     return newRundown
   }
 
-  private enqueueEvent(priority: number, event: () => Promise<void>): void {
+  private enqueueEvent(priority: number, eventType: CallableDataChangeEvent['eventType'], entityType: CallableDataChangeEvent['entityType'], entityId: string, callback: () => Promise<void>): void {
     if (!this.isInitialized) {
       return
     }
 
     this.eventPriorityQueue[priority] ??= []
-    this.eventPriorityQueue[priority].push(event)
+    this.eventPriorityQueue[priority].push({ eventType, entityType, entityId, callback })
     clearTimeout(this.timerId)
     this.timerId = setTimeout(() => this.executeNextEvent(), 200)
   }
@@ -308,15 +315,16 @@ export class IngestDataChangedService implements DataChangeService {
     if (Date.now() - this.lastBulkExecutionStartTimestamp >= BULK_EXECUTION_TIMESPAN_IN_MS) {
       this.lastBulkExecutionStartTimestamp = Date.now()
     }
-    const eventCallback: (() => Promise<void>) | undefined = this.getEventToExecute()
-    if (!eventCallback) {
+    const event: CallableDataChangeEvent | undefined = this.getEventToExecute()
+    if (!event) {
+      this.logger.debug('No more ingest events. Generating actions.')
       this.generateActions().catch(error => this.logger.data(error).error('Failed generating actions for ingest batch.'))
       return
     }
 
     this.isExecutingEvent = true
-    eventCallback()
-      .catch(error => this.logger.data(error).error('Error when executing Ingest event:'))
+    event.callback()
+      .catch(error => this.logger.data(error).error(`Error when executing ${event.eventType} ingest event for ${event.entityType} with id '${event.entityId}':`))
       .then(() => this.buildRundowns())
       .catch(error => this.logger.data(error).error('Failed building rundowns.'))
       .finally(() => {
@@ -325,8 +333,8 @@ export class IngestDataChangedService implements DataChangeService {
       })
   }
 
-  private getEventToExecute(): (() => Promise<void>) | undefined {
-    const events: (() => Promise<void>)[] | undefined = Object.entries(this.eventPriorityQueue)
+  private getEventToExecute(): CallableDataChangeEvent | undefined {
+    const events: CallableDataChangeEvent[] | undefined = Object.entries(this.eventPriorityQueue)
       .sort(([priorityA], [priorityB]) => Number.parseInt(priorityA) - Number.parseInt(priorityB))
       .find(([, events]) => events.length > 0)?.[1]
 
@@ -424,6 +432,8 @@ export class IngestDataChangedService implements DataChangeService {
   private async deleteRundown(rundownId: string): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     this.eventEmitter.emitRundownDeleted(rundown.id)
+    this.rundownIdsToGenerateActionsFor.delete(rundownId)
+    await this.actionRepository.deleteActionsForRundown(rundownId)
     await this.rundownRepository.deleteRundown(rundown.id)
   }
 

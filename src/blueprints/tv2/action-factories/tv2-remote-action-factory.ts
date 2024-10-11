@@ -2,7 +2,7 @@ import { Piece } from '../../../model/entities/piece'
 import { Part, PartInterface } from '../../../model/entities/part'
 import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -66,7 +66,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     ].map(source => this.createInsertRemoteAsNextAction(blueprintConfiguration, source))
   }
 
-  private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
+  private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithAudio): Tv2RemoteAction {
     const sanitizedId: string = this.sanitizeStringForId(remoteSource.name)
     const partId: string = `remoteInsertActionPart_${sanitizedId}`
     const remotePieceInterface: Tv2PieceInterface = this.createRemotePieceInterface(configuration, remoteSource, partId)
@@ -88,7 +88,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     }
   }
 
-  private createRemotePieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2PieceInterface {
+  private createRemotePieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, parentPartId: string): Tv2PieceInterface {
     const videoMixerTimelineObjects: Tv2BlueprintTimelineObject[] = this.createVideoMixerTimelineObjects(source)
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
@@ -96,7 +96,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       type: Tv2PieceType.REMOTE,
       outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
-        sisyfosLayers: source.sisyfosLayers,
+        sisyfosLayers: source.audioLayers,
         wantsToPersistAudio: source.wantsToPersistAudio,
         acceptsPersistedAudio: source.acceptPersistAudio
       }
@@ -123,7 +123,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     }
   }
 
-  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): Tv2BlueprintTimelineObject[] {
+  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithAudio): Tv2BlueprintTimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, enable),
@@ -132,7 +132,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     ]
   }
 
-  private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
+  private createPartInterface(partId: string, source: Tv2SourceMappingWithAudio): PartInterface {
     return {
       id: partId,
       rundownId: '',
@@ -163,7 +163,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     ].map(source => this.createInsertRemoteAsOnAirAction(blueprintConfiguration, source))
   }
 
-  private createInsertRemoteAsOnAirAction(blueprintConfiguration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
+  private createInsertRemoteAsOnAirAction(blueprintConfiguration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithAudio): Tv2RemoteAction {
     const sanitizedId: string = this.sanitizeStringForId(remoteSource.name)
     const partId: string = `remoteInsertActionPart_${sanitizedId}`
     const remotePieceInterface: Tv2PieceInterface = this.createRemotePieceInterface(blueprintConfiguration, remoteSource, partId)

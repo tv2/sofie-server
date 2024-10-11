@@ -431,7 +431,7 @@ export class MongoEntityConverter {
     for (const mapping in mongoStudio.mappings) {
       layers.push({
         name: mapping,
-        lookaheadMode: this.mapLookaheadNumberToEnum(mongoStudio.mappings[mapping].lookahead),
+        lookaheadMode: this.getLookaheadModeForMongoLayerMapping(mapping, mongoStudio.mappings[mapping]),
         amountOfLookaheadObjectsToFind: mongoStudio.mappings[mapping].lookaheadDepth ?? defaultNumberOfObjects,
         maximumLookaheadSearchDistance: mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookaheadDistance,
       })
@@ -445,7 +445,16 @@ export class MongoEntityConverter {
     }
   }
 
-  private mapLookaheadNumberToEnum(lookAheadNumber: number): LookaheadMode {
+  private getLookaheadModeForMongoLayerMapping(mappingName: string, mapping: MongoLayerMapping): LookaheadMode {
+    const lookahead: LookaheadMode | undefined = this.mapLookaheadNumberToEnum(mapping.lookahead)
+    if (!lookahead) {
+      this.logger.warn(`Found unknown value '${mapping.lookahead}' for lookahead in '${mappingName}' layer mapping. Defaulting to NONE.`)
+      return LookaheadMode.NONE
+    }
+    return lookahead
+  }
+
+  private mapLookaheadNumberToEnum(lookAheadNumber: number): LookaheadMode | undefined {
     // These numbers are based on the "LookaheadMode" enum from BlueprintsIntegration
     switch (lookAheadNumber) {
       case 0: {
@@ -458,8 +467,7 @@ export class MongoEntityConverter {
         return LookaheadMode.WHEN_CLEAR
       }
       default: {
-        this.logger.warn(`Found unknown number for LookAhead: ${lookAheadNumber}. Defaulting to NONE.`)
-        return LookaheadMode.NONE
+        return undefined
       }
     }
   }
