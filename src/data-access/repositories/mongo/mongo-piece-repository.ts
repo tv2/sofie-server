@@ -4,8 +4,6 @@ import { MongoDatabase } from './mongo-database'
 import {
   AnyBulkWriteOperation,
   ClientSession,
-  DeleteManyModel,
-  UpdateOneModel
 } from 'mongodb'
 import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -38,11 +36,11 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
       .toArray()
   }
 
-  public buildSavePieceQueries(pieces: readonly Piece[]): { updateOne: UpdateOneModel<MongoPiece> }[] {
+  public buildSavePieceQueries(pieces: readonly Piece[]): AnyBulkWriteOperation<MongoPiece>[] {
     return pieces.map(piece => this.buildSavePieceQuery(piece))
   }
 
-  private buildSavePieceQuery(piece: Piece): { updateOne: UpdateOneModel<MongoPiece> } {
+  private buildSavePieceQuery(piece: Piece): AnyBulkWriteOperation<MongoPiece> {
     const mongoPiece: MongoPiece = this.mongoEntityConverter.convertToMongoPiece(piece)
     return {
       updateOne: {
@@ -60,7 +58,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  public buildDeletePiecesForRundownQuery(partIds: readonly string[]): { deleteMany: DeleteManyModel<MongoPiece> } {
+  public buildDeletePiecesForRundownQuery(partIds: readonly string[]): AnyBulkWriteOperation<MongoPiece> {
     return {
       deleteMany: {
         filter: { partId: { $in: partIds } },

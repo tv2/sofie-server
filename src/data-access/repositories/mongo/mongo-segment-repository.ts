@@ -4,8 +4,7 @@ import { MongoIngestedSegment } from './mongo-ingested-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
 import {
   AnyBulkWriteOperation,
-  ClientSession, DeleteManyModel,
-  UpdateOneModel
+  ClientSession,
 } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Part } from '../../../model/entities/part'
@@ -55,11 +54,11 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
     )
   }
 
-  public buildSaveSegmentQueries(segments: readonly Segment[]): { updateOne: UpdateOneModel<MongoSegment> }[] {
+  public buildSaveSegmentQueries(segments: readonly Segment[]): AnyBulkWriteOperation<MongoSegment>[] {
     return segments.map(segment => this.buildSaveSegmentQuery(segment))
   }
 
-  private buildSaveSegmentQuery(segment: Segment): { updateOne: UpdateOneModel<MongoSegment> } {
+  private buildSaveSegmentQuery(segment: Segment): AnyBulkWriteOperation<MongoSegment> {
     const mongoSegment: MongoSegment = this.mongoEntityConverter.convertToMongoSegment(segment)
     return {
       updateOne: {
@@ -77,7 +76,7 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  public buildDeleteSegmentsForRundownQuery(rundownId: string): { deleteMany: DeleteManyModel<MongoSegment> } {
+  public buildDeleteSegmentsForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoSegment> {
     return {
       deleteMany: {
         filter: { rundownId },

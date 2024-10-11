@@ -3,7 +3,7 @@ import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { AnyBulkWriteOperation, ClientSession, UpdateOneModel } from 'mongodb'
+import { AnyBulkWriteOperation, ClientSession } from 'mongodb'
 import { Piece } from '../../../model/entities/piece'
 import { Segment } from '../../../model/entities/segment'
 import { MongoEntityConverter, MongoPart, MongoPiece, MongoRundown, MongoSegment } from './mongo-entity-converter'
@@ -59,11 +59,11 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
 
     const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
     const segments: readonly Segment[] = rundown.getSegments()
-    const saveSegmentQueries: readonly { updateOne: UpdateOneModel<MongoSegment> }[] = this.mongoSegmentRepository.buildSaveSegmentQueries(rundown.getSegments())
+    const saveSegmentQueries: readonly AnyBulkWriteOperation<MongoSegment>[] = this.mongoSegmentRepository.buildSaveSegmentQueries(rundown.getSegments())
     const parts: readonly Part[] = segments.flatMap(segment => segment.getParts())
-    const savePartQueries: readonly { updateOne: UpdateOneModel<MongoPart> }[] = this.mongoPartRepository.buildSavePartQueries(parts)
+    const savePartQueries: readonly AnyBulkWriteOperation<MongoPart>[] = this.mongoPartRepository.buildSavePartQueries(parts)
     const pieces: readonly Piece[] = parts.flatMap(part => part.getPieces())
-    const savePieceQueries: readonly { updateOne: UpdateOneModel<MongoPiece> }[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
+    const savePieceQueries: readonly AnyBulkWriteOperation<MongoPiece>[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
 
     await this.withTransaction(async (session) => {
       await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })

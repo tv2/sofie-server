@@ -3,8 +3,7 @@ import { Part } from '../../../model/entities/part'
 import { MongoDatabase } from './mongo-database'
 import {
   AnyBulkWriteOperation,
-  ClientSession, DeleteManyModel,
-  UpdateOneModel
+  ClientSession,
 } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Piece } from '../../../model/entities/piece'
@@ -62,11 +61,11 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     return this.getCollection().find({ segmentId }).map(document => document._id).toArray()
   }
 
-  public buildSavePartQueries(parts: readonly Part[]): { updateOne: UpdateOneModel<MongoPart> }[] {
+  public buildSavePartQueries(parts: readonly Part[]): AnyBulkWriteOperation<MongoPart>[] {
     return parts.map(part => this.buildSavePartQuery(part))
   }
 
-  private buildSavePartQuery(part: Part): { updateOne: UpdateOneModel<MongoPart> } {
+  private buildSavePartQuery(part: Part): AnyBulkWriteOperation<MongoPart> {
     const mongoPart: MongoPart = this.mongoEntityConverter.convertToMongoPart(part)
     return {
       updateOne: {
@@ -84,7 +83,7 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  public buildDeletePartsForRundownQuery(rundownId: string): { deleteMany: DeleteManyModel<MongoPart> } {
+  public buildDeletePartsForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoPart> {
     return {
       deleteMany: {
         filter: { rundownId },
@@ -92,7 +91,7 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     }
   }
 
-  public buildDeletePartsForSegmentQuery(segmentId: string, mongoPart: Partial<MongoPart> = {}): { deleteMany: DeleteManyModel<MongoPart> } {
+  public buildDeletePartsForSegmentQuery(segmentId: string, mongoPart: Partial<MongoPart> = {}): AnyBulkWriteOperation<MongoPart> {
     return {
       deleteMany: {
         filter: { ...mongoPart, segmentId },
