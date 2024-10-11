@@ -42,7 +42,7 @@ export class IngestedEntityToEntityMapper {
       history: rundownToUpdate.getHistory(),
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),
-      segments: rundownToUpdate.getSegments(),
+      segments: [...rundownToUpdate.getSegments()],
       alreadyActiveProperties
     })
   }
@@ -61,7 +61,7 @@ export class IngestedEntityToEntityMapper {
       isUnsynced: false,
       expectedDurationInMs: ingestedSegment.budgetDuration,
       definesShowStyleVariant: ingestedSegment.definesShowStyleVariant ?? false,
-      parts: [],
+      parts: ingestedSegment.ingestedParts.map(ingestedPart => this.convertIngestedPartToPart(ingestedPart)),
     })
   }
 
@@ -83,7 +83,6 @@ export class IngestedEntityToEntityMapper {
       }),
     })
   }
-
 
   public convertIngestedPartToPart(ingestedPart: IngestedPart): Part {
     return new Part({
@@ -108,6 +107,9 @@ export class IngestedEntityToEntityMapper {
   }
 
   public updatePartWithIngestedPart(partToBeUpdated: Part, ingestedPart: IngestedPart): Part {
+    if (partToBeUpdated.isOnAir()) {
+      return partToBeUpdated
+    }
     const updatedPieces: Piece[] = ingestedPart.ingestedPieces.map(ingestedPiece => {
       const existingPiece: Piece | undefined = partToBeUpdated.getPieces().find(piece => piece.id === ingestedPiece.id)
       return existingPiece
@@ -115,7 +117,7 @@ export class IngestedEntityToEntityMapper {
         : this.convertIngestedPieceToPiece(ingestedPiece)
     })
 
-    return new Part({
+    const updatedPart: Part = new Part({
       ...ingestedPart,
       id: partToBeUpdated.id,
       segmentId: partToBeUpdated.getSegmentId(),
@@ -131,6 +133,11 @@ export class IngestedEntityToEntityMapper {
       timings: this.getPartTimings(partToBeUpdated),
       ingestedPart
     })
+
+    const unplannedPiecesToKeep: Piece[] = partToBeUpdated.getPieces().filter(piece => !piece.isPlanned)
+    unplannedPiecesToKeep.forEach(unplannedPiece => updatedPart.insertPiece(unplannedPiece))
+
+    return updatedPart
   }
 
   private getPartTimings(part: Part): PartTimings | undefined {

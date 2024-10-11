@@ -16,10 +16,8 @@ export class CachedStudioRepository implements StudioRepository {
   private constructor(private readonly studioRepository: StudioRepository) {}
 
   public async getStudio(studioId: string): Promise<Studio> {
-    if (!this.cachedStudios.has(studioId)) {
-      const studio: Studio = await this.studioRepository.getStudio(studioId)
-      this.cachedStudios.set(studioId, studio)
-    }
-    return this.cachedStudios.get(studioId) as Studio
+    const studio: Studio = this.cachedStudios.get(studioId) ?? await this.studioRepository.getStudio(studioId)
+    this.cachedStudios.set(studioId, studio)
+    return studio
   }
 }

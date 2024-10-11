@@ -162,7 +162,7 @@ export class Segment {
 
     const doesPartAlreadyExistOnSegment: boolean = this.parts.some(part => part.id === partToAdd.id)
     if (doesPartAlreadyExistOnSegment) {
-      throw new AlreadyExistException(`Unable to add Part to Segment. Part ${partToAdd.id} already exist on Segment ${this.id}`)
+      throw new AlreadyExistException(`Unable to add the part '${partToAdd.name}' with id '${partToAdd.id}' to the segment '${this.name}' with id '${this.id}'. The part already exists on the segment.`)
     }
     this.parts.push(partToAdd)
     this.parts.sort(this.compareParts)
@@ -193,13 +193,15 @@ export class Segment {
 
     if (partToDelete.isOnAir()) {
       partToDelete.markAsUnsynced()
-      return partToDelete
+      const unsyncedPart: Part = partToDelete.getUnsyncedCopy()
+      this.parts = this.parts.map(part => part.id === partId ? unsyncedPart : part)
+      return unsyncedPart
     }
     this.parts = this.parts.filter(part => part.id !== partId)
     return partToDelete
   }
 
-  public getParts(): Part[] {
+  public getParts(): readonly Part[] {
     return this.parts
   }
 

@@ -154,8 +154,8 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
     this.emitRundownEvent(event)
   }
 
-  public emitPartUnsynced(rundown: Rundown, part: Part): void {
-    const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, part)
+  public emitPartUnsynced(rundown: Rundown, unsyncedPart: Part, originalPartId: string): void {
+    const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, unsyncedPart, originalPartId)
     this.emitRundownEvent(event)
   }
 

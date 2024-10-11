@@ -662,7 +662,7 @@ export class Rundown extends BasicRundown {
     return unsyncedSegment
   }
 
-  public getSegments(): Segment[] {
+  public getSegments(): readonly Segment[] {
     return this.segments
   }
 
@@ -681,6 +681,14 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find segment with id '${part.getSegmentId()}' when updating part '${part.name}' with id '${part.id}' in rundown '${this.name}' with id '${this.id}'.`)
     }
     segment.updatePart(part)
+    if (this.activeCursor?.part.id === part.id) {
+      this.activeCursor = this.createCursor(this.activeCursor, { part })
+    }
+    if (this.nextCursor?.part.id === part.id) {
+      part.setAsNext()
+      this.nextCursor = this.createCursor(this.nextCursor, { part })
+      return
+    }
     this.updateNextCursor()
   }
 
@@ -690,6 +698,9 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException(`Unable to find segment for part with id '${partId}' in rundown ${this.id}.`)
     }
     const removedPart: Part | undefined = segment.removePart(partId)
+    if (removedPart?.isOnAir()) {
+      this.activeCursor = this.createCursor(this.activeCursor, { part: removedPart })
+    }
 
     this.markInfinitePiecesFromPartUnsynced(partId)
     this.updateNextCursor()

@@ -16,11 +16,9 @@ export class CachedPartRepository implements PartRepository {
   private constructor(private readonly partRepository: PartRepository) {}
 
   public async getPart(partId: string): Promise<Part> {
-    if (!this.cachedParts.has(partId)) {
-      const part: Part = await this.partRepository.getPart(partId)
-      this.cachedParts.set(partId, part)
-    }
-    return this.cachedParts.get(partId) as Part
+    const part: Part = this.cachedParts.get(partId) ?? await this.partRepository.getPart(partId)
+    this.cachedParts.set(partId, part)
+    return part
   }
 
   public async getParts(segmentId: string): Promise<Part[]> {
@@ -30,18 +28,18 @@ export class CachedPartRepository implements PartRepository {
   }
 
   public async savePart(part: Part): Promise<void> {
+    await this.partRepository.savePart(part)
     this.cachedParts.set(part.id, part)
-    return this.partRepository.savePart(part)
   }
 
   public async delete(partId: string): Promise<void> {
+    await this.partRepository.delete(partId)
     this.cachedParts.delete(partId)
-    return this.partRepository.delete(partId)
   }
 
   public async deletePartsForSegment(segmentId: string): Promise<void> {
+    await this.partRepository.deletePartsForSegment(segmentId)
     this.deleteCachedPartsWithPredicate(part => part.getSegmentId() === segmentId)
-    return this.partRepository.deletePartsForSegment(segmentId)
   }
 
   private deleteCachedPartsWithPredicate(predicate: (part: Part) => boolean): void {
@@ -54,17 +52,17 @@ export class CachedPartRepository implements PartRepository {
   }
 
   public async deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
+    await this.partRepository.deleteUnsyncedPartsForSegment(segmentId)
     this.deleteCachedPartsWithPredicate(part => part.isUnsynced() && part.getSegmentId() === segmentId)
-    return this.partRepository.deleteUnsyncedPartsForSegment(segmentId)
   }
 
   public async deleteAllUnplannedParts(): Promise<void> {
+    await this.partRepository.deleteAllUnplannedParts()
     this.deleteCachedPartsWithPredicate(part => !part.isPlanned)
-    return this.partRepository.deleteAllUnplannedParts()
   }
 
   public async deleteAllUnsyncedParts(): Promise<void> {
+    await this.partRepository.deleteAllUnsyncedParts()
     this.deleteCachedPartsWithPredicate(part => part.isUnsynced())
-    return this.partRepository.deleteAllUnsyncedParts()
   }
 }

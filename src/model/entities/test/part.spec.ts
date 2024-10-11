@@ -261,7 +261,7 @@ describe(Part.name, () => {
 
     it('removes the Piece to replace from the Part', () => {
       const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: false })
-      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
+      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece', isPlanned: false })
 
       const testee: Part = new Part({ pieces: [pieceToBeReplaced] } as PartInterface)
 
@@ -274,9 +274,9 @@ describe(Part.name, () => {
 
     it('inserts the new Piece on the Part', () => {
       const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: false })
-      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
+      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece', isPlanned: false })
 
-      const testee: Part = new Part({ pieces: [pieceToBeReplaced] } as PartInterface)
+      const testee: Part = new Part(EntityTestFactory.createPartInterface({ pieces: [pieceToBeReplaced] }))
 
       expect(testee.getPieces()).not.toContain(newPiece)
 
@@ -287,9 +287,9 @@ describe(Part.name, () => {
 
     it('gives the new Piece the same index in the Pieces of the Part as the Piece to replace', () => {
       const pieceToBeReplaced: Piece = EntityTestFactory.createPiece({ id: 'toBeReplacedPiece', isPlanned: false })
-      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece' })
+      const newPiece: Piece = EntityTestFactory.createPiece({ id: 'newPiece', isPlanned: false })
 
-      const testee: Part = new Part({ pieces: [pieceToBeReplaced] } as PartInterface)
+      const testee: Part = new Part(EntityTestFactory.createPartInterface({ pieces: [pieceToBeReplaced] }))
 
       const indexOfPieceToBeReplaced: number = testee.getPieces().findIndex(piece => piece.id === pieceToBeReplaced.id)
       expect(indexOfPieceToBeReplaced).not.toBe(-1)
