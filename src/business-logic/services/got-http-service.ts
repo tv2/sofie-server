@@ -1,9 +1,19 @@
 import { HttpService } from './interfaces/http-service'
 import got from 'got'
+import { HttpError, HttpErrorCode } from '../http-error'
 
 export class GotHttpService implements HttpService {
 
-  public post(url: string, body: unknown): unknown {
-    return got.post(url, body || undefined)
+  public post(url: string, body?: string): unknown {
+    return got.post(url, { body }).catch(error => {
+      const bodyText: string = error.response?.body
+      if (bodyText) {
+        throw new HttpError(HttpErrorCode.BAD_REQUEST, bodyText)
+      }
+      if (error.code === HttpErrorCode.CONNECTION_REFUSED) {
+        throw new HttpError(HttpErrorCode.CONNECTION_REFUSED, 'Connection refused.')
+      }
+      throw error
+    })
   }
 }

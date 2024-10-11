@@ -1,7 +1,7 @@
 import { PartInterface } from '../../../model/entities/part'
 import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -37,7 +37,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
       ])
   }
 
-  private createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
+  private createInsertCameraAsNextAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithAudio): Tv2CameraAction {
     const sanitizedId: string = this.sanitizeStringForId(cameraSource.id)
     const partId: string = `cameraInsertActionPart_${sanitizedId}`
     const cameraPieceInterface: Tv2PieceInterface = this.createCameraPieceInterface(configuration, cameraSource, partId)
@@ -58,7 +58,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
     }
   }
 
-  private createCameraPieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2PieceInterface {
+  private createCameraPieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, parentPartId: string): Tv2PieceInterface {
     const videoMixerTimelineObjects: Tv2BlueprintTimelineObject[] = this.createVideoMixerTimelineObjects(source)
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
@@ -92,7 +92,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
     }
   }
 
-  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): Tv2BlueprintTimelineObject[] {
+  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithAudio): Tv2BlueprintTimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, enable),
@@ -101,7 +101,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
     ]
   }
 
-  private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
+  private createPartInterface(partId: string, source: Tv2SourceMappingWithAudio): PartInterface {
     return {
       id: partId,
       rundownId: '',
@@ -125,7 +125,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
     }
   }
 
-  private createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithSound): Tv2CameraAction {
+  private createInsertCameraAsOnAirAction(configuration: Tv2BlueprintConfiguration, cameraSource: Tv2SourceMappingWithAudio): Tv2CameraAction {
     const sanitizedId: string = this.sanitizeStringForId(cameraSource.id)
     const partId: string = `cameraInsertAndTakeActionPart_${sanitizedId}`
     const cameraPieceInterface: Tv2PieceInterface = this.createCameraPieceInterface(configuration, cameraSource, partId)

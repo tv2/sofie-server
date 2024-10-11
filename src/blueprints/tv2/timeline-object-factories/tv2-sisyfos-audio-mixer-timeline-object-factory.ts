@@ -11,12 +11,12 @@ import { DeviceType } from '../../../model/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
-import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 
 export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerTimelineObjectFactory {
-  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, audioMode?: Tv2AudioMode): SisyfosTimelineObject[] {
-    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.sisyfosLayers.map(sisyfosLayer => {
+  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, audioMode?: Tv2AudioMode): SisyfosTimelineObject[] {
+    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.audioLayers.map(sisyfosLayer => {
       return {
         id: `${source.id}_${this.generateRandomWholeNumber()}`,
         enable: {
@@ -31,14 +31,14 @@ export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerT
       }
     })
 
-    if (!source.studioMicrophones) {
-      return sisyfosChannelTimelineObjects
+    if (source.usesStudioMicrophones || audioMode === Tv2AudioMode.VOICE_OVER) {
+      return [
+        ...sisyfosChannelTimelineObjects,
+        this.createStudioMicrophonesTimelineObject(configuration)
+      ]
     }
 
-    return [
-      ...sisyfosChannelTimelineObjects,
-      this.createStudioMicrophonesTimelineObject(configuration)
-    ]
+    return sisyfosChannelTimelineObjects
   }
 
   private generateRandomWholeNumber(): number {
