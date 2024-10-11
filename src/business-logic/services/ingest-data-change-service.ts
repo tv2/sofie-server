@@ -233,7 +233,7 @@ export class IngestDataChangeService implements DataChangeService {
     }).trace(message)
   }
 
-  private applyRundownSynchronizeResult(rundown: Rundown, rundownSynchronizeResult: RundownSynchronizeResult): { deletedPartsInfo: DeletedPartInfo[], deletedSegmentsInfo: DeletedSegmentInfo[] } {
+  private applyRundownSynchronizeResult(rundown: Rundown, rundownSynchronizeResult: RundownSynchronizeResult): DeletedInfo {
     const deletedSegmentsInfo: DeletedSegmentInfo[] = rundownSynchronizeResult.deletedSegments.map(segment => {
       const originalSegmentId: string = segment.id
       const deletedSegment: Segment | undefined = rundown.removeSegment(segment.id)
