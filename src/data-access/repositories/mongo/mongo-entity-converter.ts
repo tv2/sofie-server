@@ -299,10 +299,6 @@ export class MongoEntityConverter {
     )
   }
 
-  public convertToBasicRundowns(mongoRundowns: MongoRundown[]): BasicRundown[] {
-    return mongoRundowns.map(this.convertToBasicRundown.bind(this))
-  }
-
   public convertToSegment(mongoSegment: MongoSegment): Segment {
     return new Segment({
       ...mongoSegment,

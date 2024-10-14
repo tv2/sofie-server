@@ -31,13 +31,13 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     return RUNDOWN_COLLECTION_NAME
   }
 
-  public async getBasicRundowns(): Promise<BasicRundown[]> {
+  public getBasicRundowns(): Promise<BasicRundown[]> {
     this.assertDatabaseConnection(this.getBasicRundowns.name)
-    const basicRundowns: MongoRundown[] = (await this.getCollection()
+    return this.getCollection()
       .find({})
-      .project({ _id: 1, name: 1, modifiedAt: 1, mode: 1, timing: 1 })
-      .toArray()) as unknown as MongoRundown[]
-    return this.mongoEntityConverter.convertToBasicRundowns(basicRundowns)
+      .project<MongoRundown>({ _id: 1, name: 1, modifiedAt: 1, mode: 1, timing: 1 })
+      .map(basicMongoRundown => this.mongoEntityConverter.convertToBasicRundown(basicMongoRundown))
+      .toArray()
   }
 
   public async getRundown(rundownId: string): Promise<Rundown> {
