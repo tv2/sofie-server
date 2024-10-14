@@ -5,7 +5,6 @@ import { MongoIngestedEntityConverter } from '../repositories/mongo/mongo-ingest
 import { SegmentRepository } from '../repositories/interfaces/segment-repository'
 import { MongoSegmentRepository } from '../repositories/mongo/mongo-segment-repository'
 import { PartRepository } from '../repositories/interfaces/part-repository'
-import { PieceRepository } from '../repositories/interfaces/piece-repository'
 import { MongoPieceRepository } from '../repositories/mongo/mongo-piece-repository'
 import { MongoPartRepository } from '../repositories/mongo/mongo-part-repository'
 import { TimelineRepository } from '../repositories/interfaces/timeline-repository'
@@ -73,8 +72,12 @@ import {
   MongoShowStyleVariantConfigurationListener
 } from '../repositories/mongo/mongo-show-style-variant-configuration-listener'
 import { RundownAggregateRepository } from '../repositories/interfaces/rundown-aggregate-repository'
+import { AsyncLock } from '../async-lock'
 
 export class RepositoryFacade {
+
+  private static rundownAggregateRepository?: RundownAggregateRepository
+  public static rundownLock: AsyncLock = new AsyncLock()
 
   public static getDatabase(): Database {
     return MongoDatabase.getInstance(LoggerFacade.createLogger())
@@ -85,14 +88,17 @@ export class RepositoryFacade {
   }
 
   public static createRundownAggregateRepository(): RundownAggregateRepository {
-    const mongoRundownRepository: RundownAggregateRepository = new MongoRundownAggregateRepository(
-      MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createMongoSegmentRepository(),
-      RepositoryFacade.createMongoPartRepository(),
-      RepositoryFacade.createMongoPieceRepository(),
-      new MongoEntityConverter(LoggerFacade.createLogger()),
-    )
-    return CachedRundownAggregateRepository.getInstance(mongoRundownRepository, LoggerFacade.createLogger())
+    if (!this.rundownAggregateRepository) {
+      const mongoRundownRepository: RundownAggregateRepository = new MongoRundownAggregateRepository(
+        MongoDatabase.getInstance(LoggerFacade.createLogger()),
+        RepositoryFacade.createMongoSegmentRepository(),
+        RepositoryFacade.createMongoPartRepository(),
+        RepositoryFacade.createMongoPieceRepository(),
+        new MongoEntityConverter(LoggerFacade.createLogger()),
+      )
+      this.rundownAggregateRepository = new CachedRundownAggregateRepository(mongoRundownRepository, LoggerFacade.createLogger())
+    }
+    return this.rundownAggregateRepository
   }
 
   public static createIngestedRundownRepository(): IngestedRundownRepository {
@@ -178,10 +184,6 @@ export class RepositoryFacade {
       LoggerFacade.createLogger(),
       RepositoryFacade.createMediaRepository()
     )
-  }
-
-  public static createPieceRepository(): PieceRepository {
-    return this.createRundownAggregateRepository()
   }
 
   private static createMongoPieceRepository(): MongoPieceRepository {

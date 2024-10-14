@@ -20,6 +20,7 @@ import { TimelineRepository } from '../../data-access/repositories/interfaces/ti
 import { ActionGenerationService } from './action-generation-service'
 import { Part } from '../../model/entities/part'
 import { Timeline } from '../../model/entities/timeline'
+import { AsyncLock } from '../../data-access/async-lock'
 
 interface DeletedInfo {
   readonly deletedPartsInfo: readonly DeletedPartInfo[]
@@ -47,6 +48,7 @@ export class IngestDataChangeService implements DataChangeService {
   constructor(
     private readonly ingestedRundownRepository: IngestedRundownRepository,
     private readonly rundownRepository: RundownRepository,
+    private readonly rundownLock: AsyncLock,
     private readonly segmentRepository: SegmentRepository,
     private readonly partRepository: PartRepository,
     private readonly rundownChangedListener: DataChangedListener<IngestedRundown>,
@@ -154,34 +156,36 @@ export class IngestDataChangeService implements DataChangeService {
   }
 
   private async synchronizeRundown(rundownId: string): Promise<void> {
-    const rundown: Rundown | undefined = await this.rundownRepository.getRundown(rundownId).catch(error => {
-      if (error instanceof NotFoundException) {
-        return undefined
+    await this.rundownLock.withLock(async () => {
+      const rundown: Rundown | undefined = await this.rundownRepository.getRundown(rundownId).catch(error => {
+        if (error instanceof NotFoundException) {
+          return undefined
+        }
+        throw error
+      })
+      const ingestedRundown: IngestedRundown | undefined = await this.ingestedRundownRepository.getIngestedRundown(rundownId).catch(error => {
+        if (error instanceof NotFoundException) {
+          return undefined
+        }
+        throw error
+      })
+
+      if (!ingestedRundown) {
+        if (rundown) {
+          this.rundownEventEmitter.emitRundownDeleted(rundownId)
+          await this.rundownRepository.deleteRundown(rundownId)
+          await this.actionGenerationService.removeActionsForRundown(rundownId)
+        }
+        return
       }
-      throw error
+
+      if (!rundown) {
+        await this.createEmitAndPersistRundown(ingestedRundown)
+        return
+      }
+
+      await this.updateEmitAndPersistRundown(rundown, ingestedRundown)
     })
-    const ingestedRundown: IngestedRundown | undefined = await this.ingestedRundownRepository.getIngestedRundown(rundownId).catch(error => {
-      if (error instanceof NotFoundException) {
-        return undefined
-      }
-      throw error
-    })
-
-    if (!ingestedRundown) {
-      if (rundown) {
-        this.rundownEventEmitter.emitRundownDeleted(rundownId)
-        await this.rundownRepository.deleteRundown(rundownId)
-        await this.actionGenerationService.removeActionsForRundown(rundownId)
-      }
-      return
-    }
-
-    if (!rundown) {
-      await this.createEmitAndPersistRundown(ingestedRundown)
-      return
-    }
-
-    await this.updateEmitAndPersistRundown(rundown, ingestedRundown)
   }
 
   private async createEmitAndPersistRundown(ingestedRundown: IngestedRundown): Promise<void> {

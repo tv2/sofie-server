@@ -6,15 +6,6 @@ import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
 
 export class CachedRundownAggregateRepository implements RundownAggregateRepository {
-  private static instance: RundownAggregateRepository
-
-  public static getInstance(rundownAggregateRepository: RundownAggregateRepository, logger: Logger): RundownAggregateRepository {
-    if (!this.instance) {
-      this.instance = new CachedRundownAggregateRepository(rundownAggregateRepository, logger)
-    }
-    return this.instance
-  }
-
   private readonly logger: Logger
   private readonly cachedRundowns: Map<string, Rundown> = new Map()
 

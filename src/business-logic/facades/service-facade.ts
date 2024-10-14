@@ -40,6 +40,7 @@ export class ServiceFacade {
       EventEmitterFacade.createRundownEventEmitter(),
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.rundownLock,
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createIngestService(),
@@ -83,6 +84,7 @@ export class ServiceFacade {
     return new IngestDataChangeService(
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.rundownLock,
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPartRepository(),
       RepositoryFacade.createIngestedRundownChangeListener(),
