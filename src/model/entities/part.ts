@@ -212,18 +212,18 @@ export class Part {
   }
 
   private stopOverlappingPiecesOnSameLayer(referencePiece: Piece): void {
-    this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doesPiecesOverlap(referencePiece, piece))
+    this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doPiecesOverlap(referencePiece, piece))
       .forEach(stoppablePiece => stoppablePiece.stop())
   }
 
-  private doesPiecesOverlap(pieceA: Piece, pieceB: Piece): boolean {
+  private doPiecesOverlap(pieceA: Piece, pieceB: Piece): boolean {
     const pieceAEnd: number = pieceA.getStart() + (pieceA.getDuration() ?? Infinity)
     const pieceBEnd: number = pieceB.getStart() + (pieceB.getDuration() ?? Infinity)
     return pieceA.getStart() <= pieceBEnd && pieceAEnd >= pieceB.getStart()
   }
 
   private removeOverlappingPiecesOnSameLayer(referencePiece: Piece): void {
-    const piecesToRemove: Piece[] = this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doesPiecesOverlap(referencePiece, piece))
+    const piecesToRemove: Piece[] = this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doPiecesOverlap(referencePiece, piece))
     this.pieces = this.pieces.filter(piece => !piecesToRemove.includes(piece))
     this.replacedPlannedPieces.push(...piecesToRemove.filter(piece => piece.isPlanned))
   }

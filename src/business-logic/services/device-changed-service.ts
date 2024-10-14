@@ -85,8 +85,18 @@ export class DeviceChangedService implements DataChangeService {
       id: `${DEVICE_STATUS_MESSAGE_PREFIX}${device.id}`,
       statusCode: device.statusCode,
       title: device.name,
-      message: device.statusMessage
+      message: this.getDeviceMessage(device)
     }
+  }
+
+  private getDeviceMessage(device: Device): string {
+    if (device.statusMessage) {
+      return device.statusMessage
+    }
+    if (device.statusCode === StatusCode.GOOD) {
+      return 'The device is in a good state.'
+    }
+    return ''
   }
 
   private async onDeviceDeleted(deviceId: string): Promise<void> {

@@ -67,7 +67,7 @@ export class IngestRundownSynchronizer {
       .map(ingestedSegment => this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment))
   }
 
-  public getUpdatedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[]): readonly Segment[] {
+  private getUpdatedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[]): readonly Segment[] {
     return ingestedSegments.reduce<readonly Segment[]>((updatedSegments, ingestedSegment) => {
       const segment: Segment | undefined = segments.find(segment => segment.id === ingestedSegment.id)
       if (!segment) {
@@ -83,7 +83,7 @@ export class IngestRundownSynchronizer {
     }, [])
   }
 
-  public getDeletedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[]): readonly Segment[] {
+  private getDeletedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[]): readonly Segment[] {
     const ingestedSegmentIds: ReadonlySet<string> = new Set(ingestedSegments.map(ingestedSegment => ingestedSegment.id))
     return segments.filter(segment => !segment.isUnsynced() && !ingestedSegmentIds.has(segment.id))
   }
