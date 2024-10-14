@@ -57,8 +57,8 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     return this.getCollection().find({ rundownId }).map(document => document._id).toArray()
   }
 
-  public getPartIdsForSegment(segmentId: string): Promise<readonly string[]> {
-    return this.getCollection().find({ segmentId }).map(document => document._id).toArray()
+  public getPartIdsForSegment(segmentId: string, mongoPart: Partial<MongoPart> = {}): Promise<readonly string[]> {
+    return this.getCollection().find({ ...mongoPart, segmentId }).map(document => document._id).toArray()
   }
 
   public buildSavePartQueries(parts: readonly Part[]): AnyBulkWriteOperation<MongoPart>[] {

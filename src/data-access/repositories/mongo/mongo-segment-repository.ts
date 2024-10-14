@@ -1,6 +1,5 @@
 import { Segment } from '../../../model/entities/segment'
 import { MongoDatabase } from './mongo-database'
-import { MongoIngestedSegment } from './mongo-ingested-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
 import {
   AnyBulkWriteOperation,
@@ -40,7 +39,7 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
     return segment
   }
 
-  public async getSegments(rundownId: string, filters?: Partial<MongoIngestedSegment>): Promise<Segment[]> {
+  public async getSegments(rundownId: string, filters?: Partial<MongoSegment>): Promise<Segment[]> {
     this.assertDatabaseConnection(this.getSegments.name)
     const mongoSegments: MongoSegment[] = (await this.getCollection()
       .find<MongoSegment>({ ...filters, rundownId: rundownId })

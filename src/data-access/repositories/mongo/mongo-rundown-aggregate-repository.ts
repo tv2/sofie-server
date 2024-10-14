@@ -99,8 +99,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
 
   public async deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
     this.assertDatabaseConnection(this.deleteUnsyncedSegmentsForRundown.name)
-    const unsyncedFilter: Partial<MongoSegment> = { isUnsynced: true }
-    const segments: Segment[] = await this.mongoSegmentRepository.getSegments(rundownId, unsyncedFilter)
+    const segments: Segment[] = await this.mongoSegmentRepository.getSegments(rundownId, { isUnsynced: true })
     const parts: readonly Part[] = segments.flatMap(segment => segment.getParts())
 
     const deletePartQueries: AnyBulkWriteOperation<MongoPart>[] = segments.map(segment => this.mongoPartRepository.buildDeletePartsForSegmentQuery(segment.id))
@@ -143,9 +142,10 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
 
   public async deleteUnplannedPartsForSegment(segmentId: string): Promise<void> {
     this.assertDatabaseConnection(this.deleteUnplannedPartsForSegment.name)
+    const unplannedPartIds: readonly string[] = await this.mongoPartRepository.getPartIdsForSegment(segmentId, { isPlanned: false })
     await this.withTransaction(async (session) => {
       await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForSegmentQuery(segmentId, { isPlanned: false })], session)
-      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForSegmentQuery(segmentId, { isPlanned: false })], session)
+      await this.mongoPieceRepository.executeQueries(unplannedPartIds.map(partId => this.mongoPieceRepository.buildDeletePiecesForPartQuery(partId)), session)
     })
   }
 
