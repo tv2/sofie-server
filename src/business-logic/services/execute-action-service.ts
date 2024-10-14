@@ -161,6 +161,7 @@ export class ExecuteActionService implements ActionService {
 
     partInterface.pieces = partAction.data.pieceInterfaces.map(pieceInterface => new Piece({
       ...pieceInterface,
+      id: this.makeUnique(pieceInterface.id),
       partId: partInterface.id
     }))
 
