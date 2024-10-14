@@ -66,7 +66,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     const deleteOrphanedPartsQuery: AnyBulkWriteOperation<MongoPart> = this.mongoPartRepository.buildDeleteOrphanedPartsForRundownQuery(rundown.id, parts)
     const pieces: readonly Piece[] = parts.flatMap(part => part.getPieces())
     const savePieceQueries: readonly AnyBulkWriteOperation<MongoPiece>[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
-    const deleteOrphanedPiecesQuery: AnyBulkWriteOperation<MongoPiece> = this.mongoPieceRepository.buildDeleteOrphanedPiecesForPartsQuery(parts.map(part => part.id), pieces)
+    const deleteOrphanedPiecesQuery: AnyBulkWriteOperation<MongoPiece> = this.mongoPieceRepository.buildDeleteOrphanedPiecesForPartsQuery(parts.map(part => part.id), pieces.concat(rundown.getInfinitePieces()))
 
     await this.withTransaction(async (session) => {
       await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
@@ -134,24 +134,6 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     })
   }
 
-  public async deleteAllUnplannedAndUnsyncedContent(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnplannedAndUnsyncedContent.name)
-    await this.withTransaction(async (session) => {
-      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteAllUnsyncedSegmentsQuery()], session)
-      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeleteAllUnsyncedPartsQuery(), this.mongoPartRepository.buildDeleteAllUnplannedPartsQuery()], session)
-      await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeleteAllUnsyncedPiecesQuery(), this.mongoPieceRepository.buildDeleteAllUnplannedPiecesQuery()], session)
-    })
-  }
-
-  public async deleteUnplannedPartsForSegment(segmentId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deleteUnplannedPartsForSegment.name)
-    const unplannedPartIds: readonly string[] = await this.mongoPartRepository.getPartIdsForSegment(segmentId, { isPlanned: false })
-    await this.withTransaction(async (session) => {
-      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForSegmentQuery(segmentId, { isPlanned: false })], session)
-      await this.mongoPieceRepository.executeQueries(unplannedPartIds.map(partId => this.mongoPieceRepository.buildDeletePiecesForPartQuery(partId)), session)
-    })
-  }
-
   public async deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
     this.assertDatabaseConnection(this.deleteUnsyncedPartsForSegment.name)
     const partIdsInSegment: readonly string[] = await this.mongoPartRepository.getPartIdsForSegment(segmentId)
@@ -167,9 +149,5 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
 
   public getPiecesFromIds(pieceIds: string[]): Promise<Piece[]> {
     return this.mongoPieceRepository.getPiecesFromIds(pieceIds)
-  }
-
-  public deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {
-    return this.mongoPieceRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
   }
 }

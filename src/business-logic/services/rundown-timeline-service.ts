@@ -12,10 +12,7 @@ import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
 import { Part } from '../../model/entities/part'
 import { Owner } from '../../model/enums/owner'
-import { PartRepository } from '../../data-access/repositories/interfaces/part-repository'
 import { Segment } from '../../model/entities/segment'
-import { SegmentRepository } from '../../data-access/repositories/interfaces/segment-repository'
-import { PieceRepository } from '../../data-access/repositories/interfaces/piece-repository'
 import { InTransition } from '../../model/value-objects/in-transition'
 import { AlreadyActivatedException } from '../../model/exceptions/already-activated-exception'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
@@ -33,9 +30,6 @@ export class RundownTimelineService implements RundownService {
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
     private readonly rundownRepository: RundownRepository,
-    private readonly segmentRepository: SegmentRepository,
-    private readonly partRepository: PartRepository,
-    private readonly pieceRepository: PieceRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly ingestService: IngestService,
@@ -141,12 +135,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.saveRundown(rundown)
 
-    await this.deleteAllUnsyncedAndUnplanned()
     await this.playoutService.makeDevicesStandDown()
-  }
-
-  private async deleteAllUnsyncedAndUnplanned(): Promise<void> {
-    await this.rundownRepository.deleteAllUnplannedAndUnsyncedContent()
   }
 
   private stopAutoNext(): void {
@@ -174,8 +163,8 @@ export class RundownTimelineService implements RundownService {
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundown.id)
 
-    await this.deleteUnsyncedPreviousPart(rundown)
-    await this.deleteUnsyncedSegments(rundown)
+    this.emitDeleteUnsyncedPreviousPart(rundown)
+    this.deleteUnsyncedSegments(rundown)
     await this.saveRundown(rundown)
 
     if (rundown.getActiveSegment().definesShowStyleVariant) {
@@ -197,30 +186,21 @@ export class RundownTimelineService implements RundownService {
     }
   }
 
-  private async deleteUnsyncedPreviousPart(rundown: Rundown): Promise<void> {
+  private emitDeleteUnsyncedPreviousPart(rundown: Rundown): void {
     const previousPart: Part | undefined = rundown.getPreviousPart()
     if (previousPart && previousPart.isUnsynced()) {
-      await this.partRepository.deletePart(previousPart.id)
       this.rundownEventEmitter.emitPartDeleted(rundown, previousPart.getSegmentId(), previousPart.id)
     }
   }
 
-  private async deleteUnsyncedSegments(rundown: Rundown): Promise<void> {
+  private deleteUnsyncedSegments(rundown: Rundown): void {
     const unsyncedSegments: Segment[] = rundown.getSegments().filter(segment => segment.isUnsynced())
-    await Promise.all(
-      unsyncedSegments.map(async segment => {
-        if (rundown.isActive() && segment.isOnAir()) {
-          await this.partRepository.deleteUnsyncedPartsForSegment(segment.id)
-          return
-        }
-        if (!segment.isOnAir()) {
-          rundown.removeUnsyncedSegment(segment)
-          this.rundownEventEmitter.emitSegmentDeleted(rundown, segment.id)
-        }
-        await this.segmentRepository.deleteUnsyncedSegmentsForRundown(rundown.id)
-      })
-    )
-    await this.pieceRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
+    unsyncedSegments.map(segment => {
+      if (!segment.isOnAir()) {
+        rundown.removeUnsyncedSegment(segment)
+        this.rundownEventEmitter.emitSegmentDeleted(rundown, segment.id)
+      }
+    })
   }
 
   private getEndStateForActivePart(rundown: Rundown): PartEndState {
@@ -243,16 +223,12 @@ export class RundownTimelineService implements RundownService {
 
   public async setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const unplannedPartsInSegment: readonly Part[] | undefined = rundown.getSegments().find(segment => segment.id === segmentId)?.getParts().filter(part => !part.isPlanned)
     rundown.setNext(segmentId, partId, owner)
 
     await this.buildAndPersistTimeline(rundown)
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
-    if (!rundown.getNextCursor()!.segment.isOnAir() && unplannedPartsInSegment) {
-      await this.partRepository.deleteParts(unplannedPartsInSegment.map(part => part.id))
-    }
     await this.saveRundown(rundown)
   }
 

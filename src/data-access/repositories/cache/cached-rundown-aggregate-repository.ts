@@ -50,38 +50,11 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
     return this.rundownAggregateRepository.getSegment(segmentId)
   }
 
-  public deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
-    return this.rundownAggregateRepository.deleteUnsyncedSegmentsForRundown(rundownId)
-  }
-
   public getPart(partId: string): Promise<Part> {
     return this.rundownAggregateRepository.getPart(partId)
   }
 
-  public deletePart(partId: string): Promise<void> {
-    return this.rundownAggregateRepository.deletePart(partId)
-  }
-  public deleteParts(partIds: readonly string[]): Promise<void> {
-    return this.rundownAggregateRepository.deleteParts(partIds)
-  }
-
-  public deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
-    return this.rundownAggregateRepository.deleteUnsyncedPartsForSegment(segmentId)
-  }
-
   public getPiecesFromIds(pieceIds: string[]): Promise<Piece[]> {
     return this.rundownAggregateRepository.getPiecesFromIds(pieceIds)
-  }
-
-  public deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {
-    return this.rundownAggregateRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
-  }
-
-  public deleteAllUnplannedAndUnsyncedContent(): Promise<void> {
-    return this.rundownAggregateRepository.deleteAllUnplannedAndUnsyncedContent()
-  }
-
-  public deleteUnplannedPartsForSegment(segmentId: string): Promise<void> {
-    return this.rundownAggregateRepository.deleteUnplannedPartsForSegment(segmentId)
   }
 }
