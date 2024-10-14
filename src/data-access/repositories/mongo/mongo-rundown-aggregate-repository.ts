@@ -60,16 +60,19 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
     const segments: readonly Segment[] = rundown.getSegments()
     const saveSegmentQueries: readonly AnyBulkWriteOperation<MongoSegment>[] = this.mongoSegmentRepository.buildSaveSegmentQueries(rundown.getSegments())
+    const deleteOrphanedSegmentsQuery: AnyBulkWriteOperation<MongoSegment> = this.mongoSegmentRepository.buildDeleteOrphanedSegmentsForRundownQuery(rundown.id, segments)
     const parts: readonly Part[] = segments.flatMap(segment => segment.getParts())
     const savePartQueries: readonly AnyBulkWriteOperation<MongoPart>[] = this.mongoPartRepository.buildSavePartQueries(parts)
+    const deleteOrphanedPartsQuery: AnyBulkWriteOperation<MongoPart> = this.mongoPartRepository.buildDeleteOrphanedPartsForRundownQuery(rundown.id, parts)
     const pieces: readonly Piece[] = parts.flatMap(part => part.getPieces())
     const savePieceQueries: readonly AnyBulkWriteOperation<MongoPiece>[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
+    const deleteOrphanedPiecesQuery: AnyBulkWriteOperation<MongoPiece> = this.mongoPieceRepository.buildDeleteOrphanedPiecesForPartsQuery(parts.map(part => part.id), pieces)
 
     await this.withTransaction(async (session) => {
       await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
-      await this.mongoSegmentRepository.executeQueries(saveSegmentQueries, session)
-      await this.mongoPartRepository.executeQueries(savePartQueries, session)
-      await this.mongoPieceRepository.executeQueries(savePieceQueries, session)
+      await this.mongoSegmentRepository.executeQueries(saveSegmentQueries.concat(deleteOrphanedSegmentsQuery), session)
+      await this.mongoPartRepository.executeQueries(savePartQueries.concat(deleteOrphanedPartsQuery), session)
+      await this.mongoPieceRepository.executeQueries(savePieceQueries.concat(deleteOrphanedPiecesQuery), session)
     })
   }
 

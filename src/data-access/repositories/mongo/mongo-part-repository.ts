@@ -76,6 +76,14 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     }
   }
 
+  public buildDeleteOrphanedPartsForRundownQuery(rundownId: string, parts: readonly Part[]): AnyBulkWriteOperation<MongoPart> {
+    return {
+      deleteMany: {
+        filter: { rundownId, _id: { $nin: parts.map(part => part.id) } }
+      }
+    }
+  }
+
   public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoPart>[], session: ClientSession): Promise<void> {
     if (queries.length === 0) {
       return

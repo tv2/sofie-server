@@ -57,6 +57,14 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
     return segments.map(segment => this.buildSaveSegmentQuery(segment))
   }
 
+  public buildDeleteOrphanedSegmentsForRundownQuery(rundownId: string, segments: readonly Segment[]): AnyBulkWriteOperation<MongoSegment> {
+    return {
+      deleteMany: {
+        filter: { rundownId, _id: { $nin: segments.map(segment => segment.id) } }
+      }
+    }
+  }
+
   private buildSaveSegmentQuery(segment: Segment): AnyBulkWriteOperation<MongoSegment> {
     const mongoSegment: MongoSegment = this.mongoEntityConverter.convertToMongoSegment(segment)
     return {
