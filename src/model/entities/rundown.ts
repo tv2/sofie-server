@@ -548,78 +548,86 @@ export class Rundown extends BasicRundown {
 
   public setNextFromDirection(direction: SetNextDirection, owner?: Owner): void {
     this.assertActive(this.setNextFromDirection.name)
+    const nextCursor: RundownCursor = this.findNextCursorFromDirection(direction)
+    this.setNextFromIds(nextCursor.segment.id, nextCursor.part.id, owner)
+  }
 
+  private findNextCursorFromDirection(direction: SetNextDirection): RundownCursor {
     switch (direction) {
       case SetNextDirection.PART_AFTER_NEXT_PART: {
-        this.setPartAfterCurrentNextPartAsNext(owner)
-        break
+        return this.findCursorWithPartAfterCurrentNextPart()
       }
       case SetNextDirection.PART_BEFORE_NEXT_PART: {
-        this.setPartBeforeCurrentNextPartAsNext(owner)
-        break
+        return this.findCursorWithPartBeforeCurrentNextPart()
       }
       case SetNextDirection.SEGMENT_BEFORE_NEXT_SEGMENT: {
-        this.setFirstPartInSegmentBeforeNextSegmentAsNext(owner)
-        break
+        return this.findCursorWithFirstPartInSegmentBeforeNextSegment()
       }
       case SetNextDirection.SEGMENT_AFTER_NEXT_SEGMENT: {
-        this.setFirstPartInSegmentAfterNextSegmentAsNext(owner)
-        break
+        return this.findCursorWithFirstPartInSegmentAfterNextSegment()
       }
     }
   }
 
-  private setPartAfterCurrentNextPartAsNext(owner?: Owner): void {
+  private findCursorWithPartAfterCurrentNextPart(): RundownCursor {
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
-    const currentNextSegment: Segment = this.nextCursor?.segment
-    const currentNextPart: Part = this.nextCursor?.part
+    const currentNextSegment: Segment = this.nextCursor.segment
+    const currentNextPart: Part = this.nextCursor.part
     try {
       const nextPart: Part = currentNextSegment.findNextPartNotOnAir(currentNextPart)
-      this.setNextFromIds(currentNextSegment.id, nextPart.id, owner)
+      return this.createCursorFromSegmentAndPart(currentNextSegment, nextPart)
     }  catch (exception) {
       if (!(exception instanceof LastPartInSegmentException)) {
         throw exception
       }
-      this.setFirstPartInSegmentAfterNextSegmentAsNext(owner)
+      return this.findCursorWithFirstPartInSegmentAfterNextSegment()
     }
   }
 
-  private setPartBeforeCurrentNextPartAsNext(owner?: Owner): void {
+  private createCursorFromSegmentAndPart(segment: Segment, part: Part): RundownCursor {
+    return {
+      segment,
+      part,
+      owner: Owner.SYSTEM
+    }
+  }
+
+  private findCursorWithPartBeforeCurrentNextPart(): RundownCursor {
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
-    const currentNextSegment: Segment = this.nextCursor?.segment
-    const currentNextPart: Part = this.nextCursor?.part
+    const currentNextSegment: Segment = this.nextCursor.segment
+    const currentNextPart: Part = this.nextCursor.part
     try {
       const previousPart: Part = currentNextSegment.findPreviousPartNotOnAir(currentNextPart)
-      this.setNextFromIds(currentNextSegment.id, previousPart.id, owner)
+      return this.createCursorFromSegmentAndPart(currentNextSegment, previousPart)
     } catch (exception) {
       if (!(exception instanceof FirstPartInSegmentException)) {
         throw exception
       }
-      this.setLastPartInSegmentBeforeNextSegmentAsNext(owner)
+      return this.findCursorWithLastPartInSegmentBeforeNextSegment()
     }
   }
 
-  private setFirstPartInSegmentAfterNextSegmentAsNext(owner?: Owner): void {
+  private findCursorWithFirstPartInSegmentAfterNextSegment(): RundownCursor {
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
-    const currentNextSegment: Segment = this.nextCursor?.segment
+    const currentNextSegment: Segment = this.nextCursor.segment
 
     const currentNextSegmentIndex: number = this.segments.findIndex(segment => segment.id === currentNextSegment.id)
-    this.setFirstPartInSegmentAfterSegmentIndexAsNext(currentNextSegmentIndex, owner)
+    return this.findCursorWithFirstPartInSegmentAfterSegmentIndex(currentNextSegmentIndex)
   }
 
-  private setFirstPartInSegmentAfterSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
+  private findCursorWithFirstPartInSegmentAfterSegmentIndex(segmentIndex: number): RundownCursor {
     if (segmentIndex === this.segments.length - 1) {
       throw new LastSegmentInRundownException('Unable to find the first Part of the next Segment. We are on the last Segment of the Rundown')
     }
     try {
       const nextSegment: Segment = this.findFirstValidSegmentAfterIndex(segmentIndex)
       const nextPart: Part = nextSegment.findFirstPartNotOnAir()
-      this.setNextFromIds(nextSegment.id, nextPart.id, owner)
+      return this.createCursorFromSegmentAndPart(nextSegment, nextPart)
     } catch (error) {
       if (!(error instanceof NotFoundException)) {
         throw error
       }
-      this.setFirstPartInSegmentAfterSegmentIndexAsNext(segmentIndex + 1, owner)
+      return this.findCursorWithFirstPartInSegmentAfterSegmentIndex(segmentIndex + 1)
     }
   }
 
@@ -633,27 +641,27 @@ export class Rundown extends BasicRundown {
     throw new LastSegmentInRundownException(`No valid Segments after SegmentIndex ${searchIndex}`)
   }
 
-  private setFirstPartInSegmentBeforeNextSegmentAsNext(owner?: Owner): void {
+  private findCursorWithFirstPartInSegmentBeforeNextSegment(): RundownCursor {
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
-    const currentNextSegment: Segment = this.nextCursor?.segment
+    const currentNextSegment: Segment = this.nextCursor.segment
 
     const currentNextSegmentIndex: number = this.segments.findIndex(segment => segment.id === currentNextSegment.id)
-    this.setFirstPartInSegmentBeforeSegmentIndexAsNext(currentNextSegmentIndex, owner)
+    return this.findCursorWithFirstPartInSegmentBeforeSegmentIndex(currentNextSegmentIndex)
   }
 
-  private setFirstPartInSegmentBeforeSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
+  private findCursorWithFirstPartInSegmentBeforeSegmentIndex(segmentIndex: number): RundownCursor {
     if (segmentIndex === 0) {
       throw new FirstSegmentInRundownException('Unable to set the first Part of the previous Segment. We are on the first Segment of the Rundown')
     }
     try {
       const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(segmentIndex)
       const nextPart: Part = previousSegment.findFirstPartNotOnAir()
-      this.setNextFromIds(previousSegment.id, nextPart.id, owner)
+      return this.createCursorFromSegmentAndPart(previousSegment, nextPart)
     } catch (error) {
       if (!(error instanceof NotFoundException)) {
         throw error
       }
-      this.setFirstPartInSegmentBeforeSegmentIndexAsNext(segmentIndex - 1, owner)
+      return this.findCursorWithFirstPartInSegmentBeforeSegmentIndex(segmentIndex - 1)
     }
   }
 
@@ -667,27 +675,27 @@ export class Rundown extends BasicRundown {
     throw new FirstSegmentInRundownException(`No valid Segments before SegmentIndex ${searchIndex}`)
   }
 
-  private setLastPartInSegmentBeforeNextSegmentAsNext(owner?: Owner): void {
+  private findCursorWithLastPartInSegmentBeforeNextSegment(): RundownCursor {
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
     const currentNextSegment: Segment = this.nextCursor?.segment
 
     const currentNextSegmentIndex: number = this.segments.findIndex(segment => segment.id === currentNextSegment.id)
-    this.setLastPartInSegmentBeforeSegmentIndexAsNext(currentNextSegmentIndex, owner)
+    return this.findCursorWithLastPartInSegmentBeforeSegmentIndex(currentNextSegmentIndex)
   }
 
-  private setLastPartInSegmentBeforeSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
+  private findCursorWithLastPartInSegmentBeforeSegmentIndex(segmentIndex: number): RundownCursor {
     if (segmentIndex === 0) {
       throw new FirstSegmentInRundownException('Unable to set last Part in previous Segment. We are on the first Segment of the Rundown')
     }
     try {
       const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(segmentIndex)
       const nextPart: Part = previousSegment.findLastPartNotOnAir()
-      this.setNextFromIds(previousSegment.id, nextPart.id, owner)
+      return this.createCursorFromSegmentAndPart(previousSegment, nextPart)
     } catch (error) {
       if (!(error instanceof NotFoundException)) {
         throw error
       }
-      this.setLastPartInSegmentBeforeSegmentIndexAsNext(segmentIndex - 1, owner)
+      return this.findCursorWithLastPartInSegmentBeforeSegmentIndex(segmentIndex - 1)
     }
   }
 
