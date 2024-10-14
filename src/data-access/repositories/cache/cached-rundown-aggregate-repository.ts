@@ -4,7 +4,6 @@ import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { Logger } from '../../../logger/logger'
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
-import { Piece } from '../../../model/entities/piece'
 
 export class CachedRundownAggregateRepository implements RundownAggregateRepository {
   private static instance: RundownAggregateRepository
@@ -52,9 +51,5 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
 
   public getPart(partId: string): Promise<Part> {
     return this.rundownAggregateRepository.getPart(partId)
-  }
-
-  public getPiecesFromIds(pieceIds: string[]): Promise<Piece[]> {
-    return this.rundownAggregateRepository.getPiecesFromIds(pieceIds)
   }
 }
