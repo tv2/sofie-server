@@ -8,7 +8,7 @@ import {
 import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
-export const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
+const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
 export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
 

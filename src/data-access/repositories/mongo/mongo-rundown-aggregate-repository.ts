@@ -13,7 +13,7 @@ import { MongoPieceRepository } from './mongo-piece-repository'
 import { Part } from '../../../model/entities/part'
 import { RundownAggregateRepository } from '../interfaces/rundown-aggregate-repository'
 
-export const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
+const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
 export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRundown> implements RundownAggregateRepository {
 
@@ -100,54 +100,11 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     return this.mongoSegmentRepository.getSegment(segmentId)
   }
 
-  public async deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deleteUnsyncedSegmentsForRundown.name)
-    const segments: Segment[] = await this.mongoSegmentRepository.getSegments(rundownId, { isUnsynced: true })
-    const parts: readonly Part[] = segments.flatMap(segment => segment.getParts())
-
-    const deletePartQueries: AnyBulkWriteOperation<MongoPart>[] = segments.map(segment => this.mongoPartRepository.buildDeletePartsForSegmentQuery(segment.id))
-
-    await this.withTransaction(async (session) => {
-      await this.mongoPieceRepository.executeQueries(parts.map(part => this.mongoPieceRepository.buildDeletePiecesForPartQuery(part.id)), session)
-      await this.mongoPartRepository.executeQueries(deletePartQueries, session)
-      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteUnsyncedSegmentsForRundownQuery(rundownId)], session)
-    })
-  }
-
   public getPart(partId: string): Promise<Part> {
     return this.mongoPartRepository.getPart(partId)
   }
 
-  public async deletePart(partId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deletePart.name)
-    await this.withTransaction(async (session) => {
-      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartQuery(partId)], session)
-      await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeletePiecesForPartQuery(partId)], session)
-    })
-  }
-
-  public async deleteParts(partIds: readonly string[]): Promise<void> {
-    this.assertDatabaseConnection(this.deleteParts.name)
-    await this.withTransaction(async (session) => {
-      await this.mongoPartRepository.executeQueries(partIds.map(partId => this.mongoPartRepository.buildDeletePartQuery(partId)), session)
-      await this.mongoPieceRepository.executeQueries(partIds.map(partId => this.mongoPieceRepository.buildDeletePiecesForPartQuery(partId)), session)
-    })
-  }
-
-  public async deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deleteUnsyncedPartsForSegment.name)
-    const partIdsInSegment: readonly string[] = await this.mongoPartRepository.getPartIdsForSegment(segmentId)
-    await this.withTransaction(async (session) => {
-      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeleteUnsyncedPartsForSegmentQuery(segmentId)], session)
-      await this.mongoPieceRepository.executeQueries(partIdsInSegment.map(partId => this.mongoPieceRepository.buildDeletePiecesForPartQuery(partId)), session)
-    })
-  }
-
   private withTransaction(callback: (session: ClientSession) => Promise<void>): Promise<void> {
     return this.mongoDatabase.getClient().withSession(session => session.withTransaction(session => callback(session)))
-  }
-
-  public getPiecesFromIds(pieceIds: string[]): Promise<Piece[]> {
-    return this.mongoPieceRepository.getPiecesFromIds(pieceIds)
   }
 }
