@@ -31,8 +31,8 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
     return this.cachedRundowns.get(rundownId) as Rundown
   }
 
-  public async getBasicRundowns(): Promise<BasicRundown[]> {
-    return await this.rundownAggregateRepository.getBasicRundowns()
+  public getBasicRundowns(): Promise<BasicRundown[]> {
+    return this.rundownAggregateRepository.getBasicRundowns()
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {
