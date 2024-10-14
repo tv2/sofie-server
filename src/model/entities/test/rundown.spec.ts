@@ -4306,23 +4306,31 @@ describe(Rundown.name, () => {
         })
 
         it('next Part is planned - does not remove the next Part', () => {
-          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
-          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
-          const nextPlannedPart: Part = EntityTestFactory.createPart({ isNext: true, ingestedPart: EntityTestFactory.createIngestedPart() })
+          const segmentId: string = 'segment-id'
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ segmentId, ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ segmentId, isOnAir: true })
+          const nextPlannedPart: Part = EntityTestFactory.createPart({ segmentId, isNext: true, ingestedPart: EntityTestFactory.createIngestedPart() })
 
           const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirPart, nextPlannedPart] })
           const threshold: number = 1
 
-          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
-            activeCursor: {
-              segment,
-              part: onAirPart
-            },
-            nextCursor: {
-              segment,
-              part: nextPlannedPart
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: onAirPart,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: {
+                segment,
+                part: nextPlannedPart,
+                owner: Owner.SYSTEM,
+              },
+              infinitePieces: new Map(),
             }
-          } } as RundownInterface)
+          }))
 
           expect(segment.getParts()).toContain(nextPlannedPart)
           testee.pruneOldUnplannedPartsOnActiveSegment(threshold)

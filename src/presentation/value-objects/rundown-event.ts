@@ -120,4 +120,5 @@ export interface PartDeletedEvent extends RundownEvent {
 export interface PartUnsyncedEvent extends RundownEvent {
   type: IngestEventType.PART_UNSYNCED
   part: PartDto
+  originalPartId: string
 }
