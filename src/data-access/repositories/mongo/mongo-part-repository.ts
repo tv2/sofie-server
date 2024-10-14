@@ -111,16 +111,20 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     return this.buildDeleteUnsyncedPartsQuery({ segmentId })
   }
 
-  /*
-  * NOTE: This will delete ALL unsynced Parts in the database. Should only be used on deactivate or activate Rundown.
-  * NOTE: This will NOT delete the associated Pieces.
-  */
   public buildDeleteUnsyncedPartsQuery(mongoPart: Partial<MongoPart> = {}): AnyBulkWriteOperation<MongoPart> {
     return {
       deleteMany: {
         filter: { ...mongoPart, isUnsynced: true },
       }
     }
+  }
+
+  /*
+  * NOTE: This will delete ALL unsynced Parts in the database. Should only be used on deactivate or activate Rundown.
+  * NOTE: This will NOT delete the associated Pieces.
+  */
+  public buildDeleteAllUnsyncedPartsQuery(): AnyBulkWriteOperation<MongoPart> {
+    return this.buildDeleteUnsyncedPartsQuery()
   }
 
   /*

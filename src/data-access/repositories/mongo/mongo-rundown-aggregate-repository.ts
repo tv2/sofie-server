@@ -134,8 +134,8 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
   public async deleteAllUnplannedAndUnsyncedContent(): Promise<void> {
     this.assertDatabaseConnection(this.deleteAllUnplannedAndUnsyncedContent.name)
     await this.withTransaction(async (session) => {
-      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteUnsyncedSegmentsQuery()], session)
-      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeleteUnsyncedPartsQuery(), this.mongoPartRepository.buildDeleteAllUnplannedPartsQuery()], session)
+      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteAllUnsyncedSegmentsQuery()], session)
+      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeleteAllUnsyncedPartsQuery(), this.mongoPartRepository.buildDeleteAllUnplannedPartsQuery()], session)
       await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeleteAllUnsyncedPiecesQuery(), this.mongoPieceRepository.buildDeleteAllUnplannedPiecesQuery()], session)
     })
   }
