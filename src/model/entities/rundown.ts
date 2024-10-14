@@ -609,7 +609,7 @@ export class Rundown extends BasicRundown {
 
   private setFirstPartInSegmentAfterSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
     if (segmentIndex === this.segments.length - 1) {
-      throw new LastSegmentInRundownException('')
+      throw new LastSegmentInRundownException('Unable to find the first Part of the next Segment. We are on the last Segment of the Rundown')
     }
     try {
       const nextSegment: Segment = this.findFirstValidSegmentAfterIndex(segmentIndex)
@@ -643,7 +643,7 @@ export class Rundown extends BasicRundown {
 
   private setFirstPartInSegmentBeforeSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
     if (segmentIndex === 0) {
-      throw new FirstSegmentInRundownException('')
+      throw new FirstSegmentInRundownException('Unable to set the first Part of the previous Segment. We are on the first Segment of the Rundown')
     }
     try {
       const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(segmentIndex)
@@ -677,7 +677,7 @@ export class Rundown extends BasicRundown {
 
   private setLastPartInSegmentBeforeSegmentIndexAsNext(segmentIndex: number, owner?: Owner): void {
     if (segmentIndex === 0) {
-      throw new FirstSegmentInRundownException('')
+      throw new FirstSegmentInRundownException('Unable to set last Part in previous Segment. We are on the first Segment of the Rundown')
     }
     try {
       const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(segmentIndex)
