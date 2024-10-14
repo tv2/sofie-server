@@ -194,13 +194,12 @@ export class RundownTimelineService implements RundownService {
   }
 
   private deleteUnsyncedSegments(rundown: Rundown): void {
-    const unsyncedSegments: Segment[] = rundown.getSegments().filter(segment => segment.isUnsynced())
-    unsyncedSegments.map(segment => {
-      if (!segment.isOnAir()) {
+    rundown.getSegments()
+      .filter(segment => segment.isUnsynced() && !segment.isOnAir())
+      .forEach(segment => {
         rundown.removeUnsyncedSegment(segment)
         this.rundownEventEmitter.emitSegmentDeleted(rundown, segment.id)
-      }
-    })
+      })
   }
 
   private getEndStateForActivePart(rundown: Rundown): PartEndState {
