@@ -253,7 +253,21 @@ export class RundownTimelineService implements RundownService {
     if (!rundown.getNextCursor()!.segment.isOnAir() && unplannedPartsInSegment) {
       await this.partRepository.deleteParts(unplannedPartsInSegment.map(part => part.id))
     }
+    this.deleteUnplannedUntakenPartsFromActiveSegment(rundown)
     await this.saveRundown(rundown)
+  }
+
+  private deleteUnplannedUntakenPartsFromActiveSegment(rundown: Rundown): void {
+    if (!rundown.isActivePartSet()) {
+      return
+    }
+    const activeSegment: Segment = rundown.getActiveSegment()
+    for (const part of activeSegment.getParts()) {
+      if (!part.isPlanned && !part.isNext() && part.getExecutedAt() === 0) {
+        rundown.removePartFromSegment(part.id)
+        this.rundownEventEmitter.emitPartDeleted(rundown, part.getSegmentId(), part.id)
+      }
+    }
   }
 
   public async resetRundown(rundownId: string): Promise<void> {
