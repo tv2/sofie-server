@@ -8,7 +8,7 @@ import {
 import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
-export const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
+const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
 export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
 
@@ -20,7 +20,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
     return PIECE_COLLECTION_NAME
   }
 
-  public async getPieces(partId: string): Promise<Piece[]> {
+  public getPieces(partId: string): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPieces.name)
     return this.getCollection()
       .find<MongoPiece>({ partId: partId })
@@ -28,7 +28,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
       .toArray()
   }
 
-  public async getPiecesFromIds(pieceIds: string[] = []): Promise<Piece[]> {
+  public getPiecesFromIds(pieceIds: string[] = []): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPiecesFromIds.name)
     return this.getCollection()
       .find<MongoPiece>({_id: { $in: pieceIds } })
@@ -47,6 +47,14 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
         filter: { _id: mongoPiece._id },
         update: { $set: mongoPiece },
         upsert: true,
+      }
+    }
+  }
+
+  public buildDeleteOrphanedPiecesForPartsQuery(partIds: readonly string[], pieces: readonly Piece[]): AnyBulkWriteOperation<MongoPiece> {
+    return {
+      deleteMany: {
+        filter: { partId: { $in: partIds }, _id: { $nin: pieces.map(piece => piece.id) } }
       }
     }
   }
@@ -84,7 +92,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
     })
   }
 
-  private async getInfinitePieceIdsOnRundowns(): Promise<string[]> {
+  private getInfinitePieceIdsOnRundowns(): Promise<string[]> {
     return this.getCollection()
       .aggregate<MongoPiece>()
       .lookup({

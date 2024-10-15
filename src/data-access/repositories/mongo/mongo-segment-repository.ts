@@ -10,7 +10,7 @@ import { Part } from '../../../model/entities/part'
 import { MongoEntityConverter, MongoSegment } from './mongo-entity-converter'
 import { MongoPartRepository } from './mongo-part-repository'
 
-export const SEGMENT_COLLECTION_NAME: string = 'executedSegments' // TODO: Once we control ingest rename to "segments".
+const SEGMENT_COLLECTION_NAME: string = 'executedSegments' // TODO: Once we control ingest rename to "segments".
 
 export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
   constructor(
@@ -55,6 +55,14 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
 
   public buildSaveSegmentQueries(segments: readonly Segment[]): AnyBulkWriteOperation<MongoSegment>[] {
     return segments.map(segment => this.buildSaveSegmentQuery(segment))
+  }
+
+  public buildDeleteOrphanedSegmentsForRundownQuery(rundownId: string, segments: readonly Segment[]): AnyBulkWriteOperation<MongoSegment> {
+    return {
+      deleteMany: {
+        filter: { rundownId, _id: { $nin: segments.map(segment => segment.id) } }
+      }
+    }
   }
 
   private buildSaveSegmentQuery(segment: Segment): AnyBulkWriteOperation<MongoSegment> {

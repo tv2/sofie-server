@@ -286,7 +286,6 @@ export class IngestDataChangeService implements DataChangeService {
   }
 
   private async persistRundown(rundown: Rundown): Promise<void> {
-    await this.rundownRepository.deleteRundown(rundown.id) // TODO: Move deletion of in-memory-deleted parts and pieces to the repository.
     await this.rundownRepository.saveRundown(rundown)
     if (rundown.isActive()) {
       const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)

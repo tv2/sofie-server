@@ -4,7 +4,6 @@ import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { Logger } from '../../../logger/logger'
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
-import { Piece } from '../../../model/entities/piece'
 
 export class CachedRundownAggregateRepository implements RundownAggregateRepository {
   private static instance: RundownAggregateRepository
@@ -32,8 +31,8 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
     return this.cachedRundowns.get(rundownId) as Rundown
   }
 
-  public async getBasicRundowns(): Promise<BasicRundown[]> {
-    return await this.rundownAggregateRepository.getBasicRundowns()
+  public getBasicRundowns(): Promise<BasicRundown[]> {
+    return this.rundownAggregateRepository.getBasicRundowns()
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {
@@ -50,38 +49,7 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
     return this.rundownAggregateRepository.getSegment(segmentId)
   }
 
-  public deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
-    return this.rundownAggregateRepository.deleteUnsyncedSegmentsForRundown(rundownId)
-  }
-
   public getPart(partId: string): Promise<Part> {
     return this.rundownAggregateRepository.getPart(partId)
-  }
-
-  public deletePart(partId: string): Promise<void> {
-    return this.rundownAggregateRepository.deletePart(partId)
-  }
-  public deleteParts(partIds: readonly string[]): Promise<void> {
-    return this.rundownAggregateRepository.deleteParts(partIds)
-  }
-
-  public deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
-    return this.rundownAggregateRepository.deleteUnsyncedPartsForSegment(segmentId)
-  }
-
-  public getPiecesFromIds(pieceIds: string[]): Promise<Piece[]> {
-    return this.rundownAggregateRepository.getPiecesFromIds(pieceIds)
-  }
-
-  public deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {
-    return this.rundownAggregateRepository.deleteUnsyncedInfinitePiecesNotOnAnyRundown()
-  }
-
-  public deleteAllUnplannedAndUnsyncedContent(): Promise<void> {
-    return this.rundownAggregateRepository.deleteAllUnplannedAndUnsyncedContent()
-  }
-
-  public deleteUnplannedPartsForSegment(segmentId: string): Promise<void> {
-    return this.rundownAggregateRepository.deleteUnplannedPartsForSegment(segmentId)
   }
 }

@@ -10,7 +10,7 @@ import { Piece } from '../../../model/entities/piece'
 import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 import { MongoPieceRepository } from './mongo-piece-repository'
 
-export const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
+const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
 
 export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
   constructor(
@@ -72,6 +72,14 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
         filter: { _id: mongoPart._id },
         update: { $set: mongoPart },
         upsert: true
+      }
+    }
+  }
+
+  public buildDeleteOrphanedPartsForRundownQuery(rundownId: string, parts: readonly Part[]): AnyBulkWriteOperation<MongoPart> {
+    return {
+      deleteMany: {
+        filter: { rundownId, _id: { $nin: parts.map(part => part.id) } }
       }
     }
   }
