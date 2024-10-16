@@ -30,7 +30,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
   public getPiecesFromIds(pieceIds: string[] = []): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPiecesFromIds.name)
     return this.getCollection()
-      .find<MongoPiece>({_id: { $in: pieceIds } })
+      .find<MongoPiece>({ _id: { $in: pieceIds } })
       .map(mongoPiece => this.mongoEntityConverter.convertToPiece(mongoPiece))
       .toArray()
   }
