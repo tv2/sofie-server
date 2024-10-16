@@ -6,7 +6,7 @@ import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 
-@RestController('/logger')
+@RestController('/loggers')
 export class LoggerController extends BaseController {
   private readonly logger: Logger
 
