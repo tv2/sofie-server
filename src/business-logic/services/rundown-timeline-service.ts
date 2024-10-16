@@ -21,7 +21,6 @@ import { IngestService } from './interfaces/ingest-service'
 import { Logger } from '../../logger/logger'
 import { PlayoutService } from './interfaces/playoutService'
 import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-exception'
-import { Segment } from '../../model/entities/segment'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -236,8 +235,7 @@ export class RundownTimelineService implements RundownService {
     if (!rundown.isActivePartSet()) {
       return
     }
-    const activeSegment: Segment = rundown.getActiveSegment()
-    activeSegment.getParts().forEach(part => {
+    rundown.getActiveSegment().getParts().forEach(part => {
       if (!part.isPlanned && !part.isNext() && part.getExecutedAt() === 0) {
         rundown.removePartFromSegment(part.id)
         this.rundownEventEmitter.emitPartDeleted(rundown, part.getSegmentId(), part.id)
