@@ -268,6 +268,50 @@ describe(RundownTimelineService.name, () => {
     })
   })
 
+  describe(`${RundownTimelineService.prototype.setNext.name}`, () => {
+    const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
+    const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
+    const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [activePiece] })
+    const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
+
+    const rundownRepository: RundownRepository = mock<RundownRepository>()
+    const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+
+    describe('has active segment with unplanned part as next', () => {
+      it('removes unplayed unplanned part when next cursor is moved away', async () => {
+        const unplayedUnplannedPart: Part = EntityTestFactory.createPart({ id: 'unplannedNextPart', isNext: true, executedAt: 0, ingestedPart: undefined })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart, unplayedUnplannedPart]})
+        const segments: Segment[] = [activeSegment, nextSegment]
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          segments: segments,
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: activeSegment,
+              part: activePart,
+              owner: Owner.SYSTEM
+            },
+            nextCursor: {
+              segment: activeSegment,
+              part: unplayedUnplannedPart,
+              owner: Owner.SYSTEM
+            },
+            infinitePieces: new Map()
+          },
+        })
+
+        const testee: RundownTimelineService = createTestee({
+          rundownEventEmitter,
+          rundownRepository,
+        })
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+        await testee.setNext(rundown.id, nextSegment.id, nextPart.id)
+        expect(activeSegment.getParts()).not.toContain(unplayedUnplannedPart)
+      })
+    })
+  })
+
   describe(`${RundownTimelineService.prototype.takeNext.name}`, () => {
     const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
     const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
