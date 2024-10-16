@@ -9,9 +9,6 @@ import { RundownTimelineService } from '../rundown-timeline-service'
 import { CallbackScheduler } from '../interfaces/callback-scheduler'
 import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
 import { Blueprint } from '../../../model/value-objects/blueprint'
-import { PartRepository } from '../../../data-access/repositories/interfaces/part-repository'
-import { SegmentRepository } from '../../../data-access/repositories/interfaces/segment-repository'
-import { PieceRepository } from '../../../data-access/repositories/interfaces/piece-repository'
 import { AlreadyActivatedException } from '../../../model/exceptions/already-activated-exception'
 import { IngestedRundownRepository } from '../../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { Piece } from '../../../model/entities/piece'
@@ -830,9 +827,6 @@ function createTestee(params?: {
   rundownEventEmitter?: RundownEventEmitter
   ingestedRundownRepository?: IngestedRundownRepository
   rundownRepository?: RundownRepository
-  segmentRepository?: SegmentRepository
-  partRepository?: PartRepository
-  pieceRepository?: PieceRepository
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
   ingestService?: IngestService,

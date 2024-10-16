@@ -5,7 +5,6 @@ import { MongoIngestedEntityConverter } from '../repositories/mongo/mongo-ingest
 import { SegmentRepository } from '../repositories/interfaces/segment-repository'
 import { MongoSegmentRepository } from '../repositories/mongo/mongo-segment-repository'
 import { PartRepository } from '../repositories/interfaces/part-repository'
-import { PieceRepository } from '../repositories/interfaces/piece-repository'
 import { MongoPieceRepository } from '../repositories/mongo/mongo-piece-repository'
 import { MongoPartRepository } from '../repositories/mongo/mongo-part-repository'
 import { TimelineRepository } from '../repositories/interfaces/timeline-repository'
@@ -84,7 +83,7 @@ export class RepositoryFacade {
     return this.createRundownAggregateRepository()
   }
 
-  public static createRundownAggregateRepository(): RundownAggregateRepository {
+  private static createRundownAggregateRepository(): RundownAggregateRepository {
     const mongoRundownRepository: RundownAggregateRepository = new MongoRundownAggregateRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       RepositoryFacade.createMongoSegmentRepository(),
@@ -180,10 +179,6 @@ export class RepositoryFacade {
     )
   }
 
-  public static createPieceRepository(): PieceRepository {
-    return this.createRundownAggregateRepository()
-  }
-
   private static createMongoPieceRepository(): MongoPieceRepository {
     return new MongoPieceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
   }
@@ -229,7 +224,7 @@ export class RepositoryFacade {
   }
 
   public static createActionRepository(): ActionRepository {
-    return new MongoActionRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
+    return new MongoActionRepository(new MongoEntityConverter(LoggerFacade.createLogger()), MongoDatabase.getInstance(LoggerFacade.createLogger()))
   }
 
   public static createActionTriggerRepository(): ActionTriggerRepository {

@@ -100,7 +100,6 @@ export class ServiceFacade {
 
   public static createActionGenerationService(): ActionGenerationService {
     return new ActionGenerationService(
-      RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionManifestRepository(),
       RepositoryFacade.createActionRepository(),

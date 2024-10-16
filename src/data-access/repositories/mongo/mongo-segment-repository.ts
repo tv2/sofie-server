@@ -90,25 +90,4 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
       },
     }
   }
-
-
-  public buildDeleteUnsyncedSegmentsForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoSegment> {
-    return this.buildDeleteUnsyncedSegmentsQuery({ rundownId })
-  }
-
-  public buildDeleteUnsyncedSegmentsQuery(mongoSegment: Partial<MongoSegment> = {}): AnyBulkWriteOperation<MongoSegment> {
-    return {
-      deleteMany: {
-        filter: { ...mongoSegment, isUnsynced: true },
-      }
-    }
-  }
-
-  /*
-  * NOTE: This will delete ALL unsynced Segments in the database. Should only be used on deactivate or activate Rundown.
-  * NOTE: This will NOT delete the associated Parts.
-  */
-  public buildDeleteAllUnsyncedSegmentsQuery(): AnyBulkWriteOperation<MongoSegment> {
-    return this.buildDeleteUnsyncedSegmentsQuery()
-  }
 }
