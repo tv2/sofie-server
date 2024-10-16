@@ -973,13 +973,13 @@ describe(Segment.name, () => {
     })
   })
 
-  describe(Segment.prototype.findPreviousPartNotOnAir.name, () => {
+  describe(Segment.prototype.findPreviousValidPartNotOnAir.name, () => {
     it ('returns the Part before the fromPart', () => {
       const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPartId', rank: 1 })
       const fromPart: Part = EntityTestFactory.createPart({ id: 'fromPartId', rank: 2 })
 
       const testee: Segment = EntityTestFactory.createSegment({ parts: [previousPart, fromPart]})
-      const result: Part = testee.findPreviousPartNotOnAir(fromPart)
+      const result: Part = testee.findPreviousValidPartNotOnAir(fromPart)
 
       expect(result).toBe(previousPart)
     })
@@ -991,7 +991,7 @@ describe(Segment.name, () => {
         const thirdPart: Part = EntityTestFactory.createPart({ id: 'thirdPartId', rank: 3 })
 
         const testee: Segment = EntityTestFactory.createSegment({ parts: [firstPart, secondPart, thirdPart]})
-        const result: Part = testee.findPreviousPartNotOnAir(thirdPart)
+        const result: Part = testee.findPreviousValidPartNotOnAir(thirdPart)
 
         expect(result).toBe(secondPart)
       })
@@ -1001,7 +1001,7 @@ describe(Segment.name, () => {
       it('throws a not found exception', () => {
         const nonExistingPart: Part = EntityTestFactory.createPart()
         const testee: Segment = EntityTestFactory.createSegment()
-        expect(() => testee.findPreviousPartNotOnAir(nonExistingPart)).toThrow(NotFoundException)
+        expect(() => testee.findPreviousValidPartNotOnAir(nonExistingPart)).toThrow(NotFoundException)
       })
     })
 
@@ -1009,7 +1009,7 @@ describe(Segment.name, () => {
       it('throws a first Part in Segment exception', () => {
         const firstPart: Part = EntityTestFactory.createPart()
         const testee: Segment = EntityTestFactory.createSegment({ parts: [firstPart] })
-        expect(() => testee.findPreviousPartNotOnAir(firstPart)).toThrow(FirstPartInSegmentException)
+        expect(() => testee.findPreviousValidPartNotOnAir(firstPart)).toThrow(FirstPartInSegmentException)
       })
     })
 
@@ -1018,7 +1018,7 @@ describe(Segment.name, () => {
         const invalidPart: Part = EntityTestFactory.createPart({ id: 'invalidPart', rank: 1, invalidity: { reason: 'invalid' } })
         const firstValidPart: Part = EntityTestFactory.createPart({ id: 'validPart', rank: 2 })
         const testee: Segment = EntityTestFactory.createSegment({ parts: [invalidPart, firstValidPart] })
-        expect(() => testee.findPreviousPartNotOnAir(firstValidPart)).toThrow(FirstPartInSegmentException)
+        expect(() => testee.findPreviousValidPartNotOnAir(firstValidPart)).toThrow(FirstPartInSegmentException)
       })
     })
 
@@ -1029,7 +1029,7 @@ describe(Segment.name, () => {
         const thirdPart: Part = EntityTestFactory.createPart({ id: 'thirdPart', rank: 3 })
 
         const testee: Segment = EntityTestFactory.createSegment({ parts: [firstPart, invalidPart, thirdPart] })
-        const result: Part = testee.findPreviousPartNotOnAir(thirdPart)
+        const result: Part = testee.findPreviousValidPartNotOnAir(thirdPart)
 
         expect(result).toBe(firstPart)
       })

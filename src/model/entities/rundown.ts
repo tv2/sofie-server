@@ -143,15 +143,11 @@ export class Rundown extends BasicRundown {
   }
 
   private findFirstSegment(): Segment {
-    const segment: Segment | undefined = this.segments.find(segment => this.isSegmentValidForRundownExecution(segment))
+    const segment: Segment | undefined = this.segments.find(segment => segment.isValid())
     if (!segment) {
       throw new NotFoundException(`Unable to find first valid Segment for Rundown ${this.id}`)
     }
     return segment
-  }
-
-  private isSegmentValidForRundownExecution(segment: Segment): boolean {
-    return !segment.invalidity && !segment.isHidden && segment.getParts().some(part => !part.invalidity)
   }
 
   private setNextFromActive(owner: Owner): void {
@@ -238,7 +234,7 @@ export class Rundown extends BasicRundown {
       throw new NotFoundException('Active Segment does not exist in Rundown')
     }
 
-    const nextValidSegment: Segment | undefined = this.segments.slice(activeSegmentIndex + 1).find(segment => this.isSegmentValidForRundownExecution(segment))
+    const nextValidSegment: Segment | undefined = this.segments.slice(activeSegmentIndex + 1).find(segment => segment.isValid())
     if (!nextValidSegment) {
       throw new LastSegmentInRundownException(`Segment: ${this.activeCursor?.segment?.id} is the last valid Segment of Rundown: ${this.id}`)
     }
@@ -340,7 +336,7 @@ export class Rundown extends BasicRundown {
 
   private findFirstPartOfValidSegmentSkippingUnsyncedSegments(indexToSearchFrom: number): Part {
     while (indexToSearchFrom < this.segments.length) {
-      if (!this.segments[indexToSearchFrom].isUnsynced() && this.isSegmentValidForRundownExecution(this.segments[indexToSearchFrom])) {
+      if (!this.segments[indexToSearchFrom].isUnsynced() && this.segments[indexToSearchFrom].isValid()) {
         return this.segments[indexToSearchFrom].findFirstPart()
       }
       indexToSearchFrom++
@@ -576,7 +572,7 @@ export class Rundown extends BasicRundown {
     try {
       const nextPart: Part = currentNextSegment.findNextPartNotOnAir(currentNextPart)
       return this.createCursorFromSegmentAndPart(currentNextSegment, nextPart)
-    }  catch (exception) {
+    } catch (exception) {
       if (!(exception instanceof LastPartInSegmentException)) {
         throw exception
       }
@@ -597,7 +593,7 @@ export class Rundown extends BasicRundown {
     const currentNextSegment: Segment = this.nextCursor.segment
     const currentNextPart: Part = this.nextCursor.part
     try {
-      const previousPart: Part = currentNextSegment.findPreviousPartNotOnAir(currentNextPart)
+      const previousPart: Part = currentNextSegment.findPreviousValidPartNotOnAir(currentNextPart)
       return this.createCursorFromSegmentAndPart(currentNextSegment, previousPart)
     } catch (exception) {
       if (!(exception instanceof FirstPartInSegmentException)) {
@@ -634,7 +630,7 @@ export class Rundown extends BasicRundown {
   private findFirstValidSegmentAfterIndex(searchIndex: number): Segment {
     for (let i: number = searchIndex + 1; i < this.segments.length; i++) {
       const segment: Segment = this.segments[i]
-      if (!segment.invalidity && segment.getParts().some(part => !part.invalidity)) {
+      if (segment.isValid()) {
         return segment
       }
     }
@@ -668,7 +664,7 @@ export class Rundown extends BasicRundown {
   private findFirstValidSegmentBeforeIndex(searchIndex: number): Segment {
     for (let i: number = searchIndex - 1; i >= 0; i--) {
       const segment: Segment = this.segments[i]
-      if (!segment.invalidity && segment.getParts().some(part => !part.invalidity)) {
+      if (segment.isValid()) {
         return segment
       }
     }

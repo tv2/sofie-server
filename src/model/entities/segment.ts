@@ -159,7 +159,7 @@ export class Segment {
     return nextPart
   }
 
-  public findPreviousPartNotOnAir(fromPart: Part): Part {
+  public findPreviousValidPartNotOnAir(fromPart: Part): Part {
     const fromPartIndex: number = this.parts.findIndex(part => part.id === fromPart.id)
     if (fromPartIndex === -1) {
       throw new NotFoundException('Part does not exist in Segment')
@@ -323,5 +323,9 @@ export class Segment {
 
   public isSegmentUntimed(): boolean {
     return !this.getParts().some(part => !part.isUntimed())
+  }
+
+  public isValid(): boolean {
+    return !this.invalidity && !this.isHidden && this.parts.some(part => !part.invalidity)
   }
 }
