@@ -5,10 +5,11 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { Logger } from '../../../logger/logger'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { MongoShowStyle } from './mongo-entity-converter'
 
-const SHOW_STYLE_CONFIGURATION_COLLECTION_NAME: string = 'showStyleBases'
+const SHOW_STYLE_COLLECTION_NAME: string = 'showStyleBases'
 
-export class MongoShowStyleConfigurationChangedListener extends BaseMongoRepository implements DataChangedListener<ShowStyle> {
+export class MongoShowStyleChangedListener extends BaseMongoRepository<MongoShowStyle> implements DataChangedListener<ShowStyle> {
 
   private readonly logger: Logger
 
@@ -16,12 +17,12 @@ export class MongoShowStyleConfigurationChangedListener extends BaseMongoReposit
 
   constructor(mongoDatabase: MongoDatabase, logger: Logger) {
     super(mongoDatabase)
-    this.logger = logger.tag(MongoShowStyleConfigurationChangedListener.name)
-    mongoDatabase.onConnect(SHOW_STYLE_CONFIGURATION_COLLECTION_NAME, () => this.listenForChanges())
+    this.logger = logger.tag(MongoShowStyleChangedListener.name)
+    mongoDatabase.onConnect(SHOW_STYLE_COLLECTION_NAME, () => this.listenForChanges())
   }
 
   protected getCollectionName(): string {
-    return SHOW_STYLE_CONFIGURATION_COLLECTION_NAME
+    return SHOW_STYLE_COLLECTION_NAME
   }
 
   protected listenForChanges(): void {
@@ -39,7 +40,7 @@ export class MongoShowStyleConfigurationChangedListener extends BaseMongoReposit
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onCreated(_onCreatedCallback: (showStyle: ShowStyle) => void): void {
     throw new UnsupportedOperationException(
-      `${MongoShowStyleConfigurationChangedListener.prototype.onCreated.name} is not supported in ${MongoShowStyleConfigurationChangedListener.name}`
+      `${MongoShowStyleChangedListener.prototype.onCreated.name} is not supported in ${MongoShowStyleChangedListener.name}`
     )
   }
 
@@ -50,7 +51,7 @@ export class MongoShowStyleConfigurationChangedListener extends BaseMongoReposit
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onDeleted(_onDeletedCallback: (id: string) => void): void {
     throw new UnsupportedOperationException(
-      `${MongoShowStyleConfigurationChangedListener.prototype.onDeleted.name} is not supported in ${MongoShowStyleConfigurationChangedListener.name}`
+      `${MongoShowStyleChangedListener.prototype.onDeleted.name} is not supported in ${MongoShowStyleChangedListener.name}`
     )
   }
 }

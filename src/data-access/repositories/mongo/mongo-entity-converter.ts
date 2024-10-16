@@ -31,6 +31,8 @@ import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { Invalidity } from '../../../model/value-objects/invalidity'
 import { Logger } from '../../../logger/logger'
+import { Action, ActionArgument } from '../../../model/entities/action'
+import { ActionType } from '../../../model/enums/action-type'
 
 
 export interface MongoId {
@@ -134,6 +136,7 @@ export interface MongoTimeline extends MongoId {
 }
 
 export interface MongoStudio {
+  _id: string
   settings: {
     mediaPreviewsUrl: string
   }
@@ -146,6 +149,7 @@ interface MongoLayerMappings {
 }
 
 export interface MongoShowStyle {
+  _id: string
   blueprintConfig: unknown
 }
 
@@ -175,6 +179,18 @@ export interface MongoMedia extends MongoId {
 
 export interface MongoSystemInformation extends MongoId {
   name: string
+}
+
+export interface MongoAction extends MongoId {
+  id: string
+  name: string
+  rank: number
+  description?: string
+  type: ActionType
+  data: unknown
+  metadata?: unknown
+  rundownId?: string
+  argument?: ActionArgument
 }
 
 export interface MongoDevice extends MongoId {
@@ -283,10 +299,6 @@ export class MongoEntityConverter {
     )
   }
 
-  public convertToBasicRundowns(mongoRundowns: MongoRundown[]): BasicRundown[] {
-    return mongoRundowns.map(this.convertToBasicRundown.bind(this))
-  }
-
   public convertToSegment(mongoSegment: MongoSegment): Segment {
     return new Segment({
       ...mongoSegment,
@@ -378,10 +390,6 @@ export class MongoEntityConverter {
       id: mongoPiece._id,
       isInsertedOnAir: mongoPiece.isInsertedOnAir,
     })
-  }
-
-  public convertToPieces(mongoPieces: MongoPiece[]): Piece[] {
-    return mongoPieces.map(this.convertToPiece)
   }
 
   public convertToMongoPiece(piece: Piece): MongoPiece {
@@ -538,5 +546,26 @@ export class MongoEntityConverter {
 
   public convertToDevices(mongoDevices: MongoDevice[]): Device[] {
     return mongoDevices.map(mongoDevice => this.convertToDevice(mongoDevice))
+  }
+
+  public convertToAction(mongoAction: MongoAction): Action {
+    return {
+      id: mongoAction.id,
+      type: mongoAction.type,
+      rundownId: mongoAction.rundownId ?? undefined,
+      argument: mongoAction.argument,
+      data: mongoAction.data,
+      description: mongoAction.description,
+      metadata: mongoAction.metadata,
+      name: mongoAction.name,
+      rank: mongoAction.rank,
+    }
+  }
+
+  public convertToMongoAction(action: Action): MongoAction {
+    return {
+      ...action,
+      _id: action.id
+    }
   }
 }

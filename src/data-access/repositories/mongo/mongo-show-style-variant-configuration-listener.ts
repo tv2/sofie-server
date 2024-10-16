@@ -5,10 +5,11 @@ import { Logger } from '../../../logger/logger'
 import { MongoDatabase } from './mongo-database'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { MongoShowStyleVariant } from './mongo-entity-converter'
 
 const SHOW_STYLE_VARIANT_CONFIGURATION_COLLECTION_NAME: string = 'showStyleVariants'
 
-export class MongoShowStyleVariantConfigurationListener extends BaseMongoRepository implements DataChangedListener<ShowStyleVariant> {
+export class MongoShowStyleVariantConfigurationListener extends BaseMongoRepository<MongoShowStyleVariant> implements DataChangedListener<ShowStyleVariant> {
 
   private readonly logger: Logger
 

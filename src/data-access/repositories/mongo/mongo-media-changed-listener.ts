@@ -16,7 +16,7 @@ import { MediaRepository } from '../interfaces/MediaRepository'
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 
-export class MongoMediaChangedListener extends BaseMongoRepository implements DataChangedListener<Media> {
+export class MongoMediaChangedListener extends BaseMongoRepository<MongoMedia> implements DataChangedListener<Media> {
 
   private readonly logger: Logger
   private onCreatedCallback: (media: Media) => void

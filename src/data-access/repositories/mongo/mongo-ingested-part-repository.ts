@@ -8,7 +8,7 @@ import { NotFoundException } from '../../../model/exceptions/not-found-exception
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest rename to "ingestedParts"
 
-export class MongoIngestedPartRepository extends BaseMongoRepository implements IngestedPartRepository {
+export class MongoIngestedPartRepository extends BaseMongoRepository<MongoIngestedPart> implements IngestedPartRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,

@@ -7,7 +7,7 @@ import { MongoEntityConverter, MongoTimeline } from './mongo-entity-converter'
 
 const TIMELINE_COLLECTION_NAME: string = 'timeline'
 
-export class MongoTimelineRepository extends BaseMongoRepository implements TimelineRepository {
+export class MongoTimelineRepository extends BaseMongoRepository<MongoTimeline> implements TimelineRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)

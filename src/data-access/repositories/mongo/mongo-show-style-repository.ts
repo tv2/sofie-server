@@ -9,7 +9,7 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 
 const COLLECTION_NAME: string = 'showStyleBases'
 
-export class MongoShowStyleRepository extends BaseMongoRepository implements ShowStyleRepository {
+export class MongoShowStyleRepository extends BaseMongoRepository<MongoShowStyle> implements ShowStyleRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,

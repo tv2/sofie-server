@@ -1,21 +1,22 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { PartRepository } from '../interfaces/part-repository'
 import { Part } from '../../../model/entities/part'
 import { MongoDatabase } from './mongo-database'
-import { PieceRepository } from '../interfaces/piece-repository'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { DeleteResult } from 'mongodb'
+import {
+  AnyBulkWriteOperation,
+  ClientSession,
+} from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Piece } from '../../../model/entities/piece'
 import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
+import { MongoPieceRepository } from './mongo-piece-repository'
 
-export const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
+const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
 
-export class MongoPartRepository extends BaseMongoRepository implements PartRepository {
+export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
   constructor(
     mongoDatabase: MongoDatabase,
+    private readonly mongoPieceRepository: MongoPieceRepository,
     private readonly mongoEntityConverter: MongoEntityConverter,
-    private readonly pieceRepository: PieceRepository
   ) {
     super(mongoDatabase)
   }
@@ -33,7 +34,7 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
       throw new NotFoundException(`No Part found for PartId ${partId}`)
     }
     const part: Part = this.mongoEntityConverter.convertToPart(mongoPart)
-    const pieces: Piece[] = await this.pieceRepository.getPieces(part.id)
+    const pieces: Piece[] = await this.mongoPieceRepository.getPieces(part.id)
     part.setPieces(pieces)
     return part
   }
@@ -46,74 +47,51 @@ export class MongoPartRepository extends BaseMongoRepository implements PartRepo
     const parts: Part[] = this.mongoEntityConverter.convertToParts(mongoParts)
     return Promise.all(
       parts.map(async (part) => {
-        part.setPieces(await this.pieceRepository.getPieces(part.id))
+        part.setPieces(await this.mongoPieceRepository.getPieces(part.id))
         return part
       })
     )
   }
 
-  public async savePart(part: Part): Promise<void> {
+  public getPartIdsForRundown(rundownId: string): Promise<readonly string[]> {
+    return this.getCollection().find({ rundownId }).map(document => document._id).toArray()
+  }
+
+  public buildSavePartQueries(parts: readonly Part[]): AnyBulkWriteOperation<MongoPart>[] {
+    return parts.map(part => this.buildSavePartQuery(part))
+  }
+
+  private buildSavePartQuery(part: Part): AnyBulkWriteOperation<MongoPart> {
     const mongoPart: MongoPart = this.mongoEntityConverter.convertToMongoPart(part)
-    await this.getCollection().updateOne(
-      { _id: mongoPart._id },
-      { $set: mongoPart },
-      { upsert: true, ignoreUndefined: true }
-    )
-    await Promise.all(part.getPieces().map(piece => this.pieceRepository.savePiece(piece)))
-  }
-
-  public async delete(partId: string): Promise<void> {
-    this.assertDatabaseConnection(this.delete.name)
-    await this.pieceRepository.deletePiecesForPart(partId)
-    await this.getCollection().deleteMany({ _id: partId })
-  }
-
-  public async deletePartsForSegment(segmentId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deletePartsForSegment.name)
-    const parts: Part[] = await this.getParts(segmentId)
-
-    await Promise.all(parts.map(async (part) => this.pieceRepository.deletePiecesForPart(part.id)))
-
-    const partsDeletedResult: DeleteResult = await this.getCollection().deleteMany({ segmentId: segmentId })
-
-    if (!partsDeletedResult.acknowledged) {
-      throw new DeletionFailedException(`Deletion of parts was not acknowledged, for segmentId: ${segmentId}`)
+    return {
+      updateOne: {
+        filter: { _id: mongoPart._id },
+        update: { $set: mongoPart },
+        upsert: true
+      }
     }
   }
 
-  public async deleteUnsyncedPartsForSegment(segmentId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deleteUnsyncedPartsForSegment.name)
-    const unsyncedFilter: Partial<MongoPart> = { isUnsynced: true }
-    const unsyncedParts: Part[] = await this.getParts(segmentId, unsyncedFilter)
-
-    await Promise.all(unsyncedParts.map(async (part) => this.pieceRepository.deletePiecesForPart(part.id)))
-
-    const partsDeletedResult: DeleteResult = await this.getCollection().deleteMany({ ...unsyncedFilter, segmentId: segmentId })
-
-    if (!partsDeletedResult.acknowledged) {
-      throw new DeletionFailedException(`Deletion of parts was not acknowledged, for segmentId: ${segmentId}`)
+  public buildDeleteOrphanedPartsForRundownQuery(rundownId: string, parts: readonly Part[]): AnyBulkWriteOperation<MongoPart> {
+    return {
+      deleteMany: {
+        filter: { rundownId, _id: { $nin: parts.map(part => part.id) } }
+      }
     }
   }
 
-  /*
-  * NOTE: This will delete ALL unsynced Parts in the database. Should only be used on deactivate or activate Rundown.
-  * NOTE: This will NOT delete the associated Pieces.
-  */
-  public async deleteAllUnsyncedParts(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnsyncedParts.name)
-    await this.getCollection().deleteMany({
-      isUnsynced: true
-    })
+  public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoPart>[], session: ClientSession): Promise<void> {
+    if (queries.length === 0) {
+      return
+    }
+    await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  /*
-  * NOTE: This will delete ALL unplanned Parts in the database. Should only be used on deactivate or activate Rundown.
-  * NOTE: This will NOT delete the associated Pieces.
-  */
-  public async deleteAllUnplannedParts(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnplannedParts.name)
-    await this.getCollection().deleteMany({
-      isPlanned: false
-    })
+  public buildDeletePartsForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoPart> {
+    return {
+      deleteMany: {
+        filter: { rundownId },
+      },
+    }
   }
 }
