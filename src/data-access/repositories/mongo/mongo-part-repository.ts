@@ -57,10 +57,6 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     return this.getCollection().find({ rundownId }).map(document => document._id).toArray()
   }
 
-  public getPartIdsForSegment(segmentId: string, mongoPart: Partial<MongoPart> = {}): Promise<readonly string[]> {
-    return this.getCollection().find({ ...mongoPart, segmentId }).map(document => document._id).toArray()
-  }
-
   public buildSavePartQueries(parts: readonly Part[]): AnyBulkWriteOperation<MongoPart>[] {
     return parts.map(part => this.buildSavePartQuery(part))
   }
@@ -96,54 +92,6 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
       deleteMany: {
         filter: { rundownId },
       },
-    }
-  }
-
-  public buildDeletePartsForSegmentQuery(segmentId: string, mongoPart: Partial<MongoPart> = {}): AnyBulkWriteOperation<MongoPart> {
-    return {
-      deleteMany: {
-        filter: { ...mongoPart, segmentId },
-      },
-    }
-  }
-
-  public buildDeletePartQuery(partId: string): AnyBulkWriteOperation<MongoPart> {
-    return {
-      deleteOne: {
-        filter: { _id: partId }
-      }
-    }
-  }
-
-  public buildDeleteUnsyncedPartsForSegmentQuery(segmentId: string): AnyBulkWriteOperation<MongoPart> {
-    return this.buildDeleteUnsyncedPartsQuery({ segmentId })
-  }
-
-  public buildDeleteUnsyncedPartsQuery(mongoPart: Partial<MongoPart> = {}): AnyBulkWriteOperation<MongoPart> {
-    return {
-      deleteMany: {
-        filter: { ...mongoPart, isUnsynced: true },
-      }
-    }
-  }
-
-  /*
-  * NOTE: This will delete ALL unsynced Parts in the database. Should only be used on deactivate or activate Rundown.
-  * NOTE: This will NOT delete the associated Pieces.
-  */
-  public buildDeleteAllUnsyncedPartsQuery(): AnyBulkWriteOperation<MongoPart> {
-    return this.buildDeleteUnsyncedPartsQuery()
-  }
-
-  /*
-  * NOTE: This will delete ALL unplanned Parts in the database. Should only be used on deactivate or activate Rundown.
-  * NOTE: This will NOT delete the associated Pieces.
-  */
-  public buildDeleteAllUnplannedPartsQuery(): AnyBulkWriteOperation<MongoPart> {
-    return {
-      deleteMany: {
-        filter: { isPlanned: false },
-      }
     }
   }
 }

@@ -202,7 +202,7 @@ export class IngestDataChangeService implements DataChangeService {
 
     this.rundownEventEmitter.emitRundownCreated(createdRundown)
     await this.persistRundown(createdRundown)
-    await this.actionGenerationService.generateActionsForRundown(createdRundown.id).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${createdRundown.name}' with id ${createdRundown.id}.`))
+    await this.actionGenerationService.generateActionsForRundown(createdRundown).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${createdRundown.name}' with id ${createdRundown.id}.`))
   }
 
   private async updateEmitAndPersistRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<void> {
@@ -222,7 +222,7 @@ export class IngestDataChangeService implements DataChangeService {
 
     await this.persistRundown(updatedRundown)
     this.emitEventsFromRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult, { deletedSegmentsInfo, deletedPartsInfo })
-    await this.actionGenerationService.generateActionsForRundown(updatedRundown.id).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${updatedRundown.name}' with id ${updatedRundown.id}.`))
+    await this.actionGenerationService.generateActionsForRundown(updatedRundown).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${updatedRundown.name}' with id ${updatedRundown.id}.`))
   }
 
   private logRundownSynchronizeResult(rundownSynchronizeResult: RundownSynchronizeResult, message: string): void {

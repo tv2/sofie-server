@@ -87,7 +87,7 @@ export class RepositoryFacade {
     return this.createRundownAggregateRepository()
   }
 
-  public static createRundownAggregateRepository(): RundownAggregateRepository {
+  private static createRundownAggregateRepository(): RundownAggregateRepository {
     if (!this.rundownAggregateRepository) {
       const mongoRundownRepository: RundownAggregateRepository = new MongoRundownAggregateRepository(
         MongoDatabase.getInstance(LoggerFacade.createLogger()),
@@ -231,7 +231,7 @@ export class RepositoryFacade {
   }
 
   public static createActionRepository(): ActionRepository {
-    return new MongoActionRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
+    return new MongoActionRepository(new MongoEntityConverter(LoggerFacade.createLogger()), MongoDatabase.getInstance(LoggerFacade.createLogger()))
   }
 
   public static createActionTriggerRepository(): ActionTriggerRepository {
