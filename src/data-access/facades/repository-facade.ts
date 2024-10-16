@@ -5,7 +5,6 @@ import { MongoIngestedEntityConverter } from '../repositories/mongo/mongo-ingest
 import { SegmentRepository } from '../repositories/interfaces/segment-repository'
 import { MongoSegmentRepository } from '../repositories/mongo/mongo-segment-repository'
 import { PartRepository } from '../repositories/interfaces/part-repository'
-import { PieceRepository } from '../repositories/interfaces/piece-repository'
 import { MongoPieceRepository } from '../repositories/mongo/mongo-piece-repository'
 import { MongoPartRepository } from '../repositories/mongo/mongo-part-repository'
 import { TimelineRepository } from '../repositories/interfaces/timeline-repository'
@@ -178,10 +177,6 @@ export class RepositoryFacade {
       LoggerFacade.createLogger(),
       RepositoryFacade.createMediaRepository()
     )
-  }
-
-  public static createPieceRepository(): PieceRepository {
-    return this.createRundownAggregateRepository()
   }
 
   private static createMongoPieceRepository(): MongoPieceRepository {
