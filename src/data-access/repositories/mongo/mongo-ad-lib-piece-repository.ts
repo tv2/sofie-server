@@ -52,7 +52,7 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository<MongoAdLibPie
         name: adLibPiece.name,
         rank: adLibPiece._rank,
         expectedDuration: adLibPiece.expectedDuration ?? undefined,
-        sourceLayerId: adLibPiece.sourceLayerId,
+        pieceLayer: adLibPiece.sourceLayerId,
         lifespan: adLibPiece.lifespan ?? undefined,
         content: adLibPiece.content
       },

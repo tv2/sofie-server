@@ -1,6 +1,6 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
@@ -53,13 +53,13 @@ import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
 import { Configuration } from '../../../model/entities/configuration'
 import { PieceInterface } from '../../../model/entities/piece'
 
-const TV2_GRAPHICS_LAYERS: Tv2SourceLayer[] = [
-  Tv2SourceLayer.GRAPHICS_IDENT,
-  Tv2SourceLayer.GRAPHICS_TOP,
-  Tv2SourceLayer.GRAPHICS_LOWER_THIRD,
-  Tv2SourceLayer.GRAPHICS_HEADLINE,
-  Tv2SourceLayer.GRAPHICS_TEMA,
-  Tv2SourceLayer.GRAPHICS_TELEPHONE
+const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
+  Tv2PieceLayer.GRAPHICS_IDENT,
+  Tv2PieceLayer.GRAPHICS_TOP,
+  Tv2PieceLayer.GRAPHICS_LOWER_THIRD,
+  Tv2PieceLayer.GRAPHICS_HEADLINE,
+  Tv2PieceLayer.GRAPHICS_TEMA,
+  Tv2PieceLayer.GRAPHICS_TELEPHONE
 ]
 
 const FULLSCREEN_GRAPHICS_SOURCE_NAME_PREFIX: string = 'PILOT_'
@@ -203,7 +203,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   private createGraphicsPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>): Tv2PieceInterface {
     return {
       partId: '',
-      layer: Tv2SourceLayer.GRAPHICS_ACTION_COMMAND,
+      layer: Tv2PieceLayer.GRAPHICS_ACTION_COMMAND,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: false,
@@ -370,7 +370,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       name: graphicsData.name,
       preRollDuration: this.getPreRollDuration(blueprintConfiguration),
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, graphicsData.name),
-      layer: Tv2SourceLayer.PILOT_GRAPHICS,
+      layer: Tv2PieceLayer.PILOT_GRAPHICS,
       timelineObjects: [
         elementTimelineObjectFactory.createFullscreenGraphicsTimelineObject(blueprintConfiguration, graphicsData),
         this.audioMixerTimelineObjectFactory.createStudioMicrophonesUpTimelineObject(blueprintConfiguration),
@@ -460,15 +460,15 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
 
   private createOverlayGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2OverlayGraphicsManifestData[]): Tv2PieceAction[] {
     const identActions: Tv2PieceAction[] = graphicsData
-      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_IDENT)
+      .filter(data => data.pieceLayer === Tv2PieceLayer.GRAPHICS_IDENT)
       .map(data => this.createIdentGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
 
     const lowerThirdActions: Tv2PieceAction[] = graphicsData
-      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_LOWER_THIRD)
+      .filter(data => data.pieceLayer === Tv2PieceLayer.GRAPHICS_LOWER_THIRD)
       .map((data) => this.createLowerThirdGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
 
     const pilotOverlayActions: Tv2PieceAction[] = graphicsData
-      .filter(data => data.sourceLayerId === Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY)
+      .filter(data => data.pieceLayer === Tv2PieceLayer.GRAPHICS_PILOT_OVERLAY)
       .map(data => this.createPilotOverlayAction(blueprintConfiguration, elementTimelineObjectFactory, data))
 
     return [...identActions, ...lowerThirdActions, ...pilotOverlayActions]
@@ -480,7 +480,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: `${identifier}_piece`,
       name: overlayGraphicsData.name,
-      layer: Tv2SourceLayer.GRAPHICS_IDENT,
+      layer: Tv2PieceLayer.GRAPHICS_IDENT,
       duration: overlayGraphicsData.expectedDuration,
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, overlayGraphicsData.templateName),
       timelineObjects: [
@@ -513,7 +513,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: `${identifier}_piece`,
       name: overlayGraphicsData.name,
-      layer: Tv2SourceLayer.GRAPHICS_LOWER_THIRD,
+      layer: Tv2PieceLayer.GRAPHICS_LOWER_THIRD,
       duration: overlayGraphicsData.expectedDuration,
       pieceLifespan: this.findPieceLifespan(blueprintConfiguration, overlayGraphicsData.templateName),
       timelineObjects: [
@@ -546,7 +546,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     const pieceInterface: Tv2PieceInterface = this.createGraphicsPieceInterface({
       id: `${identifier}_piece`,
       name: overlayGraphicsData.name,
-      layer: Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY,
+      layer: Tv2PieceLayer.GRAPHICS_PILOT_OVERLAY,
       preRollDuration: this.getPreRollDuration(blueprintConfiguration),
       pieceLifespan: overlayGraphicsData.lifespan,
       timelineObjects: [elementTimelineObjectFactory.createPilotGraphicsTimelineObject(blueprintConfiguration, overlayGraphicsData)],

@@ -14,7 +14,7 @@ import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-con
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2Logger } from '../../tv2-logger'
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
-import { Tv2SourceLayer } from '../../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
 
 describe(Tv2ActionManifestMapper.name, () => {
   describe(Tv2ActionManifestMapper.prototype.filterAndMapToSplitScreenManifestData.name, () => {
@@ -168,7 +168,7 @@ describe(Tv2ActionManifestMapper.name, () => {
             actionId: 'studio0_overlay',
             data: {
               rank: 5,
-              sourceLayerId: Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY,
+              pieceLayer: Tv2PieceLayer.GRAPHICS_PILOT_OVERLAY,
               name: 'overlay graphics A',
             }
           }),

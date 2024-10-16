@@ -4,7 +4,7 @@ import { PartActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
@@ -132,7 +132,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       id: `videoClipActionPiece_${this.sanitizeStringForId(videoClipData.fileName)}`,
       partId,
       name: videoClipData.fileName,
-      layer: Tv2SourceLayer.VIDEO_CLIP,
+      layer: Tv2PieceLayer.VIDEO_CLIP,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       metadata,

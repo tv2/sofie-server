@@ -2,7 +2,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { ActionRepository } from '../interfaces/action-repository'
 import { Action } from '../../../model/entities/action'
 import { MongoDatabase } from './mongo-database'
-import { DeleteResult } from 'mongodb'
+import { DeleteResult, UnorderedBulkOperation } from 'mongodb'
 import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { MongoAction, MongoEntityConverter } from './mongo-entity-converter'
@@ -51,7 +51,7 @@ export class MongoActionRepository extends BaseMongoRepository<MongoAction> impl
 
   public async saveActions(actions: Action[]): Promise<void> {
     this.assertDatabaseConnection(this.saveActions.name)
-    const bulkOperation = this.getCollection().initializeUnorderedBulkOp({ ignoreUndefined: true })
+    const bulkOperation: UnorderedBulkOperation = this.getCollection().initializeUnorderedBulkOp({ ignoreUndefined: true })
     actions.forEach(action => bulkOperation.find({ _id: action.id }).upsert().replaceOne(this.mongoEntityConverter.convertToMongoAction(action)))
     await bulkOperation.execute()
   }

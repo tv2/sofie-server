@@ -9,7 +9,7 @@ import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import {
   Tv2Action,
   Tv2ActionContentType,
@@ -48,6 +48,8 @@ import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
 const MINIMUM_DURATION_IN_MS: number = 1000
+
+const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 
 enum SpecialEffectName {
   MIX = 'Mix',
@@ -170,7 +172,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       id: `${this.sanitizeStringForId(effectName)}TransitionActionPiece`,
       name: `${effectName} transition`,
       partId: '',
-      layer: Tv2SourceLayer.JINGLE,
+      layer: Tv2PieceLayer.JINGLE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.IN_TRANSITION,
       isPlanned: false,
@@ -301,7 +303,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createMixTransitionEffectAction(actionType: PieceActionType, durationInFrames: number): Tv2TransitionEffectAction {
     const effectName: string = `Mix${durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.MIX,
@@ -312,7 +314,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createDipTransitionEffectAction(actionType: PieceActionType, durationInFrames: number, configuredDipInput: number): Tv2TransitionEffectAction {
     const effectName: string = `Dip${durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.DIP,
@@ -325,7 +327,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
 
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
     return this.createTransitionEffectAction(actionType, breaker.name, metadata, pieceInterface)
   }

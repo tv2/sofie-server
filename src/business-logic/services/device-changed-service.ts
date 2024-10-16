@@ -1,12 +1,13 @@
 import { DataChangeService } from './interfaces/data-change-service'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
-import { Device } from '../../model/entities/device'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusCode } from '../../model/enums/status-code'
-import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
 import { Logger } from '../../logger/logger'
 import { StatusMessageService } from './interfaces/status-message-service'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { Device } from '../../model/entities/device'
+import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
+import { DeviceType } from '../../model/enums/device-type'
 
 // TODO: Find a way to translate
 const NOT_CONNECTED_MESSAGE: string = 'Not connected'
@@ -105,7 +106,8 @@ export class DeviceChangedService implements DataChangeService {
       name: '',
       statusMessage: 'Device was deleted',
       statusCode: StatusCode.GOOD,
-      isConnected: false
+      isConnected: false,
+      type: DeviceType.ABSTRACT
     }
 
     await this.statusMessageService.updateStatusMessage(this.convertDeviceToStatusMessage(deletedDevice))

@@ -128,7 +128,7 @@ describe(ExecuteActionService.name, () => {
       })
 
       it('updates Piece ExecutedAt to be set', async () => {
-        const now = Date.now()
+        const now: number = Date.now()
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 

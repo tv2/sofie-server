@@ -8,12 +8,12 @@ import {
 } from '../../timeline-object-factories/interfaces/tv2-audio-bed-timeline-object-factory'
 import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
-import { Tv2SourceLayer } from '../../value-objects/tv2-layers'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2AudioAction } from '../../value-objects/tv2-action'
 import { FrameTimeConverter } from '../../helpers/frame-time-converter'
 import { Tv2ActionManifestAudioBedData } from '../../value-objects/tv2-action-manifest-data'
+import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
 
 describe(Tv2AudioActionFactory.name, () => {
   describe(Tv2AudioActionFactory.prototype.createAudioActions.name, () => {
@@ -22,14 +22,14 @@ describe(Tv2AudioActionFactory.name, () => {
         it('creates audio bed actions for all audio bed action manifests', () => {
           const actionManifests: Tv2ActionManifest<Tv2ActionManifestAudioBedData>[] = [
             EntityTestFactory.createActionManifest({
-              actionId: Tv2SourceLayer.AUDIO_BED,
+              actionId: Tv2PieceLayer.AUDIO_BED,
               data: {
                 rank: 5,
                 name: 'Audio bed A'
               }
             }),
             EntityTestFactory.createActionManifest({
-              actionId: Tv2SourceLayer.AUDIO_BED,
+              actionId: Tv2PieceLayer.AUDIO_BED,
               data: {
                 rank: 10,
                 name: 'Audio bed B'
@@ -69,14 +69,14 @@ describe(Tv2AudioActionFactory.name, () => {
           it('returns one action with the lowest rank', () => {
             const actionManifests: Tv2ActionManifest<Tv2ActionManifestAudioBedData>[] = [
               EntityTestFactory.createActionManifest({
-                actionId: Tv2SourceLayer.AUDIO_BED,
+                actionId: Tv2PieceLayer.AUDIO_BED,
                 data: {
                   rank: 5,
                   name: 'Audio bed A'
                 }
               }),
               EntityTestFactory.createActionManifest({
-                actionId: Tv2SourceLayer.AUDIO_BED,
+                actionId: Tv2PieceLayer.AUDIO_BED,
                 data: {
                   rank: 10,
                   name: 'Audio bed A'
@@ -109,21 +109,21 @@ describe(Tv2AudioActionFactory.name, () => {
         it('creates audio bed actions for all action manifests with a audio bed configuration', () => {
           const actionManifests: Tv2ActionManifest[] = [
             EntityTestFactory.createActionManifest({
-              actionId: Tv2SourceLayer.AUDIO_BED,
+              actionId: Tv2PieceLayer.AUDIO_BED,
               data: {
                 rank: 0,
                 name: 'Audio bed A'
               }
             }),
             EntityTestFactory.createActionManifest({
-              actionId: Tv2SourceLayer.AUDIO_BED,
+              actionId: Tv2PieceLayer.AUDIO_BED,
               data: {
                 rank: 0,
                 name: 'Audio bed B'
               }
             }),
             EntityTestFactory.createActionManifest({
-              actionId: Tv2SourceLayer.AUDIO_BED,
+              actionId: Tv2PieceLayer.AUDIO_BED,
               data: {
                 rank: 0,
                 name: 'Audio bed C'
