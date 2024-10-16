@@ -84,7 +84,7 @@ export class RepositoryFacade {
     return this.createRundownAggregateRepository()
   }
 
-  public static createRundownAggregateRepository(): RundownAggregateRepository {
+  private static createRundownAggregateRepository(): RundownAggregateRepository {
     const mongoRundownRepository: RundownAggregateRepository = new MongoRundownAggregateRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       RepositoryFacade.createMongoSegmentRepository(),
