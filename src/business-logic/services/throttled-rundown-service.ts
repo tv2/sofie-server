@@ -62,8 +62,8 @@ export class ThrottledRundownService implements RundownService {
     return this.rundownService.setNextFromIds(rundownId, segmentId, partId, owner)
   }
 
-  public setNext(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void> {
-    return this.rundownService.setNext(rundownId, direction, owner)
+  public setNextFromDirection(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void> {
+    return this.rundownService.setNextFromDirection(rundownId, direction, owner)
   }
 
   public insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {

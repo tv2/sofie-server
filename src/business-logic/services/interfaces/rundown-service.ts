@@ -11,7 +11,7 @@ export interface RundownService {
   deactivateRundown(rundownId: string): Promise<void>
   takeNext(rundownId: string): Promise<void>
   setNextFromIds(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void>
-  setNext(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void>
+  setNextFromDirection(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void>
   resetRundown(rundownId: string): Promise<void>
   insertPartAsOnAir(rundownId: string, part: Part): Promise<void>
   insertPartAsNext(rundownId: string, part: Part): Promise<void>

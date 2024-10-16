@@ -259,7 +259,7 @@ export class RundownTimelineService implements RundownService {
     await this.saveRundown(rundown)
   }
 
-  public async setNext(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void> {
+  public async setNextFromDirection(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     rundown.setNextFromDirection(direction, owner)
 

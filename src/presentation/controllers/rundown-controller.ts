@@ -108,7 +108,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       const setNextDirection: SetNextDirection = request.params.direction as SetNextDirection
-      await this.rundownService.setNext(rundownId, setNextDirection, Owner.EXTERNAL)
+      await this.rundownService.setNextFromDirection(rundownId, setNextDirection, Owner.EXTERNAL)
       response.send(this.httpResponseFormatter.formatSuccessResponse('Successfully set next'))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
