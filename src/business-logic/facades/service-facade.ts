@@ -36,25 +36,20 @@ import { ActionGenerationService } from '../services/action-generation-service'
 import { SynchronizedRundownService } from '../services/synchronized-rundown-service'
 
 export class ServiceFacade {
-  private static rundownService?: RundownService
-
   public static createRundownService(): RundownService {
-    if (!this.rundownService) {
-      const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
-        EventEmitterFacade.createRundownEventEmitter(),
-        RepositoryFacade.createIngestedRundownRepository(),
-        RepositoryFacade.createRundownRepository(),
-        RepositoryFacade.createTimelineRepository(),
-        ServiceFacade.createTimelineBuilder(),
-        ServiceFacade.createIngestService(),
-        ServiceFacade.createPlayoutService(),
-        TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
-        BlueprintsFacade.createBlueprint(),
-        LoggerFacade.createLogger(),
-      )
-      this.rundownService = new ThrottledRundownService(new SynchronizedRundownService(rundownTimelineService, RepositoryFacade.rundownLock))
-    }
-    return this.rundownService
+    const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
+      EventEmitterFacade.createRundownEventEmitter(),
+      RepositoryFacade.createIngestedRundownRepository(),
+      RepositoryFacade.createRundownRepository(),
+      RepositoryFacade.createTimelineRepository(),
+      ServiceFacade.createTimelineBuilder(),
+      ServiceFacade.createIngestService(),
+      ServiceFacade.createPlayoutService(),
+      TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
+      BlueprintsFacade.createBlueprint(),
+      LoggerFacade.createLogger(),
+    )
+    return ThrottledRundownService.getInstance(new SynchronizedRundownService(rundownTimelineService, RepositoryFacade.rundownLock))
   }
 
   public static createTimelineBuilder(): TimelineBuilder {

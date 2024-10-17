@@ -76,7 +76,6 @@ import { AsyncLock } from '../async-lock'
 
 export class RepositoryFacade {
 
-  private static rundownAggregateRepository?: RundownAggregateRepository
   public static rundownLock: AsyncLock = new AsyncLock(LoggerFacade.createLogger())
 
   public static getDatabase(): Database {
@@ -88,17 +87,14 @@ export class RepositoryFacade {
   }
 
   private static createRundownAggregateRepository(): RundownAggregateRepository {
-    if (!this.rundownAggregateRepository) {
-      const mongoRundownRepository: RundownAggregateRepository = new MongoRundownAggregateRepository(
-        MongoDatabase.getInstance(LoggerFacade.createLogger()),
-        RepositoryFacade.createMongoSegmentRepository(),
-        RepositoryFacade.createMongoPartRepository(),
-        RepositoryFacade.createMongoPieceRepository(),
-        new MongoEntityConverter(LoggerFacade.createLogger()),
-      )
-      this.rundownAggregateRepository = new CachedRundownAggregateRepository(mongoRundownRepository, LoggerFacade.createLogger())
-    }
-    return this.rundownAggregateRepository
+    const mongoRundownRepository: RundownAggregateRepository = new MongoRundownAggregateRepository(
+      MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      RepositoryFacade.createMongoSegmentRepository(),
+      RepositoryFacade.createMongoPartRepository(),
+      RepositoryFacade.createMongoPieceRepository(),
+      new MongoEntityConverter(LoggerFacade.createLogger()),
+    )
+    return CachedRundownAggregateRepository.getInstance(mongoRundownRepository, LoggerFacade.createLogger())
   }
 
   public static createIngestedRundownRepository(): IngestedRundownRepository {
