@@ -33,24 +33,28 @@ import { IngestRundownSynchronizer } from '../services/ingest-rundown-synchroniz
 import { EntityChangeDetector } from '../services/entity-change-detector'
 import { IngestDataChangeService } from '../services/ingest-data-change-service'
 import { ActionGenerationService } from '../services/action-generation-service'
+import { SynchronizedRundownService } from '../services/synchronized-rundown-service'
 
 export class ServiceFacade {
-  public static createRundownService(): RundownService {
-    const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
-      EventEmitterFacade.createRundownEventEmitter(),
-      RepositoryFacade.createIngestedRundownRepository(),
-      RepositoryFacade.createRundownRepository(),
-      RepositoryFacade.rundownLock,
-      RepositoryFacade.createTimelineRepository(),
-      ServiceFacade.createTimelineBuilder(),
-      ServiceFacade.createIngestService(),
-      ServiceFacade.createPlayoutService(),
-      TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
-      BlueprintsFacade.createBlueprint(),
-      LoggerFacade.createLogger(),
-    )
+  private static rundownService?: RundownService
 
-    return ThrottledRundownService.getInstance(rundownTimelineService)
+  public static createRundownService(): RundownService {
+    if (!this.rundownService) {
+      const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
+        EventEmitterFacade.createRundownEventEmitter(),
+        RepositoryFacade.createIngestedRundownRepository(),
+        RepositoryFacade.createRundownRepository(),
+        RepositoryFacade.createTimelineRepository(),
+        ServiceFacade.createTimelineBuilder(),
+        ServiceFacade.createIngestService(),
+        ServiceFacade.createPlayoutService(),
+        TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
+        BlueprintsFacade.createBlueprint(),
+        LoggerFacade.createLogger(),
+      )
+      this.rundownService = new ThrottledRundownService(new SynchronizedRundownService(rundownTimelineService, RepositoryFacade.rundownLock))
+    }
+    return this.rundownService
   }
 
   public static createTimelineBuilder(): TimelineBuilder {

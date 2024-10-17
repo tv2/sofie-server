@@ -27,7 +27,6 @@ import { PlayoutService } from '../interfaces/playoutService'
 import { InTransition } from '../../../model/value-objects/in-transition'
 import { TakeIsBlockedException } from '../../../model/exceptions/take-is-blocked-exception'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
-import { AsyncLock } from '../../../data-access/async-lock'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -784,7 +783,6 @@ function createTestee(params?: {
   rundownEventEmitter?: RundownEventEmitter
   ingestedRundownRepository?: IngestedRundownRepository
   rundownRepository?: RundownRepository
-  rundownLock?: AsyncLock
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
   ingestService?: IngestService,
@@ -800,7 +798,6 @@ function createTestee(params?: {
     instance(params?.rundownEventEmitter ?? mock<RundownEventEmitter>()),
     instance(params?.ingestedRundownRepository ?? mock<IngestedRundownRepository>()),
     instance(params?.rundownRepository ?? mock<RundownRepository>()),
-    params?.rundownLock ?? new AsyncLock(),
     instance(params?.timelineRepository ?? mock<TimelineRepository>()),
     instance(params?.timelineBuilder ?? timelineBuilderMock),
     instance(params?.ingestService ?? mock<IngestService>()),
