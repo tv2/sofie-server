@@ -3,7 +3,7 @@ import { Piece } from '../../model/entities/piece'
 import { Owner } from '../../model/enums/owner'
 import { InTransition } from '../../model/value-objects/in-transition'
 import { RundownService } from './interfaces/rundown-service'
-import { AsyncLock } from '../../data-access/async-lock'
+import { AsyncLock } from '../async-lock'
 
 export class SynchronizedRundownService implements RundownService {
 

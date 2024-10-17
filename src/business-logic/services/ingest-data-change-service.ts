@@ -20,7 +20,7 @@ import { TimelineRepository } from '../../data-access/repositories/interfaces/ti
 import { ActionGenerationService } from './action-generation-service'
 import { Part } from '../../model/entities/part'
 import { Timeline } from '../../model/entities/timeline'
-import { AsyncLock } from '../../data-access/async-lock'
+import { AsyncLock } from '../async-lock'
 
 interface DeletedInfo {
   readonly deletedPartsInfo: readonly DeletedPartInfo[]

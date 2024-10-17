@@ -72,11 +72,8 @@ import {
   MongoShowStyleVariantConfigurationListener
 } from '../repositories/mongo/mongo-show-style-variant-configuration-listener'
 import { RundownAggregateRepository } from '../repositories/interfaces/rundown-aggregate-repository'
-import { AsyncLock } from '../async-lock'
 
 export class RepositoryFacade {
-
-  public static rundownLock: AsyncLock = new AsyncLock(LoggerFacade.createLogger())
 
   public static getDatabase(): Database {
     return MongoDatabase.getInstance(LoggerFacade.createLogger())
