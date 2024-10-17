@@ -5,8 +5,7 @@ import {
   AnyBulkWriteOperation,
   ClientSession,
 } from 'mongodb'
-import { MongoEntityConverter, MongoId, MongoPiece } from './mongo-entity-converter'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { MongoEntityConverter, MongoPiece } from './mongo-entity-converter'
 
 const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
@@ -23,7 +22,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
   public getPieces(partId: string): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPieces.name)
     return this.getCollection()
-      .find<MongoPiece>({ partId: partId })
+      .find<MongoPiece>({ partId })
       .map(mongoPiece => this.mongoEntityConverter.convertToPiece(mongoPiece))
       .toArray()
   }
@@ -31,7 +30,7 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
   public getPiecesFromIds(pieceIds: string[] = []): Promise<Piece[]> {
     this.assertDatabaseConnection(this.getPiecesFromIds.name)
     return this.getCollection()
-      .find<MongoPiece>({_id: { $in: pieceIds } })
+      .find<MongoPiece>({ _id: { $in: pieceIds } })
       .map(mongoPiece => this.mongoEntityConverter.convertToPiece(mongoPiece))
       .toArray()
   }
@@ -71,61 +70,6 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
       deleteMany: {
         filter: { partId: { $in: partIds } },
       },
-    }
-  }
-
-  public buildDeletePiecesForPartQuery(partId: string): AnyBulkWriteOperation<MongoPiece> {
-    return {
-      deleteOne: {
-        filter: { partId }
-      }
-    }
-  }
-
-  public async deleteUnsyncedInfinitePiecesNotOnAnyRundown(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteUnsyncedInfinitePiecesNotOnAnyRundown.name)
-    const infinitePieceIdsOnRundowns: string[] = await this.getInfinitePieceIdsOnRundowns()
-    await this.getCollection().deleteMany({
-      _id: { $nin: infinitePieceIdsOnRundowns },
-      isUnsynced: true,
-      lifespan: { $ne: PieceLifespan.WITHIN_PART }
-    })
-  }
-
-  private getInfinitePieceIdsOnRundowns(): Promise<string[]> {
-    return this.getCollection()
-      .aggregate<MongoPiece>()
-      .lookup({
-        from: 'rundowns',
-        localField: '_id',
-        foreignField: 'infinitePieceIds',
-        as: 'rundown'
-      })
-      .match({ rundown: { $ne: [] } })
-      .project<MongoId>({ _id: 1 })
-      .map(mongoId => mongoId._id)
-      .toArray()
-  }
-
-  /*
-  * NOTE: This will delete ALL unsynced Pieces in the database. Should only be used on deactivate or activate Rundown.
-  */
-  public buildDeleteAllUnsyncedPiecesQuery(): AnyBulkWriteOperation<MongoPiece> {
-    return {
-      deleteMany: {
-        filter: { isUnsynced: true }
-      }
-    }
-  }
-
-  /*
-  * NOTE: This will delete ALL unplanned Pieces in the database. Should only be used on deactivate or activate Rundown.
-  */
-  public buildDeleteAllUnplannedPiecesQuery(): AnyBulkWriteOperation<MongoPiece> {
-    return {
-      deleteMany: {
-        filter: { isPlanned: false }
-      }
     }
   }
 }

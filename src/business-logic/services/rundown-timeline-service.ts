@@ -21,7 +21,6 @@ import { IngestService } from './interfaces/ingest-service'
 import { Logger } from '../../logger/logger'
 import { PlayoutService } from './interfaces/playoutService'
 import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-exception'
-import { AsyncLock } from '../../data-access/async-lock'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -30,7 +29,6 @@ export class RundownTimelineService implements RundownService {
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
     private readonly rundownRepository: RundownRepository,
-    private readonly rundownLock: AsyncLock,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly ingestService: IngestService,
@@ -43,47 +41,43 @@ export class RundownTimelineService implements RundownService {
   }
 
   public async activateRundown(rundownId: string): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      await this.assertNoRundownIsActive()
-      await this.assertNoRundownIsInRehearsal(rundownId)
+    await this.assertNoRundownIsActive()
+    await this.assertNoRundownIsInRehearsal(rundownId)
 
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      const infinitePiecesBeforeActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
-      const rundownModeBeforeActivation: RundownMode = rundown.getMode()
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const infinitePiecesBeforeActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    const rundownModeBeforeActivation: RundownMode = rundown.getMode()
 
-      rundown.activate()
+    rundown.activate()
 
-      await this.buildAndPersistTimeline(rundown)
-      this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeActivation)
-      this.rundownEventEmitter.emitActivateEvent(rundown)
-      this.rundownEventEmitter.emitSetNextEvent(rundown)
+    await this.buildAndPersistTimeline(rundown)
+    this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeActivation)
+    this.rundownEventEmitter.emitActivateEvent(rundown)
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
 
-      await this.saveRundown(rundown)
+    await this.saveRundown(rundown)
 
-      const okToDestroyStuff: boolean = rundownModeBeforeActivation !== RundownMode.REHEARSAL
-      await this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id)
-    })
+    const okToDestroyStuff: boolean = rundownModeBeforeActivation !== RundownMode.REHEARSAL
+    await this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id)
   }
 
   public async enterRehearsal(rundownId: string): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      await this.assertNoRundownIsActive()
-      await this.assertNoRundownIsInRehearsal()
+    await this.assertNoRundownIsActive()
+    await this.assertNoRundownIsInRehearsal()
 
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      const infinitePiecesBeforeRehearsal: Map<string, Piece> = rundown.getInfinitePiecesMap()
-      rundown.enterRehearsal()
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const infinitePiecesBeforeRehearsal: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    rundown.enterRehearsal()
 
-      await this.buildAndPersistTimeline(rundown)
-      this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeRehearsal)
-      this.rundownEventEmitter.emitRehearseEvent(rundown)
-      this.rundownEventEmitter.emitSetNextEvent(rundown)
+    await this.buildAndPersistTimeline(rundown)
+    this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeRehearsal)
+    this.rundownEventEmitter.emitRehearseEvent(rundown)
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
 
-      await this.saveRundown(rundown)
+    await this.saveRundown(rundown)
 
-      const okToDestroyStuff: boolean = true // It's always "ok to destroy stuff" when we enter rehearsal.
-      await this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id)
-    })
+    const okToDestroyStuff: boolean = true // It's always "ok to destroy stuff" when we enter rehearsal.
+    await this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id)
   }
 
   private async saveRundown(rundown: Rundown): Promise<void> {
@@ -131,18 +125,16 @@ export class RundownTimelineService implements RundownService {
   public async deactivateRundown(rundownId: string): Promise<void> {
     this.stopAutoNext()
 
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
-      rundown.deactivate()
-      const timeline: Timeline = this.timelineBuilder.getBaseTimeline()
+    rundown.deactivate()
+    const timeline: Timeline = this.timelineBuilder.getBaseTimeline()
 
-      await this.timelineRepository.saveTimeline(timeline)
+    await this.timelineRepository.saveTimeline(timeline)
 
-      this.rundownEventEmitter.emitDeactivateEvent(rundown)
+    this.rundownEventEmitter.emitDeactivateEvent(rundown)
 
-      await this.saveRundown(rundown)
-    })
+    await this.saveRundown(rundown)
 
     await this.playoutService.makeDevicesStandDown()
   }
@@ -152,10 +144,8 @@ export class RundownTimelineService implements RundownService {
   }
 
   public async takeNext(rundownId: string): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      await this.takeNextBuildEmitAndSave(rundown)
-    })
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    await this.takeNextBuildEmitAndSave(rundown)
   }
 
   private async takeNextBuildEmitAndSave(rundown: Rundown): Promise<void> {
@@ -232,113 +222,99 @@ export class RundownTimelineService implements RundownService {
   }
 
   public async setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      rundown.setNext(segmentId, partId, owner)
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.setNext(segmentId, partId, owner)
 
-      await this.buildAndPersistTimeline(rundown)
+    await this.buildAndPersistTimeline(rundown)
 
-      this.rundownEventEmitter.emitSetNextEvent(rundown)
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
 
-      await this.saveRundown(rundown)
-    })
+    await this.saveRundown(rundown)
   }
 
   public async resetRundown(rundownId: string): Promise<void> {
     this.stopAutoNext()
 
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      rundown.reset()
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.reset()
 
-      await this.buildAndPersistTimeline(rundown)
+    await this.buildAndPersistTimeline(rundown)
 
-      this.rundownEventEmitter.emitResetEvent(rundown)
+    this.rundownEventEmitter.emitResetEvent(rundown)
 
-      await this.saveRundown(rundown)
-    })
+    await this.saveRundown(rundown)
   }
 
   public async deleteRundown(rundownId: string): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
 
-      if (rundown.isActive()) {
-        throw new ActiveRundownException(`Unable to delete active Rundown: ${rundown.id}`)
-      }
+    if (rundown.isActive()) {
+      throw new ActiveRundownException(`Unable to delete active Rundown: ${rundown.id}`)
+    }
 
-      await this.ingestedRundownRepository.deleteIngestedRundown(rundownId)
+    await this.ingestedRundownRepository.deleteIngestedRundown(rundownId)
 
-      this.rundownEventEmitter.emitRundownDeleted(rundown.id)
-    })
+    this.rundownEventEmitter.emitRundownDeleted(rundown.id)
   }
 
   public async insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      this.assertTakeIsNotBlocked(rundown)
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    this.assertTakeIsNotBlocked(rundown)
 
-      const unplannedNextPartToKeepAsNextPart: Part | undefined = !rundown.getNextPart().isPlanned ? rundown.getNextPart() : undefined
+    const unplannedNextPartToKeepAsNextPart: Part | undefined = !rundown.getNextPart().isPlanned ? rundown.getNextPart() : undefined
 
-      rundown.insertPartAsNext(part)
-      rundown.takeNext()
-      rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
+    rundown.insertPartAsNext(part)
+    rundown.takeNext()
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-      if (unplannedNextPartToKeepAsNextPart) {
-        rundown.insertPartAsNext(unplannedNextPartToKeepAsNextPart)
-      }
+    if (unplannedNextPartToKeepAsNextPart) {
+      rundown.insertPartAsNext(unplannedNextPartToKeepAsNextPart)
+    }
 
-      await this.buildAndPersistTimeline(rundown)
+    await this.buildAndPersistTimeline(rundown)
 
-      const prunedPartIds: string[] = rundown.pruneOldUnplannedPartsOnActiveSegment()
-      if (prunedPartIds.length > 0) {
-        this.rundownEventEmitter.emitSegmentUpdated(rundown, rundown.getActiveSegment())
-      } else if (rundown.getActivePart().id === part.id) {
-        this.rundownEventEmitter.emitPartInsertedAsOnAirEvent(rundown, part)
-      }
+    const prunedPartIds: string[] = rundown.pruneOldUnplannedPartsOnActiveSegment()
+    if (prunedPartIds.length > 0) {
+      this.rundownEventEmitter.emitSegmentUpdated(rundown, rundown.getActiveSegment())
+    } else if (rundown.getActivePart().id === part.id) {
+      this.rundownEventEmitter.emitPartInsertedAsOnAirEvent(rundown, part)
+    }
 
-      await this.saveRundown(rundown)
-    })
+    await this.saveRundown(rundown)
   }
 
   public async insertPartAsNext(rundownId: string, part: Part): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      rundown.insertPartAsNext(part)
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.insertPartAsNext(part)
 
-      await this.buildAndPersistTimeline(rundown)
+    await this.buildAndPersistTimeline(rundown)
 
-      this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, part)
+    this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, part)
 
-      await this.saveRundown(rundown)
-    })
+    await this.saveRundown(rundown)
   }
 
   public async insertPieceAsOnAir(rundownId: string, piece: Piece, layersToStopPiecesOn: string[] = []): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      const infinitePiecesBeforeInsertPieceAsOnAir: Map<string, Piece> = rundown.getInfinitePiecesMap()
-      rundown.stopActivePiecesOnLayers(layersToStopPiecesOn)
-      rundown.insertPieceIntoActivePart(piece)
-      rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const infinitePiecesBeforeInsertPieceAsOnAir: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    rundown.stopActivePiecesOnLayers(layersToStopPiecesOn)
+    rundown.insertPieceIntoActivePart(piece)
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-      await this.buildAndPersistTimeline(rundown)
+    await this.buildAndPersistTimeline(rundown)
 
-      this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeInsertPieceAsOnAir)
-      this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getActivePart())
+    this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeInsertPieceAsOnAir)
+    this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getActivePart())
 
-      await this.saveRundown(rundown)
-    })
+    await this.saveRundown(rundown)
   }
 
   public async insertPieceAsNext(rundownId: string, piece: Piece, partInTransition?: InTransition): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      this.insertPieceAsNextAndEmit(rundown, piece, partInTransition)
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    this.insertPieceAsNextAndEmit(rundown, piece, partInTransition)
 
-      await this.buildAndPersistTimeline(rundown)
-      await this.saveRundown(rundown)
-    })
+    await this.buildAndPersistTimeline(rundown)
+    await this.saveRundown(rundown)
   }
 
   private insertPieceAsNextAndEmit(rundown: Rundown, piece: Piece, partInTransition?: InTransition): void {
@@ -347,28 +323,24 @@ export class RundownTimelineService implements RundownService {
   }
 
   public async insertPieceAsNextAndTake(rundownId: string, piece: Piece, partInTransition?: InTransition): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      this.insertPieceAsNextAndEmit(rundown, piece, partInTransition)
-      await this.takeNextBuildEmitAndSave(rundown)
-    })
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    this.insertPieceAsNextAndEmit(rundown, piece, partInTransition)
+    await this.takeNextBuildEmitAndSave(rundown)
   }
 
   public async replacePieceOnAirOnNextPart(rundownId: string, pieceToBeReplaced: Piece, newPiece: Piece): Promise<void> {
-    await this.rundownLock.withLock(async () => {
-      const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-      rundown.replacePiece(pieceToBeReplaced, newPiece)
-      rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.replacePiece(pieceToBeReplaced, newPiece)
+    rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-      await this.buildAndPersistTimeline(rundown)
+    await this.buildAndPersistTimeline(rundown)
 
-      const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id
-        ? rundown.getActiveSegment().id
-        : rundown.getNextSegment().id
+    const segmentId: string = pieceToBeReplaced.getPartId() === rundown.getActivePart().id
+      ? rundown.getActiveSegment().id
+      : rundown.getNextSegment().id
 
-      this.rundownEventEmitter.emitPieceReplacedEvent(rundown, segmentId, pieceToBeReplaced.id, newPiece)
+    this.rundownEventEmitter.emitPieceReplacedEvent(rundown, segmentId, pieceToBeReplaced.id, newPiece)
 
-      await this.saveRundown(rundown)
-    })
+    await this.saveRundown(rundown)
   }
 }

@@ -9,14 +9,6 @@ const RUNDOWN_THROTTLED_INTERVAL_MS: number = 500
 const RUNDOWN_THROTTLED_ERROR_TEXT: string = `Unable to do action. An action was already executed less than ${RUNDOWN_THROTTLED_INTERVAL_MS}ms ago`
 
 export class ThrottledRundownService implements RundownService {
-  private static instance: RundownService
-
-  public static getInstance(rundownService: RundownService): RundownService {
-    if (!this.instance) {
-      this.instance = new ThrottledRundownService(rundownService)
-    }
-    return this.instance
-  }
 
   private lastOperationTakenEpochTimestamp: number
 

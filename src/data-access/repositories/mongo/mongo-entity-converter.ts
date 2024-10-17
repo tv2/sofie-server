@@ -31,7 +31,7 @@ import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { Invalidity } from '../../../model/value-objects/invalidity'
 import { Logger } from '../../../logger/logger'
-import { ActionArgument } from '../../../model/entities/action'
+import { Action, ActionArgument } from '../../../model/entities/action'
 import { ActionType } from '../../../model/enums/action-type'
 
 
@@ -189,7 +189,7 @@ export interface MongoAction extends MongoId {
   type: ActionType
   data: unknown
   metadata?: unknown
-  rundownId?: string | null
+  rundownId?: string
   argument?: ActionArgument
 }
 
@@ -392,10 +392,6 @@ export class MongoEntityConverter {
     })
   }
 
-  public convertToPieces(mongoPieces: MongoPiece[]): Piece[] {
-    return mongoPieces.map(this.convertToPiece)
-  }
-
   public convertToMongoPiece(piece: Piece): MongoPiece {
     return {
       _id: piece.id,
@@ -550,5 +546,26 @@ export class MongoEntityConverter {
 
   public convertToDevices(mongoDevices: MongoDevice[]): Device[] {
     return mongoDevices.map(mongoDevice => this.convertToDevice(mongoDevice))
+  }
+
+  public convertToAction(mongoAction: MongoAction): Action {
+    return {
+      id: mongoAction.id,
+      type: mongoAction.type,
+      rundownId: mongoAction.rundownId ?? undefined,
+      argument: mongoAction.argument,
+      data: mongoAction.data,
+      description: mongoAction.description,
+      metadata: mongoAction.metadata,
+      name: mongoAction.name,
+      rank: mongoAction.rank,
+    }
+  }
+
+  public convertToMongoAction(action: Action): MongoAction {
+    return {
+      ...action,
+      _id: action.id
+    }
   }
 }
