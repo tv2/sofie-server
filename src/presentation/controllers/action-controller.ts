@@ -27,7 +27,7 @@ export class ActionController extends BaseController {
   @GetRequest()
   public async getActions(_request: Request, response: Response): Promise<void> {
     try {
-      const actions: Action[] = await this.actionRepository.getActions()
+      const actions: Action[] = await this.actionRepository.getSystemActions()
       response.send(this.httpResponseFormatter.formatSuccessResponse(actions.map(action => new ActionDto(action))))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)

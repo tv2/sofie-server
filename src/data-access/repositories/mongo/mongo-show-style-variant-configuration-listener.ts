@@ -5,10 +5,11 @@ import { Logger } from '../../../logger/logger'
 import { MongoDatabase } from './mongo-database'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { MongoShowStyleVariant } from './mongo-entity-converter'
 
 const SHOW_STYLE_VARIANT_CONFIGURATION_COLLECTION_NAME: string = 'showStyleVariants'
 
-export class MongoShowStyleVariantConfigurationListener extends BaseMongoRepository implements DataChangedListener<ShowStyleVariant> {
+export class MongoShowStyleVariantConfigurationListener extends BaseMongoRepository<MongoShowStyleVariant> implements DataChangedListener<ShowStyleVariant> {
 
   private readonly logger: Logger
 
@@ -36,7 +37,6 @@ export class MongoShowStyleVariantConfigurationListener extends BaseMongoReposit
     return SHOW_STYLE_VARIANT_CONFIGURATION_COLLECTION_NAME
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onCreated(_onCreatedCallback: (data: ShowStyleVariant) => void): void {
     throw new UnsupportedOperationException(`${MongoShowStyleVariantConfigurationListener.prototype.onCreated.name} is not supported`)
   }
@@ -45,7 +45,6 @@ export class MongoShowStyleVariantConfigurationListener extends BaseMongoReposit
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onDeleted(_onDeletedCallback: (id: string) => void): void {
     throw new UnsupportedOperationException(`${MongoShowStyleVariantConfigurationListener.prototype.onDeleted.name} is not supported`)
   }

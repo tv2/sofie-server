@@ -17,7 +17,7 @@ import { Logger } from '../../../logger/logger'
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest changed this to "ingestedSegments"
 
-export class MongoIngestedSegmentChangedListener extends BaseMongoRepository implements DataChangedListener<IngestedSegment> {
+export class MongoIngestedSegmentChangedListener extends BaseMongoRepository<MongoIngestedSegment> implements DataChangedListener<IngestedSegment> {
 
   private readonly logger: Logger
   private onCreatedCallback: (segment: IngestedSegment) => void

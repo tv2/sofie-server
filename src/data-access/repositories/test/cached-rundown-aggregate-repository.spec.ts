@@ -1,34 +1,34 @@
-import { CachedRundownRepository } from '../cache/cached-rundown-repository'
-import { RundownRepository } from '../interfaces/rundown-repository'
+import { CachedRundownAggregateRepository } from '../cache/cached-rundown-aggregate-repository'
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { RundownAggregateRepository } from '../interfaces/rundown-aggregate-repository'
 import { Rundown, RundownInterface } from '../../../model/entities/rundown'
 import { Logger } from '../../../logger/logger'
 
-describe(CachedRundownRepository.name, () => {
-  describe(CachedRundownRepository.prototype.getRundown.name, () => {
+describe(CachedRundownAggregateRepository.name, () => {
+  describe(CachedRundownAggregateRepository.prototype.getRundown.name, () => {
     it('receives a RundownId returns a rundown', async () => {
-      const mockRepo: RundownRepository = mock<RundownRepository>()
+      const mockRepo: RundownAggregateRepository = mock<RundownAggregateRepository>()
 
       const randomRundownId: string = 'randomRundownId'
       const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
 
       when(mockRepo.getRundown(randomRundownId)).thenReturn(Promise.resolve(randomRundown))
 
-      const testee: CachedRundownRepository = new CachedRundownRepository(instance(mockRepo), createLogger())
+      const testee: CachedRundownAggregateRepository = new CachedRundownAggregateRepository(instance(mockRepo), createLogger())
 
       const result: Rundown = await testee.getRundown(randomRundownId)
       expect(result).toBe(randomRundown)
     })
 
     it('receives two request to fetch the same Rundown, only call the database once', async () => {
-      const mockRepo: RundownRepository = mock<RundownRepository>()
+      const mockRepo: RundownAggregateRepository = mock<RundownAggregateRepository>()
 
       const randomRundownId: string = 'randomRundownId'
       const randomRundown: Rundown = new Rundown({ id: randomRundownId } as RundownInterface)
 
       when(mockRepo.getRundown(randomRundownId)).thenReturn(Promise.resolve(randomRundown))
 
-      const testee: CachedRundownRepository = new CachedRundownRepository(instance(mockRepo), createLogger())
+      const testee: CachedRundownAggregateRepository = new CachedRundownAggregateRepository(instance(mockRepo), createLogger())
 
       await testee.getRundown(randomRundownId)
       await testee.getRundown(randomRundownId)

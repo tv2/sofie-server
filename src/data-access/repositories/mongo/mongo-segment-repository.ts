@@ -1,22 +1,22 @@
-import { SegmentRepository } from '../interfaces/segment-repository'
 import { Segment } from '../../../model/entities/segment'
 import { MongoDatabase } from './mongo-database'
-import { MongoIngestedSegment } from './mongo-ingested-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
-import { PartRepository } from '../interfaces/part-repository'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { DeleteResult } from 'mongodb'
+import {
+  AnyBulkWriteOperation,
+  ClientSession,
+} from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Part } from '../../../model/entities/part'
 import { MongoEntityConverter, MongoSegment } from './mongo-entity-converter'
+import { MongoPartRepository } from './mongo-part-repository'
 
-export const SEGMENT_COLLECTION_NAME: string = 'executedSegments' // TODO: Once we control ingest rename to "segments".
+const SEGMENT_COLLECTION_NAME: string = 'executedSegments' // TODO: Once we control ingest rename to "segments".
 
-export class MongoSegmentRepository extends BaseMongoRepository implements SegmentRepository {
+export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
   constructor(
     mongoDatabase: MongoDatabase,
+    private readonly mongoPartRepository: MongoPartRepository,
     private readonly mongoEntityConverter: MongoEntityConverter,
-    private readonly partRepository: PartRepository
   ) {
     super(mongoDatabase)
   }
@@ -34,12 +34,12 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
       throw new NotFoundException(`No Segment found for SegmentId ${segmentId}`)
     }
     const segment: Segment = this.mongoEntityConverter.convertToSegment(mongoSegment)
-    const parts: Part[] = await this.partRepository.getParts(segment.id)
+    const parts: Part[] = await this.mongoPartRepository.getParts(segment.id)
     segment.setParts(parts)
     return segment
   }
 
-  public async getSegments(rundownId: string, filters?: Partial<MongoIngestedSegment>): Promise<Segment[]> {
+  public async getSegments(rundownId: string, filters?: Partial<MongoSegment>): Promise<Segment[]> {
     this.assertDatabaseConnection(this.getSegments.name)
     const mongoSegments: MongoSegment[] = (await this.getCollection()
       .find<MongoSegment>({ ...filters, rundownId: rundownId })
@@ -47,62 +47,47 @@ export class MongoSegmentRepository extends BaseMongoRepository implements Segme
     const segments: Segment[] = this.mongoEntityConverter.convertToSegments(mongoSegments)
     return Promise.all(
       segments.map(async (segment) => {
-        segment.setParts(await this.partRepository.getParts(segment.id))
+        segment.setParts(await this.mongoPartRepository.getParts(segment.id))
         return segment
       })
     )
   }
 
-  public async saveSegment(segment: Segment): Promise<void> {
+  public buildSaveSegmentQueries(segments: readonly Segment[]): AnyBulkWriteOperation<MongoSegment>[] {
+    return segments.map(segment => this.buildSaveSegmentQuery(segment))
+  }
+
+  public buildDeleteOrphanedSegmentsForRundownQuery(rundownId: string, segments: readonly Segment[]): AnyBulkWriteOperation<MongoSegment> {
+    return {
+      deleteMany: {
+        filter: { rundownId, _id: { $nin: segments.map(segment => segment.id) } }
+      }
+    }
+  }
+
+  private buildSaveSegmentQuery(segment: Segment): AnyBulkWriteOperation<MongoSegment> {
     const mongoSegment: MongoSegment = this.mongoEntityConverter.convertToMongoSegment(segment)
-    await this.getCollection().updateOne(
-      { _id: mongoSegment._id },
-      { $set: mongoSegment },
-      { upsert: true, ignoreUndefined: true }
-    )
-    await Promise.all(segment.getParts().map(part => this.partRepository.savePart(part)))
-  }
-
-  public async delete(segmentId: string): Promise<void> {
-    await this.partRepository.deletePartsForSegment(segmentId)
-    await this.getCollection().deleteMany({ _id: segmentId })
-  }
-
-  public async deleteSegmentsForRundown(rundownId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deleteSegmentsForRundown.name)
-    const segments: Segment[] = await this.getSegments(rundownId)
-
-    await Promise.all(segments.map(async (segment) => this.partRepository.deletePartsForSegment(segment.id)))
-
-    const segmentDeleteResult: DeleteResult = await this.getCollection().deleteMany({ rundownId: rundownId })
-
-    if (!segmentDeleteResult.acknowledged) {
-      throw new DeletionFailedException(`Failed to delete Segments for Rundown: ${rundownId}`)
+    return {
+      updateOne: {
+        filter: { _id: mongoSegment._id },
+        update: { $set: mongoSegment },
+        upsert: true
+      }
     }
   }
 
-  public async deleteUnsyncedSegmentsForRundown(rundownId: string): Promise<void> {
-    this.assertDatabaseConnection(this.deleteUnsyncedSegmentsForRundown.name)
-    const unsyncedFilter: Partial<MongoSegment> = { isUnsynced: true }
-    const segments: Segment[] = await this.getSegments(rundownId, unsyncedFilter)
-
-    await Promise.all(segments.map(async (segment) => this.partRepository.deletePartsForSegment(segment.id)))
-
-    const segmentDeleteResult: DeleteResult = await this.getCollection().deleteMany({ ...unsyncedFilter, rundownId: rundownId })
-
-    if (!segmentDeleteResult.acknowledged) {
-      throw new DeletionFailedException(`Failed to delete Segments for Rundown: ${rundownId}`)
+  public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoSegment>[], session: ClientSession): Promise<void> {
+    if (queries.length === 0) {
+      return
     }
+    await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  /*
-  * NOTE: This will delete ALL unsynced Segments in the database. Should only be used on deactivate or activate Rundown.
-  * NOTE: This will NOT delete the associated Parts.
-  */
-  public async deleteAllUnsyncedSegments(): Promise<void> {
-    this.assertDatabaseConnection(this.deleteAllUnsyncedSegments.name)
-    await this.getCollection().deleteMany({
-      isUnsynced: true
-    })
+  public buildDeleteSegmentsForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoSegment> {
+    return {
+      deleteMany: {
+        filter: { rundownId },
+      },
+    }
   }
 }

@@ -9,7 +9,7 @@ import { IngestedRundown } from '../../../model/entities/ingested-rundown'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest this should be renamed to "ingestedRundowns".
 
-export class MongoIngestedRundownRepository extends BaseMongoRepository implements IngestedRundownRepository {
+export class MongoIngestedRundownRepository extends BaseMongoRepository<MongoIngestedRundown> implements IngestedRundownRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,
@@ -37,6 +37,11 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository implemen
       baselineTimelineObjects: await this.rundownBaselineRepository.getRundownBaseline(mongoIngestedRundown._id)
 
     }
+  }
+
+  public getIngestedRundownIds(): Promise<readonly string[]> {
+    this.assertDatabaseConnection(this.getIngestedRundownIds.name)
+    return this.getCollection().find({}, { projection: { _id: 1 } }).map(document => document._id).toArray()
   }
 
   public async getIngestedRundown(rundownId: string): Promise<IngestedRundown> {
