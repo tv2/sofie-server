@@ -303,6 +303,42 @@ describe(RundownTimelineService.name, () => {
         expect(activeSegment.getParts()).not.toContain(unplayedUnplannedPart)
       })
     })
+
+    it('keeps unplanned part if it has already been played', async () => {
+      const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+      const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
+      const playedUnplannedPart: Part = EntityTestFactory.createPart({ id: 'unplannedNextPart', isNext: true, executedAt: 100, ingestedPart: undefined })
+      const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart, playedUnplannedPart]})
+      const segments: Segment[] = [activeSegment, nextSegment]
+      const rundown: Rundown = EntityTestFactory.createRundown({
+        segments: segments,
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            segment: activeSegment,
+            part: activePart,
+            owner: Owner.SYSTEM
+          },
+          nextCursor: {
+            segment: activeSegment,
+            part: playedUnplannedPart,
+            owner: Owner.SYSTEM
+          },
+          infinitePieces: new Map()
+        },
+      })
+
+      const rundownRepository: RundownRepository = mock<RundownRepository>()
+      const testee: RundownTimelineService = createTestee({
+        rundownRepository,
+      })
+      when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+      expect(activeSegment.getParts()).toContain(playedUnplannedPart)
+      await testee.setNext(rundown.id, nextSegment.id, nextPart.id)
+      expect(activeSegment.getParts()).toContain(playedUnplannedPart)
+    })
   })
 
   describe(`${RundownTimelineService.prototype.takeNext.name}`, () => {
