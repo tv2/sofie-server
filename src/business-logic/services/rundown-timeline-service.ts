@@ -43,6 +43,7 @@ export class RundownTimelineService implements RundownService {
   public async activateRundown(rundownId: string): Promise<void> {
     await this.assertNoRundownIsActive()
     await this.assertNoRundownIsInRehearsal(rundownId)
+
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBeforeActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
     const rundownModeBeforeActivation: RundownMode = rundown.getMode()
@@ -63,6 +64,7 @@ export class RundownTimelineService implements RundownService {
   public async enterRehearsal(rundownId: string): Promise<void> {
     await this.assertNoRundownIsActive()
     await this.assertNoRundownIsInRehearsal()
+
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBeforeRehearsal: Map<string, Piece> = rundown.getInfinitePiecesMap()
     rundown.enterRehearsal()
