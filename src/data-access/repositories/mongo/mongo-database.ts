@@ -57,6 +57,10 @@ export class MongoDatabase implements Database {
     return this.db.collection<Model>(collectionName)
   }
 
+  public getClient(): mongodb.MongoClient {
+    return this.client
+  }
+
   private assertDatabaseConnection(): void {
     if (!this.db) {
       throw new DatabaseNotConnectedException('Not connected to the database')

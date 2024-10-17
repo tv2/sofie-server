@@ -9,7 +9,7 @@ import { IngestedRundown } from '../../../model/entities/ingested-rundown'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest this should be renamed to "ingestedRundowns".
 
-export class MongoIngestedRundownRepository extends BaseMongoRepository implements IngestedRundownRepository {
+export class MongoIngestedRundownRepository extends BaseMongoRepository<MongoIngestedRundown> implements IngestedRundownRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,

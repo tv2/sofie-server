@@ -6,6 +6,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 const AD_LIB_ACTIONS_COLLECTION: string = 'adLibActions'
 
 interface MongoAdLibAction {
+  _id: string
   actionId: string
   rundownId: string
   userData: unknown
@@ -14,7 +15,7 @@ interface MongoAdLibAction {
   }
 }
 
-export class MongoAdLibActionsRepository extends BaseMongoRepository implements ActionManifestRepository {
+export class MongoAdLibActionsRepository extends BaseMongoRepository<MongoAdLibAction> implements ActionManifestRepository {
 
   constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)

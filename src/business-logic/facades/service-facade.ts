@@ -42,9 +42,6 @@ export class ServiceFacade {
       EventEmitterFacade.createRundownEventEmitter(),
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
-      RepositoryFacade.createSegmentRepository(),
-      RepositoryFacade.createPartRepository(),
-      RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
       ServiceFacade.createIngestService(),
@@ -105,7 +102,6 @@ export class ServiceFacade {
 
   public static createActionGenerationService(): ActionGenerationService {
     return new ActionGenerationService(
-      RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionManifestRepository(),
       RepositoryFacade.createActionRepository(),

@@ -3,11 +3,12 @@ import { MongoDatabase } from './mongo-database'
 import { ShelfConfigurationRepository } from '../interfaces/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../../model/entities/shelf-configuration'
 import { UuidGenerator } from '../interfaces/uuid-generator'
+import { MongoId } from './mongo-entity-converter'
 
 const SHELF_CONFIGURATION_COLLECTION_NAME: string = 'shelfConfiguration'
 const SHELF_CONFIGURATION_ID: string = 'SHELF_CONFIGURATION_ID' // The system only support having a single Shelf.
 
-export class MongoShelfRepository extends BaseMongoRepository implements ShelfConfigurationRepository {
+export class MongoShelfRepository extends BaseMongoRepository<ShelfConfiguration & MongoId> implements ShelfConfigurationRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator
   ) {

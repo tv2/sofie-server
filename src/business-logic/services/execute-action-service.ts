@@ -150,17 +150,19 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
-    const part: Part = this.createPartFromAction(partAction)
+    const part: Part = this.createPartFromAction(partAction, rundownId)
     await this.rundownService.insertPartAsOnAir(rundownId, part)
   }
 
-  private createPartFromAction(partAction: PartAction): Part {
+  private createPartFromAction(partAction: PartAction, rundownId: string): Part {
     const partInterface: PartInterface = partAction.data.partInterface
     partInterface.metadata = { actionId: partAction.id }
     partInterface.id = this.makeUnique(partInterface.id)
+    partInterface.rundownId = rundownId
 
     partInterface.pieces = partAction.data.pieceInterfaces.map(pieceInterface => new Piece({
       ...pieceInterface,
+      id: this.makeUnique(pieceInterface.id),
       partId: partInterface.id
     }))
 
@@ -172,7 +174,7 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async insertPartAsNext(partAction: PartAction, rundownId: string): Promise<void> {
-    const part: Part = this.createPartFromAction(partAction)
+    const part: Part = this.createPartFromAction(partAction, rundownId)
     await this.rundownService.insertPartAsNext(rundownId, part)
   }
 

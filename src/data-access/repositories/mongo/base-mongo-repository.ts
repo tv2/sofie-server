@@ -3,13 +3,13 @@ import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
 import { MongoId } from './mongo-entity-converter'
 
-export abstract class BaseMongoRepository {
+export abstract class BaseMongoRepository<Model extends MongoId> {
 
   protected constructor(protected mongoDatabase: MongoDatabase) {}
 
   protected abstract getCollectionName(): string
 
-  protected getCollection<Model extends MongoId = MongoId>(): Collection<Model> {
+  protected getCollection(): Collection<Model> {
     return this.mongoDatabase.getCollection(this.getCollectionName())
   }
 

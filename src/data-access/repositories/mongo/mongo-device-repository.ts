@@ -4,10 +4,11 @@ import { Device } from '../../../model/entities/device'
 import { MongoDatabase } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { MongoDevice } from './mongo-entity-converter'
 
 const DEVICE_COLLECTION_NAME: string = 'externalDevices'
 
-export class MongoDeviceRepository extends BaseMongoRepository implements DeviceRepository {
+export class MongoDeviceRepository extends BaseMongoRepository<MongoDevice> implements DeviceRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)

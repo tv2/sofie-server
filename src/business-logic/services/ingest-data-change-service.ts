@@ -144,8 +144,8 @@ export class IngestDataChangeService implements DataChangeService {
       try {
         const startTime: bigint = process.hrtime.bigint()
         await this.synchronizeRundown(rundownId)
-        const timeSpendInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
-        this.logger.trace(`Synchronizing changes for rundown with id '${rundownId}' took ${timeSpendInMs}ms.`)
+        const timeSpentInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
+        this.logger.trace(`Synchronizing changes for rundown with id '${rundownId}' took ${timeSpentInMs}ms.`)
       } catch (error) {
         this.logger.data(error).error(`Failed synchronizing changes for rundown with id '${rundownId}'.`)
       }
@@ -198,7 +198,7 @@ export class IngestDataChangeService implements DataChangeService {
 
     this.rundownEventEmitter.emitRundownCreated(createdRundown)
     await this.persistRundown(createdRundown)
-    await this.actionGenerationService.generateActionsForRundown(createdRundown.id).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${createdRundown.name}' with id ${createdRundown.id}.`))
+    await this.actionGenerationService.generateActionsForRundown(createdRundown).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${createdRundown.name}' with id ${createdRundown.id}.`))
   }
 
   private async updateEmitAndPersistRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<void> {
@@ -208,8 +208,8 @@ export class IngestDataChangeService implements DataChangeService {
     this.logRundownSynchronizeResult(rundownSynchronizeResult, `Synchronizing rundown '${updatedRundown.name}' with id '${updatedRundown.id}' had following effects:`)
     const { deletedPartsInfo, deletedSegmentsInfo }: DeletedInfo = this.applyRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult)
 
-    const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
-    this.logger.trace(`Synchronizing rundown (without IO) took ${durationInMs}ms.`)
+    const timeSpentInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
+    this.logger.trace(`Synchronizing rundown (without IO) took ${timeSpentInMs}ms.`)
 
     if (!this.wasRundownChanged(rundownSynchronizeResult)) {
       this.logger.debug(`No changes to save for rundown ${updatedRundown.name} with id '${updatedRundown.id}'.`)
@@ -218,7 +218,7 @@ export class IngestDataChangeService implements DataChangeService {
 
     await this.persistRundown(updatedRundown)
     this.emitEventsFromRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult, { deletedSegmentsInfo, deletedPartsInfo })
-    await this.actionGenerationService.generateActionsForRundown(updatedRundown.id).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${updatedRundown.name}' with id ${updatedRundown.id}.`))
+    await this.actionGenerationService.generateActionsForRundown(updatedRundown).catch(error => this.logger.data(error).warn(`Failed while generating actions for rundown '${updatedRundown.name}' with id ${updatedRundown.id}.`))
   }
 
   private logRundownSynchronizeResult(rundownSynchronizeResult: RundownSynchronizeResult, message: string): void {
@@ -286,7 +286,6 @@ export class IngestDataChangeService implements DataChangeService {
   }
 
   private async persistRundown(rundown: Rundown): Promise<void> {
-    await this.rundownRepository.deleteRundown(rundown.id) // TODO: Move deletion of in-memory-deleted parts and pieces to the repository.
     await this.rundownRepository.saveRundown(rundown)
     if (rundown.isActive()) {
       const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
