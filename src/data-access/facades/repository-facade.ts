@@ -77,7 +77,7 @@ import { AsyncLock } from '../async-lock'
 export class RepositoryFacade {
 
   private static rundownAggregateRepository?: RundownAggregateRepository
-  public static rundownLock: AsyncLock = new AsyncLock()
+  public static rundownLock: AsyncLock = new AsyncLock(LoggerFacade.createLogger())
 
   public static getDatabase(): Database {
     return MongoDatabase.getInstance(LoggerFacade.createLogger())
