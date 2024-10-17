@@ -2,8 +2,7 @@ import {
   Action,
   ActionArgumentType,
   MutateActionMethods,
-  MutateActionType,
-  MutateActionWithPieceMethods
+  MutateActionType, MutateActionWithPieceMethods,
 } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
@@ -96,7 +95,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
           }
           throw exception
         }
-      })]
+      }),
+    ]
   }
 
   public isTransitionEffectAction(action: Tv2Action): action is Tv2TransitionEffectAction {

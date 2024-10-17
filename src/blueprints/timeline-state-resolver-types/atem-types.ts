@@ -14,7 +14,7 @@ export interface AtemMixEffectWithTransition {
   type: AtemMixEffectType.TRANSITION
   input: number
   transition: AtemTransition,
-  transitionSettings?: AtemTransitionSettings
+  transitionSettings?: AtemTransitionSettings,
 }
 
 export interface AtemMixEffectWithPreview {

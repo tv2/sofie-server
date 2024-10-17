@@ -246,19 +246,19 @@ describe(ThrottledRundownService.name, () => {
     })
   })
 
-  describe(ThrottledRundownService.prototype.setNext.name, () => {
+  describe(ThrottledRundownService.prototype.setNextFromIds.name, () => {
     it('calls SetNext on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
-      await testee.setNext('rundownId', 'segmentId', 'partId')
-      verify(rundownService.setNext(anything(), anything(), anything(), anything())).once()
+      await testee.setNextFromIds('rundownId', 'segmentId', 'partId')
+      verify(rundownService.setNextFromIds(anything(), anything(), anything(), anything())).once()
     })
 
     it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
-      await testee.setNext('rundownId', 'segmentId', 'partId')
+      await testee.setNextFromIds('rundownId', 'segmentId', 'partId')
       jest.advanceTimersByTime(5)
-      expect(() => testee.setNext('rundownId', 'segmentId', 'partId')).not.toThrow(ThrottledRundownException)
+      expect(() => testee.setNextFromIds('rundownId', 'segmentId', 'partId')).not.toThrow(ThrottledRundownException)
     })
   })
 

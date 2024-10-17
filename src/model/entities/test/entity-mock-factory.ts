@@ -123,7 +123,10 @@ export class EntityMockFactory {
     when(mockedSegment.findFirstPart()).thenReturn(
       misc.firstPart ?? this.createPart({ id: 'firstPartId' } as PartInterface)
     )
-    when(mockedSegment.findNextPart(anything())).thenReturn(
+    when(mockedSegment.findFirstPartNotOnAir()).thenReturn(
+      misc.firstPart ?? this.createPart({ id: 'firstPartId' } as PartInterface)
+    )
+    when(mockedSegment.findNextPartNotOnAir(anything())).thenReturn(
       misc.nextPart ?? this.createPart({ id: 'nextPartId' } as PartInterface)
     )
     when(mockedSegment.getFirstSpanningPieceForEachLayerBeforePart(anything(), anything())).thenReturn(

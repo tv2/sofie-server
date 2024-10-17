@@ -106,7 +106,7 @@ export enum TransitionEffectType {
   CUT = 'CUT',
   MIX = 'MIX',
   DIP = 'DIP',
-  BREAKER = 'BREAKER'
+  BREAKER = 'BREAKER',
 }
 
 export interface Breaker {
