@@ -89,6 +89,7 @@ export class ControllerFacade {
     return new SystemInformationController(
       RepositoryFacade.createSystemInformationRepository(),
       RepositoryFacade.createStatusMessageRepository(),
+      ServiceFacade.createStatusMessageService(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
