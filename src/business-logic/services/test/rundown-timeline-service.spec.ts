@@ -298,9 +298,9 @@ describe(RundownTimelineService.name, () => {
         })
         when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
-        expect(activeSegment.getParts()).toContain(unplayedUnplannedPart)
+        expect(rundown.getActiveSegment().getParts()).toContain(unplayedUnplannedPart)
         await testee.setNext(rundown.id, nextSegment.id, nextPart.id)
-        expect(activeSegment.getParts()).not.toContain(unplayedUnplannedPart)
+        expect(rundown.getActiveSegment().getParts()).not.toContain(unplayedUnplannedPart)
       })
     })
 
@@ -335,9 +335,9 @@ describe(RundownTimelineService.name, () => {
       })
       when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
-      expect(activeSegment.getParts()).toContain(playedUnplannedPart)
+      expect(rundown.getActiveSegment().getParts()).toContain(playedUnplannedPart)
       await testee.setNext(rundown.id, nextSegment.id, nextPart.id)
-      expect(activeSegment.getParts()).toContain(playedUnplannedPart)
+      expect(rundown.getActiveSegment().getParts()).toContain(playedUnplannedPart)
     })
   })
 
