@@ -229,7 +229,20 @@ export class RundownTimelineService implements RundownService {
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
+    this.deleteUnplayedUnplannedPartsFromActiveSegment(rundown)
     await this.saveRundown(rundown)
+  }
+
+  private deleteUnplayedUnplannedPartsFromActiveSegment(rundown: Rundown): void {
+    if (!rundown.isActivePartSet()) {
+      return
+    }
+    rundown.getActiveSegment().getParts().forEach(part => {
+      if (!part.isPlanned && !part.isNext() && part.getExecutedAt() === 0) {
+        rundown.removePartFromSegment(part.id)
+        this.rundownEventEmitter.emitPartDeleted(rundown, part.getSegmentId(), part.id)
+      }
+    })
   }
 
   public async resetRundown(rundownId: string): Promise<void> {
