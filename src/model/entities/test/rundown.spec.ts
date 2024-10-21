@@ -3632,7 +3632,7 @@ describe(Rundown.name, () => {
 
             const nextSegmentId: string = 'next-segment-id'
             const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId: nextSegmentId, isNext: true })
-            const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, parts: [nextPart] })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
 
             const partToAdd: Part = EntityTestFactory.createPart({ id: 'part-to-add-id', segmentId: onAirSegmentId })
 
