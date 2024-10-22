@@ -70,36 +70,45 @@ export class IngestDataChangeService implements DataChangeService {
   ) {
     this.logger = logger.tag(this.constructor.name)
 
-    this.rundownChangedListener.onCreated(rundown => this.registerReceivedDataChangeEvent(rundown.id))
-    this.rundownChangedListener.onUpdated(rundown => this.registerReceivedDataChangeEvent(rundown.id))
-    this.rundownChangedListener.onDeleted(rundownId => this.registerReceivedDataChangeEvent(rundownId))
+    this.rundownChangedListener.onCreated(rundown => this.registerChangeForRundown(rundown.id))
+    this.rundownChangedListener.onUpdated(rundown => this.registerChangeForRundown(rundown.id))
+    this.rundownChangedListener.onDeleted(rundownId => this.registerChangeForRundown(rundownId))
 
-    this.segmentChangedListener.onCreated(segment => this.registerReceivedDataChangeEvent(segment.rundownId))
-    this.segmentChangedListener.onUpdated(segment => this.registerReceivedDataChangeEvent(segment.rundownId))
+    this.segmentChangedListener.onCreated(segment => this.registerChangeForRundown(segment.rundownId))
+    this.segmentChangedListener.onUpdated(segment => this.registerChangeForRundown(segment.rundownId))
     this.segmentChangedListener.onDeleted(segmentId => {
       this.segmentRepository.getSegment(segmentId)
-        .then(segment => this.registerReceivedDataChangeEvent(segment.rundownId))
-        .catch(error => this.logger.data(error).error(`Failed getting segment with id '${segmentId}' for delete segment event.`))
+        .then(segment => this.registerChangeForRundown(segment.rundownId))
+        .catch(error => {
+          this.logger.data(error).error(`Failed getting segment with id '${segmentId}' for delete segment event.`)
+          this.markAllRundownsAsAffected().catch(error => this.logger.data(error).error(`Failed marking all rundowns as affected when deletion of the segment with id '${segmentId}' failed.`))
+        })
     })
 
-    this.partChangedListener.onCreated(part => this.registerReceivedDataChangeEvent(part.rundownId))
-    this.partChangedListener.onUpdated(part => this.registerReceivedDataChangeEvent(part.rundownId))
+    this.partChangedListener.onCreated(part => this.registerChangeForRundown(part.rundownId))
+    this.partChangedListener.onUpdated(part => this.registerChangeForRundown(part.rundownId))
     this.partChangedListener.onDeleted(partId => {
       this.partRepository.getPart(partId)
-        .then(part => this.registerReceivedDataChangeEvent(part.rundownId))
-        .catch(error => this.logger.data(error).error(`Failed getting part with id '${partId}' for deleted part event.`))
+        .then(part => this.registerChangeForRundown(part.rundownId))
+        .catch(error => {
+          this.logger.data(error).warn(`Failed getting part with id '${partId}' for deleted part event. Marking all rundowns as affected.`)
+          this.markAllRundownsAsAffected().catch(error => this.logger.data(error).error(`Failed marking all rundowns as affected when deletion of the part with id '${partId}' failed.`))
+        })
     })
 
-    this.pieceChangedListener.onCreated(piece => this.registerReceivedDataChangeEvent(piece.rundownId))
-    this.pieceChangedListener.onUpdated(piece => this.registerReceivedDataChangeEvent(piece.rundownId))
+    this.pieceChangedListener.onCreated(piece => this.registerChangeForRundown(piece.rundownId))
+    this.pieceChangedListener.onUpdated(piece => this.registerChangeForRundown(piece.rundownId))
     this.pieceChangedListener.onDeleted(pieceId => {
       this.pieceRepository.getPiece(pieceId)
-        .then(piece => this.registerReceivedDataChangeEvent(piece.rundownId))
-        .catch(error => this.logger.data(error).error(`Failed getting piece with id '${pieceId}' for deleted piece event.`))
+        .then(piece => this.registerChangeForRundown(piece.rundownId))
+        .catch(error => {
+          this.logger.data(error).error(`Failed getting piece with id '${pieceId}' for deleted piece event.`)
+          this.markAllRundownsAsAffected().catch(error => this.logger.data(error).error(`Failed marking all rundowns as affected when deletion of the piece with id '${pieceId}' failed.`))
+        })
     })
   }
 
-  private registerReceivedDataChangeEvent(rundownId: string): void {
+  private registerChangeForRundown(rundownId: string): void {
     this.affectedRundownIds.add(rundownId)
     this.clearAndStartSynchronizeTimer()
   }
@@ -144,17 +153,17 @@ export class IngestDataChangeService implements DataChangeService {
     })
   }
 
+  private async markAllRundownsAsAffected(): Promise<void> {
+    const rundownIds: ReadonlySet<string> = await this.getAllRundownIds()
+    rundownIds.forEach(rundownId => this.registerChangeForRundown(rundownId))
+  }
+
   public async initialize(): Promise<void> {
     await this.synchronizeAllRundowns().catch(error => this.logger.data(error).error('Failed synchronizing all rundowns on initialization.'))
   }
 
   private async synchronizeAllRundowns(): Promise<void> {
-    const ingestedRundownIds: readonly string[] = await this.ingestedRundownRepository.getIngestedRundownIds()
-    const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns()
-    const allRundownIds: ReadonlySet<string> = new Set([
-      ...ingestedRundownIds,
-      ...basicRundowns.map(basicRundown => basicRundown.id),
-    ])
+    const allRundownIds: ReadonlySet<string> = await this.getAllRundownIds()
     this.logger.trace(`Synchronizing state for ${allRundownIds.size} rundowns.`)
     for (const rundownId of allRundownIds) {
       try {
@@ -167,6 +176,15 @@ export class IngestDataChangeService implements DataChangeService {
       }
     }
     await this.actionGenerationService.generateActionsForSystem().catch(error => this.logger.data(error).error('Failed generating system actions.'))
+  }
+
+  private async getAllRundownIds(): Promise<ReadonlySet<string>> {
+    const ingestedRundownIds: readonly string[] = await this.ingestedRundownRepository.getIngestedRundownIds()
+    const basicRundowns: BasicRundown[] = await this.rundownRepository.getBasicRundowns()
+    return new Set([
+      ...ingestedRundownIds,
+      ...basicRundowns.map(basicRundown => basicRundown.id),
+    ])
   }
 
   private async synchronizeRundown(rundownId: string): Promise<void> {
