@@ -72,7 +72,7 @@ export interface MongoSegment extends MongoId {
   isNext: boolean
   isUnsynced: boolean
   referenceTag?: string
-  budgetDuration?: number
+  expectedDurationInMs?: number
   executedAtEpochTime?: number
   invalidity?: {
     reason: string
@@ -325,7 +325,7 @@ export class MongoEntityConverter {
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
       isUnsynced: segment.isUnsynced(),
-      budgetDuration: segment.expectedDurationInMs,
+      expectedDurationInMs: segment.expectedDurationInMs,
       executedAtEpochTime: segment.getExecutedAtEpochTime(),
       invalidity: segment.invalidity,
       definesShowStyleVariant: segment.definesShowStyleVariant
