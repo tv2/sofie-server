@@ -33,13 +33,11 @@ export class MongoIngestedPieceChangedListener extends BaseMongoRepository<Mongo
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedPiece>) => {
-      this.onChange(change).catch(error => this.logger.data({ event: change, error }).error('Failed processing ingested piece change event.'))
-    })
+    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedPiece>) => this.onChange(change))
     this.logger.debug('Listening for Piece collection changes...')
   }
 
-  private onChange(change: ChangeStreamDocument<MongoIngestedPiece>): Promise<void> {
+  private onChange(change: ChangeStreamDocument<MongoIngestedPiece>): void {
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
         const ingestedPiece: IngestedPiece = this.mongoIngestedEntityConverter.convertToIngestedPiece(change.fullDocument)
@@ -61,7 +59,6 @@ export class MongoIngestedPieceChangedListener extends BaseMongoRepository<Mongo
         break
       }
     }
-    return Promise.resolve()
   }
 
   protected getCollectionName(): string {

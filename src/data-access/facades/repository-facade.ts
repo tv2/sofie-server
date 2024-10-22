@@ -109,7 +109,7 @@ export class RepositoryFacade {
   public static createIngestedRundownChangeListener(): DataChangedListener<IngestedRundown> {
     return new MongoIngestedRundownChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedRundownRepository(),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }
@@ -141,7 +141,7 @@ export class RepositoryFacade {
   public static createIngestedSegmentChangedListener(): DataChangedListener<IngestedSegment> {
     return new MongoIngestedSegmentChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedSegmentRepository(),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }
@@ -173,7 +173,7 @@ export class RepositoryFacade {
   public static createIngestedPartChangedListener(): DataChangedListener<IngestedPart> {
     return new MongoIngestedPartChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedPartRepository(),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }
