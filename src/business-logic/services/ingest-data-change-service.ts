@@ -21,6 +21,8 @@ import { ActionGenerationService } from './action-generation-service'
 import { Part } from '../../model/entities/part'
 import { Timeline } from '../../model/entities/timeline'
 import { AsyncLock } from '../async-lock'
+import { PieceRepository } from '../../data-access/repositories/interfaces/piece-repository'
+import { IngestedPiece } from '../../model/entities/ingested-piece'
 
 interface DeletedInfo {
   readonly deletedPartsInfo: readonly DeletedPartInfo[]
@@ -51,9 +53,11 @@ export class IngestDataChangeService implements DataChangeService {
     private readonly rundownLock: AsyncLock,
     private readonly segmentRepository: SegmentRepository,
     private readonly partRepository: PartRepository,
+    private readonly pieceRepository: PieceRepository,
     private readonly rundownChangedListener: DataChangedListener<IngestedRundown>,
     private readonly segmentChangedListener: DataChangedListener<IngestedSegment>,
     private readonly partChangedListener: DataChangedListener<IngestedPart>,
+    private readonly pieceChangedListener: DataChangedListener<IngestedPiece>,
     private readonly ingestRundownSynchronizer: IngestRundownSynchronizer,
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     private readonly rundownEventEmitter: RundownEventEmitter,
@@ -82,6 +86,14 @@ export class IngestDataChangeService implements DataChangeService {
       this.partRepository.getPart(partId)
         .then(part => this.registerReceivedDataChangeEvent(part.rundownId))
         .catch(error => this.logger.data(error).error(`Failed getting part with id '${partId}' for deleted part event.`))
+    })
+
+    this.pieceChangedListener.onCreated(piece => this.registerReceivedDataChangeEvent(piece.rundownId))
+    this.pieceChangedListener.onUpdated(piece => this.registerReceivedDataChangeEvent(piece.rundownId))
+    this.pieceChangedListener.onDeleted(pieceId => {
+      this.pieceRepository.getPiece(pieceId)
+        .then(piece => this.registerReceivedDataChangeEvent(piece.rundownId))
+        .catch(error => this.logger.data(error).error(`Failed getting piece with id '${pieceId}' for deleted piece event.`))
     })
   }
 

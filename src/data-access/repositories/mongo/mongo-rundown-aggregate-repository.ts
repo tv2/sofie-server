@@ -107,4 +107,8 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
   private withTransaction(callback: (session: ClientSession) => Promise<void>): Promise<void> {
     return this.mongoDatabase.getClient().withSession(session => session.withTransaction(session => callback(session)))
   }
+
+  public getPiece(pieceId: string): Promise<Piece> {
+    return this.mongoPieceRepository.getPiece(pieceId)
+  }
 }

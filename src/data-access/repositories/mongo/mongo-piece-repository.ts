@@ -6,6 +6,7 @@ import {
   ClientSession,
 } from 'mongodb'
 import { MongoEntityConverter, MongoPiece } from './mongo-entity-converter'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
@@ -17,6 +18,17 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
 
   protected getCollectionName(): string {
     return PIECE_COLLECTION_NAME
+  }
+
+  public async getPiece(pieceId: string): Promise<Piece> {
+    this.assertDatabaseConnection(this.getPiece.name)
+    const mongoPiece: MongoPiece | null = await this.getCollection().findOne<MongoPiece>({
+      _id: pieceId
+    })
+    if (!mongoPiece) {
+      throw new NotFoundException(`No piece found with id '${pieceId}'.`)
+    }
+    return this.mongoEntityConverter.convertToPiece(mongoPiece)
   }
 
   public getPieces(partId: string): Promise<Piece[]> {

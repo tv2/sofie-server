@@ -72,6 +72,9 @@ import {
   MongoShowStyleVariantConfigurationListener
 } from '../repositories/mongo/mongo-show-style-variant-configuration-listener'
 import { RundownAggregateRepository } from '../repositories/interfaces/rundown-aggregate-repository'
+import { IngestedPiece } from '../../model/entities/ingested-piece'
+import { PieceRepository } from '../repositories/interfaces/piece-repository'
+import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-ingested-piece-changed-listener'
 
 export class RepositoryFacade {
 
@@ -147,6 +150,10 @@ export class RepositoryFacade {
     return this.createRundownAggregateRepository()
   }
 
+  public static createPieceRepository(): PieceRepository {
+    return this.createRundownAggregateRepository()
+  }
+
   private static createMongoPartRepository(): MongoPartRepository {
     return new MongoPartRepository(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
@@ -167,6 +174,14 @@ export class RepositoryFacade {
     return new MongoIngestedPartChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       RepositoryFacade.createIngestedPartRepository(),
+      LoggerFacade.createLogger()
+    )
+  }
+
+  public static createIngestedPieceChangedListener(): DataChangedListener<IngestedPiece> {
+    return new MongoIngestedPieceChangedListener(
+      MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }
