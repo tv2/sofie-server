@@ -33,20 +33,20 @@ type MongoIngestedRundownTiming = MongoForwardRundownTiming | MongoBackwardRundo
 interface MongoForwardRundownTiming { // PlaylistTimingForwardTime from blueprints-integration
   type: MongoRundownTimingType.FORWARD
   expectedStart: number
-  expectedDuration?: number
-  expectedEnd?: number
+  expectedDuration?: number | null
+  expectedEnd?: number | null
 }
 
 interface MongoBackwardRundownTiming { // PlaylistTimingBackTime from blueprints-integration
   type: MongoRundownTimingType.BACKWARD
-  expectedStart?: number
-  expectedDuration?: number
+  expectedStart?: number | null
+  expectedDuration?: number | null
   expectedEnd: number
 }
 
 interface MongoUnscheduledRundownTiming { // PlaylistTimingNone from blueprints-integration
   type: MongoRundownTimingType.UNSCHEDULED
-  expectedDuration?: number
+  expectedDuration?: number | null
 }
 
 export interface MongoIngestedSegment extends MongoId {
@@ -136,26 +136,31 @@ export class MongoIngestedEntityConverter {
   }
 
   private convertToUnscheduledRundownTiming(mongoUnscheduledRundownTiming: MongoUnscheduledRundownTiming): UnscheduledRundownTiming {
+    const expectedDurationInMs: number | undefined = mongoUnscheduledRundownTiming.expectedDuration ?? undefined
     return {
       type: RundownTimingType.UNSCHEDULED,
-      expectedDurationInMs: mongoUnscheduledRundownTiming.expectedDuration,
+      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null)
     }
   }
 
   private convertToForwardRundownTiming(mongoForwardRundownTiming: MongoForwardRundownTiming): ForwardRundownTiming {
+    const expectedDurationInMs: number | undefined = mongoForwardRundownTiming.expectedDuration ?? undefined
+    const expectedEndEpochTime: number | undefined = mongoForwardRundownTiming.expectedEnd ?? undefined
     return {
       type: RundownTimingType.FORWARD,
       expectedStartEpochTime: mongoForwardRundownTiming.expectedStart,
-      expectedDurationInMs: mongoForwardRundownTiming.expectedDuration,
-      expectedEndEpochTime: mongoForwardRundownTiming.expectedEnd
+      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null),
+      ...(expectedEndEpochTime !== undefined ? { expectedEndEpochTime } : null),
     }
   }
 
   private convertToBackwardRundownTiming(mongoBackwardRundownTiming: MongoBackwardRundownTiming): BackwardRundownTiming {
+    const expectedStartEpochTime: number | undefined = mongoBackwardRundownTiming.expectedStart ?? undefined
+    const expectedDurationInMs: number | undefined = mongoBackwardRundownTiming.expectedDuration ?? undefined
     return {
       type: RundownTimingType.BACKWARD,
-      expectedStartEpochTime: mongoBackwardRundownTiming.expectedStart,
-      expectedDurationInMs: mongoBackwardRundownTiming.expectedDuration,
+      ...(expectedStartEpochTime !== undefined ? { expectedStartEpochTime } : null),
+      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null),
       expectedEndEpochTime: mongoBackwardRundownTiming.expectedEnd
     }
   }
