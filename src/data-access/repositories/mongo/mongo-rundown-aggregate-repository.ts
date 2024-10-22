@@ -66,7 +66,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     const deleteOrphanedPartsQuery: AnyBulkWriteOperation<MongoPart> = this.mongoPartRepository.buildDeleteOrphanedPartsForRundownQuery(rundown.id, parts)
     const pieces: readonly Piece[] = parts.flatMap(part => part.getPieces())
     const savePieceQueries: readonly AnyBulkWriteOperation<MongoPiece>[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
-    const deleteOrphanedPiecesQuery: AnyBulkWriteOperation<MongoPiece> = this.mongoPieceRepository.buildDeleteOrphanedPiecesForPartsQuery(parts.map(part => part.id), pieces.concat(rundown.getInfinitePieces()))
+    const deleteOrphanedPiecesQuery: AnyBulkWriteOperation<MongoPiece> = this.mongoPieceRepository.buildDeleteOrphanedPiecesForRundownQuery(rundown.id, pieces.concat(rundown.getInfinitePieces()))
 
     await this.withTransaction(async (session) => {
       await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
@@ -83,9 +83,8 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
       return
     }
 
-    const partIdsForRundown: readonly string[] = await this.mongoPartRepository.getPartIdsForRundown(rundownId)
     await this.withTransaction(async (session) => {
-      await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeletePiecesForRundownQuery(partIdsForRundown)], session)
+      await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeletePiecesForRundownQuery(rundownId)], session)
       await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForRundownQuery(rundownId)], session)
       await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteSegmentsForRundownQuery(rundownId)], session)
       await this.getCollection().deleteOne({ _id: rundownId })

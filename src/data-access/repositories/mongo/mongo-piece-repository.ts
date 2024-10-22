@@ -62,10 +62,10 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
     }
   }
 
-  public buildDeleteOrphanedPiecesForPartsQuery(partIds: readonly string[], pieces: readonly Piece[]): AnyBulkWriteOperation<MongoPiece> {
+  public buildDeleteOrphanedPiecesForRundownQuery(rundownId: string, pieces: readonly Piece[]): AnyBulkWriteOperation<MongoPiece> {
     return {
       deleteMany: {
-        filter: { partId: { $in: partIds }, _id: { $nin: pieces.map(piece => piece.id) } }
+        filter: { rundownId, _id: { $nin: pieces.map(piece => piece.id) } }
       }
     }
   }
@@ -77,10 +77,10 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  public buildDeletePiecesForRundownQuery(partIds: readonly string[]): AnyBulkWriteOperation<MongoPiece> {
+  public buildDeletePiecesForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoPiece> {
     return {
       deleteMany: {
-        filter: { partId: { $in: partIds } },
+        filter: { rundownId },
       },
     }
   }
