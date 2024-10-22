@@ -4,7 +4,6 @@ import { IngestedPart } from '../../../model/entities/ingested-part'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedEntityConverter, MongoIngestedPart } from './mongo-ingested-entity-converter'
 import { IngestedPieceRepository } from '../interfaces/ingested-piece-repository'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest rename to "ingestedParts"
 
@@ -20,20 +19,6 @@ export class MongoIngestedPartRepository extends BaseMongoRepository<MongoIngest
 
   protected getCollectionName(): string {
     return INGESTED_PART_COLLECTION_NAME
-  }
-
-  public async getIngestedPart(partId: string): Promise<IngestedPart> {
-    this.assertDatabaseConnection(this.getIngestedPart.name)
-    const mongoIngestedPart: MongoIngestedPart | null = await this.getCollection().findOne<MongoIngestedPart>({
-      _id: partId
-    })
-    if (!mongoIngestedPart) {
-      throw new NotFoundException(`No Part found for partId: ${partId}`)
-    }
-    return {
-      ...this.mongoIngestedEntityConverter.convertToIngestedPart(mongoIngestedPart),
-      ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesForPart(mongoIngestedPart._id)
-    }
   }
 
   public async getIngestedPartsForSegment(segmentId: string): Promise<IngestedPart[]> {

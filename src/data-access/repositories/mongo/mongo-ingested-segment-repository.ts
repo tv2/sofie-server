@@ -4,7 +4,6 @@ import { IngestedSegment } from '../../../model/entities/ingested-segment'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedEntityConverter, MongoIngestedSegment } from './mongo-ingested-entity-converter'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest rename to "ingestedSegments".
 
@@ -20,20 +19,6 @@ export class MongoIngestedSegmentRepository extends BaseMongoRepository<MongoIng
 
   protected getCollectionName(): string {
     return INGESTED_SEGMENT_COLLECTION_NAME
-  }
-
-  public async getIngestedSegment(segmentId: string): Promise<IngestedSegment> {
-    this.assertDatabaseConnection(this.getIngestedSegment.name)
-    const mongoSegment: MongoIngestedSegment | null = await this.getCollection().findOne<MongoIngestedSegment>({
-      _id: segmentId
-    })
-    if (!mongoSegment) {
-      throw new NotFoundException(`No Segment found for segmentId: ${segmentId}`)
-    }
-    return {
-      ...this.mongoIngestedEntityConverter.convertToIngestedSegment(mongoSegment),
-      ingestedParts: await this.ingestedPartRepository.getIngestedPartsForSegment(mongoSegment._id)
-    }
   }
 
   public async getIngestedSegmentsForRundown(rundownId: string): Promise<IngestedSegment[]> {
