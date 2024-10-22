@@ -40,6 +40,8 @@ interface DeletedSegmentInfo {
   originalSegmentId: string
 }
 
+const SYNCHRONIZE_DEBOUNCE_DELAY_IN_MS: number = 600
+
 export class IngestDataChangeService implements DataChangeService {
 
   private isSynchronizing: boolean = false
@@ -107,7 +109,7 @@ export class IngestDataChangeService implements DataChangeService {
     this.dataChangeEventDebounceTimerId = setTimeout(() => {
       this.dataChangeEventDebounceTimerId = undefined
       this.synchronizeAffectedRundowns().catch(error => this.logger.data(error).error('Failed synchronizing one or more affected rundowns.'))
-    }, 200)
+    }, SYNCHRONIZE_DEBOUNCE_DELAY_IN_MS)
 
   }
 
