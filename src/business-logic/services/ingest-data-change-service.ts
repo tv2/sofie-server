@@ -113,7 +113,7 @@ export class IngestDataChangeService implements DataChangeService {
 
   private async synchronizeAffectedRundowns(): Promise<void> {
     if (this.isSynchronizing) {
-      this.logger.trace('Trying to synchronize while synchronzing.')
+      this.logger.trace('Trying to synchronize while synchronizing.')
       return
     }
     this.isSynchronizing = true
@@ -124,6 +124,8 @@ export class IngestDataChangeService implements DataChangeService {
       return
     }
 
+    this.affectedRundownIds.delete(rundownId)
+
     try {
       const startTime: bigint = process.hrtime.bigint()
       this.logger.debug(`Starting to synchronize rundown with id '${rundownId}'.`)
@@ -133,8 +135,6 @@ export class IngestDataChangeService implements DataChangeService {
     } catch (error) {
       this.logger.data(error).error(`Failed synchronizing changes for rundown with id '${rundownId}'.`)
     }
-
-    this.affectedRundownIds.delete(rundownId)
 
     this.isSynchronizing = false
     setImmediate(() => {
@@ -206,7 +206,7 @@ export class IngestDataChangeService implements DataChangeService {
 
     const rundownSynchronizeResult: RundownSynchronizeResult = this.ingestRundownSynchronizer.synchronizeRundown(emptyRundown, ingestedRundown)
     const createdRundown: Rundown = rundownSynchronizeResult.updatedRundown ?? emptyRundown
-    this.logRundownSynchronizeResult(rundownSynchronizeResult, `Creating rundown '${createdRundown.name}' with id '${createdRundown.id}' had following effects:`)
+    this.logRundownSynchronizeResult(rundownSynchronizeResult, `Creating the rundown '${createdRundown.name}' with id '${createdRundown.id}' has the following effects:`)
     this.applyRundownSynchronizeResult(createdRundown, rundownSynchronizeResult)
 
     const durationInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
