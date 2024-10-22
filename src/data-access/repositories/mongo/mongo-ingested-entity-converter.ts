@@ -214,6 +214,7 @@ export class MongoIngestedEntityConverter {
     return {
       id: mongoPiece._id,
       partId: mongoPiece.startPartId,
+      rundownId: mongoPiece.startRundownId,
       name: mongoPiece.name,
       layer: mongoPiece.sourceLayerId,
       pieceLifespan: this.mapMongoPieceLifespanToPieceLifespan(mongoPiece.lifespan),

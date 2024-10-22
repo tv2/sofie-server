@@ -110,6 +110,7 @@ export interface MongoPart extends MongoId {
 
 export interface MongoPiece extends MongoId {
   partId: string
+  rundownId: string
   name: string
   layer: string
   pieceLifespan: PieceLifespan
@@ -396,6 +397,7 @@ export class MongoEntityConverter {
     return {
       _id: piece.id,
       partId: piece.getPartId(),
+      rundownId: piece.rundownId,
       name: piece.name,
       layer: piece.layer,
       pieceLifespan: piece.pieceLifespan,

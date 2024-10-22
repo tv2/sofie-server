@@ -96,6 +96,7 @@ export class Tv2RobotActionFactory extends ActionFactory {
       id: `callRobotPreset_${this.sanitizeStringForId(preset + '')}`,
       name: `Call Preset ${preset}`,
       partId: '',
+      rundownId: '',
       layer: Tv2SourceLayer.ROBOT_CAMERA,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,

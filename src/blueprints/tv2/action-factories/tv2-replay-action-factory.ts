@@ -194,6 +194,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     return {
       id: `replayAction_${this.sanitizeStringForId(source.name)}`,
       partId: parentPartId,
+      rundownId: '',
       name: `${source.name}${audioMode === Tv2AudioMode.VOICE_OVER ? ' VO' : ''}`,
       layer: Tv2SourceLayer.REPLAY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
@@ -233,6 +234,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       id: `insert_studio_aux_${sanitizedId}_piece`,
       name: `${source.name} Studio AUX`,
       partId: '',
+      rundownId: '',
       layer: Tv2SourceLayer.REPLAY_STUDIO_AUXILIARY,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
@@ -276,6 +278,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       id: `insert_viz_aux_${sanitizedId}_piece`,
       name: `${source.name} Viz AUX`,
       partId: '',
+      rundownId: '',
       layer: Tv2SourceLayer.REPLAY_VIZ_AUXILIARY,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,

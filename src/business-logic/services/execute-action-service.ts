@@ -163,7 +163,8 @@ export class ExecuteActionService implements ActionService {
     partInterface.pieces = partAction.data.pieceInterfaces.map(pieceInterface => new Piece({
       ...pieceInterface,
       id: this.makeUnique(pieceInterface.id),
-      partId: partInterface.id
+      partId: partInterface.id,
+      rundownId: partInterface.rundownId,
     }))
 
     return new Part(partInterface)
@@ -179,24 +180,25 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async insertPieceAsOnAir(pieceAction: PieceAction, rundownId: string): Promise<void> {
-    const piece: Piece = this.createPieceFromAction(pieceAction)
+    const piece: Piece = this.createPieceFromAction(pieceAction, rundownId)
     piece.setExecutedAt(Date.now())
     await this.rundownService.insertPieceAsOnAir(rundownId, piece, pieceAction.data.layersToStopPiecesOn)
   }
 
-  private createPieceFromAction(pieceAction: PieceAction): Piece {
+  private createPieceFromAction(pieceAction: PieceAction, rundownId: string): Piece {
     const pieceInterface: PieceInterface = pieceAction.data.pieceInterface
     pieceInterface.id = this.makeUnique(pieceInterface.id)
+    pieceInterface.rundownId = rundownId
     return new Piece(pieceInterface)
   }
 
   private async insertPieceAsNext(pieceAction: PieceAction, rundownId: string): Promise<void> {
-    const piece: Piece = this.createPieceFromAction(pieceAction)
+    const piece: Piece = this.createPieceFromAction(pieceAction, rundownId)
     await this.rundownService.insertPieceAsNext(rundownId, piece, pieceAction.data.partInTransition)
   }
 
   private async insertPieceAsNextAndTake(pieceAction: PieceAction, rundownId: string): Promise<void> {
-    const piece: Piece = this.createPieceFromAction(pieceAction)
+    const piece: Piece = this.createPieceFromAction(pieceAction, rundownId)
     await this.rundownService.insertPieceAsNextAndTake(rundownId, piece, pieceAction.data.partInTransition)
   }
 
@@ -227,7 +229,7 @@ export class ExecuteActionService implements ActionService {
       return
     }
 
-    const piece: Piece = this.createPieceFromAction(action as PieceAction)
+    const piece: Piece = this.createPieceFromAction(action as PieceAction, rundownId)
     await this.rundownService.replacePieceOnAirOnNextPart(rundownId, pieceFromRundown, piece)
   }
 }

@@ -105,6 +105,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     return {
       id: `remoteAction_${this.sanitizeStringForId(source.id)}`,
       partId: parentPartId,
+      rundownId: '',
       name: source.name,
       layer: Tv2SourceLayer.REMOTE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
@@ -244,6 +245,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       ingestedPieceId: '',
       ingestedPartId: '',
       partId: partInterface.id,
+      rundownId: '',
       name: piece.name,
       layer: piece.layer,
       pieceLifespan: piece.pieceLifespan,

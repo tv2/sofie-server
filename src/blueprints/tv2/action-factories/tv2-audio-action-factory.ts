@@ -130,6 +130,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
   private createAudioCommandPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>): Tv2PieceInterface {
     return {
       partId: '',
+      rundownId: '',
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       layer: Tv2SourceLayer.AUDIO_ACTION_COMMAND,
@@ -243,6 +244,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
   private createAudioBedPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>): Tv2PieceInterface {
     return {
       partId: '',
+      rundownId: '',
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       layer: Tv2SourceLayer.AUDIO_BED,
