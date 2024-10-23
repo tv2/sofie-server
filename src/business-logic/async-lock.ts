@@ -2,6 +2,7 @@ import { Logger } from '../logger/logger'
 
 interface EnqueuedOperation {
   operation: () => Promise<void>
+  operationName: string
   enqueuedAtTimestampInMs: number
 }
 
@@ -14,14 +15,14 @@ export class AsyncLock {
     this.logger = logger.tag(this.constructor.name)
   }
 
-  public withLock<T>(operation: () => Promise<T>): Promise<T> {
+  public withLock<T>(operationName: string, operation: () => Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {
-      this.enqueueOperation(() => operation().then(resolve).catch(reject))
+      this.enqueueOperation(operationName, () => operation().then(resolve).catch(reject))
     })
   }
 
-  private enqueueOperation(operation: () => Promise<void>): void {
-    this.queuedOperations.push({ operation, enqueuedAtTimestampInMs: Date.now() })
+  private enqueueOperation(operationName: string, operation: () => Promise<void>): void {
+    this.queuedOperations.push({ operation, operationName, enqueuedAtTimestampInMs: Date.now() })
     this.executeQueuedOperation()
   }
 
@@ -49,6 +50,6 @@ export class AsyncLock {
     if (delayInMs < 1) {
       return
     }
-    this.logger.warn(`Operation was delayed by ${delayInMs}ms.`)
+    this.logger.warn(`Operation '${enqueuedOperation.operationName}' was delayed by ${delayInMs}ms.`)
   }
 }
