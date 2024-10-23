@@ -47,8 +47,6 @@ import { Tv2Logger } from '../tv2-logger'
 import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 
-const MINIMUM_DURATION_IN_MS: number = 1000
-
 enum SpecialEffectName {
   MIX = 'Mix',
   DIP = 'Dip'
@@ -165,7 +163,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return true
   }
 
-  private createPieceInterface(effectName: string, durationFrames: number): Tv2PieceInterface {
+  private createPieceInterface(effectName: string, durationInFrames: number): Tv2PieceInterface {
     return {
       id: `${this.sanitizeStringForId(effectName)}TransitionActionPiece`,
       name: `${effectName} transition`,
@@ -176,7 +174,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       transitionType: TransitionType.IN_TRANSITION,
       isPlanned: false,
       start: 0,
-      duration: Math.max(this.frameTimeConverter.convertFramesToMilliseconds(durationFrames), MINIMUM_DURATION_IN_MS),
+      duration: Math.max(this.frameTimeConverter.convertFramesToMilliseconds(durationInFrames), 0),
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
