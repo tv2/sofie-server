@@ -168,10 +168,12 @@ export class Rundown extends BasicRundown {
       return
     }
 
+    this.unmarkNextSegment()
     try {
       const nextPart: Part = this.activeCursor.segment.findNextPart(this.activeCursor.part)
       const nextSegment: Segment | undefined = this.segments.find(segment => segment.id === nextPart.getSegmentId())
       this.nextCursor = this.createCursor(this.nextCursor, { segment: nextSegment, part: nextPart, owner })
+      this.markNextSegment()
       this.markNextPart()
       return
     } catch (exception) {
@@ -180,7 +182,6 @@ export class Rundown extends BasicRundown {
       }
     }
 
-    this.unmarkNextSegment()
     try {
       const segment: Segment = this.findNextValidSegment()
       this.nextCursor = this.createCursor(this.nextCursor, { segment, part: segment.findFirstPart(), owner })
