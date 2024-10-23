@@ -4,6 +4,7 @@ import { IngestedPart } from '../../../model/entities/ingested-part'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedEntityConverter, MongoIngestedPart } from './mongo-ingested-entity-converter'
 import { IngestedPieceRepository } from '../interfaces/ingested-piece-repository'
+import { IngestedPiece } from '../../../model/entities/ingested-piece'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest rename to "ingestedParts"
 
@@ -21,20 +22,15 @@ export class MongoIngestedPartRepository extends BaseMongoRepository<MongoIngest
     return INGESTED_PART_COLLECTION_NAME
   }
 
-  public async getIngestedPartsForSegment(segmentId: string): Promise<IngestedPart[]> {
-    this.assertDatabaseConnection(this.getIngestedPartsForSegment.name)
-    const mongoIngestedParts: MongoIngestedPart[] = await this.getCollection()
-      .find<MongoIngestedPart>({ segmentId: segmentId })
+  public async getIngestedPartsForRundown(rundownId: string, ingestedPieces: readonly IngestedPiece[]): Promise<IngestedPart[]> {
+    this.assertDatabaseConnection(this.getIngestedPartsForRundown.name)
+    return this.getCollection()
+      .find<MongoIngestedPart>({ rundownId })
+      .map(mongoIngestedPart => ({
+        ...this.mongoIngestedEntityConverter.convertToIngestedPart(mongoIngestedPart),
+        ingestedPieces: ingestedPieces.filter(ingestedPiece => ingestedPiece.partId === mongoIngestedPart._id)
+      }))
       .toArray()
-    const ingestedParts: IngestedPart[] = this.mongoIngestedEntityConverter.convertToIngestedParts(mongoIngestedParts)
-    return Promise.all(
-      ingestedParts.map(async (ingestedPart) => {
-        return {
-          ...ingestedPart,
-          ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesForPart(ingestedPart.id)
-        }
-      })
-    )
   }
 
   public async deleteIngestedPartsForRundown(rundownId: string): Promise<void> {
