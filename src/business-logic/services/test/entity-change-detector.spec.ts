@@ -5,7 +5,7 @@ import { IngestedRundown } from '../../../model/entities/ingested-rundown'
 import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
 import { Segment, SegmentInterface } from '../../../model/entities/segment'
 import { IngestedSegment } from '../../../model/entities/ingested-segment'
-import { Part, PartInterface } from '../../../model/entities/part'
+import { Part } from '../../../model/entities/part'
 import { IngestedPart } from '../../../model/entities/ingested-part'
 import { IngestedPiece } from '../../../model/entities/ingested-piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -81,19 +81,19 @@ describe(EntityChangeDetector.name, () => {
     })
   })
 
-  describe(EntityChangeDetector.prototype.doesPartDifferFromIngestPart.name, () => {
+  describe(EntityChangeDetector.prototype.doesIngestedPartOnPartDifferFromIngestedPart.name, () => {
     describe('when nothing has changed', () => {
       it('returns false', () => {
-        const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'part-a' })
         const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'part-a' })
+        const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'part-a', ingestedPart })
 
         const testee: EntityChangeDetector = createTestee()
 
-        expect(testee.doesPartDifferFromIngestPart(part, ingestedPart)).toBeFalsy()
+        expect(testee.doesIngestedPartOnPartDifferFromIngestedPart(part, ingestedPart)).toBeFalsy()
       })
     })
 
-    const testCases: [string, Partial<PartInterface>, Partial<IngestedPart>][] = [
+    const testCases: [string, Partial<IngestedPart>, Partial<IngestedPart>][] = [
       ['name', { name: 'part-a' }, { name: 'part-a (updated)' }],
       ['rank', { rank: 100 }, { rank: 200 }],
       ['expected duration', { expectedDuration: 100 }, { expectedDuration: 200 }],
@@ -101,17 +101,17 @@ describe(EntityChangeDetector.name, () => {
       ['in transition', { inTransition: { delayPiecesDuration: 0, blockTakeDuration: 0, keepPreviousPartAliveDuration: 0 } }, { inTransition: { delayPiecesDuration: 0, blockTakeDuration: 0, keepPreviousPartAliveDuration: 100 } }],
       ['out transition', { outTransition: { keepAliveDuration: 100 } }, { outTransition: { keepAliveDuration: 200 } }],
       ['auto next', { autoNext: { overlap: 100 } }, { autoNext: { overlap: 200 } }],
-      ['pieces', { pieces: [EntityTestFactory.createPiece({ id: 'piece-a', name: 'hello' })] }, { ingestedPieces: [EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'world' })] }],
+      ['pieces', { ingestedPieces: [EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'hello' })] }, { ingestedPieces: [EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'world' })] }],
     ]
-    testCases.forEach(([attribute, partAttributes, ingestedPartAttributes]) => {
-      describe(`when the ingested part has a different ${attribute} than the part`, () => {
+    testCases.forEach(([attribute, currentIngestedPartAttributes, ingestedPartAttributes]) => {
+      describe(`when the ingested part has a different ${attribute} than the parts ingested part`, () => {
         it('returns true', () => {
-          const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'part-a', ...partAttributes })
+          const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'part-a', ingestedPart: EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'part-a', ...currentIngestedPartAttributes }) })
           const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'part-a', ...ingestedPartAttributes })
 
           const testee: EntityChangeDetector = createTestee()
 
-          expect(testee.doesPartDifferFromIngestPart(part, ingestedPart)).toBeTruthy()
+          expect(testee.doesIngestedPartOnPartDifferFromIngestedPart(part, ingestedPart)).toBeTruthy()
         })
       })
     })

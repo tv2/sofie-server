@@ -35,15 +35,19 @@ export class EntityChangeDetector {
       || segment.definesShowStyleVariant !== ingestSegment.definesShowStyleVariant
   }
 
-  public doesPartDifferFromIngestPart(part: Part, ingestPart: IngestedPart): boolean {
-    return part.name !== ingestPart.name
-      || part.getRank() !== ingestPart.rank
-      || part.expectedDuration !== ingestPart.expectedDuration
-      || part.invalidity?.reason !== ingestPart.invalidity?.reason
-      || this.serializeComplexTypeForComparison(part.getInTransition()) !== this.serializeComplexTypeForComparison(ingestPart.inTransition)
-      || this.serializeComplexTypeForComparison(part.outTransition) !== this.serializeComplexTypeForComparison(ingestPart.outTransition)
-      || part.autoNext?.overlap !== ingestPart.autoNext?.overlap
-      || part.ingestedPart !== undefined && this.doesIngestedPieceSequencesDiffer(part.ingestedPart.ingestedPieces, ingestPart.ingestedPieces)
+  public doesIngestedPartOnPartDifferFromIngestedPart(part: Part, ingestedPart: IngestedPart): boolean {
+    return part.ingestedPart !== undefined && this.doesIngestedPartsDiffer(part.ingestedPart, ingestedPart)
+  }
+
+  private doesIngestedPartsDiffer(ingestedPartA: IngestedPart, ingestedPartB: IngestedPart): boolean {
+    return ingestedPartA.name !== ingestedPartB.name
+      || ingestedPartA.rank !== ingestedPartB.rank
+      || ingestedPartA.expectedDuration !== ingestedPartB.expectedDuration
+      || ingestedPartA.invalidity?.reason !== ingestedPartB.invalidity?.reason
+      || this.serializeComplexTypeForComparison(ingestedPartA.inTransition) !== this.serializeComplexTypeForComparison(ingestedPartB.inTransition)
+      || this.serializeComplexTypeForComparison(ingestedPartA.outTransition) !== this.serializeComplexTypeForComparison(ingestedPartB.outTransition)
+      || ingestedPartA.autoNext?.overlap !== ingestedPartB.autoNext?.overlap
+      || this.doesIngestedPieceSequencesDiffer(ingestedPartA.ingestedPieces, ingestedPartB.ingestedPieces)
   }
 
   private doesIngestedPieceSequencesDiffer(ingestedPieceSequenceA: readonly IngestedPiece[], ingstedPieceSequenceB: readonly IngestedPiece[]): boolean {
