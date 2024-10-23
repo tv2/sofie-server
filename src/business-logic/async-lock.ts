@@ -8,6 +8,7 @@ interface EnqueuedOperation {
 
 export class AsyncLock {
   private isExecutingOperation: boolean = false
+  private lastExecutedOperationName: string = ''
   private readonly queuedOperations: EnqueuedOperation[] = []
   private readonly logger: Logger
 
@@ -35,10 +36,12 @@ export class AsyncLock {
     const enqueuedOperation: EnqueuedOperation | undefined = this.queuedOperations.shift()
     if (!enqueuedOperation) {
       this.isExecutingOperation = false
+      this.lastExecutedOperationName = ''
       return
     }
 
     this.logOperationDelay(enqueuedOperation)
+    this.lastExecutedOperationName = enqueuedOperation.operationName
     enqueuedOperation.operation().catch(() => {}).finally(() => {
       this.isExecutingOperation = false
       this.executeQueuedOperation()
@@ -50,6 +53,7 @@ export class AsyncLock {
     if (delayInMs < 1) {
       return
     }
-    this.logger.warn(`Operation '${enqueuedOperation.operationName}' was delayed by ${delayInMs}ms.`)
+    const lastOperationMessage: string = this.lastExecutedOperationName ? ` The preceding operation was '${this.lastExecutedOperationName}'.` : ''
+    this.logger.warn(`Operation '${enqueuedOperation.operationName}' was delayed by ${delayInMs}ms.${lastOperationMessage}`)
   }
 }
