@@ -11,7 +11,7 @@ import { MongoChangeEvent } from './mongo-enums'
 import { IngestedPiece } from '../../../model/entities/ingested-piece'
 import { Logger } from '../../../logger/logger'
 
-const INGESTED_PART_COLLECTION_NAME: string = 'pieces' // TODO: Once we control ingest changed this to "ingestedPieces"
+const INGESTED_PIECE_COLLECTION_NAME: string = 'pieces' // TODO: Once we control ingest changed this to "ingestedPieces"
 
 export class MongoIngestedPieceChangedListener extends BaseMongoRepository<MongoIngestedPiece> implements DataChangedListener<IngestedPiece> {
 
@@ -27,7 +27,7 @@ export class MongoIngestedPieceChangedListener extends BaseMongoRepository<Mongo
   ) {
     super(mongoDatabase)
     this.logger = logger.tag(MongoIngestedPieceChangedListener.name)
-    mongoDatabase.onConnect(INGESTED_PART_COLLECTION_NAME, () => this.listenForChanges())
+    mongoDatabase.onConnect(INGESTED_PIECE_COLLECTION_NAME, () => this.listenForChanges())
   }
 
   private listenForChanges(): void {
@@ -62,7 +62,7 @@ export class MongoIngestedPieceChangedListener extends BaseMongoRepository<Mongo
   }
 
   protected getCollectionName(): string {
-    return INGESTED_PART_COLLECTION_NAME
+    return INGESTED_PIECE_COLLECTION_NAME
   }
 
   public onCreated(onCreatedCallback: (piece: IngestedPiece) => void): void {
