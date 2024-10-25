@@ -136,6 +136,7 @@ export class Rundown extends BasicRundown {
   }
 
   private resetSegments(): void {
+    this.segments = this.segments.filter(segment => !segment.isUnsynced())
     this.segments.forEach(segment => segment.reset())
   }
 

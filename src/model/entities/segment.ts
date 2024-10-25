@@ -250,6 +250,7 @@ export class Segment {
 
   public reset(): void {
     this.removeUnplannedParts()
+    this.removeUnsyncedParts()
     this.parts.forEach(part => part.reset())
     this.executedAtEpochTime = undefined
   }
