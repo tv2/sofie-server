@@ -102,7 +102,9 @@ export class RepositoryFacade {
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       new MongoIngestedEntityConverter(),
       RepositoryFacade.createRundownBaselineRepository(),
-      RepositoryFacade.createIngestedSegmentRepository()
+      RepositoryFacade.createIngestedSegmentRepository(),
+      RepositoryFacade.createIngestedPartRepository(),
+      RepositoryFacade.createIngestedPieceRepository(),
     )
   }
 

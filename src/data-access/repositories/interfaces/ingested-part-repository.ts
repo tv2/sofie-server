@@ -1,6 +1,7 @@
 import { IngestedPart } from '../../../model/entities/ingested-part'
+import { IngestedPiece } from '../../../model/entities/ingested-piece'
 
 export interface IngestedPartRepository {
-  getIngestedPartsForSegment(segmentId: string): Promise<IngestedPart[]>
+  getIngestedPartsForRundown(rundownId: string, ingestedPieces: readonly IngestedPiece[]): Promise<IngestedPart[]>
   deleteIngestedPartsForRundown(rundownId: string): Promise<void>
 }
