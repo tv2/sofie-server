@@ -746,13 +746,13 @@ export class Rundown extends BasicRundown {
     this.persistentState = rundownPersistentState
   }
 
-  public insertPartAsNext(part: Part): void {
+  public insertPartAsNext(part: Part, nextCursorOwner?: Owner): void {
     this.assertActive(this.insertPartAsNext.name)
     this.assertNotUndefined(this.activeCursor, 'active Segment')
 
     this.updateRankFromOnAirPart(part)
     this.activeCursor.segment.insertPartAfterActivePart(part)
-    this.setNext(this.activeCursor.segment.id, part.id)
+    this.setNext(this.activeCursor.segment.id, part.id, nextCursorOwner)
   }
 
   private updateRankFromOnAirPart(partToBeUpdated: Part): void {

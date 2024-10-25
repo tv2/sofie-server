@@ -298,7 +298,7 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPartAsNext(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.insertPartAsNext(part)
+    rundown.insertPartAsNext(part, Owner.EXTERNAL)
 
     await this.buildAndPersistTimeline(rundown)
 
