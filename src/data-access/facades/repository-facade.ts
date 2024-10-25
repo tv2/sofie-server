@@ -72,6 +72,9 @@ import {
   MongoShowStyleVariantConfigurationListener
 } from '../repositories/mongo/mongo-show-style-variant-configuration-listener'
 import { RundownAggregateRepository } from '../repositories/interfaces/rundown-aggregate-repository'
+import { IngestedPiece } from '../../model/entities/ingested-piece'
+import { PieceRepository } from '../repositories/interfaces/piece-repository'
+import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-ingested-piece-changed-listener'
 
 export class RepositoryFacade {
 
@@ -106,7 +109,7 @@ export class RepositoryFacade {
   public static createIngestedRundownChangeListener(): DataChangedListener<IngestedRundown> {
     return new MongoIngestedRundownChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedRundownRepository(),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }
@@ -138,12 +141,16 @@ export class RepositoryFacade {
   public static createIngestedSegmentChangedListener(): DataChangedListener<IngestedSegment> {
     return new MongoIngestedSegmentChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedSegmentRepository(),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }
 
   public static createPartRepository(): PartRepository {
+    return this.createRundownAggregateRepository()
+  }
+
+  public static createPieceRepository(): PieceRepository {
     return this.createRundownAggregateRepository()
   }
 
@@ -166,7 +173,15 @@ export class RepositoryFacade {
   public static createIngestedPartChangedListener(): DataChangedListener<IngestedPart> {
     return new MongoIngestedPartChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedPartRepository(),
+      new MongoIngestedEntityConverter(),
+      LoggerFacade.createLogger()
+    )
+  }
+
+  public static createIngestedPieceChangedListener(): DataChangedListener<IngestedPiece> {
+    return new MongoIngestedPieceChangedListener(
+      MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }

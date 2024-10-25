@@ -154,6 +154,7 @@ export class IngestedEntityToEntityMapper {
     return new Piece({
       id: ingestedPiece.id,
       partId: ingestedPiece.partId,
+      rundownId: ingestedPiece.rundownId,
       name: ingestedPiece.name,
       layer: ingestedPiece.layer,
       pieceLifespan: ingestedPiece.pieceLifespan,
@@ -175,6 +176,7 @@ export class IngestedEntityToEntityMapper {
     return new Piece({
       id: pieceToBeUpdated.id,
       partId: pieceToBeUpdated.getPartId(),
+      rundownId: pieceToBeUpdated.rundownId,
       name: ingestedPiece.name,
       layer: ingestedPiece.layer,
       pieceLifespan: ingestedPiece.pieceLifespan,

@@ -24,21 +24,6 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository<MongoIng
     return INGESTED_RUNDOWN_COLLECTION_NAME
   }
 
-  public async getIngestedRundowns(): Promise<IngestedRundown[]> {
-    this.assertDatabaseConnection(this.getIngestedRundowns.name)
-    const mongoIngestedRundowns: MongoIngestedRundown[] = await this.getCollection().find<MongoIngestedRundown>({}).toArray()
-    return Promise.all(mongoIngestedRundowns.map(mongoIngestedRundown => this.populateIngestedRundown(mongoIngestedRundown)))
-  }
-
-  private async populateIngestedRundown(mongoIngestedRundown: MongoIngestedRundown): Promise<IngestedRundown> {
-    return {
-      ...this.mongoIngestedEntityConverter.convertToIngestedRundown(mongoIngestedRundown),
-      ingestedSegments: await this.ingestedSegmentRepository.getIngestedSegmentsForRundown(mongoIngestedRundown._id),
-      baselineTimelineObjects: await this.rundownBaselineRepository.getRundownBaseline(mongoIngestedRundown._id)
-
-    }
-  }
-
   public getIngestedRundownIds(): Promise<readonly string[]> {
     this.assertDatabaseConnection(this.getIngestedRundownIds.name)
     return this.getCollection().find({}, { projection: { _id: 1 } }).map(document => document._id).toArray()
