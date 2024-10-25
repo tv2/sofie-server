@@ -276,12 +276,14 @@ export class IngestDataChangeService implements DataChangeService {
     rundownSynchronizeResult.createdSegments.forEach(segment => this.rundownEventEmitter.emitSegmentCreated(rundown, segment))
     rundownSynchronizeResult.updatedSegments.forEach(segment => this.rundownEventEmitter.emitSegmentUpdated(rundown, segment))
 
-    deletedInfo.deletedPartsInfo.filter((deletedPartInfo): deletedPartInfo is Required<DeletedPartInfo> => deletedPartInfo.part !== undefined)
+    const updatedSegmentIds: ReadonlySet<string> = new Set(rundownSynchronizeResult.updatedSegments.map(segment => segment.id))
+    deletedInfo.deletedPartsInfo
+      .filter((deletedPartInfo): deletedPartInfo is Required<DeletedPartInfo> => deletedPartInfo.part !== undefined && !updatedSegmentIds.has(deletedPartInfo.part.getSegmentId()))
       .forEach(({ part, originalSegmentId, originalPartId }) => {
         part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(rundown, part, originalPartId) : this.rundownEventEmitter.emitPartDeleted(rundown, originalSegmentId, originalPartId)
       })
-    rundownSynchronizeResult.createdParts.forEach(part => this.rundownEventEmitter.emitPartCreated(rundown, part))
-    rundownSynchronizeResult.updatedParts.forEach(part => this.rundownEventEmitter.emitPartUpdated(rundown, part))
+    rundownSynchronizeResult.createdParts.filter(part => !updatedSegmentIds.has(part.getSegmentId())).forEach(part => this.rundownEventEmitter.emitPartCreated(rundown, part))
+    rundownSynchronizeResult.updatedParts.filter(part => !updatedSegmentIds.has(part.getSegmentId())).forEach(part => this.rundownEventEmitter.emitPartUpdated(rundown, part))
   }
 
   private wasRundownChanged({ updatedRundown, createdSegments, updatedSegments, deletedSegments, createdParts, updatedParts, deletedParts }: RundownSynchronizeResult): boolean {
