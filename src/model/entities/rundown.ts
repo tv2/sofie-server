@@ -725,7 +725,6 @@ export class Rundown extends BasicRundown {
 
     this.resetSegments()
     this.resetHistory()
-    this.infinitePieces = new Map()
 
     if (this.mode !== RundownMode.INACTIVE) {
       this.setFirstSegmentAndPartNextCursor()
