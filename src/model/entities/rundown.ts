@@ -135,8 +135,11 @@ export class Rundown extends BasicRundown {
     return {...cursor, ...cursorPatch}
   }
 
-  private resetSegments(): void {
+  private removeUnsyncedSegments(): void {
     this.segments = this.segments.filter(segment => !segment.isUnsynced())
+  }
+
+  private resetSegments(): void {
     this.segments.forEach(segment => segment.reset())
   }
 
@@ -723,6 +726,7 @@ export class Rundown extends BasicRundown {
     this.previousPart = undefined
     this.persistentState = undefined
 
+    this.removeUnsyncedSegments()
     this.resetSegments()
     this.resetHistory()
 
