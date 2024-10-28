@@ -331,7 +331,7 @@ export class RundownTimelineService implements RundownService {
   }
 
   private insertPieceAsNextAndEmit(rundown: Rundown, piece: Piece, partInTransition?: InTransition): void {
-    rundown.insertPieceIntoNextPart(piece, partInTransition)
+    rundown.insertPieceIntoNextPart(piece, partInTransition, Owner.EXTERNAL)
     this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getNextPart())
   }
 

@@ -793,12 +793,15 @@ export class Rundown extends BasicRundown {
     this.updateInfinitePieces()
   }
 
-  public insertPieceIntoNextPart(piece: Piece, partInTransition?: InTransition): void {
+  public insertPieceIntoNextPart(piece: Piece, partInTransition?: InTransition, nextCursorOwner?: Owner): void {
     this.assertActive(this.insertPieceIntoNextPart.name)
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
     this.nextCursor.part.insertPiece(piece)
     if (partInTransition) {
       this.nextCursor.part.updateInTransition(partInTransition)
+    }
+    if (nextCursorOwner) {
+      this.nextCursor = this.createCursor(this.nextCursor, { owner: nextCursorOwner })
     }
   }
 
