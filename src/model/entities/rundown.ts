@@ -135,6 +135,10 @@ export class Rundown extends BasicRundown {
     return {...cursor, ...cursorPatch}
   }
 
+  private removeUnsyncedSegments(): void {
+    this.segments = this.segments.filter(segment => !segment.isUnsynced())
+  }
+
   private resetSegments(): void {
     this.segments.forEach(segment => segment.reset())
   }
@@ -246,19 +250,9 @@ export class Rundown extends BasicRundown {
 
   public deactivate(): void {
     this.assertActive(this.deactivate.name)
-    this.deactivateActivePartAndSegment()
-    this.unmarkNextSegment()
-    this.unmarkNextPart()
-    this.segments.forEach(segment => segment.takeOffAir())
-    this.nextCursor = undefined
-    this.infinitePieces = new Map()
     this.mode = RundownMode.INACTIVE
-    this.previousPart = undefined
-    this.persistentState = undefined
-
-    this.resetSegments()
-    this.resetHistory()
-    this.infinitePieces = new Map()
+    this.reset()
+    this.clearNextCursor()
   }
 
   private assertActive(operationName: string): void {
@@ -267,7 +261,7 @@ export class Rundown extends BasicRundown {
     }
   }
 
-  private deactivateActivePartAndSegment(): void {
+  private clearActiveCursor(): void {
     if (!this.activeCursor) {
       return
     }
@@ -726,9 +720,25 @@ export class Rundown extends BasicRundown {
   }
 
   public reset(): void {
-    const isRundownInRehearsalBeforeResetting: boolean = this.mode === RundownMode.REHEARSAL
-    this.deactivate()
-    isRundownInRehearsalBeforeResetting ? this.enterRehearsal() : this.activate()
+    this.clearActiveCursor()
+    this.clearNextCursor()
+    this.infinitePieces = new Map()
+    this.previousPart = undefined
+    this.persistentState = undefined
+
+    this.removeUnsyncedSegments()
+    this.resetSegments()
+    this.resetHistory()
+
+    if (this.mode !== RundownMode.INACTIVE) {
+      this.setFirstSegmentAndPartNextCursor()
+    }
+  }
+
+  private clearNextCursor(): void {
+    this.unmarkNextSegment()
+    this.unmarkNextPart()
+    this.nextCursor = undefined
   }
 
   public getPersistentState(): RundownPersistentState {
