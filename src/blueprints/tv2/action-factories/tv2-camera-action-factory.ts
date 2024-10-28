@@ -74,6 +74,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
     return {
       id: `cameraAction_${this.sanitizeStringForId(source.id)}`,
       partId: parentPartId,
+      rundownId: '',
       name: `KAM ${source.name}`,
       layer: Tv2SourceLayer.CAMERA,
       pieceLifespan: PieceLifespan.WITHIN_PART,

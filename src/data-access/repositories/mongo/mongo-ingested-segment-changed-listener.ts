@@ -1,18 +1,15 @@
 import { DataChangedListener } from '../interfaces/data-changed-listener'
 import { MongoDatabase } from './mongo-database'
-import { MongoIngestedSegment } from './mongo-ingested-entity-converter'
+import { MongoIngestedEntityConverter, MongoIngestedSegment } from './mongo-ingested-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
 import {
   ChangeStream,
   ChangeStreamDeleteDocument,
   ChangeStreamDocument,
-  ChangeStreamInsertDocument,
   ChangeStreamOptions,
-  ChangeStreamReplaceDocument
 } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedSegment } from '../../../model/entities/ingested-segment'
-import { IngestedSegmentRepository } from '../interfaces/ingested-segment-repository'
 import { Logger } from '../../../logger/logger'
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest changed this to "ingestedSegments"
@@ -26,7 +23,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository<Mon
 
   constructor(
     mongoDatabase: MongoDatabase,
-    private readonly ingestedSegmentRepository: IngestedSegmentRepository,
+    private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     logger: Logger
   ) {
     super(mongoDatabase)
@@ -37,18 +34,14 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository<Mon
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedSegment>) => {
-      this.onChange(change).catch(error => this.logger.data({ event: change, error }).error('Failed processing ingested segment change event.'))
-    })
+    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedSegment>) => this.onChange(change))
     this.logger.debug('Listening for Segment collection changes...')
   }
 
-  private async onChange(change: ChangeStreamDocument<MongoIngestedSegment>): Promise<void> {
+  private onChange(change: ChangeStreamDocument<MongoIngestedSegment>): void {
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
-        const insertChange: ChangeStreamInsertDocument<MongoIngestedSegment> = change as ChangeStreamInsertDocument<MongoIngestedSegment>
-        const ingestedSegmentId: string = insertChange.fullDocument._id
-        const ingestedSegment: IngestedSegment = await this.ingestedSegmentRepository.getIngestedSegment(ingestedSegmentId)
+        const ingestedSegment: IngestedSegment = this.mongoIngestedEntityConverter.convertToIngestedSegment(change.fullDocument)
         this.onCreatedCallback(ingestedSegment)
         break
       }
@@ -59,9 +52,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository<Mon
         break
       }
       case MongoChangeEvent.REPLACE: {
-        const replaceChange: ChangeStreamReplaceDocument<MongoIngestedSegment> = change as ChangeStreamReplaceDocument<MongoIngestedSegment>
-        const ingestedSegmentId: string = replaceChange.fullDocument._id
-        const ingestedSegment: IngestedSegment = await this.ingestedSegmentRepository.getIngestedSegment(ingestedSegmentId)
+        const ingestedSegment: IngestedSegment = this.mongoIngestedEntityConverter.convertToIngestedSegment(change.fullDocument)
         this.onUpdatedCallback(ingestedSegment)
         break
       }

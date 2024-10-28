@@ -2958,6 +2958,75 @@ describe(Rundown.name, () => {
       verify(mockedSegment3.reset()).once()
     })
 
+    it('removes unsynced segments', () => {
+      const onAirSegmentId: string = 'on-air-segment-id'
+      const onAirPart: Part = EntityTestFactory.createPart({ segmentId: onAirSegmentId, isOnAir: true })
+      const unsyncedOnAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, isUnsynced: true, isOnAir: true, parts: [onAirPart] })
+
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ segmentId: nextSegmentId, isNext: true })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+      const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: onAirPart,
+            segment: unsyncedOnAirSegment,
+            owner: Owner.SYSTEM,
+          },
+          nextCursor: {
+            part: nextPart,
+            segment: nextSegment,
+            owner: Owner.SYSTEM,
+          },
+          infinitePieces: new Map(),
+        },
+        segments: [unsyncedOnAirSegment, nextSegment]
+      }))
+
+      testee.deactivate()
+
+      expect(testee.getSegments().length).toBe(1)
+      expect(testee.getSegments()).toEqual(expect.arrayContaining([expect.objectContaining({ id: nextSegmentId })]))
+    })
+
+    it('removes unsynced parts', () => {
+      const onAirSegmentId: string = 'on-air-segment-id'
+      const unsyncedOnAirPart: Part = EntityTestFactory.createPart({ segmentId: onAirSegmentId, isOnAir: true, isUnsynced: true })
+      const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, isOnAir: true, parts: [unsyncedOnAirPart] })
+
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ segmentId: nextSegmentId, isNext: true })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+      const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: unsyncedOnAirPart,
+            segment: onAirSegment,
+            owner: Owner.SYSTEM,
+          },
+          nextCursor: {
+            part: nextPart,
+            segment: nextSegment,
+            owner: Owner.SYSTEM,
+          },
+          infinitePieces: new Map(),
+        },
+        segments: [onAirSegment, nextSegment]
+      }))
+
+      testee.deactivate()
+
+      expect(testee.getSegments().length).toBe(2)
+      expect(testee.getSegments()).toEqual(expect.arrayContaining([
+        expect.objectContaining({ id: nextSegmentId }),
+        expect.objectContaining({ id: onAirSegmentId, parts: expect.not.arrayContaining([expect.objectContaining({ id: unsyncedOnAirPart.id })]) }),
+      ]))
+    })
+
     it('resets history to an empty array', () => {
       const segment: Segment = EntityMockFactory.createSegment({ parts: [EntityMockFactory.createPart()] })
       const history: Part[] = [
@@ -3061,6 +3130,77 @@ describe(Rundown.name, () => {
       testee.enterRehearsal()
 
       expect(() => testee.getActiveSegment()).toThrow()
+    })
+  })
+
+  describe(Rundown.prototype.reset.name, () => {
+    it('removes unsynced segments', () => {
+      const onAirSegmentId: string = 'on-air-segment-id'
+      const onAirPart: Part = EntityTestFactory.createPart({ segmentId: onAirSegmentId, isOnAir: true })
+      const unsyncedOnAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, isUnsynced: true, isOnAir: true, parts: [onAirPart] })
+
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ segmentId: nextSegmentId, isNext: true })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+      const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: onAirPart,
+            segment: unsyncedOnAirSegment,
+            owner: Owner.SYSTEM,
+          },
+          nextCursor: {
+            part: nextPart,
+            segment: nextSegment,
+            owner: Owner.SYSTEM,
+          },
+          infinitePieces: new Map(),
+        },
+        segments: [unsyncedOnAirSegment, nextSegment]
+      }))
+
+      testee.reset()
+
+      expect(testee.getSegments().length).toBe(1)
+      expect(testee.getSegments()).toEqual(expect.arrayContaining([expect.objectContaining({ id: nextSegmentId })]))
+    })
+
+    it('removes unsynced parts', () => {
+      const onAirSegmentId: string = 'on-air-segment-id'
+      const unsyncedOnAirPart: Part = EntityTestFactory.createPart({ segmentId: onAirSegmentId, isOnAir: true, isUnsynced: true })
+      const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, isOnAir: true, parts: [unsyncedOnAirPart] })
+
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ segmentId: nextSegmentId, isNext: true })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+      const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: unsyncedOnAirPart,
+            segment: onAirSegment,
+            owner: Owner.SYSTEM,
+          },
+          nextCursor: {
+            part: nextPart,
+            segment: nextSegment,
+            owner: Owner.SYSTEM,
+          },
+          infinitePieces: new Map(),
+        },
+        segments: [onAirSegment, nextSegment]
+      }))
+
+      testee.reset()
+
+      expect(testee.getSegments().length).toBe(2)
+      expect(testee.getSegments()).toEqual(expect.arrayContaining([
+        expect.objectContaining({ id: nextSegmentId }),
+        expect.objectContaining({ id: onAirSegmentId, parts: expect.not.arrayContaining([expect.objectContaining({ id: unsyncedOnAirPart.id })]) }),
+      ]))
     })
   })
 
@@ -3700,13 +3840,53 @@ describe(Rundown.name, () => {
         })
       })
     })
+
+    describe('when the next cursor has an external owner', () => {
+      it('does not change the next cursor', () => {
+        const onAirSegmentId: string =  'on-air-segment-id'
+        const onAirPart: Part = EntityTestFactory.createPart({ id: 'on-air-part-id', segmentId: onAirSegmentId, isOnAir: true })
+        const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, parts: [onAirPart] })
+
+        const nextPartId: string = 'next-part-id'
+        const nextSegmentId: string = 'next-segment-id'
+        const nextPart: Part = EntityTestFactory.createPart({ id: nextPartId, segmentId: nextSegmentId, isNext: true })
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, parts: [nextPart] })
+
+        const partToAdd: Part = EntityTestFactory.createPart({ id: 'part-to-add-id', segmentId: onAirSegmentId })
+
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+          segments: [onAirSegment, nextSegment],
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: onAirSegment,
+              part: onAirPart,
+              owner: Owner.SYSTEM,
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: nextPart,
+              owner: Owner.EXTERNAL,
+            },
+            infinitePieces: new Map(),
+          }
+        }))
+
+        testee.addPart(partToAdd)
+
+        const result: Part | undefined = testee.getSegments()
+          .find(segment => segment.id == nextSegmentId)?.getParts()
+          .find(part => part.id === nextPartId)
+        expect(result?.isNext()).toBe(true)
+      })
+    })
   })
 
   describe(Rundown.prototype.updatePart.name, () => {
     describe('Part does not have a Segment id for any Segments in the Rundown', () => {
       it('throws a NotFound exception', () => {
         const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId: 'nonExistingSegmentId' })
-        const testee: Rundown = new Rundown({} as RundownInterface)
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface())
 
         expect(() => testee.updatePart(part)).toThrow(NotFoundException)
       })
@@ -4751,12 +4931,13 @@ function createTesteeWithActiveAndNextCursors(params?: {
     part: params?.nextPart ?? existingNextPart,
     owner: params?.nextOwner ?? Owner.EXTERNAL
   }
-  return new Rundown({
+  return new Rundown(EntityTestFactory.createRundownInterface({
     mode: RundownMode.ACTIVE,
     alreadyActiveProperties: {
       activeCursor,
-      nextCursor
+      nextCursor,
+      infinitePieces: new Map(),
     },
     segments: [existingActiveSegment, existingNextSegment]
-  } as RundownInterface)
+  }))
 }

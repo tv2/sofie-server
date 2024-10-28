@@ -53,10 +53,6 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
     )
   }
 
-  public getPartIdsForRundown(rundownId: string): Promise<readonly string[]> {
-    return this.getCollection().find({ rundownId }).map(document => document._id).toArray()
-  }
-
   public buildSavePartQueries(parts: readonly Part[]): AnyBulkWriteOperation<MongoPart>[] {
     return parts.map(part => this.buildSavePartQuery(part))
   }

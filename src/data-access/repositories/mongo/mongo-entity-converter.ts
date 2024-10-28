@@ -72,7 +72,7 @@ export interface MongoSegment extends MongoId {
   isNext: boolean
   isUnsynced: boolean
   referenceTag?: string
-  budgetDuration?: number
+  expectedDurationInMs?: number
   executedAtEpochTime?: number
   invalidity?: {
     reason: string
@@ -110,6 +110,7 @@ export interface MongoPart extends MongoId {
 
 export interface MongoPiece extends MongoId {
   partId: string
+  rundownId: string
   name: string
   layer: string
   pieceLifespan: PieceLifespan
@@ -324,7 +325,7 @@ export class MongoEntityConverter {
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
       isUnsynced: segment.isUnsynced(),
-      budgetDuration: segment.expectedDurationInMs,
+      expectedDurationInMs: segment.expectedDurationInMs,
       executedAtEpochTime: segment.getExecutedAtEpochTime(),
       invalidity: segment.invalidity,
       definesShowStyleVariant: segment.definesShowStyleVariant
@@ -396,6 +397,7 @@ export class MongoEntityConverter {
     return {
       _id: piece.id,
       partId: piece.getPartId(),
+      rundownId: piece.rundownId,
       name: piece.name,
       layer: piece.layer,
       pieceLifespan: piece.pieceLifespan,

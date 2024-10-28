@@ -139,6 +139,7 @@ export class EntityTestFactory {
     return {
       id: 'pieceId' + Math.floor(Math.random() * 1000),
       partId: 'partId',
+      rundownId: 'rundownId',
       layer: 'some_layer',
       name: 'pieceName',
       start: 0,
@@ -158,6 +159,7 @@ export class EntityTestFactory {
     return {
       id: 'pieceId' + Math.floor(Math.random() * 1000),
       partId: 'partId',
+      rundownId: 'rundownId',
       layer: 'some_layer',
       name: 'pieceName',
       start: 0,

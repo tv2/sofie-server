@@ -5,6 +5,7 @@ import { TimelineObject } from './timeline-object'
 export interface IngestedPiece {
   readonly id: string
   readonly partId: string
+  readonly rundownId: string
   readonly name: string
   readonly layer: string
   readonly pieceLifespan: PieceLifespan
