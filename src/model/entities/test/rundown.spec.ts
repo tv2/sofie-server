@@ -3840,13 +3840,53 @@ describe(Rundown.name, () => {
         })
       })
     })
+
+    describe('when the next cursor has an external owner', () => {
+      it('does not change the next cursor', () => {
+        const onAirSegmentId: string =  'on-air-segment-id'
+        const onAirPart: Part = EntityTestFactory.createPart({ id: 'on-air-part-id', segmentId: onAirSegmentId, isOnAir: true })
+        const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, parts: [onAirPart] })
+
+        const nextPartId: string = 'next-part-id'
+        const nextSegmentId: string = 'next-segment-id'
+        const nextPart: Part = EntityTestFactory.createPart({ id: nextPartId, segmentId: nextSegmentId, isNext: true })
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, parts: [nextPart] })
+
+        const partToAdd: Part = EntityTestFactory.createPart({ id: 'part-to-add-id', segmentId: onAirSegmentId })
+
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+          segments: [onAirSegment, nextSegment],
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: onAirSegment,
+              part: onAirPart,
+              owner: Owner.SYSTEM,
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: nextPart,
+              owner: Owner.EXTERNAL,
+            },
+            infinitePieces: new Map(),
+          }
+        }))
+
+        testee.addPart(partToAdd)
+
+        const result: Part | undefined = testee.getSegments()
+          .find(segment => segment.id == nextSegmentId)?.getParts()
+          .find(part => part.id === nextPartId)
+        expect(result?.isNext()).toBe(true)
+      })
+    })
   })
 
   describe(Rundown.prototype.updatePart.name, () => {
     describe('Part does not have a Segment id for any Segments in the Rundown', () => {
       it('throws a NotFound exception', () => {
         const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId: 'nonExistingSegmentId' })
-        const testee: Rundown = new Rundown({} as RundownInterface)
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface())
 
         expect(() => testee.updatePart(part)).toThrow(NotFoundException)
       })

@@ -749,13 +749,13 @@ export class Rundown extends BasicRundown {
     this.persistentState = rundownPersistentState
   }
 
-  public insertPartAsNext(part: Part): void {
+  public insertPartAsNext(part: Part, nextCursorOwner?: Owner): void {
     this.assertActive(this.insertPartAsNext.name)
     this.assertNotUndefined(this.activeCursor, 'active Segment')
 
     this.updateRankFromOnAirPart(part)
     this.activeCursor.segment.insertPartAfterActivePart(part)
-    this.setNext(this.activeCursor.segment.id, part.id)
+    this.setNext(this.activeCursor.segment.id, part.id, nextCursorOwner)
   }
 
   private updateRankFromOnAirPart(partToBeUpdated: Part): void {
@@ -796,12 +796,15 @@ export class Rundown extends BasicRundown {
     this.updateInfinitePieces()
   }
 
-  public insertPieceIntoNextPart(piece: Piece, partInTransition?: InTransition): void {
+  public insertPieceIntoNextPart(piece: Piece, partInTransition?: InTransition, nextCursorOwner?: Owner): void {
     this.assertActive(this.insertPieceIntoNextPart.name)
     this.assertNotUndefined(this.nextCursor, 'next Cursor')
     this.nextCursor.part.insertPiece(piece)
     if (partInTransition) {
       this.nextCursor.part.updateInTransition(partInTransition)
+    }
+    if (nextCursorOwner) {
+      this.nextCursor = this.createCursor(this.nextCursor, { owner: nextCursorOwner })
     }
   }
 
