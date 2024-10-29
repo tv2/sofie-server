@@ -6,16 +6,85 @@ import { Tv2CasparCgTimelineObjectFactory } from '../../timeline-object-factorie
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
-import { instance, mock } from '@typestrong/ts-mockito'
+import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
 import { Tv2Logger } from '../../tv2-logger'
 import { FrameTimeConverter } from '../../helpers/frame-time-converter'
+import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
+import {
+  Tv2Action,
+  Tv2ActionContentType,
+  Tv2BreakerTransitionEffectActionMetadata,
+  Tv2TransitionEffectAction
+} from '../../value-objects/tv2-action'
+import { MutateActionMethods, MutateActionType, MutateActionWithPieceMethods } from '../../../../model/entities/action'
+import { Breaker, TransitionEffectType } from '../../value-objects/tv2-show-style-blueprint-configuration'
+import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
-  it('compiles', () => {
-    createTestee()
+  describe(Tv2TransitionEffectActionFactory.prototype.getMutateActionMethods.name, () => {
+    describe('it mutates a BreakerTransitionAction', () => {
+      it('has a blockTakeDuration of 4200 ms when breaker duration is 100 frames and casparCg pre roll duration is 200 ms', () => {
+        const breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata = createBreakerActionMetadata(100, 200)
+        testBlockTakeDurationForBreakerAction(breakerActionMetadata, 4200)
+      })
+
+      it('has a blockTakeDuration of 4100 ms when breaker duration is 100 frames and casparCg pre roll duration is 100 ms', () => {
+        const breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata = createBreakerActionMetadata(100, 100)
+        testBlockTakeDurationForBreakerAction(breakerActionMetadata, 4100)
+      })
+
+      it('has a blockTakeDuration of 2200 ms when breaker duration is 50 frames and casparCg pre roll duration is 200 ms', () => {
+        const breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata = createBreakerActionMetadata(50, 200)
+        testBlockTakeDurationForBreakerAction(breakerActionMetadata, 2200)
+      })
+
+      it('has a blockTakeDuration of 2100 ms when breaker duration is 50 frames and casparCg pre roll duration is 100 ms', () => {
+        const breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata = createBreakerActionMetadata(50, 100)
+        testBlockTakeDurationForBreakerAction(breakerActionMetadata, 2100)
+      })
+    })
   })
 })
+
+function createBreakerActionMetadata(durationInFrames: number, casparCgPreRollDurationInMs: number): Tv2BreakerTransitionEffectActionMetadata {
+  return  {
+    breaker: {
+      durationInFrames
+    } as Breaker,
+    casparCgPreRollDuration: casparCgPreRollDurationInMs,
+    breakerFolder: '',
+    contentType: Tv2ActionContentType.TRANSITION,
+    transitionEffectType: TransitionEffectType.BREAKER,
+    downstreamKeyer: {} as Tv2DownstreamKeyer
+  }
+}
+
+function testBlockTakeDurationForBreakerAction(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata, expectedBlockTakeDuration: number): void {
+  const randomSourceInput: number = 1
+  const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = mock<Tv2VideoMixerTimelineObjectFactory>()
+  when(videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(anything())).thenReturn(randomSourceInput)
+
+  const action: Tv2TransitionEffectAction = EntityTestFactory.createPieceAction({
+    metadata: breakerActionMetadata,
+  }) as Tv2TransitionEffectAction
+
+  const frameRate: number = 25
+  const testee: Tv2TransitionEffectActionFactory = createTestee({ videoMixerTimelineObjectFactory, frameTimeConverter: new FrameTimeConverter(frameRate) })
+  const pieceMutateActionMethods: MutateActionWithPieceMethods = getPieceMutateActionMethods(testee, action)
+  const result: Tv2TransitionEffectAction = pieceMutateActionMethods.updateActionWithPiece(action, EntityTestFactory.createPiece()) as Tv2TransitionEffectAction
+
+  expect(result.data.partInTransition?.blockTakeDuration).toBe(expectedBlockTakeDuration)
+}
+
+function getPieceMutateActionMethods(transitionEffectActionFactory: Tv2TransitionEffectActionFactory, action: Tv2Action): MutateActionWithPieceMethods {
+  const mutateActionMethods: MutateActionMethods[] = transitionEffectActionFactory.getMutateActionMethods(action)
+  const pieceMutateActionMethods: MutateActionWithPieceMethods | undefined = mutateActionMethods.find(m => m.type === MutateActionType.PIECE) as MutateActionWithPieceMethods | undefined
+  if (!pieceMutateActionMethods) {
+    throw new Error('No PieceMutateActionsFound')
+  }
+  return pieceMutateActionMethods
+}
 
 function createTestee(params?: {
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,

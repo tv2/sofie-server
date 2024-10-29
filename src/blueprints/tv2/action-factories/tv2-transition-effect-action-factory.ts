@@ -448,7 +448,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createPartInTransitionForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): InTransition {
     return {
-      blockTakeDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames + breakerActionMetadata.casparCgPreRollDuration),
+      blockTakeDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames) + breakerActionMetadata.casparCgPreRollDuration,
       keepPreviousPartAliveDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
       delayPiecesDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
     }

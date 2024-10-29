@@ -9,11 +9,12 @@ import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
 import { TransitionType } from '../../enums/transition-type'
-import { ActionManifest } from '../action'
+import { ActionManifest, PieceAction } from '../action'
 import { IngestedPart } from '../ingested-part'
 import { IngestedPiece } from '../ingested-piece'
 import { IngestedRundown } from '../ingested-rundown'
 import { IngestedSegment } from '../ingested-segment'
+import { PieceActionType } from '../../enums/action-type'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -197,6 +198,20 @@ export class EntityTestFactory {
       actionId: `action-manifest-${process.hrtime.bigint()}`,
       rundownId: 'rundownId',
       ...actionManifest,
+    }
+  }
+
+  public static createPieceAction(action?: Partial<PieceAction>): PieceAction {
+    return {
+      id: 'randomActionId',
+      rundownId: 'randomRundownId',
+      name: 'randomActionName',
+      rank: Math.floor(Math.random() * 100),
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+      data: {
+        pieceInterface: this.createPieceInterface()
+      },
+      ...action
     }
   }
 }
