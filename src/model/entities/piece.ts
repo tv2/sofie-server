@@ -8,6 +8,7 @@ import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 export interface PieceInterface {
   id: string
   partId: string
+  rundownId: string
   name: string
   layer: string
   pieceLifespan: PieceLifespan
@@ -29,6 +30,7 @@ export interface PieceInterface {
 
 export class Piece {
   public readonly id: string
+  public readonly rundownId: string
   public readonly name: string
   public readonly layer: string
   public readonly pieceLifespan: PieceLifespan
@@ -52,6 +54,7 @@ export class Piece {
   constructor(piece: PieceInterface) {
     this.id = piece.id
     this.partId = piece.partId
+    this.rundownId = piece.rundownId
     this.name = piece.name
     this.layer = piece.layer
     this.pieceLifespan = piece.pieceLifespan

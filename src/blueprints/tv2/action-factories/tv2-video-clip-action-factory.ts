@@ -131,6 +131,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
     return {
       id: `videoClipActionPiece_${this.sanitizeStringForId(videoClipData.fileName)}`,
       partId,
+      rundownId: '',
       name: videoClipData.fileName,
       layer: Tv2PieceLayer.VIDEO_CLIP,
       pieceLifespan: PieceLifespan.WITHIN_PART,

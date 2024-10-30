@@ -61,15 +61,16 @@ import { StatusMessageRepository } from '../repositories/interfaces/status-messa
 import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status-message-repository'
 import { MongoCoreDeviceRepository } from '../repositories/mongo/mongo-core-device-repository'
 import { ShowStyle } from '../../model/entities/show-style'
-import {
-  MongoShowStyleChangedListener
-} from '../repositories/mongo/mongo-show-style-changed-listener'
+import { MongoShowStyleChangedListener } from '../repositories/mongo/mongo-show-style-changed-listener'
 import { Database } from '../repositories/interfaces/database'
 import { ShowStyleVariant } from '../../model/entities/show-style-variant'
 import {
   MongoShowStyleVariantConfigurationListener
 } from '../repositories/mongo/mongo-show-style-variant-configuration-listener'
 import { RundownAggregateRepository } from '../repositories/interfaces/rundown-aggregate-repository'
+import { IngestedPiece } from '../../model/entities/ingested-piece'
+import { PieceRepository } from '../repositories/interfaces/piece-repository'
+import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-ingested-piece-changed-listener'
 import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
 import { DeviceRepository } from '../repositories/interfaces/device-repository'
 import { Device } from '../../model/entities/device'
@@ -99,14 +100,16 @@ export class RepositoryFacade {
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       new MongoIngestedEntityConverter(),
       RepositoryFacade.createRundownBaselineRepository(),
-      RepositoryFacade.createIngestedSegmentRepository()
+      RepositoryFacade.createIngestedSegmentRepository(),
+      RepositoryFacade.createIngestedPartRepository(),
+      RepositoryFacade.createIngestedPieceRepository(),
     )
   }
 
   public static createIngestedRundownChangeListener(): DataChangedListener<IngestedRundown> {
     return new MongoIngestedRundownChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedRundownRepository(),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }
@@ -138,12 +141,16 @@ export class RepositoryFacade {
   public static createIngestedSegmentChangedListener(): DataChangedListener<IngestedSegment> {
     return new MongoIngestedSegmentChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedSegmentRepository(),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }
 
   public static createPartRepository(): PartRepository {
+    return this.createRundownAggregateRepository()
+  }
+
+  public static createPieceRepository(): PieceRepository {
     return this.createRundownAggregateRepository()
   }
 
@@ -166,7 +173,15 @@ export class RepositoryFacade {
   public static createIngestedPartChangedListener(): DataChangedListener<IngestedPart> {
     return new MongoIngestedPartChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      RepositoryFacade.createIngestedPartRepository(),
+      new MongoIngestedEntityConverter(),
+      LoggerFacade.createLogger()
+    )
+  }
+
+  public static createIngestedPieceChangedListener(): DataChangedListener<IngestedPiece> {
+    return new MongoIngestedPieceChangedListener(
+      MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      new MongoIngestedEntityConverter(),
       LoggerFacade.createLogger()
     )
   }

@@ -35,8 +35,13 @@ import { IngestRundownSynchronizer } from '../services/ingest-rundown-synchroniz
 import { EntityChangeDetector } from '../services/entity-change-detector'
 import { IngestDataChangeService } from '../services/ingest-data-change-service'
 import { ActionGenerationService } from '../services/action-generation-service'
+import { SynchronizedRundownService } from '../services/synchronized-rundown-service'
+import { AsyncLock } from '../async-lock'
 
 export class ServiceFacade {
+
+  private static readonly rundownLock: AsyncLock = new AsyncLock(LoggerFacade.createLogger())
+
   public static createRundownService(): RundownService {
     const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
       EventEmitterFacade.createRundownEventEmitter(),
@@ -50,8 +55,7 @@ export class ServiceFacade {
       BlueprintsFacade.createBlueprint(),
       LoggerFacade.createLogger(),
     )
-
-    return ThrottledRundownService.getInstance(rundownTimelineService)
+    return ThrottledRundownService.getInstance(new SynchronizedRundownService(rundownTimelineService, this.rundownLock))
   }
 
   public static createTimelineBuilder(): TimelineBuilder {
@@ -85,11 +89,14 @@ export class ServiceFacade {
     return new IngestDataChangeService(
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
+      this.rundownLock,
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPartRepository(),
+      RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
       RepositoryFacade.createIngestedPartChangedListener(),
+      RepositoryFacade.createIngestedPieceChangedListener(),
       ServiceFacade.createIngestRundownSynchronizer(),
       new IngestedEntityToEntityMapper(),
       EventEmitterFacade.createRundownEventEmitter(),

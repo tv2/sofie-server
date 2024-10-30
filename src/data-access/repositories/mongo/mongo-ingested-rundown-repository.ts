@@ -1,11 +1,19 @@
 import { MongoDatabase } from './mongo-database'
-import { MongoIngestedEntityConverter, MongoIngestedRundown } from './mongo-ingested-entity-converter'
+import {
+  MongoIngestedEntityConverter,
+  MongoIngestedRundown,
+} from './mongo-ingested-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { IngestedRundownRepository } from '../interfaces/ingested-rundown-repository'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'
 import { IngestedSegmentRepository } from '../interfaces/ingested-segment-repository'
 import { IngestedRundown } from '../../../model/entities/ingested-rundown'
+import { IngestedSegment } from '../../../model/entities/ingested-segment'
+import { IngestedPart } from '../../../model/entities/ingested-part'
+import { IngestedPiece } from '../../../model/entities/ingested-piece'
+import { IngestedPieceRepository } from '../interfaces/ingested-piece-repository'
+import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest this should be renamed to "ingestedRundowns".
 
@@ -15,28 +23,15 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository<MongoIng
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     private readonly rundownBaselineRepository: RundownBaselineRepository,
-    private readonly ingestedSegmentRepository: IngestedSegmentRepository
+    private readonly ingestedSegmentRepository: IngestedSegmentRepository,
+    private readonly ingestedPartRepository: IngestedPartRepository,
+    private readonly ingestedPieceRepository: IngestedPieceRepository,
   ) {
     super(mongoDatabase)
   }
 
   protected getCollectionName(): string {
     return INGESTED_RUNDOWN_COLLECTION_NAME
-  }
-
-  public async getIngestedRundowns(): Promise<IngestedRundown[]> {
-    this.assertDatabaseConnection(this.getIngestedRundowns.name)
-    const mongoIngestedRundowns: MongoIngestedRundown[] = await this.getCollection().find<MongoIngestedRundown>({}).toArray()
-    return Promise.all(mongoIngestedRundowns.map(mongoIngestedRundown => this.populateIngestedRundown(mongoIngestedRundown)))
-  }
-
-  private async populateIngestedRundown(mongoIngestedRundown: MongoIngestedRundown): Promise<IngestedRundown> {
-    return {
-      ...this.mongoIngestedEntityConverter.convertToIngestedRundown(mongoIngestedRundown),
-      ingestedSegments: await this.ingestedSegmentRepository.getIngestedSegmentsForRundown(mongoIngestedRundown._id),
-      baselineTimelineObjects: await this.rundownBaselineRepository.getRundownBaseline(mongoIngestedRundown._id)
-
-    }
   }
 
   public getIngestedRundownIds(): Promise<readonly string[]> {
@@ -53,9 +48,13 @@ export class MongoIngestedRundownRepository extends BaseMongoRepository<MongoIng
       throw new NotFoundException(`No Rundown found for ingestRundownId: ${rundownId}`)
     }
 
+    const ingestedPieces: IngestedPiece[] = await this.ingestedPieceRepository.getIngestedPiecesForRundown(rundownId)
+    const ingestedParts: IngestedPart[] = await this.ingestedPartRepository.getIngestedPartsForRundown(rundownId, ingestedPieces)
+    const ingestedSegments: IngestedSegment[] = await this.ingestedSegmentRepository.getIngestedSegmentsForRundown(rundownId, ingestedParts)
+
     return {
       ...this.mongoIngestedEntityConverter.convertToIngestedRundown(mongoRundown),
-      ingestedSegments: await this.ingestedSegmentRepository.getIngestedSegmentsForRundown(rundownId),
+      ingestedSegments,
       baselineTimelineObjects: await this.rundownBaselineRepository.getRundownBaseline(rundownId)
     }
   }

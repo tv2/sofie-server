@@ -4,14 +4,14 @@ import { BasicRundown } from '../../../model/entities/basic-rundown'
 import { Logger } from '../../../logger/logger'
 import { Segment } from '../../../model/entities/segment'
 import { Part } from '../../../model/entities/part'
+import { Piece } from '../../../model/entities/piece'
 
 export class CachedRundownAggregateRepository implements RundownAggregateRepository {
-  private static instance: RundownAggregateRepository
 
-  public static getInstance(rundownAggregateRepository: RundownAggregateRepository, logger: Logger): RundownAggregateRepository {
-    if (!this.instance) {
-      this.instance = new CachedRundownAggregateRepository(rundownAggregateRepository, logger)
-    }
+  private static instance?: CachedRundownAggregateRepository
+
+  public static getInstance(rundownAggregateRepository: RundownAggregateRepository, logger: Logger): CachedRundownAggregateRepository {
+    this.instance ??= new CachedRundownAggregateRepository(rundownAggregateRepository, logger)
     return this.instance
   }
 
@@ -51,5 +51,9 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
 
   public getPart(partId: string): Promise<Part> {
     return this.rundownAggregateRepository.getPart(partId)
+  }
+
+  public getPiece(pieceId: string): Promise<Piece> {
+    return this.rundownAggregateRepository.getPiece(pieceId)
   }
 }

@@ -59,6 +59,7 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
   private createVideoSwitcherPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>): Tv2PieceInterface {
     return {
       partId: '',
+      rundownId: '',
       layer: Tv2PieceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,

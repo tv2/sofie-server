@@ -12,6 +12,7 @@ import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaController } from '../controllers/media-controller'
 import { SystemInformationController } from '../controllers/system-information-controller'
 import { DeviceController } from '../controllers/device-controller'
+import { LoggerController } from '../controllers/logger-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -23,7 +24,8 @@ export class ControllerFacade {
       this.createConfigurationController(),
       this.createMediaController(),
       this.createSystemInformationController(),
-      this.createDeviceController()
+      this.createDeviceController(),
+      this.createLoggerController(),
     ]
   }
 
@@ -91,6 +93,14 @@ export class ControllerFacade {
       RepositoryFacade.createStatusMessageRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
+    )
+  }
+
+  private static createLoggerController(): LoggerController {
+    return new LoggerController(
+      new JsendResponseFormatter(),
+      ControllerFacade.createExpressErrorHandler(),
+      LoggerFacade.createLogger()
     )
   }
 

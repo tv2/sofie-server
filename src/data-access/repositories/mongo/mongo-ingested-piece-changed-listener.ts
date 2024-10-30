@@ -3,22 +3,22 @@ import { DataChangedListener } from '../interfaces/data-changed-listener'
 import { MongoDatabase } from './mongo-database'
 import {
   MongoIngestedEntityConverter,
-  MongoIngestedPart,
+  MongoIngestedPiece,
   MongoIngestedSegment
 } from './mongo-ingested-entity-converter'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
-import { IngestedPart } from '../../../model/entities/ingested-part'
+import { IngestedPiece } from '../../../model/entities/ingested-piece'
 import { Logger } from '../../../logger/logger'
 
-const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest changed this to "ingestedParts"
+const INGESTED_PIECE_COLLECTION_NAME: string = 'pieces' // TODO: Once we control ingest changed this to "ingestedPieces"
 
-export class MongoIngestedPartChangedListener extends BaseMongoRepository<MongoIngestedPart> implements DataChangedListener<IngestedPart> {
+export class MongoIngestedPieceChangedListener extends BaseMongoRepository<MongoIngestedPiece> implements DataChangedListener<IngestedPiece> {
 
   private readonly logger: Logger
-  private onCreatedCallback: (part: IngestedPart) => void
-  private onUpdatedCallback: (part: IngestedPart) => void
-  private onDeletedCallback: (partId: string) => void
+  private onCreatedCallback: (piece: IngestedPiece) => void
+  private onUpdatedCallback: (piece: IngestedPiece) => void
+  private onDeletedCallback: (pieceId: string) => void
 
   constructor(
     mongoDatabase: MongoDatabase,
@@ -26,32 +26,32 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository<MongoI
     logger: Logger
   ) {
     super(mongoDatabase)
-    this.logger = logger.tag(MongoIngestedPartChangedListener.name)
-    mongoDatabase.onConnect(INGESTED_PART_COLLECTION_NAME, () => this.listenForChanges())
+    this.logger = logger.tag(MongoIngestedPieceChangedListener.name)
+    mongoDatabase.onConnect(INGESTED_PIECE_COLLECTION_NAME, () => this.listenForChanges())
   }
 
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedSegment, ChangeStreamDocument<MongoIngestedSegment>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedPart>) => this.onChange(change))
-    this.logger.debug('Listening for Part collection changes...')
+    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedPiece>) => this.onChange(change))
+    this.logger.debug('Listening for Piece collection changes...')
   }
 
-  private onChange(change: ChangeStreamDocument<MongoIngestedPart>): void {
+  private onChange(change: ChangeStreamDocument<MongoIngestedPiece>): void {
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
-        const ingestedPart: IngestedPart = this.mongoIngestedEntityConverter.convertToIngestedPart(change.fullDocument)
-        this.onCreatedCallback(ingestedPart)
+        const ingestedPiece: IngestedPiece = this.mongoIngestedEntityConverter.convertToIngestedPiece(change.fullDocument)
+        this.onCreatedCallback(ingestedPiece)
         break
       }
       case MongoChangeEvent.DELETE: {
-        const partId: string = change.documentKey._id
-        this.onDeletedCallback(partId)
+        const pieceId: string = change.documentKey._id
+        this.onDeletedCallback(pieceId)
         break
       }
       case MongoChangeEvent.REPLACE: {
-        const ingestedPart: IngestedPart = this.mongoIngestedEntityConverter.convertToIngestedPart(change.fullDocument)
-        this.onUpdatedCallback(ingestedPart)
+        const ingestedPiece: IngestedPiece = this.mongoIngestedEntityConverter.convertToIngestedPiece(change.fullDocument)
+        this.onUpdatedCallback(ingestedPiece)
         break
       }
       case MongoChangeEvent.UPDATE: {
@@ -62,14 +62,14 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository<MongoI
   }
 
   protected getCollectionName(): string {
-    return INGESTED_PART_COLLECTION_NAME
+    return INGESTED_PIECE_COLLECTION_NAME
   }
 
-  public onCreated(onCreatedCallback: (part: IngestedPart) => void): void {
+  public onCreated(onCreatedCallback: (piece: IngestedPiece) => void): void {
     this.onCreatedCallback = onCreatedCallback
   }
 
-  public onUpdated(onUpdatedCallback: (part: IngestedPart) => void): void {
+  public onUpdated(onUpdatedCallback: (piece: IngestedPiece) => void): void {
     this.onUpdatedCallback = onUpdatedCallback
   }
 

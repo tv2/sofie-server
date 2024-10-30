@@ -223,6 +223,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     return {
       id: `${partId}_piece_${Date.now()}`,
       partId,
+      rundownId: '',
       name,
       layer: Tv2PieceLayer.SPLIT_SCREEN,
       pieceLifespan: PieceLifespan.WITHIN_PART,
@@ -243,6 +244,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     return {
       id: `${piece.getPartId()}_piece_${Date.now()}`,
       partId: piece.getPartId(),
+      rundownId: '',
       name: piece.name,
       layer: Tv2PieceLayer.SPLIT_SCREEN,
       pieceLifespan: PieceLifespan.WITHIN_PART,
@@ -531,6 +533,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         ingestedPieceId: '',
         ingestedPartId: '',
         partId: partInterface.id,
+        rundownId: '',
         name: piece.name,
         layer: piece.layer,
         pieceLifespan: piece.pieceLifespan,
