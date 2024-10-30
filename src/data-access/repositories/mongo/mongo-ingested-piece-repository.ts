@@ -16,10 +16,10 @@ export class MongoIngestedPieceRepository extends BaseMongoRepository<MongoInges
     return INGESTED_PIECE_COLLECTION_NAME
   }
 
-  public async getIngestedPiecesForPart(partId: string): Promise<IngestedPiece[]> {
-    this.assertDatabaseConnection(this.getIngestedPiecesForPart.name)
+  public async getIngestedPiecesForRundown(rundownId: string): Promise<IngestedPiece[]> {
+    this.assertDatabaseConnection(this.getIngestedPiecesForRundown.name)
     const mongoPieces: MongoIngestedPiece[] = (await this.getCollection()
-      .find<MongoIngestedPiece>({ startPartId: partId })
+      .find<MongoIngestedPiece>({ startRundownId: rundownId })
       .toArray())
     return this.mongoEntityConverter.convertToIngestedPieces(mongoPieces)
   }

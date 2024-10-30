@@ -2,7 +2,8 @@ import {
   Action,
   ActionArgumentType,
   MutateActionMethods,
-  MutateActionType, MutateActionWithPieceMethods,
+  MutateActionType,
+  MutateActionWithPieceMethods,
 } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
@@ -45,8 +46,6 @@ import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/t
 import { Tv2Logger } from '../tv2-logger'
 import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
-
-const MINIMUM_DURATION_IN_MS: number = 1000
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 
@@ -167,17 +166,18 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return true
   }
 
-  private createPieceInterface(effectName: string, durationFrames: number): Tv2PieceInterface {
+  private createPieceInterface(effectName: string, durationInFrames: number): Tv2PieceInterface {
     return {
       id: `${this.sanitizeStringForId(effectName)}TransitionActionPiece`,
       name: `${effectName} transition`,
       partId: '',
+      rundownId: '',
       layer: Tv2PieceLayer.JINGLE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.IN_TRANSITION,
       isPlanned: false,
       start: 0,
-      duration: Math.max(this.frameTimeConverter.convertFramesToMilliseconds(durationFrames), MINIMUM_DURATION_IN_MS),
+      duration: Math.max(this.frameTimeConverter.convertFramesToMilliseconds(durationInFrames), 0),
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
@@ -451,7 +451,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createPartInTransitionForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): InTransition {
     return {
-      blockTakeDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames + breakerActionMetadata.casparCgPreRollDuration),
+      blockTakeDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames) + breakerActionMetadata.casparCgPreRollDuration,
       keepPreviousPartAliveDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
       delayPiecesDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
     }

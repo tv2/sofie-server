@@ -254,16 +254,16 @@ export class Part {
     return this.playedDuration
   }
 
-  public getSegmentId(): string {
-    return this.segmentId
-  }
-
   public getRank(): number {
     return this.rank
   }
 
   public updateRank(rank: number): void {
     this.rank = rank
+  }
+
+  public getSegmentId(): string {
+    return this.segmentId
   }
 
   public setSegmentId(segmentId: string): void {

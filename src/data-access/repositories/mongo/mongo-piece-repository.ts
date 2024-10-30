@@ -6,6 +6,7 @@ import {
   ClientSession,
 } from 'mongodb'
 import { MongoEntityConverter, MongoPiece } from './mongo-entity-converter'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
@@ -17,6 +18,17 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
 
   protected getCollectionName(): string {
     return PIECE_COLLECTION_NAME
+  }
+
+  public async getPiece(pieceId: string): Promise<Piece> {
+    this.assertDatabaseConnection(this.getPiece.name)
+    const mongoPiece: MongoPiece | null = await this.getCollection().findOne<MongoPiece>({
+      _id: pieceId
+    })
+    if (!mongoPiece) {
+      throw new NotFoundException(`No piece found with id '${pieceId}'.`)
+    }
+    return this.mongoEntityConverter.convertToPiece(mongoPiece)
   }
 
   public getPieces(partId: string): Promise<Piece[]> {
@@ -50,10 +62,10 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
     }
   }
 
-  public buildDeleteOrphanedPiecesForPartsQuery(partIds: readonly string[], pieces: readonly Piece[]): AnyBulkWriteOperation<MongoPiece> {
+  public buildDeleteOrphanedPiecesForRundownQuery(rundownId: string, pieces: readonly Piece[]): AnyBulkWriteOperation<MongoPiece> {
     return {
       deleteMany: {
-        filter: { partId: { $in: partIds }, _id: { $nin: pieces.map(piece => piece.id) } }
+        filter: { rundownId, _id: { $nin: pieces.map(piece => piece.id) } }
       }
     }
   }
@@ -65,10 +77,10 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
     await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
-  public buildDeletePiecesForRundownQuery(partIds: readonly string[]): AnyBulkWriteOperation<MongoPiece> {
+  public buildDeletePiecesForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoPiece> {
     return {
       deleteMany: {
-        filter: { partId: { $in: partIds } },
+        filter: { rundownId },
       },
     }
   }

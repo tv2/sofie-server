@@ -44,6 +44,7 @@ export class RundownTimelineService implements RundownService {
   public async activateRundown(rundownId: string): Promise<void> {
     await this.assertNoRundownIsActive()
     await this.assertNoRundownIsInRehearsal(rundownId)
+
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBeforeActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
     const rundownModeBeforeActivation: RundownMode = rundown.getMode()
@@ -64,6 +65,7 @@ export class RundownTimelineService implements RundownService {
   public async enterRehearsal(rundownId: string): Promise<void> {
     await this.assertNoRundownIsActive()
     await this.assertNoRundownIsInRehearsal()
+
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const infinitePiecesBeforeRehearsal: Map<string, Piece> = rundown.getInfinitePiecesMap()
     rundown.enterRehearsal()
@@ -228,6 +230,7 @@ export class RundownTimelineService implements RundownService {
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
+    this.deleteUnplayedUnplannedPartsFromActiveSegment(rundown)
     await this.saveRundown(rundown)
   }
 
@@ -239,7 +242,20 @@ export class RundownTimelineService implements RundownService {
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
 
+    this.deleteUnplayedUnplannedPartsFromActiveSegment(rundown)
     await this.saveRundown(rundown)
+  }
+
+  private deleteUnplayedUnplannedPartsFromActiveSegment(rundown: Rundown): void {
+    if (!rundown.isActivePartSet()) {
+      return
+    }
+    rundown.getActiveSegment().getParts().forEach(part => {
+      if (!part.isPlanned && !part.isNext() && part.getExecutedAt() === 0) {
+        rundown.removePartFromSegment(part.id)
+        this.rundownEventEmitter.emitPartDeleted(rundown, part.getSegmentId(), part.id)
+      }
+    })
   }
 
   public async resetRundown(rundownId: string): Promise<void> {
@@ -296,7 +312,7 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPartAsNext(rundownId: string, part: Part): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.insertPartAsNext(part)
+    rundown.insertPartAsNext(part, Owner.EXTERNAL)
 
     await this.buildAndPersistTimeline(rundown)
 
@@ -329,7 +345,7 @@ export class RundownTimelineService implements RundownService {
   }
 
   private insertPieceAsNextAndEmit(rundown: Rundown, piece: Piece, partInTransition?: InTransition): void {
-    rundown.insertPieceIntoNextPart(piece, partInTransition)
+    rundown.insertPieceIntoNextPart(piece, partInTransition, Owner.EXTERNAL)
     this.rundownEventEmitter.emitPartUpdated(rundown, rundown.getNextPart())
   }
 

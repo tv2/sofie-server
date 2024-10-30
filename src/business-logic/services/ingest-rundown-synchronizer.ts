@@ -102,7 +102,7 @@ export class IngestRundownSynchronizer {
         if (!part || part.isOnAir() || affectedSegmentIds.has(ingestedPart.segmentId)) {
           return updatedParts
         }
-        if (!this.ingestEntityDiffer.doesPartDifferFromIngestPart(part, ingestedPart)) {
+        if (!this.ingestEntityDiffer.doesIngestedPartOnPartDifferFromIngestedPart(part, ingestedPart)) {
           return updatedParts
         }
         return [
@@ -127,7 +127,7 @@ export class IngestRundownSynchronizer {
       }
 
       const ingestedPart: IngestedPart | undefined = ingestedParts.find(ingestedPart => part.id === ingestedPart.id)
-      if (ingestedPart && this.ingestEntityDiffer.doesPartDifferFromIngestPart(part, ingestedPart)) {
+      if (ingestedPart && this.ingestEntityDiffer.doesIngestedPartOnPartDifferFromIngestedPart(part, ingestedPart)) {
         return [...deletedParts, part]
       }
       return deletedParts
@@ -140,6 +140,6 @@ export class IngestRundownSynchronizer {
     if (!part || !ingestedPart) {
       return false
     }
-    return part.isOnAir() && this.ingestEntityDiffer.doesPartDifferFromIngestPart(part, ingestedPart)
+    return part.isOnAir() && this.ingestEntityDiffer.doesIngestedPartOnPartDifferFromIngestedPart(part, ingestedPart)
   }
 }
