@@ -3,6 +3,9 @@ import { VideoMixerDeviceRepository } from '../interfaces/video-mixer-device-rep
 import { MongoDatabase } from './mongo-database'
 import { VideoMixerConfiguration } from '../../../model/value-objects/video-mixer-configuration'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { DeviceEventEmitter } from '../../../business-logic/services/interfaces/device-event-emitter'
+import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
+import { MongoChangeEvent } from './mongo-enums'
 
 interface MongoDevice {
   _id: string
@@ -28,8 +31,41 @@ const VIDEO_MIXER_NAME: string = 'atem'
  */
 export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDevice> implements VideoMixerDeviceRepository {
 
-  constructor(mongoDatabase: MongoDatabase) {
+  constructor(mongoDatabase: MongoDatabase, private readonly deviceEventEmitter: DeviceEventEmitter) {
     super(mongoDatabase)
+    mongoDatabase.onConnect(COLLECTION_NAME, () => this.listenForVideoMixerChanges())
+  }
+
+  private listenForVideoMixerChanges(): void {
+    const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
+    const changeStream: ChangeStream = this.getCollection().watch<MongoDevice, ChangeStreamDocument<MongoDevice>>([], options)
+    changeStream.on('change', (change: ChangeStreamDocument<MongoDevice>) => {
+      switch (change.operationType) {
+        case MongoChangeEvent.UPDATE: {
+          const mongoDevice: MongoDevice | undefined = change.fullDocument
+          if (!mongoDevice) {
+            return
+          }
+          const videoMixerConfiguration: VideoMixerConfiguration = this.findVideoMixerConfiguration(mongoDevice)
+          this.deviceEventEmitter.emitVideoMixerConfigurationUpdated(videoMixerConfiguration)
+          break
+        }
+        default: {
+          // Ignore the rest
+        }
+      }
+    })
+  }
+
+  private findVideoMixerConfiguration(mongoDevice: MongoDevice): VideoMixerConfiguration {
+    const key: string | undefined = Object.keys(mongoDevice.settings.devices).find(key => key.includes(VIDEO_MIXER_NAME))
+    if (!key) {
+      throw new NotFoundException('No VideoMixer device configured')
+    }
+    return {
+      hostname: mongoDevice.settings.devices[key].options.host,
+      port: mongoDevice.settings.devices[key].options.port
+    }
   }
 
   protected getCollectionName(): string {
@@ -42,14 +78,6 @@ export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDe
     if (!playoutGateway) {
       throw new NotFoundException('No PlayoutGateway configured')
     }
-
-    const key: string | undefined = Object.keys(playoutGateway.settings.devices).find(key => key.includes(VIDEO_MIXER_NAME))
-    if (!key) {
-      throw new NotFoundException('No VideoMixer device configured')
-    }
-    return {
-      hostname: playoutGateway.settings.devices[key].options.host,
-      port: playoutGateway.settings.devices[key].options.port
-    }
+    return this.findVideoMixerConfiguration(playoutGateway)
   }
 }

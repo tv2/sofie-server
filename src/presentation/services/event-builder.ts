@@ -65,7 +65,13 @@ import { ActionsUpdatedEvent } from '../value-objects/action-event'
 import { ActionDto } from '../dtos/action-dto'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import { Device } from '../../model/entities/device'
-import { DeviceCreatedEvent, DeviceDeletedEvent, DeviceUpdatedEvent } from '../value-objects/device-event'
+import {
+  DeviceCreatedEvent,
+  DeviceDeletedEvent,
+  DeviceUpdatedEvent,
+  VideoMixerConfigurationUpdatedEvent
+} from '../value-objects/device-event'
+import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
 
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
@@ -365,6 +371,14 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
       type: DeviceEventType.DEVICE_DELETED,
       timestamp: Date.now(),
       deviceId
+    }
+  }
+
+  public buildVideoMixerConfigurationUpdatedEvent(videoMixerConfiguration: VideoMixerConfiguration): VideoMixerConfigurationUpdatedEvent {
+    return {
+      type: DeviceEventType.VIDEO_MIXER_CONFIGURATION_UPDATED,
+      videoMixer: videoMixerConfiguration,
+      timestamp: Date.now()
     }
   }
 }
