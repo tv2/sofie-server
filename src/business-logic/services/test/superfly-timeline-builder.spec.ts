@@ -15,6 +15,7 @@ import { StudioLayer } from '../../../model/value-objects/studio-layer'
 import { LookaheadMode } from '../../../model/enums/lookahead-mode'
 import { LastPartInRundownException } from '../../../model/exceptions/last-part-in-rundown-exception'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
+import {Segment} from '../../../model/entities/segment'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -3140,7 +3141,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3173,7 +3175,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3205,7 +3208,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3237,7 +3241,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3269,7 +3274,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3303,7 +3309,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3339,7 +3346,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3375,7 +3383,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     timelineObjects: [timelineObject],
                   })
                   const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                  const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                  const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                  const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
@@ -3412,7 +3421,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     timelineObjects: [timelineObject],
                   })
                   const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                  const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                  const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                  const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
@@ -3448,7 +3458,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     timelineObjects: [timelineObject],
                   })
                   const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                  const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+                  const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                  const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
@@ -3492,7 +3503,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                 timelineObjects: [timelineObjectOne, timelineObjectTwo],
               })
               const activePart: Part = EntityMockFactory.createPart({pieces: [piece]})
-              const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart})
+              const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+              const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart}, {segments: [activeSegment]})
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: timelineObjectOne.layer,
@@ -3590,7 +3602,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+                const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3623,7 +3636,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+                const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3655,7 +3669,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+                const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3688,7 +3703,9 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
                 const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
                 const activePart: Part = EntityMockFactory.createPart({id: 'activePartId'})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart, nextPart})
+                const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({activePart, nextPart}, {segments: [activeSegment, nextSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3722,7 +3739,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+                const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3758,7 +3776,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+                const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
                     name: timelineObject.layer,
@@ -3794,7 +3813,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     timelineObjects: [timelineObject],
                   })
                   const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                  const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+                  const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                  const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
@@ -3831,7 +3851,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     timelineObjects: [timelineObject],
                   })
                   const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                  const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+                  const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                  const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
@@ -3867,7 +3888,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     timelineObjects: [timelineObject],
                   })
                   const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-                  const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+                  const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+                  const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
                   const studioLayers: StudioLayer[] = [
                     createStudioLayer({
                       name: timelineObject.layer,
@@ -3911,7 +3933,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                 timelineObjects: [timelineObjectOne, timelineObjectTwo],
               })
               const nextPart: Part = EntityMockFactory.createPart({pieces: [piece]})
-              const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart})
+              const nextSegment: Segment = EntityMockFactory.createSegment({parts: [nextPart]})
+              const rundown: Rundown = EntityMockFactory.createActiveRundown({nextPart}, {segments: [nextSegment]})
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
                   name: timelineObjectOne.layer,
@@ -3952,6 +3975,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [firstTimelineObject],
                 })
                 const firstPart: Part = EntityMockFactory.createPart({pieces: [firstPiece]})
+                const firstSegment: Segment = EntityMockFactory.createSegment({parts: [firstPart]})
 
                 const secondTimelineObject: TimelineObject = {
                   id: 'secondTimelineObject',
@@ -3961,11 +3985,13 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [secondTimelineObject],
                 })
                 const secondPart: Part = EntityMockFactory.createPart({pieces: [secondPiece]})
+                const secondSegment: Segment = EntityMockFactory.createSegment({parts: [secondPart]})
 
                 const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                   nextPart: firstPart,
+                }, {
+                  segments: [firstSegment, secondSegment]
                 })
-                when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
 
                 const studioLayers: StudioLayer[] = [
                   createStudioLayer({
@@ -3995,12 +4021,15 @@ describe(SuperflyTimelineBuilder.name, () => {
               it('adds the TimelineObject to the children of the lookahead group', async () => {
                 const firstPiece: Piece = EntityMockFactory.createPiece()
                 const firstPart: Part = EntityMockFactory.createPart({pieces: [firstPiece]})
+                const firstSegment: Segment = EntityMockFactory.createSegment({parts: [firstPart]})
 
                 const secondPiece: Piece = EntityMockFactory.createPiece()
                 const secondPart: Part = EntityMockFactory.createPart({pieces: [secondPiece]})
+                const secondSegment: Segment = EntityMockFactory.createSegment({parts: [secondPart]})
 
                 const thirdPiece: Piece = EntityMockFactory.createPiece()
                 const thirdPart: Part = EntityMockFactory.createPart({pieces: [thirdPiece]})
+                const thirdSegment: Segment = EntityMockFactory.createSegment({parts: [thirdPart]})
 
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
@@ -4010,9 +4039,13 @@ describe(SuperflyTimelineBuilder.name, () => {
                   timelineObjects: [timelineObject],
                 })
                 const lastPart: Part = EntityMockFactory.createPart({pieces: [lastPiece]})
+                const lastSegment: Segment = EntityMockFactory.createSegment({parts: [lastPart]})
 
                 const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                   nextPart: firstPart,
+                },
+                {
+                  segments: [firstSegment, secondSegment, thirdSegment, lastSegment]
                 })
                 when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
                 when(rundown.getPartAfter(secondPart)).thenReturn(thirdPart)
@@ -4101,6 +4134,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 timelineObjects: [activePartTimelineObject],
               })
               const activePart: Part = EntityMockFactory.createPart({pieces: [activePiece]})
+              const activeSegment: Segment = EntityMockFactory.createSegment({parts: [activePart]})
 
               const lookaheadTimelineObject: TimelineObject = {
                 id: 'lookaheadTimelineObject',
@@ -4110,12 +4144,15 @@ describe(SuperflyTimelineBuilder.name, () => {
                 timelineObjects: [lookaheadTimelineObject],
               })
               const lookAheadPart: Part = EntityMockFactory.createPart({pieces: [lookAheadPiece]})
+              const lookAheadSegment: Segment = EntityMockFactory.createSegment({parts: [lookAheadPart]})
 
               const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                 activePart,
                 nextPart: lookAheadPart,
+              },
+              {
+                segments: [activeSegment, lookAheadSegment]
               })
-              when(rundown.getPartAfter(activePart)).thenReturn(lookAheadPart)
 
               const studioLayers: StudioLayer[] = [
                 createStudioLayer({
@@ -4151,6 +4188,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 timelineObjects: [firstTimelineObject],
               })
               const firstPart: Part = EntityMockFactory.createPart({pieces: [firstPiece]})
+              const firstSegment: Segment = EntityMockFactory.createSegment({parts: [firstPart]})
 
               const secondTimelineObject: TimelineObject = {
                 id: 'secondTimelineObject',
@@ -4160,9 +4198,12 @@ describe(SuperflyTimelineBuilder.name, () => {
                 timelineObjects: [secondTimelineObject],
               })
               const secondPart: Part = EntityMockFactory.createPart({pieces: [secondPiece]})
+              const secondSegment: Segment = EntityMockFactory.createSegment({parts: [secondPart]})
 
               const rundown: Rundown = EntityMockFactory.createActiveRundownMock({
                 nextPart: firstPart,
+              }, {
+                segments: [firstSegment, secondSegment]
               })
               when(rundown.getPartAfter(firstPart)).thenReturn(secondPart)
 
