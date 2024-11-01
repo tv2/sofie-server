@@ -1,21 +1,22 @@
-import { TimelineBuilder } from '../interfaces/timeline-builder'
-import { SuperflyTimelineBuilder } from '../superfly-timeline-builder'
-import { EntityMockFactory } from '../../../model/entities/test/entity-mock-factory'
-import { Part } from '../../../model/entities/part'
-import { Rundown } from '../../../model/entities/rundown'
-import { Timeline } from '../../../model/entities/timeline'
-import { Piece } from '../../../model/entities/piece'
-import { LookaheadTimelineObject, TimelineObject, TimelineObjectGroup } from '../../../model/entities/timeline-object'
-import { TransitionType } from '../../../model/enums/transition-type'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { ObjectCloner } from '../interfaces/object-cloner'
-import { anything, instance, mock, when } from '@typestrong/ts-mockito'
-import { Studio } from '../../../model/entities/studio'
-import { StudioLayer } from '../../../model/value-objects/studio-layer'
-import { LookaheadMode } from '../../../model/enums/lookahead-mode'
-import { LastPartInRundownException } from '../../../model/exceptions/last-part-in-rundown-exception'
-import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
+import {TimelineBuilder} from '../interfaces/timeline-builder'
+import {SuperflyTimelineBuilder} from '../superfly-timeline-builder'
+import {EntityMockFactory} from '../../../model/entities/test/entity-mock-factory'
+import {Part} from '../../../model/entities/part'
+import {Rundown} from '../../../model/entities/rundown'
+import {Timeline} from '../../../model/entities/timeline'
+import {Piece} from '../../../model/entities/piece'
+import {LookaheadTimelineObject, TimelineObject, TimelineObjectGroup} from '../../../model/entities/timeline-object'
+import {TransitionType} from '../../../model/enums/transition-type'
+import {PieceLifespan} from '../../../model/enums/piece-lifespan'
+import {ObjectCloner} from '../interfaces/object-cloner'
+import {anything, instance, mock, when} from '@typestrong/ts-mockito'
+import {Studio} from '../../../model/entities/studio'
+import {StudioLayer} from '../../../model/value-objects/studio-layer'
+import {LookaheadMode} from '../../../model/enums/lookahead-mode'
+import {LastPartInRundownException} from '../../../model/exceptions/last-part-in-rundown-exception'
+import {EntityTestFactory} from '../../../model/entities/test/entity-test-factory'
 import {Segment} from '../../../model/entities/segment'
+import {RundownMode} from '../../../model/enums/rundown-mode'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -4266,6 +4267,39 @@ describe(SuperflyTimelineBuilder.name, () => {
               expect(lookaheadGroup.children).toHaveLength(0)
             })
           })
+        })
+      })
+
+      describe('there is no next cursor', () => {
+        it('returns empty lookahead group', async () => {
+          const rundown: Rundown = EntityTestFactory.createRundown({
+            segments: [],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: undefined,
+              nextCursor: undefined,
+              infinitePieces: new Map()
+            }
+          })
+
+          const studioLayers: StudioLayer[] = [
+            createStudioLayer({
+              name: 'someLayer',
+              maximumLookaheadSearchDistance: 10,
+              lookaheadMode: LookaheadMode.WHEN_CLEAR,
+            }),
+          ]
+
+          const testee: TimelineBuilder = createTestee()
+          const timeline: Timeline = await testee.buildTimeline(
+            rundown,
+            createBasicStudioMock(studioLayers)
+          )
+
+          const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
+            (group) => group.id === LOOKAHEAD_GROUP_ID
+          )!
+          expect(lookaheadGroup.children).toHaveLength(0)
         })
       })
     })

@@ -328,7 +328,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   }
 
   private findLookaheadTimelineObjectsForLayers(lookaheadLayers: StudioLayer[], rundown: Rundown, activeGroup: TimelineObjectGroup | undefined): TimelineObject[] {
-    if (rundown.isActive() && rundown.getSegments().length === 0) {
+    if (rundown.getSegments().length === 0) {
       return []
     }
     return lookaheadLayers.flatMap((layer) => {
