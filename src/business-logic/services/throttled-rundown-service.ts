@@ -43,7 +43,6 @@ export class ThrottledRundownService implements RundownService {
   }
 
   public resetRundown(rundownId: string): Promise<void> {
-    this.assertEnoughTimeHasPassed()
     return this.rundownService.resetRundown(rundownId)
   }
 

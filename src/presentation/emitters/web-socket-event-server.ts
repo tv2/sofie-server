@@ -15,6 +15,9 @@ import { StatusMessageEventObserver } from '../interfaces/status-message-event-o
 import { StatusMessageEvent } from '../value-objects/status-message-event'
 import { ActionEventObserver } from '../interfaces/action-event-observer'
 import { ActionEvent } from '../value-objects/action-event'
+import { TypedEvent } from '../value-objects/typed-event'
+import { NtpEvent } from '../value-objects/ntp-event'
+import { NtpEventType } from '../enums/event-type'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer
@@ -114,6 +117,40 @@ export class WebSocketEventServer implements EventServer {
     this.statusMessageEventObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => {
       webSocket.send(JSON.stringify(statusMessageEvent))
     })
+
+    webSocket.onmessage = (message: WebSocket.MessageEvent): void => {
+      const messageText: string = message.data.toString()
+      const event: TypedEvent | undefined = this.parseTypedEvent(messageText)
+
+      if (!event) {
+        this.logger.warn(`Expected typed event, but got: ${messageText}`)
+        return
+      }
+
+      if (event.type === NtpEventType.NTP) {
+        const ntpEvent: NtpEvent = { type: event.type, clientTimestamp: event.timestamp, timestamp: Date.now() }
+        webSocket.send(JSON.stringify(ntpEvent))
+      }
+    }
+  }
+
+  private parseTypedEvent(eventText: string): TypedEvent | undefined {
+    try {
+      const event: unknown = JSON.parse(eventText)
+      return this.isTypedEvent(event) ? event : undefined
+    } catch {
+      return
+    }
+  }
+
+  private isTypedEvent(event: unknown): event is TypedEvent {
+    if (typeof event !== 'object' || event === null) {
+      return false
+    }
+    if (!('type' in event) || typeof event.type !== 'string') {
+      return false
+    }
+    return 'timestamp' in event && typeof event.timestamp === 'number'
   }
 
   public stopServer(): void {
