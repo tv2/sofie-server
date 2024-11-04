@@ -1,4 +1,4 @@
-export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | ActionTriggerEventType
+export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | ActionTriggerEventType | NtpEventType
 
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
@@ -48,4 +48,8 @@ export enum ActionTriggerEventType {
 
 export enum StatusMessageEventType {
   STATUS_MESSAGE = 'STATUS_MESSAGE'
+}
+
+export enum NtpEventType {
+  NTP = 'NTP'
 }
