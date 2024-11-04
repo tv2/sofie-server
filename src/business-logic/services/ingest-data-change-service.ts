@@ -328,7 +328,9 @@ export class IngestDataChangeService implements DataChangeService {
     if (rundown.isActive()) {
       const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
       await this.timelineRepository.saveTimeline(timeline)
-      this.rundownEventEmitter.emitSetNextEvent(rundown)
+      if (rundown.getSegments().length > 0) {
+        this.rundownEventEmitter.emitSetNextEvent(rundown)
+      }
     }
   }
 }
