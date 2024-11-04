@@ -21,13 +21,12 @@ interface MongoDevice {
 }
 
 const COLLECTION_NAME: string = 'peripheralDevices'
-
 const PLAYOUT_GATEWAY_POSTFIX: string = 'PlayoutCoreParent'
 const VIDEO_MIXER_NAME: string = 'atem'
 
 /**
- * This Repository only exist to fetch the hostname and port of the configured VideoMixer (currently hardcoded to Atem) while device settings resides in Sofie.
- * Once proper device settings is introduced in Alba. This SHOULD be deleted!
+ * This Repository only exists to fetch the hostname and port of the configured VideoMixer (currently hardcoded to Atem) while device settings reside in Sofie.
+ * Once proper device settings are introduced in Alba this SHOULD be deleted!
  */
 export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDevice> implements VideoMixerDeviceRepository {
 
@@ -58,13 +57,13 @@ export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDe
   }
 
   private findVideoMixerConfiguration(mongoDevice: MongoDevice): VideoMixerConfiguration {
-    const key: string | undefined = Object.keys(mongoDevice.settings.devices).find(key => key.includes(VIDEO_MIXER_NAME))
-    if (!key) {
+    const deviceName: string | undefined = Object.keys(mongoDevice.settings.devices).find(key => key.includes(VIDEO_MIXER_NAME))
+    if (!deviceName) {
       throw new NotFoundException('No VideoMixer device configured')
     }
     return {
-      hostname: mongoDevice.settings.devices[key].options.host,
-      port: mongoDevice.settings.devices[key].options.port
+      hostname: mongoDevice.settings.devices[deviceName].options.host,
+      port: mongoDevice.settings.devices[deviceName].options.port
     }
   }
 
