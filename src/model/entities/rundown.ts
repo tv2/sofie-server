@@ -88,21 +88,25 @@ export class Rundown extends BasicRundown {
 
   public activate(): void {
     if (this.isActive()) {
-      throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated')
+      throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated.')
     }
     if (this.mode === RundownMode.REHEARSAL) {
       this.mode = RundownMode.ACTIVE
       return
+    }
+    const hasValidSegments: boolean = this.segments.some(segment => this.isSegmentValidForRundownExecution(segment))
+    if (!hasValidSegments) {
+      throw new UnsupportedOperationException('Can\'t activate a Rundown that has no valid Segment.')
     }
     this.initializeRundown(RundownMode.ACTIVE)
   }
 
   public enterRehearsal() :void {
     if (this.isActive()) {
-      throw new AlreadyActivatedException('Can\'t set Rundown to rehearsal since it is already activated')
+      throw new AlreadyActivatedException('Can\'t set Rundown to rehearsal since it is already activated.')
     }
     if (this.getMode() === RundownMode.REHEARSAL) {
-      throw new AlreadyRehearsalException('Can\'t set Rundown to rehearsal since it is already in rehearsal')
+      throw new AlreadyRehearsalException('Can\'t set Rundown to rehearsal since it is already in rehearsal.')
     }
     this.initializeRundown(RundownMode.REHEARSAL)
   }
@@ -314,7 +318,7 @@ export class Rundown extends BasicRundown {
         throw exception
       }
       if (segmentIndexForPart + 1 === this.segments.length) {
-        throw new LastPartInRundownException(`Part: ${part.id} is the last Part of Rundown: ${this.id}`)
+        throw new LastPartInRundownException(`Part: ${part.id} is the last Part of Rundown: ${this.id}.`)
       }
       return this.findFirstPartOfValidSegmentSkippingUnsyncedSegments(segmentIndexForPart + 1)
     }
