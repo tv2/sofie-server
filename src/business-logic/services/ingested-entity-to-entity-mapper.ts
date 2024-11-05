@@ -74,14 +74,20 @@ export class IngestedEntityToEntityMapper {
       isUnsynced: false, // Updated are never unsynced since Core removes and adds new Segments instead of updating them
       expectedDurationInMs: ingestedSegment.budgetDuration,
       executedAtEpochTime: segmentToBeUpdated.getExecutedAtEpochTime(),
-      parts: segmentToBeUpdated.getParts().map(part => {
-        const ingestedPart: IngestedPart | undefined = ingestedSegment.ingestedParts.find(ingestedPart => ingestedPart.id === part.id)
-        if (!ingestedPart) {
-          return part
-        }
-        return this.updatePartWithIngestedPart(part, ingestedPart)
-      }),
+      parts: this.mergePartsWithIngestedParts(segmentToBeUpdated.getParts(), ingestedSegment.ingestedParts)
     })
+  }
+
+  private mergePartsWithIngestedParts(parts: readonly Part[], ingestedParts: readonly IngestedPart[]): Part[] {
+    const existingPartsMap: Readonly<Record<string, Part>> = Object.fromEntries(parts.map(part => [part.id, part]))
+    const updatedPartsMap: Readonly<Record<string, Part>> = ingestedParts.reduce((updatedPartsMap, ingestedPart) => {
+      const part: Part | undefined = existingPartsMap[ingestedPart.id]
+      return {
+        ...updatedPartsMap,
+        [ingestedPart.id]: part ? this.updatePartWithIngestedPart(part, ingestedPart) : this.convertIngestedPartToPart(ingestedPart)
+      }
+    }, existingPartsMap)
+    return Object.values(updatedPartsMap).sort((partA, partB) => partA.getRank() - partB.getRank())
   }
 
   public convertIngestedPartToPart(ingestedPart: IngestedPart): Part {

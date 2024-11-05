@@ -3,8 +3,56 @@ import { Part } from '../../../model/entities/part'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { IngestedPart } from '../../../model/entities/ingested-part'
 import { IngestedPiece } from '../../../model/entities/ingested-piece'
+import { Segment } from '../../../model/entities/segment'
+import { IngestedSegment } from '../../../model/entities/ingested-segment'
 
 describe(IngestedEntityToEntityMapper.name, () => {
+  describe(IngestedEntityToEntityMapper.prototype.updateSegmentWithIngestedSegment, () => {
+    describe('when ingested segment has new parts', () => {
+      it('adds the new parts', () => {
+        const segmentId: string = 'segment-id'
+        const partId: string = 'part-id'
+        const part: Part = EntityTestFactory.createPart({ id: partId, segmentId })
+        const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts: [part] })
+
+        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: partId, segmentId })
+        const newPartId: string = 'new-part-id'
+        const newIngestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: newPartId, segmentId })
+        const ingestedSegment: IngestedSegment = EntityTestFactory.createIngestedSegment({ id: segmentId, ingestedParts: [ingestedPart, newIngestedPart] })
+
+        const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
+
+        const result: Segment = testee.updateSegmentWithIngestedSegment(segment, ingestedSegment)
+
+        expect(result.getParts()).toEqual([
+          expect.objectContaining({ id: partId }),
+          expect.objectContaining({ id: newPartId }),
+        ])
+      })
+
+      it('preserves the rank ordering', () => {
+        const segmentId: string = 'segment-id'
+        const partId: string = 'part-id'
+        const part: Part = EntityTestFactory.createPart({ id: partId, segmentId, rank: 10 })
+        const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts: [part] })
+
+        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: partId, segmentId, rank: 10 })
+        const newPartId: string = 'new-part-id'
+        const newIngestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: newPartId, segmentId, rank: 5 })
+        const ingestedSegment: IngestedSegment = EntityTestFactory.createIngestedSegment({ id: segmentId, ingestedParts: [ingestedPart, newIngestedPart] })
+
+        const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
+
+        const result: Segment = testee.updateSegmentWithIngestedSegment(segment, ingestedSegment)
+
+        expect(result.getParts()).toEqual([
+          expect.objectContaining({ id: newPartId }),
+          expect.objectContaining({ id: partId }),
+        ])
+      })
+    })
+  })
+
   describe(IngestedEntityToEntityMapper.prototype.updatePartWithIngestedPart.name, () => {
     describe('ingestedPart has Pieces not on the Part to be updated', () => {
       it('adds the Pieces to the Part', () => {
@@ -76,35 +124,35 @@ describe(IngestedEntityToEntityMapper.name, () => {
         expect(part).toStrictEqual(result)
       })
     })
-  })
 
-  describe('when the part has unplanned pieces', () => {
-    describe('when the ingested part has no overlapping pieces on the same layer', () => {
-      it('keeps the unplanned piece', () => {
-        const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'Part A', pieces: [EntityTestFactory.createPiece({ id: 'unplanned-piece-a', name: 'mix 100', isPlanned: false })] })
-        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'Part A', ingestedPieces: [] })
+    describe('when the part has unplanned pieces', () => {
+      describe('when the ingested part has no overlapping pieces on the same layer', () => {
+        it('keeps the unplanned piece', () => {
+          const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'Part A', pieces: [EntityTestFactory.createPiece({ id: 'unplanned-piece-a', name: 'mix 100', isPlanned: false })] })
+          const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'Part A', ingestedPieces: [] })
 
-        const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
+          const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
 
-        const result: Part = testee.updatePartWithIngestedPart(part, ingestedPart)
+          const result: Part = testee.updatePartWithIngestedPart(part, ingestedPart)
 
-        expect(result.getPieces().length).toBe(1)
-        expect(result.getPieces()).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'mix 100' })]))
+          expect(result.getPieces().length).toBe(1)
+          expect(result.getPieces()).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'mix 100' })]))
+        })
       })
-    })
 
-    describe('when the ingested part has an overlapping piece on the same layer', () => {
-      it('ignores the ingested overlapping piece', () => {
-        const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'Part A', pieces: [EntityTestFactory.createPiece({ id: 'unplanned-piece-a', name: 'mix 100', layer: 'mix_effect', isPlanned: false })] })
-        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'Part A', ingestedPieces: [EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'mix 50', layer: 'mix_effect' })] })
+      describe('when the ingested part has an overlapping piece on the same layer', () => {
+        it('ignores the ingested overlapping piece', () => {
+          const part: Part = EntityTestFactory.createPart({ id: 'part-a', name: 'Part A', pieces: [EntityTestFactory.createPiece({ id: 'unplanned-piece-a', name: 'mix 100', layer: 'mix_effect', isPlanned: false })] })
+          const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'part-a', name: 'Part A', ingestedPieces: [EntityTestFactory.createIngestedPiece({ id: 'piece-a', name: 'mix 50', layer: 'mix_effect' })] })
 
-        const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
+          const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
 
-        const result: Part = testee.updatePartWithIngestedPart(part, ingestedPart)
+          const result: Part = testee.updatePartWithIngestedPart(part, ingestedPart)
 
-        expect(result.getPieces().length).toBe(1)
-        expect(result.getPieces()).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'mix 100' })]))
-        expect(result.getPieces()).toEqual(expect.not.arrayContaining([expect.objectContaining({ name: 'mix 50' })]))
+          expect(result.getPieces().length).toBe(1)
+          expect(result.getPieces()).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'mix 100' })]))
+          expect(result.getPieces()).toEqual(expect.not.arrayContaining([expect.objectContaining({ name: 'mix 50' })]))
+        })
       })
     })
   })
