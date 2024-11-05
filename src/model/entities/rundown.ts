@@ -94,8 +94,7 @@ export class Rundown extends BasicRundown {
       this.mode = RundownMode.ACTIVE
       return
     }
-    const hasValidSegments: boolean = this.segments.some(segment => this.isSegmentValidForRundownExecution(segment))
-    if (!hasValidSegments) {
+    if (!this.doesValidSegmentExistInRundown()) {
       throw new UnsupportedOperationException('Can\'t activate a Rundown that has no valid Segment.')
     }
     this.initializeRundown(RundownMode.ACTIVE)
@@ -108,12 +107,19 @@ export class Rundown extends BasicRundown {
     if (this.getMode() === RundownMode.REHEARSAL) {
       throw new AlreadyRehearsalException('Can\'t set Rundown to rehearsal since it is already in rehearsal.')
     }
+    if (!this.doesValidSegmentExistInRundown()) {
+      throw new UnsupportedOperationException('Can\'t set a Rundown to rehearsal that has no valid Segment.')
+    }
     this.initializeRundown(RundownMode.REHEARSAL)
   }
 
   private initializeRundown(mode: RundownMode): void {
     this.mode = mode
     this.setFirstSegmentAndPartNextCursor()
+  }
+
+  private doesValidSegmentExistInRundown(): boolean {
+    return this.segments.some(segment => this.isSegmentValidForRundownExecution(segment))
   }
 
   private setFirstSegmentAndPartNextCursor(): void {
@@ -734,7 +740,7 @@ export class Rundown extends BasicRundown {
     this.resetSegments()
     this.resetHistory()
 
-    if (this.mode !== RundownMode.INACTIVE) {
+    if (this.mode !== RundownMode.INACTIVE && this.doesValidSegmentExistInRundown()) {
       this.setFirstSegmentAndPartNextCursor()
     }
   }
