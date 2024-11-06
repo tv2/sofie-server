@@ -11,43 +11,48 @@ describe(IngestedEntityToEntityMapper.name, () => {
     describe('when ingested segment has new parts', () => {
       it('adds the new parts', () => {
         const segmentId: string = 'segment-id'
-        const partId: string = 'part-id'
-        const part: Part = EntityTestFactory.createPart({ id: partId, segmentId })
+        const part: Part = EntityTestFactory.createPart({ id: 'part-id', segmentId })
         const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts: [part] })
 
-        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: partId, segmentId })
-        const newPartId: string = 'new-part-id'
-        const newIngestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: newPartId, segmentId })
+        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: part.id, segmentId })
+        const newIngestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'new-part-id', segmentId })
         const ingestedSegment: IngestedSegment = EntityTestFactory.createIngestedSegment({ id: segmentId, ingestedParts: [ingestedPart, newIngestedPart] })
 
         const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
 
+
         const result: Segment = testee.updateSegmentWithIngestedSegment(segment, ingestedSegment)
 
+        expect(segment.getParts()).toEqual([
+          expect.objectContaining({ id: part.id })
+        ])
+
         expect(result.getParts()).toEqual([
-          expect.objectContaining({ id: partId }),
-          expect.objectContaining({ id: newPartId }),
+          expect.objectContaining({ id: part.id }),
+          expect.objectContaining({ id: newIngestedPart.id }),
         ])
       })
 
       it('preserves the rank ordering', () => {
         const segmentId: string = 'segment-id'
-        const partId: string = 'part-id'
-        const part: Part = EntityTestFactory.createPart({ id: partId, segmentId, rank: 10 })
+        const part: Part = EntityTestFactory.createPart({ id: 'part-id', segmentId, rank: 10 })
         const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts: [part] })
 
-        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: partId, segmentId, rank: 10 })
-        const newPartId: string = 'new-part-id'
-        const newIngestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: newPartId, segmentId, rank: 5 })
+        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: part.id, segmentId, rank: 10 })
+        const newIngestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'new-part-id', segmentId, rank: 5 })
         const ingestedSegment: IngestedSegment = EntityTestFactory.createIngestedSegment({ id: segmentId, ingestedParts: [ingestedPart, newIngestedPart] })
 
         const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
 
         const result: Segment = testee.updateSegmentWithIngestedSegment(segment, ingestedSegment)
 
+        expect(segment.getParts()).toEqual([
+          expect.objectContaining({ id: part.id })
+        ])
+
         expect(result.getParts()).toEqual([
-          expect.objectContaining({ id: newPartId }),
-          expect.objectContaining({ id: partId }),
+          expect.objectContaining({ id: newIngestedPart.id }),
+          expect.objectContaining({ id: part.id }),
         ])
       })
     })
