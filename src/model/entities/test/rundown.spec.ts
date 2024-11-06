@@ -2816,12 +2816,14 @@ describe(Rundown.name, () => {
       expect(testee.isActive()).toBeTruthy()
     })
 
-    it('sets an empty rundown to be active', () => {
-      const testee: Rundown = EntityTestFactory.createRundown({id: 'emptyRundown', mode: RundownMode.INACTIVE})
+    describe('Rundown is empty', () => {
+      it('sets the Rundown to be active', () => {
+        const testee: Rundown = EntityTestFactory.createRundown({id: 'emptyRundown', mode: RundownMode.INACTIVE})
 
-      expect(testee.isActive()).toBeFalsy()
-      testee.activate()
-      expect(testee.isActive()).toBeTruthy()
+        expect(testee.isActive()).toBeFalsy()
+        testee.activate()
+        expect(testee.isActive()).toBeTruthy()
+      })
     })
 
     describe('Rundown is in Rehearsal', () => {
@@ -3076,12 +3078,14 @@ describe(Rundown.name, () => {
       expect(testee.getMode()).toBe(RundownMode.REHEARSAL)
     })
 
-    it('sets an empty rundown to be in rehearsal mode', () => {
-      const testee: Rundown = EntityTestFactory.createRundown({id: 'emptyRundown', mode: RundownMode.INACTIVE})
+    describe('Rundown is empty', () => {
+      it('sets Rundown to be in rehearsal mode', () => {
+        const testee: Rundown = EntityTestFactory.createRundown({id: 'emptyRundown', mode: RundownMode.INACTIVE})
 
-      expect(testee.isRehearsal()).toBeFalsy()
-      testee.enterRehearsal()
-      expect(testee.isRehearsal()).toBeTruthy()
+        expect(testee.isRehearsal()).toBeFalsy()
+        testee.enterRehearsal()
+        expect(testee.isRehearsal()).toBeTruthy()
+      })
     })
 
     describe('first Segment is hidden', () => {
@@ -3218,30 +3222,32 @@ describe(Rundown.name, () => {
         expect.objectContaining({ id: onAirSegmentId, parts: expect.not.arrayContaining([expect.objectContaining({ id: unsyncedOnAirPart.id })]) }),
       ]))
     })
-  })
 
-  it('resets when the last remaining on air segment is unsynced', () => {
-    const unsyncedOnAirSegmentId: string = 'unsynced-on-air-segment-id'
-    const unsyncedOnAirPart: Part = EntityTestFactory.createPart({ segmentId: unsyncedOnAirSegmentId, isOnAir: true, isUnsynced: true })
-    const unsyncedOnAirSegment: Segment = EntityTestFactory.createSegment({ id: unsyncedOnAirSegmentId, isOnAir: true, parts: [unsyncedOnAirPart], isUnsynced: true })
+    describe('last segment on air is unsynced', () => {
+      it('resets and removes the last segment', () => {
+        const unsyncedOnAirSegmentId: string = 'unsynced-on-air-segment-id'
+        const unsyncedOnAirPart: Part = EntityTestFactory.createPart({ segmentId: unsyncedOnAirSegmentId, isOnAir: true, isUnsynced: true })
+        const unsyncedOnAirSegment: Segment = EntityTestFactory.createSegment({ id: unsyncedOnAirSegmentId, isOnAir: true, parts: [unsyncedOnAirPart], isUnsynced: true })
 
-    const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
-      mode: RundownMode.ACTIVE,
-      alreadyActiveProperties: {
-        activeCursor: {
-          part: unsyncedOnAirPart,
-          segment: unsyncedOnAirSegment,
-          owner: Owner.SYSTEM,
-        },
-        nextCursor: undefined,
-        infinitePieces: new Map(),
-      },
-      segments: [unsyncedOnAirSegment]
-    }))
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              part: unsyncedOnAirPart,
+              segment: unsyncedOnAirSegment,
+              owner: Owner.SYSTEM,
+            },
+            nextCursor: undefined,
+            infinitePieces: new Map(),
+          },
+          segments: [unsyncedOnAirSegment]
+        }))
 
-    testee.reset()
-    expect(testee.getSegments().length).toBe(0)
-    expect(testee.getActiveCursor()).toBeUndefined()
+        testee.reset()
+        expect(testee.getSegments().length).toBe(0)
+        expect(testee.getActiveCursor()).toBeUndefined()
+      })
+    })
   })
 
   describe(Rundown.prototype.addSegment.name, () => {
