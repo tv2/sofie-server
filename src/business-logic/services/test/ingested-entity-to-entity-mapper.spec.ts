@@ -34,26 +34,35 @@ describe(IngestedEntityToEntityMapper.name, () => {
       })
 
       it('preserves the rank ordering', () => {
-        const segmentId: string = 'segment-id'
-        const part: Part = EntityTestFactory.createPart({ id: 'part-id', segmentId, rank: 10 })
-        const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts: [part] })
+        const numberOfCurrentParts: number = 30
+        const numberOfNewParts: number = 10
 
-        const ingestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: part.id, segmentId, rank: 10 })
-        const newIngestedPart: IngestedPart = EntityTestFactory.createIngestedPart({ id: 'new-part-id', segmentId, rank: 5 })
-        const ingestedSegment: IngestedSegment = EntityTestFactory.createIngestedSegment({ id: segmentId, ingestedParts: [ingestedPart, newIngestedPart] })
+        const segmentId: string = 'segment-id'
+        const currentIngestedParts: readonly IngestedPart[] = Array.from(
+          { length: numberOfCurrentParts },
+          (_, index) => EntityTestFactory.createIngestedPart({ id: `part-${index}-id`, segmentId, rank: 10 * index })
+        )
+
+        const parts: Part[] = currentIngestedParts.map(ingestedPart => EntityTestFactory.createPart({ id: ingestedPart.id, segmentId: ingestedPart.segmentId, rank: ingestedPart.rank }))
+        const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts })
+
+        const newIngestedParts: readonly IngestedPart[] = Array.from(
+          { length: numberOfNewParts },
+          (_, index) => EntityTestFactory.createIngestedPart({ id: `new-part-${index}-id`, segmentId, rank: 10 * index + 1 })
+        )
+
+        const ingestedSegment: IngestedSegment = EntityTestFactory.createIngestedSegment({ id: segmentId, ingestedParts: currentIngestedParts.concat(newIngestedParts) })
 
         const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
 
         const result: Segment = testee.updateSegmentWithIngestedSegment(segment, ingestedSegment)
 
-        expect(segment.getParts()).toEqual([
-          expect.objectContaining({ id: part.id })
-        ])
+        expect(segment.getParts()).toEqual(parts.map(part => expect.objectContaining({ id: part.id })))
 
-        expect(result.getParts()).toEqual([
-          expect.objectContaining({ id: newIngestedPart.id }),
-          expect.objectContaining({ id: part.id }),
-        ])
+        result.getParts().forEach(((part, partIndex, newParts) => {
+          const previousRank: number = partIndex > 0 ? newParts[partIndex-1].getRank() : 0
+          expect(part.getRank()).toBeGreaterThanOrEqual(previousRank)
+        }))
       })
     })
   })

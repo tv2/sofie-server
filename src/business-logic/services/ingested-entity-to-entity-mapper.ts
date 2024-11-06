@@ -87,7 +87,7 @@ export class IngestedEntityToEntityMapper {
         [ingestedPart.id]: part ? this.updatePartWithIngestedPart(part, ingestedPart) : this.convertIngestedPartToPart(ingestedPart)
       }
     }, existingPartsMap)
-    return Object.values(updatedPartsMap).sort((partA, partB) => partA.getRank() - partB.getRank())
+    return Object.values(updatedPartsMap)
   }
 
   public convertIngestedPartToPart(ingestedPart: IngestedPart): Part {
