@@ -144,6 +144,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       type: MutateActionType.PIECE,
       updateActionWithPiece: (action: Action, piece: Piece) => this.updateTimelineObjectsWithTransitionEffect(action as Tv2TransitionEffectAction, piece),
       piecePredicate: (piece: Piece) => this.isProgramPiece(piece),
+      isActionAllowedToMutatePiece: () => true
     }
     mutateActionMethods.push(updateTransitionMutateAction)
     return mutateActionMethods
