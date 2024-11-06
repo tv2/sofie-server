@@ -94,21 +94,15 @@ export class Rundown extends BasicRundown {
       this.mode = RundownMode.ACTIVE
       return
     }
-    if (!this.doesValidSegmentExistInRundown()) {
-      throw new UnsupportedOperationException('Can\'t activate a Rundown that has no valid Segment.')
-    }
     this.initializeRundown(RundownMode.ACTIVE)
   }
 
-  public enterRehearsal() :void {
+  public enterRehearsal(): void {
     if (this.isActive()) {
       throw new AlreadyActivatedException('Can\'t set Rundown to rehearsal since it is already activated.')
     }
     if (this.getMode() === RundownMode.REHEARSAL) {
       throw new AlreadyRehearsalException('Can\'t set Rundown to rehearsal since it is already in rehearsal.')
-    }
-    if (!this.doesValidSegmentExistInRundown()) {
-      throw new UnsupportedOperationException('Can\'t set a Rundown to rehearsal that has no valid Segment.')
     }
     this.initializeRundown(RundownMode.REHEARSAL)
   }
@@ -118,11 +112,10 @@ export class Rundown extends BasicRundown {
     this.setFirstSegmentAndPartNextCursor()
   }
 
-  private doesValidSegmentExistInRundown(): boolean {
-    return this.segments.some(segment => this.isSegmentValidForRundownExecution(segment))
-  }
-
   private setFirstSegmentAndPartNextCursor(): void {
+    if (!this.doesValidSegmentExistInRundown()) {
+      return
+    }
     const firstSegment: Segment = this.findFirstSegment()
     firstSegment.setAsNext()
     const firstPart: Part = firstSegment.findFirstPart()
@@ -132,6 +125,10 @@ export class Rundown extends BasicRundown {
       segment: firstSegment,
       owner: Owner.SYSTEM
     }
+  }
+
+  private doesValidSegmentExistInRundown(): boolean {
+    return this.segments.some(segment => this.isSegmentValidForRundownExecution(segment))
   }
 
   private resetHistory(): void {
@@ -740,7 +737,7 @@ export class Rundown extends BasicRundown {
     this.resetSegments()
     this.resetHistory()
 
-    if (this.mode !== RundownMode.INACTIVE && this.doesValidSegmentExistInRundown()) {
+    if (this.mode !== RundownMode.INACTIVE) {
       this.setFirstSegmentAndPartNextCursor()
     }
   }
