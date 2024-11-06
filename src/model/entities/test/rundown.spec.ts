@@ -1,28 +1,28 @@
-import { Segment, SegmentInterface } from '../segment'
-import { Rundown, RundownInterface } from '../rundown'
-import { Part } from '../part'
-import { Piece } from '../piece'
-import { PieceLifespan } from '../../enums/piece-lifespan'
-import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
-import { NotActivatedException } from '../../exceptions/not-activated-exception'
-import { NotFoundException } from '../../exceptions/not-found-exception'
-import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
-import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
-import { AlreadyActivatedException } from '../../exceptions/already-activated-exception'
-import { Owner } from '../../enums/owner'
-import { EntityTestFactory } from './entity-test-factory'
-import { AlreadyExistException } from '../../exceptions/already-exist-exception'
-import { RundownCursor } from '../../value-objects/rundown-cursor'
-import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
-import { OnAirException } from '../../exceptions/on-air-exception'
-import { NoPartInHistoryException } from '../../exceptions/no-part-in-history-exception'
-import { RundownMode } from '../../enums/rundown-mode'
-import { AlreadyRehearsalException } from '../../exceptions/already-rehearsal-exception'
-import { InvalidSegmentException } from '../../exceptions/invalid-segment-exception'
-import { Invalidity } from '../../value-objects/invalidity'
-import { InvalidPartException } from '../../exceptions/invalid-part-exception'
-import { PartTimings } from '../../value-objects/part-timings'
+import {Segment, SegmentInterface} from '../segment'
+import {Rundown, RundownInterface} from '../rundown'
+import {Part} from '../part'
+import {Piece} from '../piece'
+import {PieceLifespan} from '../../enums/piece-lifespan'
+import {EntityMockFactory} from './entity-mock-factory'
+import {capture, instance, mock, spy, verify, when} from '@typestrong/ts-mockito'
+import {NotActivatedException} from '../../exceptions/not-activated-exception'
+import {NotFoundException} from '../../exceptions/not-found-exception'
+import {LastPartInSegmentException} from '../../exceptions/last-part-in-segment-exception'
+import {LastPartInRundownException} from '../../exceptions/last-part-in-rundown-exception'
+import {AlreadyActivatedException} from '../../exceptions/already-activated-exception'
+import {Owner} from '../../enums/owner'
+import {EntityTestFactory} from './entity-test-factory'
+import {AlreadyExistException} from '../../exceptions/already-exist-exception'
+import {RundownCursor} from '../../value-objects/rundown-cursor'
+import {UNSYNCED_ID_POSTFIX} from '../../value-objects/unsynced_constants'
+import {OnAirException} from '../../exceptions/on-air-exception'
+import {NoPartInHistoryException} from '../../exceptions/no-part-in-history-exception'
+import {RundownMode} from '../../enums/rundown-mode'
+import {AlreadyRehearsalException} from '../../exceptions/already-rehearsal-exception'
+import {InvalidSegmentException} from '../../exceptions/invalid-segment-exception'
+import {Invalidity} from '../../value-objects/invalidity'
+import {InvalidPartException} from '../../exceptions/invalid-part-exception'
+import {PartTimings} from '../../value-objects/part-timings'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
@@ -2816,6 +2816,14 @@ describe(Rundown.name, () => {
       expect(testee.isActive()).toBeTruthy()
     })
 
+    it('sets an empty rundown to be active', () => {
+      const testee: Rundown = EntityTestFactory.createRundown({id: 'emptyRundown', mode: RundownMode.INACTIVE})
+
+      expect(testee.isActive()).toBeFalsy()
+      testee.activate()
+      expect(testee.isActive()).toBeTruthy()
+    })
+
     describe('Rundown is in Rehearsal', () => {
       it ('sets the Rundown to be active', () => {
         const testee: Rundown = new Rundown({ mode: RundownMode.REHEARSAL } as RundownInterface)
@@ -3060,12 +3068,20 @@ describe(Rundown.name, () => {
       })
     })
 
-    it('sets the Rundown to be rehearsal', () => {
+    it('sets the Rundown to be in rehearsal mode', () => {
       const segment: Segment = EntityMockFactory.createSegment({ parts: [EntityMockFactory.createPart()] })
       const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [segment] } as RundownInterface)
 
       testee.enterRehearsal()
       expect(testee.getMode()).toBe(RundownMode.REHEARSAL)
+    })
+
+    it('sets an empty rundown to be in rehearsal mode', () => {
+      const testee: Rundown = EntityTestFactory.createRundown({id: 'emptyRundown', mode: RundownMode.INACTIVE})
+
+      expect(testee.isRehearsal()).toBeFalsy()
+      testee.enterRehearsal()
+      expect(testee.isRehearsal()).toBeTruthy()
     })
 
     describe('first Segment is hidden', () => {
@@ -3202,6 +3218,30 @@ describe(Rundown.name, () => {
         expect.objectContaining({ id: onAirSegmentId, parts: expect.not.arrayContaining([expect.objectContaining({ id: unsyncedOnAirPart.id })]) }),
       ]))
     })
+  })
+
+  it('resets when the last remaining on air segment is unsynced', () => {
+    const unsyncedOnAirSegmentId: string = 'unsynced-on-air-segment-id'
+    const unsyncedOnAirPart: Part = EntityTestFactory.createPart({ segmentId: unsyncedOnAirSegmentId, isOnAir: true, isUnsynced: true })
+    const unsyncedOnAirSegment: Segment = EntityTestFactory.createSegment({ id: unsyncedOnAirSegmentId, isOnAir: true, parts: [unsyncedOnAirPart], isUnsynced: true })
+
+    const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+      mode: RundownMode.ACTIVE,
+      alreadyActiveProperties: {
+        activeCursor: {
+          part: unsyncedOnAirPart,
+          segment: unsyncedOnAirSegment,
+          owner: Owner.SYSTEM,
+        },
+        nextCursor: undefined,
+        infinitePieces: new Map(),
+      },
+      segments: [unsyncedOnAirSegment]
+    }))
+
+    testee.reset()
+    expect(testee.getSegments().length).toBe(0)
+    expect(testee.getActiveCursor()).toBeUndefined()
   })
 
   describe(Rundown.prototype.addSegment.name, () => {
