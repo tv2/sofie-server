@@ -74,6 +74,9 @@ import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-i
 import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
 import { DeviceRepository } from '../repositories/interfaces/device-repository'
 import { Device } from '../../model/entities/device'
+import { VideoMixerDeviceRepository } from '../repositories/interfaces/video-mixer-device-repository'
+import { MongoVideoMixerDeviceRepository } from '../repositories/mongo/mongo-video-mixer-device-repository'
+import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
 
 export class RepositoryFacade {
   public static getDatabase(): Database {
@@ -297,5 +300,9 @@ export class RepositoryFacade {
 
   private static createUuidGenerator(): UuidGenerator {
     return new CryptoUuidGenerator()
+  }
+
+  public static createVideoMixerDeviceRepository(): VideoMixerDeviceRepository {
+    return new MongoVideoMixerDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), EventEmitterFacade.createDeviceEventEmitter())
   }
 }

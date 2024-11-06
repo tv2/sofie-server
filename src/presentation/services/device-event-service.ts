@@ -3,6 +3,7 @@ import { DeviceEventEmitter } from '../../business-logic/services/interfaces/dev
 import { DeviceEventObserver } from '../interfaces/device-event-observer'
 import { Device } from '../../model/entities/device'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
+import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
 
 export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserver {
 
@@ -38,5 +39,9 @@ export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserv
   public emitDeviceDeletedEvent(deviceId: string): void {
     const event: DeviceDeletedEvent = this.deviceEventBuilder.buildDeviceDeletedEvent(deviceId)
     this.emitDeviceEvent(event)
+  }
+
+  public emitVideoMixerConfigurationUpdated(videoMixerConfiguration: VideoMixerConfiguration): void {
+    this.emitDeviceEvent(this.deviceEventBuilder.buildVideoMixerConfigurationUpdatedEvent(videoMixerConfiguration))
   }
 }
