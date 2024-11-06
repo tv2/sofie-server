@@ -42,7 +42,7 @@ export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDe
       switch (change.operationType) {
         case MongoChangeEvent.UPDATE: {
           const mongoDevice: MongoDevice | undefined = change.fullDocument
-          if (!mongoDevice) {
+          if (!mongoDevice || !mongoDevice.settings.devices) {
             return
           }
           const videoMixerConfiguration: VideoMixerConfiguration = this.findVideoMixerConfiguration(mongoDevice)
