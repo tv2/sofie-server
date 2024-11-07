@@ -112,7 +112,8 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         return [{
           type: MutateActionType.PIECE,
           updateActionWithPiece: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
-          piecePredicate: (piece: Piece) => this.doesPieceHaveSplitScreenBoxesTimelineObject(piece)
+          piecePredicate: (piece: Piece) => this.doesPieceHaveSplitScreenBoxesTimelineObject(piece),
+          isActionAllowedToMutatePiece: (action: Action, piece: Piece) => this.doesSplitScreenHaveInputEnabled(action, piece)
         }]
       }
       case Tv2ActionSubtype.RECALL_SPLIT_SCREEN: {
@@ -132,7 +133,8 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
           {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action: Action, piece: Piece) => this.updateInsertToInputAction(action, piece),
-            piecePredicate: (piece: Piece) => this.doesPieceHaveSplitScreenBoxesTimelineObject(piece)
+            piecePredicate: (piece: Piece) => this.doesPieceHaveSplitScreenBoxesTimelineObject(piece),
+            isActionAllowedToMutatePiece: () => true
           }
         ]
       }
@@ -365,6 +367,16 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       pieceInterface: this.createSplitScreenPieceInterfaceFromPiece(splitScreenPieceFromRundown, pieceMetadata, timelineObjects)
     }
     return splitScreenAction
+  }
+
+  private doesSplitScreenHaveInputEnabled(action: Action, piece: Piece): boolean {
+    const pieceMetadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
+    if (!pieceMetadata.splitScreen) {
+      return false
+    }
+
+    const insertSourceInputMetadata: Tv2SplitScreenInsertSourceInputMetadata = action.metadata as Tv2SplitScreenInsertSourceInputMetadata
+    return pieceMetadata.splitScreen.boxes[insertSourceInputMetadata.inputIndex].enabled
   }
 
   private findTimelineObjectsToKeepForSplitScreenInsertSource(splitScreenPieceFromRundown: Piece): Tv2BlueprintTimelineObject[] {

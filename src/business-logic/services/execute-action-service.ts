@@ -120,7 +120,7 @@ export class ExecuteActionService implements ActionService {
   private async mutateActionWithPieceFromNextPart(rundownId: string, mutateActionMethods: MutateActionWithPieceMethods, action: Action): Promise<Action> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const piece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
-    if (!piece) {
+    if (!piece || !mutateActionMethods.isActionAllowedToMutatePiece(action, piece)) {
       return action
     }
     return mutateActionMethods.updateActionWithPiece(action, piece)
@@ -220,6 +220,10 @@ export class ExecuteActionService implements ActionService {
 
       if (!pieceFromRundown) {
         continue
+      }
+
+      if (!mutateActionMethods.isActionAllowedToMutatePiece(action, pieceFromRundown)) {
+        return
       }
 
       action = mutateActionMethods.updateActionWithPiece(action, pieceFromRundown)
