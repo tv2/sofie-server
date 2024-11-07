@@ -39,6 +39,7 @@ export interface Tv2PieceMetadata {
   }
   config?: {
     DVEInputs: string
+    DVEName: string
   }
   mediaPlayerSessions?: string[]
   sourceName?: string
