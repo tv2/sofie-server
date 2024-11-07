@@ -175,7 +175,10 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         outputLayer: Tv2OutputLayer.PROGRAM,
         splitScreen: {
           boxes,
-          audioTimelineObjectsForBoxes: []
+          audioTimelineObjectsForBoxes: [],
+        },
+        config: {
+          DVEInputs: splitScreenConfiguration.inputs
         }
       }
 
@@ -339,7 +342,8 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = Object.values(pieceMetadata.splitScreen.audioTimelineObjectsForBoxes).flat()
 
     const splitScreenBoxes: SplitScreenBoxProperties[] = pieceMetadata.splitScreen.boxes
-    splitScreenBoxes[insertSourceInputMetadata.inputIndex].source = insertSourceInputMetadata.videoMixerSource
+    const boxIndex: number = pieceMetadata.config ? this.getBoxIndex(insertSourceInputMetadata.inputIndex, pieceMetadata.config) : -1
+    splitScreenBoxes[boxIndex].source = insertSourceInputMetadata.videoMixerSource
     const splitScreenBoxesTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createSplitScreenBoxesTimelineObject(splitScreenBoxes, INSERT_SOURCE_TO_INPUT_TIMELINE_OBJECT_PRIORITY)
 
     const timelineObjects: Tv2BlueprintTimelineObject[] = [
@@ -369,6 +373,14 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     return splitScreenAction
   }
 
+  private getBoxIndex(inputIndex: number, splitScreenConfig: NonNullable<Tv2PieceMetadata['config']>): number {
+    return splitScreenConfig.DVEInputs
+      .split(';')
+      .map(text => text.split(':'))
+      .filter(inputMapping => inputMapping[1]?.toLowerCase() === `inp${inputIndex + 1}`)
+      .map(inputMapping => Number.parseInt(inputMapping[0]) - 1)[0] ?? -1
+  }
+
   private doesSplitScreenHaveInputEnabled(action: Action, piece: Piece): boolean {
     const pieceMetadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
     if (!pieceMetadata.splitScreen) {
@@ -376,7 +388,8 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     }
 
     const insertSourceInputMetadata: Tv2SplitScreenInsertSourceInputMetadata = action.metadata as Tv2SplitScreenInsertSourceInputMetadata
-    return pieceMetadata.splitScreen.boxes[insertSourceInputMetadata.inputIndex].enabled
+    const boxIndex: number = pieceMetadata.config ? this.getBoxIndex(insertSourceInputMetadata.inputIndex, pieceMetadata.config) : -1
+    return pieceMetadata.splitScreen.boxes[boxIndex]?.enabled ?? false
   }
 
   private findTimelineObjectsToKeepForSplitScreenInsertSource(splitScreenPieceFromRundown: Piece): Tv2BlueprintTimelineObject[] {
@@ -433,8 +446,11 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       outputLayer: Tv2OutputLayer.PROGRAM,
       splitScreen: {
         boxes,
-        audioTimelineObjectsForBoxes
-      }
+        audioTimelineObjectsForBoxes,
+      },
+      config: {
+        DVEInputs: splitScreenConfiguration.inputs,
+      },
     }
 
     const videoSwitcherTimelineEnable: TimelineEnable = {

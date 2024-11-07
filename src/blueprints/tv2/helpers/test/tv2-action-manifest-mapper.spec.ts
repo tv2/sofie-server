@@ -246,6 +246,7 @@ function createConfiguredBlueprintConfiguration(): Tv2BlueprintConfiguration {
             },
             index: 0,
           },
+          inputs: '',
           graphicsTemplateJson: '',
           key: '',
           frame: '',

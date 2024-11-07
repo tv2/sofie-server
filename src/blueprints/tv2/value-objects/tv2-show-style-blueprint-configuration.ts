@@ -47,6 +47,7 @@ export interface CasparCgDesignValue {
 export interface SplitScreenConfiguration {
   id: string
   name: string
+  inputs: string
   layoutProperties: SplitScreenLayoutProperties
   graphicsTemplateJson: string
   key: string

@@ -37,6 +37,9 @@ export interface Tv2PieceMetadata {
     boxes: SplitScreenBoxProperties[],
     audioTimelineObjectsForBoxes: { [inputIndex: number]: Tv2BlueprintTimelineObject[] }
   }
+  config?: {
+    DVEInputs: string
+  }
   mediaPlayerSessions?: string[]
   sourceName?: string
 }
