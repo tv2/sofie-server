@@ -88,7 +88,7 @@ export class Rundown extends BasicRundown {
 
   public activate(): void {
     if (this.isActive()) {
-      throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated')
+      throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated.')
     }
     if (this.mode === RundownMode.REHEARSAL) {
       this.mode = RundownMode.ACTIVE
@@ -97,12 +97,12 @@ export class Rundown extends BasicRundown {
     this.initializeRundown(RundownMode.ACTIVE)
   }
 
-  public enterRehearsal() :void {
+  public enterRehearsal(): void {
     if (this.isActive()) {
-      throw new AlreadyActivatedException('Can\'t set Rundown to rehearsal since it is already activated')
+      throw new AlreadyActivatedException('Can\'t set Rundown to rehearsal since it is already activated.')
     }
     if (this.getMode() === RundownMode.REHEARSAL) {
-      throw new AlreadyRehearsalException('Can\'t set Rundown to rehearsal since it is already in rehearsal')
+      throw new AlreadyRehearsalException('Can\'t set Rundown to rehearsal since it is already in rehearsal.')
     }
     this.initializeRundown(RundownMode.REHEARSAL)
   }
@@ -113,6 +113,9 @@ export class Rundown extends BasicRundown {
   }
 
   private setFirstSegmentAndPartNextCursor(): void {
+    if (!this.doesValidSegmentExistInRundown()) {
+      return
+    }
     const firstSegment: Segment = this.findFirstSegment()
     firstSegment.setAsNext()
     const firstPart: Part = firstSegment.findFirstPart()
@@ -122,6 +125,10 @@ export class Rundown extends BasicRundown {
       segment: firstSegment,
       owner: Owner.SYSTEM
     }
+  }
+
+  private doesValidSegmentExistInRundown(): boolean {
+    return this.segments.some(segment => this.isSegmentValidForRundownExecution(segment))
   }
 
   private resetHistory(): void {
@@ -314,7 +321,7 @@ export class Rundown extends BasicRundown {
         throw exception
       }
       if (segmentIndexForPart + 1 === this.segments.length) {
-        throw new LastPartInRundownException(`Part: ${part.id} is the last Part of Rundown: ${this.id}`)
+        throw new LastPartInRundownException(`Part: ${part.id} is the last Part of Rundown: ${this.id}.`)
       }
       return this.findFirstPartOfValidSegmentSkippingUnsyncedSegments(segmentIndexForPart + 1)
     }
