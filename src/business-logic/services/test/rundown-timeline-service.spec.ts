@@ -172,7 +172,7 @@ describe(RundownTimelineService.name, () => {
 
     describe('Rundown is coming from inactive', () => {
       it('calls playoutService.makeDevicesReady with okToDestroyStuff true', async () => {
-        const playoutService: PlayoutService = mock<PlayoutService>()
+        const playoutService: PlayoutService = createMockOfPlayoutService()
         const rundownMock: Rundown = EntityMockFactory.createRundownMock()
         when(rundownMock.getMode()).thenReturn(RundownMode.INACTIVE)
         when(rundownMock.getInfinitePiecesMap()).thenReturn(new Map())
@@ -191,7 +191,7 @@ describe(RundownTimelineService.name, () => {
 
     describe('Rundown is coming from rehearsal', () => {
       it('calls playoutService.makeDevicesReady with okToDestroyStuff false', async () => {
-        const playoutService: PlayoutService = mock<PlayoutService>()
+        const playoutService: PlayoutService = createMockOfPlayoutService()
         const rundown: Rundown = EntityTestFactory.createRundown({ mode: RundownMode.REHEARSAL })
 
         const rundownRepository: RundownRepository = mock<RundownRepository>()
@@ -235,7 +235,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     it('calls playoutService.makeDevicesReady with okToDestroyStuff is true', async () => {
-      const playoutService: PlayoutService = mock<PlayoutService>()
+      const playoutService: PlayoutService = createMockOfPlayoutService()
       const rundownMock: Rundown = EntityMockFactory.createRundownMock()
       when(rundownMock.getInfinitePiecesMap()).thenReturn(new Map())
 
@@ -253,7 +253,7 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.deactivateRundown.name}`, () => {
     it('calls the playoutService.makeDevicesStandDown', async () => {
-      const playoutService: PlayoutService = mock<PlayoutService>()
+      const playoutService: PlayoutService = createMockOfPlayoutService()
       const rundown: Rundown = EntityMockFactory.createRundown()
       const rundownRepository: RundownRepository = mock<RundownRepository>()
       when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
@@ -877,7 +877,7 @@ function createTestee(params?: {
     instance(params?.timelineRepository ?? mock<TimelineRepository>()),
     instance(params?.timelineBuilder ?? timelineBuilderMock),
     instance(params?.ingestService ?? createMockOfIngestService()),
-    instance(params?.playoutService ?? mock<PlayoutService>()) ,
+    instance(params?.playoutService ?? createMockOfPlayoutService()) ,
     instance(params?.callbackScheduler ?? mock<CallbackScheduler>()),
     instance(params?.blueprint ?? mock<Blueprint>()),
     instance(params?.logger ?? createMockOfLogger()),
@@ -888,6 +888,13 @@ function createMockOfIngestService(): IngestService {
   const mockedIngestService: IngestService = mock()
   when(mockedIngestService.reloadIngestData(anyString())).thenResolve()
   return mockedIngestService
+}
+
+function createMockOfPlayoutService(): PlayoutService {
+  const mockedPlayoutService: PlayoutService = mock()
+  when(mockedPlayoutService.makeDevicesReady(anything(), anyString())).thenResolve()
+  when(mockedPlayoutService.makeDevicesStandDown()).thenResolve()
+  return mockedPlayoutService
 }
 
 function createMockOfLogger(): Logger {
