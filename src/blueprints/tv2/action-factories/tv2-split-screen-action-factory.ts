@@ -67,6 +67,8 @@ const PLANNED_SPLIT_SCREEN_TIMELINE_OBJECT_PRIORITY: number = 1
 const CAMERA_SOURCE_NAME: string = 'Camera'
 const REPLAY_SOURCE_NAME: string = 'Replay'
 
+const DEFAULT_DVE_INPUT_MAPPINGS: string = '1:INP1;2:INP2;3:INP3;4:INP4'
+
 export class Tv2SplitScreenActionFactory extends ActionFactory {
 
   private readonly logger: Tv2Logger
@@ -325,7 +327,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   private updateInsertToInputAction(action: Action, splitScreenPieceFromRundown: Piece): Action {
     const pieceMetadata: Tv2PieceMetadata = splitScreenPieceFromRundown.metadata as Tv2PieceMetadata
     if (!pieceMetadata.splitScreen || !pieceMetadata.config) {
-      throw new Tv2UnexpectedActionException(`Unable to set split screen source on a '${pieceMetadata.type.toLowerCase()}' piece.`)
+      throw new Tv2UnexpectedActionException(`Unable to find split screen configuration for the piece '${splitScreenPieceFromRundown.name}'.`)
     }
 
     const splitScreenBoxes: SplitScreenBoxProperties[] = pieceMetadata.splitScreen.boxes
@@ -384,7 +386,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   }
 
   private getBoxIndex(inputIndex: number, splitScreenConfig: NonNullable<Tv2PieceMetadata['config']>): number {
-    return (splitScreenConfig.DVEInputs || '1:INP1;2:INP2;3:INP3;4:INP4')
+    return (splitScreenConfig.DVEInputs || DEFAULT_DVE_INPUT_MAPPINGS)
       .split(';')
       .map(text => text.split(':'))
       .filter(inputMapping => inputMapping[1]?.toLowerCase() === `inp${inputIndex + 1}`)

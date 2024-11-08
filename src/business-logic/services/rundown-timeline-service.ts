@@ -161,6 +161,7 @@ export class RundownTimelineService implements RundownService {
 
     this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
+
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundown.id)
 
@@ -169,7 +170,7 @@ export class RundownTimelineService implements RundownService {
     await this.saveRundown(rundown)
 
     if (rundown.getActiveSegment().definesShowStyleVariant) {
-      await this.ingestService.reloadIngestData(rundown.id)
+      this.ingestService.reloadIngestData(rundown.id).catch(error => this.logger.data(error).warn('Failed to trigger reload of ingest data.'))
     }
   }
 
