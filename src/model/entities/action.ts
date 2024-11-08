@@ -64,7 +64,6 @@ export interface MutateActionWithPieceMethods {
   type: MutateActionType.PIECE
   updateActionWithPiece: (action: Action, piece: Piece) => Action
   piecePredicate: (piece: Piece) => boolean
-  isActionAllowedToMutatePiece: (action: Action, piece: Piece) => boolean
 }
 
 export interface MutateActionWithMedia {

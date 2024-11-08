@@ -120,7 +120,7 @@ export class ExecuteActionService implements ActionService {
   private async mutateActionWithPieceFromNextPart(rundownId: string, mutateActionMethods: MutateActionWithPieceMethods, action: Action): Promise<Action> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const piece: Piece | undefined = rundown.getNextPart().getPieces().find(mutateActionMethods.piecePredicate)
-    if (!piece || !mutateActionMethods.isActionAllowedToMutatePiece(action, piece)) {
+    if (!piece) {
       return action
     }
     return mutateActionMethods.updateActionWithPiece(action, piece)
@@ -203,12 +203,12 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async replacePiece(action: Action, rundownId: string, actionArguments: unknown): Promise<void> {
-    const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
+    const mutateActionMethodsSequence: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
 
     let pieceFromRundown: Piece | undefined
 
-    for (let i = 0; i < mutateActionMethodsArray.length; i++) {
-      const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
+    for (let i = 0; i < mutateActionMethodsSequence.length; i++) {
+      const mutateActionMethods: MutateActionMethods = mutateActionMethodsSequence[i]
       if (mutateActionMethods.type !== MutateActionType.PIECE) {
         action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
         continue
@@ -220,10 +220,6 @@ export class ExecuteActionService implements ActionService {
 
       if (!pieceFromRundown) {
         continue
-      }
-
-      if (!mutateActionMethods.isActionAllowedToMutatePiece(action, pieceFromRundown)) {
-        return
       }
 
       action = mutateActionMethods.updateActionWithPiece(action, pieceFromRundown)

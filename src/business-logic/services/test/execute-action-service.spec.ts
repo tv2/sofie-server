@@ -201,7 +201,6 @@ describe(ExecuteActionService.name, () => {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.id === activePiece.id,
-            isActionAllowedToMutatePiece: () => true
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
@@ -260,7 +259,6 @@ describe(ExecuteActionService.name, () => {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.id === nextPiece.id,
-            isActionAllowedToMutatePiece: () => true
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
@@ -325,7 +323,6 @@ describe(ExecuteActionService.name, () => {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action) => action,
             piecePredicate: (piece) => piece.name === name,
-            isActionAllowedToMutatePiece: () => true
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
