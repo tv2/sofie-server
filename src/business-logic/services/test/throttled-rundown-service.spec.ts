@@ -26,7 +26,7 @@ describe(ThrottledRundownService.name, () => {
         expect(result).toThrow(ThrottledRundownException)
       })
 
-      it('throws error when two different actions are performed with 0ms delay', async () => {
+      it('does not throw an error when two different actions are performed with 0ms delay', async () => {
         const rundownService: RundownService = mock<RundownService>()
 
         const rundownId: string = 'rundown-id'
@@ -37,7 +37,7 @@ describe(ThrottledRundownService.name, () => {
 
         const result: () => Promise<void> = () => testee.takeNext(rundownId)
 
-        expect(result).toThrow(ThrottledRundownException)
+        expect(result).not.toThrow(ThrottledRundownException)
       })
 
       it('throws error when two take nexts are performed with 499ms delay', async () => {
@@ -206,11 +206,11 @@ describe(ThrottledRundownService.name, () => {
       verify(rundownService.resetRundown(anything())).once()
     })
 
-    it('throws ThrottleRundownException if called twice in succession', async () => {
+    it('does not throw a ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.resetRundown('rundownId')
       jest.advanceTimersByTime(5)
-      expect(() => testee.resetRundown('rundownId')).toThrow(ThrottledRundownException)
+      expect(() => testee.resetRundown('rundownId')).not.toThrow(ThrottledRundownException)
     })
   })
 

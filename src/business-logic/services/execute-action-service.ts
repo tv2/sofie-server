@@ -203,12 +203,12 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async replacePiece(action: Action, rundownId: string, actionArguments: unknown): Promise<void> {
-    const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
+    const mutateActionMethodsSequence: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
 
     let pieceFromRundown: Piece | undefined
 
-    for (let i: number = 0; i < mutateActionMethodsArray.length; i++) {
-      const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
+    for (let i: number = 0; i < mutateActionMethodsSequence.length; i++) {
+      const mutateActionMethods: MutateActionMethods = mutateActionMethodsSequence[i]
       if (mutateActionMethods.type !== MutateActionType.PIECE) {
         action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
         continue
