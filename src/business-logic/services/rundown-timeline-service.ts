@@ -59,7 +59,7 @@ export class RundownTimelineService implements RundownService {
     await this.saveRundown(rundown)
 
     const okToDestroyStuff: boolean = rundownModeBeforeActivation !== RundownMode.REHEARSAL
-    await this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id)
+    this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id).catch(error => this.logger.data(error).warn(`Request for making devices ready failed when entering active mode for rundown '${rundown.name}' with id '${rundown.id}'.`))
   }
 
   public async enterRehearsal(rundownId: string): Promise<void> {
@@ -78,7 +78,7 @@ export class RundownTimelineService implements RundownService {
     await this.saveRundown(rundown)
 
     const okToDestroyStuff: boolean = true // It's always "ok to destroy stuff" when we enter rehearsal.
-    await this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id)
+    this.playoutService.makeDevicesReady(okToDestroyStuff, rundown.id).catch(error => this.logger.data(error).warn(`Request for making devices ready failed when entering rehearsal mode for rundown '${rundown.name}' with id '${rundown.id}'.`))
   }
 
   private async saveRundown(rundown: Rundown): Promise<void> {
@@ -137,7 +137,7 @@ export class RundownTimelineService implements RundownService {
 
     await this.saveRundown(rundown)
 
-    await this.playoutService.makeDevicesStandDown()
+    this.playoutService.makeDevicesStandDown().catch(error => this.logger.data(error).warn(`Request for making devices stand down failed when deactivating rundown '${rundown.name}' with id '${rundown.id}'.`))
   }
 
   private stopAutoNext(): void {
@@ -162,6 +162,7 @@ export class RundownTimelineService implements RundownService {
 
     this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
+
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundown.id)
 
@@ -170,7 +171,7 @@ export class RundownTimelineService implements RundownService {
     await this.saveRundown(rundown)
 
     if (rundown.getActiveSegment().definesShowStyleVariant) {
-      await this.ingestService.reloadIngestData(rundown.id)
+      this.ingestService.reloadIngestData(rundown.id).catch(error => this.logger.data(error).warn(`Request for reloading ingest data failed for rundown '${rundown.name}' with id '${rundown.id}'.`))
     }
   }
 
