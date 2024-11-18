@@ -222,12 +222,8 @@ export class Segment {
     return this.parts
       .slice(0, startIndex + 1)
       .flatMap((part) => part.getPiecesWithLifespan(lifespans))
-      .filter(piece => !this.hasPieceEnded(piece))
+      .filter(piece => !piece.hasEnded())
       .reduceRight(this.createGetPiecesOnUnusedLayersReducer(usedLayers), [])
-  }
-
-  private hasPieceEnded(piece: Piece): boolean {
-    return !!piece.getDuration() && piece.getExecutedAt() + piece.getDuration()! < Date.now()
   }
 
   private createGetPiecesOnUnusedLayersReducer(

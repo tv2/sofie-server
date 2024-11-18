@@ -406,7 +406,7 @@ export class Rundown extends BasicRundown {
     let layersWithPieces: Map<string, Piece> = new Map(
       this.activeCursor.part
         .getPieces()
-        .filter(piece => !this.hasPieceEnded(piece))
+        .filter(piece => !piece.hasEnded())
         .map((piece) => [piece.layer, piece])
     )
 
@@ -425,16 +425,12 @@ export class Rundown extends BasicRundown {
     this.setInfinitePieces(layersWithPieces)
   }
 
-  private hasPieceEnded(piece: Piece): boolean {
-    return !!piece.getDuration() && piece.getExecutedAt() + piece.getDuration()! < Date.now()
-  }
-
   private findOldInfinitePiecesNotOnLayers(layers: Set<string>): Piece[] {
     return Array.from(this.infinitePieces.values()).filter((oldPiece) => !layers.has(oldPiece.layer))
   }
 
   private isPieceOutlived(piece: Piece): boolean {
-    if (this.hasPieceEnded(piece)) {
+    if (piece.hasEnded()) {
       return true
     }
     switch (piece.pieceLifespan) {
