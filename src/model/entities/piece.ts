@@ -162,4 +162,8 @@ export class Piece {
   public insertTimelineObjects(timelineObjects: TimelineObject[]): void {
     this.timelineObjects.push(...timelineObjects)
   }
+
+  public hasEnded(): boolean {
+    return !!this.duration && this.executedAt + this.duration < Date.now()
+  }
 }

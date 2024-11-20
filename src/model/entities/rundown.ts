@@ -406,6 +406,7 @@ export class Rundown extends BasicRundown {
     let layersWithPieces: Map<string, Piece> = new Map(
       this.activeCursor.part
         .getPieces()
+        .filter(piece => !piece.hasEnded())
         .map((piece) => [piece.layer, piece])
     )
 
@@ -429,6 +430,9 @@ export class Rundown extends BasicRundown {
   }
 
   private isPieceOutlived(piece: Piece): boolean {
+    if (piece.hasEnded()) {
+      return true
+    }
     switch (piece.pieceLifespan) {
       case PieceLifespan.WITHIN_PART: {
         // Not an infinite, so we don't care about it and just mark it as outlived.
@@ -788,11 +792,15 @@ export class Rundown extends BasicRundown {
   public stopActivePiecesOnLayers(layers: string[]): void {
     this.assertActive(this.stopActivePiecesOnLayers.name)
     const piecesToStop: Piece[] = [
-      ...this.getActiveCursor()?.part.getPieces().filter(piece => layers.includes(piece.layer)) ?? [],
+      ...this.getActiveCursor()?.part.getPieces().filter(piece => layers.includes(piece.layer) && !this.isPieceStopped(piece)) ?? [],
       ...layers.map(layer => this.infinitePieces.get(layer)).filter((piece): piece is Piece => !!piece)
     ]
 
     piecesToStop.forEach(piece => piece.stop())
+  }
+
+  private isPieceStopped(piece: Piece): boolean {
+    return !!piece.getDuration()
   }
 
   public insertPieceIntoActivePart(piece: Piece): void {
