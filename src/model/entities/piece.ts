@@ -164,6 +164,6 @@ export class Piece {
   }
 
   public hasEnded(): boolean {
-    return !!this.duration && this.executedAt + this.duration < Date.now()
+    return !!this.duration && this.executedAt + this.duration <= Date.now()
   }
 }
