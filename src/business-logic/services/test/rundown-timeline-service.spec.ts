@@ -768,6 +768,37 @@ describe(RundownTimelineService.name, () => {
       })
     })
 
+    describe('the Next Part is not immediately after the OnAir part', () => {
+      it('keeps the Part marked as Next as the Next Part', async () => {
+        const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
+
+        const segmentId: string = 'segmentId'
+        const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPart', segmentId })
+        const partBetweenOnAirAndNextPart: Part = EntityTestFactory.createPart({ id: 'middlePart', segmentId })
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', segmentId })
+
+        const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts: [onAirPart, partBetweenOnAirAndNextPart, nextPart] })
+
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          segments: [segment]
+        })
+        rundown.activate()
+        rundown.takeNext()
+        rundown.setNext(segment.id, nextPart.id)
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository })
+
+        expect(rundown.getNextPart().id).toBe(nextPart.id)
+
+        await testee.insertPartAsOnAir(rundown.id, partToBeInserted)
+
+        expect(rundown.getNextPart().id).toBe(nextPart.id)
+      })
+    })
+
     describe('no Parts were pruned from the active Segment', () => {
       it('emits a PartInsertedAsOnAirEvent with the inserted Part', async () => {
         const rundownMock: Rundown = EntityMockFactory.createRundownMock()
