@@ -98,6 +98,9 @@ export class Piece {
   }
 
   public stop(): void {
+    if (this.duration && this.duration + this.executedAt < Date.now()) {
+      return
+    }
     this.duration = Date.now() - this.executedAt
   }
 

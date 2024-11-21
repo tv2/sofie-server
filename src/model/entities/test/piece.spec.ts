@@ -200,4 +200,45 @@ describe(Piece.name, () => {
       })
     })
   })
+
+  describe(Piece.prototype.stop.name, () => {
+    describe('Piece isn\'t stopped', () => {
+      it('sets duration to now() minus executedAt', () => {
+        const now: number = 300
+        jest.useFakeTimers({ now })
+        const testee: Piece = new Piece({ executedAt: 10, duration: undefined } as PieceInterface)
+
+        testee.stop()
+        expect(testee.getDuration()).toBe(now - testee.getExecutedAt())
+      })
+    })
+
+    describe('Piece already have a duration', () => {
+      describe('the duration plus executedAt is in the future', () => {
+        it('sets duration to now() minus executedAt', () => {
+          const now: number = 300
+          jest.useFakeTimers({ now })
+
+          const testee: Piece = new Piece({ executedAt: 10, duration: 400 } as PieceInterface)
+          testee.stop()
+
+          expect(testee.getDuration()).toBe(now - testee.getExecutedAt())
+        })
+      })
+
+      describe('the duration plus executedAt is in the past', () => {
+        it('does not update duration', () => {
+          const now: number = 300
+          jest.useFakeTimers({ now })
+
+          const duration: number = 20
+          const testee: Piece = new Piece({ executedAt: 15, duration } as PieceInterface)
+
+          expect(testee.getDuration()).toBe(duration)
+          testee.stop()
+          expect(testee.getDuration()).toBe(duration)
+        })
+      })
+    })
+  })
 })
