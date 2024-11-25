@@ -167,7 +167,7 @@ export class Piece {
   }
 
   public hasEnded(): boolean {
-    if (!this.executedAt) {
+    if (this.executedAt === undefined) {
       return false
     }
     const durationInMs: number = this.duration ? this.duration : Infinity
