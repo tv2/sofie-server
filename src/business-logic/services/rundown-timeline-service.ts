@@ -21,6 +21,7 @@ import { IngestService } from './interfaces/ingest-service'
 import { Logger } from '../../logger/logger'
 import { PlayoutService } from './interfaces/playoutService'
 import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-exception'
+import { RundownCursor } from '../../model/value-objects/rundown-cursor'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -276,6 +277,7 @@ export class RundownTimelineService implements RundownService {
     this.assertTakeIsNotBlocked(rundown)
 
     const unplannedNextPartToKeepAsNextPart: Part | undefined = !rundown.getNextPart().isPlanned ? rundown.getNextPart() : undefined
+    const nextCursor: RundownCursor | undefined = rundown.getNextCursor()
 
     rundown.insertPartAsNext(part)
     rundown.takeNext()
@@ -283,6 +285,8 @@ export class RundownTimelineService implements RundownService {
 
     if (unplannedNextPartToKeepAsNextPart) {
       rundown.insertPartAsNext(unplannedNextPartToKeepAsNextPart)
+    } else if (nextCursor) {
+      rundown.setNext(nextCursor.segment.id, nextCursor.part.id, nextCursor.owner)
     }
 
     await this.buildAndPersistTimeline(rundown)
