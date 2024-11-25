@@ -164,6 +164,10 @@ export class Piece {
   }
 
   public hasEnded(): boolean {
-    return !!this.duration && this.executedAt + this.duration < Date.now()
+    if (!this.executedAt) {
+      return false
+    }
+    const durationInMs: number = this.duration ? this.duration : Infinity
+    return this.executedAt + durationInMs <= Date.now()
   }
 }

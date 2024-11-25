@@ -14,6 +14,9 @@ interface MongoAdLibPiece {
   name: string
   _rank: number
   expectedDuration: number | null
+  enable?: {
+    duration: number | null
+  }
   lifespan: string | null
   content?: {
     path: string
@@ -51,11 +54,23 @@ export class MongoAdLibPieceRepository extends BaseMongoRepository<MongoAdLibPie
       data: {
         name: adLibPiece.name,
         rank: adLibPiece._rank,
-        expectedDuration: adLibPiece.expectedDuration ?? undefined,
+        expectedDuration: this.getExpectedDuration(adLibPiece),
         sourceLayerId: adLibPiece.sourceLayerId,
         lifespan: adLibPiece.lifespan ?? undefined,
         content: adLibPiece.content
       },
     }
+  }
+
+  private getExpectedDuration(adLibPiece: MongoAdLibPiece): number | undefined {
+    if (adLibPiece.expectedDuration) {
+      return adLibPiece.expectedDuration
+    }
+
+    if (adLibPiece.enable?.duration) {
+      return adLibPiece.enable.duration
+    }
+
+    return undefined
   }
 }

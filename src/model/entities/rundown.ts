@@ -792,15 +792,11 @@ export class Rundown extends BasicRundown {
   public stopActivePiecesOnLayers(layers: string[]): void {
     this.assertActive(this.stopActivePiecesOnLayers.name)
     const piecesToStop: Piece[] = [
-      ...this.getActiveCursor()?.part.getPieces().filter(piece => layers.includes(piece.layer) && !this.isPieceStopped(piece)) ?? [],
+      ...this.getActiveCursor()?.part.getPieces().filter(piece => layers.includes(piece.layer) && !piece.hasEnded()) ?? [],
       ...layers.map(layer => this.infinitePieces.get(layer)).filter((piece): piece is Piece => !!piece)
     ]
 
     piecesToStop.forEach(piece => piece.stop())
-  }
-
-  private isPieceStopped(piece: Piece): boolean {
-    return !!piece.getDuration()
   }
 
   public insertPieceIntoActivePart(piece: Piece): void {
