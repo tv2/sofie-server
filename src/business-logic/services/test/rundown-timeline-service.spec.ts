@@ -1,5 +1,5 @@
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
-import { Rundown } from '../../../model/entities/rundown'
+import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities/rundown'
 import { RundownEventEmitter } from '../interfaces/rundown-event-emitter'
 import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
 import { TimelineRepository } from '../../../data-access/repositories/interfaces/timeline-repository'
@@ -27,6 +27,7 @@ import { PlayoutService } from '../interfaces/playoutService'
 import { InTransition } from '../../../model/value-objects/in-transition'
 import { TakeIsBlockedException } from '../../../model/exceptions/take-is-blocked-exception'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -850,6 +851,105 @@ describe(RundownTimelineService.name, () => {
         await testee.insertPartAsOnAir(rundown.id, partToBeInserted)
 
         verify(rundownEventEmitter.emitSegmentUpdated(rundown, segment)).once()
+      })
+    })
+  })
+
+  describe(RundownTimelineService.prototype.stopPiece.name, () => {
+    describe('there is no Piece to stop for the PieceId', () => {
+      const nonExistingPieceId: string = 'nonExistingPieceId'
+      let rundown: Rundown
+      let rundownRepository: RundownRepository
+
+      beforeEach(() => {
+        const part: Part = EntityTestFactory.createPart()
+        rundown = EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+          activeCursor: {
+            part
+          } as RundownCursor
+        } as RundownAlreadyActiveProperties })
+
+        rundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+      })
+
+      it('saves no new Timeline', async () => {
+        const timelineRepository: TimelineRepository = mock<TimelineRepository>()
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository, timelineRepository })
+        await testee.stopPiece(rundown.id, nonExistingPieceId)
+
+        verify(timelineRepository.saveTimeline(anything())).never()
+      })
+
+      it('emits no PieceStoppedEvent', async () => {
+        const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
+        await testee.stopPiece(rundown.id, nonExistingPieceId)
+
+        verify(rundownEventEmitter.emitPieceStoppedEvent(anything(), anything())).never()
+      })
+
+      it('does not save the Rundown', async () => {
+        const testee: RundownTimelineService = createTestee({ rundownRepository })
+        await testee.stopPiece(rundown.id, nonExistingPieceId)
+
+        verify(rundownRepository.saveRundown(rundown)).never()
+      })
+    })
+
+    describe('there is a Piece to stop for the PieceId', () => {
+      let piece: Piece
+      let part: Part
+      let rundown: Rundown
+      let rundownRepository: RundownRepository
+
+      beforeEach(() => {
+        piece = EntityTestFactory.createPiece()
+        part = EntityTestFactory.createPart({ pieces: [piece] })
+        rundown = EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+          activeCursor: {
+            part
+          } as RundownCursor
+        } as RundownAlreadyActiveProperties
+        })
+
+        rundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+      })
+
+      it('build and saves a new Timeline', async () => {
+        const timeline: Timeline = { // We just need a Timeline. We don't care what's in for this test.
+          timelineGroups: []
+        }
+
+        const timelineBuilder: TimelineBuilder = mock<TimelineBuilder>()
+        when(timelineBuilder.buildTimeline(rundown)).thenResolve(timeline)
+
+        const timelineRepository: TimelineRepository = mock<TimelineRepository>()
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository, timelineBuilder, timelineRepository })
+        await testee.stopPiece(rundown.id, piece.id)
+
+        verify(timelineBuilder.buildTimeline(rundown)).once()
+        verify(timelineRepository.saveTimeline(timeline)).once()
+      })
+
+      it('emits a PieceStopped event for the Piece', async () => {
+        const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
+        await testee.stopPiece(rundown.id, piece.id)
+
+        verify(rundownEventEmitter.emitPieceStoppedEvent(rundown, piece)).once()
+      })
+
+      it('saves the Rundown', async () => {
+        const testee: RundownTimelineService = createTestee({ rundownRepository })
+        await testee.stopPiece(rundown.id, piece.id)
+
+        verify(rundownRepository.saveRundown(rundown)).once()
       })
     })
   })

@@ -799,9 +799,11 @@ export class Rundown extends BasicRundown {
     piecesToStop.forEach(piece => piece.stop())
   }
 
-  public stopPiece(pieceId: string): void {
+  public stopPiece(pieceId: string): Piece | undefined {
     this.assertActive(this.stopPiece.name)
-    this.getActivePart().getPieces().concat(this.getInfinitePieces()).find(piece => piece.id === pieceId)?.stop()
+    const pieceToStop: Piece | undefined = this.getActivePart().getPieces().concat(this.getInfinitePieces()).find(piece => piece.id === pieceId)
+    pieceToStop?.stop()
+    return pieceToStop
   }
 
   public insertPieceIntoActivePart(piece: Piece): void {

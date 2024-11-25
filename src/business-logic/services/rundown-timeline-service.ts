@@ -357,4 +357,15 @@ export class RundownTimelineService implements RundownService {
 
     await this.saveRundown(rundown)
   }
+
+  public async stopPiece(rundownId: string, pieceId: string): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const stoppedPiece: Piece | undefined = rundown.stopPiece(pieceId)
+    if (!stoppedPiece) {
+      return
+    }
+    await this.buildAndPersistTimeline(rundown)
+    this.rundownEventEmitter.emitPieceStoppedEvent(rundown, stoppedPiece)
+    await this.rundownRepository.saveRundown(rundown)
+  }
 }
