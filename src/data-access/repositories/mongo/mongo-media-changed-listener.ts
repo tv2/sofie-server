@@ -12,7 +12,7 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { MongoMedia } from './mongo-entity-converter'
 import { Media } from '../../../model/entities/media'
-import { MediaRepository } from '../interfaces/MediaRepository'
+import { MediaRepository } from '../interfaces/media-repository'
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 

@@ -29,7 +29,7 @@ import { MongoIngestedPartChangedListener } from '../repositories/mongo/mongo-in
 import { MongoIngestedRundownChangedListener } from '../repositories/mongo/mongo-ingested-rundown-changed-listener'
 import { ActionManifestRepository } from '../repositories/interfaces/action-manifest-repository'
 import { MongoAdLibActionsRepository } from '../repositories/mongo/mongo-ad-lib-actions-repository'
-import { MediaRepository } from '../repositories/interfaces/MediaRepository'
+import { MediaRepository } from '../repositories/interfaces/media-repository'
 import { MongoMediaRepository } from '../repositories/mongo/mongo-media-repository'
 import { MongoAdLibPieceRepository } from '../repositories/mongo/mongo-ad-lib-piece-repository'
 import { MongoActionManifestRepository } from '../repositories/mongo/mongo-action-manifest-repository'
@@ -75,6 +75,7 @@ import { RundownAggregateRepository } from '../repositories/interfaces/rundown-a
 import { IngestedPiece } from '../../model/entities/ingested-piece'
 import { PieceRepository } from '../repositories/interfaces/piece-repository'
 import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-ingested-piece-changed-listener'
+import { MongoExpectedPlayoutItemRepository } from '../repositories/mongo/mongo-expected-playout-item-repository'
 
 export class RepositoryFacade {
 
@@ -92,6 +93,7 @@ export class RepositoryFacade {
       RepositoryFacade.createMongoSegmentRepository(),
       RepositoryFacade.createMongoPartRepository(),
       RepositoryFacade.createMongoPieceRepository(),
+      RepositoryFacade.createExpectedPlayoutItemRepository(),
       new MongoEntityConverter(LoggerFacade.createLogger()),
     )
     return CachedRundownAggregateRepository.getInstance(mongoRundownRepository, LoggerFacade.createLogger())
@@ -294,5 +296,9 @@ export class RepositoryFacade {
 
   private static createUuidGenerator(): UuidGenerator {
     return new CryptoUuidGenerator()
+  }
+
+  private static createExpectedPlayoutItemRepository(): MongoExpectedPlayoutItemRepository {
+    return new MongoExpectedPlayoutItemRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
   }
 }

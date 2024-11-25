@@ -1,10 +1,7 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { Part } from '../../../model/entities/part'
 import { MongoDatabase } from './mongo-database'
-import {
-  AnyBulkWriteOperation,
-  ClientSession,
-} from 'mongodb'
+import { AnyBulkWriteOperation, } from 'mongodb'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { Piece } from '../../../model/entities/piece'
 import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
@@ -74,13 +71,6 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
         filter: { rundownId, _id: { $nin: parts.map(part => part.id) } }
       }
     }
-  }
-
-  public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoPart>[], session: ClientSession): Promise<void> {
-    if (queries.length === 0) {
-      return
-    }
-    await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
   public buildDeletePartsForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoPart> {
