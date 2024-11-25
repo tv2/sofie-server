@@ -192,6 +192,20 @@ describe(Piece.name, () => {
         })
       })
 
+      describe('executedAt + duration is exactly one less than now', () => {
+        it('has ended', () => {
+          const testee: Piece = EntityTestFactory.createPiece({ executedAt: 250, duration: 249 })
+          expect(testee.hasEnded()).toBeTruthy()
+        })
+      })
+
+      describe('executedAt + duration is exactly one larger than now', () => {
+        it('has not ended', () => {
+          const testee: Piece = EntityTestFactory.createPiece({ executedAt: 250, duration: 251 })
+          expect(testee.hasEnded()).toBeFalsy()
+        })
+      })
+
       describe('executedAt + duration is larger than now', () => {
         it('has not ended', () => {
           const testee: Piece = EntityTestFactory.createPiece({ executedAt: 300, duration: 300 })
