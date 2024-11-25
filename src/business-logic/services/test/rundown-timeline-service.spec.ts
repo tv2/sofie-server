@@ -888,7 +888,7 @@ describe(RundownTimelineService.name, () => {
         const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
         await testee.stopPiece(rundown.id, nonExistingPieceId)
 
-        verify(rundownEventEmitter.emitPieceStoppedEvent(anything(), anything())).never()
+        verify(rundownEventEmitter.emitPieceStoppedEvent(anything(), anyString(), anything())).never()
       })
 
       it('does not save the Rundown', async () => {
@@ -942,7 +942,7 @@ describe(RundownTimelineService.name, () => {
         const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
         await testee.stopPiece(rundown.id, piece.id)
 
-        verify(rundownEventEmitter.emitPieceStoppedEvent(rundown, piece)).once()
+        verify(rundownEventEmitter.emitPieceStoppedEvent(rundown, anyString(), piece)).once()
       })
 
       it('saves the Rundown', async () => {

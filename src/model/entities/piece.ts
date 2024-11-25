@@ -26,6 +26,7 @@ export interface PieceInterface {
   tags: string[]
   isUnsynced: boolean
   isInsertedOnAir?: boolean
+  createdFromActionId?: string
 }
 
 export class Piece {
@@ -35,6 +36,7 @@ export class Piece {
   public readonly layer: string
   public readonly pieceLifespan: PieceLifespan
   public readonly isPlanned: boolean = true
+  public readonly createdFromActionId?: string
   public readonly preRollDuration: number
   public readonly postRollDuration: number
   public readonly transitionType: TransitionType
@@ -59,6 +61,7 @@ export class Piece {
     this.layer = piece.layer
     this.pieceLifespan = piece.pieceLifespan
     this.isPlanned = piece.isPlanned
+    this.createdFromActionId = piece.createdFromActionId
     this.start = piece.start
     this.duration = piece.duration
     this.preRollDuration = piece.preRollDuration
