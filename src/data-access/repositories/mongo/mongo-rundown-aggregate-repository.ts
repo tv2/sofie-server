@@ -12,6 +12,7 @@ import { MongoPartRepository } from './mongo-part-repository'
 import { MongoPieceRepository } from './mongo-piece-repository'
 import { Part } from '../../../model/entities/part'
 import { RundownAggregateRepository } from '../interfaces/rundown-aggregate-repository'
+import { MongoExpectedPlayoutItemRepository } from './mongo-expected-playout-item-repository'
 
 const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
@@ -22,7 +23,8 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     private readonly mongoSegmentRepository: MongoSegmentRepository,
     private readonly mongoPartRepository: MongoPartRepository,
     private readonly mongoPieceRepository: MongoPieceRepository,
-    private readonly mongoEntityConverter: MongoEntityConverter,
+    private readonly mongoExpectedPlayoutItemRepository: MongoExpectedPlayoutItemRepository,
+    private readonly mongoEntityConverter: MongoEntityConverter
   ) {
     super(mongoDatabase)
   }
@@ -87,6 +89,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
       await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeletePiecesForRundownQuery(rundownId)], session)
       await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForRundownQuery(rundownId)], session)
       await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteSegmentsForRundownQuery(rundownId)], session)
+      await this.mongoExpectedPlayoutItemRepository.executeQueries([this.mongoExpectedPlayoutItemRepository.buildDeleteExpectedPlayoutItemsForRundownQuery(rundownId)], session)
       await this.getCollection().deleteOne({ _id: rundownId })
     })
   }
