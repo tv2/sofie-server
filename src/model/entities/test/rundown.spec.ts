@@ -4967,7 +4967,7 @@ describe(Rundown.name, () => {
     describe('the Rundown is active', () => {
       describe('the Piece is on the Active Part', () => {
         it ('stops the Piece', () => {
-          const piece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', executedAt: 0, duration: undefined })
+          const piece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', executedAt: 12345678, duration: undefined })
           const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [piece] })
           const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart] })
 
@@ -4978,15 +4978,15 @@ describe(Rundown.name, () => {
             }
           }} as RundownInterface)
 
-          expect(piece.hasEnded()).toBeFalsy()
+          expect(piece.hasEnded(Date.now())).toBeFalsy()
           testee.stopPiece(piece.id)
-          expect(piece.hasEnded()).toBeTruthy()
+          expect(piece.hasEnded(Date.now())).toBeTruthy()
         })
       })
 
-      describe('the Piece is Infinite Pieces', () => {
+      describe('when piece is an infinite piece', () => {
         it ('stops the Piece', () => {
-          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', layer: 'infinitePieceLayer', executedAt: 0, duration: undefined })
+          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', layer: 'infinitePieceLayer', executedAt: 12345678, duration: undefined })
           const infinitePieces: Map<string, Piece> = new Map()
           infinitePieces.set(infinitePiece.layer, infinitePiece)
 
@@ -5001,9 +5001,9 @@ describe(Rundown.name, () => {
             infinitePieces
           }} as RundownInterface)
 
-          expect(infinitePiece.hasEnded()).toBeFalsy()
+          expect(infinitePiece.hasEnded(Date.now())).toBeFalsy()
           testee.stopPiece(infinitePiece.id)
-          expect(infinitePiece.hasEnded()).toBeTruthy()
+          expect(infinitePiece.hasEnded(Date.now())).toBeTruthy()
         })
       })
     })

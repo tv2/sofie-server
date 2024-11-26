@@ -169,11 +169,11 @@ export class Piece {
     this.timelineObjects.push(...timelineObjects)
   }
 
-  public hasEnded(): boolean {
-    if (this.executedAt === undefined) {
+  public hasEnded(timestamp: number): boolean {
+    if (!this.executedAt) {
       return false
     }
     const durationInMs: number = this.duration ? this.duration : Infinity
-    return this.executedAt + durationInMs <= Date.now()
+    return this.executedAt + durationInMs <= timestamp
   }
 }

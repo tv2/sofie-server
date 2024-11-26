@@ -219,10 +219,11 @@ export class Segment {
     usedLayers: Set<string>,
     lifespans: PieceLifespan[]
   ): Piece[] {
+    const now: number = Date.now()
     return this.parts
       .slice(0, startIndex + 1)
       .flatMap((part) => part.getPiecesWithLifespan(lifespans))
-      .filter(piece => !piece.hasEnded())
+      .filter(piece => !piece.hasEnded(now))
       .reduceRight(this.createGetPiecesOnUnusedLayersReducer(usedLayers), [])
   }
 
