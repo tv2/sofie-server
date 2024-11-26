@@ -168,7 +168,7 @@ describe(Piece.name, () => {
     describe('it does not have an executedAt', () => {
       it('has not ended', () => {
         const testee: Piece = EntityTestFactory.createPiece({ executedAt: undefined })
-        expect(testee.hasEnded()).toBeFalsy()
+        expect(testee.hasEnded(Date.now())).toBeFalsy()
       })
     })
 
@@ -176,66 +176,62 @@ describe(Piece.name, () => {
       describe('it does not have a duration', () => {
         it('has not ended', () => {
           const testee: Piece = EntityTestFactory.createPiece({ executedAt: 0, duration: undefined })
-          expect(testee.hasEnded()).toBeFalsy()
+          expect(testee.hasEnded(Date.now())).toBeFalsy()
         })
       })
 
       describe('it has a duration which is less than now - executedAt ', () => {
         it('has ended', () => {
-          jest.useFakeTimers({ now: 50 })
-          const testee: Piece = EntityTestFactory.createPiece({ executedAt: 0, duration: 10 })
-          expect(testee.hasEnded()).toBeTruthy()
+          const testee: Piece = EntityTestFactory.createPiece({ executedAt: 12345678, duration: 10 })
+          expect(testee.hasEnded(Date.now())).toBeTruthy()
         })
       })
     })
 
 
     describe('executedAt is more than zero', () => {
+      const now: number = 500
+
       describe('it does not have a duration', () => {
         it('has not ended', () => {
           const testee: Piece = EntityTestFactory.createPiece({ executedAt: 10, duration: undefined })
-          expect(testee.hasEnded()).toBeFalsy()
+          expect(testee.hasEnded(now)).toBeFalsy()
         })
       })
 
       describe('the Piece has a duration', () => {
-        beforeEach(() => {
-          const now: number = 500
-          jest.useFakeTimers({ now })
-        })
-
         describe('executedAt + duration is less than now', () => {
           it('has ended', () => {
             const testee: Piece = EntityTestFactory.createPiece({ executedAt: 100, duration: 100 })
-            expect(testee.hasEnded()).toBeTruthy()
+            expect(testee.hasEnded(now)).toBeTruthy()
           })
         })
 
         describe('executedAt + duration is equal to now', () => {
           it('has ended', () => {
             const testee: Piece = EntityTestFactory.createPiece({ executedAt: 250, duration: 250 })
-            expect(testee.hasEnded()).toBeTruthy()
+            expect(testee.hasEnded(now)).toBeTruthy()
           })
         })
 
         describe('executedAt + duration is exactly one less than now', () => {
           it('has ended', () => {
             const testee: Piece = EntityTestFactory.createPiece({ executedAt: 250, duration: 249 })
-            expect(testee.hasEnded()).toBeTruthy()
+            expect(testee.hasEnded(now)).toBeTruthy()
           })
         })
 
         describe('executedAt + duration is exactly one larger than now', () => {
           it('has not ended', () => {
             const testee: Piece = EntityTestFactory.createPiece({ executedAt: 250, duration: 251 })
-            expect(testee.hasEnded()).toBeFalsy()
+            expect(testee.hasEnded(now)).toBeFalsy()
           })
         })
 
         describe('executedAt + duration is larger than now', () => {
           it('has not ended', () => {
             const testee: Piece = EntityTestFactory.createPiece({ executedAt: 300, duration: 300 })
-            expect(testee.hasEnded()).toBeFalsy()
+            expect(testee.hasEnded(now)).toBeFalsy()
           })
         })
       })

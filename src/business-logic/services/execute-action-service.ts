@@ -189,6 +189,7 @@ export class ExecuteActionService implements ActionService {
     const pieceInterface: PieceInterface = pieceAction.data.pieceInterface
     pieceInterface.id = this.makeUnique(pieceInterface.id)
     pieceInterface.rundownId = rundownId
+    pieceInterface.createdFromActionId = pieceAction.id
     return new Piece(pieceInterface)
   }
 

@@ -155,12 +155,14 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
     }
   }
 
-  public buildPieceStoppedEvent(rundown: Rundown, piece: Piece): PieceStoppedEvent {
+  public buildPieceStoppedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceStoppedEvent {
     return {
       type: RundownEventType.PIECE_STOPPED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      piece: new PieceDto(piece)
+      segmentId,
+      partId: piece.getPartId(),
+      piece: new PieceDto(piece),
     }
   }
 

@@ -61,7 +61,8 @@ export interface PieceReplacedEvent extends PartEvent {
   newPiece: PieceDto
 }
 
-export interface PieceStoppedEvent extends RundownEvent {
+export interface PieceStoppedEvent extends PartEvent {
+  type: RundownEventType.PIECE_STOPPED
   piece: PieceDto
 }
 

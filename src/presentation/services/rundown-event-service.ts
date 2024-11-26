@@ -90,8 +90,8 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
     this.emitRundownEvent(event)
   }
 
-  public emitPieceStoppedEvent(rundown: Rundown, piece: Piece): void {
-    const event: PieceStoppedEvent = this.rundownEventBuilder.buildPieceStoppedEvent(rundown, piece)
+  public emitPieceStoppedEvent(rundown: Rundown, segmentId: string, piece: Piece): void {
+    const event: PieceStoppedEvent = this.rundownEventBuilder.buildPieceStoppedEvent(rundown, segmentId, piece)
     this.emitRundownEvent(event)
   }
 

@@ -4865,12 +4865,19 @@ describe(Rundown.name, () => {
           const segment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, unplannedPartOneAfterActivePart, unplannedPartTwoAfterActivePart] })
           const threshold: number = 1
 
-          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
-            activeCursor: {
-              segment,
-              part: onAirPart
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: onAirPart,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: undefined,
+              infinitePieces: new Map(),
             }
-          } } as RundownInterface)
+          }))
 
           expect(segment.getParts()).toContain(onAirPart)
           expect(segment.getParts()).toContain(unplannedPartOneAfterActivePart)
@@ -4938,12 +4945,19 @@ describe(Rundown.name, () => {
           const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, unplannedPartTwo, onAirPart] })
           const threshold: number = 1
 
-          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
-            activeCursor: {
-              segment,
-              part: onAirPart
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: onAirPart,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: undefined,
+              infinitePieces: new Map(),
             }
-          } } as RundownInterface)
+          }))
 
           const result: string[] = testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
           expect(result).toHaveLength(2)
@@ -4955,55 +4969,66 @@ describe(Rundown.name, () => {
   })
 
   describe(Rundown.prototype.stopPiece.name, () => {
-    describe('the Rundown isn\'t active', () => {
-      it('throws NotActivateException', () => {
+    describe('the rundown is inactive', () => {
+      it('throws NotActivatedException', () => {
         const pieceId: string = 'randomPieceId'
-        const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE } as RundownInterface)
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({ mode: RundownMode.INACTIVE }))
 
         expect(() => testee.stopPiece(pieceId)).toThrow(NotActivatedException)
       })
     })
 
-    describe('the Rundown is active', () => {
+    describe('the rundown is active', () => {
       describe('the Piece is on the Active Part', () => {
         it ('stops the Piece', () => {
-          const piece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', executedAt: 0, duration: undefined })
+          const piece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', executedAt: 12345678, duration: undefined })
           const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [piece] })
           const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart] })
 
-          const testee: Rundown = new Rundown({ mode: RundownMode.ACTIVE, alreadyActiveProperties: {
-            activeCursor: {
-              part: activePart,
-              segment
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: activePart,
+                segment,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: undefined,
+              infinitePieces: new Map(),
             }
-          }} as RundownInterface)
+          }))
 
-          expect(piece.hasEnded()).toBeFalsy()
+          expect(piece.hasEnded(Date.now())).toBeFalsy()
           testee.stopPiece(piece.id)
-          expect(piece.hasEnded()).toBeTruthy()
+          expect(piece.hasEnded(Date.now())).toBeTruthy()
         })
       })
 
-      describe('the Piece is Infinite Pieces', () => {
+      describe('when piece is an infinite piece', () => {
         it ('stops the Piece', () => {
-          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', layer: 'infinitePieceLayer', executedAt: 0, duration: undefined })
+          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', layer: 'infinitePieceLayer', executedAt: 12345678, duration: undefined })
           const infinitePieces: Map<string, Piece> = new Map()
           infinitePieces.set(infinitePiece.layer, infinitePiece)
 
           const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
           const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart] })
 
-          const testee: Rundown = new Rundown({ mode: RundownMode.ACTIVE, alreadyActiveProperties: {
-            activeCursor: {
-              part: activePart,
-              segment
-            },
-            infinitePieces
-          }} as RundownInterface)
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: activePart,
+                segment,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: undefined,
+              infinitePieces
+            }
+          }))
 
-          expect(infinitePiece.hasEnded()).toBeFalsy()
+          expect(infinitePiece.hasEnded(Date.now())).toBeFalsy()
           testee.stopPiece(infinitePiece.id)
-          expect(infinitePiece.hasEnded()).toBeTruthy()
+          expect(infinitePiece.hasEnded(Date.now())).toBeTruthy()
         })
       })
     })

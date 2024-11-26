@@ -1,5 +1,5 @@
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
-import { Rundown, RundownAlreadyActiveProperties } from '../../../model/entities/rundown'
+import { Rundown } from '../../../model/entities/rundown'
 import { RundownEventEmitter } from '../interfaces/rundown-event-emitter'
 import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
 import { TimelineRepository } from '../../../data-access/repositories/interfaces/timeline-repository'
@@ -27,7 +27,6 @@ import { PlayoutService } from '../interfaces/playoutService'
 import { InTransition } from '../../../model/value-objects/in-transition'
 import { TakeIsBlockedException } from '../../../model/exceptions/take-is-blocked-exception'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
-import { RundownCursor } from '../../../model/value-objects/rundown-cursor'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -893,12 +892,20 @@ describe(RundownTimelineService.name, () => {
       let rundownRepository: RundownRepository
 
       beforeEach(() => {
-        const part: Part = EntityTestFactory.createPart()
-        rundown = EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE, alreadyActiveProperties: {
-          activeCursor: {
-            part
-          } as RundownCursor
-        } as RundownAlreadyActiveProperties })
+        const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+        const onAirSegment: Segment = EntityTestFactory.createSegment({ isOnAir: true })
+        rundown = EntityTestFactory.createRundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              part: onAirPart,
+              segment: onAirSegment,
+              owner: Owner.SYSTEM,
+            },
+            nextCursor: undefined,
+            infinitePieces: new Map(),
+          }
+        })
 
         rundownRepository = mock<RundownRepository>()
         when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
@@ -919,7 +926,7 @@ describe(RundownTimelineService.name, () => {
         const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
         await testee.stopPiece(rundown.id, nonExistingPieceId)
 
-        verify(rundownEventEmitter.emitPieceStoppedEvent(anything(), anything())).never()
+        verify(rundownEventEmitter.emitPieceStoppedEvent(anything(), anyString(), anything())).never()
       })
 
       it('does not save the Rundown', async () => {
@@ -933,17 +940,25 @@ describe(RundownTimelineService.name, () => {
     describe('there is a Piece to stop for the PieceId', () => {
       let piece: Piece
       let part: Part
+      let segment: Segment
       let rundown: Rundown
       let rundownRepository: RundownRepository
 
       beforeEach(() => {
         piece = EntityTestFactory.createPiece()
-        part = EntityTestFactory.createPart({ pieces: [piece] })
-        rundown = EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE, alreadyActiveProperties: {
-          activeCursor: {
-            part
-          } as RundownCursor
-        } as RundownAlreadyActiveProperties
+        part = EntityTestFactory.createPart({ isOnAir: true, pieces: [piece] })
+        segment = EntityTestFactory.createSegment({ isOnAir: true, parts: [part] })
+        rundown = EntityTestFactory.createRundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              part,
+              segment,
+              owner: Owner.SYSTEM,
+            },
+            nextCursor: undefined,
+            infinitePieces: new Map()
+          }
         })
 
         rundownRepository = mock<RundownRepository>()
@@ -973,7 +988,7 @@ describe(RundownTimelineService.name, () => {
         const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
         await testee.stopPiece(rundown.id, piece.id)
 
-        verify(rundownEventEmitter.emitPieceStoppedEvent(rundown, piece)).once()
+        verify(rundownEventEmitter.emitPieceStoppedEvent(rundown, anyString(), piece)).once()
       })
 
       it('saves the Rundown', async () => {
