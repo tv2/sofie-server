@@ -184,13 +184,15 @@ describe(Part.name, () => {
         expect(testee.getPieces()).toContain(unplannedPiece)
       })
 
-      describe('there is already a Piece on the layer of the inserted Piece', () => {
+      describe('there is an overlapping piece on the layer of the inserted piece', () => {
         describe('the Part is On Air', () => {
+          beforeEach(() => jest.useFakeTimers({ now: 500 }))
+          afterEach(() => jest.useRealTimers())
+
           it('keeps the existing Piece on the Part', () => {
             const layer: string = 'someLayer'
             const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
             const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
-
             const testee: Part = new Part({ id: 'partId', isOnAir: true, pieces: [existingPiece] } as PartInterface)
 
             expect(testee.getPieces()).toContain(existingPiece)
@@ -202,16 +204,17 @@ describe(Part.name, () => {
 
           it('stops the existing Piece', () => {
             const layer: string = 'someLayer'
-            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
-            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
+            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', executedAt: 200, isPlanned: true, start: 200, duration: 0, layer })
+            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, duration: 200, layer })
 
-            const testee: Part = new Part({ id: 'partId', isOnAir: true, pieces: [existingPiece] } as PartInterface)
+            const testee: Part = new Part(EntityTestFactory.createPartInterface({ id: 'partId', isOnAir: true, pieces: [existingPiece] }))
 
-            expect(existingPiece.getDuration()).toBeUndefined()
+            expect(existingPiece.getDuration()).toBe(0)
+            jest.advanceTimersByTime(200)
 
             testee.insertPiece(unplannedPiece)
 
-            expect(existingPiece.getDuration()).not.toBeUndefined()
+            expect(existingPiece.getDuration()).toBeGreaterThan(0)
           })
         })
 

@@ -7,26 +7,26 @@ import { TimelineObject } from '../timeline-object'
 import { DuplicateIdException } from '../../exceptions/duplicate-id-exception'
 
 describe(Piece.name, () => {
-  describe(Piece.prototype.setExecutedAt.name, () => {
+  describe(Piece.prototype.putOnAir.name, () => {
     it('updates executedAt', () => {
       const testee: Piece = new Piece({
         pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       } as PieceInterface)
 
       const now: number = Date.now()
-      testee.setExecutedAt(now)
+      testee.putOnAir(now)
 
       const result: number = testee.getExecutedAt()
       expect(result).toEqual(now)
     })
   })
 
-  describe(Piece.prototype.resetExecutedAt.name, () => {
+  describe(Piece.prototype.resetExecution.name, () => {
     it('sets executedAt to zero', () => {
       const testee: Piece = new Piece({} as PieceInterface)
 
-      testee.setExecutedAt(Date.now())
-      testee.resetExecutedAt()
+      testee.putOnAir(Date.now())
+      testee.resetExecution()
 
       const result: number = testee.getExecutedAt()
       expect(result).toEqual(0)
@@ -239,14 +239,14 @@ describe(Piece.name, () => {
     })
   })
 
-  describe(Piece.prototype.stop.name, () => {
+  describe(Piece.prototype.takeOffAir.name, () => {
     describe('Piece isn\'t stopped', () => {
       it('sets duration to now() minus executedAt', () => {
         const now: number = 300
         jest.useFakeTimers({ now })
         const testee: Piece = new Piece({ executedAt: 10, duration: undefined } as PieceInterface)
 
-        testee.stop()
+        testee.takeOffAir(now)
         expect(testee.getDuration()).toBe(now - testee.getExecutedAt())
       })
     })
@@ -257,8 +257,9 @@ describe(Piece.name, () => {
           const now: number = 300
           jest.useFakeTimers({ now })
 
-          const testee: Piece = new Piece({ executedAt: 10, duration: 400 } as PieceInterface)
-          testee.stop()
+          const testee: Piece = new Piece(EntityTestFactory.createPieceInterface({ executedAt: 10, duration: 400, takenOffAirTimestamp: 410 }))
+
+          testee.takeOffAir(now)
 
           expect(testee.getDuration()).toBe(now - testee.getExecutedAt())
         })
@@ -270,10 +271,11 @@ describe(Piece.name, () => {
           jest.useFakeTimers({ now })
 
           const duration: number = 20
-          const testee: Piece = new Piece({ executedAt: 15, duration } as PieceInterface)
+          const testee: Piece = new Piece({ duration } as PieceInterface)
 
+          testee.putOnAir(15)
           expect(testee.getDuration()).toBe(duration)
-          testee.stop()
+          testee.takeOffAir(now)
           expect(testee.getDuration()).toBe(duration)
         })
       })

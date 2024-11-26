@@ -470,7 +470,7 @@ export class Rundown extends BasicRundown {
     const pieceIdsThatHasNotBeenOutlived: string[] = piecesThatHasNotBeenOutlived.map((piece) => piece.id)
     Array.from(this.infinitePieces.values())
       .filter((piece) => !pieceIdsThatHasNotBeenOutlived.includes(piece.id))
-      .forEach((piece) => piece.resetExecutedAt())
+      .forEach((piece) => piece.resetExecution())
   }
 
   private addPiecesToLayers(pieces: Piece[], layersWithPieces: Map<string, Piece>): Map<string, Piece> {
@@ -496,7 +496,7 @@ export class Rundown extends BasicRundown {
 
   private setExecutedAtIfMissing(piece: Piece): Piece {
     if (!piece.getExecutedAt()) {
-      piece.setExecutedAt(Date.now())
+      piece.putOnAir(Date.now())
     }
     return piece
   }
@@ -955,13 +955,14 @@ export class Rundown extends BasicRundown {
       ...layers.map(layer => this.infinitePieces.get(layer)).filter((piece): piece is Piece => !!piece)
     ]
 
-    piecesToStop.forEach(piece => piece.stop())
+    const now: number = Date.now()
+    piecesToStop.forEach(piece => piece.takeOffAir(now))
   }
 
   public stopPiece(pieceId: string): Piece | undefined {
     this.assertActive(this.stopPiece.name)
     const pieceToStop: Piece | undefined = this.getActivePart().getPieces().concat(this.getInfinitePieces()).find(piece => piece.id === pieceId)
-    pieceToStop?.stop()
+    pieceToStop?.takeOffAir(Date.now())
     return pieceToStop
   }
 

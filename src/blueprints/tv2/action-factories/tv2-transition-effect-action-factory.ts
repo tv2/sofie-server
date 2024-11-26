@@ -177,6 +177,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       isPlanned: false,
       start: 0,
       duration: Math.max(this.frameTimeConverter.convertFramesToMilliseconds(durationInFrames), 0),
+      takenOffAirTimestamp: 0,
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],

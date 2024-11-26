@@ -170,6 +170,7 @@ export class IngestedEntityToEntityMapper {
       isPlanned: true,
       start: ingestedPiece.start,
       duration: ingestedPiece.duration,
+      takenOffAirTimestamp: 0,
       preRollDuration: ingestedPiece.preRollDuration,
       postRollDuration: ingestedPiece.postRollDuration,
       transitionType: ingestedPiece.transitionType,
@@ -200,7 +201,8 @@ export class IngestedEntityToEntityMapper {
       content: ingestedPiece.content,
       tags: pieceToBeUpdated.tags,
       isUnsynced: pieceToBeUpdated.isUnsynced(),
-      executedAt: pieceToBeUpdated.getExecutedAt()
+      executedAt: pieceToBeUpdated.getExecutedAt(),
+      takenOffAirTimestamp: pieceToBeUpdated.getTakenOffAirTimestamp(),
     })
   }
 }
