@@ -4970,7 +4970,7 @@ describe(Rundown.name, () => {
 
   describe(Rundown.prototype.stopPiece.name, () => {
     describe('the rundown is inactive', () => {
-      it('throws NotActivateException', () => {
+      it('throws NotActivatedException', () => {
         const pieceId: string = 'randomPieceId'
         const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({ mode: RundownMode.INACTIVE }))
 
