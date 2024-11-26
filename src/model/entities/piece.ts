@@ -98,6 +98,9 @@ export class Piece {
   }
 
   public stop(): void {
+    if (this.duration && this.duration + this.executedAt < Date.now()) {
+      return
+    }
     this.duration = Date.now() - this.executedAt
   }
 
@@ -164,7 +167,7 @@ export class Piece {
   }
 
   public hasEnded(): boolean {
-    if (!this.executedAt) {
+    if (this.executedAt === undefined) {
       return false
     }
     const durationInMs: number = this.duration ? this.duration : Infinity

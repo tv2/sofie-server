@@ -82,4 +82,8 @@ export class ThrottledRundownService implements RundownService {
   public replacePieceOnAirOnNextPart(rundownId: string, pieceToBeReplaced: Piece, newPiece: Piece): Promise<void> {
     return this.rundownService.replacePieceOnAirOnNextPart(rundownId, pieceToBeReplaced, newPiece)
   }
+
+  public stopPiece(rundownId: string, pieceId: string): Promise<void> {
+    return this.rundownService.stopPiece(rundownId, pieceId)
+  }
 }

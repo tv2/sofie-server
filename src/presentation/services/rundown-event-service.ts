@@ -9,6 +9,7 @@ import {
   PartUpdatedEvent,
   PieceInsertedEvent,
   PieceReplacedEvent,
+  PieceStoppedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
@@ -86,6 +87,11 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
 
   public emitPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPieceId: string, newPiece: Piece): void {
     const event: PieceReplacedEvent = this.rundownEventBuilder.buildPieceReplacedEvent(rundown, segmentId, replacedPieceId, newPiece)
+    this.emitRundownEvent(event)
+  }
+
+  public emitPieceStoppedEvent(rundown: Rundown, piece: Piece): void {
+    const event: PieceStoppedEvent = this.rundownEventBuilder.buildPieceStoppedEvent(rundown, piece)
     this.emitRundownEvent(event)
   }
 

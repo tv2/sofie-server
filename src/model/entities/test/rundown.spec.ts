@@ -4953,6 +4953,61 @@ describe(Rundown.name, () => {
       })
     })
   })
+
+  describe(Rundown.prototype.stopPiece.name, () => {
+    describe('the Rundown isn\'t active', () => {
+      it('throws NotActivateException', () => {
+        const pieceId: string = 'randomPieceId'
+        const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE } as RundownInterface)
+
+        expect(() => testee.stopPiece(pieceId)).toThrow(NotActivatedException)
+      })
+    })
+
+    describe('the Rundown is active', () => {
+      describe('the Piece is on the Active Part', () => {
+        it ('stops the Piece', () => {
+          const piece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', executedAt: 0, duration: undefined })
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [piece] })
+          const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart] })
+
+          const testee: Rundown = new Rundown({ mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              part: activePart,
+              segment
+            }
+          }} as RundownInterface)
+
+          expect(piece.hasEnded()).toBeFalsy()
+          testee.stopPiece(piece.id)
+          expect(piece.hasEnded()).toBeTruthy()
+        })
+      })
+
+      describe('the Piece is Infinite Pieces', () => {
+        it ('stops the Piece', () => {
+          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', layer: 'infinitePieceLayer', executedAt: 0, duration: undefined })
+          const infinitePieces: Map<string, Piece> = new Map()
+          infinitePieces.set(infinitePiece.layer, infinitePiece)
+
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+          const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart] })
+
+          const testee: Rundown = new Rundown({ mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              part: activePart,
+              segment
+            },
+            infinitePieces
+          }} as RundownInterface)
+
+          expect(infinitePiece.hasEnded()).toBeFalsy()
+          testee.stopPiece(infinitePiece.id)
+          expect(infinitePiece.hasEnded()).toBeTruthy()
+        })
+      })
+    })
+  })
 })
 
 function createTesteeWithActiveAndNextCursors(params?: {

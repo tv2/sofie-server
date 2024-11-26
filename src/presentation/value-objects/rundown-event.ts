@@ -61,6 +61,10 @@ export interface PieceReplacedEvent extends PartEvent {
   newPiece: PieceDto
 }
 
+export interface PieceStoppedEvent extends RundownEvent {
+  piece: PieceDto
+}
+
 export interface RundownInfinitePiecesUpdatedEvent extends RundownEvent {
   type: RundownEventType.INFINITE_PIECES_UPDATED
   infinitePieces: PieceDto[]

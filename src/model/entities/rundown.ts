@@ -799,6 +799,13 @@ export class Rundown extends BasicRundown {
     piecesToStop.forEach(piece => piece.stop())
   }
 
+  public stopPiece(pieceId: string): Piece | undefined {
+    this.assertActive(this.stopPiece.name)
+    const pieceToStop: Piece | undefined = this.getActivePart().getPieces().concat(this.getInfinitePieces()).find(piece => piece.id === pieceId)
+    pieceToStop?.stop()
+    return pieceToStop
+  }
+
   public insertPieceIntoActivePart(piece: Piece): void {
     this.assertActive(this.insertPieceIntoActivePart.name)
     this.assertNotUndefined(this.activeCursor, 'active Part')
