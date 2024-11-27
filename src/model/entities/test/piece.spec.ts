@@ -271,7 +271,7 @@ describe(Piece.name, () => {
           jest.useFakeTimers({ now })
 
           const duration: number = 20
-          const testee: Piece = new Piece({ duration } as PieceInterface)
+          const testee: Piece = new Piece(EntityTestFactory.createPieceInterface({ duration }))
 
           testee.putOnAir(15)
           expect(testee.getDuration()).toBe(duration)

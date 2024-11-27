@@ -210,7 +210,6 @@ describe(Part.name, () => {
             const testee: Part = new Part(EntityTestFactory.createPartInterface({ id: 'partId', isOnAir: true, pieces: [existingPiece] }))
 
             expect(existingPiece.getDuration()).toBe(0)
-            jest.advanceTimersByTime(200)
 
             testee.insertPiece(unplannedPiece)
 
