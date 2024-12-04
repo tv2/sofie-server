@@ -550,6 +550,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       name: overlayGraphicsData.name,
       layer: Tv2PieceLayer.GRAPHICS_PILOT_OVERLAY,
       preRollDuration: this.getPreRollDuration(blueprintConfiguration),
+      duration: overlayGraphicsData.expectedDuration,
       pieceLifespan: overlayGraphicsData.lifespan,
       timelineObjects: [elementTimelineObjectFactory.createPilotGraphicsTimelineObject(blueprintConfiguration, overlayGraphicsData)],
       metadata: {

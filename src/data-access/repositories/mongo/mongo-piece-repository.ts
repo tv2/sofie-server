@@ -1,10 +1,7 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { Piece } from '../../../model/entities/piece'
 import { MongoDatabase } from './mongo-database'
-import {
-  AnyBulkWriteOperation,
-  ClientSession,
-} from 'mongodb'
+import { AnyBulkWriteOperation, } from 'mongodb'
 import { MongoEntityConverter, MongoPiece } from './mongo-entity-converter'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
@@ -68,13 +65,6 @@ export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
         filter: { rundownId, _id: { $nin: pieces.map(piece => piece.id) } }
       }
     }
-  }
-
-  public async executeQueries(queries: readonly AnyBulkWriteOperation<MongoPiece>[], session: ClientSession): Promise<void> {
-    if (queries.length === 0) {
-      return
-    }
-    await this.getCollection().bulkWrite([...queries], { session, ignoreUndefined: true })
   }
 
   public buildDeletePiecesForRundownQuery(rundownId: string): AnyBulkWriteOperation<MongoPiece> {

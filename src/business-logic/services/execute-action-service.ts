@@ -20,7 +20,7 @@ import { Part, PartInterface } from '../../model/entities/part'
 import { Piece, PieceInterface } from '../../model/entities/piece'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
-import { MediaRepository } from '../../data-access/repositories/interfaces/MediaRepository'
+import { MediaRepository } from '../../data-access/repositories/interfaces/media-repository'
 import { Media } from '../../model/entities/media'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
@@ -189,6 +189,7 @@ export class ExecuteActionService implements ActionService {
     const pieceInterface: PieceInterface = pieceAction.data.pieceInterface
     pieceInterface.id = this.makeUnique(pieceInterface.id)
     pieceInterface.rundownId = rundownId
+    pieceInterface.createdFromActionId = pieceAction.id
     return new Piece(pieceInterface)
   }
 

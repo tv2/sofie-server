@@ -402,10 +402,11 @@ export class Rundown extends BasicRundown {
   private updateInfinitePieces(): void {
     this.assertNotUndefined(this.activeCursor, 'active Part')
 
+    const now: number = Date.now()
     let layersWithPieces: Map<string, Piece> = new Map(
       this.activeCursor.part
         .getPieces()
-        .filter(piece => !piece.hasEnded())
+        .filter(piece => !piece.hasEnded(now))
         .map((piece) => [piece.layer, piece])
     )
 
@@ -429,7 +430,7 @@ export class Rundown extends BasicRundown {
   }
 
   private isPieceOutlived(piece: Piece): boolean {
-    if (piece.hasEnded()) {
+    if (piece.hasEnded(Date.now())) {
       return true
     }
     switch (piece.pieceLifespan) {
@@ -944,15 +945,18 @@ export class Rundown extends BasicRundown {
   public stopActivePiecesOnLayers(layers: string[]): void {
     this.assertActive(this.stopActivePiecesOnLayers.name)
     const piecesToStop: Piece[] = [
-      ...this.getActiveCursor()?.part.getPieces().filter(piece => layers.includes(piece.layer) && !this.isPieceStopped(piece)) ?? [],
+      ...this.getActiveCursor()?.part.getPieces().filter(piece => layers.includes(piece.layer) && !piece.hasEnded(Date.now())) ?? [],
       ...layers.map(layer => this.infinitePieces.get(layer)).filter((piece): piece is Piece => !!piece)
     ]
 
     piecesToStop.forEach(piece => piece.stop())
   }
 
-  private isPieceStopped(piece: Piece): boolean {
-    return !!piece.getDuration()
+  public stopPiece(pieceId: string): Piece | undefined {
+    this.assertActive(this.stopPiece.name)
+    const pieceToStop: Piece | undefined = this.getActivePart().getPieces().concat(this.getInfinitePieces()).find(piece => piece.id === pieceId)
+    pieceToStop?.stop()
+    return pieceToStop
   }
 
   public insertPieceIntoActivePart(piece: Piece): void {

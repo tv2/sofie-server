@@ -31,17 +31,22 @@ import {
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2ActionManifestAudioBedData } from '../value-objects/tv2-action-manifest-data'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
+import { Logger } from '../../../logger/logger'
 
 const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 
 export class Tv2AudioActionFactory extends ActionFactory {
 
+  private readonly logger: Logger
+
   constructor(
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly audioBedTimelineObjectFactory: Tv2AudioBedTimelineObjectFactory,
     private readonly frameTimeConverter: FrameTimeConverter,
+    logger: Logger,
   ) {
     super()
+    this.logger = logger.tag(this.constructor.name)
   }
 
   public isAudioAction(action: Tv2Action): boolean {
@@ -176,18 +181,22 @@ export class Tv2AudioActionFactory extends ActionFactory {
   private createAudioBedActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2AudioAction[] {
     const audioBedActions: Tv2AudioAction[] = actionManifests
       .filter(this.isAudioBedActionManifest.bind(this))
-      .filter(audioBedActionManifest => this.isAudioBedConfigured(audioBedActionManifest.data.name, blueprintConfiguration))
-      .map(audioBedActionManifest => this.createAudioBedActionFromActionManifest(blueprintConfiguration, audioBedActionManifest))
+      .reduce<Tv2AudioAction[]>(
+      (audioBedActions, audioBedActionManifest) => {
+        try {
+          return [...audioBedActions, this.createAudioBedActionFromActionManifest(blueprintConfiguration, audioBedActionManifest)]
+        } catch (error) {
+          this.logger.data(error).warn(`Failed creating audio bed action for action manifest '${audioBedActionManifest.data.name}'.`)
+          return audioBedActions
+        }
+      }, []
+    )
 
     return this.removeDuplicateActions(audioBedActions)
   }
 
   private isAudioBedActionManifest(actionManifest: Tv2ActionManifest): actionManifest is ActionManifest<Tv2ActionManifestAudioBedData> {
     return actionManifest.actionId === AUDIO_BED_ACTION_ID
-  }
-
-  private isAudioBedConfigured(audioBedName: string, blueprintConfiguration: Tv2BlueprintConfiguration): boolean {
-    return blueprintConfiguration.showStyle.audioBedConfigurations.some(audioBedConfiguration => audioBedConfiguration.name === audioBedName)
   }
 
   private createAudioBedActionFromActionManifest(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifest: ActionManifest<Tv2ActionManifestAudioBedData>): Tv2AudioAction {
