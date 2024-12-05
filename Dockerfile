@@ -25,4 +25,4 @@ EXPOSE 3005
 # WebSocket port
 EXPOSE 3006
 
-CMD node .
+CMD node --no-deprecation .
