@@ -10,7 +10,6 @@ import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
 import { DataChangeService } from '../services/interfaces/data-change-service'
-import { IngestDataChangedService } from '../services/ingest-data-changed-service'
 import { BlueprintTimelineBuilder } from '../services/blueprint-timeline-builder'
 import { IngestService } from '../services/interfaces/ingest-service'
 import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
@@ -24,27 +23,37 @@ import { MediaDatabaseChangedService } from '../services/media-database-changed-
 import { ConfigurationService } from '../services/interfaces/configuration-service'
 import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
 import { DeviceChangedService } from '../services/device-changed-service'
-import { ThrottledRundownService } from '../services/throttled-rundown-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
+import { PlayoutService } from '../services/interfaces/playoutService'
+import { PlayoutGatewayService } from '../services/playout-gateway-service'
+import { ThrottledRundownService } from '../services/throttled-rundown-service'
+import { IngestRundownSynchronizer } from '../services/ingest-rundown-synchronizer'
+import { EntityChangeDetector } from '../services/entity-change-detector'
+import { IngestDataChangeService } from '../services/ingest-data-change-service'
+import { ActionGenerationService } from '../services/action-generation-service'
+import { SynchronizedRundownService } from '../services/synchronized-rundown-service'
+import { AsyncLock } from '../async-lock'
 
 export class ServiceFacade {
+
+  private static readonly rundownLock: AsyncLock = new AsyncLock(LoggerFacade.createLogger())
+
   public static createRundownService(): RundownService {
     const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
       EventEmitterFacade.createRundownEventEmitter(),
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
-      RepositoryFacade.createSegmentRepository(),
-      RepositoryFacade.createPartRepository(),
-      RepositoryFacade.createPieceRepository(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createTimelineBuilder(),
+      ServiceFacade.createIngestService(),
+      ServiceFacade.createPlayoutService(),
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
-      BlueprintsFacade.createBlueprint()
+      BlueprintsFacade.createBlueprint(),
+      LoggerFacade.createLogger(),
     )
-
-    return ThrottledRundownService.getInstance(rundownTimelineService)
+    return ThrottledRundownService.getInstance(new SynchronizedRundownService(rundownTimelineService, this.rundownLock))
   }
 
   public static createTimelineBuilder(): TimelineBuilder {
@@ -58,11 +67,10 @@ export class ServiceFacade {
 
   public static createActionService(): ActionService {
     return new ExecuteActionService(
-      RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionRepository(),
-      RepositoryFacade.createActionManifestRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createMediaRepository(),
+      RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createRundownService(),
       BlueprintsFacade.createBlueprint()
     )
@@ -76,21 +84,43 @@ export class ServiceFacade {
   }
 
   public static createIngestChangeService(): DataChangeService {
-    return IngestDataChangedService.getInstance(
+    return new IngestDataChangeService(
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
+      this.rundownLock,
       RepositoryFacade.createSegmentRepository(),
       RepositoryFacade.createPartRepository(),
       RepositoryFacade.createPieceRepository(),
-      RepositoryFacade.createTimelineRepository(),
-      ServiceFacade.createTimelineBuilder(),
-      EventEmitterFacade.createRundownEventEmitter(),
-      new IngestedEntityToEntityMapper(),
-      LoggerFacade.createLogger(),
       RepositoryFacade.createIngestedRundownChangeListener(),
       RepositoryFacade.createIngestedSegmentChangedListener(),
-      RepositoryFacade.createIngestedPartChangedListener()
+      RepositoryFacade.createIngestedPartChangedListener(),
+      RepositoryFacade.createIngestedPieceChangedListener(),
+      ServiceFacade.createIngestRundownSynchronizer(),
+      new IngestedEntityToEntityMapper(),
+      EventEmitterFacade.createRundownEventEmitter(),
+      ServiceFacade.createTimelineBuilder(),
+      RepositoryFacade.createTimelineRepository(),
+      ServiceFacade.createActionGenerationService(),
+      LoggerFacade.createLogger(),
     )
+  }
+
+  public static createActionGenerationService(): ActionGenerationService {
+    return new ActionGenerationService(
+      RepositoryFacade.createConfigurationRepository(),
+      RepositoryFacade.createActionManifestRepository(),
+      RepositoryFacade.createActionRepository(),
+      EventEmitterFacade.createActionEventEmitter(),
+      BlueprintsFacade.createBlueprint(),
+    )
+  }
+
+  public static createIngestRundownSynchronizer(): IngestRundownSynchronizer {
+    return new IngestRundownSynchronizer(new IngestedEntityToEntityMapper(), ServiceFacade.createEntityChangeDetector())
+  }
+
+  public static createEntityChangeDetector(): EntityChangeDetector {
+    return new EntityChangeDetector()
   }
 
   public static createMediaDataChangeService(): DataChangeService {
@@ -101,8 +131,15 @@ export class ServiceFacade {
   }
 
   public static createIngestService(): IngestService {
-    const httpService: HttpService = new GotHttpService()
-    return new Tv2INewsIngestService(httpService, RepositoryFacade.createRundownRepository())
+    return new Tv2INewsIngestService(ServiceFacade.createHttpService(), RepositoryFacade.createRundownRepository())
+  }
+
+  public static createPlayoutService(): PlayoutService {
+    return new PlayoutGatewayService(ServiceFacade.createHttpService(), LoggerFacade.createLogger())
+  }
+
+  private static createHttpService(): HttpService {
+    return new GotHttpService()
   }
 
   public static createConfigurationService(): ConfigurationService {
@@ -127,6 +164,7 @@ export class ServiceFacade {
       ServiceFacade.createStatusMessageService(),
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createShowStyleChangedListener(),
+      RepositoryFacade.createShowStyleVariantConfigurationListener(),
       LoggerFacade.createLogger()
     )
   }

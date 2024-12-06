@@ -1,9 +1,13 @@
+import { DeviceType } from '../../../model/enums/device-type'
+
 export interface Tv2StudioBlueprintConfiguration {
-  cameraSources: Tv2SourceMappingWithSound[]
-  remoteSources: Tv2SourceMappingWithSound[]
-  replaySources: Tv2SourceMappingWithSound[]
+  cameraSources: Tv2SourceMappingWithAudio[]
+  remoteSources: Tv2SourceMappingWithAudio[]
+  feedSources: Tv2SourceMappingWithAudio[]
+  replaySources: Tv2SourceMappingWithAudio[]
   studioMicrophones: string[]
   mediaPlayers: Tv2MediaPlayer[]
+  videoMixerType: VideoMixerType
   videoMixerBasicConfiguration: Tv2VideoMixerBasicConfiguration
   casparCgPreRollDuration: number
   serverPostRollDuration: number
@@ -16,6 +20,8 @@ export interface Tv2StudioBlueprintConfiguration {
   shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: boolean,
   audioBedSettings: AudioBedSettings
 }
+
+export type VideoMixerType = DeviceType.ATEM | DeviceType.TRICASTER
 
 export interface Tv2FolderConfiguration {
   name?: string
@@ -56,9 +62,9 @@ export interface Tv2SourceMapping {
 
 export interface Tv2MediaPlayer extends Tv2SourceMapping { }
 
-export interface Tv2SourceMappingWithSound extends Tv2SourceMapping {
-  sisyfosLayers: string[]
-  studioMicrophones: boolean
+export interface Tv2SourceMappingWithAudio extends Tv2SourceMapping {
+  audioLayers: string[]
+  usesStudioMicrophones: boolean
   wantsToPersistAudio?: boolean
   acceptPersistAudio?: boolean
 }
@@ -89,6 +95,7 @@ export enum Tv2DownstreamKeyerRole {
 }
 
 export interface AudioBedSettings {
+  mediaDirectory: string
   fadeInDurationFrames: number
   fadeOutDurationInFrames: number
   volume: number

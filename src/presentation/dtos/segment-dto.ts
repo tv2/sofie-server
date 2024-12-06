@@ -1,5 +1,6 @@
 import { PartDto } from './part-dto'
 import { Segment } from '../../model/entities/segment'
+import { Invalidity } from '../../model/value-objects/invalidity'
 
 export class SegmentDto {
   public readonly id: string
@@ -11,9 +12,11 @@ export class SegmentDto {
   public readonly isUnsynced: boolean
   public readonly rank: number
   public readonly isHidden: boolean
+  public readonly referenceTag?: string
   public readonly metadata?: unknown
   public readonly expectedDurationInMs?: number
   public readonly executedAtEpochTime?: number
+  public readonly invalidity?: Invalidity
   public readonly parts: PartDto[]
 
   constructor(segment: Segment) {
@@ -26,9 +29,11 @@ export class SegmentDto {
     this.isUnsynced = segment.isUnsynced()
     this.rank = segment.rank
     this.isHidden = segment.isHidden
+    this.referenceTag = segment.referenceTag
     this.metadata = segment.metadata
     this.expectedDurationInMs = segment.expectedDurationInMs
     this.executedAtEpochTime = segment.getExecutedAtEpochTime()
+    this.invalidity = segment.invalidity
     this.parts = segment.getParts().map((part) => new PartDto(part))
   }
 }

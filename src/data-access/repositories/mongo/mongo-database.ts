@@ -9,7 +9,7 @@ const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://loca
 const MONGO_DB_NAME: string = getMongoDatabaseName()
 
 function getMongoDatabaseName(): string {
-  const mongoUrlPattern: RegExp = /^mongodb:\/\/\w+(:\d+)?\/(?<databaseName>[^/]+)/i
+  const mongoUrlPattern: RegExp = /^mongodb:\/\/(\w+|\d+\.\d+\.\d+\.\d+)(:\d+)?\/(?<databaseName>[^/?]+)/i
   return mongoUrlPattern.exec(MONGO_CONNECTION_STRING)?.groups?.databaseName ?? 'meteor'
 }
 
@@ -55,6 +55,10 @@ export class MongoDatabase implements Database {
   public getCollection<Model extends MongoId = MongoId>(collectionName: string): Collection<Model> {
     this.assertDatabaseConnection()
     return this.db.collection<Model>(collectionName)
+  }
+
+  public getClient(): mongodb.MongoClient {
+    return this.client
   }
 
   private assertDatabaseConnection(): void {

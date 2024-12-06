@@ -25,11 +25,15 @@ import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
-import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { SystemInformation } from '../../../model/entities/system-information'
 import { Device } from '../../../model/entities/device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
+import { Invalidity } from '../../../model/value-objects/invalidity'
+import { Logger } from '../../../logger/logger'
+import { Action, ActionArgument } from '../../../model/entities/action'
+import { ActionType } from '../../../model/enums/action-type'
+
 
 export interface MongoId {
   _id: string
@@ -67,8 +71,13 @@ export interface MongoSegment extends MongoId {
   isOnAir: boolean
   isNext: boolean
   isUnsynced: boolean
-  budgetDuration?: number
+  referenceTag?: string
+  expectedDurationInMs?: number
   executedAtEpochTime?: number
+  invalidity?: {
+    reason: string
+  }
+  definesShowStyleVariant: boolean
 }
 
 export interface MongoPart extends MongoId {
@@ -85,6 +94,7 @@ export interface MongoPart extends MongoId {
   expectedDuration?: number
   executedAt?: number
   playedDuration?: number
+  invalidity?: Invalidity
 
   inTransition: InTransition
   outTransition: OutTransition
@@ -100,6 +110,7 @@ export interface MongoPart extends MongoId {
 
 export interface MongoPiece extends MongoId {
   partId: string
+  rundownId: string
   name: string
   layer: string
   pieceLifespan: PieceLifespan
@@ -116,6 +127,7 @@ export interface MongoPiece extends MongoId {
   content?: unknown
   tags: string[]
   isUnsynced: boolean
+  isInsertedOnAir?: boolean
 }
 
 export interface MongoTimeline extends MongoId {
@@ -125,6 +137,7 @@ export interface MongoTimeline extends MongoId {
 }
 
 export interface MongoStudio {
+  _id: string
   settings: {
     mediaPreviewsUrl: string
   }
@@ -137,6 +150,7 @@ interface MongoLayerMappings {
 }
 
 export interface MongoShowStyle {
+  _id: string
   blueprintConfig: unknown
 }
 
@@ -168,6 +182,18 @@ export interface MongoSystemInformation extends MongoId {
   name: string
 }
 
+export interface MongoAction extends MongoId {
+  id: string
+  name: string
+  rank: number
+  description?: string
+  type: ActionType
+  data: unknown
+  metadata?: unknown
+  rundownId?: string
+  argument?: ActionArgument
+}
+
 export interface MongoDevice extends MongoId {
   name: string
   status: {
@@ -180,6 +206,11 @@ export interface MongoDevice extends MongoId {
 const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 
 export class MongoEntityConverter {
+  private readonly logger: Logger
+
+  constructor(logger: Logger) {
+    this.logger = logger.tag(MongoEntityConverter.name)
+  }
 
   public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {
     const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = [RundownMode.ACTIVE, RundownMode.REHEARSAL].includes(mongoRundown.mode)
@@ -269,10 +300,6 @@ export class MongoEntityConverter {
     )
   }
 
-  public convertToBasicRundowns(mongoRundowns: MongoRundown[]): BasicRundown[] {
-    return mongoRundowns.map(this.convertToBasicRundown.bind(this))
-  }
-
   public convertToSegment(mongoSegment: MongoSegment): Segment {
     return new Segment({
       ...mongoSegment,
@@ -291,14 +318,17 @@ export class MongoEntityConverter {
       rundownId: segment.rundownId,
       name: segment.name,
       rank: segment.rank,
+      referenceTag: segment.referenceTag,
       isHidden: segment.isHidden,
       metadata: segment.metadata,
       partIds: segment.getParts().map(part => part.id),
       isOnAir: segment.isOnAir(),
       isNext: segment.isNext(),
       isUnsynced: segment.isUnsynced(),
-      budgetDuration: segment.expectedDurationInMs,
+      expectedDurationInMs: segment.expectedDurationInMs,
       executedAtEpochTime: segment.getExecutedAtEpochTime(),
+      invalidity: segment.invalidity,
+      definesShowStyleVariant: segment.definesShowStyleVariant
     }
   }
 
@@ -330,6 +360,7 @@ export class MongoEntityConverter {
       expectedDuration: part.expectedDuration,
       executedAt: part.getExecutedAt(),
       playedDuration: part.getPlayedDuration(),
+      invalidity: part.invalidity,
 
       inTransition: part.getInTransition(),
       outTransition: part.outTransition,
@@ -357,18 +388,16 @@ export class MongoEntityConverter {
   public convertToPiece(mongoPiece: MongoPiece): Piece {
     return new Piece({
       ...mongoPiece,
-      id: mongoPiece._id
+      id: mongoPiece._id,
+      isInsertedOnAir: mongoPiece.isInsertedOnAir,
     })
-  }
-
-  public convertToPieces(mongoPieces: MongoPiece[]): Piece[] {
-    return mongoPieces.map(this.convertToPiece)
   }
 
   public convertToMongoPiece(piece: Piece): MongoPiece {
     return {
       _id: piece.id,
       partId: piece.getPartId(),
+      rundownId: piece.rundownId,
       name: piece.name,
       layer: piece.layer,
       pieceLifespan: piece.pieceLifespan,
@@ -379,11 +408,12 @@ export class MongoEntityConverter {
       postRollDuration: piece.postRollDuration,
       executedAt: piece.getExecutedAt(),
       transitionType: piece.transitionType,
-      timelineObjects: piece.timelineObjects,
+      timelineObjects: piece.getTimelineObjects(),
       metadata: piece.metadata,
       content: piece.content,
       isUnsynced: piece.isUnsynced(),
-      tags: piece.tags
+      tags: piece.tags,
+      isInsertedOnAir: piece.isInsertedOnAir(),
     }
   }
 
@@ -409,7 +439,7 @@ export class MongoEntityConverter {
     for (const mapping in mongoStudio.mappings) {
       layers.push({
         name: mapping,
-        lookaheadMode: this.mapLookaheadNumberToEnum(mongoStudio.mappings[mapping].lookahead),
+        lookaheadMode: this.getLookaheadModeForMongoLayerMapping(mapping, mongoStudio.mappings[mapping]),
         amountOfLookaheadObjectsToFind: mongoStudio.mappings[mapping].lookaheadDepth ?? defaultNumberOfObjects,
         maximumLookaheadSearchDistance: mongoStudio.mappings[mapping].lookaheadMaxSearchDistance ?? defaultLookaheadDistance,
       })
@@ -423,7 +453,16 @@ export class MongoEntityConverter {
     }
   }
 
-  private mapLookaheadNumberToEnum(lookAheadNumber: number): LookaheadMode {
+  private getLookaheadModeForMongoLayerMapping(mappingName: string, mapping: MongoLayerMapping): LookaheadMode {
+    const lookahead: LookaheadMode | undefined = this.mapLookaheadNumberToEnum(mapping.lookahead)
+    if (!lookahead) {
+      this.logger.warn(`Found unknown value '${mapping.lookahead}' for lookahead in '${mappingName}' layer mapping. Defaulting to NONE.`)
+      return LookaheadMode.NONE
+    }
+    return lookahead
+  }
+
+  private mapLookaheadNumberToEnum(lookAheadNumber: number): LookaheadMode | undefined {
     // These numbers are based on the "LookaheadMode" enum from BlueprintsIntegration
     switch (lookAheadNumber) {
       case 0: {
@@ -436,15 +475,20 @@ export class MongoEntityConverter {
         return LookaheadMode.WHEN_CLEAR
       }
       default: {
-        throw new UnsupportedOperationException(`Found unknown number for LookAhead: ${lookAheadNumber}`)
+        return undefined
       }
     }
   }
 
-  public convertShowStyle(mongoShowStyle: MongoShowStyle): ShowStyle {
+  public convertShowStyle(mongoShowStyle: MongoShowStyle, showStyleVariants: ShowStyleVariant[]): ShowStyle {
     return {
       blueprintConfiguration: mongoShowStyle.blueprintConfig,
+      variants: showStyleVariants
     }
+  }
+
+  public convertShowStyleVariants(mongoShowStyleVariants: MongoShowStyleVariant[]): ShowStyleVariant[] {
+    return mongoShowStyleVariants.map(this.convertShowStyleVariant)
   }
 
   public convertShowStyleVariant(mongoShowStyleVariant: MongoShowStyleVariant): ShowStyleVariant {
@@ -504,5 +548,26 @@ export class MongoEntityConverter {
 
   public convertToDevices(mongoDevices: MongoDevice[]): Device[] {
     return mongoDevices.map(mongoDevice => this.convertToDevice(mongoDevice))
+  }
+
+  public convertToAction(mongoAction: MongoAction): Action {
+    return {
+      id: mongoAction.id,
+      type: mongoAction.type,
+      rundownId: mongoAction.rundownId ?? undefined,
+      argument: mongoAction.argument,
+      data: mongoAction.data,
+      description: mongoAction.description,
+      metadata: mongoAction.metadata,
+      name: mongoAction.name,
+      rank: mongoAction.rank,
+    }
+  }
+
+  public convertToMongoAction(action: Action): MongoAction {
+    return {
+      ...action,
+      _id: action.id
+    }
   }
 }

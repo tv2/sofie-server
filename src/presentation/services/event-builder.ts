@@ -1,7 +1,6 @@
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { Rundown } from '../../model/entities/rundown'
 import {
-  AutoNextStartedEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -11,6 +10,8 @@ import {
   PartUnsyncedEvent,
   PartUpdatedEvent,
   PieceInsertedEvent,
+  PieceReplacedEvent,
+  PieceStoppedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
@@ -29,6 +30,7 @@ import { Part } from '../../model/entities/part'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
 import {
+  ActionEventType,
   ActionTriggerEventType,
   ConfigurationEventType,
   IngestEventType,
@@ -57,8 +59,12 @@ import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-e
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusMessageEvent } from '../value-objects/status-message-event'
+import { ActionEventBuilder } from '../interfaces/action-event-builder'
+import { Action } from '../../model/entities/action'
+import { ActionsUpdatedEvent } from '../value-objects/action-event'
+import { ActionDto } from '../dtos/action-dto'
 
-export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -149,11 +155,26 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     }
   }
 
-  public buildAutoNextStartedEvent(rundownId: string): AutoNextStartedEvent {
+  public buildPieceStoppedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceStoppedEvent {
     return {
-      type: RundownEventType.AUTO_NEXT_STARTED,
+      type: RundownEventType.PIECE_STOPPED,
       timestamp: Date.now(),
-      rundownId: rundownId,
+      rundownId: rundown.id,
+      segmentId,
+      partId: piece.getPartId(),
+      piece: new PieceDto(piece),
+    }
+  }
+
+  public buildPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPieceId: string, newPiece: Piece): PieceReplacedEvent {
+    return {
+      type: RundownEventType.PIECE_REPLACED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId,
+      partId: newPiece.getPartId(),
+      replacedPieceId: replacedPieceId,
+      newPiece: new PieceDto(newPiece)
     }
   }
 
@@ -248,12 +269,13 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
     }
   }
 
-  public buildPartUnsyncedEvent(rundown: Rundown, part: Part): PartUnsyncedEvent {
+  public buildPartUnsyncedEvent(rundown: Rundown, unsyncedPart: Part, originalPartId: string): PartUnsyncedEvent {
     return {
       type: IngestEventType.PART_UNSYNCED,
       timestamp: Date.now(),
       rundownId: rundown.id,
-      part: new PartDto(part),
+      part: new PartDto(unsyncedPart),
+      originalPartId,
     }
   }
 
@@ -318,6 +340,15 @@ export class EventBuilder implements RundownEventBuilder, ActionTriggerEventBuil
       type: StatusMessageEventType.STATUS_MESSAGE,
       timestamp: Date.now(),
       statusMessage
+    }
+  }
+
+  public buildActionsUpdatedEvent(actions: Action[], rundownId?: string): ActionsUpdatedEvent {
+    return {
+      type: ActionEventType.ACTIONS_UPDATED,
+      timestamp: Date.now(),
+      rundownId,
+      actions: actions.map(action => new ActionDto(action))
     }
   }
 }

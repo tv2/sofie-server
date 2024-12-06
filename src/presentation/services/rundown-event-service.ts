@@ -1,5 +1,4 @@
 import {
-  AutoNextStartedEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -9,6 +8,8 @@ import {
   PartUnsyncedEvent,
   PartUpdatedEvent,
   PieceInsertedEvent,
+  PieceReplacedEvent,
+  PieceStoppedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
@@ -84,6 +85,16 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
     this.emitRundownEvent(event)
   }
 
+  public emitPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPieceId: string, newPiece: Piece): void {
+    const event: PieceReplacedEvent = this.rundownEventBuilder.buildPieceReplacedEvent(rundown, segmentId, replacedPieceId, newPiece)
+    this.emitRundownEvent(event)
+  }
+
+  public emitPieceStoppedEvent(rundown: Rundown, segmentId: string, piece: Piece): void {
+    const event: PieceStoppedEvent = this.rundownEventBuilder.buildPieceStoppedEvent(rundown, segmentId, piece)
+    this.emitRundownEvent(event)
+  }
+
   public emitResetEvent(rundown: Rundown): void {
     const event: RundownResetEvent = this.rundownEventBuilder.buildResetEvent(rundown)
     this.emitRundownEvent(event)
@@ -149,13 +160,8 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
     this.emitRundownEvent(event)
   }
 
-  public emitPartUnsynced(rundown: Rundown, part: Part): void {
-    const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, part)
-    this.emitRundownEvent(event)
-  }
-
-  public emitAutoNextStarted(rundownId: string): void {
-    const event: AutoNextStartedEvent = this.rundownEventBuilder.buildAutoNextStartedEvent(rundownId)
+  public emitPartUnsynced(rundown: Rundown, unsyncedPart: Part, originalPartId: string): void {
+    const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, unsyncedPart, originalPartId)
     this.emitRundownEvent(event)
   }
 

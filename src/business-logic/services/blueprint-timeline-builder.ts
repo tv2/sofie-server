@@ -41,6 +41,7 @@ export class BlueprintTimelineBuilder implements TimelineBuilder {
 
     return this.blueprint.onTimelineGenerate(
       configuration,
+      rundown.getShowStyleVariantId(),
       timeline,
       rundown.getActivePart(),
       rundown.getPersistentState(),

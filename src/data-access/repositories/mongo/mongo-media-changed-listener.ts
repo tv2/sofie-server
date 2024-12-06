@@ -12,11 +12,11 @@ import {
 import { MongoChangeEvent } from './mongo-enums'
 import { MongoMedia } from './mongo-entity-converter'
 import { Media } from '../../../model/entities/media'
-import { MediaRepository } from '../interfaces/MediaRepository'
+import { MediaRepository } from '../interfaces/media-repository'
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 
-export class MongoMediaChangedListener extends BaseMongoRepository implements DataChangedListener<Media> {
+export class MongoMediaChangedListener extends BaseMongoRepository<MongoMedia> implements DataChangedListener<Media> {
 
   private readonly logger: Logger
   private onCreatedCallback: (media: Media) => void
@@ -40,7 +40,9 @@ export class MongoMediaChangedListener extends BaseMongoRepository implements Da
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoMedia, ChangeStreamDocument<MongoMedia>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoMedia>) => void this.onChange(change))
+    changeStream.on('change', (change: ChangeStreamDocument<MongoMedia>) => {
+      this.onChange(change).catch(error => this.logger.data({ event: change, error }).error('Failed processing media change event.'))
+    })
     this.logger.debug('Listening for Media collection changes...')
   }
 

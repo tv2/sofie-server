@@ -4,11 +4,11 @@ import { IngestedPart } from '../../../model/entities/ingested-part'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedEntityConverter, MongoIngestedPart } from './mongo-ingested-entity-converter'
 import { IngestedPieceRepository } from '../interfaces/ingested-piece-repository'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { IngestedPiece } from '../../../model/entities/ingested-piece'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest rename to "ingestedParts"
 
-export class MongoIngestedPartRepository extends BaseMongoRepository implements IngestedPartRepository {
+export class MongoIngestedPartRepository extends BaseMongoRepository<MongoIngestedPart> implements IngestedPartRepository {
 
   constructor(
     mongoDatabase: MongoDatabase,
@@ -22,34 +22,15 @@ export class MongoIngestedPartRepository extends BaseMongoRepository implements 
     return INGESTED_PART_COLLECTION_NAME
   }
 
-  public async getIngestedPart(partId: string): Promise<IngestedPart> {
-    this.assertDatabaseConnection(this.getIngestedPart.name)
-    const mongoIngestedPart: MongoIngestedPart | null = await this.getCollection().findOne<MongoIngestedPart>({
-      _id: partId
-    })
-    if (!mongoIngestedPart) {
-      throw new NotFoundException(`No Part found for partId: ${partId}`)
-    }
-    return {
-      ...this.mongoIngestedEntityConverter.convertToIngestedPart(mongoIngestedPart),
-      ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesForPart(mongoIngestedPart._id)
-    }
-  }
-
-  public async getIngestedPartsForSegment(segmentId: string): Promise<IngestedPart[]> {
-    this.assertDatabaseConnection(this.getIngestedPartsForSegment.name)
-    const mongoIngestedParts: MongoIngestedPart[] = await this.getCollection()
-      .find<MongoIngestedPart>({ segmentId: segmentId })
+  public async getIngestedPartsForRundown(rundownId: string, ingestedPieces: readonly IngestedPiece[]): Promise<IngestedPart[]> {
+    this.assertDatabaseConnection(this.getIngestedPartsForRundown.name)
+    return this.getCollection()
+      .find<MongoIngestedPart>({ rundownId })
+      .map(mongoIngestedPart => ({
+        ...this.mongoIngestedEntityConverter.convertToIngestedPart(mongoIngestedPart),
+        ingestedPieces: ingestedPieces.filter(ingestedPiece => ingestedPiece.partId === mongoIngestedPart._id)
+      }))
       .toArray()
-    const ingestedParts: IngestedPart[] = this.mongoIngestedEntityConverter.convertToIngestedParts(mongoIngestedParts)
-    return Promise.all(
-      ingestedParts.map(async (ingestedPart) => {
-        return {
-          ...ingestedPart,
-          ingestedPieces: await this.ingestedPieceRepository.getIngestedPiecesForPart(ingestedPart.id)
-        }
-      })
-    )
   }
 
   public async deleteIngestedPartsForRundown(rundownId: string): Promise<void> {

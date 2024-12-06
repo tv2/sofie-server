@@ -1,1 +1,3 @@
-export interface DataChangeService {}
+export interface DataChangeService {
+  initialize(): Promise<void>
+}

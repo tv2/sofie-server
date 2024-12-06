@@ -12,6 +12,7 @@ export type Blueprint = BlueprintOnTimelineGenerate & BlueprintGetEndStateForPar
 export interface BlueprintOnTimelineGenerate {
   onTimelineGenerate(
     configuration: Configuration,
+    showStyleVariantId: string,
     timeline: Timeline,
     activePart: Part,
     previousRundownPersistentState: RundownPersistentState | undefined,
@@ -29,7 +30,7 @@ export interface BlueprintGetEndStateForPart {
 }
 
 export interface BlueprintGenerateActions {
-  generateActions(configuration: Configuration, actionManifests: ActionManifest[]): Action[]
+  generateActions(configuration: Configuration, showStyleVariantId: string, actionManifests: ActionManifest[]): Action[]
 
   /**
    * If any Action need to have data only accessible at the time of executing the action,

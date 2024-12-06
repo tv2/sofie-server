@@ -1,6 +1,5 @@
 import { Rundown } from '../../model/entities/rundown'
 import {
-  AutoNextStartedEvent,
   PartCreatedEvent,
   PartDeletedEvent,
   PartInsertedAsNextEvent,
@@ -10,6 +9,8 @@ import {
   PartUnsyncedEvent,
   PartUpdatedEvent,
   PieceInsertedEvent,
+  PieceReplacedEvent,
+  PieceStoppedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
@@ -37,6 +38,8 @@ export interface RundownEventBuilder {
   buildPartInsertedAsOnAirEvent(rundown: Rundown, part: Part): PartInsertedAsOnAirEvent
   buildPartInsertedAsNextEvent(rundown: Rundown, part: Part): PartInsertedAsNextEvent
   buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent
+  buildPieceReplacedEvent(rundown: Rundown, segmentId: string, replacedPieceId: string, newPiece: Piece): PieceReplacedEvent
+  buildPieceStoppedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceStoppedEvent
   buildInfinitePiecesUpdatedEvent(rundown: Rundown): RundownInfinitePiecesUpdatedEvent
 
   buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent
@@ -51,7 +54,5 @@ export interface RundownEventBuilder {
   buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent
   buildPartUpdatedEvent(rundown: Rundown, part: Part): PartUpdatedEvent
   buildPartDeletedEvent(rundown: Rundown, segmentId: string, partId: string): PartDeletedEvent
-  buildPartUnsyncedEvent(rundown: Rundown, part: Part): PartUnsyncedEvent
-
-  buildAutoNextStartedEvent(rundownId: string): AutoNextStartedEvent
+  buildPartUnsyncedEvent(rundown: Rundown, unsyncedPart: Part, originalPartId: string): PartUnsyncedEvent
 }

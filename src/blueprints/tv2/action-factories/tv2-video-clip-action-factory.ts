@@ -9,8 +9,8 @@ import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/t
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
@@ -26,17 +26,20 @@ import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
+import { ActionFactory } from './action-factory'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
-export class Tv2VideoClipActionFactory {
+export class Tv2VideoClipActionFactory extends ActionFactory {
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory,
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
-  ) { }
+  ) {
+    super()
+  }
 
   public isVideoClipAction(action: Tv2Action): boolean {
     return [Tv2ActionContentType.VIDEO_CLIP].includes(action.metadata.contentType)
@@ -64,28 +67,36 @@ export class Tv2VideoClipActionFactory {
       : videoClipAction.data.partInterface.expectedDuration
 
     const mediaPlayerSession: string = `${action.id}_${Date.now()}`
-    videoClipAction.data.pieceInterfaces.map(pieceInterface => pieceInterface.timelineObjects.map(timelineObject => {
-      const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
-      blueprintTimelineObject.metaData = {
-        ...blueprintTimelineObject.metaData,
-        mediaPlayerSession
-      }
-    }))
+    videoClipAction.data.pieceInterfaces.map(pieceInterface => {
+      const pieceMetadata: Tv2PieceMetadata = pieceInterface.metadata as Tv2PieceMetadata
+      pieceMetadata.mediaPlayerSessions = [mediaPlayerSession]
+
+      pieceInterface.timelineObjects.map(timelineObject => {
+        const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
+        blueprintTimelineObject.metaData = {
+          ...blueprintTimelineObject.metaData,
+          mediaPlayerSession
+        }
+      })
+    })
 
     return videoClipAction
   }
 
   public createVideoClipActions(configuration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2VideoClipAction[] {
-    const videoClipManifestData: Tv2VideoClipManifestData[] = this.actionManifestMapper.mapToVideoClipManifestData(actionManifests)
-    return videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
+    const videoClipManifestData: Tv2VideoClipManifestData[] = this.actionManifestMapper.filterAndMapToVideoClipManifestData(actionManifests)
+    return this.removeDuplicateActions(
+      videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
+    )
   }
 
   private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): Tv2VideoClipAction {
     const partId: string = 'videoClipInsertAction'
     const partInterface: PartInterface = this.createPartInterface(partId, videoClipData)
     return {
-      id: `videoClipAsNextAction_${videoClipData.name}_${videoClipData.fileName}`, // TODO: Utilize information about the Segment once we control ingest
+      id: this.sanitizeStringForId(`videoClipAsNextAction_${videoClipData.name}_${videoClipData.fileName}`), // TODO: Utilize information about the Segment once we control ingest
       name: videoClipData.name,
+      rank: videoClipData.rank,
       rundownId: videoClipData.rundownId,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
@@ -109,7 +120,8 @@ export class Tv2VideoClipActionFactory {
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioMode === Tv2AudioMode.VOICE_OVER
-      }
+      },
+      sourceName: videoClipData.fileName
     }
 
     const videoMixerEnable: TimelineEnable = {
@@ -117,8 +129,9 @@ export class Tv2VideoClipActionFactory {
     }
 
     return {
-      id: `videoClipActionPiece_${videoClipData.fileName}`,
+      id: `videoClipActionPiece_${this.sanitizeStringForId(videoClipData.fileName)}`,
       partId,
+      rundownId: '',
       name: videoClipData.fileName,
       layer: Tv2SourceLayer.VIDEO_CLIP,
       pieceLifespan: PieceLifespan.WITHIN_PART,
@@ -136,7 +149,7 @@ export class Tv2VideoClipActionFactory {
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, videoMixerEnable),
         this.videoClipTimelineObjectFactory.createVideoClipTimelineObject(videoClipData),
-        ...this.audioTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
+        ...this.audioMixerTimelineObjectFactory.createVideoClipAudioTimelineObjects(configuration, videoClipData)
       ]
     }
   }
@@ -154,6 +167,7 @@ export class Tv2VideoClipActionFactory {
       isUntimed: false,
       isUnsynced: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },

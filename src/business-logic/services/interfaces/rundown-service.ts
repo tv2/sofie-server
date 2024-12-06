@@ -15,5 +15,7 @@ export interface RundownService {
   insertPartAsNext(rundownId: string, part: Part): Promise<void>
   insertPieceAsOnAir(rundownId: string, piece: Piece, layersToStopPiecesOn?: string[]): Promise<void>
   insertPieceAsNext(rundownId: string, piece: Piece, partInTransition?: InTransition): Promise<void>
+  insertPieceAsNextAndTake(rundownId: string, piece: Piece, partInTransition?: InTransition): Promise<void>
   replacePieceOnAirOnNextPart(rundownId: string, pieceToBeReplaced: Piece, newPiece: Piece): Promise<void>
+  stopPiece(rundownId: string, pieceId: string): Promise<void>
 }

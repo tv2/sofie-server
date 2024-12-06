@@ -1,4 +1,5 @@
 import {
+  AudioBedConfiguration,
   Breaker,
   BreakerTransitionEffect,
   GraphicsDefault,
@@ -7,10 +8,12 @@ import {
   GraphicsTemplate,
   SplitScreenConfiguration,
   TransitionEffectType,
-  Tv2ShowStyleBlueprintConfiguration
+  Tv2ShowStyleBlueprintConfiguration,
+  Tv2ShowStyleVariantBlueprintConfiguration
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { ShowStyle } from '../../../model/entities/show-style'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
 
 interface CoreShowStyleBlueprintConfiguration {
   GfxDefaults: CoreGraphicsDefault[]
@@ -19,8 +22,14 @@ interface CoreShowStyleBlueprintConfiguration {
   GfxSchemaTemplates: CoreGraphicsSchema[]
   DVEStyles: CoreSplitScreenConfiguration[]
   BreakerConfig: CoreBreaker[]
-  Transitions: { _id: string, Transition: string }[]
+  Transitions: Transition[]
   ShowstyleTransition: string
+  LYDConfig: CoreAudioBedConfiguration[]
+}
+
+interface Transition {
+  _id: string
+  Transition: string
 }
 
 interface CoreGraphicsDefault {
@@ -70,22 +79,60 @@ interface CoreBreaker {
   LoadFirstFrame: boolean
 }
 
+interface CoreAudioBedConfiguration {
+  _id: string
+  INewsName: string
+  FileName: string
+  FadeIn: number
+  FadeOut: number
+}
+
+export interface CoreShowStyleVariantBlueprintConfiguration {
+  GfxDefaults?: CoreGraphicsDefault[]
+}
+
 export class Tv2ShowStyleBlueprintConfigurationMapper {
 
-  public mapShowStyleConfiguration(showStyle: ShowStyle): Tv2ShowStyleBlueprintConfiguration {
+  public mapShowStyleConfiguration(showStyle: ShowStyle, showStyleVariantId: string): Tv2ShowStyleBlueprintConfiguration {
     const coreConfiguration: CoreShowStyleBlueprintConfiguration = { ...(showStyle.blueprintConfiguration as CoreShowStyleBlueprintConfiguration) }
+    const showStyleVariantBlueprintConfiguration: Tv2ShowStyleVariantBlueprintConfiguration | undefined = this.findShowStyleVariantBlueprintConfiguration(showStyleVariantId, showStyle)
+
     return {
       graphicsDefault: this.mapGraphicsDefault(coreConfiguration.GfxDefaults),
       graphicsSetups: this.mapGraphicsSetups(coreConfiguration.GfxSetups),
       graphicsTemplates: this.mapGraphicsTemplates(coreConfiguration.GfxTemplates),
       graphicsSchemas: this.mapGraphicsSchemas(coreConfiguration.GfxSchemaTemplates),
-      selectedGraphicsSetup: this.findSelectedGraphicsSetup(coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
+      selectedGraphicsSetup: this.findSelectedGraphicsSetup(showStyleVariantBlueprintConfiguration, coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
       splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
-      breakerTransitionEffectConfigurations: this.mapTransitionEffectConfigurations([
-        ...coreConfiguration.Transitions.map(transition => transition.Transition),
-        coreConfiguration.ShowstyleTransition
-      ]),
-      breakers: this.mapToBreakers(coreConfiguration.BreakerConfig)
+      breakerTransitionEffectConfigurations: this.mapBreakerTransitionEffectConfigurations(
+        coreConfiguration.ShowstyleTransition,
+        coreConfiguration.Transitions),
+      breakers: this.mapBreakers(coreConfiguration.BreakerConfig),
+      audioBedConfigurations: this.mapAudioBedConfigurations(coreConfiguration.LYDConfig)
+    }
+  }
+
+  private mapBreakerTransitionEffectConfigurations(showstyleTransition: string, coreTransitions?: Transition[]) : BreakerTransitionEffect[] {
+    if (!coreTransitions) {
+      return []
+    }
+
+    const transitions: string[] = coreTransitions.map(transition => transition.Transition).filter(transition => transition !== undefined)
+
+    return this.mapTransitionEffectConfigurations([...transitions, showstyleTransition])
+  }
+
+  private findShowStyleVariantBlueprintConfiguration(showStyleVariantId: string, showStyle: ShowStyle): Tv2ShowStyleVariantBlueprintConfiguration | undefined {
+    const showStyleVariant: ShowStyleVariant | undefined = showStyle.variants.find(variant => variant.id === showStyleVariantId)
+    if (!showStyleVariant) {
+      return
+    }
+    const coreVariantBlueprintConfiguration: CoreShowStyleVariantBlueprintConfiguration = showStyleVariant.blueprintConfiguration as CoreShowStyleVariantBlueprintConfiguration
+    if (!coreVariantBlueprintConfiguration.GfxDefaults || coreVariantBlueprintConfiguration.GfxDefaults.length === 0) {
+      return
+    }
+    return {
+      graphicsDefault: this.mapGraphicsDefault(coreVariantBlueprintConfiguration.GfxDefaults)
     }
   }
 
@@ -97,7 +144,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapGraphicsSetups(coreGraphicsSetups: CoreGraphicsSetup[]): GraphicsSetup[] {
+  private mapGraphicsSetups(coreGraphicsSetups?: CoreGraphicsSetup[]): GraphicsSetup[] {
+    if (!coreGraphicsSetups) {
+      return []
+    }
+
     return coreGraphicsSetups.map(setup => {
       return {
         id: setup._id,
@@ -109,7 +160,12 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     })
   }
 
-  private mapGraphicsTemplates(coreGraphicsTemplates: CoreGraphicsTemplate[]): GraphicsTemplate[] {
+
+  private mapGraphicsTemplates(coreGraphicsTemplates?: CoreGraphicsTemplate[]): GraphicsTemplate[] {
+    if(!coreGraphicsTemplates) {
+      return []
+    }
+
     return coreGraphicsTemplates.map(template => {
       return {
         name: template.VizTemplate,
@@ -130,7 +186,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapGraphicsSchemas(coreGraphicsSchemas: CoreGraphicsSchema[]): GraphicsSchema[] {
+  private mapGraphicsSchemas(coreGraphicsSchemas?: CoreGraphicsSchema[]): GraphicsSchema[] {
+    if(!coreGraphicsSchemas) {
+      return []
+    }
+
     return coreGraphicsSchemas.map(schema => {
       return {
         iNewsName: schema.VizTemplate,
@@ -141,8 +201,9 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     })
   }
 
-  private findSelectedGraphicsSetup(coreGraphicsDefaults: CoreGraphicsDefault[], coreGraphicsSetups: CoreGraphicsSetup[]): GraphicsSetup {
-    const selectedGraphicsSetup: CoreGraphicsSetup | undefined = coreGraphicsSetups.find(setup => setup._id === coreGraphicsDefaults[0].DefaultSetupName.value)
+  private findSelectedGraphicsSetup(showStyleVariantConfiguration: Tv2ShowStyleVariantBlueprintConfiguration | undefined, coreGraphicsDefaults: CoreGraphicsDefault[], coreGraphicsSetups: CoreGraphicsSetup[]): GraphicsSetup {
+    const selectedGraphicsSetup: CoreGraphicsSetup | undefined = coreGraphicsSetups.find(setup => setup._id === showStyleVariantConfiguration?.graphicsDefault.setupName.value)
+      ?? coreGraphicsSetups.find(setup => setup._id === coreGraphicsDefaults[0].DefaultSetupName.value)
     if (!selectedGraphicsSetup) {
       throw new Error('Unable to find any selected graphics setup')
     }
@@ -155,7 +216,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapSplitScreenConfigurations(coreSplitScreenConfigurations: CoreSplitScreenConfiguration[]): SplitScreenConfiguration[] {
+  private mapSplitScreenConfigurations(coreSplitScreenConfigurations?: CoreSplitScreenConfiguration[]): SplitScreenConfiguration[] {
+    if(!coreSplitScreenConfigurations) {
+      return []
+    }
+
     return coreSplitScreenConfigurations.map(coreSplitScreenConfiguration => {
       return {
         id: coreSplitScreenConfiguration._id,
@@ -170,17 +235,21 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapTransitionEffectConfigurations(transitions: string[]): BreakerTransitionEffect[] {
-    return transitions.map(this.mapToVideoClipTransitionEffect)
+    return transitions.map(this.mapVideoClipTransitionEffect)
   }
 
-  private mapToVideoClipTransitionEffect(transition: string): BreakerTransitionEffect {
+  private mapVideoClipTransitionEffect(transition: string): BreakerTransitionEffect {
     return {
       type: TransitionEffectType.BREAKER,
       name: transition
     }
   }
 
-  private mapToBreakers(coreBreakers: CoreBreaker[]): Breaker[] {
+  private mapBreakers(coreBreakers?: CoreBreaker[]): Breaker[] {
+    if(!coreBreakers) {
+      return []
+    }
+
     return coreBreakers.map(coreBreaker => {
       return {
         id: coreBreaker._id,
@@ -193,5 +262,19 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
         shouldLoadFirstFrame: coreBreaker.LoadFirstFrame
       }
     })
+  }
+
+  private mapAudioBedConfigurations(coreAudioBedConfigurations?: CoreAudioBedConfiguration[]): AudioBedConfiguration[] {
+    if (!Array.isArray(coreAudioBedConfigurations)) {
+      return []
+    }
+
+    return coreAudioBedConfigurations.map(coreAudioBedConfiguration => ({
+      id: coreAudioBedConfiguration._id,
+      name: coreAudioBedConfiguration.INewsName,
+      filename: coreAudioBedConfiguration.FileName,
+      fadeInDurationInFrames: coreAudioBedConfiguration.FadeIn,
+      fadeOutDurationInFrames: coreAudioBedConfiguration.FadeOut
+    }))
   }
 }

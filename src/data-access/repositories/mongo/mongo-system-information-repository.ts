@@ -7,7 +7,7 @@ import { NotFoundException } from '../../../model/exceptions/not-found-exception
 
 const SYSTEM_INFORMATION_COLLECTION_NAME: string = 'coreSystem'
 
-export class MongoSystemInformationRepository extends BaseMongoRepository implements SystemInformationRepository {
+export class MongoSystemInformationRepository extends BaseMongoRepository<MongoSystemInformation> implements SystemInformationRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)

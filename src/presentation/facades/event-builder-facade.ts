@@ -4,10 +4,15 @@ import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-bu
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
+import { ActionEventBuilder } from '../interfaces/action-event-builder'
 
 export class EventBuilderFacade {
 
   public static createRundownEventBuilder(): RundownEventBuilder {
+    return new EventBuilder()
+  }
+
+  public static createActionEventBuilder(): ActionEventBuilder {
     return new EventBuilder()
   }
 

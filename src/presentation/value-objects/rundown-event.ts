@@ -55,13 +55,20 @@ export interface PieceInsertedEvent extends PartEvent {
   piece: PieceDto
 }
 
+export interface PieceReplacedEvent extends PartEvent {
+  type: RundownEventType.PIECE_REPLACED
+  replacedPieceId: string
+  newPiece: PieceDto
+}
+
+export interface PieceStoppedEvent extends PartEvent {
+  type: RundownEventType.PIECE_STOPPED
+  piece: PieceDto
+}
+
 export interface RundownInfinitePiecesUpdatedEvent extends RundownEvent {
   type: RundownEventType.INFINITE_PIECES_UPDATED
   infinitePieces: PieceDto[]
-}
-
-export interface AutoNextStartedEvent extends RundownEvent {
-  type: RundownEventType.AUTO_NEXT_STARTED
 }
 
 export interface RundownCreatedEvent extends RundownEvent {
@@ -118,4 +125,5 @@ export interface PartDeletedEvent extends RundownEvent {
 export interface PartUnsyncedEvent extends RundownEvent {
   type: IngestEventType.PART_UNSYNCED
   part: PartDto
+  originalPartId: string
 }

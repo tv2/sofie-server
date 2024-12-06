@@ -4,10 +4,11 @@ import { ActionTrigger } from '../../../model/entities/action-trigger'
 import { MongoDatabase } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { MongoId } from './mongo-entity-converter'
 
 const ACTION_TRIGGER_COLLECTION: string = 'actionTriggers'
 
-export class MongoActionTriggerRepository extends BaseMongoRepository implements ActionTriggerRepository {
+export class MongoActionTriggerRepository extends BaseMongoRepository<ActionTrigger & MongoId> implements ActionTriggerRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)

@@ -1,4 +1,4 @@
-export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | ActionTriggerEventType
+export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | ActionTriggerEventType | NtpEventType
 
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
@@ -10,6 +10,8 @@ export enum RundownEventType {
   PART_INSERTED_AS_ON_AIR = 'PART_INSERTED_AS_ON_AIR',
   PART_INSERTED_AS_NEXT = 'PART_INSERTED_AS_NEXT',
   PIECE_INSERTED = 'PIECE_INSERTED',
+  PIECE_REPLACED = 'PIECE_REPLACED',
+  PIECE_STOPPED = 'PIECE_STOPPED',
   INFINITE_PIECES_UPDATED = 'INFINITE_PIECES_UPDATED',
   AUTO_NEXT_STARTED = 'AUTO_NEXT_STARTED'
 }
@@ -35,6 +37,10 @@ export enum ConfigurationEventType {
   SHELF_CONFIGURATION_UPDATED = 'SHELF_CONFIGURATION_UPDATED'
 }
 
+export enum ActionEventType {
+  ACTIONS_UPDATED = 'ACTIONS_UPDATED'
+}
+
 export enum ActionTriggerEventType {
   ACTION_TRIGGER_CREATED = 'ACTION_TRIGGER_CREATED',
   ACTION_TRIGGER_UPDATED = 'ACTION_TRIGGER_UPDATED',
@@ -43,4 +49,8 @@ export enum ActionTriggerEventType {
 
 export enum StatusMessageEventType {
   STATUS_MESSAGE = 'STATUS_MESSAGE'
+}
+
+export enum NtpEventType {
+  NTP = 'NTP'
 }

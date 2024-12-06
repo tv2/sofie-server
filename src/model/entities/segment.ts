@@ -5,6 +5,8 @@ import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import { Invalidity } from '../value-objects/invalidity'
+import { InvalidSegmentException } from '../exceptions/invalid-segment-exception'
 
 export interface SegmentInterface {
   id: string
@@ -12,6 +14,7 @@ export interface SegmentInterface {
   name: string
   rank: number
   isHidden: boolean
+  referenceTag?: string
   metadata?: unknown
   parts: Part[]
   isOnAir: boolean
@@ -19,6 +22,8 @@ export interface SegmentInterface {
   isUnsynced: boolean
   executedAtEpochTime?: number
   expectedDurationInMs?: number
+  invalidity?: Invalidity
+  definesShowStyleVariant: boolean
 }
 
 export class Segment {
@@ -27,7 +32,10 @@ export class Segment {
   public readonly name: string
   public readonly expectedDurationInMs?: number
   public readonly isHidden: boolean
+  public readonly referenceTag?: string
   public readonly metadata?: unknown
+  public readonly invalidity?: Invalidity
+  public readonly definesShowStyleVariant: boolean
   public rank: number
 
   private isSegmentOnAir: boolean
@@ -43,25 +51,37 @@ export class Segment {
     this.name = segment.name
     this.rank = segment.rank
     this.isHidden = segment.isHidden
+    this.referenceTag = segment.referenceTag
     this.metadata = segment.metadata
     this.isSegmentOnAir = segment.isOnAir
     this.isSegmentNext = segment.isNext
     this.isSegmentUnsynced = segment.isUnsynced
     this.expectedDurationInMs = segment.expectedDurationInMs
     this.executedAtEpochTime = segment.executedAtEpochTime
+    this.invalidity = segment.invalidity
+    this.definesShowStyleVariant = segment.definesShowStyleVariant
     this.setParts(segment.parts ?? [])
   }
 
   public findFirstPart(): Part {
-    if (this.parts.length === 0) {
-      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no parts.`)
+    const part: Part | undefined = this.parts.find(part => !part.invalidity)
+    if (!part) {
+      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid parts.`)
     }
-    return this.parts[0]
+    return part
   }
 
   public putOnAir(): void {
+    this.assertValidity(this.putOnAir.name)
     this.isSegmentOnAir = true
     this.executedAtEpochTime ??= Date.now()
+  }
+
+  private assertValidity(operationName: string): void {
+    if (!this.invalidity) {
+      return
+    }
+    throw new InvalidSegmentException(`Unable to do "${operationName}", since segment "${this.name}" is invalid.`)
   }
 
   public takeOffAir(): void {
@@ -92,6 +112,7 @@ export class Segment {
   }
 
   public setAsNext(): void {
+    this.assertValidity(this.setAsNext.name)
     this.isSegmentNext = true
     if (!this.isSegmentOnAir) {
       this.reset()
@@ -111,10 +132,11 @@ export class Segment {
     if (fromPartIndex === -1) {
       throw new NotFoundException('Part does not exist in Segment')
     }
-    if (fromPartIndex + 1 === this.parts.length) {
-      throw new LastPartInSegmentException(`Part: ${fromPart.id} is the last Part in Segment: ${this.id}`)
+    const nextPart: Part | undefined = this.parts.slice(fromPartIndex + 1).find(part => !part.invalidity)
+    if (!nextPart) {
+      throw new LastPartInSegmentException(`The part "${fromPart.name}" with id "${fromPart.id}" is the last part in the segment "${this.name}" with id "${this.id}".`)
     }
-    return this.parts[fromPartIndex + 1]
+    return nextPart
   }
 
   public findPart(partId: string): Part {
@@ -140,7 +162,7 @@ export class Segment {
 
     const doesPartAlreadyExistOnSegment: boolean = this.parts.some(part => part.id === partToAdd.id)
     if (doesPartAlreadyExistOnSegment) {
-      throw new AlreadyExistException(`Unable to add Part to Segment. Part ${partToAdd.id} already exist on Segment ${this.id}`)
+      throw new AlreadyExistException(`Unable to add the part '${partToAdd.name}' with id '${partToAdd.id}' to the segment '${this.name}' with id '${this.id}'. The part already exists on the segment.`)
     }
     this.parts.push(partToAdd)
     this.parts.sort(this.compareParts)
@@ -171,13 +193,15 @@ export class Segment {
 
     if (partToDelete.isOnAir()) {
       partToDelete.markAsUnsynced()
-      return partToDelete
+      const unsyncedPart: Part = partToDelete.getUnsyncedCopy()
+      this.parts = this.parts.map(part => part.id === partId ? unsyncedPart : part)
+      return unsyncedPart
     }
     this.parts = this.parts.filter(part => part.id !== partId)
     return partToDelete
   }
 
-  public getParts(): Part[] {
+  public getParts(): readonly Part[] {
     return this.parts
   }
 
@@ -195,9 +219,11 @@ export class Segment {
     usedLayers: Set<string>,
     lifespans: PieceLifespan[]
   ): Piece[] {
+    const now: number = Date.now()
     return this.parts
       .slice(0, startIndex + 1)
       .flatMap((part) => part.getPiecesWithLifespan(lifespans))
+      .filter(piece => !piece.hasEnded(now))
       .reduceRight(this.createGetPiecesOnUnusedLayersReducer(usedLayers), [])
   }
 
@@ -226,6 +252,7 @@ export class Segment {
 
   public reset(): void {
     this.removeUnplannedParts()
+    this.removeUnsyncedParts()
     this.parts.forEach(part => part.reset())
     this.executedAtEpochTime = undefined
   }

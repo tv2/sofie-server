@@ -1,0 +1,18 @@
+{
+	"public": {
+		"customizationClassName": "tv2",
+		"autoRewindLeavingSegment": true,
+		"allowUnsyncedSegments": true,
+		"allowGrabbingTimeline": true,
+		"defaultDisplayDuration": 4000,
+		"allowRundownResetOnAir": true,
+		"preserveUnsyncedPlayingSegmentContents": true,
+		"keyboardMapLayout": "STANDARD_102",
+		"followOnAirSegmentsHistory": 1,
+		"poisonKey": "",
+		"defaultShelfDisplayOptions": "layout,shelfLayout",
+		"enableKeyboardPreview": true,
+		"confirmKeyCode": "AnyEnter"
+	}
+}
+

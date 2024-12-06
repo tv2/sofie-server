@@ -13,6 +13,7 @@ import {
 } from '../../../model/value-objects/rundown-timing'
 import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
 import { MongoId } from './mongo-entity-converter'
+import { Invalidity } from '../../../model/value-objects/invalidity'
 
 export interface MongoIngestedRundown extends MongoId {
   name: string
@@ -32,20 +33,20 @@ type MongoIngestedRundownTiming = MongoForwardRundownTiming | MongoBackwardRundo
 interface MongoForwardRundownTiming { // PlaylistTimingForwardTime from blueprints-integration
   type: MongoRundownTimingType.FORWARD
   expectedStart: number
-  expectedDuration?: number
-  expectedEnd?: number
+  expectedDuration?: number | null
+  expectedEnd?: number | null
 }
 
 interface MongoBackwardRundownTiming { // PlaylistTimingBackTime from blueprints-integration
   type: MongoRundownTimingType.BACKWARD
-  expectedStart?: number
-  expectedDuration?: number
+  expectedStart?: number | null
+  expectedDuration?: number | null
   expectedEnd: number
 }
 
 interface MongoUnscheduledRundownTiming { // PlaylistTimingNone from blueprints-integration
   type: MongoRundownTimingType.UNSCHEDULED
-  expectedDuration?: number
+  expectedDuration?: number | null
 }
 
 export interface MongoIngestedSegment extends MongoId {
@@ -54,8 +55,11 @@ export interface MongoIngestedSegment extends MongoId {
   rundownId: string
   externalId: string
   isHidden: boolean
+  identifier?: string
   metaData?: unknown // This is the current spelling in the database from Core... TOD: Update when we control Ingest
   budgetDuration?: number
+  invalidity?: { reason: string }
+  definesShowStyleVariant: boolean
 }
 
 export interface MongoIngestedPart extends MongoId {
@@ -70,6 +74,7 @@ export interface MongoIngestedPart extends MongoId {
   isUnsynced?: boolean
   untimed: boolean
   inTransition?: {
+    blockTakeDuration: number
     previousPartKeepaliveDuration: number
     partContentDelayDuration: number
   }
@@ -80,6 +85,7 @@ export interface MongoIngestedPart extends MongoId {
   autoNextOverlap: number
   disableNextInTransition: boolean
   timings?: PartTimings
+  invalidity?: Invalidity
 }
 
 export interface MongoIngestedPiece extends MongoId {
@@ -130,26 +136,31 @@ export class MongoIngestedEntityConverter {
   }
 
   private convertToUnscheduledRundownTiming(mongoUnscheduledRundownTiming: MongoUnscheduledRundownTiming): UnscheduledRundownTiming {
+    const expectedDurationInMs: number | undefined = mongoUnscheduledRundownTiming.expectedDuration ?? undefined
     return {
       type: RundownTimingType.UNSCHEDULED,
-      expectedDurationInMs: mongoUnscheduledRundownTiming.expectedDuration,
+      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null)
     }
   }
 
   private convertToForwardRundownTiming(mongoForwardRundownTiming: MongoForwardRundownTiming): ForwardRundownTiming {
+    const expectedDurationInMs: number | undefined = mongoForwardRundownTiming.expectedDuration ?? undefined
+    const expectedEndEpochTime: number | undefined = mongoForwardRundownTiming.expectedEnd ?? undefined
     return {
       type: RundownTimingType.FORWARD,
       expectedStartEpochTime: mongoForwardRundownTiming.expectedStart,
-      expectedDurationInMs: mongoForwardRundownTiming.expectedDuration,
-      expectedEndEpochTime: mongoForwardRundownTiming.expectedEnd
+      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null),
+      ...(expectedEndEpochTime !== undefined ? { expectedEndEpochTime } : null),
     }
   }
 
   private convertToBackwardRundownTiming(mongoBackwardRundownTiming: MongoBackwardRundownTiming): BackwardRundownTiming {
+    const expectedStartEpochTime: number | undefined = mongoBackwardRundownTiming.expectedStart ?? undefined
+    const expectedDurationInMs: number | undefined = mongoBackwardRundownTiming.expectedDuration ?? undefined
     return {
       type: RundownTimingType.BACKWARD,
-      expectedStartEpochTime: mongoBackwardRundownTiming.expectedStart,
-      expectedDurationInMs: mongoBackwardRundownTiming.expectedDuration,
+      ...(expectedStartEpochTime !== undefined ? { expectedStartEpochTime } : null),
+      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null),
       expectedEndEpochTime: mongoBackwardRundownTiming.expectedEnd
     }
   }
@@ -161,9 +172,12 @@ export class MongoIngestedEntityConverter {
       name: mongoSegment.name,
       rank: mongoSegment._rank,
       isHidden: mongoSegment.isHidden,
+      referenceTag: mongoSegment.identifier,
       metadata: mongoSegment.metaData,
       ingestedParts: [],
-      budgetDuration: mongoSegment.budgetDuration ?? undefined
+      budgetDuration: mongoSegment.budgetDuration ?? undefined,
+      invalidity: mongoSegment.invalidity,
+      definesShowStyleVariant: mongoSegment.definesShowStyleVariant
     }
   }
 
@@ -182,6 +196,7 @@ export class MongoIngestedEntityConverter {
       expectedDuration: mongoPart.expectedDuration,
       ingestedPieces: [],
       inTransition: {
+        blockTakeDuration: mongoPart.inTransition?.blockTakeDuration ?? 0,
         keepPreviousPartAliveDuration: mongoPart.inTransition?.previousPartKeepaliveDuration ?? 0,
         delayPiecesDuration: mongoPart.inTransition?.partContentDelayDuration ?? 0,
       },
@@ -192,6 +207,7 @@ export class MongoIngestedEntityConverter {
       disableNextInTransition: mongoPart.disableNextInTransition,
       isUntimed: mongoPart.untimed ?? false,
       timings: mongoPart.timings,
+      invalidity: mongoPart.invalidity
     }
   }
 
@@ -203,13 +219,14 @@ export class MongoIngestedEntityConverter {
     return {
       id: mongoPiece._id,
       partId: mongoPiece.startPartId,
+      rundownId: mongoPiece.startRundownId,
       name: mongoPiece.name,
       layer: mongoPiece.sourceLayerId,
       pieceLifespan: this.mapMongoPieceLifespanToPieceLifespan(mongoPiece.lifespan),
       start: typeof mongoPiece.enable.start === 'number' ? mongoPiece.enable.start : 0,
       duration: mongoPiece.enable.duration ?? undefined,
       preRollDuration: mongoPiece.prerollDuration,
-      postRollDuration: mongoPiece.prerollDuration,
+      postRollDuration: mongoPiece.postrollDuration,
       transitionType: this.mapMongoPieceTypeToTransitionType(mongoPiece.pieceType),
       timelineObjects: JSON.parse(mongoPiece.timelineObjectsString),
       metadata: mongoPiece.metaData,

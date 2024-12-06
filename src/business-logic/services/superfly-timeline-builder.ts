@@ -158,7 +158,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       controlForPiece.enable.start = `#${preRollControlForPiece.id} + ${piece.preRollDuration}`
     }
 
-    childGroupForPiece.children = piece.timelineObjects.map((timelineObject) =>
+    childGroupForPiece.children = piece.getTimelineObjects().map((timelineObject) =>
       this.mapToTimelineObjectForPieceGroup(timelineObject, childGroupForPiece, piece)
     )
 
@@ -182,7 +182,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         return this.createNoTransitionTimelineEnable(partCalculatedTimings, piece, parentGroup)
       }
       default: {
-        ExhaustiveCaseChecker.assertAllCases(piece.transitionType)
+        ExhaustiveCaseChecker.assertAllCases(piece.transitionType, 'piece transition type')
       }
     }
   }
@@ -230,7 +230,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           : piece.getDuration()
 
     return {
-      start: piece.getStart() + (piece.isPlanned ? partCalculatedTimings.delayStartOfPiecesDuration : 0),
+      start: piece.getStart() + (piece.isInsertedOnAir() ? 0 : partCalculatedTimings.delayStartOfPiecesDuration),
       duration: duration === 0 ? undefined : duration,
     }
   }
@@ -328,6 +328,9 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   }
 
   private findLookaheadTimelineObjectsForLayers(lookaheadLayers: StudioLayer[], rundown: Rundown, activeGroup: TimelineObjectGroup | undefined): TimelineObject[] {
+    if (rundown.getSegments().length === 0) {
+      return []
+    }
     return lookaheadLayers.flatMap((layer) => {
       const lookaheadObjects: LookaheadTimelineObject[] = this.findLookaheadTimelineObjectsForFutureParts(
         rundown,
@@ -339,7 +342,21 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         this.findLookaheadTimelineObjectsForActivePart(rundown, layer, activeGroup)
       lookaheadObjects.push(...activePartLookaheadObjects)
 
-      return lookaheadObjects
+      return this.postFixRandomIdToDuplicateObjects(lookaheadObjects)
+    })
+  }
+
+  private postFixRandomIdToDuplicateObjects(timelineObjects: LookaheadTimelineObject[]): LookaheadTimelineObject[] {
+    const existingIds: Set<string> = new Set<string>()
+    return timelineObjects.map(timelineObject => {
+      if (existingIds.has(timelineObject.id)) {
+        return {
+          ...timelineObject,
+          id: `${timelineObject.id}_${process.hrtime.bigint()}`
+        }
+      }
+      existingIds.add(timelineObject.id)
+      return timelineObject
     })
   }
 
@@ -383,7 +400,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return part
       .getPieces()
       .filter((piece) => piece.pieceLifespan === PieceLifespan.WITHIN_PART)
-      .flatMap((piece) => piece.timelineObjects)
+      .flatMap((piece) => piece.getTimelineObjects())
       .filter((timelineObject) => timelineObject.layer === layer.name)
       .map((timelineObject) => this.mapTimelineObjectToLookAheadTimelineObject(timelineObject, enable, layer, idPostFix))
   }
@@ -500,7 +517,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           content: {}
         }
 
-        infiniteGroup.children = piece.timelineObjects.flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))
+        infiniteGroup.children = piece.getTimelineObjects().flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))
         infinitePieceTimelineObjectGroups.push(infiniteGroup)
       })
 

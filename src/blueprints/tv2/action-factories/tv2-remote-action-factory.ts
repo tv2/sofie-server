@@ -2,7 +2,7 @@ import { Piece } from '../../../model/entities/piece'
 import { Part, PartInterface } from '../../../model/entities/part'
 import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Tv2SourceMappingWithSound } from '../value-objects/tv2-studio-blueprint-configuration'
+import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
 import { Tv2SourceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
@@ -16,8 +16,8 @@ import {
   Tv2RemoteAction
 } from '../value-objects/tv2-action'
 import {
-  Tv2AudioTimelineObjectFactory
-} from '../timeline-object-factories/interfaces/tv2-audio-timeline-object-factory'
+  Tv2AudioMixerTimelineObjectFactory
+} from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
   Tv2VideoMixerTimelineObjectFactory
@@ -26,13 +26,16 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
+import { ActionFactory } from './action-factory'
 
-export class Tv2RemoteActionFactory {
+export class Tv2RemoteActionFactory extends ActionFactory {
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly audioTimelineObjectFactory: Tv2AudioTimelineObjectFactory
-  ) {}
+    private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
+  ) {
+    super()
+  }
 
   public isRemoteAction(action: Tv2Action): action is Tv2RemoteAction {
     return action.metadata.contentType === Tv2ActionContentType.REMOTE
@@ -51,23 +54,28 @@ export class Tv2RemoteActionFactory {
   public createRemoteActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2PartAction[] {
     return [
       ...this.createInsertRemoteAsNextActions(blueprintConfiguration),
+      ...this.createInsertRemoteAsOnAirActions(blueprintConfiguration),
       this.createRecallLastPlannedRemoteAsNextAction(),
     ]
   }
 
   private createInsertRemoteAsNextActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
-    return blueprintConfiguration.studio.remoteSources
-      .map(source => this.createInsertRemoteAsNextAction(blueprintConfiguration, source))
+    return [
+      ...blueprintConfiguration.studio.remoteSources,
+      ...blueprintConfiguration.studio.feedSources
+    ].map(source => this.createInsertRemoteAsNextAction(blueprintConfiguration, source))
   }
 
-  private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithSound): Tv2RemoteAction {
-    const partId: string = `remoteInsertActionPart_${remoteSource.name}`
+  private createInsertRemoteAsNextAction(configuration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithAudio): Tv2RemoteAction {
+    const sanitizedId: string = this.sanitizeStringForId(remoteSource.name)
+    const partId: string = `remoteInsertActionPart_${sanitizedId}`
     const remotePieceInterface: Tv2PieceInterface = this.createRemotePieceInterface(configuration, remoteSource, partId)
     const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
     return {
-      id: `remoteAsNextAction_${remoteSource.name}`,
-      name: `LIVE ${remoteSource.name}`,
-      description: `Insert LIVE ${remoteSource.name} as next.`,
+      id: `remoteAsNextAction_${sanitizedId}`,
+      name: `${remoteSource.name} PVW`,
+      rank: 0,
+      description: `Insert ${remoteSource.name} as next.`,
       type: PartActionType.INSERT_PART_AS_NEXT,
       data: {
         partInterface: partInterface,
@@ -80,24 +88,25 @@ export class Tv2RemoteActionFactory {
     }
   }
 
-  private createRemotePieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithSound, parentPartId: string): Tv2PieceInterface {
+  private createRemotePieceInterface(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, parentPartId: string): Tv2PieceInterface {
     const videoMixerTimelineObjects: Tv2BlueprintTimelineObject[] = this.createVideoMixerTimelineObjects(source)
-    const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
+    const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: Tv2PieceMetadata = {
       type: Tv2PieceType.REMOTE,
       outputLayer: Tv2OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
-        sisyfosLayers: source.sisyfosLayers,
+        sisyfosLayers: source.audioLayers,
         wantsToPersistAudio: source.wantsToPersistAudio,
         acceptsPersistedAudio: source.acceptPersistAudio
       }
     }
 
     return {
-      id: `remoteAction_${source.id}`,
+      id: `remoteAction_${this.sanitizeStringForId(source.id)}`,
       partId: parentPartId,
-      name: `LIVE ${source.name}`,
+      rundownId: '',
+      name: source.name,
       layer: Tv2SourceLayer.REMOTE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -115,7 +124,7 @@ export class Tv2RemoteActionFactory {
     }
   }
 
-  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithSound): Tv2BlueprintTimelineObject[] {
+  private createVideoMixerTimelineObjects(source: Tv2SourceMappingWithAudio): Tv2BlueprintTimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
       this.videoMixerTimelineObjectFactory.createProgramTimelineObject(source.videoMixerSource, enable),
@@ -124,11 +133,11 @@ export class Tv2RemoteActionFactory {
     ]
   }
 
-  private createPartInterface(partId: string, source: Tv2SourceMappingWithSound): PartInterface {
+  private createPartInterface(partId: string, source: Tv2SourceMappingWithAudio): PartInterface {
     return {
       id: partId,
       rundownId: '',
-      name: `Live Part ${source.name}`,
+      name: `Part ${source.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,
@@ -137,6 +146,7 @@ export class Tv2RemoteActionFactory {
       isUntimed: false,
       isUnsynced: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0
       },
@@ -147,10 +157,40 @@ export class Tv2RemoteActionFactory {
     }
   }
 
+  private createInsertRemoteAsOnAirActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2RemoteAction[] {
+    return [
+      ...blueprintConfiguration.studio.remoteSources,
+      ...blueprintConfiguration.studio.feedSources
+    ].map(source => this.createInsertRemoteAsOnAirAction(blueprintConfiguration, source))
+  }
+
+  private createInsertRemoteAsOnAirAction(blueprintConfiguration: Tv2BlueprintConfiguration, remoteSource: Tv2SourceMappingWithAudio): Tv2RemoteAction {
+    const sanitizedId: string = this.sanitizeStringForId(remoteSource.name)
+    const partId: string = `remoteInsertActionPart_${sanitizedId}`
+    const remotePieceInterface: Tv2PieceInterface = this.createRemotePieceInterface(blueprintConfiguration, remoteSource, partId)
+    const partInterface: PartInterface = this.createPartInterface(partId, remoteSource)
+    return {
+      id: `remoteAsOnAirAction_${sanitizedId}`,
+      name: `${remoteSource.name} PGM`,
+      rank: 0,
+      description: `Insert and Take ${remoteSource.name}.`,
+      type: PartActionType.INSERT_PART_AS_ON_AIR,
+      data: {
+        partInterface: partInterface,
+        pieceInterfaces: [remotePieceInterface]
+      },
+      metadata: {
+        contentType: Tv2ActionContentType.REMOTE,
+        remoteNumber: remoteSource.name,
+      },
+    }
+  }
+
   private createRecallLastPlannedRemoteAsNextAction(): Tv2RecallLastPlannedRemoteAsNextAction {
     return {
       id: 'recall_last_planned_remote_as_next_action',
       name: 'Recall last Live',
+      rank: 0,
       description: 'Recalls the last live that has been on air.',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
@@ -189,6 +229,7 @@ export class Tv2RemoteActionFactory {
       isUnsynced: false,
       isUntimed: false,
       inTransition: {
+        blockTakeDuration: 0,
         keepPreviousPartAliveDuration: 0,
         delayPiecesDuration: 0,
       },
@@ -204,6 +245,7 @@ export class Tv2RemoteActionFactory {
       ingestedPieceId: '',
       ingestedPartId: '',
       partId: partInterface.id,
+      rundownId: '',
       name: piece.name,
       layer: piece.layer,
       pieceLifespan: piece.pieceLifespan,
@@ -216,7 +258,7 @@ export class Tv2RemoteActionFactory {
       metadata: piece.metadata as Tv2PieceMetadata,
       tags: [],
       isUnsynced: false,
-      timelineObjects: piece.timelineObjects,
+      timelineObjects: piece.getTimelineObjects()
     }))
 
     const recallLastPlannedRemoteAction: Tv2RecallLastPlannedRemoteAsNextAction = action as Tv2RecallLastPlannedRemoteAsNextAction

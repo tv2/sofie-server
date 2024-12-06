@@ -7,6 +7,7 @@ export enum Tv2SourceLayer {
 
   GRAPHICS_IDENT = 'studio0_graphicsIdent',
   GRAPHICS_LOWER_THIRD = 'studio0_graphicsLower',
+  GRAPHICS_PILOT_OVERLAY = 'studio0_pilotOverlay',
   GRAPHICS_TOP = 'studio0_graphicsTop',
   GRAPHICS_HEADLINE = 'studio0_graphicsHeadline',
   GRAPHICS_TEMA = 'studio0_graphicsTema',
@@ -41,6 +42,16 @@ export enum Tv2AtemLayer {
   CLEAN_UPSTREAM_KEYER = 'atem_clean_usk_full',
   SPLIT_SCREEN = 'atem_dve',
   SPLIT_SCREEN_BOXES = 'atem_dve_boxes',
+}
+
+export enum Tv2TriCasterLayer {
+  PROGRAM = 'tricaster_me_program',
+  CLEAN_FEED = 'tricaster_me_clean',
+  LOOKAHEAD = 'tricaster_aux_lookahead',
+  DOWNSTREAM_KEYER = 'tricaster_dsk',
+  CLEAN_UPSTREAM_KEYER = 'tricaster_clean_usk_full',
+  SPLIT_SCREEN = 'tricaster_dve',
+  SPLIT_SCREEN_BOXES = 'tricaster_dve_boxes',
 }
 
 export enum Tv2VideoMixerLayer {

@@ -1,12 +1,12 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { MediaRepository } from '../interfaces/MediaRepository'
+import { MediaRepository } from '../interfaces/media-repository'
 import { Media } from '../../../model/entities/media'
 import { MongoDatabase } from './mongo-database'
 import { MongoEntityConverter, MongoMedia } from './mongo-entity-converter'
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 
-export class MongoMediaRepository extends BaseMongoRepository implements MediaRepository {
+export class MongoMediaRepository extends BaseMongoRepository<MongoMedia> implements MediaRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)

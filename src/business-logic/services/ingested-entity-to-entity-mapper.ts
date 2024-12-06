@@ -42,7 +42,7 @@ export class IngestedEntityToEntityMapper {
       history: rundownToUpdate.getHistory(),
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),
-      segments: rundownToUpdate.getSegments(),
+      segments: [...rundownToUpdate.getSegments()],
       alreadyActiveProperties
     })
   }
@@ -54,12 +54,14 @@ export class IngestedEntityToEntityMapper {
       name: ingestedSegment.name,
       rank: ingestedSegment.rank,
       isHidden: ingestedSegment.isHidden,
+      referenceTag: ingestedSegment.referenceTag,
       metadata: ingestedSegment.metadata,
       isOnAir: false,
       isNext: false,
       isUnsynced: false,
       expectedDurationInMs: ingestedSegment.budgetDuration,
-      parts: [],
+      definesShowStyleVariant: ingestedSegment.definesShowStyleVariant ?? false,
+      parts: ingestedSegment.ingestedParts.map(ingestedPart => this.convertIngestedPartToPart(ingestedPart)),
     })
   }
 
@@ -72,16 +74,21 @@ export class IngestedEntityToEntityMapper {
       isUnsynced: false, // Updated are never unsynced since Core removes and adds new Segments instead of updating them
       expectedDurationInMs: ingestedSegment.budgetDuration,
       executedAtEpochTime: segmentToBeUpdated.getExecutedAtEpochTime(),
-      parts: segmentToBeUpdated.getParts().map(part => {
-        const ingestedPart: IngestedPart | undefined = ingestedSegment.ingestedParts.find(ingestedPart => ingestedPart.id === part.id)
-        if (!ingestedPart) {
-          return part
-        }
-        return this.updatePartWithIngestedPart(part, ingestedPart)
-      }),
+      parts: this.mergePartsWithIngestedParts(segmentToBeUpdated.getParts(), ingestedSegment.ingestedParts)
     })
   }
 
+  private mergePartsWithIngestedParts(parts: readonly Part[], ingestedParts: readonly IngestedPart[]): Part[] {
+    const existingPartsMap: Readonly<Record<string, Part>> = Object.fromEntries(parts.map(part => [part.id, part]))
+    const updatedPartsMap: Readonly<Record<string, Part>> = ingestedParts.reduce((updatedPartsMap, ingestedPart) => {
+      const part: Part | undefined = existingPartsMap[ingestedPart.id]
+      return {
+        ...updatedPartsMap,
+        [ingestedPart.id]: part ? this.updatePartWithIngestedPart(part, ingestedPart) : this.convertIngestedPartToPart(ingestedPart)
+      }
+    }, existingPartsMap)
+    return Object.values(updatedPartsMap)
+  }
 
   public convertIngestedPartToPart(ingestedPart: IngestedPart): Part {
     return new Part({
@@ -96,6 +103,7 @@ export class IngestedEntityToEntityMapper {
       isUntimed: ingestedPart.isUntimed,
       pieces: ingestedPart.ingestedPieces.map((ingestedPiece: IngestedPiece) => this.convertIngestedPieceToPiece(ingestedPiece)),
       expectedDuration: ingestedPart.expectedDuration,
+      invalidity: ingestedPart.invalidity,
       inTransition: ingestedPart.inTransition,
       outTransition: ingestedPart.outTransition,
       autoNext: ingestedPart.autoNext,
@@ -105,6 +113,9 @@ export class IngestedEntityToEntityMapper {
   }
 
   public updatePartWithIngestedPart(partToBeUpdated: Part, ingestedPart: IngestedPart): Part {
+    if (partToBeUpdated.isOnAir()) {
+      return partToBeUpdated
+    }
     const updatedPieces: Piece[] = ingestedPart.ingestedPieces.map(ingestedPiece => {
       const existingPiece: Piece | undefined = partToBeUpdated.getPieces().find(piece => piece.id === ingestedPiece.id)
       return existingPiece
@@ -112,7 +123,7 @@ export class IngestedEntityToEntityMapper {
         : this.convertIngestedPieceToPiece(ingestedPiece)
     })
 
-    return new Part({
+    const updatedPart: Part = new Part({
       ...ingestedPart,
       id: partToBeUpdated.id,
       segmentId: partToBeUpdated.getSegmentId(),
@@ -128,6 +139,11 @@ export class IngestedEntityToEntityMapper {
       timings: this.getPartTimings(partToBeUpdated),
       ingestedPart
     })
+
+    const unplannedPiecesToKeep: Piece[] = partToBeUpdated.getPieces().filter(piece => !piece.isPlanned)
+    unplannedPiecesToKeep.forEach(unplannedPiece => updatedPart.insertPiece(unplannedPiece))
+
+    return updatedPart
   }
 
   private getPartTimings(part: Part): PartTimings | undefined {
@@ -144,6 +160,7 @@ export class IngestedEntityToEntityMapper {
     return new Piece({
       id: ingestedPiece.id,
       partId: ingestedPiece.partId,
+      rundownId: ingestedPiece.rundownId,
       name: ingestedPiece.name,
       layer: ingestedPiece.layer,
       pieceLifespan: ingestedPiece.pieceLifespan,
@@ -165,6 +182,7 @@ export class IngestedEntityToEntityMapper {
     return new Piece({
       id: pieceToBeUpdated.id,
       partId: pieceToBeUpdated.getPartId(),
+      rundownId: pieceToBeUpdated.rundownId,
       name: ingestedPiece.name,
       layer: ingestedPiece.layer,
       pieceLifespan: ingestedPiece.pieceLifespan,

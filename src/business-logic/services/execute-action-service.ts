@@ -1,10 +1,10 @@
 import { ActionService } from './interfaces/action-service'
 import {
   Action,
-  ActionManifest,
   MutateActionMethods,
   MutateActionType,
   MutateActionWithArgumentsMethods,
+  MutateActionWithConfiguration,
   MutateActionWithHistoricPartMethods,
   MutateActionWithMedia,
   MutateActionWithPieceMethods,
@@ -12,8 +12,6 @@ import {
   PieceAction
 } from '../../model/entities/action'
 import { Blueprint } from '../../model/value-objects/blueprint'
-import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
-import { Configuration } from '../../model/entities/configuration'
 import { ActionRepository } from '../../data-access/repositories/interfaces/action-repository'
 import { PartActionType, PieceActionType } from '../../model/enums/action-type'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
@@ -22,44 +20,20 @@ import { Part, PartInterface } from '../../model/entities/part'
 import { Piece, PieceInterface } from '../../model/entities/piece'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
-import { ActionManifestRepository } from '../../data-access/repositories/interfaces/action-manifest-repository'
-import { MediaRepository } from '../../data-access/repositories/interfaces/MediaRepository'
+import { MediaRepository } from '../../data-access/repositories/interfaces/media-repository'
 import { Media } from '../../model/entities/media'
+import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
+import { Configuration } from '../../model/entities/configuration'
 
 export class ExecuteActionService implements ActionService {
   constructor(
-    private readonly configurationRepository: ConfigurationRepository,
     private readonly actionRepository: ActionRepository,
-    private readonly actionManifestRepository: ActionManifestRepository,
     private readonly rundownRepository: RundownRepository,
     private readonly mediaRepository: MediaRepository,
+    private readonly configurationRepository: ConfigurationRepository,
     private readonly rundownService: RundownService,
     private readonly blueprint: Blueprint
   ) {}
-
-  /**
-   * Fetches all Actions that are not associated with a Rundown
-   */
-  public async getActions(): Promise<Action[]> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    // TODO: The Actions should be generated on ingest. Move them once we control ingest.
-    const actions: Action[] = this.blueprint.generateActions(configuration, [])
-    await this.actionRepository.saveActions(actions)
-    return actions
-  }
-
-  /**
-   * Fetches all Actions that are not associated with a Rundown plus all Rundown specific Actions for the parsed RundownId
-   */
-  public async getActionsForRundown(rundownId: string): Promise<Action[]> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    const actionManifests: ActionManifest[] = await this.actionManifestRepository.getActionManifests(rundownId)
-    // TODO: The Actions should be generated on ingest. Move them once we control ingest.
-    const actions: Action[] = this.blueprint.generateActions(configuration, actionManifests)
-    await this.actionRepository.deleteActionsForRundown(rundownId)
-    await this.actionRepository.saveActions(actions)
-    return actions
-  }
 
   public async executeAction(actionId: string, rundownId: string, actionArguments?: unknown): Promise<void> {
     const action: Action = await this.actionRepository.getAction(actionId)
@@ -86,8 +60,7 @@ export class ExecuteActionService implements ActionService {
       }
       case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
         const pieceAction: PieceAction = (await this.mutateAction(action, rundownId, actionArguments)) as PieceAction
-        await this.insertPieceAsNext(pieceAction, rundownId)
-        await this.rundownService.takeNext(rundownId)
+        await this.insertPieceAsNextAndTake(pieceAction, rundownId)
         break
       }
       case PieceActionType.REPLACE_PIECE: {
@@ -128,6 +101,9 @@ export class ExecuteActionService implements ActionService {
       case MutateActionType.APPLY_ARGUMENTS: {
         return this.mutateActionWithArgument(mutateActionMethods, action, actionArguments)
       }
+      case MutateActionType.CONFIGURATION: {
+        return this.mutateActionWithConfiguration(mutateActionMethods, action, rundownId)
+      }
       default: {
         return action
       }
@@ -167,19 +143,28 @@ export class ExecuteActionService implements ActionService {
     return mutateActionsMethods.updateActionWithArguments(action, actionArguments)
   }
 
+  private async mutateActionWithConfiguration(mutateActionsMethods: MutateActionWithConfiguration, action: Action, rundownId: string): Promise<Action> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    return mutateActionsMethods.updateWithConfiguration(action, configuration, rundown.getShowStyleVariantId())
+  }
+
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
-    const part: Part = this.createPartFromAction(partAction)
+    const part: Part = this.createPartFromAction(partAction, rundownId)
     await this.rundownService.insertPartAsOnAir(rundownId, part)
   }
 
-  private createPartFromAction(partAction: PartAction): Part {
+  private createPartFromAction(partAction: PartAction, rundownId: string): Part {
     const partInterface: PartInterface = partAction.data.partInterface
     partInterface.metadata = { actionId: partAction.id }
     partInterface.id = this.makeUnique(partInterface.id)
+    partInterface.rundownId = rundownId
 
     partInterface.pieces = partAction.data.pieceInterfaces.map(pieceInterface => new Piece({
       ...pieceInterface,
-      partId: partInterface.id
+      id: this.makeUnique(pieceInterface.id),
+      partId: partInterface.id,
+      rundownId: partInterface.rundownId,
     }))
 
     return new Part(partInterface)
@@ -190,34 +175,41 @@ export class ExecuteActionService implements ActionService {
   }
 
   private async insertPartAsNext(partAction: PartAction, rundownId: string): Promise<void> {
-    const part: Part = this.createPartFromAction(partAction)
+    const part: Part = this.createPartFromAction(partAction, rundownId)
     await this.rundownService.insertPartAsNext(rundownId, part)
   }
 
   private async insertPieceAsOnAir(pieceAction: PieceAction, rundownId: string): Promise<void> {
-    const piece: Piece = this.createPieceFromAction(pieceAction)
+    const piece: Piece = this.createPieceFromAction(pieceAction, rundownId)
     piece.setExecutedAt(Date.now())
     await this.rundownService.insertPieceAsOnAir(rundownId, piece, pieceAction.data.layersToStopPiecesOn)
   }
 
-  private createPieceFromAction(pieceAction: PieceAction): Piece {
+  private createPieceFromAction(pieceAction: PieceAction, rundownId: string): Piece {
     const pieceInterface: PieceInterface = pieceAction.data.pieceInterface
     pieceInterface.id = this.makeUnique(pieceInterface.id)
+    pieceInterface.rundownId = rundownId
+    pieceInterface.createdFromActionId = pieceAction.id
     return new Piece(pieceInterface)
   }
 
   private async insertPieceAsNext(pieceAction: PieceAction, rundownId: string): Promise<void> {
-    const piece: Piece = this.createPieceFromAction(pieceAction)
+    const piece: Piece = this.createPieceFromAction(pieceAction, rundownId)
     await this.rundownService.insertPieceAsNext(rundownId, piece, pieceAction.data.partInTransition)
   }
 
+  private async insertPieceAsNextAndTake(pieceAction: PieceAction, rundownId: string): Promise<void> {
+    const piece: Piece = this.createPieceFromAction(pieceAction, rundownId)
+    await this.rundownService.insertPieceAsNextAndTake(rundownId, piece, pieceAction.data.partInTransition)
+  }
+
   private async replacePiece(action: Action, rundownId: string, actionArguments: unknown): Promise<void> {
-    const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
+    const mutateActionMethodsSequence: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
 
     let pieceFromRundown: Piece | undefined
 
-    for (let i = 0; i < mutateActionMethodsArray.length; i++) {
-      const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
+    for (let i = 0; i < mutateActionMethodsSequence.length; i++) {
+      const mutateActionMethods: MutateActionMethods = mutateActionMethodsSequence[i]
       if (mutateActionMethods.type !== MutateActionType.PIECE) {
         action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
         continue
@@ -238,7 +230,7 @@ export class ExecuteActionService implements ActionService {
       return
     }
 
-    const piece: Piece = this.createPieceFromAction(action as PieceAction)
+    const piece: Piece = this.createPieceFromAction(action as PieceAction, rundownId)
     await this.rundownService.replacePieceOnAirOnNextPart(rundownId, pieceFromRundown, piece)
   }
 }

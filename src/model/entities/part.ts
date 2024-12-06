@@ -9,6 +9,8 @@ import { PartEndState } from '../value-objects/part-end-state'
 import { IngestedPart } from './ingested-part'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import { Invalidity } from '../value-objects/invalidity'
+import { InvalidPartException } from '../exceptions/invalid-part-exception'
 
 export interface PartInterface {
   id: string
@@ -24,6 +26,7 @@ export interface PartInterface {
   expectedDuration?: number
   executedAt?: number
   playedDuration?: number
+  invalidity?: Invalidity
 
   inTransition: InTransition
   outTransition: OutTransition
@@ -55,6 +58,7 @@ export class Part {
 
   public readonly autoNext?: AutoNext
   public readonly disableNextInTransition: boolean
+  public readonly invalidity?: Invalidity
 
   private segmentId: string
   private rank: number
@@ -96,6 +100,7 @@ export class Part {
     this.isPartOnAir = part.isOnAir
     this.isPartNext = part.isNext
     this.expectedDuration = part.expectedDuration
+    this.invalidity = part.invalidity
 
     this.inTransition = part.inTransition ?? { keepPreviousPartAliveDuration: 0, delayPiecesDuration: 0 }
     this.outTransition = part.outTransition ?? { keepAliveDuration: 0 }
@@ -118,12 +123,20 @@ export class Part {
   }
 
   public putOnAir(): void {
+    this.assertValidity(this.putOnAir.name)
     this.isPartOnAir = true
 
     const now: number = Date.now()
     this.executedAt = now
     this.playedDuration = 0
-    this.pieces.forEach((piece) => piece.setExecutedAt(now))
+    this.pieces.forEach((piece) => piece.setExecutedAt(now + piece.getStart()))
+  }
+
+  private assertValidity(operationName: string): void {
+    if (!this.invalidity) {
+      return
+    }
+    throw new InvalidPartException(`Unable to do "${operationName}", since part "${this.name}" is invalid.`)
   }
 
   public takeOffAir(): void {
@@ -139,6 +152,9 @@ export class Part {
   }
 
   public markAsUnsynced(): void {
+    if (!this.isPlanned) {
+      return // Only planned Parts can be unsynced
+    }
     this.isPartUnsynced = true
     this.rank = this.rank - 1
     this.pieces.forEach(piece => piece.markAsUnsyncedWithUnsyncedPart())
@@ -158,6 +174,7 @@ export class Part {
   }
 
   public setAsNext(): void {
+    this.assertValidity(this.setAsNext.name)
     this.isPartNext = true
   }
 
@@ -169,7 +186,7 @@ export class Part {
     return this.isPartNext
   }
 
-  public getPieces(): Piece[] {
+  public getPieces(): readonly Piece[] {
     return this.pieces
   }
 
@@ -185,17 +202,30 @@ export class Part {
     if (this.isPartOnAir) {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
-    }
-    const indexOfExistingPieceOnLayer: number = this.pieces.findIndex(piece => piece.layer === unPlannedPiece.layer)
-    if (indexOfExistingPieceOnLayer >= 0) {
-      const piecesToBeRemoved: Piece[] = this.pieces.splice(indexOfExistingPieceOnLayer, 1)
-      piecesToBeRemoved.forEach(piece => {
-        if (piece.isPlanned) {
-          this.replacedPlannedPieces.push(piece)
-        }
-      })
+      unPlannedPiece.markAsInsertedOnAir()
+
+      this.stopOverlappingPiecesOnSameLayer(unPlannedPiece)
+    } else {
+      this.removeOverlappingPiecesOnSameLayer(unPlannedPiece)
     }
     this.pieces.push(unPlannedPiece)
+  }
+
+  private stopOverlappingPiecesOnSameLayer(referencePiece: Piece): void {
+    this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doPiecesOverlap(referencePiece, piece))
+      .forEach(stoppablePiece => stoppablePiece.stop())
+  }
+
+  private doPiecesOverlap(pieceA: Piece, pieceB: Piece): boolean {
+    const pieceAEnd: number = pieceA.getStart() + (pieceA.getDuration() ?? Infinity)
+    const pieceBEnd: number = pieceB.getStart() + (pieceB.getDuration() ?? Infinity)
+    return pieceA.getStart() <= pieceBEnd && pieceAEnd >= pieceB.getStart()
+  }
+
+  private removeOverlappingPiecesOnSameLayer(referencePiece: Piece): void {
+    const piecesToRemove: Piece[] = this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doPiecesOverlap(referencePiece, piece))
+    this.pieces = this.pieces.filter(piece => !piecesToRemove.includes(piece))
+    this.replacedPlannedPieces.push(...piecesToRemove.filter(piece => piece.isPlanned))
   }
 
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
@@ -224,12 +254,16 @@ export class Part {
     return this.playedDuration
   }
 
-  public getSegmentId(): string {
-    return this.segmentId
-  }
-
   public getRank(): number {
     return this.rank
+  }
+
+  public updateRank(rank: number): void {
+    this.rank = rank
+  }
+
+  public getSegmentId(): string {
+    return this.segmentId
   }
 
   public setSegmentId(segmentId: string): void {
@@ -258,12 +292,14 @@ export class Part {
         inTransition = {
           keepPreviousPartAliveDuration: previousPart.autoNext.overlap,
           delayPiecesDuration: 0,
+          blockTakeDuration: 0 // BlockTakeDuration is irrelevant for CalculateTimings
         }
       } else if (!previousPart.disableNextInTransition) {
         allowTransition = true
         inTransition = {
           keepPreviousPartAliveDuration: this.inTransition.keepPreviousPartAliveDuration ?? 0,
           delayPiecesDuration: this.inTransition.delayPiecesDuration ?? 0,
+          blockTakeDuration: 0 // BlockTakeDuration is irrelevant for CalculateTimings
         }
       }
     }
@@ -362,9 +398,19 @@ export class Part {
   }
 
   public updateInTransition(inTransition: InTransition): void {
-    this.inTransition = {
-      keepPreviousPartAliveDuration: Math.max(inTransition.keepPreviousPartAliveDuration, this.inTransition.keepPreviousPartAliveDuration),
-      delayPiecesDuration: Math.max(inTransition.delayPiecesDuration, this.inTransition.delayPiecesDuration)
-    }
+    this.inTransition = inTransition
+    // Note: Leaving below code snippet here. I'm not entirely sure if there is any drawbacks by always overriding the InTransition.
+    // If we don't override, then if we change the transition from a Mix200 to Mix25, then the Take would still be blocked for the full 200 frames.
+    // TODO: If no issues has arose from overriding by the 1st of November 2024, this comment and the code snippet should be deleted.
+
+    // this.inTransition = {
+    //   blockTakeDuration: Math.max(inTransition.blockTakeDuration, this.inTransition.blockTakeDuration),
+    //   keepPreviousPartAliveDuration: Math.max(inTransition.keepPreviousPartAliveDuration, this.inTransition.keepPreviousPartAliveDuration),
+    //   delayPiecesDuration: Math.max(inTransition.delayPiecesDuration, this.inTransition.delayPiecesDuration)
+    // }
+  }
+
+  public getReplacedPlannedPieces(): readonly Piece[] {
+    return this.replacedPlannedPieces
   }
 }

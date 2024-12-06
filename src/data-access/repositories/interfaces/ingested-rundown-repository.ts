@@ -1,7 +1,7 @@
 import { IngestedRundown } from '../../../model/entities/ingested-rundown'
 
 export interface IngestedRundownRepository {
-  getIngestedRundowns(): Promise<IngestedRundown[]>
+  getIngestedRundownIds(): Promise<readonly string[]>
   getIngestedRundown(rundownId: string): Promise<IngestedRundown>
   deleteIngestedRundown(rundownId: string): Promise<void>
 }

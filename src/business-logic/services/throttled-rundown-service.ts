@@ -9,12 +9,11 @@ const RUNDOWN_THROTTLED_INTERVAL_MS: number = 500
 const RUNDOWN_THROTTLED_ERROR_TEXT: string = `Unable to do action. An action was already executed less than ${RUNDOWN_THROTTLED_INTERVAL_MS}ms ago`
 
 export class ThrottledRundownService implements RundownService {
-  private static instance: RundownService
 
-  public static getInstance(rundownService: RundownService): RundownService {
-    if (!this.instance) {
-      this.instance = new ThrottledRundownService(rundownService)
-    }
+  private static instance?: ThrottledRundownService
+
+  public static getInstance(rundownService: RundownService): ThrottledRundownService {
+    this.instance ??= new ThrottledRundownService(rundownService)
     return this.instance
   }
 
@@ -36,17 +35,14 @@ export class ThrottledRundownService implements RundownService {
   }
 
   public activateRundown(rundownId: string): Promise<void> {
-    this.assertEnoughTimeHasPassed()
     return this.rundownService.activateRundown(rundownId)
   }
 
   public deactivateRundown(rundownId: string): Promise<void> {
-    this.assertEnoughTimeHasPassed()
     return this.rundownService.deactivateRundown(rundownId)
   }
 
   public resetRundown(rundownId: string): Promise<void> {
-    this.assertEnoughTimeHasPassed()
     return this.rundownService.resetRundown(rundownId)
   }
 
@@ -79,7 +75,15 @@ export class ThrottledRundownService implements RundownService {
     return this.rundownService.insertPieceAsNext(rundownId, piece, partInTransition)
   }
 
+  public insertPieceAsNextAndTake(rundownId: string, piece: Piece, partInTransition?: InTransition): Promise<void> {
+    return this.rundownService.insertPieceAsNextAndTake(rundownId, piece, partInTransition)
+  }
+
   public replacePieceOnAirOnNextPart(rundownId: string, pieceToBeReplaced: Piece, newPiece: Piece): Promise<void> {
     return this.rundownService.replacePieceOnAirOnNextPart(rundownId, pieceToBeReplaced, newPiece)
+  }
+
+  public stopPiece(rundownId: string, pieceId: string): Promise<void> {
+    return this.rundownService.stopPiece(rundownId, pieceId)
   }
 }

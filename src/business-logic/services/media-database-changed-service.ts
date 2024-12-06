@@ -2,6 +2,7 @@ import { DataChangeService } from './interfaces/data-change-service'
 import { MediaEventEmitter } from './interfaces/media-event-emitter'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
 import { Media } from '../../model/entities/media'
+import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 
 export class MediaDatabaseChangedService implements DataChangeService {
 
@@ -22,6 +23,10 @@ export class MediaDatabaseChangedService implements DataChangeService {
 
   private constructor(private readonly mediaEventEmitter: MediaEventEmitter, mediaChangedListener: DataChangedListener<Media>) {
     this.listenForMediaChanges(mediaChangedListener)
+  }
+
+  public initialize(): Promise<void> {
+    throw new UnsupportedOperationException('Not implemented')
   }
 
   private listenForMediaChanges(mediaChangedListener: DataChangedListener<Media>): void {

@@ -1,23 +1,31 @@
 import { Studio } from '../../../model/entities/studio'
 import {
   AudioBedSettings,
-  Tv2DownstreamKeyerRole, Tv2FolderConfiguration,
-  Tv2GraphicsType, Tv2HtmlGraphics,
+  Tv2DownstreamKeyerRole,
+  Tv2FolderConfiguration,
+  Tv2GraphicsType,
+  Tv2HtmlGraphics,
   Tv2SourceMapping,
-  Tv2SourceMappingWithSound,
+  Tv2SourceMappingWithAudio,
   Tv2StudioBlueprintConfiguration,
-  Tv2VideoMixerBasicConfiguration, Tv2VizPilotGraphics
+  Tv2VideoMixerBasicConfiguration,
+  Tv2VizPilotGraphics,
+  VideoMixerType
 } from '../value-objects/tv2-studio-blueprint-configuration'
+import { DeviceType } from '../../../model/enums/device-type'
 
 interface CoreStudioBlueprintConfiguration {
   SourcesCam: CoreSourceMappingWithSound[] // Cameras
   SourcesRM: CoreSourceMappingWithSound[] // Lives
+  SourcesFeed: CoreSourceMappingWithSound[] // Feeds
   SourcesReplay: CoreSourceMappingWithSound[] // Replays
   StudioMics: string[]
   ABMediaPlayers: CoreMediaPlayer[]
-  SwitcherSource: CoreVideoMixer
   CasparPrerollDuration: number
   ServerPostrollDuration: number
+
+  SwitcherType: string
+  SwitcherSource: CoreVideoMixer
 
   DVEFolder?: string,
   DVEFileExtension: string
@@ -43,6 +51,7 @@ interface CoreStudioBlueprintConfiguration {
   PreventOverlayWithFull: boolean
 
   AudioBedSettings: CoreAudioBedSettings
+  AudioBedFolder: string
 }
 
 interface CoreSourceMapping {
@@ -51,7 +60,7 @@ interface CoreSourceMapping {
   SwitcherSource: number
 }
 
-interface CoreMediaPlayer extends CoreSourceMapping { }
+interface CoreMediaPlayer extends CoreSourceMapping {}
 
 interface CoreSourceMappingWithSound extends CoreSourceMapping {
   SisyfosLayers: string[]
@@ -116,9 +125,11 @@ export class Tv2StudioBlueprintConfigurationMapper {
     return {
       cameraSources: this.mapSourcesWithSound(coreConfiguration.SourcesCam),
       remoteSources: this.mapSourcesWithSound(coreConfiguration.SourcesRM),
+      feedSources: this.mapSourcesWithSound(coreConfiguration.SourcesFeed),
       replaySources: this.mapSourcesWithSound(coreConfiguration.SourcesReplay),
       studioMicrophones: coreConfiguration.StudioMics,
       mediaPlayers: this.mapSources(coreConfiguration.ABMediaPlayers),
+      videoMixerType: this.mapToVideoMixerType(coreConfiguration.SwitcherType),
       videoMixerBasicConfiguration: this.mapVideoMixerBasicConfiguration(coreConfiguration.SwitcherSource),
       casparCgPreRollDuration: coreConfiguration.CasparPrerollDuration,
       serverPostRollDuration: coreConfiguration.ServerPostrollDuration,
@@ -129,18 +140,21 @@ export class Tv2StudioBlueprintConfigurationMapper {
       vizPilotGraphics: this.mapVizPilotGraphics(coreConfiguration.VizPilotGraphics),
       htmlGraphics: coreConfiguration.HTMLGraphics ? this.mapHtmlGraphics(coreConfiguration.HTMLGraphics) : undefined,
       shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: coreConfiguration.PreventOverlayWithFull,
-      audioBedSettings: this.mapAudioBedSettings(coreConfiguration.AudioBedSettings)
+      audioBedSettings: this.mapAudioBedSettings(coreConfiguration.AudioBedSettings, coreConfiguration.AudioBedFolder)
     }
   }
 
-  private mapSourcesWithSound(sources: CoreSourceMappingWithSound[]): Tv2SourceMappingWithSound[] {
+  private mapSourcesWithSound(sources: CoreSourceMappingWithSound[] | undefined): Tv2SourceMappingWithAudio[] {
+    if (!sources) {
+      return []
+    }
     return sources.map(source => {
       return {
         id: source._id,
         name: source.SourceName,
         videoMixerSource: source.SwitcherSource,
-        sisyfosLayers: source.SisyfosLayers,
-        studioMicrophones: source.StudioMics,
+        audioLayers: source.SisyfosLayers,
+        usesStudioMicrophones: source.StudioMics,
         wantsToPersistAudio: source.WantsToPersistAudio,
         acceptPersistAudio: source.AcceptPersistAudio
       }
@@ -155,6 +169,18 @@ export class Tv2StudioBlueprintConfigurationMapper {
         videoMixerSource: source.SwitcherSource
       }
     })
+  }
+
+  private mapToVideoMixerType(rawVideoMixerType: string): VideoMixerType {
+    switch(rawVideoMixerType) {
+      case 'TRICASTER': {
+        return DeviceType.TRICASTER
+      }
+      case 'ATEM':
+      default: {
+        return DeviceType.ATEM
+      }
+    }
   }
 
   private mapVideoMixerBasicConfiguration(coreVideoMixer: CoreVideoMixer): Tv2VideoMixerBasicConfiguration {
@@ -244,8 +270,9 @@ export class Tv2StudioBlueprintConfigurationMapper {
     }
   }
 
-  private mapAudioBedSettings(coreAudioBed: CoreAudioBedSettings): AudioBedSettings {
+  private mapAudioBedSettings(coreAudioBed: CoreAudioBedSettings, coreAudioBedFolder: string): AudioBedSettings {
     return {
+      mediaDirectory: coreAudioBedFolder,
       fadeInDurationFrames: coreAudioBed.fadeIn,
       fadeOutDurationInFrames: coreAudioBed.fadeOut,
       volume: coreAudioBed.volume

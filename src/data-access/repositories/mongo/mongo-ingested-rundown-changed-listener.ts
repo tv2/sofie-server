@@ -4,20 +4,17 @@ import {
   ChangeStream,
   ChangeStreamDeleteDocument,
   ChangeStreamDocument,
-  ChangeStreamInsertDocument,
   ChangeStreamOptions,
-  ChangeStreamReplaceDocument
 } from 'mongodb'
-import { MongoIngestedRundown } from './mongo-ingested-entity-converter'
+import { MongoIngestedEntityConverter, MongoIngestedRundown } from './mongo-ingested-entity-converter'
 import { MongoDatabase } from './mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
-import { IngestedRundownRepository } from '../interfaces/ingested-rundown-repository'
 import { IngestedRundown } from '../../../model/entities/ingested-rundown'
 import { Logger } from '../../../logger/logger'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest changed this to "ingestedRundowns"
 
-export class MongoIngestedRundownChangedListener extends BaseMongoRepository implements DataChangedListener<IngestedRundown> {
+export class MongoIngestedRundownChangedListener extends BaseMongoRepository<MongoIngestedRundown> implements DataChangedListener<IngestedRundown> {
 
   private readonly logger: Logger
   private onCreatedCallback: (rundown: IngestedRundown) => void
@@ -26,7 +23,7 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
 
   constructor(
     mongoDatabase: MongoDatabase,
-    private readonly ingestedRundownRepository: IngestedRundownRepository,
+    private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     logger: Logger
   ) {
     super(mongoDatabase)
@@ -41,23 +38,19 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository imp
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
     const changeStream: ChangeStream = this.getCollection().watch<MongoIngestedRundown, ChangeStreamDocument<MongoIngestedRundown>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedRundown>) => void this.onChange(change))
+    changeStream.on('change', (change: ChangeStreamDocument<MongoIngestedRundown>) => this.onChange(change))
     this.logger.debug('Listening for Rundown collection changes...')
   }
 
-  private async onChange(change: ChangeStreamDocument<MongoIngestedRundown>): Promise<void> {
+  private onChange(change: ChangeStreamDocument<MongoIngestedRundown>): void {
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
-        const insertChange: ChangeStreamInsertDocument<MongoIngestedRundown> = change as ChangeStreamInsertDocument<MongoIngestedRundown>
-        const rundownId: string = insertChange.fullDocument._id
-        const ingestedRundown: IngestedRundown = await this.ingestedRundownRepository.getIngestedRundown(rundownId)
+        const ingestedRundown: IngestedRundown = this.mongoIngestedEntityConverter.convertToIngestedRundown(change.fullDocument)
         this.onCreatedCallback(ingestedRundown)
         break
       }
       case MongoChangeEvent.REPLACE: {
-        const replaceChange: ChangeStreamReplaceDocument<MongoIngestedRundown> = change as ChangeStreamReplaceDocument<MongoIngestedRundown>
-        const rundownId: string = replaceChange.documentKey._id
-        const ingestedRundown: IngestedRundown = await this.ingestedRundownRepository.getIngestedRundown(rundownId)
+        const ingestedRundown: IngestedRundown = this.mongoIngestedEntityConverter.convertToIngestedRundown(change.fullDocument)
         this.onUpdatedCallback(ingestedRundown)
         break
       }

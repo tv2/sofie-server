@@ -8,20 +8,18 @@ import {
 } from '../../../model/entities/action'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { Part, PartInterface } from '../../../model/entities/part'
-import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
 import { ActionRepository } from '../../../data-access/repositories/interfaces/action-repository'
 import { RundownService } from '../interfaces/rundown-service'
 import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
 import { Blueprint } from '../../../model/value-objects/blueprint'
 import { anyOfClass, anyString, anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
-import { ActionManifestsRepository } from '../../../data-access/repositories/interfaces/action-manifests-repository'
-import { MediaRepository } from '../../../data-access/repositories/interfaces/MediaRepository'
-import { ActionManifestRepository } from '../../../data-access/repositories/interfaces/action-manifest-repository'
+import { MediaRepository } from '../../../data-access/repositories/interfaces/media-repository'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { Rundown } from '../../../model/entities/rundown'
 import { Owner } from '../../../model/enums/owner'
 import { RundownMode } from '../../../model/enums/rundown-mode'
+import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
 
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
@@ -202,7 +200,7 @@ describe(ExecuteActionService.name, () => {
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action) => action,
-            piecePredicate: (piece) => piece.id === activePiece.id
+            piecePredicate: (piece) => piece.id === activePiece.id,
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
@@ -260,7 +258,7 @@ describe(ExecuteActionService.name, () => {
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action) => action,
-            piecePredicate: (piece) => piece.id === nextPiece.id
+            piecePredicate: (piece) => piece.id === nextPiece.id,
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
@@ -324,7 +322,7 @@ describe(ExecuteActionService.name, () => {
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
             updateActionWithPiece: (action) => action,
-            piecePredicate: (piece) => piece.name === name
+            piecePredicate: (piece) => piece.name === name,
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
@@ -358,6 +356,7 @@ function createPartAction(actionType: PartActionType): PartAction {
   return {
     id: 'actionId',
     name: 'someAction',
+    rank: 0,
     type: actionType,
     data: {
       partInterface: {
@@ -372,6 +371,7 @@ function createPieceAction(actionType: PieceActionType): PieceAction {
   return {
     id: 'actionId',
     name: 'someAction',
+    rank: 0,
     type: actionType,
     data: {
       pieceInterface: {
@@ -384,12 +384,10 @@ function createPieceAction(actionType: PieceActionType): PieceAction {
 
 function createTestee(
   params?: {
-    manifestRepository?: ActionManifestsRepository
-    configurationRepository?: ConfigurationRepository,
     actionRepository?: ActionRepository,
-    actionManifestRepository?: ActionManifestRepository,
     rundownRepository?: RundownRepository,
-    mediaRepository?: MediaRepository
+    mediaRepository?: MediaRepository,
+    configurationRepository?: ConfigurationRepository,
     rundownService?: RundownService,
     blueprint?: Blueprint
   },
@@ -397,11 +395,10 @@ function createTestee(
     action?: Action
   }
 ): ExecuteActionService {
-  const configurationRepository: ConfigurationRepository = params?.configurationRepository ?? mock<ConfigurationRepository>()
   const actionRepository: ActionRepository = params?.actionRepository ?? mock<ActionRepository>()
-  const actionManifestRepository: ActionManifestRepository = params?.actionManifestRepository ?? mock<ActionManifestRepository>()
   const rundownRepository: RundownRepository = params?.rundownRepository ?? mock<RundownRepository>()
   const mediaRepository: MediaRepository = params?.mediaRepository ?? mock<MediaRepository>()
+  const configurationRepository: ConfigurationRepository = params?.configurationRepository ?? mock<ConfigurationRepository>()
   const rundownService: RundownService = params?.rundownService ?? mock<RundownService>()
   const blueprint: Blueprint = params?.blueprint ?? mock<Blueprint>()
 
@@ -410,11 +407,10 @@ function createTestee(
   }
 
   return new ExecuteActionService(
-    instance(configurationRepository),
     instance(actionRepository),
-    instance(actionManifestRepository),
     instance(rundownRepository),
     instance(mediaRepository),
+    instance(configurationRepository),
     instance(rundownService),
     instance(blueprint)
   )

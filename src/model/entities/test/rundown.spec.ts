@@ -4,7 +4,7 @@ import { Part } from '../part'
 import { Piece } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { NotActivatedException } from '../../exceptions/not-activated-exception'
 import { NotFoundException } from '../../exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
@@ -19,11 +19,15 @@ import { OnAirException } from '../../exceptions/on-air-exception'
 import { NoPartInHistoryException } from '../../exceptions/no-part-in-history-exception'
 import { RundownMode } from '../../enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../exceptions/already-rehearsal-exception'
+import { InvalidSegmentException } from '../../exceptions/invalid-segment-exception'
+import { Invalidity } from '../../value-objects/invalidity'
+import { InvalidPartException } from '../../exceptions/invalid-part-exception'
+import { PartTimings } from '../../value-objects/part-timings'
 
 describe(Rundown.name, () => {
   describe('instantiate already active Rundown', () => {
     describe('"alreadyActiveProperties" is provided', () => {
-      describe('active status is provided as false', () => {
+      describe('when rundown is inactive', () => {
         it('throws error', () => {
           const rundownInterface: RundownInterface = {
             mode: RundownMode.INACTIVE,
@@ -42,19 +46,13 @@ describe(Rundown.name, () => {
             },
           } as RundownInterface
 
-          try {
-            new Rundown(rundownInterface)
-          } catch (error) {
-            // Instantiation threw error, so all is well
-            return
-          }
-          throw new Error(
-            'Rundown didn\'t fail when instantiated with false active status and alreadyActiveProperties'
-          )
+          const result: () => Rundown = () => new Rundown(rundownInterface)
+
+          expect(result).toThrow()
         })
       })
 
-      describe('active status is provided as true', () => {
+      describe('when rundown is active', () => {
         describe('it provides all necessary values', () => {
           it('sets all values', () => {
             const activePart: Part = EntityMockFactory.createPart({ id: 'activePart' })
@@ -86,13 +84,113 @@ describe(Rundown.name, () => {
               },
             } as RundownInterface
 
-            const rundown: Rundown = new Rundown(rundownInterface)
+            const testee: Rundown = new Rundown(rundownInterface)
 
-            expect(rundown.getActivePart()).toBe(activePart)
-            expect(rundown.getNextPart()).toBe(nextPart)
-            expect(rundown.getActiveSegment()).toBe(activeSegment)
-            expect(rundown.getNextSegment()).toBe(nextSegment)
-            expect(rundown.getInfinitePieces()).toContain(piece)
+            expect(testee.getActivePart()).toBe(activePart)
+            expect(testee.getNextPart()).toBe(nextPart)
+            expect(testee.getActiveSegment()).toBe(activeSegment)
+            expect(testee.getNextSegment()).toBe(nextSegment)
+            expect(testee.getInfinitePieces()).toContain(piece)
+          })
+
+          it('marks the next Part as next', () => {
+            const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', isNext: false }) // Needs to be false, so we can verify it being set to true.
+            const activeSegment: Segment = EntityTestFactory.createSegment({
+              id: 'activeSegment',
+            })
+            const nextSegment: Segment = EntityTestFactory.createSegment({
+              id: 'nextSegment',
+            })
+            const piece: Piece = EntityTestFactory.createPiece({
+              pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
+            })
+
+            const rundownInterface: RundownInterface = {
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  part: activePart,
+                  segment: activeSegment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: nextPart,
+                  segment: nextSegment,
+                  owner: Owner.SYSTEM
+                },
+                infinitePieces: new Map([[piece.layer, piece]]),
+              },
+            } as RundownInterface
+
+            expect(nextPart.isNext()).toBeFalsy()
+            new Rundown(rundownInterface)
+            expect(nextPart.isNext()).toBeTruthy()
+          })
+        })
+
+        describe('when next part is invalid', () => {
+          describe('when there are no valid parts after the on air part', () => {
+            it ('sets the on air part as next', () => {
+              const segmentId: string = 'segment-id'
+              const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', segmentId, isOnAir: true })
+              activePart.calculateTimings()
+              const invalidity: Invalidity = { reason: 'some reason' }
+              const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId, isNext: true, invalidity })
+              const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, isNext: true, parts: [activePart, nextPart] })
+              const testee: Rundown = EntityTestFactory.createRundown({
+                mode: RundownMode.ACTIVE,
+                alreadyActiveProperties: {
+                  activeCursor: {
+                    segment,
+                    part: activePart,
+                    owner: Owner.SYSTEM,
+                  },
+                  nextCursor: {
+                    segment,
+                    part: nextPart,
+                    owner: Owner.SYSTEM,
+                  },
+                  infinitePieces: new Map(),
+                },
+                segments: [segment]
+              })
+
+              expect(testee.getNextCursor()?.segment).toBe(segment)
+              expect(testee.getNextCursor()?.part).toBe(activePart)
+            })
+          })
+
+          describe('when there is a valid part after the on air part', () => {
+            it('sets the first valid part after the on air part as next', () => {
+              const segmentId: string = 'segment-id'
+              const activePart: Part = EntityTestFactory.createPart({ id: 'active-part-id', segmentId, isOnAir: true })
+              activePart.calculateTimings()
+              const invalidity: Invalidity = { reason: 'some reason' }
+              const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId, isNext: true, invalidity })
+              const nextValidPart: Part = EntityTestFactory.createPart({ id: 'next-valid-part-id', segmentId })
+              const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, isNext: true, parts: [activePart, nextPart, nextValidPart] })
+              const testee: Rundown = EntityTestFactory.createRundown({
+                mode: RundownMode.ACTIVE,
+                alreadyActiveProperties: {
+                  activeCursor: {
+                    segment,
+                    part: activePart,
+                    owner: Owner.SYSTEM,
+                  },
+                  nextCursor: {
+                    segment,
+                    part: nextPart,
+                    owner: Owner.SYSTEM,
+                  },
+                  infinitePieces: new Map(),
+                },
+                segments: [segment]
+              })
+
+              expect(testee.getNextCursor()?.segment).toBe(segment)
+              expect(testee.getNextCursor()?.part).toBe(nextValidPart)
+            })
           })
         })
       })
@@ -184,10 +282,10 @@ describe(Rundown.name, () => {
 
       describe('it has an active Part', () => {
         it('sets the active Part as the previous Part', () => {
-          const activePart: Part = EntityTestFactory.createPart({ id: 'activePartId', isOnAir: true })
+          const activePart: Part = EntityTestFactory.createPart({id: 'activePartId', isOnAir: true})
           activePart.calculateTimings()
-          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId' })
-          const segment: Segment = EntityTestFactory.createSegment({ parts: [activePart, nextPart] })
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPartId'})
+          const segment: Segment = EntityTestFactory.createSegment({parts: [activePart, nextPart]})
 
           const testee: Rundown = new Rundown({
             segments: [segment],
@@ -215,10 +313,10 @@ describe(Rundown.name, () => {
         })
 
         it('adds the new previous Part to the history', () => {
-          const activePart: Part = EntityTestFactory.createPart({ id: 'activePartId', isOnAir: true })
+          const activePart: Part = EntityTestFactory.createPart({id: 'activePartId', isOnAir: true})
           activePart.calculateTimings()
-          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId' })
-          const segment: Segment = EntityTestFactory.createSegment({ parts: [activePart, nextPart] })
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPartId'})
+          const segment: Segment = EntityTestFactory.createSegment({parts: [activePart, nextPart]})
 
           const testee: Rundown = new Rundown({
             segments: [segment],
@@ -247,15 +345,23 @@ describe(Rundown.name, () => {
 
         describe('when next segment is the same as the on air segment', () => {
           it('keeps the executed at epoch time for the segment', () => {
-            const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPartId', isOnAir: true, timings: {
-              inTransitionStart: 0,
-              delayStartOfPiecesDuration: 0,
-              postRollDuration: 0,
-              previousPartContinueIntoPartDuration: 0,
-            } })
-            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId', isNext: true })
+            const onAirPart: Part = EntityTestFactory.createPart({
+              id: 'onAirPartId', isOnAir: true, timings: {
+                inTransitionStart: 0,
+                delayStartOfPiecesDuration: 0,
+                postRollDuration: 0,
+                previousPartContinueIntoPartDuration: 0,
+              }
+            })
+            const nextPart: Part = EntityTestFactory.createPart({id: 'nextPartId', isNext: true})
             const executedAtEpochTime: number = 1234
-            const onAirAndNextSegment: Segment = EntityTestFactory.createSegment({ id: 'onAirAndNextSegmentId', isOnAir: true, isNext: true, parts: [onAirPart, nextPart], executedAtEpochTime })
+            const onAirAndNextSegment: Segment = EntityTestFactory.createSegment({
+              id: 'onAirAndNextSegmentId',
+              isOnAir: true,
+              isNext: true,
+              parts: [onAirPart, nextPart],
+              executedAtEpochTime
+            })
 
             const testee: Rundown = new Rundown({
               segments: [onAirAndNextSegment],
@@ -286,16 +392,28 @@ describe(Rundown.name, () => {
           afterEach(() => jest.useRealTimers())
 
           it('sets the executed at epoch time for the next segment', () => {
-            const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPartId', isOnAir: true, timings: {
-              inTransitionStart: 0,
-              delayStartOfPiecesDuration: 0,
-              postRollDuration: 0,
-              previousPartContinueIntoPartDuration: 0,
-            } })
-            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId', isNext: true })
+            const onAirPart: Part = EntityTestFactory.createPart({
+              id: 'onAirPartId', isOnAir: true, timings: {
+                inTransitionStart: 0,
+                delayStartOfPiecesDuration: 0,
+                postRollDuration: 0,
+                previousPartContinueIntoPartDuration: 0,
+              }
+            })
+            const nextPart: Part = EntityTestFactory.createPart({id: 'nextPartId', isNext: true})
             const executedAtEpochTime: number = 1234
-            const onAirSegment: Segment = EntityTestFactory.createSegment({ id: 'onAirSegmentId', isOnAir: true, parts: [onAirPart], executedAtEpochTime })
-            const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'nextSegmentId', isNext: true, parts: [nextPart], executedAtEpochTime: undefined })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({
+              id: 'onAirSegmentId',
+              isOnAir: true,
+              parts: [onAirPart],
+              executedAtEpochTime
+            })
+            const nextSegment: Segment = EntityTestFactory.createSegment({
+              id: 'nextSegmentId',
+              isNext: true,
+              parts: [nextPart],
+              executedAtEpochTime: undefined
+            })
 
             const testee: Rundown = new Rundown({
               segments: [onAirSegment, nextSegment],
@@ -324,10 +442,10 @@ describe(Rundown.name, () => {
 
         describe('history has exceed maximum history entries', () => {
           it('removes the oldest entries to get down to maximum entries', () => {
-            const activePart: Part = EntityTestFactory.createPart({ id: 'activePartId', isOnAir: true })
+            const activePart: Part = EntityTestFactory.createPart({id: 'activePartId', isOnAir: true})
             activePart.calculateTimings()
-            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId' })
-            const segment: Segment = EntityTestFactory.createSegment({ parts: [activePart, nextPart] })
+            const nextPart: Part = EntityTestFactory.createPart({id: 'nextPartId'})
+            const segment: Segment = EntityTestFactory.createSegment({parts: [activePart, nextPart]})
 
             const historyPartIdPrefix: string = 'partId_'
 
@@ -336,7 +454,7 @@ describe(Rundown.name, () => {
 
             const history: Part[] = []
             for (let i = 0; i < maximumHistoryEntries + numberToExceedHistory; i++) {
-              history.push(EntityTestFactory.createPart({ id: `${historyPartIdPrefix}${i}`}))
+              history.push(EntityTestFactory.createPart({id: `${historyPartIdPrefix}${i}`}))
             }
 
             const testee: Rundown = new Rundown({
@@ -378,8 +496,8 @@ describe(Rundown.name, () => {
 
       describe('it does not have an active Part', () => {
         it('does not set any Part as previous', () => {
-          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPartId' })
-          const segment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPartId'})
+          const segment: Segment = EntityTestFactory.createSegment({parts: [nextPart]})
 
           const testee: Rundown = new Rundown({
             segments: [segment],
@@ -662,27 +780,24 @@ describe(Rundown.name, () => {
     describe('Rundown has two Segments', () => {
       describe('Each Segment has an infinite Piece on different layers', () => {
         it('adds both infinite Pieces', () => {
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             layer: 'someLayer',
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({ pieces: [firstPiece] })
-          const firstSegment: Segment = EntityMockFactory.createSegment(
-            { id: 'firstSegment', parts: [firstPart] },
-            { firstSpanningRundownPieceForEachLayerForAllParts: [firstPiece] }
-          )
+          const firstPart: Part = EntityTestFactory.createPart({pieces: [firstPiece]})
+          const firstSegment: Segment = EntityTestFactory.createSegment({ id: 'firstSegment', parts: [firstPart] })
 
-          const nextPiece: Piece = EntityMockFactory.createPiece({
+          const nextPiece: Piece = EntityTestFactory.createPiece({
             layer: 'someOtherLayer',
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const nextPart: Part = EntityMockFactory.createPart({ pieces: [nextPiece] })
-          const nextSegment: Segment = EntityMockFactory.createSegment({
+          const nextPart: Part = EntityTestFactory.createPart({pieces: [nextPiece]})
+          const nextSegment: Segment = EntityTestFactory.createSegment({
             id: 'nextSegment',
             parts: [nextPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, nextSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -698,7 +813,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -713,27 +828,27 @@ describe(Rundown.name, () => {
         it('only adds the last infinite piece', () => {
           const layer: string = 'someLayer'
 
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({ pieces: [firstPiece] })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstPart: Part = EntityTestFactory.createPart({pieces: [firstPiece]})
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const nextPiece: Piece = EntityMockFactory.createPiece({
+          const nextPiece: Piece = EntityTestFactory.createPiece({
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const nextPart: Part = EntityMockFactory.createPart({ pieces: [nextPiece] })
-          const nextSegment: Segment = EntityMockFactory.createSegment({
+          const nextPart: Part = EntityTestFactory.createPart({pieces: [nextPiece]})
+          const nextSegment: Segment = EntityTestFactory.createSegment({
             id: 'nextSegment',
             parts: [nextPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, nextSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -749,7 +864,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -763,12 +878,21 @@ describe(Rundown.name, () => {
     describe('Rundown has three Segments', () => {
       describe('middle Segment is a valid Segment for execution', () => {
         it('finds the middle Segment as the next nextSegment', () => {
-          const firstPart: Part = EntityTestFactory.createPart({ id: 'firstPart' })
-          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
-          const firstSegment: Segment = EntityTestFactory.createSegment({ id: 'firstSegment', parts: [firstPart, nextPart] })
+          const firstPart: Part = EntityTestFactory.createPart({id: 'firstPart'})
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart'})
+          const firstSegment: Segment = EntityTestFactory.createSegment({
+            id: 'firstSegment',
+            parts: [firstPart, nextPart]
+          })
 
-          const middleSegment: Segment = EntityTestFactory.createSegment({ id: 'middleSegment', parts: [EntityTestFactory.createPart()] })
-          const lastSegment: Segment = EntityTestFactory.createSegment({ id: 'lastSegment', parts: [EntityTestFactory.createPart()] })
+          const middleSegment: Segment = EntityTestFactory.createSegment({
+            id: 'middleSegment',
+            parts: [EntityTestFactory.createPart()]
+          })
+          const lastSegment: Segment = EntityTestFactory.createSegment({
+            id: 'lastSegment',
+            parts: [EntityTestFactory.createPart()]
+          })
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
@@ -797,12 +921,22 @@ describe(Rundown.name, () => {
 
       describe('middle Segment is hidden', () => {
         it('skips the middle Segment when finding the next nextSegment', () => {
-          const firstPart: Part = EntityTestFactory.createPart({ id: 'firstPart' })
-          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
-          const firstSegment: Segment = EntityTestFactory.createSegment({ id: 'firstSegment', parts: [firstPart, nextPart] })
+          const firstPart: Part = EntityTestFactory.createPart({id: 'firstPart'})
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart'})
+          const firstSegment: Segment = EntityTestFactory.createSegment({
+            id: 'firstSegment',
+            parts: [firstPart, nextPart]
+          })
 
-          const middleSegment: Segment = EntityTestFactory.createSegment({ id: 'middleSegment', isHidden: true, parts: [EntityTestFactory.createPart()] })
-          const lastSegment: Segment = EntityTestFactory.createSegment({ id: 'lastSegment', parts: [EntityTestFactory.createPart()] })
+          const middleSegment: Segment = EntityTestFactory.createSegment({
+            id: 'middleSegment',
+            isHidden: true,
+            parts: [EntityTestFactory.createPart()]
+          })
+          const lastSegment: Segment = EntityTestFactory.createSegment({
+            id: 'lastSegment',
+            parts: [EntityTestFactory.createPart()]
+          })
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
@@ -831,12 +965,18 @@ describe(Rundown.name, () => {
 
       describe('middle Segment does not have any Parts', () => {
         it('skips the middle Segment when finding the next nextSegment', () => {
-          const firstPart: Part = EntityTestFactory.createPart({ id: 'firstPart' })
-          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
-          const firstSegment: Segment = EntityTestFactory.createSegment({ id: 'firstSegment', parts: [firstPart, nextPart] })
+          const firstPart: Part = EntityTestFactory.createPart({id: 'firstPart'})
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart'})
+          const firstSegment: Segment = EntityTestFactory.createSegment({
+            id: 'firstSegment',
+            parts: [firstPart, nextPart]
+          })
 
-          const middleSegment: Segment = EntityTestFactory.createSegment({ id: 'middleSegment', parts: [] })
-          const lastSegment: Segment = EntityTestFactory.createSegment({ id: 'lastSegment', parts: [EntityTestFactory.createPart()] })
+          const middleSegment: Segment = EntityTestFactory.createSegment({id: 'middleSegment', parts: []})
+          const lastSegment: Segment = EntityTestFactory.createSegment({
+            id: 'lastSegment',
+            parts: [EntityTestFactory.createPart()]
+          })
 
           const testee: Rundown = new Rundown({
             segments: [firstSegment, middleSegment, lastSegment],
@@ -868,41 +1008,41 @@ describe(Rundown.name, () => {
       describe('Rundown "skips" a Segment that also has a "sticky" infinite Piece', () => {
         it('does not change the "sticky" infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
+          const middlePiece: Piece = EntityTestFactory.createPiece({
             id: 'middlePiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           })
-          const middlePart: Part = EntityMockFactory.createPart({
+          const middlePart: Part = EntityTestFactory.createPart({
             id: 'middlePart',
             pieces: [middlePiece],
           })
-          const middleSegment: Segment = EntityMockFactory.createSegment({
+          const middleSegment: Segment = EntityTestFactory.createSegment({
             id: 'middleSegment',
             parts: [middlePart],
           })
 
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
+          const lastPart: Part = EntityTestFactory.createPart({id: 'lastPart'})
+          const lastSegment: Segment = EntityTestFactory.createSegment({
             id: 'lastSegment',
             parts: [lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, middleSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -918,7 +1058,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -931,41 +1071,41 @@ describe(Rundown.name, () => {
       describe('it jumps "back" up the Rundown and "skips" a Segment with a "sticky Rundown" infinite Piece', () => {
         it('does not change the "sticky" infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart' })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstPart: Part = EntityTestFactory.createPart({id: 'firstPart'})
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
+          const middlePiece: Piece = EntityTestFactory.createPiece({
             id: 'middlePiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           })
-          const middlePart: Part = EntityMockFactory.createPart({
+          const middlePart: Part = EntityTestFactory.createPart({
             id: 'middlePart',
             pieces: [middlePiece],
           })
-          const middleSegment: Segment = EntityMockFactory.createSegment({
+          const middleSegment: Segment = EntityTestFactory.createSegment({
             id: 'middleSegment',
             parts: [middlePart],
           })
 
-          const lastPiece: Piece = EntityMockFactory.createPiece({
+          const lastPiece: Piece = EntityTestFactory.createPiece({
             id: 'lastPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           })
-          const lastPart: Part = EntityMockFactory.createPart({
+          const lastPart: Part = EntityTestFactory.createPart({
             id: 'lastPart',
             pieces: [lastPiece],
           })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
+          const lastSegment: Segment = EntityTestFactory.createSegment({
             id: 'lastSegment',
             parts: [lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, middleSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -981,7 +1121,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -994,35 +1134,35 @@ describe(Rundown.name, () => {
       describe('it takes a Segment with a "sticky Rundown" infinite Piece for the same layer', () => {
         it('changes the "sticky" infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const lastPiece: Piece = EntityMockFactory.createPiece({
+          const lastPiece: Piece = EntityTestFactory.createPiece({
             id: 'lastPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           })
-          const lastPart: Part = EntityMockFactory.createPart({
+          const lastPart: Part = EntityTestFactory.createPart({
             id: 'lastPart',
             pieces: [lastPiece],
           })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
+          const lastSegment: Segment = EntityTestFactory.createSegment({
             id: 'lastSegment',
             parts: [lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1038,7 +1178,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1051,35 +1191,35 @@ describe(Rundown.name, () => {
       describe('it takes a Segment with a "spanning Rundown" infinite Piece', () => {
         it('changes to the "spanning" infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const lastPiece: Piece = EntityMockFactory.createPiece({
+          const lastPiece: Piece = EntityTestFactory.createPiece({
             id: 'lastPiece',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const lastPart: Part = EntityMockFactory.createPart({
+          const lastPart: Part = EntityTestFactory.createPart({
             id: 'lastPart',
             pieces: [lastPiece],
           })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
+          const lastSegment: Segment = EntityTestFactory.createSegment({
             id: 'lastSegment',
             parts: [lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1095,7 +1235,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1110,41 +1250,51 @@ describe(Rundown.name, () => {
       describe('it "skips" a Segment with a "spanning Rundown" infinite Piece"', () => {
         it('changes to the "spanning" infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
-            id: 'firstPiece',
+          const firstPartId: string = 'first-part-id'
+          const firstPiece: Piece = EntityTestFactory.createPiece({
+            id: 'first-piece-id',
+            partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
-            id: 'firstPart',
+          const firstSegmentId: string = 'first-segment-id'
+          const firstPart: Part = EntityTestFactory.createPart({
+            id: firstPartId,
+            segmentId: firstSegmentId,
+            isOnAir: true,
             pieces: [firstPiece],
           })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
-            id: 'firstSegment',
+          firstPart.calculateTimings()
+          const firstSegment: Segment = EntityTestFactory.createSegment({
+            id: firstSegmentId,
+            isOnAir: true,
             parts: [firstPart],
           })
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
-            id: 'middlePiece',
+          const middlePartId: string = 'middle-part-id'
+          const middlePiece: Piece = EntityTestFactory.createPiece({
+            id: 'middle-piece-id',
+            partId: middlePartId,
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const middlePart: Part = EntityMockFactory.createPart({
-            id: 'middlePart',
+          const middleSegmentId: string = 'middle-segment-id'
+          const middlePart: Part = EntityTestFactory.createPart({
+            id: middlePartId,
+            segmentId: middleSegmentId,
             pieces: [middlePiece],
           })
-          const middleSegment: Segment = EntityMockFactory.createSegment(
-            { id: 'middleSegment', parts: [middlePart] },
-            { firstSpanningRundownPieceForEachLayerForAllParts: [middlePiece] }
-          )
+          const middleSegment: Segment = EntityTestFactory.createSegment({ id: middleSegmentId, parts: [middlePart] })
 
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
-            id: 'lastSegment',
+          const lastSegmentId: string = 'last-segment-id'
+          const lastPart: Part = EntityTestFactory.createPart({ id: 'last-part-id', segmentId: lastSegmentId, isNext: true })
+          const lastSegment: Segment = EntityTestFactory.createSegment({
+            id: lastSegmentId,
+            isNext: true,
             parts: [lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, middleSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1160,7 +1310,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map(),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1174,42 +1324,48 @@ describe(Rundown.name, () => {
           jest.useFakeTimers().setSystemTime(now)
 
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
-            id: 'firstPiece',
+          const firstPartId: string = 'first-part-id'
+          const firstPiece: Piece = EntityTestFactory.createPiece({
+            id: 'first-piece-id',
+            partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
-            id: 'firstPart',
+          const firstSegmentId: string = 'first-segment-id'
+          const firstPart: Part = EntityTestFactory.createPart({
+            id: firstPartId,
+            segmentId: firstSegmentId,
             pieces: [firstPiece],
           })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
-            id: 'firstSegment',
+          const firstSegment: Segment = EntityTestFactory.createSegment({
+            id: firstSegmentId,
             parts: [firstPart],
           })
 
-          const mockMiddlePiece: Piece = EntityMockFactory.createPieceMock({
-            id: 'middlePiece',
+          const middlePieceId: string = 'middle-piece-id'
+          const middlePartId: string = 'middle-part-id'
+          const middlePiece: Piece = EntityTestFactory.createPiece({
+            id: middlePieceId,
+            partId: middlePartId,
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const middlePiece: Piece = instance(mockMiddlePiece)
-          const middlePart: Part = EntityMockFactory.createPart({
-            id: 'middlePart',
+          const middleSegmentId: string = 'middle-segment-id'
+          const middlePart: Part = EntityTestFactory.createPart({
+            id: middlePartId,
+            segmentId: middleSegmentId,
             pieces: [middlePiece],
           })
-          const middleSegment: Segment = EntityMockFactory.createSegment(
-            { id: 'middleSegment', parts: [middlePart] },
-            { firstSpanningRundownPieceForEachLayerForAllParts: [middlePiece] }
-          )
+          const middleSegment: Segment = EntityTestFactory.createSegment({ id: middleSegmentId, parts: [middlePart] })
 
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
-            id: 'lastSegment',
+          const lastSegmentId: string = 'last-segment-id'
+          const lastPart: Part = EntityTestFactory.createPart({ id: 'last-part-id', segmentId: lastSegmentId })
+          const lastSegment: Segment = EntityTestFactory.createSegment({
+            id: lastSegmentId,
             parts: [lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, middleSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1225,11 +1381,13 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map(),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
-          verify(mockMiddlePiece.setExecutedAt(now)).once()
+          const result: Piece | undefined = testee.getPart(middlePartId)?.getPieces()
+            .find(piece => piece.id === middlePieceId)
+          expect(result?.getExecutedAt()).toBe(now)
         })
       })
 
@@ -1237,41 +1395,38 @@ describe(Rundown.name, () => {
         describe('there is a previous "spanning" infinite Piece', () => {
           it('selects the previous "spanning" Piece', () => {
             const layer: string = 'someLayer'
-            const firstPiece: Piece = EntityMockFactory.createPiece({
+            const firstPiece: Piece = EntityTestFactory.createPiece({
               id: 'firstPiece',
               layer,
               pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
             })
-            const firstPart: Part = EntityMockFactory.createPart({
+            const firstPart: Part = EntityTestFactory.createPart({
               id: 'firstPart',
               pieces: [firstPiece],
             })
-            const firstSegment: Segment = EntityMockFactory.createSegment(
-              { id: 'firstSegment', parts: [firstPart] },
-              { firstSpanningRundownPieceForEachLayerForAllParts: [firstPiece] }
-            )
+            const firstSegment: Segment = EntityTestFactory.createSegment({id: 'firstSegment', parts: [firstPart]})
 
-            const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart' })
-            const middleSegment: Segment = EntityMockFactory.createSegment({
+            const middlePart: Part = EntityTestFactory.createPart({id: 'middlePart'})
+            const middleSegment: Segment = EntityTestFactory.createSegment({
               id: 'middleSegment',
               parts: [middlePart],
             })
 
-            const lastPiece: Piece = EntityMockFactory.createPiece({
+            const lastPiece: Piece = EntityTestFactory.createPiece({
               id: 'lastPiece',
               layer,
               pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
             })
-            const lastPart: Part = EntityMockFactory.createPart({
+            const lastPart: Part = EntityTestFactory.createPart({
               id: 'lastPart',
               pieces: [lastPiece],
             })
-            const lastSegment: Segment = EntityMockFactory.createSegment({
+            const lastSegment: Segment = EntityTestFactory.createSegment({
               id: 'lastSegment',
               parts: [lastPart],
             })
 
-            const testee: Rundown = new Rundown({
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
               segments: [firstSegment, middleSegment, lastSegment],
               mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
@@ -1287,7 +1442,7 @@ describe(Rundown.name, () => {
                 },
                 infinitePieces: new Map(),
               },
-            } as RundownInterface)
+            }))
 
             testee.takeNext()
 
@@ -1300,33 +1455,33 @@ describe(Rundown.name, () => {
         describe('there are no other "spanning" infinite Pieces', () => {
           it('has no longer any infinite Pieces', () => {
             const layer: string = 'someLayer'
-            const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart' })
-            const firstSegment: Segment = EntityMockFactory.createSegment({
+            const firstPart: Part = EntityTestFactory.createPart({id: 'firstPart'})
+            const firstSegment: Segment = EntityTestFactory.createSegment({
               id: 'firstSegment',
               parts: [firstPart],
             })
 
-            const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart' })
-            const middleSegment: Segment = EntityMockFactory.createSegment({
+            const middlePart: Part = EntityTestFactory.createPart({id: 'middlePart'})
+            const middleSegment: Segment = EntityTestFactory.createSegment({
               id: 'middleSegment',
               parts: [middlePart],
             })
 
-            const lastPiece: Piece = EntityMockFactory.createPiece({
+            const lastPiece: Piece = EntityTestFactory.createPiece({
               id: 'lastPiece',
               layer,
               pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
             })
-            const lastPart: Part = EntityMockFactory.createPart({
+            const lastPart: Part = EntityTestFactory.createPart({
               id: 'lastPart',
               pieces: [lastPiece],
             })
-            const lastSegment: Segment = EntityMockFactory.createSegment({
+            const lastSegment: Segment = EntityTestFactory.createSegment({
               id: 'lastSegment',
               parts: [lastPart],
             })
 
-            const testee: Rundown = new Rundown({
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
               segments: [firstSegment, middleSegment, lastSegment],
               mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
@@ -1342,7 +1497,7 @@ describe(Rundown.name, () => {
                 },
                 infinitePieces: new Map(),
               },
-            } as RundownInterface)
+            }))
 
             testee.takeNext()
 
@@ -1354,27 +1509,27 @@ describe(Rundown.name, () => {
 
       describe('it takes a Segment with a "stickyThenSpanning" infinite Piece', () => {
         it('takes the "stickyThenSpanning" Piece', () => {
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart', pieces: [firstPiece] })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstPart: Part = EntityTestFactory.createPart({id: 'firstPart', pieces: [firstPiece]})
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const lastPiece: Piece = EntityMockFactory.createPiece({
+          const lastPiece: Piece = EntityTestFactory.createPiece({
             id: 'lastPiece',
             pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
           })
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart', pieces: [lastPiece] })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
+          const lastPart: Part = EntityTestFactory.createPart({id: 'lastPart', pieces: [lastPiece]})
+          const lastSegment: Segment = EntityTestFactory.createSegment({
             id: 'lastSegment',
             parts: [lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1390,7 +1545,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1402,33 +1557,30 @@ describe(Rundown.name, () => {
 
       describe('"skips" a Segment with a "stickyThenSpanning infinite Piece', () => {
         it('does not change infinite Piece', () => {
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart', pieces: [firstPiece] })
-          const firstSegment: Segment = EntityMockFactory.createSegment(
-            { id: 'firstSegment', parts: [firstPart] },
-            { firstSpanningRundownPieceForEachLayerForAllParts: [firstPiece] }
-          )
+          const firstPart: Part = EntityTestFactory.createPart({id: 'firstPart', pieces: [firstPiece]})
+          const firstSegment: Segment = EntityTestFactory.createSegment({id: 'firstSegment', parts: [firstPart]})
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
+          const middlePiece: Piece = EntityTestFactory.createPiece({
             id: 'middlePiece',
             pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
           })
-          const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart', pieces: [middlePiece] })
-          const middleSegment: Segment = EntityMockFactory.createSegment({
+          const middlePart: Part = EntityTestFactory.createPart({id: 'middlePart', pieces: [middlePiece]})
+          const middleSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [middlePart],
           })
 
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
+          const lastPart: Part = EntityTestFactory.createPart({id: 'lastPart'})
+          const lastSegment: Segment = EntityTestFactory.createSegment({
             id: 'lastSegment',
             parts: [lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, middleSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1444,7 +1596,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1459,35 +1611,35 @@ describe(Rundown.name, () => {
       describe('it takes a Segment with a non-infinite Piece for same layer', () => {
         it('no longer has any infinite Pieces', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const nextPiece: Piece = EntityMockFactory.createPiece({
+          const nextPiece: Piece = EntityTestFactory.createPiece({
             id: 'nextPiece',
             layer,
             pieceLifespan: PieceLifespan.WITHIN_PART,
           })
-          const nextPart: Part = EntityMockFactory.createPart({
+          const nextPart: Part = EntityTestFactory.createPart({
             id: 'nextPart',
             pieces: [nextPiece],
           })
-          const nextSegment: Segment = EntityMockFactory.createSegment({
+          const nextSegment: Segment = EntityTestFactory.createSegment({
             id: 'nextSegment',
             parts: [nextPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, nextSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1503,7 +1655,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1517,34 +1669,32 @@ describe(Rundown.name, () => {
       describe('it takes another "sticky segment" infinite Piece within the Segment', () => {
         it('changes the "sticky" infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
 
-          const nextPiece: Piece = EntityMockFactory.createPiece({
+          const nextPiece: Piece = EntityTestFactory.createPiece({
             id: 'nextPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const nextPart: Part = EntityMockFactory.createPart({
+          const nextPart: Part = EntityTestFactory.createPart({
             id: 'nextPart',
             pieces: [nextPiece],
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
+          const segment: Segment = EntityTestFactory.createSegment({
             id: 'segment',
             parts: [firstPart, nextPart],
           })
-          when(mockedSegment.doesPieceBelongToSegment(firstPiece)).thenReturn(true)
-          const segment: Segment = instance(mockedSegment)
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1560,7 +1710,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1573,36 +1723,41 @@ describe(Rundown.name, () => {
       describe('it "skips" a Part within the Segment that has a "sticky segment" infinite Piece', () => {
         it('does not change infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
-            id: 'firstPiece',
+          const firstPartId: string = 'first-part-id'
+          const firstPiece: Piece = EntityTestFactory.createPiece({
+            id: 'first-piece-id',
+            partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
-            id: 'firstPart',
+          const segmentId: string = 'segment-id'
+          const firstPart: Part = EntityTestFactory.createPart({
+            id: firstPartId,
+            segmentId,
             pieces: [firstPiece],
           })
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
-            id: 'middlePiece',
+          const middlePartId: string = 'middle-part-id'
+          const middlePiece: Piece = EntityTestFactory.createPiece({
+            id: 'middle-piece-id',
+            partId: middlePartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const middlePart: Part = EntityMockFactory.createPart({
-            id: 'middlePart',
+          const middlePart: Part = EntityTestFactory.createPart({
+            id: middlePartId,
+            segmentId,
             pieces: [middlePiece],
           })
 
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
+          const lastPart: Part = EntityTestFactory.createPart({ id: 'last-part-id', segmentId })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
-            id: 'segment',
+          const segment: Segment = EntityTestFactory.createSegment({
+            id: segmentId,
             parts: [firstPart, middlePart, lastPart],
           })
-          when(mockedSegment.doesPieceBelongToSegment(firstPiece)).thenReturn(true)
-          const segment: Segment = instance(mockedSegment)
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1618,7 +1773,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1631,36 +1786,41 @@ describe(Rundown.name, () => {
       describe('it jumps "back" up the Segment before another "sticky segment" infinite Piece', () => {
         it('does not change infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart' })
+          const firstPart: Part = EntityTestFactory.createPart({id: 'first-part-id'})
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
-            id: 'middlePiece',
+          const middlePartId: string = 'middle-part-id'
+          const middlePiece: Piece = EntityTestFactory.createPiece({
+            id: 'middle-piece-id',
+            partId: middlePartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const middlePart: Part = EntityMockFactory.createPart({
-            id: 'middlePart',
+          const segmentId: string = 'segment-id'
+          const middlePart: Part = EntityTestFactory.createPart({
+            id: middlePartId,
+            segmentId,
             pieces: [middlePiece],
           })
 
-          const lastPiece: Piece = EntityMockFactory.createPiece({
+          const lastPartId: string = 'last-part-id'
+          const lastPiece: Piece = EntityTestFactory.createPiece({
             id: 'lastPiece',
+            partId: lastPartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const lastPart: Part = EntityMockFactory.createPart({
-            id: 'lastPart',
+          const lastPart: Part = EntityTestFactory.createPart({
+            id: lastPartId,
+            segmentId,
             pieces: [lastPiece],
           })
 
-          const mockSegment: Segment = EntityMockFactory.createSegmentMock({
-            id: 'segment',
+          const segment: Segment = EntityTestFactory.createSegment({
+            id: segmentId,
             parts: [firstPart, middlePart, lastPart],
           })
-          when(mockSegment.doesPieceBelongToSegment(lastPiece)).thenReturn(true)
-          const segment: Segment = instance(mockSegment)
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1676,7 +1836,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1689,34 +1849,32 @@ describe(Rundown.name, () => {
       describe('it takes a Part within the Segment with a "spanning segment" infinite Piece', () => {
         it('changes the infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
 
-          const nextPiece: Piece = EntityMockFactory.createPiece({
+          const nextPiece: Piece = EntityTestFactory.createPiece({
             id: 'nextPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const nextPart: Part = EntityMockFactory.createPart({
+          const nextPart: Part = EntityTestFactory.createPart({
             id: 'nextPart',
             pieces: [nextPiece],
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
+          const segment: Segment = EntityTestFactory.createSegment({
             id: 'segment',
             parts: [firstPart, nextPart],
           })
-          when(mockedSegment.doesPieceBelongToSegment(firstPiece)).thenReturn(true)
-          const segment: Segment = instance(mockedSegment)
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1732,7 +1890,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1745,34 +1903,39 @@ describe(Rundown.name, () => {
       describe('it takes a Part within segment with "stickyThenSpanning" infinite Piece', () => {
         it('changes the infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
-            id: 'firstPiece',
+          const firstPartId: string = 'first-part-id'
+          const firstPiece: Piece = EntityTestFactory.createPiece({
+            id: 'first-piece-id',
+            partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
-            id: 'firstPart',
+          const segmentId: string = 'segment-id'
+          const firstPart: Part = EntityTestFactory.createPart({
+            id: firstPartId,
+            segmentId,
             pieces: [firstPiece],
           })
 
-          const nextPiece: Piece = EntityMockFactory.createPiece({
-            id: 'nextPiece',
+          const nextPartId: string = 'next-part-id'
+          const nextPiece: Piece = EntityTestFactory.createPiece({
+            id: 'next-piece-id',
+            partId: nextPartId,
             layer,
             pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
           })
-          const nextPart: Part = EntityMockFactory.createPart({
-            id: 'nextPart',
+          const nextPart: Part = EntityTestFactory.createPart({
+            id: nextPartId,
+            segmentId,
             pieces: [nextPiece],
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
-            id: 'segment',
+          const segment: Segment = EntityTestFactory.createSegment({
+            id: segmentId,
             parts: [firstPart, nextPart],
           })
-          when(mockedSegment.doesPieceBelongToSegment(firstPiece)).thenReturn(true)
-          const segment: Segment = instance(mockedSegment)
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1788,7 +1951,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1801,38 +1964,44 @@ describe(Rundown.name, () => {
       describe('it "skips" a Part within the Segment with "stickyThenSpanning" infinite Piece', () => {
         it('does not change the infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
-            id: 'firstPiece',
+          const firstPartId: string = 'first-part-id'
+          const firstPiece: Piece = EntityTestFactory.createPiece({
+            id: 'first-piece-id',
+            partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
-            id: 'firstPart',
+          const segmentId: string = 'segment-id'
+          const firstPart: Part = EntityTestFactory.createPart({
+            id: firstPartId,
+            segmentId,
             pieces: [firstPiece],
           })
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
+          const middlePartId: string = 'middle-part-id'
+          const middlePiece: Piece = EntityTestFactory.createPiece({
             id: 'middlePiece',
+            partId: middlePartId,
             layer,
             pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
           })
-          const middlePart: Part = EntityMockFactory.createPart({
-            id: 'middlePart',
+          const middlePart: Part = EntityTestFactory.createPart({
+            id: middlePartId,
+            segmentId,
             pieces: [middlePiece],
           })
 
-          const lastPart: Part = EntityMockFactory.createPart({
-            id: 'lastPart',
+          const lastPart: Part = EntityTestFactory.createPart({
+            id: 'last-part-id',
+            segmentId,
           })
 
-          const mockedSegment: Segment = EntityMockFactory.createSegmentMock({
-            id: 'segment',
+          const segment: Segment = EntityTestFactory.createSegment({
+            id: segmentId,
             parts: [firstPart, middlePart, lastPart],
           })
-          when(mockedSegment.doesPieceBelongToSegment(firstPiece)).thenReturn(true)
-          const segment: Segment = instance(mockedSegment)
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1848,7 +2017,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1861,27 +2030,27 @@ describe(Rundown.name, () => {
       describe('it changes Segment', () => {
         it('no longer have any infinite Pieces', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const nextPart: Part = EntityMockFactory.createPart({ id: 'nextPart' })
-          const nextSegment: Segment = EntityMockFactory.createSegment({
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart'})
+          const nextSegment: Segment = EntityTestFactory.createSegment({
             id: 'nextSegment',
             parts: [nextPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, nextSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1897,7 +2066,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1911,34 +2080,31 @@ describe(Rundown.name, () => {
       describe('it "skips" a Part within the Segment that has a "spanning segment" infinite Piece', () => {
         it('changes the infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
+          const middlePiece: Piece = EntityTestFactory.createPiece({
             id: 'middlePiece',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
           })
-          const middlePart: Part = EntityMockFactory.createPart({
+          const middlePart: Part = EntityTestFactory.createPart({
             id: 'middlePart',
             pieces: [middlePiece],
           })
 
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
+          const lastPart: Part = EntityTestFactory.createPart({ id: 'lastPart' })
 
-          const segment: Segment = EntityMockFactory.createSegment(
-            { id: 'segment', parts: [firstPart, middlePart, lastPart] },
-            { firstSpanningPieceForEachLayerBeforePart: [middlePiece] }
-          )
+          const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [firstPart, middlePart, lastPart] })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -1954,7 +2120,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -1968,35 +2134,38 @@ describe(Rundown.name, () => {
           jest.useFakeTimers().setSystemTime(now)
 
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
-            id: 'firstPiece',
+          const firstPartId: string = 'first-part-id'
+          const firstPiece: Piece = EntityTestFactory.createPiece({
+            id: 'first-piece-id',
+            partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
-            id: 'firstPart',
+          const segmentId: string = 'segment-id'
+          const firstPart: Part = EntityTestFactory.createPart({
+            id: firstPartId,
+            segmentId,
             pieces: [firstPiece],
           })
 
-          const mockMiddlePiece: Piece = EntityMockFactory.createPieceMock({
-            id: 'middlePiece',
+          const middlePartId: string = 'middle-part-id'
+          const middlePiece: Piece = EntityTestFactory.createPiece({
+            id: 'middle-piece-id',
+            partId: middlePartId,
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
           })
-          const middlePiece: Piece = instance(mockMiddlePiece)
-          const middlePart: Part = EntityMockFactory.createPart({
-            id: 'middlePart',
+          const middlePart: Part = EntityTestFactory.createPart({
+            id: middlePartId,
+            segmentId,
             pieces: [middlePiece],
           })
 
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
+          const lastPart: Part = EntityTestFactory.createPart({ id: 'last-part-id', segmentId })
 
-          const segment: Segment = EntityMockFactory.createSegment(
-            { id: 'segment', parts: [firstPart, middlePart, lastPart] },
-            { firstSpanningPieceForEachLayerBeforePart: [middlePiece] }
-          )
+          const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts: [firstPart, middlePart, lastPart] })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -2012,11 +2181,15 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             }
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
-          verify(mockMiddlePiece.setExecutedAt(now)).once()
+          const result: Piece | undefined = testee
+            .getSegments()[0].getParts()
+            .find(part => part.id === middlePiece.getPartId())?.getPieces()
+            .find(piece => piece.id === middlePiece.id)
+          expect(result?.getExecutedAt()).toBe(now)
         })
       })
 
@@ -2024,34 +2197,38 @@ describe(Rundown.name, () => {
         describe('there is a previous "spanning segment" infinite Piece', () => {
           it('changes to the previous "spanning" infinite Piece', () => {
             const layer: string = 'someLayer'
-            const firstPiece: Piece = EntityMockFactory.createPiece({
-              id: 'firstPiece',
+            const segmentId: string = 'segment-id'
+            const firstPartId: string = 'first-part-id'
+            const firstPiece: Piece = EntityTestFactory.createPiece({
+              id: 'first-piece-id',
+              partId: firstPartId,
               layer,
               pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
             })
-            const firstPart: Part = EntityMockFactory.createPart({
-              id: 'firstPart',
+            const firstPart: Part = EntityTestFactory.createPart({
+              id: firstPartId,
+              segmentId,
               pieces: [firstPiece],
             })
 
-            const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart' })
+            const middlePart: Part = EntityTestFactory.createPart({ id: 'middle-part-id', segmentId })
 
+            const lastPartId: string = 'last-part-id'
             const lastPiece: Piece = EntityMockFactory.createPiece({
               id: 'lastPiece',
+              partId: lastPartId,
               layer,
               pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
             })
-            const lastPart: Part = EntityMockFactory.createPart({
-              id: 'lastPart',
+            const lastPart: Part = EntityTestFactory.createPart({
+              id: lastPartId,
+              segmentId,
               pieces: [lastPiece],
             })
 
-            const segment: Segment = EntityMockFactory.createSegment(
-              { id: 'segment', parts: [firstPart, middlePart, lastPart] },
-              { firstSpanningPieceForEachLayerBeforePart: [firstPiece] }
-            )
+            const segment: Segment = EntityTestFactory.createSegment({id: segmentId, parts: [firstPart, middlePart, lastPart]})
 
-            const testee: Rundown = new Rundown({
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
               segments: [segment],
               mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
@@ -2067,7 +2244,7 @@ describe(Rundown.name, () => {
                 },
                 infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
               }
-            } as RundownInterface)
+            }))
 
             testee.takeNext()
 
@@ -2080,26 +2257,30 @@ describe(Rundown.name, () => {
         describe('there are no previous "spanning" infinite Pieces', () => {
           it('no longer have any infinite Pieces', () => {
             const layer: string = 'someLayer'
-            const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart' })
+            const segmentId: string = 'segment-id'
+            const firstPart: Part = EntityTestFactory.createPart({ id: 'first-part-id', segmentId })
 
-            const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart' })
+            const middlePart: Part = EntityTestFactory.createPart({ id: 'middlePart', segmentId })
 
-            const lastPiece: Piece = EntityMockFactory.createPiece({
+            const lastPartId: string = 'last-part-id'
+            const lastPiece: Piece = EntityTestFactory.createPiece({
               id: 'lastPiece',
+              partId: lastPartId,
               layer,
               pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
             })
-            const lastPart: Part = EntityMockFactory.createPart({
-              id: 'lastPart',
+            const lastPart: Part = EntityTestFactory.createPart({
+              id: lastPartId,
+              segmentId,
               pieces: [lastPiece],
             })
 
-            const segment: Segment = EntityMockFactory.createSegment({
-              id: 'segment',
+            const segment: Segment = EntityTestFactory.createSegment({
+              id: segmentId,
               parts: [firstPart, middlePart, lastPart],
             })
 
-            const testee: Rundown = new Rundown({
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
               segments: [segment],
               mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
@@ -2115,7 +2296,7 @@ describe(Rundown.name, () => {
                 },
                 infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
               }
-            } as RundownInterface)
+            }))
 
             testee.takeNext()
 
@@ -2128,32 +2309,32 @@ describe(Rundown.name, () => {
       describe('it takes a Part within the Segment with a "stickyThenSpanning" infinite Piece', () => {
         it('changes the infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
 
-          const lastPiece: Piece = EntityMockFactory.createPiece({
+          const lastPiece: Piece = EntityTestFactory.createPiece({
             id: 'lastPiece',
             layer,
             pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
           })
-          const lastPart: Part = EntityMockFactory.createPart({
+          const lastPart: Part = EntityTestFactory.createPart({
             id: 'lastPart',
             pieces: [lastPiece],
           })
 
-          const segment: Segment = EntityMockFactory.createSegment({
+          const segment: Segment = EntityTestFactory.createSegment({
             id: 'segment',
             parts: [firstPart, lastPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -2169,7 +2350,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -2182,33 +2363,30 @@ describe(Rundown.name, () => {
       describe('it "skips" a Part within the Segment with a "stickyThenSpanning" infinite Piece', () => {
         it('changes the infinite Piece', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
+          const middlePiece: Piece = EntityTestFactory.createPiece({
             id: 'middlePiece',
             layer,
             pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
           })
-          const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart', pieces: [middlePiece] })
+          const middlePart: Part = EntityTestFactory.createPart({id: 'middlePart', pieces: [middlePiece]})
 
-          const lastPart: Part = EntityMockFactory.createPart({
+          const lastPart: Part = EntityTestFactory.createPart({
             id: 'lastPart',
           })
 
-          const segment: Segment = EntityMockFactory.createSegment(
-            { id: 'segment', parts: [firstPart, middlePart, lastPart] },
-            { firstSpanningPieceForEachLayerBeforePart: [middlePiece] }
-          )
+          const segment: Segment = EntityTestFactory.createSegment({id: 'segment', parts: [firstPart, middlePart, lastPart]})
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [segment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -2224,7 +2402,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -2237,27 +2415,27 @@ describe(Rundown.name, () => {
       describe('it changes Segment', () => {
         it('no longer have any infinite Pieces', () => {
           const layer: string = 'someLayer'
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
           })
-          const firstPart: Part = EntityMockFactory.createPart({
+          const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
             pieces: [firstPiece],
           })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const nextPart: Part = EntityMockFactory.createPart({ id: 'nextPart' })
-          const nextSegment: Segment = EntityMockFactory.createSegment({
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart'})
+          const nextSegment: Segment = EntityTestFactory.createSegment({
             id: 'nextSegment',
             parts: [nextPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, nextSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -2273,7 +2451,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             },
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -2286,27 +2464,27 @@ describe(Rundown.name, () => {
     describe('Rundown has a "stickyThenSpanning" infinite Piece', () => {
       describe('it takes another Segment with a "spanningThenSticky" infinite Piece', () => {
         it('changes infinite Piece', () => {
-          const firstPiece: Piece = EntityMockFactory.createPiece({
+          const firstPiece: Piece = EntityTestFactory.createPiece({
             id: 'firstPiece',
             pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
           })
-          const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart', pieces: [firstPiece] })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
+          const firstPart: Part = EntityTestFactory.createPart({id: 'firstPart', pieces: [firstPiece]})
+          const firstSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [firstPart],
           })
 
-          const nextPiece: Piece = EntityMockFactory.createPiece({
+          const nextPiece: Piece = EntityTestFactory.createPiece({
             id: 'nextPiece',
             pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
           })
-          const nextPart: Part = EntityMockFactory.createPart({ id: 'nextPart', pieces: [nextPiece] })
-          const nextSegment: Segment = EntityMockFactory.createSegment({
+          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart', pieces: [nextPiece]})
+          const nextSegment: Segment = EntityTestFactory.createSegment({
             id: 'firstSegment',
             parts: [nextPart],
           })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, nextSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -2322,7 +2500,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             }
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -2333,33 +2511,23 @@ describe(Rundown.name, () => {
 
       describe('it "skips" a Segment with a "spanningThenSticky" infinite Piece', () => {
         it('does not change the infinite Piece', () => {
-          const firstPiece: Piece = EntityMockFactory.createPiece({
-            id: 'firstPiece',
-            pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
-          })
-          const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart', pieces: [firstPiece] })
-          const firstSegment: Segment = EntityMockFactory.createSegment({
-            id: 'firstSegment',
-            parts: [firstPart],
-          })
+          const firstPartId: string = 'first-part-id'
+          const firstPiece: Piece = EntityTestFactory.createPiece({ id: 'first-piece-id', partId: firstPartId, pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN })
+          const firstSegmentId: string = 'first-segment-id'
+          const firstPart: Part = EntityTestFactory.createPart({ id: firstPartId, segmentId: firstSegmentId, pieces: [firstPiece] })
+          const firstSegment: Segment = EntityTestFactory.createSegment({ id: firstSegmentId,  parts: [firstPart] })
 
-          const middlePiece: Piece = EntityMockFactory.createPiece({
-            id: 'middlePiece',
-            pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
-          })
-          const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart', pieces: [middlePiece] })
-          const middleSegment: Segment = EntityMockFactory.createSegment({
-            id: 'firstSegment',
-            parts: [middlePart],
-          })
+          const middlePartId: string = 'middle-part-id'
+          const middlePiece: Piece = EntityTestFactory.createPiece({ id: 'middle-piece-id', partId: middlePartId, pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN })
+          const middleSegmentId: string = 'middle-segment-id'
+          const middlePart: Part = EntityTestFactory.createPart({ id: middlePartId, segmentId: middleSegmentId, pieces: [middlePiece] })
+          const middleSegment: Segment = EntityTestFactory.createSegment({ id: middleSegmentId, parts: [middlePart] })
 
-          const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart' })
-          const lastSegment: Segment = EntityMockFactory.createSegment({
-            id: 'firstSegment',
-            parts: [lastPart],
-          })
+          const lastSegmentId: string = 'last-segment-id'
+          const lastPart: Part = EntityTestFactory.createPart({ id: 'last-part-id', segmentId: lastSegmentId })
+          const lastSegment: Segment = EntityTestFactory.createSegment({ id: lastSegmentId,  parts: [lastPart] })
 
-          const testee: Rundown = new Rundown({
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
             segments: [firstSegment, middleSegment, lastSegment],
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -2375,7 +2543,7 @@ describe(Rundown.name, () => {
               },
               infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
             }
-          } as RundownInterface)
+          }))
 
           testee.takeNext()
 
@@ -2384,36 +2552,35 @@ describe(Rundown.name, () => {
         })
       })
 
-      describe('it "jumps back up" the Rundown before its "spanningThenSticky" infinite Piece', () => {
-        describe('there is a previous "spanningThenSticky" infinite Piece', () => {
-          it('keeps the first "spanningThenSticky" Piece', () => {
-            const firstPiece: Piece = EntityMockFactory.createPiece({
-              id: 'firstPiece',
+      describe('when a part, located earlier in the rundown than the part that defines the "spanning-then-sticky" infinite piece, is put on air', () => {
+        describe('when a "spanning-then-sticky" infinite piece is defined earlier than the new on air part', () => {
+          it('keeps the first "spanning-then-sticky" piece', () => {
+            const firstPartId: string = 'first-part-id'
+            const firstPiece: Piece = EntityTestFactory.createPiece({
+              id: 'first-piece-id',
+              partId: firstPartId,
               pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
             })
-            const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart', pieces: [firstPiece] })
-            const firstSegment: Segment = EntityMockFactory.createSegment({
-              id: 'firstSegment',
-              parts: [firstPart],
-            })
+            const firstSegmentId: string = 'first-segment-id'
+            const firstPart: Part = EntityTestFactory.createPart({ id: firstPartId, segmentId: firstSegmentId, pieces: [firstPiece] })
+            const firstSegment: Segment = EntityTestFactory.createSegment({ id: firstSegmentId, parts: [firstPart] })
 
-            const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart' })
-            const middleSegment: Segment = EntityMockFactory.createSegment({
-              id: 'firstSegment',
-              parts: [middlePart],
-            })
+            const middleSegmentId: string = 'middle-segment-id'
+            const middlePart: Part = EntityTestFactory.createPart({ id: 'middle-part-id', segmentId: middleSegmentId, isNext: true })
+            const middleSegment: Segment = EntityTestFactory.createSegment({ id: middleSegmentId, isNext: true, parts: [middlePart] })
 
-            const lastPiece: Piece = EntityMockFactory.createPiece({
-              id: 'lastPiece',
+            const lastPartId: string = 'last-part-id'
+            const lastPiece: Piece = EntityTestFactory.createPiece({
+              id: 'last-piece-id',
+              partId: lastPartId,
               pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
             })
-            const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart', pieces: [lastPiece] })
-            const lastSegment: Segment = EntityMockFactory.createSegment(
-              { id: 'firstSegment', parts: [lastPart] },
-              { firstSpanningPieceForEachLayerBeforePart: [lastPiece] }
-            )
+            const lastSegmentId: string = 'last-segment-id'
+            const lastPart: Part = EntityTestFactory.createPart({id: lastPartId, segmentId: lastSegmentId, isOnAir: true, pieces: [lastPiece]})
+            lastPart.calculateTimings()
+            const lastSegment: Segment = EntityTestFactory.createSegment({ id: lastSegmentId, isOnAir: true, parts: [lastPart] })
 
-            const testee: Rundown = new Rundown({
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
               segments: [firstSegment, middleSegment, lastSegment],
               mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
@@ -2429,7 +2596,7 @@ describe(Rundown.name, () => {
                 },
                 infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
               }
-            } as RundownInterface)
+            }))
 
             testee.takeNext()
 
@@ -2438,31 +2605,39 @@ describe(Rundown.name, () => {
           })
         })
 
-        describe('there is no other "spanningThenSticky" infinite Piece', () => {
+        describe('when no "spanning-then-sticky" infinite pieces are defined before the new on air part', () => {
           it('keeps the first "spanningThenSticky" Piece', () => {
-            const firstPart: Part = EntityMockFactory.createPart({ id: 'firstPart' })
+            const firstSegmentId: string = 'first-segment-id'
+            const firstPart: Part = EntityMockFactory.createPart({ id: 'first-part-id', segmentId: firstSegmentId })
             const firstSegment: Segment = EntityMockFactory.createSegment({
-              id: 'firstSegment',
+              id: firstSegmentId,
               parts: [firstPart],
             })
 
-            const middlePart: Part = EntityMockFactory.createPart({ id: 'middlePart' })
-            const middleSegment: Segment = EntityMockFactory.createSegment({
-              id: 'firstSegment',
+            const middleSegmentId: string = 'middle-segment-id'
+            const middlePart: Part = EntityTestFactory.createPart({ id: 'middle-part-id', segmentId: middleSegmentId, isNext: true })
+            const middleSegment: Segment = EntityTestFactory.createSegment({
+              id: middleSegmentId,
+              isNext: true,
               parts: [middlePart],
             })
 
-            const lastPiece: Piece = EntityMockFactory.createPiece({
-              id: 'lastPiece',
+            const lastPartId: string = 'last-part-id'
+            const lastPiece: Piece = EntityTestFactory.createPiece({
+              id: 'last-piece-id',
+              partId: lastPartId,
               pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
             })
-            const lastPart: Part = EntityMockFactory.createPart({ id: 'lastPart', pieces: [lastPiece] })
-            const lastSegment: Segment = EntityMockFactory.createSegment({
-              id: 'firstSegment',
+            const lastSegmentId: string = 'last-segment-id'
+            const lastPart: Part = EntityTestFactory.createPart({id: lastPartId, segmentId: lastSegmentId, isOnAir: true, pieces: [lastPiece]})
+            lastPart.calculateTimings()
+            const lastSegment: Segment = EntityTestFactory.createSegment({
+              id: lastSegmentId,
+              isOnAir: true,
               parts: [lastPart],
             })
 
-            const testee: Rundown = new Rundown({
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
               segments: [firstSegment, middleSegment, lastSegment],
               mode: RundownMode.ACTIVE,
               alreadyActiveProperties: {
@@ -2478,7 +2653,7 @@ describe(Rundown.name, () => {
                 },
                 infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
               }
-            } as RundownInterface)
+            }))
 
             testee.takeNext()
 
@@ -2488,6 +2663,7 @@ describe(Rundown.name, () => {
         })
       })
     })
+
   })
 
   describe(Rundown.prototype.getPartAfter.name, () => {
@@ -2501,7 +2677,7 @@ describe(Rundown.name, () => {
     describe('rundown is active', () => {
       describe('Part does not belong to any Segments of the Rundown', () => {
         it('throws error', () => {
-          const partNotInAnySegments: Part = EntityMockFactory.createPart({
+          const partNotInAnySegments: Part = EntityTestFactory.createPart({
             segmentId: 'nonExistingSegmentId',
           })
           const segments: Segment[] = [
@@ -2640,6 +2816,16 @@ describe(Rundown.name, () => {
       expect(testee.isActive()).toBeTruthy()
     })
 
+    describe('Rundown is empty', () => {
+      it('sets the Rundown to be active', () => {
+        const testee: Rundown = EntityTestFactory.createRundown({id: 'emptyRundown', mode: RundownMode.INACTIVE})
+
+        expect(testee.isActive()).toBeFalsy()
+        testee.activate()
+        expect(testee.isActive()).toBeTruthy()
+      })
+    })
+
     describe('Rundown is in Rehearsal', () => {
       it ('sets the Rundown to be active', () => {
         const testee: Rundown = new Rundown({ mode: RundownMode.REHEARSAL } as RundownInterface)
@@ -2756,8 +2942,10 @@ describe(Rundown.name, () => {
 
       expect(() => testee.getActiveSegment()).toThrow()
     })
+  })
 
-    it('resets all segments', () => {
+  describe(Rundown.prototype.deactivate.name, () => {
+    it('resets all Segments', () => {
       const mockedSegment1: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
       const mockedSegment2: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
       const mockedSegment3: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
@@ -2770,17 +2958,86 @@ describe(Rundown.name, () => {
 
       const testee: Rundown = new Rundown({
         segments,
-        mode: RundownMode.INACTIVE,
+        mode: RundownMode.ACTIVE,
       } as RundownInterface)
 
-      testee.activate()
+      testee.deactivate()
 
       verify(mockedSegment1.reset()).once()
       verify(mockedSegment2.reset()).once()
       verify(mockedSegment3.reset()).once()
     })
 
-    it('resets the history to an empty array', () => {
+    it('removes unsynced segments', () => {
+      const onAirSegmentId: string = 'on-air-segment-id'
+      const onAirPart: Part = EntityTestFactory.createPart({ segmentId: onAirSegmentId, isOnAir: true })
+      const unsyncedOnAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, isUnsynced: true, isOnAir: true, parts: [onAirPart] })
+
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ segmentId: nextSegmentId, isNext: true })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+      const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: onAirPart,
+            segment: unsyncedOnAirSegment,
+            owner: Owner.SYSTEM,
+          },
+          nextCursor: {
+            part: nextPart,
+            segment: nextSegment,
+            owner: Owner.SYSTEM,
+          },
+          infinitePieces: new Map(),
+        },
+        segments: [unsyncedOnAirSegment, nextSegment]
+      }))
+
+      testee.deactivate()
+
+      expect(testee.getSegments().length).toBe(1)
+      expect(testee.getSegments()).toEqual(expect.arrayContaining([expect.objectContaining({ id: nextSegmentId })]))
+    })
+
+    it('removes unsynced parts', () => {
+      const onAirSegmentId: string = 'on-air-segment-id'
+      const unsyncedOnAirPart: Part = EntityTestFactory.createPart({ segmentId: onAirSegmentId, isOnAir: true, isUnsynced: true })
+      const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, isOnAir: true, parts: [unsyncedOnAirPart] })
+
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ segmentId: nextSegmentId, isNext: true })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+      const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: unsyncedOnAirPart,
+            segment: onAirSegment,
+            owner: Owner.SYSTEM,
+          },
+          nextCursor: {
+            part: nextPart,
+            segment: nextSegment,
+            owner: Owner.SYSTEM,
+          },
+          infinitePieces: new Map(),
+        },
+        segments: [onAirSegment, nextSegment]
+      }))
+
+      testee.deactivate()
+
+      expect(testee.getSegments().length).toBe(2)
+      expect(testee.getSegments()).toEqual(expect.arrayContaining([
+        expect.objectContaining({ id: nextSegmentId }),
+        expect.objectContaining({ id: onAirSegmentId, parts: expect.not.arrayContaining([expect.objectContaining({ id: unsyncedOnAirPart.id })]) }),
+      ]))
+    })
+
+    it('resets history to an empty array', () => {
       const segment: Segment = EntityMockFactory.createSegment({ parts: [EntityMockFactory.createPart()] })
       const history: Part[] = [
         EntityTestFactory.createPart(),
@@ -2788,11 +3045,11 @@ describe(Rundown.name, () => {
         EntityTestFactory.createPart()
       ]
 
-      const testee: Rundown = new Rundown({ history, segments: [segment] } as RundownInterface)
+      const testee: Rundown = new Rundown({ history, segments: [segment], mode: RundownMode.ACTIVE } as RundownInterface)
 
       expect(testee.getHistory()).toHaveLength(history.length)
 
-      testee.activate()
+      testee.deactivate()
 
       expect(testee.getHistory()).toHaveLength(0)
     })
@@ -2813,12 +3070,22 @@ describe(Rundown.name, () => {
       })
     })
 
-    it('sets the Rundown to be rehearsal', () => {
+    it('sets the Rundown to be in rehearsal mode', () => {
       const segment: Segment = EntityMockFactory.createSegment({ parts: [EntityMockFactory.createPart()] })
       const testee: Rundown = new Rundown({ mode: RundownMode.INACTIVE, segments: [segment] } as RundownInterface)
 
       testee.enterRehearsal()
       expect(testee.getMode()).toBe(RundownMode.REHEARSAL)
+    })
+
+    describe('Rundown is empty', () => {
+      it('sets Rundown to be in rehearsal mode', () => {
+        const testee: Rundown = EntityTestFactory.createRundown({id: 'emptyRundown', mode: RundownMode.INACTIVE})
+
+        expect(testee.isRehearsal()).toBeFalsy()
+        testee.enterRehearsal()
+        expect(testee.isRehearsal()).toBeTruthy()
+      })
     })
 
     describe('first Segment is hidden', () => {
@@ -2884,45 +3151,102 @@ describe(Rundown.name, () => {
 
       expect(() => testee.getActiveSegment()).toThrow()
     })
+  })
 
-    it('resets all segments', () => {
-      const mockedSegment1: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
-      const mockedSegment2: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
-      const mockedSegment3: Segment = EntityMockFactory.createSegmentMock({ parts: [EntityMockFactory.createPart()] })
+  describe(Rundown.prototype.reset.name, () => {
+    it('removes unsynced segments', () => {
+      const onAirSegmentId: string = 'on-air-segment-id'
+      const onAirPart: Part = EntityTestFactory.createPart({ segmentId: onAirSegmentId, isOnAir: true })
+      const unsyncedOnAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, isUnsynced: true, isOnAir: true, parts: [onAirPart] })
 
-      const segments: Segment[] = [
-        instance(mockedSegment1),
-        instance(mockedSegment2),
-        instance(mockedSegment3),
-      ]
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ segmentId: nextSegmentId, isNext: true })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
 
-      const testee: Rundown = new Rundown({
-        segments,
-        mode: RundownMode.INACTIVE,
-      } as RundownInterface)
+      const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: onAirPart,
+            segment: unsyncedOnAirSegment,
+            owner: Owner.SYSTEM,
+          },
+          nextCursor: {
+            part: nextPart,
+            segment: nextSegment,
+            owner: Owner.SYSTEM,
+          },
+          infinitePieces: new Map(),
+        },
+        segments: [unsyncedOnAirSegment, nextSegment]
+      }))
 
-      testee.enterRehearsal()
+      testee.reset()
 
-      verify(mockedSegment1.reset()).once()
-      verify(mockedSegment2.reset()).once()
-      verify(mockedSegment3.reset()).once()
+      expect(testee.getSegments().length).toBe(1)
+      expect(testee.getSegments()).toEqual(expect.arrayContaining([expect.objectContaining({ id: nextSegmentId })]))
     })
 
-    it('resets the history to an empty array', () => {
-      const segment: Segment = EntityMockFactory.createSegment({ parts: [EntityMockFactory.createPart()] })
-      const history: Part[] = [
-        EntityTestFactory.createPart(),
-        EntityTestFactory.createPart(),
-        EntityTestFactory.createPart()
-      ]
+    it('removes unsynced parts', () => {
+      const onAirSegmentId: string = 'on-air-segment-id'
+      const unsyncedOnAirPart: Part = EntityTestFactory.createPart({ segmentId: onAirSegmentId, isOnAir: true, isUnsynced: true })
+      const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, isOnAir: true, parts: [unsyncedOnAirPart] })
 
-      const testee: Rundown = new Rundown({ history, segments: [segment] } as RundownInterface)
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ segmentId: nextSegmentId, isNext: true })
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
 
-      expect(testee.getHistory()).toHaveLength(history.length)
+      const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+        mode: RundownMode.ACTIVE,
+        alreadyActiveProperties: {
+          activeCursor: {
+            part: unsyncedOnAirPart,
+            segment: onAirSegment,
+            owner: Owner.SYSTEM,
+          },
+          nextCursor: {
+            part: nextPart,
+            segment: nextSegment,
+            owner: Owner.SYSTEM,
+          },
+          infinitePieces: new Map(),
+        },
+        segments: [onAirSegment, nextSegment]
+      }))
 
-      testee.enterRehearsal()
+      testee.reset()
 
-      expect(testee.getHistory()).toHaveLength(0)
+      expect(testee.getSegments().length).toBe(2)
+      expect(testee.getSegments()).toEqual(expect.arrayContaining([
+        expect.objectContaining({ id: nextSegmentId }),
+        expect.objectContaining({ id: onAirSegmentId, parts: expect.not.arrayContaining([expect.objectContaining({ id: unsyncedOnAirPart.id })]) }),
+      ]))
+    })
+
+    describe('last segment on air is unsynced', () => {
+      it('resets and removes the last segment', () => {
+        const unsyncedOnAirSegmentId: string = 'unsynced-on-air-segment-id'
+        const unsyncedOnAirPart: Part = EntityTestFactory.createPart({ segmentId: unsyncedOnAirSegmentId, isOnAir: true, isUnsynced: true })
+        const unsyncedOnAirSegment: Segment = EntityTestFactory.createSegment({ id: unsyncedOnAirSegmentId, isOnAir: true, parts: [unsyncedOnAirPart], isUnsynced: true })
+
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              part: unsyncedOnAirPart,
+              segment: unsyncedOnAirSegment,
+              owner: Owner.SYSTEM,
+            },
+            nextCursor: undefined,
+            infinitePieces: new Map(),
+          },
+          segments: [unsyncedOnAirSegment]
+        }))
+
+        testee.reset()
+        expect(testee.getSegments().length).toBe(0)
+        expect(testee.getActiveCursor()).toBeUndefined()
+      })
     })
   })
 
@@ -2959,6 +3283,20 @@ describe(Rundown.name, () => {
         expect(testee.getSegments()[0]).toBe(segmentOne)
         expect(testee.getSegments()[1]).toBe(segmentToAdd)
         expect(testee.getSegments()[2]).toBe(segmentTwo)
+      })
+
+      describe('the Rundown is on air and has no active part', () => {
+        describe('there are no other Segments in the Rundown', () => {
+          it('sets the Segment as next', () => {
+            const part: Part = EntityTestFactory.createPart()
+            const segment: Segment = EntityTestFactory.createSegment( {parts: [part]})
+            const testee: Rundown = new Rundown({mode: RundownMode.ACTIVE, alreadyActiveProperties: {activeCursor: undefined, nextCursor: undefined}} as RundownInterface)
+
+            testee.addSegment(segment)
+
+            expect(testee.getNextCursor()?.segment.id).toBe(segment.id)
+          })
+        })
       })
     })
 
@@ -3077,28 +3415,87 @@ describe(Rundown.name, () => {
       })
 
       describe('the old Segment is on Air', () => {
-        it('takes the Parts of the old Segment and gives them to the new Segment', () => {
+        it('update the active cursor with the OnAir Part of the new Segment', () => {
           const segmentId: string = 'segmentId'
-          const parts: Part[] = [
-            EntityTestFactory.createPart({ id: 'partOne' }),
-            EntityTestFactory.createPart({ id: 'partTwo' })
-          ]
-          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts })
-          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId })
+          const oldPart: Part = EntityTestFactory.createPart()
+          const newSegmentOnAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts: [oldPart] })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false, parts: [newSegmentOnAirPart] })
 
-          const testee: Rundown = new Rundown({ segments: [oldSegment] } as RundownInterface)
+          const activeCursor: RundownCursor = {
+            part: oldPart,
+            segment: oldSegment,
+            owner: Owner.SYSTEM
+          }
 
-          expect(newSegment.getParts()).not.toBe(parts)
+          const testee: Rundown = new Rundown({ segments: [oldSegment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor
+          } } as RundownInterface)
+
+          expect(testee.getActiveCursor()?.part).not.toBe(newSegmentOnAirPart)
           testee.updateSegment(newSegment)
-          expect(newSegment.getParts()).toBe(parts)
+          expect(testee.getActiveCursor()?.part).toBe(newSegmentOnAirPart)
+        })
+
+        it('does not put the Parts of the old Segment in the new Segment', () => {
+          const segmentId: string = 'segmentId'
+          const oldPart: Part = EntityTestFactory.createPart()
+          const newSegmentOnAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts: [oldPart] })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false, parts: [newSegmentOnAirPart] })
+
+          const activeCursor: RundownCursor = {
+            part: oldPart,
+            segment: oldSegment,
+            owner: Owner.SYSTEM
+          }
+
+          const testee: Rundown = new Rundown({ segments: [oldSegment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor
+          } } as RundownInterface)
+
+          testee.updateSegment(newSegment)
+
+          expect(newSegment.getParts().includes(oldPart)).toBeFalsy()
+        })
+
+        it('new Segment has infinite Pieces - updates infinite Pieces', () => {
+          const segmentId: string = 'segmentId'
+          const oldPart: Part = EntityTestFactory.createPart()
+          const infinitePiece: Piece = EntityTestFactory.createPiece({ pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+          const newSegmentOnAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, pieces: [infinitePiece] })
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts: [oldPart] })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false, parts: [newSegmentOnAirPart] })
+
+          const activeCursor: RundownCursor = {
+            part: oldPart,
+            segment: oldSegment,
+            owner: Owner.SYSTEM
+          }
+
+          const testee: Rundown = new Rundown({ segments: [oldSegment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor,
+            infinitePieces: new Map()
+          } } as RundownInterface)
+
+          expect(testee.getInfinitePieces()).toHaveLength(0)
+          testee.updateSegment(newSegment)
+          expect(testee.getInfinitePieces()).toContain(infinitePiece)
         })
 
         it('puts the new Segment on Air', () => {
           const segmentId: string = 'segmentId'
-          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true })
-          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false })
+          const oldPart: Part = EntityTestFactory.createPart()
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const oldSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: true, parts: [oldPart] })
+          const newSegment: Segment = EntityTestFactory.createSegment({ id: segmentId, isOnAir: false, parts: [onAirPart] })
 
-          const testee: Rundown = new Rundown({ segments: [oldSegment] } as RundownInterface)
+          const testee: Rundown = new Rundown({ segments: [oldSegment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              part: oldPart,
+              segment: oldSegment
+            },
+          } } as RundownInterface)
 
           expect(newSegment.isOnAir()).toBeFalsy()
           testee.updateSegment(newSegment)
@@ -3107,6 +3504,91 @@ describe(Rundown.name, () => {
       })
 
       // It should also update the next cursor, but those tests are covered by "addSegment()".
+    })
+
+    describe('when a non-on air segment containing the next part is updated', () => {
+      describe('when the next part is invalid', () => {
+        describe('when there are no valid parts after the on air part', () => {
+          it('updates the on air part is marked as next', () => {
+            const activeSegmentId: string = 'active-segment-id'
+            const activePart: Part = EntityTestFactory.createPart({ id: 'active-part-id', segmentId: activeSegmentId, isOnAir: true })
+            activePart.calculateTimings()
+            const activeSegment: Segment = EntityTestFactory.createSegment({ id: activeSegmentId, isOnAir: true, parts: [activePart] })
+
+            const nextSegmentId: string = 'next-segment-id'
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId: nextSegmentId, isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+            const invalidity: Invalidity = { reason: 'some reason' }
+            const updatedNextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId: nextSegmentId, isNext: true, invalidity })
+            const updatedNextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [updatedNextPart] })
+
+            const testee: Rundown = EntityTestFactory.createRundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: activeSegment,
+                  part: activePart,
+                  owner: Owner.SYSTEM,
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM,
+                },
+                infinitePieces: new Map(),
+              },
+              segments: [activeSegment, nextSegment]
+            })
+
+            testee.updateSegment(updatedNextSegment)
+
+            expect(testee.getNextCursor()?.segment).toBe(activeSegment)
+            expect(testee.getNextCursor()?.part).toBe(activePart)
+          })
+        })
+
+        describe('when there is a valid part after the on air part',() => {
+          it('updates the next cursor to the next valid part from the active cursor', () => {
+            const activeSegmentId: string = 'active-segment-id'
+            const activePart: Part = EntityTestFactory.createPart({ id: 'active-part-id', segmentId: activeSegmentId, isOnAir: true })
+            const secondPart: Part = EntityTestFactory.createPart({ id: 'second-part-id', segmentId: activeSegmentId })
+            activePart.calculateTimings()
+            const activeSegment: Segment = EntityTestFactory.createSegment({ id: activeSegmentId, isOnAir: true, parts: [activePart, secondPart] })
+
+            const nextSegmentId: string = 'next-segment-id'
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId: nextSegmentId, isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+            const invalidity: Invalidity = { reason: 'some reason' }
+            const updatedNextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId: nextSegmentId, isNext: true, invalidity })
+            const updatedNextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [updatedNextPart] })
+
+            const testee: Rundown = EntityTestFactory.createRundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: activeSegment,
+                  part: activePart,
+                  owner: Owner.SYSTEM,
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM,
+                },
+                infinitePieces: new Map(),
+              },
+              segments: [activeSegment, nextSegment]
+            })
+
+            testee.updateSegment(updatedNextSegment)
+
+            expect(testee.getNextCursor()?.segment).toBe(activeSegment)
+            expect(testee.getNextCursor()?.part).toBe(secondPart)
+          })
+        })
+      })
     })
   })
 
@@ -3124,13 +3606,27 @@ describe(Rundown.name, () => {
     })
 
     describe('Segment exist on Rundown', () => {
-      it('removes the Segment from the Rundown', () => {
-        const segment: Segment = EntityTestFactory.createSegment()
-        const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
+      describe('Segment is not on air', () => {
+        it('removes the Segment from the Rundown', () => {
+          const segment: Segment = EntityTestFactory.createSegment()
+          const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
 
-        expect(testee.getSegments()).toContain(segment)
-        testee.removeSegment(segment.id)
-        expect(testee.getSegments()).not.toContain(segment)
+          expect(testee.getSegments()).toContain(segment)
+          testee.removeSegment(segment.id)
+          expect(testee.getSegments()).not.toContain(segment)
+        })
+        describe('the Rundown is active and has no active part', () => {
+          describe('Segment is the only Segment in the Rundown', () => {
+            it('removes the next cursor', () => {
+              const part: Part = EntityTestFactory.createPart()
+              const segment: Segment = EntityTestFactory.createSegment( {parts: [part]})
+              const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {activeCursor: undefined, nextCursor: {segment, part}} } as RundownInterface)
+
+              testee.removeSegment(segment.id)
+              expect(testee.getNextCursor()).toBe(undefined)
+            })
+          })
+        })
       })
 
       describe('Segment is on Air', () => {
@@ -3238,13 +3734,205 @@ describe(Rundown.name, () => {
 
       // It should also update the NextCursor, but that is being tested by "addSegment()".
     })
+
+    describe('when a part is added right after the on air part in same segment', () => {
+      describe ('when the segment marked as next is not the on air segment', () => {
+        describe('when the next cursor is set by the system', () => {
+          it('marks the on air segment as next', () => {
+            const onAirSegmentId: string =  'on-air-segment-id'
+            const onAirPart: Part = EntityTestFactory.createPart({ id: 'on-air-part-id', segmentId: onAirSegmentId, isOnAir: true })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, parts: [onAirPart] })
+
+            const nextSegmentId: string = 'next-segment-id'
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId: nextSegmentId, isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, parts: [nextPart] })
+
+            const partToAdd: Part = EntityTestFactory.createPart({ id: 'part-to-add-id', segmentId: onAirSegmentId })
+
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+              segments: [onAirSegment, nextSegment],
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM,
+                },
+                infinitePieces: new Map(),
+              }
+            }))
+
+            testee.addPart(partToAdd)
+
+            const result: Segment | undefined = testee.getSegments().find(segment => segment.isNext())
+            expect(result?.id).toBe(onAirSegmentId)
+          })
+
+          it('marks the added part as next', () => {
+            const onAirSegmentId: string =  'on-air-segment-id'
+            const onAirPart: Part = EntityTestFactory.createPart({ id: 'on-air-part-id', segmentId: onAirSegmentId, isOnAir: true })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, parts: [onAirPart] })
+
+            const nextSegmentId: string = 'next-segment-id'
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId: nextSegmentId, isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, parts: [nextPart] })
+
+            const partToAddId: string = 'part-to-add-id'
+            const partToAdd: Part = EntityTestFactory.createPart({ id: partToAddId, segmentId: onAirSegmentId })
+
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+              segments: [onAirSegment, nextSegment],
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM,
+                },
+                infinitePieces: new Map(),
+              }
+            }))
+
+            testee.addPart(partToAdd)
+
+            const result: Part | undefined = testee.getSegments()
+              .find(segment => segment.isNext())?.getParts()
+              .find(part => part.id === partToAddId)
+            expect(result?.id).toBe(partToAddId)
+          })
+
+          it('unmarks the segment previously marked as next', () => {
+            const onAirSegmentId: string =  'on-air-segment-id'
+            const onAirPart: Part = EntityTestFactory.createPart({ id: 'on-air-part-id', segmentId: onAirSegmentId, isOnAir: true })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, parts: [onAirPart] })
+
+            const nextSegmentId: string = 'next-segment-id'
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', segmentId: nextSegmentId, isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+            const partToAdd: Part = EntityTestFactory.createPart({ id: 'part-to-add-id', segmentId: onAirSegmentId })
+
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+              segments: [onAirSegment, nextSegment],
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM,
+                },
+                infinitePieces: new Map(),
+              }
+            }))
+
+            testee.addPart(partToAdd)
+
+            const result: Segment | undefined = testee.getSegments().find(segment => segment.id == nextSegmentId)
+            expect(result?.isNext()).toBe(false)
+          })
+
+          it('unmarks the part previously marked as next', () => {
+            const onAirSegmentId: string =  'on-air-segment-id'
+            const onAirPart: Part = EntityTestFactory.createPart({ id: 'on-air-part-id', segmentId: onAirSegmentId, isOnAir: true })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, parts: [onAirPart] })
+
+            const nextPartId: string = 'next-part-id'
+            const nextSegmentId: string = 'next-segment-id'
+            const nextPart: Part = EntityTestFactory.createPart({ id: nextPartId, segmentId: nextSegmentId, isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, parts: [nextPart] })
+
+            const partToAdd: Part = EntityTestFactory.createPart({ id: 'part-to-add-id', segmentId: onAirSegmentId })
+
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+              segments: [onAirSegment, nextSegment],
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM,
+                },
+                infinitePieces: new Map(),
+              }
+            }))
+
+            testee.addPart(partToAdd)
+
+            const result: Part | undefined = testee.getSegments()
+              .find(segment => segment.id == nextSegmentId)?.getParts()
+              .find(part => part.id === nextPartId)
+            expect(result?.isNext()).toBe(false)
+          })
+        })
+      })
+    })
+
+    describe('when the next cursor has an external owner', () => {
+      it('does not change the next cursor', () => {
+        const onAirSegmentId: string =  'on-air-segment-id'
+        const onAirPart: Part = EntityTestFactory.createPart({ id: 'on-air-part-id', segmentId: onAirSegmentId, isOnAir: true })
+        const onAirSegment: Segment = EntityTestFactory.createSegment({ id: onAirSegmentId, parts: [onAirPart] })
+
+        const nextPartId: string = 'next-part-id'
+        const nextSegmentId: string = 'next-segment-id'
+        const nextPart: Part = EntityTestFactory.createPart({ id: nextPartId, segmentId: nextSegmentId, isNext: true })
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, parts: [nextPart] })
+
+        const partToAdd: Part = EntityTestFactory.createPart({ id: 'part-to-add-id', segmentId: onAirSegmentId })
+
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+          segments: [onAirSegment, nextSegment],
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: onAirSegment,
+              part: onAirPart,
+              owner: Owner.SYSTEM,
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: nextPart,
+              owner: Owner.EXTERNAL,
+            },
+            infinitePieces: new Map(),
+          }
+        }))
+
+        testee.addPart(partToAdd)
+
+        const result: Part | undefined = testee.getSegments()
+          .find(segment => segment.id == nextSegmentId)?.getParts()
+          .find(part => part.id === nextPartId)
+        expect(result?.isNext()).toBe(true)
+      })
+    })
   })
 
   describe(Rundown.prototype.updatePart.name, () => {
     describe('Part does not have a Segment id for any Segments in the Rundown', () => {
       it('throws a NotFound exception', () => {
         const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId: 'nonExistingSegmentId' })
-        const testee: Rundown = new Rundown({} as RundownInterface)
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface())
 
         expect(() => testee.updatePart(part)).toThrow(NotFoundException)
       })
@@ -3364,15 +4052,17 @@ describe(Rundown.name, () => {
 
   describe(Rundown.prototype.setNext.name, () => {
     it('resets next part right before changing next cursor', () => {
-      const mockedNextPart: Part = EntityMockFactory.createPartMock({ isNext: true })
-      const nextPart: Part = instance(mockedNextPart)
-      const nextSegment: Segment = EntityMockFactory.createSegment({ id: 'next-segment-id', isNext: true, parts: [nextPart] })
-      const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
-      const otherPartInActiveSegment: Part = EntityMockFactory.createPart({ id: 'other-part-in-active-segment-id' })
-      const mockedActiveSegment: Segment = EntityMockFactory.createSegmentMock({ id: 'active-segment-id', isOnAir: true, parts: [activePart, otherPartInActiveSegment] })
-      when(mockedActiveSegment.findPart(otherPartInActiveSegment.id)).thenReturn(otherPartInActiveSegment)
-      const activeSegment: Segment = instance(mockedActiveSegment)
-      const testee: Rundown = new Rundown({
+      const nextSegmentId: string = 'next-segment-id'
+      const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true, segmentId: nextSegmentId })
+      const nextPartSpy: Part = spy(nextPart)
+      const nextSegment: Segment = EntityTestFactory.createSegment({ id: nextSegmentId, isNext: true, parts: [nextPart] })
+
+      const activeSegmentId: string = 'active-segment-id'
+      const activePart: Part = EntityTestFactory.createPart({ id: 'active-part-id', segmentId: activeSegmentId, isOnAir: true })
+      const otherPartInActiveSegment: Part = EntityTestFactory.createPart({ id: 'other-part-in-active-segment-id', segmentId: activeSegmentId })
+      const activeSegment: Segment = EntityTestFactory.createSegment({ id: activeSegmentId, isOnAir: true, parts: [activePart, otherPartInActiveSegment] })
+
+      const testee: Rundown = EntityTestFactory.createRundown({
         mode: RundownMode.ACTIVE,
         alreadyActiveProperties: {
           activeCursor: {
@@ -3381,7 +4071,7 @@ describe(Rundown.name, () => {
             owner: Owner.SYSTEM
           },
           nextCursor: {
-            part: instance(mockedNextPart),
+            part: nextPart,
             segment: nextSegment,
             owner: Owner.SYSTEM
           },
@@ -3391,11 +4081,11 @@ describe(Rundown.name, () => {
           activeSegment,
           nextSegment,
         ],
-      } as RundownInterface)
+      })
 
       testee.setNext(activeSegment.id, otherPartInActiveSegment.id)
 
-      verify(mockedNextPart.reset()).once()
+      verify(nextPartSpy.reset()).once()
     })
 
     describe('nextCursor.Part is the same Part as the onAirCursor.Part OnAir', () => {
@@ -3439,7 +4129,7 @@ describe(Rundown.name, () => {
         const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
         const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true })
         const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', isNext: true, parts: [nextPart]})
-        const rundown: Rundown = new Rundown({
+        const testee: Rundown = new Rundown({
           mode: RundownMode.ACTIVE,
           alreadyActiveProperties: {
             activeCursor: {
@@ -3457,9 +4147,158 @@ describe(Rundown.name, () => {
           ],
         } as RundownInterface)
 
-        const result: () => void = () => rundown.setNext(activeSegment.id, activePart.id)
+        const result: () => void = () => testee.setNext(activeSegment.id, activePart.id)
 
         expect(result).toThrow(OnAirException)
+      })
+    })
+
+    describe('next Segment is invalid', () => {
+      it('does not call setNext on the Segment', () => {
+        const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true })
+        const invalidity: Invalidity = {
+          reason: 'Some Reason'
+        }
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', invalidity, isNext: true, parts: [nextPart]})
+        const testee: Rundown = new Rundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: activeSegment,
+              part: activePart,
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: nextPart,
+            },
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment,
+            nextSegment
+          ],
+        } as RundownInterface)
+
+        const spiedNextSegment: Segment = spy(nextSegment)
+
+        try {
+          testee.setNext(nextSegment.id, nextPart.id)
+        } catch (e) {
+          // Do nothing - the error is expected.
+        }
+
+        verify(spiedNextSegment.setAsNext()).never()
+      })
+
+      it('throws InvalidSegmentException', () => {
+        const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', isNext: true })
+        const invalidity: Invalidity = {
+          reason: 'Some Reason'
+        }
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', invalidity, isNext: true, parts: [nextPart]})
+        const testee: Rundown = new Rundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: activeSegment,
+              part: activePart,
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: nextPart,
+            },
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment,
+            nextSegment
+          ],
+        } as RundownInterface)
+
+
+        expect(() => testee.setNext(nextSegment.id, nextPart.id)).toThrow(InvalidSegmentException)
+      })
+    })
+    describe('when next part is invalid', () => {
+      it('does not call setNext on the next segment nor the next part', () => {
+        const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
+        const firstPartInNextSegment: Part = EntityTestFactory.createPart({ id: 'first-part-in-next-segment-id' })
+        const invalidity: Invalidity = {
+          reason: 'Some reason'
+        }
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', invalidity })
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', parts: [firstPartInNextSegment, nextPart]})
+        const testee: Rundown = EntityTestFactory.createRundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: activeSegment,
+              part: activePart,
+              owner: Owner.SYSTEM
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: firstPartInNextSegment,
+              owner: Owner.SYSTEM
+            },
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment,
+            nextSegment
+          ],
+        })
+        const spiedNextSegment: Segment = spy(nextSegment)
+        const spiedNextPart: Part = spy(nextPart)
+
+        try {
+          testee.setNext(nextSegment.id, nextPart.id)
+        } catch {
+          // Do nothing. The error is expected.
+        }
+
+        verify(spiedNextSegment.setAsNext()).never()
+        verify(spiedNextPart.setAsNext()).never()
+      })
+
+      it('throws an invalid part exception', () => {
+        const activePart: Part = EntityMockFactory.createPart({ id: 'active-part-id', isOnAir: true })
+        const activeSegment: Segment = EntityTestFactory.createSegment({ id: 'active-segment-id', parts: [activePart] })
+        const firstPartInNextSegment: Part = EntityTestFactory.createPart({ id: 'first-part-in-next-segment-id' })
+        const invalidity: Invalidity = {
+          reason: 'Some reason'
+        }
+        const nextPart: Part = EntityTestFactory.createPart({ id: 'next-part-id', invalidity })
+        const nextSegment: Segment = EntityTestFactory.createSegment({ id: 'next-segment-id', parts: [firstPartInNextSegment, nextPart]})
+        const testee: Rundown = EntityTestFactory.createRundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              segment: activeSegment,
+              part: activePart,
+              owner: Owner.SYSTEM
+            },
+            nextCursor: {
+              segment: nextSegment,
+              part: firstPartInNextSegment,
+              owner: Owner.SYSTEM
+            },
+            infinitePieces: new Map(),
+          },
+          segments: [
+            activeSegment,
+            nextSegment
+          ],
+        })
+
+        const result: () => void = () => testee.setNext(nextSegment.id, nextPart.id)
+
+        expect(result).toThrow(InvalidPartException)
       })
     })
   })
@@ -3605,6 +4444,595 @@ describe(Rundown.name, () => {
       })
     })
   })
+
+  describe(Rundown.prototype.insertPartAsNext.name, () => {
+    describe('there is no onAir Part', () => {
+      it ('throws an exception', () => {
+        const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted' })
+
+        const testee: Rundown = new Rundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: undefined
+          }
+        } as RundownInterface)
+
+        expect(() => testee.insertPartAsNext(partToBeInserted)).toThrow()
+      })
+    })
+
+    describe('there is an onAir Part', () => {
+      describe('next Part is in the same Segment as the onAir Part', () => {
+        describe('next Part is right after the onAir Part', () => {
+          it('sets the rank of the inserted Part to be between the onAir and next Parts', () => {
+            const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', rank: -1, ingestedPart: undefined })
+            const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, rank: 5 })
+            const nextPart: Part = EntityTestFactory.createPart({ isNext: true, rank: 10 })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, nextPart] })
+
+            const expectedRank: number =  (nextPart.getRank() - onAirPart.getRank()) / 2 + onAirPart.getRank()
+
+            const testee: Rundown = new Rundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: onAirSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                }
+              },
+              segments: [onAirSegment]
+            } as RundownInterface)
+
+            testee.insertPartAsNext(partToBeInserted)
+
+            expect(partToBeInserted.getRank()).toBe(expectedRank)
+          })
+        })
+
+        describe('next Part is not right after the onAir Part', () => {
+          it('sets the rank to be between the onAir Part and the part after the onAir Part', () => {
+            const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', rank: -1, ingestedPart: undefined })
+            const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, rank: 5 })
+            const partBetweenOnAirAndNextPart: Part = EntityTestFactory.createPart({ id: 'partBetweenOnAirAndNextPart', rank: 7 })
+            const nextPart: Part = EntityTestFactory.createPart({ isNext: true, rank: 10 })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, partBetweenOnAirAndNextPart, nextPart] })
+
+            const expectedRank: number =  (partBetweenOnAirAndNextPart.getRank() - onAirPart.getRank()) / 2 + onAirPart.getRank()
+
+            const testee: Rundown = new Rundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: onAirSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                }
+              },
+              segments: [onAirSegment]
+            } as RundownInterface)
+
+            testee.insertPartAsNext(partToBeInserted)
+
+            expect(partToBeInserted.getRank()).toBe(expectedRank)
+          })
+        })
+      })
+
+      describe('next Part is another Segment', () => {
+        describe('onAir Part is last Part in the Segment', () => {
+          it('sets the rank to be the rank of the onAir Part plus 0.1', () => {
+            const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', rank: -1, ingestedPart: undefined })
+            const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, rank: 4 })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart] })
+            const nextPart: Part = EntityTestFactory.createPart({ isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
+
+            const expectedRank: number =  onAirPart.getRank() + 1
+
+            const testee: Rundown = new Rundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                }
+              },
+              segments: [onAirSegment]
+            } as RundownInterface)
+
+            testee.insertPartAsNext(partToBeInserted)
+
+            expect(partToBeInserted.getRank()).toBe(expectedRank)
+          })
+        })
+
+        describe('there is a Part after the onAir Part in the Segment', () => {
+          it ('sets the rank to be between the onAir Part and the Part after the onAir Part', () => {
+            const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', rank: -1, ingestedPart: undefined })
+
+            const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true, rank: 4 })
+            const partAfterOnAirPart: Part = EntityTestFactory.createPart({ id: 'partAfterOnAirPart', rank: 6 })
+            const onAirSegment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, partAfterOnAirPart] })
+
+            const nextPart: Part = EntityTestFactory.createPart({ isNext: true })
+            const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
+
+            // The new rank is the rank of the onAir Part plus the distance between the onAir Part and the next Part: 4 + ((6 - 4) / 2)
+            const expectedRank: number =  5
+
+            const testee: Rundown = new Rundown({
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  segment: onAirSegment,
+                  part: onAirPart,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  segment: nextSegment,
+                  part: nextPart,
+                  owner: Owner.SYSTEM
+                }
+              },
+              segments: [onAirSegment]
+            } as RundownInterface)
+
+            testee.insertPartAsNext(partToBeInserted)
+
+            expect(partToBeInserted.getRank()).toBe(expectedRank)
+          })
+        })
+      })
+    })
+  })
+
+  describe(Rundown.prototype.pruneOldUnplannedPartsOnActiveSegment.name, () => {
+    describe('there are less Parts on the active Segment than the threshold', () => {
+      it('does not remove any Parts from the active Segment', () => {
+        const part: Part = EntityTestFactory.createPart()
+        const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
+        const threshold: number = 3
+
+        const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+          activeCursor: {
+            segment
+          }
+        } } as RundownInterface)
+
+        expect(testee.getActiveSegment().getParts()).toHaveLength(1)
+        testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+        expect(testee.getActiveSegment().getParts()).toHaveLength(1)
+      })
+
+      it('returns an empty array', () => {
+        const part: Part = EntityTestFactory.createPart()
+        const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
+        const threshold: number = 3
+
+        const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+          activeCursor: {
+            segment
+          }
+        } } as RundownInterface)
+
+        const result: string[] = testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+        expect(result).toHaveLength(0)
+      })
+    })
+
+    describe('there are more Parts on the active Segment than the threshold', () => {
+      describe('there is no active Part on the Segment', () => {
+        it('does not remove any Parts', () => {
+          const partOne: Part = EntityTestFactory.createPart()
+          const partTwo: Part = EntityTestFactory.createPart()
+          const partThree: Part = EntityTestFactory.createPart()
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [partOne, partTwo, partThree] })
+          const threshold: number = 2
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment
+            }
+          } } as RundownInterface)
+
+          expect(testee.getActivePart()).toBeUndefined()
+          expect(testee.getActiveSegment().getParts()).toHaveLength(3)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(testee.getActiveSegment().getParts()).toHaveLength(3)
+        })
+
+        it('returns an empty array', () => {
+          const partOne: Part = EntityTestFactory.createPart()
+          const partTwo: Part = EntityTestFactory.createPart()
+          const partThree: Part = EntityTestFactory.createPart()
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [partOne, partTwo, partThree] })
+          const threshold: number = 2
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment
+            }
+          } } as RundownInterface)
+
+          const result: string[] = testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(result).toHaveLength(0)
+        })
+      })
+
+      describe('there is an active Part on the Segment', () => {
+        it('active Part is planned - does not remove the active Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const onAirPlannedPart: Part = EntityTestFactory.createPart({ isOnAir: true, ingestedPart: EntityTestFactory.createIngestedPart() })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirPlannedPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPlannedPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(onAirPlannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(onAirPlannedPart)
+        })
+
+        it('active Part is not planned - does not remove the active Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const onAirUnplannedPart: Part = EntityTestFactory.createPart({ isOnAir: true, ingestedPart: undefined })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirUnplannedPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirUnplannedPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(onAirUnplannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(onAirUnplannedPart)
+        })
+
+        it('next Part is planned - does not remove the next Part', () => {
+          const segmentId: string = 'segment-id'
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ segmentId, ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ segmentId, isOnAir: true })
+          const nextPlannedPart: Part = EntityTestFactory.createPart({ segmentId, isNext: true, ingestedPart: EntityTestFactory.createIngestedPart() })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirPart, nextPlannedPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: onAirPart,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: {
+                segment,
+                part: nextPlannedPart,
+                owner: Owner.SYSTEM,
+              },
+              infinitePieces: new Map(),
+            }
+          }))
+
+          expect(segment.getParts()).toContain(nextPlannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(nextPlannedPart)
+        })
+
+        it('next Part is not planned - does not remove the next Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const nextUnplannedPart: Part = EntityTestFactory.createPart({ isNext: true, ingestedPart: undefined })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, onAirPart, nextUnplannedPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPart
+            },
+            nextCursor: {
+              segment,
+              part: nextUnplannedPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(nextUnplannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(nextUnplannedPart)
+        })
+
+        it('previous Part is planned - does not remove the previous Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const previousPlannedPart: Part = EntityTestFactory.createPart({ ingestedPart: EntityTestFactory.createIngestedPart() })
+          const onAirPart: Part = EntityTestFactory.createPart()
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, previousPlannedPart, onAirPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: previousPlannedPart, // To set the previous Part we need to set it as the active and do a Take.
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: {
+                segment,
+                part: onAirPart, // When we do the Take, this will become the onAir Part.
+                owner: Owner.SYSTEM,
+              },
+              infinitePieces: new Map(),
+            } }))
+          testee.takeNext() // Necessary to set the previous Part.
+
+          expect(segment.getParts()).toContain(previousPlannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(previousPlannedPart)
+        })
+
+        it('previous Part is not planned - does not remove the previous Part', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const previousUnplannedPart: Part = EntityTestFactory.createPart({ isOnAir: true, ingestedPart: undefined, timings: {} as PartTimings })
+          const onAirPart: Part = EntityTestFactory.createPart({ })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, previousUnplannedPart, onAirPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: previousUnplannedPart // To set the previous Part we need to set it as the active and do a Take.
+            },
+            nextCursor: {
+              segment,
+              part: onAirPart // When we do the Take, this will become the onAir Part.
+            }
+          } } as RundownInterface)
+          testee.takeNext() // Necessary to set the previous Part.
+
+          expect(segment.getParts()).toContain(previousUnplannedPart)
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(segment.getParts()).toContain(previousUnplannedPart)
+        })
+
+        it('does not remove any planned Parts', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const unplannedPartTwo: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const plannedPartOne: Part = EntityTestFactory.createPart({ ingestedPart: EntityTestFactory.createIngestedPart() })
+          const plannedPartTwo: Part = EntityTestFactory.createPart({ ingestedPart: EntityTestFactory.createIngestedPart() })
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, unplannedPartTwo, plannedPartOne, plannedPartTwo, onAirPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown({ segments: [segment], mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+            activeCursor: {
+              segment,
+              part: onAirPart
+            }
+          } } as RundownInterface)
+
+          expect(segment.getParts()).toContain(unplannedPartOne)
+          expect(segment.getParts()).toContain(unplannedPartTwo)
+          expect(segment.getParts()).toContain(plannedPartOne)
+          expect(segment.getParts()).toContain(plannedPartTwo)
+
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+
+          expect(segment.getParts()).not.toContain(unplannedPartOne)
+          expect(segment.getParts()).not.toContain(unplannedPartTwo)
+          expect(segment.getParts()).toContain(plannedPartOne)
+          expect(segment.getParts()).toContain(plannedPartTwo)
+        })
+
+        it('does not remove any unplanned Parts after the active Part', () => {
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+          const unplannedPartOneAfterActivePart: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+          const unplannedPartTwoAfterActivePart: Part = EntityTestFactory.createPart({ ingestedPart: undefined })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [onAirPart, unplannedPartOneAfterActivePart, unplannedPartTwoAfterActivePart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: onAirPart,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: undefined,
+              infinitePieces: new Map(),
+            }
+          }))
+
+          expect(segment.getParts()).toContain(onAirPart)
+          expect(segment.getParts()).toContain(unplannedPartOneAfterActivePart)
+          expect(segment.getParts()).toContain(unplannedPartTwoAfterActivePart)
+
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+
+          expect(segment.getParts()).toContain(onAirPart)
+          expect(segment.getParts()).toContain(unplannedPartOneAfterActivePart)
+          expect(segment.getParts()).toContain(unplannedPartTwoAfterActivePart)
+        })
+
+        it('removes all unplanned Parts before the previous Part', () => {
+          const rundownId: string = 'rundown-id'
+          const segmentId: string = 'segment-id'
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ rundownId, segmentId, ingestedPart: undefined })
+          const unplannedPartTwo: Part = EntityTestFactory.createPart({ rundownId, segmentId, ingestedPart: undefined })
+          const unplannedPartThree: Part = EntityTestFactory.createPart({ rundownId, segmentId, ingestedPart: undefined })
+          const previousPart: Part = EntityTestFactory.createPart( { rundownId, segmentId, ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ rundownId, segmentId, ingestedPart: undefined })
+          const unplannedPartAfterActivePart: Part = EntityTestFactory.createPart({ id: 'unplannedPartAfterActivePart', rundownId, segmentId, ingestedPart: undefined })
+
+          const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, rundownId, parts: [unplannedPartOne, unplannedPartTwo, unplannedPartThree, previousPart, onAirPart, unplannedPartAfterActivePart] })
+          const threshold: number = 2
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            id: rundownId,
+            segments: [segment],
+            mode: RundownMode.ACTIVE, alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: previousPart, // To set the previous Part we need to set it as the active and do a Take.
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: {
+                segment,
+                part: onAirPart, // When we do the Take, this will become the onAir Part.
+                owner: Owner.SYSTEM,
+              },
+              infinitePieces: new Map(),
+            }
+          }))
+          testee.takeNext() // Necessary to set the previous Part.
+
+
+          expect(segment.getParts()).toContain(unplannedPartOne)
+          expect(segment.getParts()).toContain(unplannedPartTwo)
+          expect(segment.getParts()).toContain(unplannedPartThree)
+          expect(segment.getParts()).toContain(unplannedPartAfterActivePart)
+
+          testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+
+          expect(segment.getParts()).not.toContain(unplannedPartOne)
+          expect(segment.getParts()).not.toContain(unplannedPartTwo)
+          expect(segment.getParts()).not.toContain(unplannedPartThree)
+          expect(segment.getParts()).toContain(unplannedPartAfterActivePart)
+        })
+
+
+        it('returns all PartIds of the removed Parts', () => {
+          const unplannedPartOne: Part = EntityTestFactory.createPart({ id: 'unplannedPartOne', ingestedPart: undefined })
+          const unplannedPartTwo: Part = EntityTestFactory.createPart({ id: 'unplannedPartTwo', ingestedPart: undefined })
+          const onAirPart: Part = EntityTestFactory.createPart({ isOnAir: true })
+
+          const segment: Segment = EntityTestFactory.createSegment({ parts: [unplannedPartOne, unplannedPartTwo, onAirPart] })
+          const threshold: number = 1
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                segment,
+                part: onAirPart,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: undefined,
+              infinitePieces: new Map(),
+            }
+          }))
+
+          const result: string[] = testee.pruneOldUnplannedPartsOnActiveSegment(threshold)
+          expect(result).toHaveLength(2)
+          expect(result).toContain(unplannedPartOne.id)
+          expect(result).toContain(unplannedPartTwo.id)
+        })
+      })
+    })
+  })
+
+  describe(Rundown.prototype.stopPiece.name, () => {
+    describe('the rundown is inactive', () => {
+      it('throws NotActivatedException', () => {
+        const pieceId: string = 'randomPieceId'
+        const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({ mode: RundownMode.INACTIVE }))
+
+        expect(() => testee.stopPiece(pieceId)).toThrow(NotActivatedException)
+      })
+    })
+
+    describe('the rundown is active', () => {
+      describe('the Piece is on the Active Part', () => {
+        it ('stops the Piece', () => {
+          const piece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', executedAt: 12345678, duration: undefined })
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [piece] })
+          const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart] })
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: activePart,
+                segment,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: undefined,
+              infinitePieces: new Map(),
+            }
+          }))
+
+          expect(piece.hasEnded(Date.now())).toBeFalsy()
+          testee.stopPiece(piece.id)
+          expect(piece.hasEnded(Date.now())).toBeTruthy()
+        })
+      })
+
+      describe('when piece is an infinite piece', () => {
+        it ('stops the Piece', () => {
+          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', layer: 'infinitePieceLayer', executedAt: 12345678, duration: undefined })
+          const infinitePieces: Map<string, Piece> = new Map()
+          infinitePieces.set(infinitePiece.layer, infinitePiece)
+
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+          const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart] })
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: activePart,
+                segment,
+                owner: Owner.SYSTEM,
+              },
+              nextCursor: undefined,
+              infinitePieces
+            }
+          }))
+
+          expect(infinitePiece.hasEnded(Date.now())).toBeFalsy()
+          testee.stopPiece(infinitePiece.id)
+          expect(infinitePiece.hasEnded(Date.now())).toBeTruthy()
+        })
+      })
+    })
+  })
 })
 
 function createTesteeWithActiveAndNextCursors(params?: {
@@ -3629,12 +5057,13 @@ function createTesteeWithActiveAndNextCursors(params?: {
     part: params?.nextPart ?? existingNextPart,
     owner: params?.nextOwner ?? Owner.EXTERNAL
   }
-  return new Rundown({
+  return new Rundown(EntityTestFactory.createRundownInterface({
     mode: RundownMode.ACTIVE,
     alreadyActiveProperties: {
       activeCursor,
-      nextCursor
+      nextCursor,
+      infinitePieces: new Map(),
     },
     segments: [existingActiveSegment, existingNextSegment]
-  } as RundownInterface)
+  }))
 }

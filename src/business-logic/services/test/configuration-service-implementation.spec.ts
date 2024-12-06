@@ -9,7 +9,8 @@ describe(ConfigurationServiceImplementation.name, () => {
     it('saves the shelfConfiguration to the repository', async () => {
       const shelfConfiguration: ShelfConfiguration = {
         id: 'someId',
-        actionPanelConfigurations: []
+        actionPanelConfigurations: [],
+        staticActionIds: []
       }
       const shelfConfigurationRepository: ShelfConfigurationRepository = mock<ShelfConfigurationRepository>()
 
@@ -22,7 +23,8 @@ describe(ConfigurationServiceImplementation.name, () => {
     it('emits the updated shelfConfiguration from the repository', async () => {
       const updateShelfConfiguration: ShelfConfiguration = {
         id: 'someId',
-        actionPanelConfigurations: []
+        actionPanelConfigurations: [],
+        staticActionIds: []
       }
       const shelfConfigurationRepository: ShelfConfigurationRepository = mock<ShelfConfigurationRepository>()
       when(shelfConfigurationRepository.updateShelfConfiguration(anything())).thenReturn(Promise.resolve(updateShelfConfiguration))
