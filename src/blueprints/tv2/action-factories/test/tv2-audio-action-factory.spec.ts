@@ -2,7 +2,7 @@ import { Tv2AudioActionFactory } from '../tv2-audio-action-factory'
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
-import { instance, mock } from '@typestrong/ts-mockito'
+import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import {
   Tv2AudioBedTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-audio-bed-timeline-object-factory'
@@ -13,6 +13,9 @@ import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-c
 import { Tv2AudioAction } from '../../value-objects/tv2-action'
 import { FrameTimeConverter } from '../../helpers/frame-time-converter'
 import { Tv2ActionManifestAudioBedData } from '../../value-objects/tv2-action-manifest-data'
+import { Logger } from '../../../../logger/logger'
+import { Tv2CasparCgTimelineObjectFactory } from '../../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
 
 describe(Tv2AudioActionFactory.name, () => {
@@ -161,14 +164,24 @@ describe(Tv2AudioActionFactory.name, () => {
   })
 })
 
-function createTestee(params?: {
+function createTestee(params: {
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
   audioBedTimelineObjectFactory?: Tv2AudioBedTimelineObjectFactory,
   frameTimeConverter?: FrameTimeConverter,
-}): Tv2AudioActionFactory {
+  logger?: Logger
+} = {}): Tv2AudioActionFactory {
   return new Tv2AudioActionFactory(
-    params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
-    params?.audioBedTimelineObjectFactory ?? instance(mock<Tv2AudioBedTimelineObjectFactory>()),
-    params?.frameTimeConverter ?? instance(mock(FrameTimeConverter)),
+    params.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
+    params.audioBedTimelineObjectFactory ?? new Tv2CasparCgTimelineObjectFactory(new Tv2AssetPathHelper(), new FrameTimeConverter(25)),
+    params.frameTimeConverter ?? instance(mock(FrameTimeConverter)),
+    params.logger ?? instance(createMockOfLogger())
   )
+}
+
+function createMockOfLogger(): Logger {
+  const mockedLogger: Logger = mock<Logger>()
+  when(mockedLogger.tag(anyString())).thenCall(() => instance(createMockOfLogger()))
+  when(mockedLogger.data(anything())).thenCall(() => instance(createMockOfLogger()))
+  when(mockedLogger.metadata(anything())).thenCall(() => instance(createMockOfLogger()))
+  return mockedLogger
 }

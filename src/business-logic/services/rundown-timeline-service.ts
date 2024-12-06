@@ -21,6 +21,7 @@ import { IngestService } from './interfaces/ingest-service'
 import { Logger } from '../../logger/logger'
 import { PlayoutService } from './interfaces/playoutService'
 import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-exception'
+import { RundownCursor } from '../../model/value-objects/rundown-cursor'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
 
 export class RundownTimelineService implements RundownService {
@@ -290,6 +291,7 @@ export class RundownTimelineService implements RundownService {
     this.assertTakeIsNotBlocked(rundown)
 
     const unplannedNextPartToKeepAsNextPart: Part | undefined = !rundown.getNextPart().isPlanned ? rundown.getNextPart() : undefined
+    const nextCursor: RundownCursor | undefined = rundown.getNextCursor()
 
     rundown.insertPartAsNext(part)
     rundown.takeNext()
@@ -297,6 +299,8 @@ export class RundownTimelineService implements RundownService {
 
     if (unplannedNextPartToKeepAsNextPart) {
       rundown.insertPartAsNext(unplannedNextPartToKeepAsNextPart)
+    } else if (nextCursor) {
+      rundown.setNextFromIds(nextCursor.segment.id, nextCursor.part.id, nextCursor.owner)
     }
 
     await this.buildAndPersistTimeline(rundown)
@@ -370,5 +374,16 @@ export class RundownTimelineService implements RundownService {
     this.rundownEventEmitter.emitPieceReplacedEvent(rundown, segmentId, pieceToBeReplaced.id, newPiece)
 
     await this.saveRundown(rundown)
+  }
+
+  public async stopPiece(rundownId: string, pieceId: string): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const stoppedPiece: Piece | undefined = rundown.stopPiece(pieceId)
+    if (!stoppedPiece) {
+      return
+    }
+    await this.buildAndPersistTimeline(rundown)
+    this.rundownEventEmitter.emitPieceStoppedEvent(rundown, rundown.getActivePart().getSegmentId(), stoppedPiece)
+    await this.rundownRepository.saveRundown(rundown)
   }
 }

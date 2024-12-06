@@ -11,6 +11,7 @@ import {
   PartUpdatedEvent,
   PieceInsertedEvent,
   PieceReplacedEvent,
+  PieceStoppedEvent,
   RundownActivatedEvent,
   RundownCreatedEvent,
   RundownDeactivatedEvent,
@@ -156,6 +157,17 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
   public buildPieceInsertedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceInsertedEvent {
     return {
       type: RundownEventType.PIECE_INSERTED,
+      timestamp: Date.now(),
+      rundownId: rundown.id,
+      segmentId,
+      partId: piece.getPartId(),
+      piece: new PieceDto(piece),
+    }
+  }
+
+  public buildPieceStoppedEvent(rundown: Rundown, segmentId: string, piece: Piece): PieceStoppedEvent {
+    return {
+      type: RundownEventType.PIECE_STOPPED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       segmentId,

@@ -147,4 +147,16 @@ export class RundownController extends BaseController {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
+
+  @PutRequest('/:rundownId/pieces/:pieceId/stop')
+  public async stopPiece(request: Request, response: Response): Promise<void> {
+    try {
+      const rundownId: string = request.params.rundownId
+      const pieceId: string = request.params.pieceId
+      await this.rundownService.stopPiece(rundownId, pieceId)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Piece "${pieceId}" was stopped` ))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
 }

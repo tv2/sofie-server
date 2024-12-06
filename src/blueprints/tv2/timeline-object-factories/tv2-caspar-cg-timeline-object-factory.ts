@@ -319,7 +319,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
 
   public createAudioBedTimelineObject(audioBedName: string, blueprintConfiguration: Tv2BlueprintConfiguration): CasparCgMediaTimelineObject {
     const audioBedSettings: AudioBedSettings = blueprintConfiguration.studio.audioBedSettings
-    const audioBedConfiguration: AudioBedConfiguration | undefined = blueprintConfiguration.showStyle.audioBedConfigurations.find(audioBedConfiguration => audioBedConfiguration.name === audioBedName)
+    const audioBedConfiguration: AudioBedConfiguration | undefined = blueprintConfiguration.showStyle.audioBedConfigurations.find(audioBedConfiguration => audioBedConfiguration.name.trim().toLowerCase() === audioBedName.trim().toLowerCase())
     if (!audioBedConfiguration) {
       throw new NotFoundException(`Unable to find the audio bed configuration for ${audioBedName}.`)
     }

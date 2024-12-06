@@ -52,6 +52,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-audio-bed-timeline-object-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
+import { LoggerFacade } from '../../../logger/logger-facade'
 
 
 interface ActionFactoryInstance<T> {
@@ -195,6 +196,7 @@ export class Tv2ActionFactoryProvider {
           this.createAudioMixerTimelineObjectFactory(),
           this.createAudioBedTimelineObjectFactory(),
           this.createFrameTimeConverter(),
+          LoggerFacade.createLogger(),
         )
       },
       (): boolean => {

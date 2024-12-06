@@ -26,6 +26,7 @@ export interface PieceInterface {
   tags: string[]
   isUnsynced: boolean
   isInsertedOnAir?: boolean
+  createdFromActionId?: string
 }
 
 export class Piece {
@@ -35,6 +36,7 @@ export class Piece {
   public readonly layer: string
   public readonly pieceLifespan: PieceLifespan
   public readonly isPlanned: boolean = true
+  public readonly createdFromActionId?: string
   public readonly preRollDuration: number
   public readonly postRollDuration: number
   public readonly transitionType: TransitionType
@@ -59,6 +61,7 @@ export class Piece {
     this.layer = piece.layer
     this.pieceLifespan = piece.pieceLifespan
     this.isPlanned = piece.isPlanned
+    this.createdFromActionId = piece.createdFromActionId
     this.start = piece.start
     this.duration = piece.duration
     this.preRollDuration = piece.preRollDuration
@@ -98,6 +101,9 @@ export class Piece {
   }
 
   public stop(): void {
+    if (this.duration && this.duration + this.executedAt < Date.now()) {
+      return
+    }
     this.duration = Date.now() - this.executedAt
   }
 
@@ -163,7 +169,11 @@ export class Piece {
     this.timelineObjects.push(...timelineObjects)
   }
 
-  public hasEnded(): boolean {
-    return !!this.duration && this.executedAt + this.duration < Date.now()
+  public hasEnded(timestamp: number): boolean {
+    if (!this.executedAt) {
+      return false
+    }
+    const durationInMs: number = this.duration ? this.duration : Infinity
+    return this.executedAt + durationInMs <= timestamp
   }
 }
