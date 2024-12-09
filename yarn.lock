@@ -707,10 +707,10 @@
   resolved "https://registry.npmjs.org/@tsconfig/node16/-/node16-1.0.4.tgz"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
-"@tv2media/logger@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.npmjs.org/@tv2media/logger/-/logger-2.0.2.tgz"
-  integrity sha512-+G2IcXDhKicX5PAZ6uhrCwax32Q3RR4nsPl61nMGVKfpsEumujaMluTpAyR1FPeV/Liqr3h9BZP2DdUH/VhugA==
+"@tv2media/logger@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@tv2media/logger/-/logger-2.0.3.tgz#2679f44c01a488a9ccde757bb4b784d5bc2abab8"
+  integrity sha512-xOKic7qUxxJZpj7siK5nmtzNAaH9NfowePrqWLOeV8oF5aPYUQ75jE95Ffuja5epmI2K0pZ6HzE3RFLe+225vw==
 
 "@types/babel__core@^7.1.14":
   version "7.20.1"
