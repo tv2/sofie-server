@@ -8,8 +8,10 @@ export class PieceDto {
   public readonly name: string
   public readonly start: number
   public readonly duration?: number
+  public readonly executedAt: number
   public readonly layer: string
   public readonly isPlanned: boolean
+  public readonly createdFromActionId?: string
   public readonly lifespan: PieceLifespan
   public readonly executedAt: number
   public readonly metadata?: unknown
@@ -21,8 +23,10 @@ export class PieceDto {
     this.name = piece.name
     this.start = piece.getStart()
     this.duration = piece.getDuration()
+    this.executedAt = piece.getExecutedAt()
     this.layer = piece.layer
     this.isPlanned = piece.isPlanned
+    this.createdFromActionId = piece.createdFromActionId
     this.lifespan = piece.pieceLifespan
     this.executedAt = piece.getExecutedAt()
     this.metadata = piece.metadata

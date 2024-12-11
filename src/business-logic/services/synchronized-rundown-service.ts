@@ -66,4 +66,8 @@ export class SynchronizedRundownService implements RundownService {
   public replacePieceOnAirOnNextPart(rundownId: string, pieceToBeReplaced: Piece, newPiece: Piece): Promise<void> {
     return this.rundownLock.withLock(this.replacePieceOnAirOnNextPart.name, () => this.rundownService.replacePieceOnAirOnNextPart(rundownId, pieceToBeReplaced, newPiece))
   }
+
+  public stopPiece(rundownId: string, pieceId: string): Promise<void> {
+    return this.rundownLock.withLock(this.stopPiece.name, () => this.rundownService.stopPiece(rundownId, pieceId))
+  }
 }

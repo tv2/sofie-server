@@ -129,7 +129,7 @@ export class Part {
     const now: number = Date.now()
     this.executedAt = now
     this.playedDuration = 0
-    this.pieces.forEach((piece) => piece.setExecutedAt(now))
+    this.pieces.forEach((piece) => piece.setExecutedAt(now + piece.getStart()))
   }
 
   private assertValidity(operationName: string): void {
