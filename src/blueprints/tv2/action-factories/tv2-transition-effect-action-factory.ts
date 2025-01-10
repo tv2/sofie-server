@@ -169,7 +169,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private createPieceInterface(effectName: string, durationInFrames: number): Tv2PieceInterface {
     return {
       id: `${this.sanitizeStringForId(effectName)}TransitionActionPiece`,
-      name: `${effectName} transition`,
+      name: `${effectName}`,
       partId: '',
       rundownId: '',
       layer: Tv2PieceLayer.JINGLE,
@@ -302,7 +302,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private createMixTransitionEffectAction(actionType: PieceActionType, durationInFrames: number): Tv2TransitionEffectAction {
-    const effectName: string = `Mix${durationInFrames}`
+    const effectName: string = `Mix ${durationInFrames}`
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
@@ -313,7 +313,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private createDipTransitionEffectAction(actionType: PieceActionType, durationInFrames: number, configuredDipInput: number): Tv2TransitionEffectAction {
-    const effectName: string = `Dip${durationInFrames}`
+    const effectName: string = `Dip ${durationInFrames}`
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
@@ -326,10 +326,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
-
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
+    const effectName: string = `Effect ${breaker.durationInFrames}`
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
-    return this.createTransitionEffectAction(actionType, breaker.name, metadata, pieceInterface)
+    return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
 
   private findBreakerFromConfiguration(transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Breaker {
