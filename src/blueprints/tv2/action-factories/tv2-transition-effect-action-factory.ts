@@ -166,7 +166,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return true
   }
 
-  private createPieceInterface(effectName: string, durationInFrames: number): Tv2PieceInterface {
+  private createPieceInterface(effectName: string, durationInFrames: number, piece: Partial<Tv2PieceInterface> = {}): Tv2PieceInterface {
     return {
       id: `${this.sanitizeStringForId(effectName)}TransitionActionPiece`,
       name: `${effectName}`,
@@ -185,8 +185,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       timelineObjects: [],
       metadata: {
         type: Tv2PieceType.TRANSITION,
-        outputLayer: Tv2OutputLayer.SECONDARY
-      }
+        outputLayer: Tv2OutputLayer.SECONDARY,
+      },
+      ...piece,
     }
   }
 
@@ -207,10 +208,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private mapToTransitionEffectNameForActionType(actionType: PieceActionType, effectName: string): string {
     switch (actionType) {
       case PieceActionType.INSERT_PIECE_AS_NEXT: {
-        return `${this.getEffectNamePrefix(effectName)}${effectName} on Next`
+        return `${effectName} on Next`
       }
       case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
-        return `${this.getEffectNamePrefix(effectName)}${effectName} and Take`
+        return `${effectName} and Take`
       }
       case PieceActionType.REPLACE_PIECE:
       case PieceActionType.INSERT_PIECE_AS_ON_AIR:
@@ -220,21 +221,13 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     }
   }
 
-  private getEffectNamePrefix(effectName: string): string {
-    const effectNamesWithoutPrefix: string[] = [SpecialEffectName.MIX, SpecialEffectName.DIP]
-    if (effectNamesWithoutPrefix.includes(effectName)) {
-      return ''
-    }
-    return 'Effect '
-  }
-
   private mapToTransitionEffectDescriptionForActionType(actionType: PieceActionType, effectName: string): string {
     switch (actionType) {
       case PieceActionType.INSERT_PIECE_AS_NEXT: {
-        return `Applies ${this.getEffectNamePrefix(effectName)}${effectName} on the next Take`
+        return `Applies ${effectName} on the next Take`
       }
       case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
-        return `Execute a Take with the ${this.getEffectNamePrefix(effectName)}${effectName} applied`
+        return `Execute a Take with the ${effectName} applied`
       }
       case PieceActionType.REPLACE_PIECE:
       case PieceActionType.INSERT_PIECE_AS_ON_AIR:
@@ -327,7 +320,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
     const effectName: string = `Effect ${breaker.durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, { metadata:  {type: Tv2PieceType.TRANSITION, outputLayer: Tv2OutputLayer.JINGLE}})
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
     return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
