@@ -319,7 +319,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
-    const effectName: string = `Effect ${breaker.durationInFrames}`
+    const effectName: string = `Effect ${breaker.name}`
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, { metadata:  {type: Tv2PieceType.TRANSITION, outputLayer: Tv2OutputLayer.JINGLE}})
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
     return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
