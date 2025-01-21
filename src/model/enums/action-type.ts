@@ -1,4 +1,8 @@
-export type ActionType = PartActionType | PieceActionType
+export type ActionType = SystemActionType | PartActionType | PieceActionType
+
+export enum SystemActionType {
+  SYSTEM_ACTION = 'SYSTEM_ACTION',
+}
 
 export enum PartActionType {
   INSERT_PART_AS_ON_AIR = 'INSERT_PART_AS_ON_AIR',

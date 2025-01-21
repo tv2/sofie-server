@@ -6,6 +6,7 @@ import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { Tv2BlueprintTimelineObject } from './tv2-metadata'
 
 export enum Tv2ActionContentType {
+  SYSTEM = 'SYSTEM',
   CAMERA = 'CAMERA',
   REMOTE = 'REMOTE',
   VIDEO_CLIP = 'VIDEO_CLIP',

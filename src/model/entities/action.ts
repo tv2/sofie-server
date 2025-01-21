@@ -1,4 +1,4 @@
-import { ActionType, PartActionType, PieceActionType } from '../enums/action-type'
+import { ActionType, PartActionType, PieceActionType, SystemActionType } from '../enums/action-type'
 import { Part, PartInterface } from './part'
 import { Piece, PieceInterface } from './piece'
 import { Media } from './media'
@@ -31,6 +31,20 @@ export enum ActionArgumentType {
   STRING_ARRAY = 'STRING_ARRAY',
   NUMBER = 'NUMBER',
   NUMBER_ARRAY = 'NUMBER_ARRAY'
+}
+
+export enum SystemActionId {
+  TAKE= 'TAKE',
+  SET_NEXT_PART = 'SET_NEXT_PART',
+  SET_PREVIOUS_PART = 'SET_PREVIOUS_PART',
+  SET_NEXT_SEGMENT = 'SET_NEXT_SEGMENT',
+  SET_PREVIOUS_SEGMENT = 'SET_PREVIOUS_SEGMENT'
+}
+
+export interface SystemAction extends Action {
+  id: SystemActionId,
+  type: SystemActionType
+  data: unknown
 }
 
 export interface PartAction extends Action {
