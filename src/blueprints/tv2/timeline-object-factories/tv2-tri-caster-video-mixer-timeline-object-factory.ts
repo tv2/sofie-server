@@ -298,7 +298,6 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createSplitScreenPropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, _layoutProperties: SplitScreenLayoutProperties): TriCasterMixEffectTimelineObject {
     return {
       id: `${TRI_CASTER_PREFIX}split_screen_properties`,
@@ -368,7 +367,6 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     ]
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, _dipInput: number, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
     const transitionEffectProperties: TriCasterTransitionEffectProperties = {
       input: sourceInput,

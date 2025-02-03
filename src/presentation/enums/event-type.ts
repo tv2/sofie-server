@@ -1,4 +1,4 @@
-export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | ActionTriggerEventType | NtpEventType
+export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | ActionTriggerEventType | DeviceEventType | NtpEventType
 
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
@@ -49,6 +49,13 @@ export enum ActionTriggerEventType {
 
 export enum StatusMessageEventType {
   STATUS_MESSAGE = 'STATUS_MESSAGE'
+}
+
+export enum DeviceEventType {
+  DEVICE_CREATED = 'DEVICE_CREATED',
+  DEVICE_UPDATED = 'DEVICE_UPDATED',
+  DEVICE_DELETED = 'DEVICE_DELETED',
+  VIDEO_MIXER_CONFIGURATION_UPDATED = 'VIDEO_MIXER_CONFIGURATION_UPDATED'
 }
 
 export enum NtpEventType {

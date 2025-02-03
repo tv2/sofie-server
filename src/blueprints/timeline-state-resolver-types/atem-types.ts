@@ -1,19 +1,29 @@
 import { DeviceType } from '../../model/enums/device-type'
 import { TimelineObject } from '../../model/entities/timeline-object'
 
-export interface AtemMeTimelineObject extends TimelineObject {
+export interface AtemMixEffectTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
-    me: {
-      input: number
-      transition: AtemTransition,
-      transitionSettings?: AtemTransitionSettings
-    }
+    me: AtemMixEffectWithTransition | AtemMixEffectWithPreview
   }
 }
 
-export interface AtemMeUpstreamKeyersTimelineObject extends TimelineObject {
+
+export interface AtemMixEffectWithTransition {
+  type: AtemMixEffectType.TRANSITION
+  input: number
+  transition: AtemTransition,
+  transitionSettings?: AtemTransitionSettings,
+}
+
+export interface AtemMixEffectWithPreview {
+  type: AtemMixEffectType.PREVIEW
+  programInput: number
+  previewInput?: number
+}
+
+export interface AtemMixEffectUpstreamKeyersTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.ATEM,
     type: AtemType.ME
@@ -166,6 +176,11 @@ export enum AtemType {
   MEDIA_PLAYER = 'mp',
   AUDIO_CHANNEL = 'audioChan',
   MACRO_PLAYER = 'macroPlayer',
+}
+
+export enum AtemMixEffectType {
+  TRANSITION = 'TRANSITION',
+  PREVIEW = 'PREVIEW'
 }
 
 export enum AtemTransition {

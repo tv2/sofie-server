@@ -26,13 +26,14 @@ import { Media } from '../../../model/entities/media'
 import { RundownTiming } from '../../../model/value-objects/rundown-timing'
 import { IngestedPart } from '../../../model/entities/ingested-part'
 import { SystemInformation } from '../../../model/entities/system-information'
-import { Device } from '../../../model/entities/device'
 import { StatusCode } from '../../../model/enums/status-code'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { Invalidity } from '../../../model/value-objects/invalidity'
 import { Logger } from '../../../logger/logger'
 import { Action, ActionArgument } from '../../../model/entities/action'
 import { ActionType } from '../../../model/enums/action-type'
+import { Device } from '../../../model/entities/device'
+import { DeviceType } from '../../../model/enums/device-type'
 
 
 export interface MongoId {
@@ -196,6 +197,7 @@ export interface MongoAction extends MongoId {
 
 export interface MongoDevice extends MongoId {
   name: string
+  type: DeviceType
   status: {
     statusCode: number,
     messages: string[]
@@ -514,16 +516,18 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDevice(mongoDevice: MongoDevice): Device {
+  public convertToDeviceInterface(mongoDevice: MongoDevice): Device {
     const statusMessage: string = mongoDevice.status.messages && mongoDevice.status.messages.length > 0
       ? mongoDevice.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
       : ''
+
     return {
       id: mongoDevice._id,
       name: mongoDevice.name,
       isConnected: mongoDevice.connected,
       statusCode: this.getStatusCode(mongoDevice.status.statusCode),
-      statusMessage
+      statusMessage,
+      type: mongoDevice.type
     }
   }
 
@@ -546,8 +550,8 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDevices(mongoDevices: MongoDevice[]): Device[] {
-    return mongoDevices.map(mongoDevice => this.convertToDevice(mongoDevice))
+  public convertToDeviceInterfaces(mongoDevices: MongoDevice[]): Device[] {
+    return mongoDevices.map(mongoDevice => this.convertToDeviceInterface(mongoDevice))
   }
 
   public convertToAction(mongoAction: MongoAction): Action {

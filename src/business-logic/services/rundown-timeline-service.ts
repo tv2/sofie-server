@@ -22,6 +22,7 @@ import { Logger } from '../../logger/logger'
 import { PlayoutService } from './interfaces/playoutService'
 import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-exception'
 import { RundownCursor } from '../../model/value-objects/rundown-cursor'
+import { SetNextDirection } from '../../model/enums/set-next-direction'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -223,9 +224,21 @@ export class RundownTimelineService implements RundownService {
     }
   }
 
-  public async setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
+  public async setNextFromIds(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    rundown.setNext(segmentId, partId, owner)
+    rundown.setNextFromIds(segmentId, partId, owner)
+
+    await this.buildAndPersistTimeline(rundown)
+
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
+
+    this.deleteUnplayedUnplannedPartsFromActiveSegment(rundown)
+    await this.saveRundown(rundown)
+  }
+
+  public async setNextFromDirection(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.setNextFromDirection(direction, owner)
 
     await this.buildAndPersistTimeline(rundown)
 
@@ -256,6 +269,7 @@ export class RundownTimelineService implements RundownService {
     await this.buildAndPersistTimeline(rundown)
 
     this.rundownEventEmitter.emitResetEvent(rundown)
+    this.rundownEventEmitter.emitSetNextEvent(rundown)
 
     await this.saveRundown(rundown)
   }
@@ -286,7 +300,7 @@ export class RundownTimelineService implements RundownService {
     if (unplannedNextPartToKeepAsNextPart) {
       rundown.insertPartAsNext(unplannedNextPartToKeepAsNextPart)
     } else if (nextCursor) {
-      rundown.setNext(nextCursor.segment.id, nextCursor.part.id, nextCursor.owner)
+      rundown.setNextFromIds(nextCursor.segment.id, nextCursor.part.id, nextCursor.owner)
     }
 
     await this.buildAndPersistTimeline(rundown)

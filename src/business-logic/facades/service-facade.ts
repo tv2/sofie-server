@@ -26,6 +26,8 @@ import { DeviceChangedService } from '../services/device-changed-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
+import { DeviceServiceImplementation } from '../services/device-service-implementation'
+import { DeviceService } from '../services/interfaces/device-service'
 import { PlayoutService } from '../services/interfaces/playoutService'
 import { PlayoutGatewayService } from '../services/playout-gateway-service'
 import { ThrottledRundownService } from '../services/throttled-rundown-service'
@@ -152,7 +154,7 @@ export class ServiceFacade {
   public static createDeviceDataChangedService(): DataChangeService {
     return DeviceChangedService.getInstance(
       ServiceFacade.createStatusMessageService(),
-      RepositoryFacade.createDeviceRepository(),
+      RepositoryFacade.createCoreDeviceRepository(),
       RepositoryFacade.createDeviceDataChangedListener(),
       LoggerFacade.createLogger()
     )
@@ -173,6 +175,13 @@ export class ServiceFacade {
     return new StatusMessageServiceImplementation(
       EventEmitterFacade.createStatusMessageEventEmitter(),
       RepositoryFacade.createStatusMessageRepository()
+    )
+  }
+
+  public static createDeviceService(): DeviceService {
+    return new DeviceServiceImplementation(
+      RepositoryFacade.createDeviceRepository(),
+      EventEmitterFacade.createDeviceEventEmitter()
     )
   }
 }

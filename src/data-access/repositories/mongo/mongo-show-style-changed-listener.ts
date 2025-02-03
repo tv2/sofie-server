@@ -37,7 +37,6 @@ export class MongoShowStyleChangedListener extends BaseMongoRepository<MongoShow
     this.onUpdatedCallback({} as ShowStyle)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onCreated(_onCreatedCallback: (showStyle: ShowStyle) => void): void {
     throw new UnsupportedOperationException(
       `${MongoShowStyleChangedListener.prototype.onCreated.name} is not supported in ${MongoShowStyleChangedListener.name}`
@@ -48,7 +47,6 @@ export class MongoShowStyleChangedListener extends BaseMongoRepository<MongoShow
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onDeleted(_onDeletedCallback: (id: string) => void): void {
     throw new UnsupportedOperationException(
       `${MongoShowStyleChangedListener.prototype.onDeleted.name} is not supported in ${MongoShowStyleChangedListener.name}`

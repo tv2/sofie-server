@@ -29,7 +29,7 @@ import {
   Tv2GraphicsElementTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-graphics-element-timeline-object-factory'
 import { DeviceType } from '../../../../model/enums/device-type'
-import { Tv2SourceLayer } from '../../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
 import { Tv2Logger } from '../../tv2-logger'
 
 describe(Tv2GraphicsActionFactory.name, () => {
@@ -79,7 +79,7 @@ describe(Tv2GraphicsActionFactory.name, () => {
             actionId: 'studio0_graphicsIdent',
             data: {
               rank: 5,
-              sourceLayerId: Tv2SourceLayer.GRAPHICS_IDENT,
+              pieceLayer: Tv2PieceLayer.GRAPHICS_IDENT,
               name: 'Some ident',
             }
           }),
@@ -87,7 +87,7 @@ describe(Tv2GraphicsActionFactory.name, () => {
             actionId: 'studio0_graphicsIdent',
             data: {
               rank: 10,
-              sourceLayerId: Tv2SourceLayer.GRAPHICS_IDENT,
+              pieceLayer: Tv2PieceLayer.GRAPHICS_IDENT,
               name: 'Some ident',
             }
           }),
@@ -113,7 +113,7 @@ describe(Tv2GraphicsActionFactory.name, () => {
             actionId: 'studio0_graphicsLower',
             data: {
               rank: 5,
-              sourceLayerId: Tv2SourceLayer.GRAPHICS_LOWER_THIRD,
+              pieceLayer: Tv2PieceLayer.GRAPHICS_LOWER_THIRD,
               name: 'Some lower third',
             }
           }),
@@ -121,7 +121,7 @@ describe(Tv2GraphicsActionFactory.name, () => {
             actionId: 'studio0_graphicsLower',
             data: {
               rank: 10,
-              sourceLayerId: Tv2SourceLayer.GRAPHICS_LOWER_THIRD,
+              pieceLayer: Tv2PieceLayer.GRAPHICS_LOWER_THIRD,
               name: 'Some lower third',
             }
           }),
@@ -147,7 +147,7 @@ describe(Tv2GraphicsActionFactory.name, () => {
             actionId: 'studio0_pilotOverlay',
             data: {
               rank: 5,
-              sourceLayerId: Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY,
+              pieceLayer: Tv2PieceLayer.GRAPHICS_PILOT_OVERLAY,
               name: 'Some pilot graphics',
             }
           }),
@@ -155,7 +155,7 @@ describe(Tv2GraphicsActionFactory.name, () => {
             actionId: 'studio0_pilotOverlay',
             data: {
               rank: 10,
-              sourceLayerId: Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY,
+              pieceLayer: Tv2PieceLayer.GRAPHICS_PILOT_OVERLAY,
               name: 'Some pilot graphics',
             }
           }),

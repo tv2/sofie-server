@@ -37,7 +37,6 @@ export class MongoShowStyleVariantConfigurationListener extends BaseMongoReposit
     return SHOW_STYLE_VARIANT_CONFIGURATION_COLLECTION_NAME
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onCreated(_onCreatedCallback: (data: ShowStyleVariant) => void): void {
     throw new UnsupportedOperationException(`${MongoShowStyleVariantConfigurationListener.prototype.onCreated.name} is not supported`)
   }
@@ -46,7 +45,6 @@ export class MongoShowStyleVariantConfigurationListener extends BaseMongoReposit
     this.onUpdatedCallback = onUpdatedCallback
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onDeleted(_onDeletedCallback: (id: string) => void): void {
     throw new UnsupportedOperationException(`${MongoShowStyleVariantConfigurationListener.prototype.onDeleted.name} is not supported`)
   }

@@ -171,7 +171,7 @@ export class Tv2ActionManifestMapper {
       name: data.name,
       rank: data.rank,
       rundownId: actionManifest.rundownId,
-      sourceLayerId: data.sourceLayerId,
+      pieceLayer: data.pieceLayer,
       templateName: this.getTemplateName(data.name),
       displayText: this.getDisplayText(data.name),
       expectedDuration: data.expectedDuration,

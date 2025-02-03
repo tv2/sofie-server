@@ -11,6 +11,7 @@ import { ActionTriggerController } from '../controllers/action-trigger-controlle
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaController } from '../controllers/media-controller'
 import { SystemInformationController } from '../controllers/system-information-controller'
+import { DeviceController } from '../controllers/device-controller'
 import { LoggerController } from '../controllers/logger-controller'
 
 export class ControllerFacade {
@@ -23,6 +24,7 @@ export class ControllerFacade {
       this.createConfigurationController(),
       this.createMediaController(),
       this.createSystemInformationController(),
+      this.createDeviceController(),
       this.createLoggerController(),
     ]
   }
@@ -52,7 +54,6 @@ export class ControllerFacade {
   private static createActionController(): ActionController {
     return new ActionController(
       ServiceFacade.createActionService(),
-      RepositoryFacade.createActionRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
@@ -99,6 +100,15 @@ export class ControllerFacade {
       new JsendResponseFormatter(),
       ControllerFacade.createExpressErrorHandler(),
       LoggerFacade.createLogger()
+    )
+  }
+
+  private static createDeviceController(): DeviceController {
+    return new DeviceController(
+      ServiceFacade.createDeviceService(),
+      RepositoryFacade.createVideoMixerDeviceRepository(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter(),
     )
   }
 }

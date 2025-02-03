@@ -371,7 +371,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     const lookAheadObjects: LookaheadTimelineObject[] = []
     let partToGetLookAheadObjectsFrom: Part = rundown.getNextPart()
 
-    for (let i = 0; i < layer.maximumLookaheadSearchDistance; i++) {
+    for (let i: number = 0; i < layer.maximumLookaheadSearchDistance; i++) {
       if (lookAheadObjects.length >= layer.amountOfLookaheadObjectsToFind) {
         return lookAheadObjects
       }

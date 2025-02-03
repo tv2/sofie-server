@@ -5,7 +5,7 @@ import {
   MutateActionMethods,
   MutateActionType
 } from '../../../model/entities/action'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceActionType } from '../../../model/enums/action-type'
@@ -33,7 +33,7 @@ import { Tv2ActionManifestAudioBedData } from '../value-objects/tv2-action-manif
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { Logger } from '../../../logger/logger'
 
-const AUDIO_BED_ACTION_ID: string = Tv2SourceLayer.AUDIO_BED
+const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 
 export class Tv2AudioActionFactory extends ActionFactory {
 
@@ -138,7 +138,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
       rundownId: '',
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
-      layer: Tv2SourceLayer.AUDIO_ACTION_COMMAND,
+      layer: Tv2PieceLayer.AUDIO_ACTION_COMMAND,
       isPlanned: false,
       isUnsynced: false,
       start: 0,
@@ -256,7 +256,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
       rundownId: '',
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
-      layer: Tv2SourceLayer.AUDIO_BED,
+      layer: Tv2PieceLayer.AUDIO_BED,
       isPlanned: false,
       isUnsynced: false,
       start: 0,

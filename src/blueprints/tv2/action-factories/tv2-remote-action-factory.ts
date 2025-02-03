@@ -4,7 +4,7 @@ import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import {
@@ -107,7 +107,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       partId: parentPartId,
       rundownId: '',
       name: source.name,
-      layer: Tv2SourceLayer.REMOTE,
+      layer: Tv2PieceLayer.REMOTE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,

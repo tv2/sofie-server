@@ -7,6 +7,7 @@ import { AlreadyExistException } from '../exceptions/already-exist-exception'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 import { Invalidity } from '../value-objects/invalidity'
 import { InvalidSegmentException } from '../exceptions/invalid-segment-exception'
+import { FirstPartInSegmentException } from '../exceptions/first-part-in-segment-exception'
 
 export interface SegmentInterface {
   id: string
@@ -71,6 +72,25 @@ export class Segment {
     return part
   }
 
+  public findFirstPartNotOnAir(): Part {
+    const part: Part | undefined = this.parts.find(part => !part.invalidity && !part.isOnAir())
+    if (!part) {
+      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid parts that is not on air.`)
+    }
+    return part
+  }
+
+  public findLastPartNotOnAir(): Part {
+    // Array.reverse() reverse the array in place. To not mess with the original array, we make a "copy" of it.
+    // Array.findLast() would be preferred by that requires a higher node version that what we currently support.
+    const part: Part | undefined = this.parts.map(part => part).reverse().find(part => !part.invalidity && !part.isOnAir())
+
+    if (!part) {
+      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid parts.`)
+    }
+    return part
+  }
+
   public putOnAir(): void {
     this.assertValidity(this.putOnAir.name)
     this.isSegmentOnAir = true
@@ -127,16 +147,34 @@ export class Segment {
     return this.isSegmentNext
   }
 
-  public findNextPart(fromPart: Part): Part {
+  public findNextPartNotOnAir(fromPart: Part): Part {
     const fromPartIndex: number = this.parts.findIndex((part) => part.id === fromPart.id)
     if (fromPartIndex === -1) {
       throw new NotFoundException('Part does not exist in Segment')
     }
-    const nextPart: Part | undefined = this.parts.slice(fromPartIndex + 1).find(part => !part.invalidity)
+    const nextPart: Part | undefined = this.parts.slice(fromPartIndex + 1).find(part => !part.invalidity && !part.isOnAir())
     if (!nextPart) {
       throw new LastPartInSegmentException(`The part "${fromPart.name}" with id "${fromPart.id}" is the last part in the segment "${this.name}" with id "${this.id}".`)
     }
     return nextPart
+  }
+
+  public findPreviousValidPartNotOnAir(fromPart: Part): Part {
+    const fromPartIndex: number = this.parts.findIndex(part => part.id === fromPart.id)
+    if (fromPartIndex === -1) {
+      throw new NotFoundException('Part does not exist in Segment')
+    }
+
+    const previousPart: Part | undefined = this.parts
+      .slice(0, fromPartIndex)
+      .reverse()
+      .find(part => !part.invalidity && !part.isOnAir())
+
+    if (!previousPart) {
+      throw new FirstPartInSegmentException(`The part "${fromPart.name}" with id "${fromPart.id}" is the first part in the segment "${this.name}" with id "${this.id}".`)
+    }
+
+    return previousPart
   }
 
   public findPart(partId: string): Part {
@@ -290,5 +328,9 @@ export class Segment {
 
   public isSegmentUntimed(): boolean {
     return !this.getParts().some(part => !part.isUntimed())
+  }
+
+  public isValid(): boolean {
+    return !this.invalidity && !this.isHidden && this.parts.some(part => !part.invalidity)
   }
 }

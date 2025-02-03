@@ -265,7 +265,7 @@ describe(RundownTimelineService.name, () => {
     })
   })
 
-  describe(`${RundownTimelineService.prototype.setNext.name}`, () => {
+  describe(`${RundownTimelineService.prototype.setNextFromIds.name}`, () => {
     describe('has active segment with unplanned part as next', () => {
       it('removes unplayed unplanned part when next cursor is moved away', async () => {
         const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
@@ -299,7 +299,7 @@ describe(RundownTimelineService.name, () => {
         when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
         expect(rundown.getActiveSegment().getParts()).toContain(unplayedUnplannedPart)
-        await testee.setNext(rundown.id, nextSegment.id, nextPart.id)
+        await testee.setNextFromIds(rundown.id, nextSegment.id, nextPart.id)
         expect(rundown.getActiveSegment().getParts()).not.toContain(unplayedUnplannedPart)
       })
     })
@@ -336,7 +336,7 @@ describe(RundownTimelineService.name, () => {
       when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
 
       expect(rundown.getActiveSegment().getParts()).toContain(playedUnplannedPart)
-      await testee.setNext(rundown.id, nextSegment.id, nextPart.id)
+      await testee.setNextFromIds(rundown.id, nextSegment.id, nextPart.id)
       expect(rundown.getActiveSegment().getParts()).toContain(playedUnplannedPart)
     })
   })
@@ -784,7 +784,7 @@ describe(RundownTimelineService.name, () => {
         })
         rundown.activate()
         rundown.takeNext()
-        rundown.setNext(segment.id, nextPart.id)
+        rundown.setNextFromIds(segment.id, nextPart.id)
 
         const rundownRepository: RundownRepository = mock<RundownRepository>()
         when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
@@ -997,6 +997,73 @@ describe(RundownTimelineService.name, () => {
 
         verify(rundownRepository.saveRundown(rundown)).once()
       })
+    })
+  })
+
+  describe(RundownTimelineService.prototype.resetRundown.name, () => {
+    describe('when rundown is in rehearsal', () => {
+      it('is still in rehearsal after reset', async () => {
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          id: 'rundown-id',
+          segments: [EntityTestFactory.createSegment({
+            parts: [EntityTestFactory.createPart()]
+          })],
+        })
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository })
+        rundown.enterRehearsal()
+        expect(rundown.isRehearsal()).toBeTruthy()
+
+        await testee.resetRundown(rundown.id)
+
+        expect(rundown.isRehearsal()).toBeTruthy()
+      })
+    })
+
+    describe('when rundown is active', () => {
+      it('is still active after reset', async () => {
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          id: 'rundown-id',
+          segments: [EntityTestFactory.createSegment({
+            parts: [EntityTestFactory.createPart()]
+          })],
+        })
+
+        const rundownRepository: RundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository })
+        rundown.activate()
+        expect(rundown.isActive()).toBeTruthy()
+
+        await testee.resetRundown(rundown.id)
+
+        expect(rundown.isActive()).toBeTruthy()
+      })
+    })
+
+    it('emits set next event after reset event', async () => {
+      const rundown: Rundown = EntityTestFactory.createRundown({
+        id: 'rundown-id',
+        segments: [EntityTestFactory.createSegment({
+          parts: [EntityTestFactory.createPart()]
+        })],
+      })
+
+      const rundownRepository: RundownRepository = mock<RundownRepository>()
+      when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+      const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+
+      const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
+      rundown.activate()
+
+      await testee.resetRundown(rundown.id)
+
+      verify(rundownEventEmitter.emitSetNextEvent(rundown)).calledAfter(rundownEventEmitter.emitResetEvent(rundown))
     })
   })
 })

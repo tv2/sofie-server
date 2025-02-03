@@ -6,7 +6,6 @@ import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
 import { ActionDto } from '../dtos/action-dto'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { ActionRepository } from '../../data-access/repositories/interfaces/action-repository'
 
 interface ExecuteActionRequestBody {
   actionArguments: unknown
@@ -17,7 +16,6 @@ export class ActionController extends BaseController {
 
   constructor(
     private readonly actionService: ActionService,
-    private readonly actionRepository: ActionRepository,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter
   ) {
@@ -27,7 +25,7 @@ export class ActionController extends BaseController {
   @GetRequest()
   public async getActions(_request: Request, response: Response): Promise<void> {
     try {
-      const actions: Action[] = await this.actionRepository.getSystemActions()
+      const actions: Action[] = await this.actionService.getSystemActions()
       response.send(this.httpResponseFormatter.formatSuccessResponse(actions.map(action => new ActionDto(action))))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
@@ -38,7 +36,7 @@ export class ActionController extends BaseController {
   public async getActionsForRundown(request: Request, response: Response): Promise<void> {
     try {
       const rundownId: string = request.params.rundownId
-      const actions: Action[] = await this.actionRepository.getActionsForRundown(rundownId)
+      const actions: Action[] = await this.actionService.getActionsForRundown(rundownId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(actions.map(action => new ActionDto(action))))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)

@@ -4,7 +4,7 @@ import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
 import { Tv2ActionContentType, Tv2ReplayAction, Tv2ReplayAuxAction } from '../value-objects/tv2-action'
-import { Tv2SourceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
@@ -196,7 +196,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       partId: parentPartId,
       rundownId: '',
       name: `${source.name}${audioMode === Tv2AudioMode.VOICE_OVER ? ' VO' : ''}`,
-      layer: Tv2SourceLayer.REPLAY,
+      layer: Tv2PieceLayer.REPLAY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
@@ -235,7 +235,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       name: `${source.name} Studio AUX`,
       partId: '',
       rundownId: '',
-      layer: Tv2SourceLayer.REPLAY_STUDIO_AUXILIARY,
+      layer: Tv2PieceLayer.REPLAY_STUDIO_AUXILIARY,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
@@ -279,7 +279,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       name: `${source.name} Viz AUX`,
       partId: '',
       rundownId: '',
-      layer: Tv2SourceLayer.REPLAY_VIZ_AUXILIARY,
+      layer: Tv2PieceLayer.REPLAY_VIZ_AUXILIARY,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,

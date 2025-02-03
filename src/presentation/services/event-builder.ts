@@ -33,6 +33,7 @@ import {
   ActionEventType,
   ActionTriggerEventType,
   ConfigurationEventType,
+  DeviceEventType,
   IngestEventType,
   RundownEventType,
   StatusMessageEventType
@@ -63,8 +64,17 @@ import { ActionEventBuilder } from '../interfaces/action-event-builder'
 import { Action } from '../../model/entities/action'
 import { ActionsUpdatedEvent } from '../value-objects/action-event'
 import { ActionDto } from '../dtos/action-dto'
+import { DeviceEventBuilder } from '../interfaces/device-event-builder'
+import { Device } from '../../model/entities/device'
+import {
+  DeviceCreatedEvent,
+  DeviceDeletedEvent,
+  DeviceUpdatedEvent,
+  VideoMixerConfigurationUpdatedEvent
+} from '../value-objects/device-event'
+import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
 
-export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -349,6 +359,38 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
       timestamp: Date.now(),
       rundownId,
       actions: actions.map(action => new ActionDto(action))
+    }
+  }
+
+  public buildDeviceCreatedEvent(device: Device): DeviceCreatedEvent {
+    return {
+      type: DeviceEventType.DEVICE_CREATED,
+      timestamp: Date.now(),
+      device
+    }
+  }
+
+  public buildDeviceUpdatedEvent(device: Device): DeviceUpdatedEvent {
+    return {
+      type: DeviceEventType.DEVICE_UPDATED,
+      timestamp: Date.now(),
+      device
+    }
+  }
+
+  public buildDeviceDeletedEvent(deviceId: string): DeviceDeletedEvent {
+    return {
+      type: DeviceEventType.DEVICE_DELETED,
+      timestamp: Date.now(),
+      deviceId
+    }
+  }
+
+  public buildVideoMixerConfigurationUpdatedEvent(videoMixerConfiguration: VideoMixerConfiguration): VideoMixerConfigurationUpdatedEvent {
+    return {
+      type: DeviceEventType.VIDEO_MIXER_CONFIGURATION_UPDATED,
+      videoMixer: videoMixerConfiguration,
+      timestamp: Date.now()
     }
   }
 }

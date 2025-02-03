@@ -122,7 +122,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const testee: TimelineBuilder = createTestee()
           const timeline: Timeline = await testee.buildTimeline(rundown, createBasicStudioMock())
 
-          const expectedGroupIdForPart = `${ACTIVE_GROUP_PREFIX}${rundown.getActivePart().id}`
+          const expectedGroupIdForPart: string = `${ACTIVE_GROUP_PREFIX}${rundown.getActivePart().id}`
           const result: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
             (group) => group.id === expectedGroupIdForPart
           )
@@ -201,7 +201,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find((group) =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
             )!
-            const expectedControlIdForPiece = `${activeGroup.id}${PIECE_CONTROL_INFIX}${piece.id}`
+            const expectedControlIdForPiece: string = `${activeGroup.id}${PIECE_CONTROL_INFIX}${piece.id}`
             const controlGroup: TimelineObject | undefined = activeGroup.children.find(
               (child) => child.id === expectedControlIdForPiece
             )
@@ -340,7 +340,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find((group) =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
                 )!
-                const expectedControlIdForPiece = `${activeGroup.id}${PIECE_CONTROL_INFIX}${piece.id}`
+                const expectedControlIdForPiece: string = `${activeGroup.id}${PIECE_CONTROL_INFIX}${piece.id}`
                 const controlObject: TimelineObject | undefined = activeGroup.children.find(
                   (child) => child.id === expectedControlIdForPiece
                 )
@@ -1334,7 +1334,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find((group) =>
                 group.id.includes(PREVIOUS_GROUP_PREFIX)
               )!
-              const expectedControlIdForPiece = `${previousGroup.id}${PIECE_CONTROL_INFIX}${piece.id}`
+              const expectedControlIdForPiece: string = `${previousGroup.id}${PIECE_CONTROL_INFIX}${piece.id}`
               const controlGroup: TimelineObject | undefined = previousGroup.children.find(
                 (child) => child.id === expectedControlIdForPiece
               )

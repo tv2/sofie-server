@@ -3,7 +3,7 @@ import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
@@ -76,7 +76,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
       partId: parentPartId,
       rundownId: '',
       name: `KAM ${source.name}`,
-      layer: Tv2SourceLayer.CAMERA,
+      layer: Tv2PieceLayer.CAMERA,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,

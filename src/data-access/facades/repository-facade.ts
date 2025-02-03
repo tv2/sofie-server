@@ -56,16 +56,12 @@ import { SystemInformationRepository } from '../repositories/interfaces/system-i
 import { MongoSystemInformationRepository } from '../repositories/mongo/mongo-system-information-repository'
 import { ShelfConfigurationRepository } from '../repositories/interfaces/shelf-configuration-repository'
 import { MongoShelfRepository } from '../repositories/mongo/mongo-shelf-repository'
-import { Device } from '../../model/entities/device'
 import { MongoDeviceChangedListener } from '../repositories/mongo/mongo-device-changed-listener'
 import { StatusMessageRepository } from '../repositories/interfaces/status-message-repository'
 import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status-message-repository'
-import { DeviceRepository } from '../repositories/interfaces/device-repository'
-import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
+import { MongoCoreDeviceRepository } from '../repositories/mongo/mongo-core-device-repository'
 import { ShowStyle } from '../../model/entities/show-style'
-import {
-  MongoShowStyleChangedListener
-} from '../repositories/mongo/mongo-show-style-changed-listener'
+import { MongoShowStyleChangedListener } from '../repositories/mongo/mongo-show-style-changed-listener'
 import { Database } from '../repositories/interfaces/database'
 import { ShowStyleVariant } from '../../model/entities/show-style-variant'
 import {
@@ -75,10 +71,15 @@ import { RundownAggregateRepository } from '../repositories/interfaces/rundown-a
 import { IngestedPiece } from '../../model/entities/ingested-piece'
 import { PieceRepository } from '../repositories/interfaces/piece-repository'
 import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-ingested-piece-changed-listener'
+import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
+import { DeviceRepository } from '../repositories/interfaces/device-repository'
+import { Device } from '../../model/entities/device'
+import { VideoMixerDeviceRepository } from '../repositories/interfaces/video-mixer-device-repository'
+import { MongoVideoMixerDeviceRepository } from '../repositories/mongo/mongo-video-mixer-device-repository'
+import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
 import { MongoExpectedPlayoutItemRepository } from '../repositories/mongo/mongo-expected-playout-item-repository'
 
 export class RepositoryFacade {
-
   public static getDatabase(): Database {
     return MongoDatabase.getInstance(LoggerFacade.createLogger())
   }
@@ -286,12 +287,17 @@ export class RepositoryFacade {
     )
   }
 
-  public static createDeviceRepository(): DeviceRepository {
-    return new MongoDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
+  public static createCoreDeviceRepository(): DeviceRepository {
+    return new MongoCoreDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
   }
 
   public static createStatusMessageRepository(): StatusMessageRepository {
     return new MongoStatusMessageRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
+  }
+
+  public static createDeviceRepository(): DeviceRepository {
+    return new MongoDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()),
+      this.createUuidGenerator() )
   }
 
   private static createUuidGenerator(): UuidGenerator {
@@ -300,5 +306,9 @@ export class RepositoryFacade {
 
   private static createExpectedPlayoutItemRepository(): MongoExpectedPlayoutItemRepository {
     return new MongoExpectedPlayoutItemRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
+  }
+
+  public static createVideoMixerDeviceRepository(): VideoMixerDeviceRepository {
+    return new MongoVideoMixerDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), EventEmitterFacade.createDeviceEventEmitter())
   }
 }

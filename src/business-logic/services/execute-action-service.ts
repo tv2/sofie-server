@@ -9,11 +9,13 @@ import {
   MutateActionWithMedia,
   MutateActionWithPieceMethods,
   PartAction,
-  PieceAction
+  PieceAction,
+  SystemAction,
+  SystemActionId
 } from '../../model/entities/action'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { ActionRepository } from '../../data-access/repositories/interfaces/action-repository'
-import { PartActionType, PieceActionType } from '../../model/enums/action-type'
+import { PartActionType, PieceActionType, SystemActionType } from '../../model/enums/action-type'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
 import { RundownService } from './interfaces/rundown-service'
 import { Part, PartInterface } from '../../model/entities/part'
@@ -24,6 +26,68 @@ import { MediaRepository } from '../../data-access/repositories/interfaces/media
 import { Media } from '../../model/entities/media'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
+import { SetNextDirection } from '../../model/enums/set-next-direction'
+import { Tv2ActionContentType } from '../../blueprints/tv2/value-objects/tv2-action'
+
+const SYSTEM_ACTIONS_ID: string = 'SYSTEM_ACTIONS_ID'
+
+const SYSTEM_ACTIONS: SystemAction[] = [
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.TAKE,
+    name: 'Take',
+    description: 'Executes a Take',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.SET_NEXT_PART,
+    name: 'Set next Part',
+    description: 'Sets the Part after the next Part as next',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.SET_PREVIOUS_PART,
+    name: 'Set previous Part',
+    description: 'Sets the Part before the next Part as next',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.SET_NEXT_SEGMENT,
+    name: 'Set next Segment',
+    description: 'Sets the the Segment after the next Segment as next',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.SET_PREVIOUS_SEGMENT,
+    name: 'Set previous Segment',
+    description: 'Sets the Segment before the next Segment as next',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+]
 
 export class ExecuteActionService implements ActionService {
   constructor(
@@ -35,7 +99,25 @@ export class ExecuteActionService implements ActionService {
     private readonly blueprint: Blueprint
   ) {}
 
+  public async getActionsForRundown(rundownId :string): Promise<Action[]> {
+    return [
+      ...rundownId === SYSTEM_ACTIONS_ID ? SYSTEM_ACTIONS : [],
+      ...await this.actionRepository.getActionsForRundown(rundownId)
+    ]
+  }
+
+  public async getSystemActions(): Promise<Action[]> {
+    return [
+      ...SYSTEM_ACTIONS,
+      ...await this.actionRepository.getSystemActions()
+    ]
+  }
+
   public async executeAction(actionId: string, rundownId: string, actionArguments?: unknown): Promise<void> {
+    if (Object.values(SystemActionId).includes(actionId as SystemActionId)) {
+      await this.executeSystemAction(actionId as SystemActionId, rundownId)
+      return
+    }
     const action: Action = await this.actionRepository.getAction(actionId)
     switch (action.type) {
       case PartActionType.INSERT_PART_AS_ON_AIR: {
@@ -73,13 +155,38 @@ export class ExecuteActionService implements ActionService {
     }
   }
 
+  private async executeSystemAction(systemActionId: SystemActionId, rundownId: string): Promise<void> {
+    switch (systemActionId) {
+      case SystemActionId.TAKE: {
+        await this.rundownService.takeNext(rundownId)
+        break
+      }
+      case SystemActionId.SET_NEXT_PART: {
+        await this.rundownService.setNextFromDirection(rundownId, SetNextDirection.PART_AFTER_NEXT_PART)
+        break
+      }
+      case SystemActionId.SET_PREVIOUS_PART: {
+        await this.rundownService.setNextFromDirection(rundownId, SetNextDirection.PART_BEFORE_NEXT_PART)
+        break
+      }
+      case SystemActionId.SET_NEXT_SEGMENT: {
+        await this.rundownService.setNextFromDirection(rundownId, SetNextDirection.SEGMENT_AFTER_NEXT_SEGMENT)
+        break
+      }
+      case SystemActionId.SET_PREVIOUS_SEGMENT: {
+        await this.rundownService.setNextFromDirection(rundownId, SetNextDirection.SEGMENT_BEFORE_NEXT_SEGMENT)
+        break
+      }
+    }
+  }
+
   private async mutateAction(action: Action, rundownId: string, actionArguments: unknown): Promise<Action> {
     const mutateActionMethodsArray: MutateActionMethods[] = this.getMutateActionsMethodsFromAction(action)
     if (!mutateActionMethodsArray) {
       return action
     }
 
-    for (let i = 0; i < mutateActionMethodsArray.length; i++) {
+    for (let i: number = 0; i < mutateActionMethodsArray.length; i++) {
       const mutateActionMethods: MutateActionMethods = mutateActionMethodsArray[i]
       action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
     }
@@ -208,7 +315,7 @@ export class ExecuteActionService implements ActionService {
 
     let pieceFromRundown: Piece | undefined
 
-    for (let i = 0; i < mutateActionMethodsSequence.length; i++) {
+    for (let i: number = 0; i < mutateActionMethodsSequence.length; i++) {
       const mutateActionMethods: MutateActionMethods = mutateActionMethodsSequence[i]
       if (mutateActionMethods.type !== MutateActionType.PIECE) {
         action = await this.executeMutateActionMethods(action, mutateActionMethods, rundownId, actionArguments)
