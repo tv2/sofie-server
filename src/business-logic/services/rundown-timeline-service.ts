@@ -23,6 +23,7 @@ import { PlayoutService } from './interfaces/playoutService'
 import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-exception'
 import { RundownCursor } from '../../model/value-objects/rundown-cursor'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
+import { TakeMode } from '../../model/enums/take-mode'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -40,6 +41,12 @@ export class RundownTimelineService implements RundownService {
     logger: Logger,
   ) {
     this.logger = logger.tag(this.constructor.name)
+  }
+
+  public async setTakeMode(rundownId: string, takeMode: TakeMode): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    rundown.setTakeMode(takeMode)
+    await this.saveRundown(rundown)
   }
 
   public async activateRundown(rundownId: string): Promise<void> {

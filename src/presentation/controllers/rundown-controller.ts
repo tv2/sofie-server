@@ -12,6 +12,7 @@ import { Owner } from '../../model/enums/owner'
 import { IngestService } from '../../business-logic/services/interfaces/ingest-service'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
+import {TakeMode} from '../../model/enums/take-mode'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -74,6 +75,18 @@ export class RundownController extends BaseController {
       const rundownId: string = request.params.rundownId
       await this.rundownService.deactivateRundown(rundownId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully deactivated` ))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @PutRequest('/:rundownId/takeMode')
+  public async takeMode(request: Request, response: Response): Promise<void> {
+    try {
+      const rundownId: string = request.params.rundownId
+      const takeMode: TakeMode = request.params.takeMode as TakeMode
+      await this.rundownService.setTakeMode(rundownId, takeMode)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully set Take Mode to ${takeMode}` ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }

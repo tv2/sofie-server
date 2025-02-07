@@ -5,10 +5,15 @@ import { InTransition } from '../../model/value-objects/in-transition'
 import { RundownService } from './interfaces/rundown-service'
 import { AsyncLock } from '../async-lock'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
+import { TakeMode } from '../../model/enums/take-mode'
 
 export class SynchronizedRundownService implements RundownService {
 
   constructor(private readonly rundownService: RundownService, private readonly rundownLock: AsyncLock) {
+  }
+
+  public setTakeMode(rundownId: string, takeMode: TakeMode): Promise<void> {
+    return this.rundownLock.withLock(this.setTakeMode.name, () => this.rundownService.setTakeMode(rundownId, takeMode))
   }
 
   public takeNext(rundownId: string): Promise<void> {

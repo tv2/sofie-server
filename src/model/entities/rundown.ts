@@ -263,6 +263,10 @@ export class Rundown extends BasicRundown {
     this.clearNextCursor()
   }
 
+  public setTakeMode(takeMode: TakeMode): void {
+    this.takeMode = takeMode
+  }
+
   private assertActive(operationName: string): void {
     if (this.mode === RundownMode.INACTIVE) {
       throw new NotActivatedException(`Rundown "${this.name}" is not active. Unable to ${operationName}`)

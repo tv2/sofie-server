@@ -15,8 +15,8 @@ export class BasicRundownDto {
     this.id = basicRundown.id
     this.name = basicRundown.name
     this.mode = basicRundown.getMode()
+    this.takeMode = basicRundown.getTakeMode()
     this.modifiedAt = basicRundown.getLastTimeModified()
     this.timing = basicRundown.timing
-    this.takeMode = basicRundown.getTakeMode()
   }
 }

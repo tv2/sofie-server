@@ -1,10 +1,11 @@
-import { IngestRundownSynchronizer, RundownSynchronizeResult } from '../ingest-rundown-synchronizer'
-import { IngestedEntityToEntityMapper } from '../ingested-entity-to-entity-mapper'
-import { EntityChangeDetector } from '../entity-change-detector'
-import { Rundown } from '../../../model/entities/rundown'
-import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
-import { IngestedRundown } from '../../../model/entities/ingested-rundown'
-import { RundownMode } from '../../../model/enums/rundown-mode'
+import {IngestRundownSynchronizer, RundownSynchronizeResult} from '../ingest-rundown-synchronizer'
+import {IngestedEntityToEntityMapper} from '../ingested-entity-to-entity-mapper'
+import {EntityChangeDetector} from '../entity-change-detector'
+import {Rundown} from '../../../model/entities/rundown'
+import {EntityTestFactory} from '../../../model/entities/test/entity-test-factory'
+import {IngestedRundown} from '../../../model/entities/ingested-rundown'
+import {RundownMode} from '../../../model/enums/rundown-mode'
+import {TakeMode} from '../../../model/enums/take-mode'
 
 describe(IngestRundownSynchronizer.name, () => {
   describe(IngestRundownSynchronizer.prototype.synchronizeRundown.name, () => {
@@ -51,6 +52,17 @@ describe(IngestRundownSynchronizer.name, () => {
         const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.updatedRundown?.getMode()).toBe(RundownMode.ACTIVE)
+        expect(result.updatedRundown?.getTakeMode()).toBe(TakeMode.STANDARD)
+      })
+
+      it('returns a rundown with the same take mode', () => {
+        const rundown: Rundown = EntityTestFactory.createRundown({ id: 'rundown-a', modifiedAt: 0, showStyleVariantId: 'show-style-variant-a', mode: RundownMode.ACTIVE, takeMode: TakeMode.RECALL })
+        const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({ id: 'rundown-a', modifiedAt: 100, showStyleVariantId: 'show-style-variant-b' })
+        const testee: IngestRundownSynchronizer = createTestee()
+
+        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+
+        expect(result.updatedRundown?.getTakeMode()).toBe(TakeMode.RECALL)
       })
     })
 
