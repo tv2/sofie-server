@@ -1,14 +1,15 @@
-import { IngestedPiece } from '../../model/entities/ingested-piece'
-import { Piece } from '../../model/entities/piece'
-import { IngestedPart } from '../../model/entities/ingested-part'
-import { Part } from '../../model/entities/part'
-import { PartTimings } from '../../model/value-objects/part-timings'
-import { IngestedSegment } from '../../model/entities/ingested-segment'
-import { Segment } from '../../model/entities/segment'
-import { IngestedRundown } from '../../model/entities/ingested-rundown'
-import { Rundown, RundownAlreadyActiveProperties } from '../../model/entities/rundown'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
-import { RundownMode } from '../../model/enums/rundown-mode'
+import {IngestedPiece} from '../../model/entities/ingested-piece'
+import {Piece} from '../../model/entities/piece'
+import {IngestedPart} from '../../model/entities/ingested-part'
+import {Part} from '../../model/entities/part'
+import {PartTimings} from '../../model/value-objects/part-timings'
+import {IngestedSegment} from '../../model/entities/ingested-segment'
+import {Segment} from '../../model/entities/segment'
+import {IngestedRundown} from '../../model/entities/ingested-rundown'
+import {Rundown, RundownAlreadyActiveProperties} from '../../model/entities/rundown'
+import {UnsupportedOperationException} from '../../model/exceptions/unsupported-operation-exception'
+import {RundownMode} from '../../model/enums/rundown-mode'
+import {TakeMode} from '../../model/enums/take-mode'
 
 export class IngestedEntityToEntityMapper {
 
@@ -20,6 +21,7 @@ export class IngestedEntityToEntityMapper {
       segments: [],
       history: [],
       mode: RundownMode.INACTIVE,
+      takeMode: TakeMode.STANDARD,
       modifiedAt: ingestedRundown.modifiedAt,
       baselineTimelineObjects: ingestedRundown.baselineTimelineObjects,
       timing: ingestedRundown.timings
@@ -39,6 +41,7 @@ export class IngestedEntityToEntityMapper {
       ...ingestedRundown,
       id: rundownToUpdate.id,
       mode: rundownToUpdate.getMode(),
+      takeMode: rundownToUpdate.getTakeMode(),
       history: rundownToUpdate.getHistory(),
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),

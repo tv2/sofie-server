@@ -34,6 +34,7 @@ import { Action, ActionArgument } from '../../../model/entities/action'
 import { ActionType } from '../../../model/enums/action-type'
 import { Device } from '../../../model/entities/device'
 import { DeviceType } from '../../../model/enums/device-type'
+import {TakeMode} from '../../../model/enums/take-mode'
 
 
 export interface MongoId {
@@ -45,6 +46,7 @@ export interface MongoRundown extends MongoId {
   showStyleVariantId: string
   segmentIds: string[]
   mode: RundownMode
+  takeMode: TakeMode
   baselineTimelineObjects: TimelineObject[]
   modifiedAt: number
 
@@ -227,6 +229,7 @@ export class MongoEntityConverter {
       name: mongoRundown.name,
       showStyleVariantId: mongoRundown.showStyleVariantId,
       mode: mongoRundown.mode ?? RundownMode.INACTIVE,
+      takeMode: mongoRundown.takeMode ?? TakeMode.STANDARD,
       baselineTimelineObjects: mongoRundown.baselineTimelineObjects,
       segments,
       modifiedAt: mongoRundown.modifiedAt,
@@ -277,6 +280,7 @@ export class MongoEntityConverter {
       nextCursor: this.convertRundownCursorToMongoRundownCursor(rundown.getNextCursor()),
       history: rundown.getHistory().map(part => this.convertToMongoPart(part)),
       mode: rundown.getMode(),
+      takeMode: rundown.getTakeMode(),
       timing: rundown.timing
     }
   }
@@ -297,6 +301,7 @@ export class MongoEntityConverter {
       mongoRundown._id,
       mongoRundown.name,
       mongoRundown.mode ?? RundownMode.INACTIVE,
+      mongoRundown.takeMode ?? TakeMode.STANDARD,
       mongoRundown.modifiedAt,
       mongoRundown.timing
     )
