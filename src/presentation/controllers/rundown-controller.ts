@@ -12,7 +12,8 @@ import { Owner } from '../../model/enums/owner'
 import { IngestService } from '../../business-logic/services/interfaces/ingest-service'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
-import {TakeMode} from '../../model/enums/take-mode'
+import { TakeMode } from '../../model/enums/take-mode'
+import { Tv2Logger } from '../../blueprints/tv2/tv2-logger'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -21,9 +22,11 @@ export class RundownController extends BaseController {
     private readonly rundownRepository: RundownRepository,
     private readonly ingestService: IngestService,
     private readonly httpErrorHandler: HttpErrorHandler,
-    private readonly httpResponseFormatter: HttpResponseFormatter
+    private readonly httpResponseFormatter: HttpResponseFormatter,
+    private readonly logger: Tv2Logger
   ) {
     super()
+    this.logger = logger.tag(this.constructor.name)
   }
 
   @GetRequest('/basic')
@@ -86,7 +89,9 @@ export class RundownController extends BaseController {
       const rundownId: string = request.params.rundownId
       const takeMode: TakeMode = TakeMode[request.params.takeMode as keyof typeof TakeMode]
       if (takeMode === undefined) {
-        response.send(this.httpResponseFormatter.formatFailResponse(`Rundown "${rundownId}" failed to set it's Take Mode, since "${request.params.takeMode}" isn't a valid input.` ))
+        const errorMessage: string = `Rundown "${rundownId}" failed to set it's Take Mode, since "${request.params.takeMode}" isn't a valid input.`
+        this.logger.error(errorMessage)
+        response.send(this.httpResponseFormatter.formatFailResponse(errorMessage))
         return
       }
       await this.rundownService.setTakeMode(rundownId, takeMode)
