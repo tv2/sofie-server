@@ -80,11 +80,15 @@ export class RundownController extends BaseController {
     }
   }
 
-  @PutRequest('/:rundownId/takeMode')
+  @PutRequest('/:rundownId/takeMode/:takeMode')
   public async takeMode(request: Request, response: Response): Promise<void> {
     try {
       const rundownId: string = request.params.rundownId
-      const takeMode: TakeMode = request.params.takeMode as TakeMode
+      const takeMode: TakeMode = TakeMode[request.params.takeMode as keyof typeof TakeMode]
+      if (takeMode === undefined) {
+        response.send(this.httpResponseFormatter.formatFailResponse(`Rundown "${rundownId}" failed to set it's Take Mode, since "${request.params.takeMode}" isn't a valid input.` ))
+        return
+      }
       await this.rundownService.setTakeMode(rundownId, takeMode)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully set Take Mode to ${takeMode}` ))
     } catch (error) {
