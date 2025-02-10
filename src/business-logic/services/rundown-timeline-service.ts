@@ -45,8 +45,13 @@ export class RundownTimelineService implements RundownService {
 
   public async setTakeMode(rundownId: string, takeMode: TakeMode): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    if (takeMode === rundown.getTakeMode()) {
+      this.logger.debug(`Rundown: ${rundown.id} already has a takeMode of ${takeMode}.`)
+      return
+    }
     rundown.setTakeMode(takeMode)
     await this.saveRundown(rundown)
+    this.rundownEventEmitter.emitRundownUpdated(rundown)
   }
 
   public async activateRundown(rundownId: string): Promise<void> {

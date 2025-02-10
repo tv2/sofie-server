@@ -28,7 +28,7 @@ import { InvalidPartException } from '../exceptions/invalid-part-exception'
 import { SetNextDirection } from '../enums/set-next-direction'
 import { FirstPartInSegmentException } from '../exceptions/first-part-in-segment-exception'
 import { FirstSegmentInRundownException } from '../exceptions/first-segment-in-rundown-exception'
-import {TakeMode} from '../enums/take-mode'
+import { TakeMode } from '../enums/take-mode'
 
 export interface RundownInterface {
   id: string

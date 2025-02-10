@@ -34,7 +34,7 @@ import { Action, ActionArgument } from '../../../model/entities/action'
 import { ActionType } from '../../../model/enums/action-type'
 import { Device } from '../../../model/entities/device'
 import { DeviceType } from '../../../model/enums/device-type'
-import {TakeMode} from '../../../model/enums/take-mode'
+import { TakeMode } from '../../../model/enums/take-mode'
 
 
 export interface MongoId {

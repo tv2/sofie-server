@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController} from './base-controller'
 import { RundownService } from '../../business-logic/services/interfaces/rundown-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
@@ -14,6 +14,7 @@ import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
 import { TakeMode } from '../../model/enums/take-mode'
 import { Tv2Logger } from '../../blueprints/tv2/tv2-logger'
+import { ErrorCode } from '../../model/enums/error-code'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -91,7 +92,7 @@ export class RundownController extends BaseController {
       if (takeMode === undefined) {
         const errorMessage: string = `Rundown "${rundownId}" failed to set it's Take Mode, since "${request.params.takeMode}" isn't a valid input.`
         this.logger.error(errorMessage)
-        response.send(this.httpResponseFormatter.formatFailResponse(errorMessage))
+        response.send(this.httpResponseFormatter.formatErrorResponse(errorMessage, ErrorCode.BAD_REQUEST))
         return
       }
       await this.rundownService.setTakeMode(rundownId, takeMode)
