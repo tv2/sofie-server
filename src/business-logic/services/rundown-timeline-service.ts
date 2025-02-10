@@ -159,10 +159,21 @@ export class RundownTimelineService implements RundownService {
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
+    let swappedPart: Part | undefined = undefined
+    const previousPart: Part | undefined = rundown.getPreviousPart()
+    if (previousPart) {
+      swappedPart = previousPart.createSwaptomationCopy()
+      rundown.insertPartAsNext(swappedPart)
+    }
+
     const timeline: Timeline = await this.buildAndPersistTimeline(rundown)
 
     this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
+
+    if (swappedPart) {
+      this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, swappedPart)
+    }
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundown.id)

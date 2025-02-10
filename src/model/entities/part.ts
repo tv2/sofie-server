@@ -390,11 +390,37 @@ export class Part {
   }
 
   public clone(): Part {
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { isPartOnAir: false, isPartNext: false})
   }
 
   public getUnsyncedCopy(): Part {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
+  }
+
+  public createSwaptomationCopy(): Part {
+    const partInterface: PartInterface = {
+      id: `SWAPPED_${this.id}`,
+      rundownId: this.rundownId,
+      segmentId: '',
+      name: `SWAPPED_${this.name}`,
+      rank: -1,
+      isOnAir: false,
+      isNext: false,
+      isUntimed: false,
+      isUnsynced: false,
+      inTransition: {
+        blockTakeDuration: 0,
+        keepPreviousPartAliveDuration: 0,
+        delayPiecesDuration: 0
+      },
+      outTransition: {
+        keepAliveDuration: 0
+      },
+      disableNextInTransition: false,
+      pieces: this.pieces
+    }
+    return new Part(partInterface)
+    // return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `SWAPPED_${this.id}`, name: `SWAPPED_${this.name}`, isPlanned: false, isPartOnAir: false, isPartNext: false, executedAt: 0 })
   }
 
   public updateInTransition(inTransition: InTransition): void {
