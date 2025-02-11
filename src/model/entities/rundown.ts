@@ -28,6 +28,7 @@ import { InvalidPartException } from '../exceptions/invalid-part-exception'
 import { SetNextDirection } from '../enums/set-next-direction'
 import { FirstPartInSegmentException } from '../exceptions/first-part-in-segment-exception'
 import { FirstSegmentInRundownException } from '../exceptions/first-segment-in-rundown-exception'
+import { TakeMode } from '../enums/take-mode'
 
 export interface RundownInterface {
   id: string
@@ -36,6 +37,7 @@ export interface RundownInterface {
   segments: Segment[]
   baselineTimelineObjects: TimelineObject[]
   mode: RundownMode
+  takeMode: TakeMode
   modifiedAt: number
   persistentState?: RundownPersistentState
   history: Part[]
@@ -70,7 +72,7 @@ export class Rundown extends BasicRundown {
   private history: Part[]
 
   constructor(rundown: RundownInterface) {
-    super(rundown.id, rundown.name, rundown.mode, rundown.modifiedAt, rundown.timing)
+    super(rundown.id, rundown.name, rundown.mode, rundown.takeMode, rundown.modifiedAt, rundown.timing)
     this.segments = rundown.segments ? [...rundown.segments].sort(this.compareSegments) : []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
@@ -259,6 +261,10 @@ export class Rundown extends BasicRundown {
     this.mode = RundownMode.INACTIVE
     this.reset()
     this.clearNextCursor()
+  }
+
+  public setTakeMode(takeMode: TakeMode): void {
+    this.takeMode = takeMode
   }
 
   private assertActive(operationName: string): void {
