@@ -50,8 +50,8 @@ export class RundownTimelineService implements RundownService {
       return
     }
     rundown.setTakeMode(takeMode)
-    await this.saveRundown(rundown)
     this.rundownEventEmitter.emitRundownUpdated(rundown)
+    await this.saveRundown(rundown)
   }
 
   public async activateRundown(rundownId: string): Promise<void> {
