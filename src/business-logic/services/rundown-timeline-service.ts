@@ -10,7 +10,7 @@ import { RundownService } from './interfaces/rundown-service'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
-import { Part } from '../../model/entities/part'
+import { Part, PartInterface } from '../../model/entities/part'
 import { Owner } from '../../model/enums/owner'
 import { InTransition } from '../../model/value-objects/in-transition'
 import { AlreadyActivatedException } from '../../model/exceptions/already-activated-exception'
@@ -27,6 +27,7 @@ import { TakeMode } from '../../model/enums/take-mode'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
+  private recallPart: Part | undefined
 
   constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
@@ -171,10 +172,14 @@ export class RundownTimelineService implements RundownService {
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
+    this.shouldRecallPart(rundown)
+
     const timeline: Timeline = await this.buildAndPersistTimeline(rundown)
 
     this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
+
+    this.shouldEmitRecallPart(rundown)
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundown.id)
@@ -186,6 +191,49 @@ export class RundownTimelineService implements RundownService {
     if (rundown.getActiveSegment().definesShowStyleVariant) {
       this.ingestService.reloadIngestData(rundown.id).catch(error => this.logger.data(error).warn(`Request for reloading ingest data failed for rundown '${rundown.name}' with id '${rundown.id}'.`))
     }
+  }
+
+  private shouldRecallPart(rundown: Rundown): void {
+    if (rundown.getTakeMode() === TakeMode.STANDARD) {
+      return
+    }
+
+    const previousPart: Part | undefined = rundown.getPreviousPart()
+    if (previousPart) {
+      this.recallPart = this.createRecallPart(rundown.id, previousPart)
+      rundown.insertPartAsNext(this.recallPart)
+    }
+  }
+
+  private shouldEmitRecallPart(rundown: Rundown): void {
+    if (this.recallPart) {
+      this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, this.recallPart)
+    }
+  }
+
+  private createRecallPart(rundownId: string, part: Part): Part {
+    const partInterface: PartInterface = {
+      id: `RECALL_${part.id}`,
+      rundownId: rundownId,
+      segmentId: '',
+      name: part.name,
+      rank: -1,
+      isOnAir: false,
+      isNext: false,
+      isUntimed: false,
+      isUnsynced: false,
+      inTransition: {
+        blockTakeDuration: 0,
+        keepPreviousPartAliveDuration: 0,
+        delayPiecesDuration: 0
+      },
+      outTransition: {
+        keepAliveDuration: 0
+      },
+      disableNextInTransition: false,
+      pieces: part.pieces
+    }
+    return new Part(partInterface)
   }
 
   private assertTakeIsNotBlocked(rundown: Rundown): void {
@@ -314,6 +362,8 @@ export class RundownTimelineService implements RundownService {
     } else if (nextCursor) {
       rundown.setNextFromIds(nextCursor.segment.id, nextCursor.part.id, nextCursor.owner)
     }
+
+    this.shouldEmitRecallPart(rundown)
 
     await this.buildAndPersistTimeline(rundown)
 

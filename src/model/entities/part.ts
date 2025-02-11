@@ -63,7 +63,7 @@ export class Part {
   private segmentId: string
   private rank: number
 
-  private pieces: Piece[]
+  public pieces: Piece[]
   private replacedPlannedPieces: Piece[]
 
   private isPartOnAir: boolean
