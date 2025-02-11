@@ -28,6 +28,7 @@ import { ConfigurationRepository } from '../../data-access/repositories/interfac
 import { Configuration } from '../../model/entities/configuration'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
 import { Tv2ActionContentType } from '../../blueprints/tv2/value-objects/tv2-action'
+import { TakeMode } from '../../model/enums/take-mode'
 
 const SYSTEM_ACTIONS_ID: string = 'SYSTEM_ACTIONS_ID'
 
@@ -81,6 +82,28 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     id: SystemActionId.SET_PREVIOUS_SEGMENT,
     name: 'Set previous Segment',
     description: 'Sets the Segment before the next Segment as next',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.SET_TAKE_MODE_STANDARD,
+    name: 'Set Take Mode Standard',
+    description: 'Sets the Take mode to Standard behavior',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.SET_TAKE_MODE_RECALL,
+    name: 'Set Take Mode Recall',
+    description: 'Sets the Take mode to Recall behavior',
     rank: 0,
     data: undefined,
     metadata: {
@@ -175,6 +198,14 @@ export class ExecuteActionService implements ActionService {
       }
       case SystemActionId.SET_PREVIOUS_SEGMENT: {
         await this.rundownService.setNextFromDirection(rundownId, SetNextDirection.SEGMENT_BEFORE_NEXT_SEGMENT)
+        break
+      }
+      case SystemActionId.SET_TAKE_MODE_STANDARD: {
+        await this.rundownService.setTakeMode(rundownId,TakeMode.STANDARD)
+        break
+      }
+      case SystemActionId.SET_TAKE_MODE_RECALL: {
+        await this.rundownService.setTakeMode(rundownId,TakeMode.RECALL)
         break
       }
     }
