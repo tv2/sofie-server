@@ -63,7 +63,7 @@ export class Part {
   private segmentId: string
   private rank: number
 
-  public pieces: Piece[]
+  private pieces: Piece[]
   private replacedPlannedPieces: Piece[]
 
   private isPartOnAir: boolean
@@ -413,4 +413,30 @@ export class Part {
   public getReplacedPlannedPieces(): readonly Piece[] {
     return this.replacedPlannedPieces
   }
+
+  public getRecallClone(): Part {
+    const partInterface: PartInterface = {
+      id: `RECALL_${this.id}`,
+      rundownId: this.rundownId,
+      segmentId: '',
+      name: this.name,
+      rank: -1,
+      isOnAir: false,
+      isNext: false,
+      isUntimed: false,
+      isUnsynced: false,
+      inTransition: {
+        blockTakeDuration: 0,
+        keepPreviousPartAliveDuration: 0,
+        delayPiecesDuration: 0
+      },
+      outTransition: {
+        keepAliveDuration: 0
+      },
+      disableNextInTransition: false,
+      pieces: this.pieces
+    }
+    return new Part(partInterface)
+  }
+
 }

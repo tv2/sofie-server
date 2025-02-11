@@ -10,7 +10,7 @@ import { RundownService } from './interfaces/rundown-service'
 import { ActiveRundownException } from '../../model/exceptions/active-rundown-exception'
 import { Blueprint } from '../../model/value-objects/blueprint'
 import { PartEndState } from '../../model/value-objects/part-end-state'
-import { Part, PartInterface } from '../../model/entities/part'
+import { Part } from '../../model/entities/part'
 import { Owner } from '../../model/enums/owner'
 import { InTransition } from '../../model/value-objects/in-transition'
 import { AlreadyActivatedException } from '../../model/exceptions/already-activated-exception'
@@ -27,7 +27,6 @@ import { TakeMode } from '../../model/enums/take-mode'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
-  private recallPart: Part | undefined
 
   constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
@@ -172,14 +171,19 @@ export class RundownTimelineService implements RundownService {
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-    this.shouldRecallPart(rundown)
+    let recallPart: Part | undefined
+    if (this.shouldRecallPart(rundown)) {
+      recallPart = this.recallPreviousPart(rundown)
+    }
 
     const timeline: Timeline = await this.buildAndPersistTimeline(rundown)
 
     this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
 
-    this.shouldEmitRecallPart(rundown)
+    if (recallPart){
+      this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, recallPart)
+    }
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundown.id)
@@ -193,47 +197,18 @@ export class RundownTimelineService implements RundownService {
     }
   }
 
-  private shouldRecallPart(rundown: Rundown): void {
-    if (rundown.getTakeMode() === TakeMode.STANDARD) {
-      return
-    }
+  private shouldRecallPart(rundown: Rundown): boolean {
+    return rundown.getTakeMode() === TakeMode.RECALL
+  }
 
+  private recallPreviousPart(rundown: Rundown): Part | undefined {
     const previousPart: Part | undefined = rundown.getPreviousPart()
-    if (previousPart) {
-      this.recallPart = this.createRecallPart(rundown.id, previousPart)
-      rundown.insertPartAsNext(this.recallPart)
+    if (!previousPart) {
+      return undefined
     }
-  }
-
-  private shouldEmitRecallPart(rundown: Rundown): void {
-    if (this.recallPart) {
-      this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, this.recallPart)
-    }
-  }
-
-  private createRecallPart(rundownId: string, part: Part): Part {
-    const partInterface: PartInterface = {
-      id: `RECALL_${part.id}`,
-      rundownId: rundownId,
-      segmentId: '',
-      name: part.name,
-      rank: -1,
-      isOnAir: false,
-      isNext: false,
-      isUntimed: false,
-      isUnsynced: false,
-      inTransition: {
-        blockTakeDuration: 0,
-        keepPreviousPartAliveDuration: 0,
-        delayPiecesDuration: 0
-      },
-      outTransition: {
-        keepAliveDuration: 0
-      },
-      disableNextInTransition: false,
-      pieces: part.pieces
-    }
-    return new Part(partInterface)
+    const recallPart: Part = previousPart.getRecallClone()
+    rundown.insertPartAsNext(recallPart)
+    return recallPart
   }
 
   private assertTakeIsNotBlocked(rundown: Rundown): void {
@@ -357,13 +332,20 @@ export class RundownTimelineService implements RundownService {
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-    if (unplannedNextPartToKeepAsNextPart) {
+    let recallPart: Part | undefined
+    if (this.shouldRecallPart(rundown)) {
+      recallPart = this.recallPreviousPart(rundown)
+    }
+
+    if (recallPart) {
+      this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, recallPart)
+    }
+    else if (unplannedNextPartToKeepAsNextPart) {
       rundown.insertPartAsNext(unplannedNextPartToKeepAsNextPart)
     } else if (nextCursor) {
       rundown.setNextFromIds(nextCursor.segment.id, nextCursor.part.id, nextCursor.owner)
     }
 
-    this.shouldEmitRecallPart(rundown)
 
     await this.buildAndPersistTimeline(rundown)
 
