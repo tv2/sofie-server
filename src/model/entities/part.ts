@@ -414,9 +414,9 @@ export class Part {
     return this.replacedPlannedPieces
   }
 
-  public getRecallClone(): Part {
+  public getStrippedClone(): Part {
     const partInterface: PartInterface = {
-      id: `RECALL_${this.id}`,
+      id: `${this.id}_STRIPPED_CLONE`,
       rundownId: this.rundownId,
       segmentId: '',
       name: this.name,
@@ -434,7 +434,7 @@ export class Part {
         keepAliveDuration: 0
       },
       disableNextInTransition: false,
-      pieces: this.pieces
+      pieces: this.pieces // TODO: Filter pieces https://tv2cms.atlassian.net/browse/SOF-2477
     }
     return new Part(partInterface)
   }

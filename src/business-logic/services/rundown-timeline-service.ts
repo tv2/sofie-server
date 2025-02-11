@@ -206,7 +206,7 @@ export class RundownTimelineService implements RundownService {
     if (!previousPart) {
       return undefined
     }
-    const recallPart: Part = previousPart.getRecallClone()
+    const recallPart: Part = previousPart.getStrippedClone()
     rundown.insertPartAsNext(recallPart)
     return recallPart
   }
@@ -332,20 +332,11 @@ export class RundownTimelineService implements RundownService {
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
-    let recallPart: Part | undefined
-    if (this.shouldRecallPart(rundown)) {
-      recallPart = this.recallPreviousPart(rundown)
-    }
-
-    if (recallPart) {
-      this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, recallPart)
-    }
-    else if (unplannedNextPartToKeepAsNextPart) {
+    if (unplannedNextPartToKeepAsNextPart) {
       rundown.insertPartAsNext(unplannedNextPartToKeepAsNextPart)
     } else if (nextCursor) {
       rundown.setNextFromIds(nextCursor.segment.id, nextCursor.part.id, nextCursor.owner)
     }
-
 
     await this.buildAndPersistTimeline(rundown)
 
