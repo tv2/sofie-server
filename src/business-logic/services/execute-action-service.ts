@@ -201,11 +201,11 @@ export class ExecuteActionService implements ActionService {
         break
       }
       case SystemActionId.SET_TAKE_MODE_STANDARD: {
-        await this.rundownService.setTakeMode(rundownId,TakeMode.STANDARD)
+        await this.rundownService.setTakeMode(rundownId, TakeMode.STANDARD)
         break
       }
       case SystemActionId.SET_TAKE_MODE_RECALL: {
-        await this.rundownService.setTakeMode(rundownId,TakeMode.RECALL)
+        await this.rundownService.setTakeMode(rundownId, TakeMode.RECALL)
         break
       }
     }
