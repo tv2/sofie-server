@@ -413,4 +413,30 @@ export class Part {
   public getReplacedPlannedPieces(): readonly Piece[] {
     return this.replacedPlannedPieces
   }
+
+  public getStrippedClone(): Part {
+    const partInterface: PartInterface = {
+      id: `${this.id}_STRIPPED_CLONE`,
+      rundownId: this.rundownId,
+      segmentId: '',
+      name: this.name,
+      rank: -1,
+      isOnAir: false,
+      isNext: false,
+      isUntimed: false,
+      isUnsynced: false,
+      inTransition: {
+        blockTakeDuration: 0,
+        keepPreviousPartAliveDuration: 0,
+        delayPiecesDuration: 0
+      },
+      outTransition: {
+        keepAliveDuration: 0
+      },
+      disableNextInTransition: false,
+      pieces: this.pieces // TODO: Filter pieces https://tv2cms.atlassian.net/browse/SOF-2477
+    }
+    return new Part(partInterface)
+  }
+
 }

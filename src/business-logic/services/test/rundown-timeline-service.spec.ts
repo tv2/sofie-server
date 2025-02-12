@@ -650,6 +650,52 @@ describe(RundownTimelineService.name, () => {
         })
       })
     })
+    
+    describe('when a take mode is selected', () => {
+      const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
+      const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
+      const activeSegment: Segment = EntityTestFactory.createSegment({parts: [activePart]})
+      const activePartInfinitePiecesMap: Map<string, Piece> = new Map<string, Piece>([['activeLayerId', activePiece]])
+      const previousPiece: Piece = EntityTestFactory.createPiece({id: 'previousPieceId'})
+      const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPart', pieces: [previousPiece] })
+      const rundownMock: Rundown = EntityMockFactory.createActiveRundownMock({
+        activePart: activePart,
+        nextPart: nextPart,
+        previousPart: previousPart,
+        activeSegment: activeSegment,
+        infinitePiecesMap: activePartInfinitePiecesMap,
+      })
+
+      describe('and the take mode is Standard', () => {
+        it('should not emit partInsertedAsNext event', async () => {
+          const activeRundown: Rundown = instance(rundownMock)
+          const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+          const rundownRepository: RundownRepository = mock<RundownRepository>()
+
+          when(rundownMock.getTakeMode()).thenReturn(TakeMode.STANDARD)
+          when(rundownRepository.getRundown(activeRundown.id)).thenReturn(Promise.resolve(activeRundown))
+
+          const testee: RundownTimelineService = createTestee({rundownRepository, rundownEventEmitter})
+          await testee.takeNext(activeRundown.id)
+          verify(rundownEventEmitter.emitPartInsertedAsNextEvent(activeRundown, anything())).never()
+        })
+      })
+
+      describe('and the take mode is Recall', () => {
+        it('should emit partInsertedAsNext event', async () => {
+          const activeRundown: Rundown = instance(rundownMock)
+          const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+          const rundownRepository: RundownRepository = mock<RundownRepository>()
+
+          when(rundownMock.getTakeMode()).thenReturn(TakeMode.RECALL)
+          when(rundownRepository.getRundown(activeRundown.id)).thenReturn(Promise.resolve(activeRundown))
+
+          const testee: RundownTimelineService = createTestee({rundownRepository, rundownEventEmitter})
+          await testee.takeNext(activeRundown.id)
+          verify(rundownEventEmitter.emitPartInsertedAsNextEvent(activeRundown, anything())).once()
+        })
+      })
+    })
   })
 
   describe(`${RundownTimelineService.prototype.insertPartAsOnAir.name}`, () => {
