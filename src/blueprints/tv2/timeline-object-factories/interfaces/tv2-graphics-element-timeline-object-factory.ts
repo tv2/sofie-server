@@ -3,7 +3,7 @@ import {
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData
 } from '../../value-objects/tv2-action-manifest-data'
-import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
 
 export interface Tv2GraphicsElementTimelineObjectFactory {
   createFullscreenGraphicsTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2BlueprintTimelineObject

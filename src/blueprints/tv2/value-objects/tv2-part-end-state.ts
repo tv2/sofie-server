@@ -1,4 +1,4 @@
-import { Tv2SisyfosPersistenceMetadata } from './tv2-metadata'
+import { Tv2SisyfosPersistenceMetadata } from './tv2-blueprint-timeline-object'
 
 // These values are taken from "PartEndStateExt" in Blueprints
 export interface Tv2PartEndState {

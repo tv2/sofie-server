@@ -3,7 +3,7 @@ import { Tv2VideoClipManifestData } from '../../value-objects/tv2-action-manifes
 import { Tv2SourceMappingWithAudio } from '../../value-objects/tv2-studio-blueprint-configuration'
 import { DeviceType } from '../../../../model/enums/device-type'
 import { Tv2AudioMode } from '../../enums/tv2-audio-mode'
-import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
 
 export interface Tv2AudioMixerTimelineObjectFactory {
   createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, audioMode?: Tv2AudioMode): Tv2BlueprintTimelineObject[]

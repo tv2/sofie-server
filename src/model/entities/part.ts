@@ -399,15 +399,6 @@ export class Part {
 
   public updateInTransition(inTransition: InTransition): void {
     this.inTransition = inTransition
-    // Note: Leaving below code snippet here. I'm not entirely sure if there is any drawbacks by always overriding the InTransition.
-    // If we don't override, then if we change the transition from a Mix200 to Mix25, then the Take would still be blocked for the full 200 frames.
-    // TODO: If no issues has arose from overriding by the 1st of November 2024, this comment and the code snippet should be deleted.
-
-    // this.inTransition = {
-    //   blockTakeDuration: Math.max(inTransition.blockTakeDuration, this.inTransition.blockTakeDuration),
-    //   keepPreviousPartAliveDuration: Math.max(inTransition.keepPreviousPartAliveDuration, this.inTransition.keepPreviousPartAliveDuration),
-    //   delayPiecesDuration: Math.max(inTransition.delayPiecesDuration, this.inTransition.delayPiecesDuration)
-    // }
   }
 
   public getReplacedPlannedPieces(): readonly Piece[] {

@@ -3,7 +3,7 @@ import {
   VideoMixerWipeTransitionSettings
 } from './interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2TriCasterLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
-import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import {
   SplitScreenBoxProperties,
@@ -30,6 +30,7 @@ import { AtemSourceIndex } from '../../timeline-state-resolver-types/atem-types'
 import { AtemToTriCasterSplitScreenConverter } from '../helpers/atem-to-tricaster-split-screen-converter'
 import { TimelineObject } from '../../../model/entities/timeline-object'
 import { Tv2Logger } from '../tv2-logger'
+import { TimelineObjectMetadata } from '../../../model/value-objects/metadata'
 
 interface TriCasterTransitionEffectProperties {
   input: number
@@ -47,7 +48,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     this.logger = logger.tag(Tv2TriCasterVideoMixerTimelineObjectFactory.name)
   }
 
-  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return this.createTriCasterMeTimelineObjectForLayer(
       `${TRI_CASTER_PREFIX}program`,
       Tv2TriCasterLayer.PROGRAM,
@@ -61,7 +62,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     )
   }
 
-  private createTriCasterMeTimelineObjectForLayer(id: string, layer: Tv2TriCasterLayer, enable: TimelineEnable, me: TriCasterMixEffectProgramContent, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
+  private createTriCasterMeTimelineObjectForLayer(id: string, layer: Tv2TriCasterLayer, enable: TimelineEnable, me: TriCasterMixEffectProgramContent, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return {
       id: `${id}_${Math.floor(Math.random() * 100)}`,
       enable,
@@ -116,7 +117,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return this.createTriCasterMeTimelineObjectForLayer(
       `${TRI_CASTER_PREFIX}clean_feed`,
       Tv2TriCasterLayer.CLEAN_FEED,
@@ -322,7 +323,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createCutTransitionEffectTimelineObjects(sourceInput: number, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
+  public createCutTransitionEffectTimelineObjects(sourceInput: number, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
     const transitionEffectProperties: TriCasterTransitionEffectProperties = {
       input: sourceInput,
       transitionEffect: TriCasterTransition.CUT
@@ -333,7 +334,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     ]
   }
 
-  private createTransitionEffectTimelineObject(layer: Tv2TriCasterLayer, transitionEffectProperties: TriCasterTransitionEffectProperties, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
+  private createTransitionEffectTimelineObject(layer: Tv2TriCasterLayer, transitionEffectProperties: TriCasterTransitionEffectProperties, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return {
       id: `${layer}_${transitionEffectProperties.transitionEffect}`,
       enable: {
@@ -355,7 +356,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
+  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
     const transitionEffectProperties: TriCasterTransitionEffectProperties = {
       input: sourceInput,
       transitionEffect: TriCasterTransition.FADE,
@@ -367,7 +368,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     ]
   }
 
-  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, _dipInput: number, metadata?: Tv2TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
+  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, _dipInput: number, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
     const transitionEffectProperties: TriCasterTransitionEffectProperties = {
       input: sourceInput,
       transitionEffect: TriCasterTransition.DIP,

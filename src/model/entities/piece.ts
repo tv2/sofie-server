@@ -4,6 +4,7 @@ import { TransitionType } from '../enums/transition-type'
 import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import { PieceMetadata } from '../value-objects/metadata'
 
 export interface PieceInterface {
   id: string
@@ -21,7 +22,7 @@ export interface PieceInterface {
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
 
-  metadata?: unknown
+  metadata: PieceMetadata
   content?: unknown
   tags: string[]
   isUnsynced: boolean
@@ -41,7 +42,7 @@ export class Piece {
   public readonly postRollDuration: number
   public readonly transitionType: TransitionType
 
-  public readonly metadata?: unknown
+  public readonly metadata: PieceMetadata
   public readonly content?: unknown
   public readonly tags: string[]
 

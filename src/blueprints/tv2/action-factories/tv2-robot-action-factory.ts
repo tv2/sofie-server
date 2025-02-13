@@ -13,12 +13,12 @@ import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import {
   Tv2RobotTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-robot-timeline-object-factory'
 import { ActionFactory } from './action-factory'
+import { PieceType } from '../../../model/enums/piece-type'
+import { OutputLayer } from '../../../model/enums/output-layer'
 
 export class Tv2RobotActionFactory extends ActionFactory {
 
@@ -111,8 +111,8 @@ export class Tv2RobotActionFactory extends ActionFactory {
         this.robotTimelineObjectFactory.createCallPresetTimelineObject(preset)
       ],
       metadata: {
-        type: Tv2PieceType.COMMAND,
-        outputLayer: Tv2OutputLayer.SECONDARY
+        type: PieceType.COMMAND,
+        outputLayer: OutputLayer.SECONDARY
       }
     }
   }

@@ -5,7 +5,7 @@ import {
   SplitScreenLayoutProperties
 } from '../../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
-import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../../value-objects/tv2-blueprint-timeline-object'
 import { Piece } from '../../../../model/entities/piece'
 import { Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
 

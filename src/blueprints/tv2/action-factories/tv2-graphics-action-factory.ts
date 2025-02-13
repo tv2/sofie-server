@@ -31,9 +31,7 @@ import {
   Tv2PartAction,
   Tv2PieceAction
 } from '../value-objects/tv2-action'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData
@@ -52,6 +50,8 @@ import { ActionFactory } from './action-factory'
 import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
 import { Configuration } from '../../../model/entities/configuration'
 import { PieceInterface } from '../../../model/entities/piece'
+import { PieceType } from '../../../model/enums/piece-type'
+import { OutputLayer } from '../../../model/enums/output-layer'
 
 const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
   Tv2PieceLayer.GRAPHICS_IDENT,
@@ -217,8 +217,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
-        type: Tv2PieceType.COMMAND,
-        outputLayer: Tv2OutputLayer.SECONDARY,
+        type: PieceType.COMMAND,
+        outputLayer: OutputLayer.SECONDARY,
       },
       ...pieceInterfaceWithRequiredValues
     }
@@ -379,8 +379,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         ...videoMixerTimelineObjects
       ],
       metadata: {
-        type: Tv2PieceType.GRAPHICS,
-        outputLayer: Tv2OutputLayer.PROGRAM,
+        type: PieceType.GRAPHICS,
+        outputLayer: OutputLayer.PROGRAM,
         sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
       }
     })
@@ -490,8 +490,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
       ],
       metadata: {
-        type: Tv2PieceType.OVERLAY_GRAPHICS,
-        outputLayer: Tv2OutputLayer.OVERLAY
+        type: PieceType.OVERLAY_GRAPHICS,
+        outputLayer: OutputLayer.OVERLAY
       }
     })
     return {
@@ -523,8 +523,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
       ],
       metadata: {
-        type: Tv2PieceType.OVERLAY_GRAPHICS,
-        outputLayer: Tv2OutputLayer.OVERLAY
+        type: PieceType.OVERLAY_GRAPHICS,
+        outputLayer: OutputLayer.OVERLAY
       }
     })
 
@@ -554,8 +554,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       pieceLifespan: overlayGraphicsData.lifespan,
       timelineObjects: [elementTimelineObjectFactory.createPilotGraphicsTimelineObject(blueprintConfiguration, overlayGraphicsData)],
       metadata: {
-        type: Tv2PieceType.OVERLAY_GRAPHICS,
-        outputLayer: Tv2OutputLayer.OVERLAY
+        type: PieceType.OVERLAY_GRAPHICS,
+        outputLayer: OutputLayer.OVERLAY
       }
     })
 
