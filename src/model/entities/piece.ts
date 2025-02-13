@@ -162,6 +162,12 @@ export class Piece {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: unsyncedId})
   }
 
+  public copy(newPartId?: string): Piece {
+    const id: string = `${this.id}_COPY`
+    const partId: string = newPartId ?? this.partId
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: id, partId })
+  }
+
   public getTimelineObjects(): TimelineObject[] {
     return [...this.timelineObjects]
   }

@@ -11,6 +11,7 @@ import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 import { Invalidity } from '../value-objects/invalidity'
 import { InvalidPartException } from '../exceptions/invalid-part-exception'
+import { PieceType } from '../enums/piece-type'
 
 export interface PartInterface {
   id: string
@@ -406,8 +407,9 @@ export class Part {
   }
 
   public getStrippedClone(): Part {
+    const newPartId: string = `${this.id}_STRIPPED_CLONE`
     const partInterface: PartInterface = {
-      id: `${this.id}_STRIPPED_CLONE`,
+      id: newPartId,
       rundownId: this.rundownId,
       segmentId: '',
       name: this.name,
@@ -425,7 +427,16 @@ export class Part {
         keepAliveDuration: 0
       },
       disableNextInTransition: false,
-      pieces: this.pieces // TODO: Filter pieces https://tv2cms.atlassian.net/browse/SOF-2477
+      pieces: this.pieces.filter(piece => [
+        PieceType.CAMERA,
+        PieceType.REMOTE,
+        PieceType.REPLAY,
+        PieceType.GRAPHICS,
+        PieceType.SPLIT_SCREEN,
+        PieceType.VIDEO_CLIP,
+        PieceType.VOICE_OVER,
+        PieceType.JINGLE,
+      ].includes(piece.metadata.type)).map(piece => piece.copy(newPartId))
     }
     return new Part(partInterface)
   }
