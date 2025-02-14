@@ -1,8 +1,8 @@
-import { Tv2SisyfosPersistenceMetadata } from './tv2-metadata'
+import { SisyfosPersistenceMetadata } from '../../../model/value-objects/metadata'
 
 // These values are taken from "PartEndStateExt" in Blueprints
 export interface Tv2PartEndState {
-  sisyfosPersistenceMetadata: Tv2SisyfosPersistenceMetadata
+  sisyfosPersistenceMetadata: SisyfosPersistenceMetadata
   isJingle?: boolean
   fullFileName?: string
   serverPosition?: Tv2ServerPosition

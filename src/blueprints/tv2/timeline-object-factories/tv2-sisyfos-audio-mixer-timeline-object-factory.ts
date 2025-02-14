@@ -12,10 +12,10 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
-import { Tv2AudioMode } from '../enums/tv2-audio-mode'
+import { AudioMode } from '../../../model/enums/audio-mode'
 
 export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerTimelineObjectFactory {
-  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, audioMode?: Tv2AudioMode): SisyfosTimelineObject[] {
+  public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, audioMode?: AudioMode): SisyfosTimelineObject[] {
     const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.audioLayers.map(sisyfosLayer => {
       return {
         id: `${source.id}_${this.generateRandomWholeNumber()}`,
@@ -26,12 +26,12 @@ export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerT
         content: {
           deviceType: DeviceType.SISYFOS,
           type: SisyfosType.CHANNEL,
-          isPgm: audioMode === Tv2AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER: SisyfosFaderState.ON
+          isPgm: audioMode === AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER: SisyfosFaderState.ON
         }
       }
     })
 
-    if (source.usesStudioMicrophones || audioMode === Tv2AudioMode.VOICE_OVER) {
+    if (source.usesStudioMicrophones || audioMode === AudioMode.VOICE_OVER) {
       return [
         ...sisyfosChannelTimelineObjects,
         this.createStudioMicrophonesTimelineObject(configuration)
@@ -124,7 +124,7 @@ export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerT
       content: {
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNEL,
-        isPgm: videoClipData.audioMode === Tv2AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
+        isPgm: videoClipData.audioMode === AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
       }
     }
 

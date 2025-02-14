@@ -1,6 +1,6 @@
 import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
-import { Tv2PieceMetadata, Tv2SisyfosPersistenceMetadata } from '../value-objects/tv2-metadata'
+import { PieceMetadata, SisyfosPersistenceMetadata } from '../../../model/value-objects/metadata'
 
 export class Tv2SisyfosPersistentLayerFinder {
   public findLayersToPersist(
@@ -8,14 +8,14 @@ export class Tv2SisyfosPersistentLayerFinder {
     time: number | undefined,
     layersWantingToPersistFromPreviousPart: string[] = []
   ): string[] {
-    const lastPlayingPieceMetadata: Tv2SisyfosPersistenceMetadata | undefined = this.findLastPlayingPieceMetadata(part, time)
+    const lastPlayingPieceMetadata: SisyfosPersistenceMetadata | undefined = this.findLastPlayingPieceMetadata(part, time)
     if (!lastPlayingPieceMetadata) {
       return []
     }
     return this.findLayersToPersistForPieceMetadata(lastPlayingPieceMetadata, layersWantingToPersistFromPreviousPart)
   }
 
-  public findLastPlayingPieceMetadata(part: Part, time: number | undefined): Tv2SisyfosPersistenceMetadata | undefined {
+  public findLastPlayingPieceMetadata(part: Part, time: number | undefined): SisyfosPersistenceMetadata | undefined {
     time ??= Date.now()
 
     const piecesWithSisyfosMetadata: Piece[] = this.findPiecesWithSisyfosMetadata(part)
@@ -29,9 +29,7 @@ export class Tv2SisyfosPersistentLayerFinder {
       return undefined
     }
 
-    // .findPieceWithSisyfosMetadata() has already filtered all Pieces without SisyfosPersistenceMetadata away, so we know it's not undefined.
-    return (lastPlayingPiece.metadata as Tv2PieceMetadata)
-      .sisyfosPersistMetaData!
+    return lastPlayingPiece.metadata.sisyfosPersistMetaData
   }
 
   private findPiecesWithSisyfosMetadata(part: Part): Piece[] {
@@ -39,7 +37,7 @@ export class Tv2SisyfosPersistentLayerFinder {
       if (!piece.metadata) {
         return false
       }
-      const metadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
+      const metadata: PieceMetadata = piece.metadata as PieceMetadata
       return !!metadata.sisyfosPersistMetaData
     })
   }
@@ -59,7 +57,7 @@ export class Tv2SisyfosPersistentLayerFinder {
     return !hasPieceStoppedPlaying
   }
 
-  public findLayersToPersistForPieceMetadata(lastPlayingPieceMetadata: Tv2SisyfosPersistenceMetadata, layersWantingToPersistFromPreviousPart: string[]): string[] {
+  public findLayersToPersistForPieceMetadata(lastPlayingPieceMetadata: SisyfosPersistenceMetadata, layersWantingToPersistFromPreviousPart: string[]): string[] {
     if (!lastPlayingPieceMetadata.acceptsPersistedAudio) {
       return lastPlayingPieceMetadata.sisyfosLayers
     }

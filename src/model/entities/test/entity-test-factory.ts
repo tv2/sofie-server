@@ -17,6 +17,7 @@ import { IngestedRundown } from '../ingested-rundown'
 import { IngestedSegment } from '../ingested-segment'
 import { PieceActionType } from '../../enums/action-type'
 import { TakeMode } from '../../enums/take-mode'
+import { PieceType } from '../../enums/piece-type'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -154,6 +155,9 @@ export class EntityTestFactory {
       timelineObjects: [],
       tags: [],
       isUnsynced: false,
+      metadata: {
+        type: PieceType.UNKNOWN
+      },
       ...pieceInterface
     }
   }
@@ -171,6 +175,9 @@ export class EntityTestFactory {
       preRollDuration: 0,
       postRollDuration: 0,
       timelineObjects: [],
+      metadata: {
+        type: PieceType.UNKNOWN
+      },
       ...ingestedPiece
     }
   }
