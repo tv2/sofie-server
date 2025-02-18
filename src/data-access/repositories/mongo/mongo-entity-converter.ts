@@ -35,6 +35,7 @@ import { ActionType } from '../../../model/enums/action-type'
 import { Device } from '../../../model/entities/device'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TakeMode } from '../../../model/enums/take-mode'
+import { Macro, Operation } from '../../../model/entities/macro'
 
 
 export interface MongoId {
@@ -195,6 +196,12 @@ export interface MongoAction extends MongoId {
   metadata?: unknown
   rundownId?: string
   argument?: ActionArgument
+}
+
+export interface MongoMacro extends MongoId {
+  id: string
+  name: string
+  operations: Operation[]
 }
 
 export interface MongoDevice extends MongoId {
@@ -573,10 +580,25 @@ export class MongoEntityConverter {
     }
   }
 
+  public convertToMacro(mongoMacro: MongoMacro): Macro {
+    return {
+      id: mongoMacro.id,
+      name: mongoMacro.name,
+      operations: mongoMacro.operations
+    }
+  }
+
   public convertToMongoAction(action: Action): MongoAction {
     return {
       ...action,
       _id: action.id
+    }
+  }
+
+  public convertToMongoMacro(macro: Macro): MongoMacro {
+    return {
+      ...macro,
+      _id: macro.id
     }
   }
 }

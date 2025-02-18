@@ -13,6 +13,7 @@ import { MediaController } from '../controllers/media-controller'
 import { SystemInformationController } from '../controllers/system-information-controller'
 import { DeviceController } from '../controllers/device-controller'
 import { LoggerController } from '../controllers/logger-controller'
+import { MacroController } from '../controllers/macro-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -26,6 +27,7 @@ export class ControllerFacade {
       this.createSystemInformationController(),
       this.createDeviceController(),
       this.createLoggerController(),
+      this.createMacroController(),
     ]
   }
 
@@ -62,6 +64,13 @@ export class ControllerFacade {
   private static createActionTriggerController(): ActionTriggerController {
     return new ActionTriggerController(
       ServiceFacade.createActionTriggerService(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
+    )
+  }
+
+  private static createMacroController(): MacroController {
+    return new MacroController(ServiceFacade.createMacroService(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
