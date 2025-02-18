@@ -5,13 +5,14 @@ import {
   SplitScreenLayoutProperties
 } from '../../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
-import { Tv2BlueprintTimelineObject, Tv2TimelineObjectMetadata } from '../../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject, } from '../../value-objects/tv2-blueprint-timeline-object'
 import { Piece } from '../../../../model/entities/piece'
 import { Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
+import { TimelineObjectMetadata } from '../../../../model/value-objects/metadata'
 
 export interface Tv2VideoMixerTimelineObjectFactory {
-  createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: Tv2TimelineObjectMetadata): Tv2BlueprintTimelineObject
-  createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: Tv2TimelineObjectMetadata): Tv2BlueprintTimelineObject
+  createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): Tv2BlueprintTimelineObject
+  createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): Tv2BlueprintTimelineObject
   createProgramTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject
   createCleanFeedTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject
   createLookaheadTimelineObject( sourceInput: number, enable: TimelineEnable): Tv2BlueprintTimelineObject
@@ -20,9 +21,9 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): Tv2BlueprintTimelineObject
   createSplitScreenBoxesTimelineObject(boxes: SplitScreenBoxProperties[], priority?: number): Tv2BlueprintTimelineObject
   createSplitScreenPropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, layoutProperties: SplitScreenLayoutProperties): Tv2BlueprintTimelineObject
-  createCutTransitionEffectTimelineObjects(sourceInput: number, metadata?: Tv2TimelineObjectMetadata): Tv2BlueprintTimelineObject[]
-  createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: Tv2TimelineObjectMetadata): Tv2BlueprintTimelineObject[]
-  createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number, metadata?: Tv2TimelineObjectMetadata): Tv2BlueprintTimelineObject[]
+  createCutTransitionEffectTimelineObjects(sourceInput: number, metadata?: TimelineObjectMetadata): Tv2BlueprintTimelineObject[]
+  createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: TimelineObjectMetadata): Tv2BlueprintTimelineObject[]
+  createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number, metadata?: TimelineObjectMetadata): Tv2BlueprintTimelineObject[]
   getProgramLayer(): string
   getSplitScreenBoxesLayer(): string
   getSplitScreenSourceInput(): number

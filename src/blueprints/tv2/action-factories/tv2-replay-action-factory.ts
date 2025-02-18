@@ -7,8 +7,7 @@ import { Tv2ActionContentType, Tv2ReplayAction, Tv2ReplayAuxAction } from '../va
 import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
@@ -16,10 +15,12 @@ import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
-import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { ActionFactory } from './action-factory'
+import { AudioMode } from '../../../model/enums/audio-mode'
+import { PieceMetadata } from '../../../model/value-objects/metadata'
+import { PieceType } from '../../../model/enums/piece-type'
+import { OutputLayer } from '../../../model/enums/output-layer'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -54,7 +55,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     const sanitizedId: string = this.sanitizeStringForId(source.name)
     const partId: string = `${sanitizedId}_VO_as_next_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name} VO`)
-    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.VOICE_OVER)
+    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, AudioMode.VOICE_OVER)
 
     return {
       id: `insert_${sanitizedId}_VO_as_next_part_action`,
@@ -78,7 +79,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     const sanitizedId: string = this.sanitizeStringForId(source.name)
     const partId: string = `${sanitizedId}_VO_on_air_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name} VO`)
-    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.VOICE_OVER)
+    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, AudioMode.VOICE_OVER)
 
     return {
       id: `insert_${sanitizedId}_VO_as_on_air_part_action`,
@@ -102,7 +103,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     const sanitizedId: string = this.sanitizeStringForId(source.name)
     const partId: string = `${sanitizedId}_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name}`)
-    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.FULL)
+    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, AudioMode.FULL)
 
     return {
       id: `insert_${sanitizedId}_as_next_part_action`,
@@ -126,7 +127,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     const sanitizedId: string = this.sanitizeStringForId(source.name)
     const partId: string = `${sanitizedId}_on_air_part_action`
     const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name}`)
-    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, Tv2AudioMode.FULL)
+    const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, AudioMode.FULL)
 
     return {
       id: `insert_${sanitizedId}_as_on_air_part_action`,
@@ -170,7 +171,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     }
   }
 
-  private createReplayForSourcePieceInterface(configuration: Tv2BlueprintConfiguration, parentPartId: string, source: Tv2SourceMappingWithAudio, audioMode: Tv2AudioMode): Tv2PieceInterface {
+  private createReplayForSourcePieceInterface(configuration: Tv2BlueprintConfiguration, parentPartId: string, source: Tv2SourceMappingWithAudio, audioMode: AudioMode): Tv2PieceInterface {
     const videoMixerEnable: TimelineEnable = {
       start: 0
     }
@@ -182,20 +183,20 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       ...this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source, audioMode)
     ]
 
-    const metadata: Tv2PieceMetadata = {
-      type: Tv2PieceType.REPLAY,
-      outputLayer: Tv2OutputLayer.PROGRAM,
+    const metadata: PieceMetadata = {
+      type: PieceType.REPLAY,
+      outputLayer: OutputLayer.PROGRAM,
       audioMode: audioMode,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
-        acceptsPersistedAudio: audioMode === Tv2AudioMode.VOICE_OVER
+        acceptsPersistedAudio: audioMode === AudioMode.VOICE_OVER
       }
     }
     return {
       id: `replayAction_${this.sanitizeStringForId(source.name)}`,
       partId: parentPartId,
       rundownId: '',
-      name: `${source.name}${audioMode === Tv2AudioMode.VOICE_OVER ? ' VO' : ''}`,
+      name: `${source.name}${audioMode === AudioMode.VOICE_OVER ? ' VO' : ''}`,
       layer: Tv2PieceLayer.REPLAY,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
@@ -249,8 +250,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.videoMixerSource, Tv2VideoMixerLayer.AR)
       ],
       metadata: {
-        type: Tv2PieceType.REPLAY,
-        outputLayer: Tv2OutputLayer.AUXILIARY
+        type: PieceType.REPLAY,
+        outputLayer: OutputLayer.AUXILIARY
       }
     }
   }
@@ -293,8 +294,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.videoMixerSource, Tv2VideoMixerLayer.VIZ_OVERLAY_AUXILIARY)
       ],
       metadata: {
-        type: Tv2PieceType.REPLAY,
-        outputLayer: Tv2OutputLayer.AUXILIARY
+        type: PieceType.REPLAY,
+        outputLayer: OutputLayer.AUXILIARY
       }
     }
   }

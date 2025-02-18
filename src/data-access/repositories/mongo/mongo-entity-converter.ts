@@ -36,6 +36,7 @@ import { Device } from '../../../model/entities/device'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TakeMode } from '../../../model/enums/take-mode'
 import { Macro, Operation } from '../../../model/entities/macro'
+import { PieceMetadata } from '../../../model/value-objects/metadata'
 
 
 export interface MongoId {
@@ -127,7 +128,7 @@ export interface MongoPiece extends MongoId {
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
 
-  metadata?: unknown
+  metadata: PieceMetadata
   content?: unknown
   tags: string[]
   isUnsynced: boolean
