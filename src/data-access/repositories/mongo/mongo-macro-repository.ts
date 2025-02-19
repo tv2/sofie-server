@@ -2,15 +2,14 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { Macro } from '../../../model/entities/macro'
 import { MongoDatabase } from './mongo-database'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { MongoEntityConverter, MongoMacro } from './mongo-entity-converter'
 import { MacroRepository } from '../interfaces/macro-repository'
 import { UuidGenerator } from '../interfaces/uuid-generator'
+import { MongoId } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'macros'
+export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> implements MacroRepository {
 
-export class MongoMacroRepository extends BaseMongoRepository<MongoMacro> implements MacroRepository {
-
-  constructor(private readonly mongoEntityConverter: MongoEntityConverter, mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
+  constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
 
@@ -20,18 +19,17 @@ export class MongoMacroRepository extends BaseMongoRepository<MongoMacro> implem
 
   public async getMacro(macroId: string): Promise<Macro> {
     this.assertDatabaseConnection(this.getMacro.name)
-    const macro: MongoMacro | null = await this.getCollection().findOne<MongoMacro>({_id: macroId})
+    const macro: Macro | null = await this.getCollection().findOne<Macro>({_id: macroId})
     if (macro === null) {
       throw new NotFoundException(`No Macro found for MacroId ${macroId}`)
     }
-    return this.mongoEntityConverter.convertToMacro(macro)
+    return macro
   }
 
   public async getMacros(): Promise<Macro[]> {
     this.assertDatabaseConnection(this.getMacros.name)
     return this.getCollection()
-      .find<MongoMacro>({})
-      .map(mongoMacro => this.mongoEntityConverter.convertToMacro(mongoMacro))
+      .find<Macro>({})
       .toArray()
 
   }

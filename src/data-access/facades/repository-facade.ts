@@ -250,7 +250,7 @@ export class RepositoryFacade {
   }
 
   public static createMacroRepository(): MacroRepository {
-    return new MongoMacroRepository(new MongoEntityConverter(LoggerFacade.createLogger()), MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
+    return new MongoMacroRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
   }
 
   public static createActionTriggerRepository(): ActionTriggerRepository {
