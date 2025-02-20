@@ -6,6 +6,7 @@ import { ConfigurationEventBuilder } from '../interfaces/configuration-event-bui
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
+import { MacroEventBuilder } from '../interfaces/macro-event-builder'
 
 export class EventBuilderFacade {
 
@@ -18,6 +19,10 @@ export class EventBuilderFacade {
   }
 
   public static createActionTriggerEventBuilder(): ActionTriggerEventBuilder {
+    return new EventBuilder()
+  }
+
+  public static createMacroEventBuilder(): MacroEventBuilder {
     return new EventBuilder()
   }
 

@@ -35,6 +35,7 @@ import {
   ConfigurationEventType,
   DeviceEventType,
   IngestEventType,
+  MacroEventType,
   RundownEventType,
   StatusMessageEventType
 } from '../enums/event-type'
@@ -73,8 +74,12 @@ import {
   VideoMixerConfigurationUpdatedEvent
 } from '../value-objects/device-event'
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { MacroEventBuilder } from '../interfaces/macro-event-builder'
+import { Macro } from '../../model/entities/macro'
+import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../value-objects/macro-event'
+import { MacroDto } from '../dtos/macro-dto'
 
-export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -391,6 +396,30 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
       type: DeviceEventType.VIDEO_MIXER_CONFIGURATION_UPDATED,
       videoMixer: videoMixerConfiguration,
       timestamp: Date.now()
+    }
+  }
+
+  public buildMacroCreatedEvent(macro: Macro): MacroCreatedEvent {
+    return {
+      type: MacroEventType.MACRO_CREATED,
+      timestamp: Date.now(),
+      macro: new MacroDto(macro),
+    }
+  }
+
+  public buildMacroDeletedEvent(macroId: string): MacroDeletedEvent {
+    return {
+      type: MacroEventType.MACRO_DELETED,
+      timestamp: Date.now(),
+      macroId,
+    }
+  }
+
+  public buildMacroUpdatedEvent(macro: Macro): MacroUpdatedEvent {
+    return {
+      type: MacroEventType.MACRO_UPDATED,
+      timestamp: Date.now(),
+      macro: new MacroDto(macro),
     }
   }
 }

@@ -47,6 +47,12 @@ export enum ActionTriggerEventType {
   ACTION_TRIGGER_DELETED = 'ACTION_TRIGGER_DELETED'
 }
 
+export enum MacroEventType {
+  MACRO_CREATED = 'MACRO_CREATED',
+  MACRO_UPDATED = 'MACRO_UPDATED',
+  MACRO_DELETED = 'MACRO_DELETED'
+}
+
 export enum StatusMessageEventType {
   STATUS_MESSAGE = 'STATUS_MESSAGE'
 }
