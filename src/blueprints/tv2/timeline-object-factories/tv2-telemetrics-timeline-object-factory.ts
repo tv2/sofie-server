@@ -18,7 +18,7 @@ export class Tv2TelemetricsTimelineObjectFactory implements Tv2RobotTimelineObje
       content: {
         deviceType: DeviceType.TELEMETRICS,
         type: TelemetricsType.CALL_PRESET,
-        presetShotIdentifier: [preset]
+        presetShotIdentifiers: [preset]
       }
     }
   }
