@@ -200,7 +200,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
       enable: {
         start: 0
       },
-      priority: 0,
+      priority: 10,
       layer: `${Tv2TriCasterLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
       content: {
         deviceType: DeviceType.TRICASTER,
