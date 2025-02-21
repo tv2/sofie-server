@@ -78,6 +78,8 @@ import { VideoMixerDeviceRepository } from '../repositories/interfaces/video-mix
 import { MongoVideoMixerDeviceRepository } from '../repositories/mongo/mongo-video-mixer-device-repository'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
 import { MongoExpectedPlayoutItemRepository } from '../repositories/mongo/mongo-expected-playout-item-repository'
+import { MongoMacroRepository } from '../repositories/mongo/mongo-macro-repository'
+import { MacroRepository } from '../repositories/interfaces/macro-repository'
 
 export class RepositoryFacade {
   public static getDatabase(): Database {
@@ -245,6 +247,10 @@ export class RepositoryFacade {
 
   public static createActionRepository(): ActionRepository {
     return new MongoActionRepository(new MongoEntityConverter(LoggerFacade.createLogger()), MongoDatabase.getInstance(LoggerFacade.createLogger()))
+  }
+
+  public static createMacroRepository(): MacroRepository {
+    return new MongoMacroRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
   }
 
   public static createActionTriggerRepository(): ActionTriggerRepository {

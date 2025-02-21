@@ -37,6 +37,8 @@ import { IngestDataChangeService } from '../services/ingest-data-change-service'
 import { ActionGenerationService } from '../services/action-generation-service'
 import { SynchronizedRundownService } from '../services/synchronized-rundown-service'
 import { AsyncLock } from '../async-lock'
+import { MacroServiceImplementation } from '../services/macro-service-implementation'
+import { MacroService } from '../services/interfaces/macro-service'
 
 export class ServiceFacade {
 
@@ -76,6 +78,10 @@ export class ServiceFacade {
       ServiceFacade.createRundownService(),
       BlueprintsFacade.createBlueprint()
     )
+  }
+
+  public static createMacroService(): MacroService {
+    return new MacroServiceImplementation(RepositoryFacade.createMacroRepository())
   }
 
   public static createActionTriggerService(): ActionTriggerService {
