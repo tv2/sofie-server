@@ -5,7 +5,7 @@ export interface TelemetricsCallPresetTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.TELEMETRICS
     type: TelemetricsType.CALL_PRESET
-    presetShotIdentifier: number[]
+    presetShotIdentifiers: number[]
   }
 }
 
