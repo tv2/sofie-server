@@ -20,6 +20,8 @@ import { ActionEventEmitter } from '../../business-logic/services/interfaces/act
 import { DeviceEventEmitter } from '../../business-logic/services/interfaces/device-event-emitter'
 import { DeviceEventService } from '../services/device-event-service'
 import { DeviceEventObserver } from '../interfaces/device-event-observer'
+import { MacroEventEmitter } from '../../business-logic/services/interfaces/macro-event-emitter'
+import { MacroEventService } from '../services/macro-event-service'
 
 export class EventEmitterFacade {
 
@@ -33,6 +35,10 @@ export class EventEmitterFacade {
 
   public static createActionTriggerEventEmitter(): ActionTriggerEventEmitter {
     return ActionTriggerEventService.getInstance(EventBuilderFacade.createActionTriggerEventBuilder())
+  }
+
+  public static createMacroEventEmitter(): MacroEventEmitter {
+    return MacroEventService.getInstance(EventBuilderFacade.createMacroEventBuilder())
   }
 
   public static createActionEventEmitter(): ActionEventEmitter {

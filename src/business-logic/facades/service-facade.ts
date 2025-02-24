@@ -81,7 +81,7 @@ export class ServiceFacade {
   }
 
   public static createMacroService(): MacroService {
-    return new MacroServiceImplementation(RepositoryFacade.createMacroRepository())
+    return new MacroServiceImplementation(EventEmitterFacade.createMacroEventEmitter(), RepositoryFacade.createMacroRepository())
   }
 
   public static createActionTriggerService(): ActionTriggerService {
