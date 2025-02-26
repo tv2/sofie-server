@@ -76,8 +76,13 @@ import {
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
 import { Macro } from '../../model/entities/macro'
-import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../value-objects/macro-event'
-import { MacroDto } from '../dtos/macro-dto'
+import {
+  MacroCreatedEvent,
+  MacroDeletedEvent,
+  MacroOperationFailedEvent,
+  MacroUpdatedEvent
+} from '../value-objects/macro-event'
+import {MacroDto} from '../dtos/macro-dto'
 
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
@@ -420,6 +425,16 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
       type: MacroEventType.MACRO_UPDATED,
       timestamp: Date.now(),
       macro: new MacroDto(macro),
+    }
+  }
+
+  public buildMacroOperationFailedEvent(macro: Macro, operationIndex: number, message: string): MacroOperationFailedEvent {
+    return {
+      type: MacroEventType.MACRO_OPERATION_FAILED,
+      timestamp: Date.now(),
+      macro: new MacroDto(macro),
+      operationIndex: operationIndex,
+      message: message
     }
   }
 }

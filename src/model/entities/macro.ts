@@ -14,8 +14,9 @@ interface BaseOperation {
 interface ActionOperation extends BaseOperation {
   type: OperationType.ACTION
   actionId: string
+  actionArguments?: unknown
 }
 
-enum OperationType {
+export enum OperationType {
   ACTION = 'ACTION'
 }

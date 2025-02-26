@@ -6,4 +6,5 @@ export interface MacroService {
   createMacro(macro: Macro): Promise<void>
   updateMacro(macro: Macro): Promise<void>
   deleteMacro(macroId: string): Promise<void>
+  executeMacro(macroId: string, rundownId: string): Promise<void>
 }

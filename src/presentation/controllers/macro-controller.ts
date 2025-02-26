@@ -57,7 +57,7 @@ export class MacroController extends BaseController {
 
 
   @PutRequest()
-  public async updateActionTrigger(request: Request, response: Response): Promise<void> {
+  public async updateMacro(request: Request, response: Response): Promise<void> {
     try {
       const macroDto: MacroDto = request.body as MacroDto
       const macro: Macro = {
@@ -74,11 +74,23 @@ export class MacroController extends BaseController {
 
 
   @DeleteRequest('/:macroId')
-  public async deleteActionTrigger(request: Request, response: Response): Promise<void> {
+  public async deleteMacro(request: Request, response: Response): Promise<void> {
     try {
       const macroId: string = request.params.macroId
       await this.macroService.deleteMacro(macroId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully deleted Macro ${macroId}`))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @PutRequest('/execute/:macroId/rundown/:rundownId')
+  public async executeMacro(request: Request, response: Response): Promise<void> {
+    try {
+      const macroId: string = request.params.macroId
+      const rundownId: string = request.params.rundownId
+      await this.macroService.executeMacro(macroId, rundownId)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully executed Macro ${macroId}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
