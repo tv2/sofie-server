@@ -48,6 +48,7 @@ export class MacroServiceImplementation implements MacroService {
     }
     try {
       await this.executeOperation(rundownId, macro.operations[index])
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       setTimeout(() => this.executeOperationAtIndex(rundownId, macro, index + 1), macro.operations[index].delayNextOperationMs)
     }
     catch (error: unknown) {
