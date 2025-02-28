@@ -45,7 +45,7 @@ import { MongoEntityConverter } from '../repositories/mongo/mongo-entity-convert
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
-import { ActionTriggerRepository } from '../repositories/interfaces/action-trigger-repository'
+import { TriggerRepository } from '../repositories/interfaces/trigger-repository'
 import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action-trigger-repository'
 import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
 import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
@@ -253,7 +253,7 @@ export class RepositoryFacade {
     return new MongoMacroRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
   }
 
-  public static createActionTriggerRepository(): ActionTriggerRepository {
+  public static createActionTriggerRepository(): TriggerRepository {
     return new MongoActionTriggerRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
   }
 

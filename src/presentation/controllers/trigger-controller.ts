@@ -1,0 +1,83 @@
+import {BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController} from './base-controller'
+import {HttpErrorHandler} from '../interfaces/http-error-handler'
+import {Exception} from '../../model/exceptions/exception'
+import {Request, Response} from 'express'
+import {ActionTrigger, Trigger, TriggerType} from '../../model/entities/trigger'
+import {ActionTriggerDto, TriggerDto} from '../dtos/trigger-dto'
+import {TriggerService} from '../../business-logic/services/interfaces/trigger-service'
+import {HttpResponseFormatter} from '../interfaces/http-response-formatter'
+
+@RestController('/actionTriggers')
+export class TriggerController extends BaseController {
+
+  constructor(
+    private readonly triggerService: TriggerService,
+    private readonly httpErrorHandler: HttpErrorHandler,
+    private readonly httpResponseFormatter: HttpResponseFormatter
+  ) {
+    super()
+  }
+
+  @GetRequest()
+  public async getTriggers(_request: Request, response: Response): Promise<void> {
+    try {
+      const triggers: Trigger[] = await this.triggerService.getTriggers()
+      response.send(this.httpResponseFormatter.formatSuccessResponse(triggers.map(trigger => new ActionTriggerDto(trigger as ActionTrigger))))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @PostRequest()
+  public async createTrigger(request: Request, response: Response): Promise<void> {
+    try {
+      const triggerDto: TriggerDto = request.body as TriggerDto
+      if (triggerDto.type === TriggerType.ACTION) {
+        const actualDto: ActionTriggerDto = triggerDto as ActionTriggerDto
+        const trigger: ActionTrigger = {
+          id: '', // No id has been created yet. The database will handle that for us
+          data: actualDto.data,
+          actionId: actualDto.actionId,
+          type: TriggerType.ACTION,
+          actionArguments: actualDto.actionArguments
+        }
+        await this.triggerService.createTrigger(trigger)
+        response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created Trigger for type of ${trigger.type}, id: ${trigger.id}` ))
+      }
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @PutRequest()
+  public async updateTrigger(request: Request, response: Response): Promise<void> {
+    try {
+      const triggerDto: TriggerDto = request.body as TriggerDto
+      if (triggerDto.type === TriggerType.ACTION) {
+        const actualDto: ActionTriggerDto = triggerDto as ActionTriggerDto
+        const trigger: ActionTrigger = {
+          id: triggerDto.id,
+          data: actualDto.data,
+          actionId: actualDto.actionId,
+          type: TriggerType.ACTION,
+          actionArguments: actualDto.actionArguments
+        }
+        await this.triggerService.updateTrigger(trigger)
+        response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully updated Trigger type of ${trigger.type}, id: ${trigger.id}` ))
+      }
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @DeleteRequest('/:actionTriggerId')
+  public async deleteTrigger(request: Request, response: Response): Promise<void> {
+    try {
+      const triggerId: string = request.params.actionTriggerId
+      await this.triggerService.deleteTrigger(triggerId)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully deleted Trigger ${triggerId}`))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+}

@@ -16,8 +16,8 @@ import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
 import { HttpService } from '../services/interfaces/http-service'
 import { GotHttpService } from '../services/got-http-service'
 import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-entity-mapper'
-import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
-import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
+import { TriggerService } from '../services/interfaces/trigger-service'
+import { TriggerServiceImplementation } from '../services/trigger-service-implementation'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaDatabaseChangedService } from '../services/media-database-changed-service'
 import { ConfigurationService } from '../services/interfaces/configuration-service'
@@ -84,8 +84,8 @@ export class ServiceFacade {
     return new MacroServiceImplementation(EventEmitterFacade.createMacroEventEmitter(), RepositoryFacade.createMacroRepository())
   }
 
-  public static createActionTriggerService(): ActionTriggerService {
-    return new ActionTriggerServiceImplementation(
+  public static createActionTriggerService(): TriggerService {
+    return new TriggerServiceImplementation(
       EventEmitterFacade.createActionTriggerEventEmitter(),
       RepositoryFacade.createActionTriggerRepository()
     )
