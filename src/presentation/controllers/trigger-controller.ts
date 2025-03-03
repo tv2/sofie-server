@@ -6,6 +6,7 @@ import { ActionTrigger, Trigger, TriggerType } from '../../model/entities/trigge
 import { ActionTriggerDto, MacroTriggerDto, TriggerDto } from '../dtos/trigger-dto'
 import { TriggerService } from '../../business-logic/services/interfaces/trigger-service'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { UnexpectedCaseException } from '../../model/exceptions/unexpected-case-exception'
 
 @RestController('/actionTriggers')
 export class TriggerController extends BaseController {
@@ -41,6 +42,9 @@ export class TriggerController extends BaseController {
         case TriggerType.MACRO:
           trigger = this.mapToMacroTrigger(triggerDto)
           break
+        default:
+          this.respondWithUnexpectedType(triggerDto, response)
+          return
       }
       await this.triggerService.createTrigger(trigger)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created Trigger for type of ${trigger.type}` ))
@@ -61,6 +65,9 @@ export class TriggerController extends BaseController {
         case TriggerType.MACRO:
           trigger = this.mapToMacroTrigger(triggerDto)
           break
+        default:
+          this.respondWithUnexpectedType(triggerDto, response)
+          return
       }
 
       await this.triggerService.updateTrigger(trigger)
@@ -68,6 +75,10 @@ export class TriggerController extends BaseController {
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
+  }
+
+  private respondWithUnexpectedType(triggerDto: TriggerDto,response: Response): void {
+    this.httpErrorHandler.handleError(response, new UnexpectedCaseException(triggerDto.type,'Unexpected Trigger type.'))
   }
 
   private mapToActionTrigger(triggerDto: Partial<TriggerDto>): Trigger {
