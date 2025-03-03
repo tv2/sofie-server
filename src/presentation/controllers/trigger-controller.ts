@@ -39,7 +39,7 @@ export class TriggerController extends BaseController {
           trigger = this.mapToActionTrigger(triggerDto)
           break
         case TriggerType.MACRO:
-          trigger = this.mapMacroTrigger(triggerDto)
+          trigger = this.mapToMacroTrigger(triggerDto)
           break
       }
       await this.triggerService.createTrigger(trigger)
@@ -59,7 +59,7 @@ export class TriggerController extends BaseController {
           trigger = this.mapToActionTrigger(triggerDto)
           break
         case TriggerType.MACRO:
-          trigger = this.mapMacroTrigger(triggerDto)
+          trigger = this.mapToMacroTrigger(triggerDto)
           break
       }
 
@@ -77,7 +77,7 @@ export class TriggerController extends BaseController {
     }
   }
 
-  private mapMacroTrigger(triggerDto: Partial<TriggerDto>): Trigger {
+  private mapToMacroTrigger(triggerDto: Partial<TriggerDto>): Trigger {
     return {
       ...triggerDto as MacroTriggerDto,
       type: TriggerType.MACRO,
