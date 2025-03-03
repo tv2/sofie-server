@@ -5,9 +5,12 @@ import { MacroEventEmitter } from './interfaces/macro-event-emitter'
 import { ActionService } from './interfaces/action-service'
 import { Exception } from '../../model/exceptions/exception'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { StatusMessageEventEmitter } from './interfaces/status-message-event-emitter'
+import { StatusCode } from '../../model/enums/status-code'
 
 export class MacroServiceImplementation implements MacroService {
   constructor(
+    private readonly statusMessageEventEmitter: StatusMessageEventEmitter,
     private readonly macroEventEmitter: MacroEventEmitter,
     private readonly macroRepository: MacroRepository,
     private readonly actionService: ActionService,
@@ -46,17 +49,18 @@ export class MacroServiceImplementation implements MacroService {
     if (index >= macro.operations.length) {
       return
     }
+    const operation: Operation = macro.operations[index]
     try {
-      await this.executeOperation(rundownId, macro.operations[index])
+      await this.executeOperation(rundownId, operation)
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      setTimeout(() => this.executeOperationAtIndex(rundownId, macro, index + 1), macro.operations[index].delayNextOperationMs)
+      setTimeout(() => this.executeOperationAtIndex(rundownId, macro, index + 1), operation.delayNextOperationMs)
     }
     catch (error: unknown) {
       let errorMessage: string = 'Operation failed for unknown reason'
       if (error instanceof Exception) {
         errorMessage = error.message
       }
-      this.macroEventEmitter.emitMacroOperationFailedEvent(macro, index, errorMessage)
+      this.statusMessageEventEmitter.emitStatusMessageEvent({id: 'OperationFailed', message: errorMessage, statusCode: StatusCode.BAD, title: 'Operation Failed'})
     }
   }
 

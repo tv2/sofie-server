@@ -7,18 +7,20 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 import { ActionService } from '../interfaces/action-service'
 import { Exception } from '../../../model/exceptions/exception'
 import { ErrorCode } from '../../../model/enums/error-code'
+import {StatusMessageEventEmitter} from '../interfaces/status-message-event-emitter'
 
 describe(MacroServiceImplementation.name, () => {
   describe(MacroServiceImplementation.prototype.createMacro.name, () => {
     it('should emit macro created event', async () => {
       const macro: Macro = EntityTestFactory.createMacro()
 
+      const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
       const eventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
       const actionService: ActionService = mock<ActionService>()
       const repo: MacroRepository = mock<MacroRepository>()
       when(repo.createMacro(macro)).thenReturn(Promise.resolve(macro))
 
-      const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(eventEmitter), instance(repo), instance(actionService))
+      const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(statusMessageEventEmitter), instance(eventEmitter), instance(repo), instance(actionService))
 
       await testee.createMacro(macro)
 
@@ -30,12 +32,13 @@ describe(MacroServiceImplementation.name, () => {
     EntityTestFactory
     const macro: Macro = EntityTestFactory.createMacro()
 
+    const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
     const eventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
     const actionService: ActionService = mock<ActionService>()
     const repo: MacroRepository = mock<MacroRepository>()
     when(repo.updateMacro(macro)).thenReturn(Promise.resolve(macro))
 
-    const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(eventEmitter), instance(repo), instance(actionService))
+    const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(statusMessageEventEmitter) ,instance(eventEmitter), instance(repo), instance(actionService))
 
     await testee.updateMacro(macro)
 
@@ -47,12 +50,13 @@ describe(MacroServiceImplementation.prototype.deleteMacro.name, () => {
   it('should emit macro deleted event', async () => {
     const macroId: string = 'FakeMacroId'
 
+    const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
     const eventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
     const actionService: ActionService = mock<ActionService>()
     const repo: MacroRepository = mock<MacroRepository>()
     when(repo.deleteMacro(macroId)).thenReturn(Promise.resolve())
 
-    const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(eventEmitter), instance(repo), instance(actionService))
+    const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(statusMessageEventEmitter), instance(eventEmitter), instance(repo), instance(actionService))
 
     await testee.deleteMacro(macroId)
 
@@ -67,8 +71,9 @@ describe(MacroServiceImplementation.prototype.executeMacro.name, () => {
       delayNextOperationMs: 200,
       actionId: 'MyActionId'
     }]
-    const macro: Macro = EntityTestFactory.createMacro(operations)
+    const macro: Macro = EntityTestFactory.createMacro({operations: operations})
 
+    const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
     const eventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
     const actionService: ActionService = mock<ActionService>()
     const repo: MacroRepository = mock<MacroRepository>()
@@ -77,11 +82,11 @@ describe(MacroServiceImplementation.prototype.executeMacro.name, () => {
     const rundownId: string = 'MyRundownId'
     when(actionService.executeAction).thenThrow(new Exception(ErrorCode.UNEXPECTED_CASE, failMessage))
 
-    const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(eventEmitter), instance(repo), instance(actionService))
+    const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(statusMessageEventEmitter), instance(eventEmitter), instance(repo), instance(actionService))
 
     await testee.executeMacro(macro.id, rundownId)
 
-    verify(eventEmitter.emitMacroOperationFailedEvent(macro, 0, failMessage)).once()
+    verify(statusMessageEventEmitter.emitStatusMessageEvent(anything())).once()
   })
 
   it('should call all 3 operations within timeframe of 401ms', async () => {
@@ -99,8 +104,9 @@ describe(MacroServiceImplementation.prototype.executeMacro.name, () => {
       delayNextOperationMs: 0,
       actionId: 'Something'
     }]
-    const macro: Macro = EntityTestFactory.createMacro(operations)
+    const macro: Macro = EntityTestFactory.createMacro({operations: operations})
 
+    const statusEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
     const eventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
     const actionService: ActionService = mock<ActionService>()
     const repo: MacroRepository = mock<MacroRepository>()
@@ -109,7 +115,7 @@ describe(MacroServiceImplementation.prototype.executeMacro.name, () => {
 
     when(actionService.executeAction(anything(), anything(),anything())).thenResolve()
 
-    const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(eventEmitter), instance(repo), instance(actionService))
+    const testee: MacroServiceImplementation = new MacroServiceImplementation(instance(statusEventEmitter), instance(eventEmitter), instance(repo), instance(actionService))
 
     await testee.executeMacro(macro.id, rundownId)
     await jest.advanceTimersByTimeAsync(401)

@@ -84,7 +84,7 @@ export class MacroController extends BaseController {
     }
   }
 
-  @PutRequest('/execute/:macroId/rundown/:rundownId')
+  @PutRequest('/execute/:macroId/rundowns/:rundownId')
   public async executeMacro(request: Request, response: Response): Promise<void> {
     try {
       const macroId: string = request.params.macroId

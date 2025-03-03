@@ -3,7 +3,7 @@ import { MacroEventObserver } from '../interfaces/macro-event-observer'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
 import {
   MacroCreatedEvent, MacroDeletedEvent,
-  MacroEvent, MacroOperationFailedEvent,
+  MacroEvent,
   MacroUpdatedEvent
 } from '../value-objects/macro-event'
 import { Macro } from '../../model/entities/macro'
@@ -38,11 +38,6 @@ export class MacroEventService implements MacroEventEmitter, MacroEventObserver 
 
   public emitMacroDeletedEvent(macroId: string): void {
     const event: MacroDeletedEvent = this.macroEventBuilder.buildMacroDeletedEvent(macroId)
-    this.emitMacroEvent(event)
-  }
-
-  public  emitMacroOperationFailedEvent(macro: Macro, operationIndex: number, message: string): void {
-    const event: MacroOperationFailedEvent = this.macroEventBuilder.buildMacroOperationFailedEvent(macro, operationIndex, message)
     this.emitMacroEvent(event)
   }
 
