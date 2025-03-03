@@ -46,7 +46,7 @@ import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
 import { TriggerRepository } from '../repositories/interfaces/trigger-repository'
-import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action-trigger-repository'
+import { MongoTriggerRepository } from '../repositories/mongo/mongo-trigger-repository'
 import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
 import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
 import { LoggerFacade } from '../../logger/logger-facade'
@@ -254,7 +254,7 @@ export class RepositoryFacade {
   }
 
   public static createActionTriggerRepository(): TriggerRepository {
-    return new MongoActionTriggerRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
+    return new MongoTriggerRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
   }
 
   public static createShowStyleVariantRepository(): ShowStyleVariantRepository {

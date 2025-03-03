@@ -1,11 +1,11 @@
-import {BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController} from './base-controller'
-import {HttpErrorHandler} from '../interfaces/http-error-handler'
-import {Exception} from '../../model/exceptions/exception'
-import {Request, Response} from 'express'
-import {ActionTrigger, Trigger, TriggerType} from '../../model/entities/trigger'
-import {ActionTriggerDto, TriggerDto} from '../dtos/trigger-dto'
-import {TriggerService} from '../../business-logic/services/interfaces/trigger-service'
-import {HttpResponseFormatter} from '../interfaces/http-response-formatter'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
+import { HttpErrorHandler } from '../interfaces/http-error-handler'
+import { Exception } from '../../model/exceptions/exception'
+import { Request, Response } from 'express'
+import { ActionTrigger, Trigger, TriggerType } from '../../model/entities/trigger'
+import { ActionTriggerDto, MacroTriggerDto, TriggerDto } from '../dtos/trigger-dto'
+import { TriggerService } from '../../business-logic/services/interfaces/trigger-service'
+import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 
 @RestController('/actionTriggers')
 export class TriggerController extends BaseController {
@@ -32,18 +32,18 @@ export class TriggerController extends BaseController {
   public async createTrigger(request: Request, response: Response): Promise<void> {
     try {
       const triggerDto: TriggerDto = request.body as TriggerDto
-      if (triggerDto.type === TriggerType.ACTION) {
-        const actualDto: ActionTriggerDto = triggerDto as ActionTriggerDto
-        const trigger: ActionTrigger = {
-          id: '', // No id has been created yet. The database will handle that for us
-          data: actualDto.data,
-          actionId: actualDto.actionId,
-          type: TriggerType.ACTION,
-          actionArguments: actualDto.actionArguments
-        }
-        await this.triggerService.createTrigger(trigger)
-        response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created Trigger for type of ${trigger.type}, id: ${trigger.id}` ))
+      triggerDto.id = ''
+      let trigger: Trigger
+      switch(triggerDto.type) {
+        case TriggerType.ACTION:
+          trigger = this.mapToActionTrigger(triggerDto)
+          break
+        case TriggerType.MACRO:
+          trigger = this.mapMacroTrigger(triggerDto)
+          break
       }
+      await this.triggerService.createTrigger(trigger)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created Trigger for type of ${trigger.type}` ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -53,20 +53,34 @@ export class TriggerController extends BaseController {
   public async updateTrigger(request: Request, response: Response): Promise<void> {
     try {
       const triggerDto: TriggerDto = request.body as TriggerDto
-      if (triggerDto.type === TriggerType.ACTION) {
-        const actualDto: ActionTriggerDto = triggerDto as ActionTriggerDto
-        const trigger: ActionTrigger = {
-          id: triggerDto.id,
-          data: actualDto.data,
-          actionId: actualDto.actionId,
-          type: TriggerType.ACTION,
-          actionArguments: actualDto.actionArguments
-        }
-        await this.triggerService.updateTrigger(trigger)
-        response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully updated Trigger type of ${trigger.type}, id: ${trigger.id}` ))
+      let trigger: Trigger
+      switch(triggerDto.type) {
+        case TriggerType.ACTION:
+          trigger = this.mapToActionTrigger(triggerDto)
+          break
+        case TriggerType.MACRO:
+          trigger = this.mapMacroTrigger(triggerDto)
+          break
       }
+
+      await this.triggerService.updateTrigger(trigger)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully updated Trigger type of ${trigger.type}, id: ${trigger.id}` ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  private mapToActionTrigger(triggerDto: Partial<TriggerDto>): Trigger {
+    return {
+      ...triggerDto as ActionTriggerDto,
+      type: TriggerType.ACTION,
+    }
+  }
+
+  private mapMacroTrigger(triggerDto: Partial<TriggerDto>): Trigger {
+    return {
+      ...triggerDto as MacroTriggerDto,
+      type: TriggerType.MACRO,
     }
   }
 
