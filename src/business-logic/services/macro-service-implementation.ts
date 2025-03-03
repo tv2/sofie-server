@@ -56,7 +56,7 @@ export class MacroServiceImplementation implements MacroService {
       setTimeout(() => this.executeOperationAtIndex(rundownId, macro, index + 1), operation.delayNextOperationMs)
     }
     catch (error: unknown) {
-      let errorMessage: string = 'Operation failed for unknown reason'
+      let errorMessage: string = 'The operation failed for an unknown reason.'
       if (error instanceof Exception) {
         errorMessage = error.message
       }
@@ -71,7 +71,7 @@ export class MacroServiceImplementation implements MacroService {
         break
       }
       default:
-        throw new UnsupportedOperationException(`Unsupported operation type ${operation.type}`)
+        throw new UnsupportedOperationException(`Unsupported operation type ${operation.type}.`)
     }
   }
 }
