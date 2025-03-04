@@ -15,6 +15,7 @@ import { SetNextDirection } from '../../model/enums/set-next-direction'
 import { TakeMode } from '../../model/enums/take-mode'
 import { Tv2Logger } from '../../blueprints/tv2/tv2-logger'
 import { ErrorCode } from '../../model/enums/error-code'
+import { AuditLog } from './audit-log-decorators'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -30,6 +31,7 @@ export class RundownController extends BaseController {
     this.logger = logger.tag(this.constructor.name)
   }
 
+  @AuditLog()
   @GetRequest('/basic')
   public async getBasicRundowns(_request: Request, response: Response): Promise<void> {
     try {
@@ -40,6 +42,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/:rundownId')
   public async getRundown(request: Request, response: Response): Promise<void> {
     try {
