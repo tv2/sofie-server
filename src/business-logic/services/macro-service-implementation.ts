@@ -62,7 +62,7 @@ export class MacroServiceImplementation implements MacroService {
       if (error instanceof Exception) {
         errorMessage = error.message
       }
-      this.statusMessageEventEmitter.emitStatusMessageEvent({id: 'OperationFailed', message: errorMessage, statusCode: StatusCode.BAD, title: 'Operation Failed'})
+      this.statusMessageEventEmitter.emitStatusMessageEvent({id: 'operationFailed', message: errorMessage, statusCode: StatusCode.GOOD, title: 'Operation Failed'})
     }
   }
 

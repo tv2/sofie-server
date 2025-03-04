@@ -11,7 +11,7 @@ interface BaseOperation {
   delayNextOperationMs: number
 }
 
-interface ActionOperation extends BaseOperation {
+export interface ActionOperation extends BaseOperation {
   type: OperationType.ACTION
   actionId: string
   actionArguments?: unknown

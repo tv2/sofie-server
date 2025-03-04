@@ -51,7 +51,6 @@ export enum MacroEventType {
   MACRO_CREATED = 'MACRO_CREATED',
   MACRO_UPDATED = 'MACRO_UPDATED',
   MACRO_DELETED = 'MACRO_DELETED',
-  MACRO_OPERATION_FAILED = 'MACRO_OPERATION_FAILED'
 }
 
 export enum StatusMessageEventType {
