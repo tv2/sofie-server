@@ -1,12 +1,12 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { TriggerRepository } from '../interfaces/trigger-repository'
-import { ActionTrigger, MacroTrigger, Trigger, TriggerType } from '../../../model/entities/trigger'
+import { Trigger } from '../../../model/entities/trigger'
 import { MongoDatabase } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { MongoId } from './mongo-entity-converter'
 
-const ACTION_TRIGGER_COLLECTION: string = 'actionTriggers'
+const ACTION_TRIGGER_COLLECTION: string = 'triggers'
 
 export class MongoTriggerRepository extends BaseMongoRepository<Trigger & MongoId> implements TriggerRepository {
 
@@ -25,44 +25,25 @@ export class MongoTriggerRepository extends BaseMongoRepository<Trigger & MongoI
 
   public async createTrigger(triggerWithoutId: Omit<Trigger, 'id'>): Promise<Trigger> {
     this.assertDatabaseConnection(this.createTrigger.name)
-    switch (triggerWithoutId.type) {
-      case TriggerType.ACTION: {
-        return this.createNewActionTrigger(triggerWithoutId)
-      }
-      case TriggerType.MACRO: {
-        return this.createNewMacroTrigger(triggerWithoutId)
-      }
-    }
-  }
-
-  private async createNewActionTrigger(triggerWithoutId:  Omit<Trigger, 'id'>): Promise<ActionTrigger> {
-    const actionTrigger: ActionTrigger = {
-      ...triggerWithoutId as ActionTrigger,
+    const trigger: Trigger = {
+      ...triggerWithoutId,
       id: this.uuidGenerator.generateUuid()
-    }
-    await this.getCollection().insertOne({...actionTrigger, _id: actionTrigger.id})
-    return actionTrigger
-  }
+    } as Trigger
 
-  private async createNewMacroTrigger(triggerWithoutId: Omit<Trigger, 'id'>): Promise<MacroTrigger> {
-    const macroTrigger: MacroTrigger = {
-      ...triggerWithoutId as MacroTrigger,
-      id: this.uuidGenerator.generateUuid()
-    }
-    await this.getCollection().insertOne({...macroTrigger, _id: macroTrigger.id})
-    return macroTrigger
+    await this.getCollection().insertOne({...trigger, _id: trigger.id})
+    return trigger
   }
 
   public async updateTrigger(trigger: Trigger): Promise<Trigger> {
     this.assertDatabaseConnection(this.updateTrigger.name)
-    if (!await this.doesActionTriggerExist(trigger.id)) {
+    if (!await this.doesTriggerExist(trigger.id)) {
       throw new NotFoundException(`Can't update Trigger ${trigger.id}. It does not exist in the database`)
     }
     await this.getCollection().updateOne({ id: trigger.id }, { $set: trigger })
     return trigger
   }
 
-  private async doesActionTriggerExist(triggerId: string): Promise<boolean> {
+  private async doesTriggerExist(triggerId: string): Promise<boolean> {
     return (await this.getCollection().countDocuments({ _id: triggerId })) === 1
   }
 

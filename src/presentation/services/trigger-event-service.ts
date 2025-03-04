@@ -41,7 +41,7 @@ export class TriggerEventService implements TriggerEventEmitter, TriggerEventObs
     this.emitTriggerEvent(event)
   }
 
-  public subscribeToTriggerEvents(onTriggerEventCallback: (actionTriggerEvent: TriggerEvent) => void): void {
+  public subscribeToTriggerEvents(onTriggerEventCallback: (triggerEvent: TriggerEvent) => void): void {
     this.callbacks.push(onTriggerEventCallback)
   }
 }

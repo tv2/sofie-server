@@ -43,13 +43,13 @@ import { SegmentDto } from '../dtos/segment-dto'
 import { Segment } from '../../model/entities/segment'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
-import {ActionTrigger, Trigger} from '../../model/entities/trigger'
+import { Trigger } from '../../model/entities/trigger'
 import {
   TriggerCreatedEvent,
   TriggerDeletedEvent,
   TriggerUpdatedEvent
 } from '../value-objects/trigger-event'
-import { ActionTriggerDto } from '../dtos/trigger-dto'
+import { TriggerDto} from '../dtos/trigger-dto'
 import { RundownDto } from '../dtos/rundown-dto'
 import { Media } from '../../model/entities/media'
 import { MediaDto } from '../dtos/media-dto'
@@ -318,27 +318,27 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
     }
   }
 
-  public buildTriggerCreatedEvent(actionTrigger: Trigger): TriggerCreatedEvent {
+  public buildTriggerCreatedEvent(trigger: Trigger): TriggerCreatedEvent {
     return {
       type: TriggerEventType.TRIGGER_CREATED,
       timestamp: Date.now(),
-      trigger: new ActionTriggerDto(actionTrigger as ActionTrigger),
+      trigger: TriggerDto.createTriggerDto(trigger)
     }
   }
 
-  public buildTriggerUpdatedEvent(actionTrigger: Trigger): TriggerUpdatedEvent {
+  public buildTriggerUpdatedEvent(trigger: Trigger): TriggerUpdatedEvent {
     return {
       type: TriggerEventType.TRIGGER_UPDATED,
       timestamp: Date.now(),
-      trigger: new ActionTriggerDto(actionTrigger as ActionTrigger),
+      trigger: TriggerDto.createTriggerDto(trigger)
     }
   }
 
-  public buildTriggerDeletedEvent(actionTriggerId: string): TriggerDeletedEvent {
+  public buildTriggerDeletedEvent(triggerId: string): TriggerDeletedEvent {
     return {
       type: TriggerEventType.TRIGGER_DELETED,
       timestamp: Date.now(),
-      triggerId: actionTriggerId,
+      triggerId: triggerId,
     }
   }
 
