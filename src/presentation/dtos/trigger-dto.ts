@@ -61,6 +61,7 @@ export class MacroTriggerDto extends TriggerDto {
   constructor(trigger: MacroTrigger) {
     super()
     this.id = trigger.id
+    this.type = trigger.type
     this.macroId = trigger.macroId
     this.data = trigger.data
   }
