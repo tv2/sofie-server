@@ -1,7 +1,8 @@
 import { MacroEventEmitter } from '../../business-logic/services/interfaces/macro-event-emitter'
 import { MacroEventObserver } from '../interfaces/macro-event-observer'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
-import { MacroCreatedEvent, MacroDeletedEvent,
+import {
+  MacroCreatedEvent, MacroDeletedEvent,
   MacroEvent,
   MacroUpdatedEvent
 } from '../value-objects/macro-event'

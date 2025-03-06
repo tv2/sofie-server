@@ -76,7 +76,11 @@ import {
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
 import { Macro } from '../../model/entities/macro'
-import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../value-objects/macro-event'
+import {
+  MacroCreatedEvent,
+  MacroDeletedEvent,
+  MacroUpdatedEvent
+} from '../value-objects/macro-event'
 import { MacroDto } from '../dtos/macro-dto'
 
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder {

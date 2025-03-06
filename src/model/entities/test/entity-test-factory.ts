@@ -18,6 +18,7 @@ import { IngestedSegment } from '../ingested-segment'
 import { PieceActionType } from '../../enums/action-type'
 import { TakeMode } from '../../enums/take-mode'
 import { PieceType } from '../../enums/piece-type'
+import { ActionOperation, Macro, Operation, OperationType } from '../macro'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -223,6 +224,25 @@ export class EntityTestFactory {
         pieceInterface: this.createPieceInterface()
       },
       ...action
+    }
+  }
+
+  public static createMacro(macro?: Partial<Macro>): Macro {
+    return {
+      id: 'macroId',
+      name: 'macroName',
+      operations: [],
+      ...macro
+    }
+  }
+
+  public static createActionOperation(actionOperation?: Partial<ActionOperation>): Operation {
+    return {
+      actionId: 'actionId',
+      type: OperationType.ACTION,
+      actionArguments: undefined,
+      delayNextOperationMs: 0,
+      ...actionOperation,
     }
   }
 }
