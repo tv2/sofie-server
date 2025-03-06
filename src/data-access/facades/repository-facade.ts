@@ -253,7 +253,7 @@ export class RepositoryFacade {
     return new MongoMacroRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
   }
 
-  public static createActionTriggerRepository(): TriggerRepository {
+  public static createTriggerRepository(): TriggerRepository {
     return new MongoTriggerRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
   }
 

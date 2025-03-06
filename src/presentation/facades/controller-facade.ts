@@ -63,7 +63,7 @@ export class ControllerFacade {
 
   private static createTriggerController(): TriggerController {
     return new TriggerController(
-      ServiceFacade.createActionTriggerService(),
+      ServiceFacade.createTriggerService(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )

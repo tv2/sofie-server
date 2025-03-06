@@ -34,8 +34,8 @@ export class EventEmitterFacade {
     return RundownEventService.getInstance(EventBuilderFacade.createRundownEventBuilder())
   }
 
-  public static createActionTriggerEventEmitter(): TriggerEventEmitter {
-    return TriggerEventService.getInstance(EventBuilderFacade.createActionTriggerEventBuilder())
+  public static createTriggerEventEmitter(): TriggerEventEmitter {
+    return TriggerEventService.getInstance(EventBuilderFacade.createTriggerEventBuilder())
   }
 
   public static createMacroEventEmitter(): MacroEventEmitter {
@@ -50,8 +50,8 @@ export class EventEmitterFacade {
     return ActionEventService.getInstance(EventBuilderFacade.createActionEventBuilder())
   }
 
-  public static createActionTriggerEventObserver(): TriggerEventObserver {
-    return TriggerEventService.getInstance(EventBuilderFacade.createActionTriggerEventBuilder())
+  public static createTriggerEventObserver(): TriggerEventObserver {
+    return TriggerEventService.getInstance(EventBuilderFacade.createTriggerEventBuilder())
   }
 
   public static createMacroEventObserver(): MacroEventObserver {

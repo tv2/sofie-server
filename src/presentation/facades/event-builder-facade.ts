@@ -18,7 +18,7 @@ export class EventBuilderFacade {
     return new EventBuilder()
   }
 
-  public static createActionTriggerEventBuilder(): TriggerEventBuilder {
+  public static createTriggerEventBuilder(): TriggerEventBuilder {
     return new EventBuilder()
   }
 
