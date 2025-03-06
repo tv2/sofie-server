@@ -10,7 +10,7 @@ export async function up(db: Db): Promise<void> {
         }
       },
       {
-        $unset: ['$data.actionArguments']
+        $unset: ['data.actionArguments']
       }
     ]
   )
@@ -24,7 +24,7 @@ export async function down(db: Db): Promise<void> {
         $set: { 'data.actionArguments': '$actionArguments' }
       },
       {
-        $unset: { '$actionArguments': ''}
+        $unset: ['actionArguments']
       }
     ]
   )
