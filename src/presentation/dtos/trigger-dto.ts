@@ -12,8 +12,6 @@ export abstract class TriggerDto {
         return new ActionTriggerDto(trigger)
       case TriggerType.MACRO:
         return new MacroTriggerDto(trigger)
-      default:
-        throw new UnexpectedCaseException('','Unexpected Trigger type.')
     }
   }
 
