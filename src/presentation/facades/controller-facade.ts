@@ -7,7 +7,7 @@ import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
 import { JsendResponseFormatter } from '../jsend-response-formatter'
-import { ActionTriggerController } from '../controllers/action-trigger-controller'
+import { TriggerController } from '../controllers/trigger-controller'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaController } from '../controllers/media-controller'
 import { SystemInformationController } from '../controllers/system-information-controller'
@@ -21,7 +21,7 @@ export class ControllerFacade {
       this.createRundownController(),
       this.createTimelineController(),
       this.createActionController(),
-      this.createActionTriggerController(),
+      this.createTriggerController(),
       this.createConfigurationController(),
       this.createMediaController(),
       this.createSystemInformationController(),
@@ -61,9 +61,9 @@ export class ControllerFacade {
     )
   }
 
-  private static createActionTriggerController(): ActionTriggerController {
-    return new ActionTriggerController(
-      ServiceFacade.createActionTriggerService(),
+  private static createTriggerController(): TriggerController {
+    return new TriggerController(
+      ServiceFacade.createTriggerService(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
