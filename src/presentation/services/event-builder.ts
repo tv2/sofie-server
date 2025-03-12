@@ -31,7 +31,7 @@ import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
 import {
   ActionEventType,
-  ActionTriggerEventType,
+  TriggerEventType,
   ConfigurationEventType,
   DeviceEventType,
   IngestEventType,
@@ -42,14 +42,14 @@ import {
 import { SegmentDto } from '../dtos/segment-dto'
 import { Segment } from '../../model/entities/segment'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
-import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
-import { ActionTrigger } from '../../model/entities/action-trigger'
+import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
+import { Trigger } from '../../model/entities/trigger'
 import {
-  ActionTriggerCreatedEvent,
-  ActionTriggerDeletedEvent,
-  ActionTriggerUpdatedEvent
-} from '../value-objects/action-trigger-event'
-import { ActionTriggerDto } from '../dtos/action-trigger-dto'
+  TriggerCreatedEvent,
+  TriggerDeletedEvent,
+  TriggerUpdatedEvent
+} from '../value-objects/trigger-event'
+import { TriggerDto} from '../dtos/trigger-dto'
 import { RundownDto } from '../dtos/rundown-dto'
 import { Media } from '../../model/entities/media'
 import { MediaDto } from '../dtos/media-dto'
@@ -83,7 +83,7 @@ import {
 } from '../value-objects/macro-event'
 import { MacroDto } from '../dtos/macro-dto'
 
-export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -322,27 +322,27 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
     }
   }
 
-  public buildActionTriggerCreatedEvent(actionTrigger: ActionTrigger): ActionTriggerCreatedEvent {
+  public buildTriggerCreatedEvent(trigger: Trigger): TriggerCreatedEvent {
     return {
-      type: ActionTriggerEventType.ACTION_TRIGGER_CREATED,
+      type: TriggerEventType.TRIGGER_CREATED,
       timestamp: Date.now(),
-      actionTrigger: new ActionTriggerDto(actionTrigger),
+      trigger: TriggerDto.createTriggerDto(trigger)
     }
   }
 
-  public buildActionTriggerUpdatedEvent(actionTrigger: ActionTrigger): ActionTriggerUpdatedEvent {
+  public buildTriggerUpdatedEvent(trigger: Trigger): TriggerUpdatedEvent {
     return {
-      type: ActionTriggerEventType.ACTION_TRIGGER_UPDATED,
+      type: TriggerEventType.TRIGGER_UPDATED,
       timestamp: Date.now(),
-      actionTrigger: new ActionTriggerDto(actionTrigger),
+      trigger: TriggerDto.createTriggerDto(trigger)
     }
   }
 
-  public buildActionTriggerDeletedEvent(actionTriggerId: string): ActionTriggerDeletedEvent {
+  public buildTriggerDeletedEvent(triggerId: string): TriggerDeletedEvent {
     return {
-      type: ActionTriggerEventType.ACTION_TRIGGER_DELETED,
+      type: TriggerEventType.TRIGGER_DELETED,
       timestamp: Date.now(),
-      actionTriggerId,
+      triggerId: triggerId,
     }
   }
 
