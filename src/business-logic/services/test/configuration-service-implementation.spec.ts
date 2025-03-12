@@ -10,7 +10,8 @@ describe(ConfigurationServiceImplementation.name, () => {
       const shelfConfiguration: ShelfConfiguration = {
         id: 'someId',
         actionPanelConfigurations: [],
-        staticActionIds: []
+        staticActionIds: [],
+        shouldShowShelf: false
       }
       const shelfConfigurationRepository: ShelfConfigurationRepository = mock<ShelfConfigurationRepository>()
 
@@ -24,7 +25,8 @@ describe(ConfigurationServiceImplementation.name, () => {
       const updateShelfConfiguration: ShelfConfiguration = {
         id: 'someId',
         actionPanelConfigurations: [],
-        staticActionIds: []
+        staticActionIds: [],
+        shouldShowShelf: false
       }
       const shelfConfigurationRepository: ShelfConfigurationRepository = mock<ShelfConfigurationRepository>()
       when(shelfConfigurationRepository.updateShelfConfiguration(anything())).thenReturn(Promise.resolve(updateShelfConfiguration))
