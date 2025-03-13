@@ -14,6 +14,8 @@ COPY --from=BUILD_PHASE /app/yarn.lock ./
 COPY --from=BUILD_PHASE /app/dist ./
 RUN yarn install --check-files --frozen-lockfile --production
 RUN yarn cache clean --all
+RUN ["apk", "update"]
+RUN ["apk", "add nano"]
 
 # Stage 3: Final image
 FROM node:22.6-alpine
