@@ -2,6 +2,7 @@ export interface ShelfConfiguration {
   id: string
   actionPanelConfigurations: ShelfActionPanelConfiguration[]
   staticActionIds: string[]
+  shouldShowShelf: boolean
 }
 
 export interface ShelfActionPanelConfiguration {

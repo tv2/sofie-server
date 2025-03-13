@@ -1,4 +1,4 @@
-export enum Tv2OutputLayer {
+export enum OutputLayer {
   PROGRAM = 'PROGRAM',
   SECONDARY = 'SECONDARY',
   JINGLE = 'JINGLE',

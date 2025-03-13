@@ -16,8 +16,8 @@ import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
 import { HttpService } from '../services/interfaces/http-service'
 import { GotHttpService } from '../services/got-http-service'
 import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-entity-mapper'
-import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
-import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
+import { TriggerService } from '../services/interfaces/trigger-service'
+import { TriggerServiceImplementation } from '../services/trigger-service-implementation'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaDatabaseChangedService } from '../services/media-database-changed-service'
 import { ConfigurationService } from '../services/interfaces/configuration-service'
@@ -37,6 +37,8 @@ import { IngestDataChangeService } from '../services/ingest-data-change-service'
 import { ActionGenerationService } from '../services/action-generation-service'
 import { SynchronizedRundownService } from '../services/synchronized-rundown-service'
 import { AsyncLock } from '../async-lock'
+import { MacroServiceImplementation } from '../services/macro-service-implementation'
+import { MacroService } from '../services/interfaces/macro-service'
 
 export class ServiceFacade {
 
@@ -78,10 +80,14 @@ export class ServiceFacade {
     )
   }
 
-  public static createActionTriggerService(): ActionTriggerService {
-    return new ActionTriggerServiceImplementation(
-      EventEmitterFacade.createActionTriggerEventEmitter(),
-      RepositoryFacade.createActionTriggerRepository()
+  public static createMacroService(): MacroService {
+    return new MacroServiceImplementation(EventEmitterFacade.createStatusMessageEventEmitter(), EventEmitterFacade.createMacroEventEmitter(), RepositoryFacade.createMacroRepository(), ServiceFacade.createActionService())
+  }
+
+  public static createTriggerService(): TriggerService {
+    return new TriggerServiceImplementation(
+      EventEmitterFacade.createTriggerEventEmitter(),
+      RepositoryFacade.createTriggerRepository()
     )
   }
 

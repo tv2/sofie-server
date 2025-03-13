@@ -1,4 +1,4 @@
-export enum Tv2AudioMode {
+export enum AudioMode {
   FULL = 'FULL',
   VOICE_OVER = 'VOICE_OVER'
 }

@@ -7,7 +7,7 @@ import { TimelineObject, TimelineObjectGroup } from '../../model/entities/timeli
 import { Tv2PartEndState } from './value-objects/tv2-part-end-state'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from './value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject } from './value-objects/tv2-blueprint-timeline-object'
 import { Tv2MediaPlayer } from './value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../model/entities/timeline'
 import { DeviceType } from '../../model/enums/device-type'
@@ -92,8 +92,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
   private isAnySisyfosPieceInjectedIntoPart(part: Part): boolean {
     // TODO: This is a hacky way to check if a Piece is an AdLib. It should not be hidden away in meta data for Sisyfos...
     return part.getPieces().some((piece) => {
-      const pieceMetadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
-      return pieceMetadata && pieceMetadata.sisyfosPersistMetaData?.isModifiedOrInsertedByAction
+      return piece.metadata && piece.metadata.sisyfosPersistMetaData?.isModifiedOrInsertedByAction
     })
   }
 

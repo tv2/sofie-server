@@ -1,4 +1,4 @@
-import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
 import { GraphicsSetup, SplitScreenConfiguration } from '../../value-objects/tv2-show-style-blueprint-configuration'
 
 export interface Tv2GraphicsSplitScreenTimelineObjectFactory {

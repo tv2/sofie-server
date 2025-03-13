@@ -23,6 +23,7 @@ import { PlayoutService } from './interfaces/playoutService'
 import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-exception'
 import { RundownCursor } from '../../model/value-objects/rundown-cursor'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
+import { TakeMode } from '../../model/enums/take-mode'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -40,6 +41,17 @@ export class RundownTimelineService implements RundownService {
     logger: Logger,
   ) {
     this.logger = logger.tag(this.constructor.name)
+  }
+
+  public async setTakeMode(rundownId: string, takeMode: TakeMode): Promise<void> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    if (takeMode === rundown.getTakeMode()) {
+      this.logger.debug(`Rundown: ${rundown.id} already has a takeMode of ${takeMode}.`)
+      return
+    }
+    rundown.setTakeMode(takeMode)
+    this.rundownEventEmitter.emitRundownUpdated(rundown)
+    await this.saveRundown(rundown)
   }
 
   public async activateRundown(rundownId: string): Promise<void> {
@@ -159,10 +171,19 @@ export class RundownTimelineService implements RundownService {
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
+    let recallPart: Part | undefined
+    if (this.shouldRecallPart(rundown)) {
+      recallPart = this.recallPreviousPart(rundown)
+    }
+
     const timeline: Timeline = await this.buildAndPersistTimeline(rundown)
 
     this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
+
+    if (recallPart){
+      this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, recallPart)
+    }
 
     this.rundownEventEmitter.emitSetNextEvent(rundown)
     this.startAutoNext(timeline, rundown.id)
@@ -174,6 +195,20 @@ export class RundownTimelineService implements RundownService {
     if (rundown.getActiveSegment().definesShowStyleVariant) {
       this.ingestService.reloadIngestData(rundown.id).catch(error => this.logger.data(error).warn(`Request for reloading ingest data failed for rundown '${rundown.name}' with id '${rundown.id}'.`))
     }
+  }
+
+  private shouldRecallPart(rundown: Rundown): boolean {
+    return rundown.getTakeMode() === TakeMode.RECALL
+  }
+
+  private recallPreviousPart(rundown: Rundown): Part | undefined {
+    const previousPart: Part | undefined = rundown.getPreviousPart()
+    if (!previousPart) {
+      return undefined
+    }
+    const recallPart: Part = previousPart.getStrippedClone()
+    rundown.insertPartAsNext(recallPart)
+    return recallPart
   }
 
   private assertTakeIsNotBlocked(rundown: Rundown): void {

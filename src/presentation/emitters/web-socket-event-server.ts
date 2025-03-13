@@ -4,13 +4,15 @@ import { Server } from 'http'
 import WebSocket, { Server as WsServer, WebSocketServer } from 'ws'
 import { Logger } from '../../logger/logger'
 import { ActionEventObserver } from '../interfaces/action-event-observer'
-import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
+import { TriggerEventObserver } from '../interfaces/trigger-event-observer'
+import { MacroEventObserver } from '../interfaces/macro-event-observer'
 import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
 import { MediaEventObserver } from '../interfaces/media-event-observer'
 import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
 import { ActionEvent } from '../value-objects/action-event'
-import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
+import { TriggerEvent } from '../value-objects/trigger-event'
+import { MacroEvent } from '../value-objects/macro-event'
 import { ConfigurationEvent } from '../value-objects/configuration-event'
 import { MediaEvent } from '../value-objects/media-event'
 import { RundownEvent } from '../value-objects/rundown-event'
@@ -28,7 +30,8 @@ export class WebSocketEventServer implements EventServer {
   public static getInstance(
     rundownEventObserver: RundownEventObserver,
     actionEventObserver: ActionEventObserver,
-    actionTriggerEventObserver: ActionTriggerEventObserver,
+    triggerEventObserver: TriggerEventObserver,
+    macroEventObserver: MacroEventObserver,
     mediaEventObserver: MediaEventObserver,
     configurationEventObserver: ConfigurationEventObserver,
     statusMessageEventObserver: StatusMessageEventObserver,
@@ -39,7 +42,8 @@ export class WebSocketEventServer implements EventServer {
       this.instance = new WebSocketEventServer(
         rundownEventObserver,
         actionEventObserver,
-        actionTriggerEventObserver,
+        triggerEventObserver,
+        macroEventObserver,
         mediaEventObserver,
         configurationEventObserver,
         statusMessageEventObserver,
@@ -56,7 +60,8 @@ export class WebSocketEventServer implements EventServer {
   private constructor(
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionEventObserver: ActionEventObserver,
-    private readonly actionTriggerEventObserver: ActionTriggerEventObserver,
+    private readonly triggerEventObserver: TriggerEventObserver,
+    private readonly macroEventObserver: MacroEventObserver,
     private readonly mediaEventObserver: MediaEventObserver,
     private readonly configurationEventObserver: ConfigurationEventObserver,
     private readonly statusMessageEventObserver: StatusMessageEventObserver,
@@ -111,8 +116,11 @@ export class WebSocketEventServer implements EventServer {
     this.actionEventObserver.subscribeToActionEvents((actionEvent: ActionEvent) => {
       webSocket.send(JSON.stringify(actionEvent))
     })
-    this.actionTriggerEventObserver.subscribeToActionTriggerEvents((actionTriggerEvent: ActionTriggerEvent) => {
-      webSocket.send(JSON.stringify(actionTriggerEvent))
+    this.triggerEventObserver.subscribeToTriggerEvents((triggerEvent: TriggerEvent) => {
+      webSocket.send(JSON.stringify(triggerEvent))
+    })
+    this.macroEventObserver.subscribeToMacroEvents((macro: MacroEvent) => {
+      webSocket.send(JSON.stringify(macro))
     })
     this.mediaEventObserver.subscribeToMediaEvents((mediaEvent: MediaEvent) => {
       webSocket.send(JSON.stringify(mediaEvent))

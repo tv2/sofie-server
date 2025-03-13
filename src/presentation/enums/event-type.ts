@@ -1,4 +1,4 @@
-export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | ActionTriggerEventType | DeviceEventType | NtpEventType
+export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | TriggerEventType | DeviceEventType | NtpEventType
 
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
@@ -41,10 +41,16 @@ export enum ActionEventType {
   ACTIONS_UPDATED = 'ACTIONS_UPDATED'
 }
 
-export enum ActionTriggerEventType {
-  ACTION_TRIGGER_CREATED = 'ACTION_TRIGGER_CREATED',
-  ACTION_TRIGGER_UPDATED = 'ACTION_TRIGGER_UPDATED',
-  ACTION_TRIGGER_DELETED = 'ACTION_TRIGGER_DELETED'
+export enum TriggerEventType {
+  TRIGGER_CREATED = 'TRIGGER_CREATED',
+  TRIGGER_UPDATED = 'TRIGGER_UPDATED',
+  TRIGGER_DELETED = 'TRIGGER_DELETED'
+}
+
+export enum MacroEventType {
+  MACRO_CREATED = 'MACRO_CREATED',
+  MACRO_UPDATED = 'MACRO_UPDATED',
+  MACRO_DELETED = 'MACRO_DELETED',
 }
 
 export enum StatusMessageEventType {

@@ -33,7 +33,8 @@ export class MongoShelfRepository extends BaseMongoRepository<ShelfConfiguration
     const shelfConfiguration: ShelfConfiguration = {
       id: SHELF_CONFIGURATION_ID,
       actionPanelConfigurations: [],
-      staticActionIds: []
+      staticActionIds: [],
+      shouldShowShelf: false
     }
     await this.getCollection().insertOne({...shelfConfiguration, _id: shelfConfiguration.id })
     return shelfConfiguration

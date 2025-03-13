@@ -7,7 +7,7 @@ import { Tv2RundownPersistentState } from './value-objects/tv2-rundown-persisten
 import { Tv2TallyTags } from './value-objects/tv2-tally-tags'
 import { Tv2FileContent } from './value-objects/tv2-content'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
-import { Tv2SisyfosPersistenceMetadata } from './value-objects/tv2-metadata'
+import { SisyfosPersistenceMetadata } from '../../model/value-objects/metadata'
 
 /*
  Disclaimer: The code in this file is almost a 1 to 1 copy of the code of the corresponding implementations in Blueprints.
@@ -73,12 +73,12 @@ export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
     previousPartEndState: Tv2PartEndState | undefined,
     time: number,
     rundownPersistentState: Tv2RundownPersistentState
-  ): Tv2SisyfosPersistenceMetadata {
+  ): SisyfosPersistenceMetadata {
     const layersWantingToPersist: string[] = this.findLayersWantingToPersist(rundownPersistentState, previousPartEndState)
-    const pieceMetadata: Tv2SisyfosPersistenceMetadata | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetadata(part, time)
+    const sisyfosPersistenceMetadata: SisyfosPersistenceMetadata | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetadata(part, time)
     return {
-      sisyfosLayers: pieceMetadata?.wantsToPersistAudio
-        ? this.sisyfosPersistentLayerFinder.findLayersToPersistForPieceMetadata(pieceMetadata, layersWantingToPersist)
+      sisyfosLayers: sisyfosPersistenceMetadata?.wantsToPersistAudio
+        ? this.sisyfosPersistentLayerFinder.findLayersToPersistForPieceMetadata(sisyfosPersistenceMetadata, layersWantingToPersist)
         : []
     }
   }

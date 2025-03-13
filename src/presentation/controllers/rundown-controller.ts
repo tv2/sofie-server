@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController} from './base-controller'
 import { RundownService } from '../../business-logic/services/interfaces/rundown-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
@@ -12,6 +12,9 @@ import { Owner } from '../../model/enums/owner'
 import { IngestService } from '../../business-logic/services/interfaces/ingest-service'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
+import { TakeMode } from '../../model/enums/take-mode'
+import { Tv2Logger } from '../../blueprints/tv2/tv2-logger'
+import { ErrorCode } from '../../model/enums/error-code'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -20,9 +23,11 @@ export class RundownController extends BaseController {
     private readonly rundownRepository: RundownRepository,
     private readonly ingestService: IngestService,
     private readonly httpErrorHandler: HttpErrorHandler,
-    private readonly httpResponseFormatter: HttpResponseFormatter
+    private readonly httpResponseFormatter: HttpResponseFormatter,
+    private readonly logger: Tv2Logger
   ) {
     super()
+    this.logger = logger.tag(this.constructor.name)
   }
 
   @GetRequest('/basic')
@@ -74,6 +79,24 @@ export class RundownController extends BaseController {
       const rundownId: string = request.params.rundownId
       await this.rundownService.deactivateRundown(rundownId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully deactivated` ))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @PutRequest('/:rundownId/takeMode/:takeMode')
+  public async takeMode(request: Request, response: Response): Promise<void> {
+    try {
+      const rundownId: string = request.params.rundownId
+      const takeMode: TakeMode = TakeMode[request.params.takeMode as keyof typeof TakeMode]
+      if (takeMode === undefined) {
+        const errorMessage: string = `Rundown "${rundownId}" failed to set it's Take Mode, since "${request.params.takeMode}" isn't a valid input.`
+        this.logger.error(errorMessage)
+        response.send(this.httpResponseFormatter.formatErrorResponse(errorMessage, ErrorCode.BAD_REQUEST))
+        return
+      }
+      await this.rundownService.setTakeMode(rundownId, takeMode)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully set Take Mode to ${takeMode}` ))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }

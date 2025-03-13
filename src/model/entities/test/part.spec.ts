@@ -10,6 +10,7 @@ import { IngestedPiece } from '../ingested-piece'
 import { IngestedPart } from '../ingested-part'
 import { Invalidity } from '../../value-objects/invalidity'
 import { InvalidPartException } from '../../exceptions/invalid-part-exception'
+import { PieceType } from '../../enums/piece-type'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -2432,6 +2433,101 @@ describe(Part.name, () => {
 
         expect(result).toThrow(InvalidPartException)
       })
+    })
+  })
+
+  describe(Part.prototype.getStrippedClone.name, () => {
+    it('copies the pieces', () => {
+      const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: PieceType.CAMERA }})
+      const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
+      const clonedPart: Part = testee.getStrippedClone()
+      expect(clonedPart.getPieces()[0].id).toContain('COPY')
+    })
+
+    describe('Part has a CAMERA Piece', () => {
+      it('keeps the Piece', () => {
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.CAMERA)
+      })
+    })
+
+    function assertPartKeepsPiecesWithTypeWhenStripCloned(pieceType: PieceType): void {
+      const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: pieceType }})
+      const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
+      const clonedPart: Part = testee.getStrippedClone()
+      expect(clonedPart.getPieces()[0].metadata.type).toContain(pieceType)
+    }
+
+    describe('Part has a REMOTE Piece', () => {
+      it('keeps the Piece', () => {
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.REMOTE)
+      })
+    })
+
+    describe('Part has a REPLAY Piece', () => {
+      it('keeps the Piece', () => {
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.REPLAY)
+      })
+    })
+
+    describe('Part has a GRAPHICS Piece', () => {
+      it('keeps the Piece', () => {
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.GRAPHICS)
+      })
+    })
+
+    describe('Part has a SPLIT_SCREEN Piece', () => {
+      it('keeps the Piece', () => {
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.SPLIT_SCREEN)
+      })
+    })
+
+    describe('Part has a VIDEO_CLIP Piece', () => {
+      it('keeps the Piece', () => {
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.VIDEO_CLIP)
+      })
+    })
+
+    describe('Part has a VOICE_OVER Piece', () => {
+      it('keeps the Piece', () => {
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.VOICE_OVER)
+      })
+    })
+
+    describe('Part has a JINGLE Piece', () => {
+      it('keeps the Piece', () => {
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.JINGLE)
+      })
+    })
+
+    describe('Part has a AUDIO Piece', () => {
+      it('does not keeps the Piece', () => {
+        assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PieceType.AUDIO)
+      })
+    })
+  })
+
+  function assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(pieceType: PieceType): void {
+    const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: pieceType }})
+    const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
+    const clonedPart: Part = testee.getStrippedClone()
+    expect(clonedPart.getPieces()).toHaveLength(0)
+  }
+
+  describe('Part has a MANUS Piece', () => {
+    it('does not keeps the Piece', () => {
+      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PieceType.MANUS)
+    })
+  })
+
+  describe('Part has a COMMAND Piece', () => {
+    it('does not keeps the Piece', () => {
+      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PieceType.COMMAND)
+    })
+  })
+
+  describe('Part has a UNKNOWN Piece', () => {
+    it('does not keeps the Piece', () => {
+      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PieceType.UNKNOWN)
     })
   })
 })

@@ -36,16 +36,16 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
 import { InTransition } from '../../../model/value-objects/in-transition'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2Logger } from '../tv2-logger'
 import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
+import { OutputLayer } from '../../../model/enums/output-layer'
+import { PieceType } from '../../../model/enums/piece-type'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 
@@ -153,8 +153,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private isProgramPiece(piece: Piece): boolean {
-    const metadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
-    const isPieceOnProgramOutputLayer: boolean = metadata.outputLayer === Tv2OutputLayer.PROGRAM
+    const isPieceOnProgramOutputLayer: boolean = piece.metadata.outputLayer === OutputLayer.PROGRAM
     const containsProgramTimelineObject: boolean = piece.getTimelineObjects().some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer())
     return isPieceOnProgramOutputLayer && containsProgramTimelineObject
   }
@@ -184,8 +183,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       isUnsynced: false,
       timelineObjects: [],
       metadata: {
-        type: Tv2PieceType.TRANSITION,
-        outputLayer: Tv2OutputLayer.SECONDARY,
+        type: PieceType.TRANSITION,
+        outputLayer: OutputLayer.SECONDARY,
       },
       ...piece,
     }
@@ -320,7 +319,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
     const effectName: string = `Effect ${breaker.name}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, { metadata:  {type: Tv2PieceType.TRANSITION, outputLayer: Tv2OutputLayer.JINGLE}})
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, { metadata:  {type: PieceType.TRANSITION, outputLayer: OutputLayer.JINGLE}})
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
     return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }

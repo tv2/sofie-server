@@ -45,8 +45,8 @@ import { MongoEntityConverter } from '../repositories/mongo/mongo-entity-convert
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
-import { ActionTriggerRepository } from '../repositories/interfaces/action-trigger-repository'
-import { MongoActionTriggerRepository } from '../repositories/mongo/mongo-action-trigger-repository'
+import { TriggerRepository } from '../repositories/interfaces/trigger-repository'
+import { MongoTriggerRepository } from '../repositories/mongo/mongo-trigger-repository'
 import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
 import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
 import { LoggerFacade } from '../../logger/logger-facade'
@@ -78,6 +78,8 @@ import { VideoMixerDeviceRepository } from '../repositories/interfaces/video-mix
 import { MongoVideoMixerDeviceRepository } from '../repositories/mongo/mongo-video-mixer-device-repository'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
 import { MongoExpectedPlayoutItemRepository } from '../repositories/mongo/mongo-expected-playout-item-repository'
+import { MongoMacroRepository } from '../repositories/mongo/mongo-macro-repository'
+import { MacroRepository } from '../repositories/interfaces/macro-repository'
 
 export class RepositoryFacade {
   public static getDatabase(): Database {
@@ -247,8 +249,12 @@ export class RepositoryFacade {
     return new MongoActionRepository(new MongoEntityConverter(LoggerFacade.createLogger()), MongoDatabase.getInstance(LoggerFacade.createLogger()))
   }
 
-  public static createActionTriggerRepository(): ActionTriggerRepository {
-    return new MongoActionTriggerRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
+  public static createMacroRepository(): MacroRepository {
+    return new MongoMacroRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
+  }
+
+  public static createTriggerRepository(): TriggerRepository {
+    return new MongoTriggerRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), this.createUuidGenerator())
   }
 
   public static createShowStyleVariantRepository(): ShowStyleVariantRepository {

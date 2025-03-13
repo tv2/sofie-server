@@ -1,6 +1,7 @@
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { TransitionType } from '../enums/transition-type'
 import { TimelineObject } from './timeline-object'
+import { PieceMetadata } from '../value-objects/metadata'
 
 export interface IngestedPiece {
   readonly id: string
@@ -15,6 +16,6 @@ export interface IngestedPiece {
   readonly postRollDuration: number
   readonly transitionType: TransitionType
   readonly timelineObjects: TimelineObject[]
-  readonly metadata?: unknown
+  readonly metadata: PieceMetadata
   readonly content?: unknown
 }

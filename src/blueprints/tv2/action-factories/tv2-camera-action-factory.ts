@@ -2,14 +2,12 @@ import { PartInterface } from '../../../model/entities/part'
 import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
@@ -18,6 +16,9 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { ActionFactory } from './action-factory'
+import { PieceMetadata } from '../../../model/value-objects/metadata'
+import { PieceType } from '../../../model/enums/piece-type'
+import { OutputLayer } from '../../../model/enums/output-layer'
 
 export class Tv2CameraActionFactory extends ActionFactory {
 
@@ -62,9 +63,9 @@ export class Tv2CameraActionFactory extends ActionFactory {
     const videoMixerTimelineObjects: Tv2BlueprintTimelineObject[] = this.createVideoMixerTimelineObjects(source)
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
-    const metadata: Tv2PieceMetadata = {
-      type: Tv2PieceType.CAMERA,
-      outputLayer: Tv2OutputLayer.PROGRAM,
+    const metadata: PieceMetadata = {
+      type: PieceType.CAMERA,
+      outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
         acceptsPersistedAudio: source.acceptPersistAudio
