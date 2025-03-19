@@ -53,6 +53,7 @@ import {
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
 import { LoggerFacade } from '../../../logger/logger-facade'
+import { HelperFacade } from '../../../business-logic/facades/helper-facade'
 
 
 interface ActionFactoryInstance<T> {
@@ -295,6 +296,7 @@ export class Tv2ActionFactoryProvider {
           this.createVideoClipTimelineObjectFactory(),
           this.createStringHashConverter(),
           this.createAssetPathHelper(),
+          HelperFacade.createObjectCloner(),
           Tv2LoggerFacade.createLogger(),
         )
       },

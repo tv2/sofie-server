@@ -57,6 +57,7 @@ import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { AudioMode } from '../../../model/enums/audio-mode'
+import { ObjectCloner } from '../../../business-logic/services/interfaces/object-cloner'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 
@@ -82,6 +83,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly stringHashConverter: Tv2StringHashConverter,
     private readonly assetPathHelper: Tv2AssetPathHelper,
+    private readonly objectCloner: ObjectCloner,
     logger: Tv2Logger,
   ) {
     super()
@@ -326,7 +328,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   }
 
   private updateInsertToInputAction(action: Action, splitScreenPieceFromRundown: Piece): Action {
-    const pieceMetadata: PieceMetadata = splitScreenPieceFromRundown.metadata
+    const pieceMetadata: PieceMetadata = this.objectCloner.clone(splitScreenPieceFromRundown.metadata)
     if (!pieceMetadata.splitScreen || !pieceMetadata.config) {
       throw new Tv2UnexpectedActionException(`Unable to find split screen configuration for the piece '${splitScreenPieceFromRundown.name}'.`)
     }
@@ -350,7 +352,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     const timelineObjectsToKeep: Tv2BlueprintTimelineObject[] = this.findTimelineObjectsToKeepForSplitScreenInsertSource(splitScreenPieceFromRundown)
 
     pieceMetadata.splitScreen.audioTimelineObjectsForBoxes[boxIndex] = insertSourceInputMetadata.audioTimelineObjects
-    const audioTimelineObjects: Tv2BlueprintTimelineObject[] = Object.values(pieceMetadata.splitScreen.audioTimelineObjectsForBoxes).flat() // TODO:
+    const audioTimelineObjects: Tv2BlueprintTimelineObject[] = Object.values(pieceMetadata.splitScreen.audioTimelineObjectsForBoxes).flat()
 
     box.source = insertSourceInputMetadata.videoMixerSource
     const splitScreenBoxesTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createSplitScreenBoxesTimelineObject(splitScreenBoxes, INSERT_SOURCE_TO_INPUT_TIMELINE_OBJECT_PRIORITY)
