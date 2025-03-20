@@ -19,6 +19,7 @@ RUN yarn cache clean --all
 FROM node:22.6-alpine
 WORKDIR /app
 COPY --from=COMPOSE_PHASE /app .
+RUN ln -s data-access/migrations/mongo/mongo-migrations
 
 # REST API port
 EXPOSE 3005
