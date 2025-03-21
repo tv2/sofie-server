@@ -4,7 +4,6 @@ import { RepositoryFacade } from '../../data-access/facades/repository-facade'
 import { TimelineBuilder } from '../services/interfaces/timeline-builder'
 import { SuperflyTimelineBuilder } from '../services/superfly-timeline-builder'
 import { TimeoutCallbackScheduler } from '../services/timeout-callback-scheduler'
-import { JsonObjectCloner } from '../services/json-object-cloner'
 import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
@@ -39,6 +38,7 @@ import { SynchronizedRundownService } from '../services/synchronized-rundown-ser
 import { AsyncLock } from '../async-lock'
 import { MacroServiceImplementation } from '../services/macro-service-implementation'
 import { MacroService } from '../services/interfaces/macro-service'
+import { HelperFacade } from './helper-facade'
 
 export class ServiceFacade {
 
@@ -61,7 +61,7 @@ export class ServiceFacade {
   }
 
   public static createTimelineBuilder(): TimelineBuilder {
-    const superflyTimelineBuilder: TimelineBuilder = new SuperflyTimelineBuilder(new JsonObjectCloner())
+    const superflyTimelineBuilder: TimelineBuilder = new SuperflyTimelineBuilder(HelperFacade.createObjectCloner())
     return new BlueprintTimelineBuilder(
       superflyTimelineBuilder,
       RepositoryFacade.createConfigurationRepository(),
