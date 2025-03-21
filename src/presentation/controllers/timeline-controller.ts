@@ -5,6 +5,7 @@ import { Timeline } from '../../model/entities/timeline'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/timelines')
 export class TimelineController extends BaseController {
@@ -16,6 +17,7 @@ export class TimelineController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest()
   public async getTimeline(_request: Request, response: Response): Promise<void> {
     try {

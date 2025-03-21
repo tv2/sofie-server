@@ -6,6 +6,7 @@ import { MacroDto } from '../dtos/macro-dto'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { MacroService } from '../../business-logic/services/interfaces/macro-service'
 import { Macro } from '../../model/entities/macro'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/macros')
 export class MacroController extends BaseController {
@@ -18,6 +19,7 @@ export class MacroController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest('/:macroId')
   public async getMacro(request: Request, response: Response): Promise<void> {
     try {
@@ -29,6 +31,7 @@ export class MacroController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest()
   public async getMacros(_request: Request, response: Response): Promise<void> {
     try {
@@ -39,6 +42,7 @@ export class MacroController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest()
   public async createMacro(request: Request, response: Response): Promise<void> {
     try {
@@ -56,6 +60,7 @@ export class MacroController extends BaseController {
   }
 
 
+  @AuditLog()
   @PutRequest()
   public async updateMacro(request: Request, response: Response): Promise<void> {
     try {
@@ -72,7 +77,7 @@ export class MacroController extends BaseController {
   }
 
 
-
+  @AuditLog()
   @DeleteRequest('/:macroId')
   public async deleteMacro(request: Request, response: Response): Promise<void> {
     try {
@@ -84,6 +89,7 @@ export class MacroController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/execute/:macroId/rundowns/:rundownId')
   public async executeMacro(request: Request, response: Response): Promise<void> {
     try {

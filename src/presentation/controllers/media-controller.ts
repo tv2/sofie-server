@@ -7,6 +7,7 @@ import { Media } from '../../model/entities/media'
 import { Exception } from '../../model/exceptions/exception'
 import { NotFoundException } from '../../model/exceptions/not-found-exception'
 import { MediaDto } from '../dtos/media-dto'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/media')
 export class MediaController extends BaseController {
@@ -19,6 +20,7 @@ export class MediaController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest()
   public async getMedia(_request: Request, response: Response): Promise<void> {
     try {
@@ -29,6 +31,7 @@ export class MediaController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/:sourceName')
   public async getMediaById(request: Request, response: Response): Promise<void> {
     try {
