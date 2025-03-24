@@ -15,6 +15,7 @@ import { SetNextDirection } from '../../model/enums/set-next-direction'
 import { TakeMode } from '../../model/enums/take-mode'
 import { Tv2Logger } from '../../blueprints/tv2/tv2-logger'
 import { ErrorCode } from '../../model/enums/error-code'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -30,6 +31,7 @@ export class RundownController extends BaseController {
     this.logger = logger.tag(this.constructor.name)
   }
 
+  @AuditLog()
   @GetRequest('/basic')
   public async getBasicRundowns(_request: Request, response: Response): Promise<void> {
     try {
@@ -40,6 +42,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/:rundownId')
   public async getRundown(request: Request, response: Response): Promise<void> {
     try {
@@ -51,6 +54,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/activate')
   public async activate(request: Request, response: Response): Promise<void> {
     try {
@@ -62,6 +66,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/rehearse')
   public async enterRehearsal(request: Request, response: Response): Promise<void> {
     try {
@@ -73,6 +78,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/deactivate')
   public async deactivate(request: Request, response: Response): Promise<void> {
     try {
@@ -84,6 +90,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/takeMode/:takeMode')
   public async takeMode(request: Request, response: Response): Promise<void> {
     try {
@@ -102,6 +109,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/takeNext')
   public async takeNext(request: Request, response: Response): Promise<void> {
     try {
@@ -113,6 +121,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/segments/:segmentId/parts/:partId/setNext')
   public async setNextFromIds(request: Request, response: Response): Promise<void> {
     try {
@@ -126,6 +135,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/setNext/:direction')
   public async setNext(request: Request, response: Response): Promise<void> {
     try {
@@ -138,6 +148,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/reset')
   public async resetRundown(request: Request, response: Response): Promise<void> {
     try {
@@ -149,6 +160,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest('/:rundownId/reingest')
   public async reloadRundownData(request: Request, response: Response): Promise<void> {
     try {
@@ -160,6 +172,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @DeleteRequest('/:rundownId')
   public async deleteRundown(request: Request, response: Response): Promise<void> {
     try {
@@ -171,6 +184,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/pieces/:pieceId/stop')
   public async stopPiece(request: Request, response: Response): Promise<void> {
     try {

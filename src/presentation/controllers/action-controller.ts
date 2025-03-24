@@ -6,6 +6,7 @@ import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
 import { ActionDto } from '../dtos/action-dto'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 interface ExecuteActionRequestBody {
   actionArguments: unknown
@@ -22,6 +23,7 @@ export class ActionController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest()
   public async getActions(_request: Request, response: Response): Promise<void> {
     try {
@@ -32,6 +34,7 @@ export class ActionController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/rundowns/:rundownId')
   public async getActionsForRundown(request: Request, response: Response): Promise<void> {
     try {
@@ -46,6 +49,7 @@ export class ActionController extends BaseController {
   /**
    * To pass along arguments for the Action provide a JSON object in the Request body that has the attribute "actionArguments".
    */
+  @AuditLog()
   @PutRequest('/:actionId/rundowns/:rundownId')
   public async executeAction(request: Request, response: Response): Promise<void> {
     try {

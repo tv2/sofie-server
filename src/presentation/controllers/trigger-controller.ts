@@ -6,6 +6,7 @@ import { Trigger } from '../../model/entities/trigger'
 import { TriggerDto } from '../dtos/trigger-dto'
 import { TriggerService } from '../../business-logic/services/interfaces/trigger-service'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/triggers')
 export class TriggerController extends BaseController {
@@ -18,6 +19,7 @@ export class TriggerController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest()
   public async getTriggers(_request: Request, response: Response): Promise<void> {
     try {
@@ -28,6 +30,7 @@ export class TriggerController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest()
   public async createTrigger(request: Request, response: Response): Promise<void> {
     try {
@@ -39,6 +42,7 @@ export class TriggerController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest()
   public async updateTrigger(request: Request, response: Response): Promise<void> {
     try {
@@ -50,6 +54,7 @@ export class TriggerController extends BaseController {
     }
   }
 
+  @AuditLog()
   @DeleteRequest('/:triggerId')
   public async deleteTrigger(request: Request, response: Response): Promise<void> {
     try {

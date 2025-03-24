@@ -5,6 +5,7 @@ import { ExhaustiveCaseChecker } from '../../business-logic/exhaustive-case-chec
 import { Exception } from '../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/loggers')
 export class LoggerController extends BaseController {
@@ -19,6 +20,7 @@ export class LoggerController extends BaseController {
     this.logger = logger.tag(this.constructor.name)
   }
 
+  @AuditLog()
   @PutRequest('/level/:level')
   public setLogLevel(request: Request, response: Response): void {
     const logLevel: string = request.params.level
