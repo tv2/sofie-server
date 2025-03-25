@@ -5,6 +5,7 @@ import { NotFoundException } from '../../../model/exceptions/not-found-exception
 import { MacroRepository } from '../interfaces/macro-repository'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { MongoId } from './mongo-entity-converter'
+import { InvalidIdException } from '../../../model/exceptions/invalid-id-exception'
 
 const COLLECTION_NAME: string = 'macros'
 export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> implements MacroRepository {
@@ -34,15 +35,25 @@ export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> i
 
   }
 
-  public async createMacro(macroWithoutId: Omit<Macro, 'id'>): Promise<Macro> {
+  public async createMacro(macro: Macro): Promise<Macro> {
     this.assertDatabaseConnection(this.createMacro.name)
-    const macro: Macro = {
-      ...macroWithoutId,
-      id: this.uuidGenerator.generateUuid(),
+
+    if (macro.id && !this.uuidGenerator.validateUuid(macro.id)) {
+      throw new InvalidIdException(`"${macro.id}" is not a valid UUID`)
     }
 
-    await this.getCollection().insertOne({...macro, _id: macro.id})
-    return macro
+    const macroToBeSaved: Macro = {
+      ...macro,
+      id: macro.id && macro.id.length > 0 ? macro.id : this.uuidGenerator.generateUuid(),
+    }
+
+    const doesMacroWithIdAlreadyExist: boolean = (await this.getCollection().countDocuments({ id: macroToBeSaved.id })) > 0
+    if (doesMacroWithIdAlreadyExist) {
+      throw new InvalidIdException(`"${macroToBeSaved.id}" already exist`)
+    }
+
+    await this.getCollection().insertOne({...macroToBeSaved, _id: macroToBeSaved.id})
+    return macroToBeSaved
   }
 
   public async updateMacro(macro: Macro): Promise<Macro> {
