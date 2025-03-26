@@ -48,7 +48,7 @@ export class MacroController extends BaseController {
     try {
       const macroDto: MacroDto = request.body as MacroDto
       const macro: Macro = {
-        id: '', // No id has been created yet. The database will handle that for us
+        id: macroDto.id,
         name: macroDto.name,
         operations: macroDto.operations
       }
