@@ -151,7 +151,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
 
   private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMixEffectWithTransition | AtemMixEffectWithPreview, metadata?: TimelineObjectMetadata): AtemMixEffectTimelineObject {
     return {
-      id: `${id}_${Math.floor(Math.random() * 100)}`,
+      id: `${id}_${Math.floor(Math.random() * 100) * Date.now()}`,
       enable,
       priority: 2, // Old Blueprints uses priority 1. By setting it to 2 we know our TimelineObjects always take priority.
       layer,
