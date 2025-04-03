@@ -43,13 +43,17 @@ export class ActionTriggerDto extends TriggerDto {
   }
 
   public static toEntity(actionTriggerDto: ActionTriggerDto): ActionTrigger {
-    return {
+    const actionTrigger: ActionTrigger = {
       id: actionTriggerDto.id,
       type: TriggerType.ACTION,
       actionId: actionTriggerDto.actionId,
-      actionArguments: actionTriggerDto.actionArguments,
       data: actionTriggerDto.data
     }
+
+    if (actionTriggerDto.actionArguments) {
+      actionTrigger.actionArguments = actionTriggerDto.actionArguments
+    }
+    return actionTrigger
   }
 }
 
