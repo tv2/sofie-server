@@ -27,6 +27,7 @@ import { Tv2Action, Tv2ActionContentType } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../model/enums/action-type'
 import { Tv2Logger } from '../../tv2-logger'
 import { PieceType } from '../../../../model/enums/piece-type'
+import { ObjectCloner } from '../../../../business-logic/services/interfaces/object-cloner'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   describe(Tv2SplitScreenActionFactory.prototype.createSplitScreenActions.name, () => {
@@ -224,6 +225,7 @@ function createTestee(params?: {
   videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory,
   stringHashConverter?: Tv2StringHashConverter,
   assetPathHelper?: Tv2AssetPathHelper,
+  objectCloner?: ObjectCloner,
   logger?: Tv2Logger,
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
@@ -234,6 +236,7 @@ function createTestee(params?: {
     params?.videoClipTimelineObjectFactory ?? instance(mock<Tv2VideoClipTimelineObjectFactory>()),
     params?.stringHashConverter ?? new Tv2StringHashConverter(),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
+    params?.objectCloner ?? instance(mock<ObjectCloner>()),
     params?.logger ?? instance(createMockOfTv2Logger()),
   )
 }

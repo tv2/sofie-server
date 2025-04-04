@@ -12,6 +12,7 @@ import { HttpStatusCode } from '../http-status-code'
 import { ApiError } from '../value-objects/ApiError'
 import { VideoMixerDeviceRepository } from '../../data-access/repositories/interfaces/video-mixer-device-repository'
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/devices')
 export class DeviceController extends BaseController {
@@ -25,6 +26,7 @@ export class DeviceController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest()
   public async getAllDevices(_request: Request, response: Response): Promise<void> {
     try {
@@ -37,6 +39,7 @@ export class DeviceController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/:deviceId')
   public async getDevice(request: Request, response: Response): Promise<void> {
     try {
@@ -48,6 +51,7 @@ export class DeviceController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest()
   public async createDevice(request: Request, response: Response): Promise<void> {
     try {
@@ -80,6 +84,7 @@ export class DeviceController extends BaseController {
     return device.type === DeviceType.TELEMETRICS
   }
 
+  @AuditLog()
   @PutRequest('/:deviceId')
   public async updateDevice(request: Request, response: Response): Promise<void> {
     try {
@@ -94,6 +99,7 @@ export class DeviceController extends BaseController {
     }
   }
 
+  @AuditLog()
   @DeleteRequest('/:deviceId')
   public async deleteDevice(request: Request, response: Response): Promise<void> {
     try {
@@ -105,6 +111,7 @@ export class DeviceController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/videoMixers/configurations')
   public async getVideoMixerConfiguration(_request: Request, response: Response): Promise<void> {
     try {

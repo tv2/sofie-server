@@ -28,7 +28,10 @@
     "migration-status": "ts-node node_modules/migrate-mongo/bin/migrate-mongo status -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
     "undo-last-migration": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts && npm run migration-status",
     "migrate": "ts-node node_modules/migrate-mongo/bin/migrate-mongo up -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
-    "migrate-down": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts"
+    "migrate-down": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f src/data-access/migrations/mongo/migrate-mongo-config.ts",
+    "migration-status-production": "ts-node node_modules/migrate-mongo/bin/migrate-mongo status -f data-access/migrations/mongo/migrate-mongo-config.js",
+    "migrate-production": "ts-node node_modules/migrate-mongo/bin/migrate-mongo up -f data-access/migrations/mongo/migrate-mongo-config.js",
+    "migrate-down-production": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f data-access/migrations/mongo/migrate-mongo-config.js"
   },
   "engines": {
     "node": ">=14 <=22.6"
@@ -49,7 +52,6 @@
     "nodemon": "^3.0.1",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
@@ -61,7 +63,8 @@
     "mongodb": "^6.1.0",
     "reflect-metadata": "^0.1.13",
     "superfly-timeline": "^9.0.0",
-    "ws": "^8.17.1"
+    "ws": "^8.17.1",
+    "ts-node": "^10.9.1"
   },
   "resolutions": {
     "cookie": ">=0.7.0"

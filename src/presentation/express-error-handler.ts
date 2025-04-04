@@ -28,7 +28,8 @@ export class ExpressErrorHandler implements HttpErrorHandler {
       case ErrorCode.RUNDOWN_IS_ACTIVE:
       case ErrorCode.LAST_PART_IN_SEGMENT:
       case ErrorCode.TAKE_IS_BLOCKED:
-      case ErrorCode.SERVICE_UNAVAILABLE: {
+      case ErrorCode.SERVICE_UNAVAILABLE:
+      case ErrorCode.INVALID_ID: {
         return HttpStatusCode.BAD_REQUEST
       }
       case ErrorCode.NOT_FOUND: {
