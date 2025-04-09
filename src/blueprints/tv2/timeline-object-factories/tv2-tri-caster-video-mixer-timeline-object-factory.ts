@@ -64,7 +64,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
 
   private createTriCasterMeTimelineObjectForLayer(id: string, layer: Tv2TriCasterLayer, enable: TimelineEnable, me: TriCasterMixEffectProgramContent, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
     return {
-      id: `${id}_${Math.floor(Math.random() * 100)}`,
+      id: `${id}_${Date.now()}`,
       enable,
       priority: 2, // Old Blueprints uses priority 1. By setting it to 2 we know our TimelineObjects always take priority.
       layer,
