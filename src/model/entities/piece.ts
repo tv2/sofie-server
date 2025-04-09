@@ -52,7 +52,8 @@ export class Piece {
   private executedAt: number
   private isUnsyncedPiece: boolean = false
   private isPieceInsertedOnAir: boolean
-  private timelineObjects: TimelineObject[]
+  private originalTimelineObjects: TimelineObject[]
+  private readonly insertedTimelineObjects: TimelineObject[] = []
 
   constructor(piece: PieceInterface) {
     this.id = piece.id
@@ -74,7 +75,7 @@ export class Piece {
     this.tags = piece.tags
     this.isUnsyncedPiece = piece.isUnsynced
     this.isPieceInsertedOnAir = piece.isInsertedOnAir ?? false
-    this.timelineObjects = piece.timelineObjects ? [...piece.timelineObjects] : []
+    this.originalTimelineObjects = piece.timelineObjects ? [...piece.timelineObjects] : []
 
     this.setExecutedAt(piece.executedAt ?? 0)
   }
@@ -86,7 +87,7 @@ export class Piece {
       // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
       this.executedAt = 0
     }
-    this.timelineObjects = [...ingestedPiece.timelineObjects]
+    this.originalTimelineObjects = [...ingestedPiece.timelineObjects]
   }
 
   public setExecutedAt(executedAt: number): void {
@@ -165,15 +166,15 @@ export class Piece {
   public copy(newPartId?: string): Piece {
     const id: string = `${this.id}_COPY`
     const partId: string = newPartId ?? this.partId
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: id, partId })
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: id, partId, isPlanned: false, insertedTimelineObjects: [] })
   }
 
   public getTimelineObjects(): TimelineObject[] {
-    return [...this.timelineObjects]
+    return [...this.originalTimelineObjects, ...this.insertedTimelineObjects]
   }
 
   public insertTimelineObjects(timelineObjects: TimelineObject[]): void {
-    this.timelineObjects.push(...timelineObjects)
+    this.insertedTimelineObjects.push(...timelineObjects)
   }
 
   public hasEnded(timestamp: number): boolean {
