@@ -5,6 +5,7 @@ import { UnsupportedOperationException } from '../exceptions/unsupported-operati
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 import { PieceMetadata } from '../value-objects/metadata'
+import { DuplicateIdException } from '../exceptions/duplicate-id-exception'
 
 export interface PieceInterface {
   id: string
@@ -174,6 +175,12 @@ export class Piece {
   }
 
   public insertTimelineObjects(timelineObjects: TimelineObject[]): void {
+    timelineObjects.forEach(timelineObjectToBeInserted => {
+      const containsDuplicateId: boolean = this.getTimelineObjects().some(timelineObject => timelineObject.id === timelineObjectToBeInserted.id)
+      if (containsDuplicateId) {
+        throw new DuplicateIdException(`A TimelineObject with id '${timelineObjectToBeInserted.id}' already exist on Piece ${this.id}`)
+      }
+    })
     this.insertedTimelineObjects.push(...timelineObjects)
   }
 

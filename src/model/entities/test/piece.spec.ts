@@ -4,6 +4,7 @@ import { UNSYNCED_ID_POSTFIX } from '../../value-objects/unsynced_constants'
 import { EntityTestFactory } from './entity-test-factory'
 import { IngestedPiece } from '../ingested-piece'
 import { TimelineObject } from '../timeline-object'
+import { DuplicateIdException } from '../../exceptions/duplicate-id-exception'
 
 describe(Piece.name, () => {
   describe(Piece.prototype.setExecutedAt.name, () => {
@@ -346,6 +347,33 @@ describe(Piece.name, () => {
       const testee: Piece = EntityTestFactory.createPiece({ timelineObjects: [EntityTestFactory.createTimelineObject({ id: 'originalTimelineObject' })] })
       testee.insertTimelineObjects([EntityTestFactory.createTimelineObject({ id: 'insertedTimelineObject' })])
       expect(testee.getTimelineObjects()).toHaveLength(2)
+    })
+  })
+
+  describe(Piece.prototype.insertTimelineObjects.name, () => {
+    describe('no TimelineObjects already have the same id as one of the TimelineObjects being inserted', () => {
+      it('throws no exception', () => {
+        const testee: Piece = EntityTestFactory.createPiece({ timelineObjects: [EntityTestFactory.createTimelineObject({ id: 'originalId' })]})
+        expect(() => testee.insertTimelineObjects([EntityTestFactory.createTimelineObject({ id: 'insertedId' })])).not.toThrow(DuplicateIdException)
+      })
+    })
+
+    describe('an original TimelineObject already have the same id as one of the TimelineObjects being inserted', () => {
+      it('throws a DuplicateIdException', () => {
+        const duplicateTimelineObjectId: string = 'duplicateTimelineObjectID'
+        const testee: Piece = EntityTestFactory.createPiece({ timelineObjects: [EntityTestFactory.createTimelineObject({ id: duplicateTimelineObjectId })]})
+        expect(() => testee.insertTimelineObjects([EntityTestFactory.createTimelineObject({ id: duplicateTimelineObjectId })])).toThrow(DuplicateIdException)
+      })
+    })
+
+    describe('a inserted TimelineObject already have the same id as one of the TimelineObjects being inserted', () => {
+      it('throws a DuplicateIdException', () => {
+        const duplicateTimelineObjectId: string = 'duplicateTimelineObjectID'
+        const testee: Piece = EntityTestFactory.createPiece()
+        // We need to insert twice. Once to populate the inserted timelineObject array and the second to insert the duplicated id.
+        testee.insertTimelineObjects([EntityTestFactory.createTimelineObject({ id: duplicateTimelineObjectId })])
+        expect(() => testee.insertTimelineObjects([EntityTestFactory.createTimelineObject({ id: duplicateTimelineObjectId })])).toThrow(DuplicateIdException)
+      })
     })
   })
 })
