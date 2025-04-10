@@ -46,6 +46,39 @@ const SYSTEM_ACTIONS: SystemAction[] = [
   },
   {
     type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.RESET_RUNDOWN,
+    name: 'Reset Rundown',
+    description: 'Executes a Reset',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.ACTIVATE_RUNDOWN,
+    name: 'Activate Rundown',
+    description: 'Activates the Rundown',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
+    id: SystemActionId.DEACTIVATE_RUNDOWN,
+    name: 'Deactivate Rundown',
+    description: 'Deactivates the Rundown',
+    rank: 0,
+    data: undefined,
+    metadata: {
+      contentType: Tv2ActionContentType.SYSTEM,
+    }
+  },
+  {
+    type: SystemActionType.SYSTEM_ACTION,
     id: SystemActionId.SET_NEXT_PART,
     name: 'Set next Part',
     description: 'Sets the Part after the next Part as next',
@@ -182,6 +215,18 @@ export class ExecuteActionService implements ActionService {
     switch (systemActionId) {
       case SystemActionId.TAKE: {
         await this.rundownService.takeNext(rundownId)
+        break
+      }
+      case SystemActionId.RESET_RUNDOWN: {
+        await this.rundownService.resetRundown(rundownId)
+        break
+      }
+      case SystemActionId.ACTIVATE_RUNDOWN: {
+        await this.rundownService.activateRundown(rundownId)
+        break
+      }
+      case SystemActionId.DEACTIVATE_RUNDOWN: {
+        await this.rundownService.deactivateRundown(rundownId)
         break
       }
       case SystemActionId.SET_NEXT_PART: {
