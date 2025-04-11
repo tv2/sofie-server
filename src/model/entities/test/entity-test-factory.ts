@@ -19,6 +19,7 @@ import { PieceActionType } from '../../enums/action-type'
 import { TakeMode } from '../../enums/take-mode'
 import { PieceType } from '../../enums/piece-type'
 import { ActionOperation, Macro, Operation, OperationType } from '../macro'
+import { TimelineObject } from '../timeline-object'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -180,6 +181,19 @@ export class EntityTestFactory {
         type: PieceType.UNKNOWN
       },
       ...ingestedPiece
+    }
+  }
+
+  public static createTimelineObject(timelineObject: Partial<TimelineObject> = {}): TimelineObject {
+    return {
+      id: 'randomTimelineObjectId',
+      layer: 'randomLayer',
+      enable: {},
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: {}
+      },
+      ...timelineObject
     }
   }
 
