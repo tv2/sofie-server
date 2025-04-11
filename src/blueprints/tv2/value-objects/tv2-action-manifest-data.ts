@@ -1,8 +1,8 @@
 import { Tv2SourceMappingWithAudio } from './tv2-studio-blueprint-configuration'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2SourceLayer } from './tv2-layers'
-import { Tv2AudioMode } from '../enums/tv2-audio-mode'
+import { Tv2PieceLayer } from './tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { PieceType } from '../../../model/enums/piece-type'
+import { AudioMode } from '../../../model/enums/audio-mode'
 
 export type Tv2ActionManifestData =
   | Tv2ActionManifestVideoClipData
@@ -37,7 +37,7 @@ export interface Tv2ActionManifestSplitScreenData {
   rank: number
   userData: {
     name: string
-    pieceType: Tv2PieceType
+    pieceType: PieceType
     config: {
       template: string
       labels: string[]
@@ -69,7 +69,7 @@ export interface Tv2ActionManifestFullscreenGraphicsData {
  */
 export interface Tv2ActionManifestOverlayGraphicsData {
   rank: number
-  sourceLayerId: Tv2SourceLayer
+  pieceLayer: Tv2PieceLayer
   name: string,
   expectedDuration?: number
   lifespan?: string
@@ -108,7 +108,7 @@ export interface Tv2VideoClipManifestData {
   fileName: string // userData.partDefinition.videoId
   durationFromIngest: number // userData.duration
   adLibPix: boolean // userData.adLibPix // What does "adLibPix" mean?
-  audioMode: Tv2AudioMode // userData.voLevels
+  audioMode: AudioMode // userData.voLevels
   rundownId?: string
 }
 
@@ -130,7 +130,7 @@ export interface Tv2FullscreenGraphicsManifestData {
 
 export interface Tv2OverlayGraphicsManifestData {
   rundownId: string
-  sourceLayerId: Tv2SourceLayer
+  pieceLayer: Tv2PieceLayer
   name: string
   rank: number
   templateName: string

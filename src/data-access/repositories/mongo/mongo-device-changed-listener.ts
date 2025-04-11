@@ -4,8 +4,8 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { ChangeStream, ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
-import { Device } from '../../../model/entities/device'
 import { Logger } from '../../../logger/logger'
+import { Device } from '../../../model/entities/device'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
@@ -33,7 +33,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository<MongoDevice>
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
         const mongoDevice: MongoDevice = change.fullDocument
-        this.onCreatedCallback(this.mongoEntityConverter.convertToDevice(mongoDevice))
+        this.onCreatedCallback(this.mongoEntityConverter.convertToDeviceInterface(mongoDevice))
         return
       }
       case MongoChangeEvent.UPDATE: {
@@ -41,7 +41,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository<MongoDevice>
         if (!mongoDevice) {
           return
         }
-        this.onUpdatedCallback(this.mongoEntityConverter.convertToDevice(mongoDevice))
+        this.onUpdatedCallback(this.mongoEntityConverter.convertToDeviceInterface(mongoDevice))
         return
       }
       case MongoChangeEvent.DELETE: {

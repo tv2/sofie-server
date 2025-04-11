@@ -10,6 +10,8 @@ import { IngestedPart } from '../../../model/entities/ingested-part'
 import { IngestedPiece } from '../../../model/entities/ingested-piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
+import { DeviceType } from '../../../model/enums/device-type'
+import { PieceType } from '../../../model/enums/piece-type'
 
 describe(EntityChangeDetector.name, () => {
   describe(EntityChangeDetector.prototype.doesShallowRundownDifferFromIngestedRundown.name, () => {
@@ -29,7 +31,7 @@ describe(EntityChangeDetector.name, () => {
       ['rank', { showStyleVariantId: 'variant-a' }, { showStyleVariantId: 'variant-b' }],
       ['modification timestamp', { modifiedAt: 100 }, { modifiedAt: 200 }],
       ['timing', { timing: { type: RundownTimingType.UNSCHEDULED } }, { timings: { type: RundownTimingType.BACKWARD, expectedEndEpochTime: Date.now() } }],
-      ['baseline', { baselineTimelineObjects: [{ id: '', layer: 'layer-1', enable: { start: 0 }, content: { foo: 'bar' }}] }, { baselineTimelineObjects: [{ id: '', layer: 'layer-1', enable: { start: 0 }, content: { foo: 'baz' }}] }],
+      ['baseline', { baselineTimelineObjects: [{ id: '', layer: 'layer-1', enable: { start: 0 }, content: { deviceType: DeviceType.CASPAR_CG, type: undefined }}] }, { baselineTimelineObjects: [{ id: '', layer: 'layer-1', enable: { start: 0 }, content: {  deviceType: DeviceType.ATEM, type: undefined  }}] }],
     ]
     testCases.forEach(([attribute, rundownAttributes, ingestedRundownAttributes]) => {
       describe(`when the ingested rundown has a different ${attribute} than the rundown`, () => {
@@ -138,8 +140,8 @@ describe(EntityChangeDetector.name, () => {
       ['pre-roll duration', { preRollDuration: 0 }, { preRollDuration: 100 }],
       ['post-roll duration', { postRollDuration: 0 }, { postRollDuration: 100 }],
       ['transition type', { transitionType: TransitionType.NO_TRANSITION }, { transitionType: TransitionType.IN_TRANSITION }],
-      ['timeline objects', { timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: { foo: 'bar' } }] }, {  timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: { foo: 'baz' } }]  }],
-      ['metadata', { metadata: undefined }, { metadata: { foo: 'bar' } }],
+      ['timeline objects', { timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: {  deviceType: DeviceType.CASPAR_CG, type: undefined  } }] }, {  timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: {  deviceType: DeviceType.ATEM, type: undefined  } }]  }],
+      ['metadata', { metadata: undefined }, { metadata: { type: PieceType.UNKNOWN } }],
       ['content', { content: undefined }, { content: { foo: 'bar' } }],
     ]
     testCases.forEach(([attribute, pieceAttributes, ingestedPieceAttributes]) => {

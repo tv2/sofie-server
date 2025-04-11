@@ -31,23 +31,25 @@ import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
 import {
   ActionEventType,
-  ActionTriggerEventType,
+  TriggerEventType,
   ConfigurationEventType,
+  DeviceEventType,
   IngestEventType,
+  MacroEventType,
   RundownEventType,
   StatusMessageEventType
 } from '../enums/event-type'
 import { SegmentDto } from '../dtos/segment-dto'
 import { Segment } from '../../model/entities/segment'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
-import { ActionTriggerEventBuilder } from '../interfaces/action-trigger-event-builder'
-import { ActionTrigger } from '../../model/entities/action-trigger'
+import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
+import { Trigger } from '../../model/entities/trigger'
 import {
-  ActionTriggerCreatedEvent,
-  ActionTriggerDeletedEvent,
-  ActionTriggerUpdatedEvent
-} from '../value-objects/action-trigger-event'
-import { ActionTriggerDto } from '../dtos/action-trigger-dto'
+  TriggerCreatedEvent,
+  TriggerDeletedEvent,
+  TriggerUpdatedEvent
+} from '../value-objects/trigger-event'
+import { TriggerDto} from '../dtos/trigger-dto'
 import { RundownDto } from '../dtos/rundown-dto'
 import { Media } from '../../model/entities/media'
 import { MediaDto } from '../dtos/media-dto'
@@ -63,8 +65,25 @@ import { ActionEventBuilder } from '../interfaces/action-event-builder'
 import { Action } from '../../model/entities/action'
 import { ActionsUpdatedEvent } from '../value-objects/action-event'
 import { ActionDto } from '../dtos/action-dto'
+import { DeviceEventBuilder } from '../interfaces/device-event-builder'
+import { Device } from '../../model/entities/device'
+import {
+  DeviceCreatedEvent,
+  DeviceDeletedEvent,
+  DeviceUpdatedEvent,
+  VideoMixerConfigurationUpdatedEvent
+} from '../value-objects/device-event'
+import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { MacroEventBuilder } from '../interfaces/macro-event-builder'
+import { Macro } from '../../model/entities/macro'
+import {
+  MacroCreatedEvent,
+  MacroDeletedEvent,
+  MacroUpdatedEvent
+} from '../value-objects/macro-event'
+import { MacroDto } from '../dtos/macro-dto'
 
-export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, ActionTriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -303,27 +322,27 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
     }
   }
 
-  public buildActionTriggerCreatedEvent(actionTrigger: ActionTrigger): ActionTriggerCreatedEvent {
+  public buildTriggerCreatedEvent(trigger: Trigger): TriggerCreatedEvent {
     return {
-      type: ActionTriggerEventType.ACTION_TRIGGER_CREATED,
+      type: TriggerEventType.TRIGGER_CREATED,
       timestamp: Date.now(),
-      actionTrigger: new ActionTriggerDto(actionTrigger),
+      trigger: TriggerDto.createTriggerDto(trigger)
     }
   }
 
-  public buildActionTriggerUpdatedEvent(actionTrigger: ActionTrigger): ActionTriggerUpdatedEvent {
+  public buildTriggerUpdatedEvent(trigger: Trigger): TriggerUpdatedEvent {
     return {
-      type: ActionTriggerEventType.ACTION_TRIGGER_UPDATED,
+      type: TriggerEventType.TRIGGER_UPDATED,
       timestamp: Date.now(),
-      actionTrigger: new ActionTriggerDto(actionTrigger),
+      trigger: TriggerDto.createTriggerDto(trigger)
     }
   }
 
-  public buildActionTriggerDeletedEvent(actionTriggerId: string): ActionTriggerDeletedEvent {
+  public buildTriggerDeletedEvent(triggerId: string): TriggerDeletedEvent {
     return {
-      type: ActionTriggerEventType.ACTION_TRIGGER_DELETED,
+      type: TriggerEventType.TRIGGER_DELETED,
       timestamp: Date.now(),
-      actionTriggerId,
+      triggerId: triggerId,
     }
   }
 
@@ -349,6 +368,62 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Ac
       timestamp: Date.now(),
       rundownId,
       actions: actions.map(action => new ActionDto(action))
+    }
+  }
+
+  public buildDeviceCreatedEvent(device: Device): DeviceCreatedEvent {
+    return {
+      type: DeviceEventType.DEVICE_CREATED,
+      timestamp: Date.now(),
+      device
+    }
+  }
+
+  public buildDeviceUpdatedEvent(device: Device): DeviceUpdatedEvent {
+    return {
+      type: DeviceEventType.DEVICE_UPDATED,
+      timestamp: Date.now(),
+      device
+    }
+  }
+
+  public buildDeviceDeletedEvent(deviceId: string): DeviceDeletedEvent {
+    return {
+      type: DeviceEventType.DEVICE_DELETED,
+      timestamp: Date.now(),
+      deviceId
+    }
+  }
+
+  public buildVideoMixerConfigurationUpdatedEvent(videoMixerConfiguration: VideoMixerConfiguration): VideoMixerConfigurationUpdatedEvent {
+    return {
+      type: DeviceEventType.VIDEO_MIXER_CONFIGURATION_UPDATED,
+      videoMixer: videoMixerConfiguration,
+      timestamp: Date.now()
+    }
+  }
+
+  public buildMacroCreatedEvent(macro: Macro): MacroCreatedEvent {
+    return {
+      type: MacroEventType.MACRO_CREATED,
+      timestamp: Date.now(),
+      macro: new MacroDto(macro),
+    }
+  }
+
+  public buildMacroDeletedEvent(macroId: string): MacroDeletedEvent {
+    return {
+      type: MacroEventType.MACRO_DELETED,
+      timestamp: Date.now(),
+      macroId,
+    }
+  }
+
+  public buildMacroUpdatedEvent(macro: Macro): MacroUpdatedEvent {
+    return {
+      type: MacroEventType.MACRO_UPDATED,
+      timestamp: Date.now(),
+      macro: new MacroDto(macro),
     }
   }
 }

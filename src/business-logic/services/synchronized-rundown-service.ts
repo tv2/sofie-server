@@ -4,10 +4,17 @@ import { Owner } from '../../model/enums/owner'
 import { InTransition } from '../../model/value-objects/in-transition'
 import { RundownService } from './interfaces/rundown-service'
 import { AsyncLock } from '../async-lock'
+import { SetNextDirection } from '../../model/enums/set-next-direction'
+import { TakeMode } from '../../model/enums/take-mode'
 
 export class SynchronizedRundownService implements RundownService {
 
-  constructor(private readonly rundownService: RundownService, private readonly rundownLock: AsyncLock) {}
+  constructor(private readonly rundownService: RundownService, private readonly rundownLock: AsyncLock) {
+  }
+
+  public setTakeMode(rundownId: string, takeMode: TakeMode): Promise<void> {
+    return this.rundownLock.withLock(this.setTakeMode.name, () => this.rundownService.setTakeMode(rundownId, takeMode))
+  }
 
   public takeNext(rundownId: string): Promise<void> {
     return this.rundownLock.withLock(this.takeNext.name, () => this.rundownService.takeNext(rundownId))
@@ -33,8 +40,12 @@ export class SynchronizedRundownService implements RundownService {
     return this.rundownLock.withLock(this.deleteRundown.name, () => this.rundownService.deleteRundown(rundownId))
   }
 
-  public setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
-    return this.rundownLock.withLock(this.setNext.name, () => this.rundownService.setNext(rundownId, segmentId, partId, owner))
+  public setNextFromIds(rundownId: string, segmentId: string, partId: string, owner?: Owner | undefined): Promise<void> {
+    return this.rundownLock.withLock(this.setNextFromIds.name, () => this.rundownService.setNextFromIds(rundownId, segmentId, partId, owner))
+  }
+
+  public setNextFromDirection(rundownId: string, direction: SetNextDirection, owner?: Owner | undefined): Promise<void> {
+    return this.rundownLock.withLock(this.setNextFromDirection.name, () => this.rundownService.setNextFromDirection(rundownId, direction, owner))
   }
 
   public insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {

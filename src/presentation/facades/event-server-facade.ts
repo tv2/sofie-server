@@ -8,10 +8,12 @@ export class EventServerFacade {
     return WebSocketEventServer.getInstance(
       EventEmitterFacade.createRundownEventObserver(),
       EventEmitterFacade.createActionEventObserver(),
-      EventEmitterFacade.createActionTriggerEventObserver(),
+      EventEmitterFacade.createTriggerEventObserver(),
+      EventEmitterFacade.createMacroEventObserver(),
       EventEmitterFacade.createMediaEventObserver(),
       EventEmitterFacade.createConfigurationEventObserver(),
       EventEmitterFacade.createStatusMessageEventObserver(),
+      EventEmitterFacade.createDeviceEventObserver(),
       LoggerFacade.createLogger()
     )
   }

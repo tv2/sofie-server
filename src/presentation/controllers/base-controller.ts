@@ -26,8 +26,8 @@ interface Route {
 
 export abstract class BaseController {
   public getRoutes(): Route[] {
-    const methods = getMethods(this)
-    const paths = getPaths(this)
+    const methods: Map<string, Method> = getMethods(this)
+    const paths: Map<string, string> = getPaths(this)
     return [...methods.keys()].map((methodName: string) => ({
       path: this.getFullPath(paths.get(methodName) ?? ''),
       method: methods.get(methodName) ?? Method.GET,
@@ -36,7 +36,7 @@ export abstract class BaseController {
   }
 
   private getFullPath(path: string): string {
-    const basePath = getBasePath(this)
+    const basePath: string = getBasePath(this)
     return `/${basePath}/${path}`.replace(/\/+/g, '/').replace(/(?<!^)\/$/g, '')
   }
 
@@ -80,7 +80,7 @@ function setRoute(target: object, methodName: string, method: Method, path?: str
 }
 
 function setPath(target: object, methodName: string, path: string): void {
-  const paths = getPaths(target)
+  const paths: Map<string, string> = getPaths(target)
   paths.set(methodName, path)
   setPaths(target, paths)
 }
@@ -94,7 +94,7 @@ function setPaths(target: object, paths: Map<string, string>): void {
 }
 
 function setMethod(target: object, methodName: string, method: Method): void {
-  const methods = getMethods(target)
+  const methods: Map<string, Method> = getMethods(target)
   methods.set(methodName, method)
   setMethods(target, methods)
 }

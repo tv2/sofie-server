@@ -7,19 +7,19 @@ import {
   Tv2ActionManifestOverlayGraphicsData,
   Tv2ActionManifestSplitScreenData,
   Tv2ActionManifestSplitScreenSource,
+  Tv2ActionManifestSplitScreenSourceType,
   Tv2ActionManifestVideoClipData,
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData,
   Tv2SplitScreenManifestData,
-  Tv2VideoClipManifestData,
-  Tv2ActionManifestSplitScreenSourceType
+  Tv2VideoClipManifestData
 } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
-import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { ExhaustiveCaseChecker } from '../../../business-logic/exhaustive-case-checker'
 import { Tv2Logger } from '../tv2-logger'
+import { AudioMode } from '../../../model/enums/audio-mode'
 
 const SPLIT_SCREEN_ACTION_MANIFEST_ID: string = 'select_dve'
 const VIDEO_CLIP_ACTION_MANIFEST_ID: string = 'select_server_clip'
@@ -124,7 +124,7 @@ export class Tv2ActionManifestMapper {
       fileName: data.userData.partDefinition.fields.videoId,
       durationFromIngest: data.userData.duration,
       adLibPix: data.userData.adLibPix,
-      audioMode: data.userData.voLevels ? Tv2AudioMode.VOICE_OVER : Tv2AudioMode.FULL,
+      audioMode: data.userData.voLevels ? AudioMode.VOICE_OVER : AudioMode.FULL,
       rundownId: actionManifest.rundownId
     }
   }
@@ -171,7 +171,7 @@ export class Tv2ActionManifestMapper {
       name: data.name,
       rank: data.rank,
       rundownId: actionManifest.rundownId,
-      sourceLayerId: data.sourceLayerId,
+      pieceLayer: data.pieceLayer,
       templateName: this.getTemplateName(data.name),
       displayText: this.getDisplayText(data.name),
       expectedDuration: data.expectedDuration,

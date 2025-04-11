@@ -4,6 +4,8 @@ import { TransitionType } from '../enums/transition-type'
 import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
+import { PieceMetadata } from '../value-objects/metadata'
+import { DuplicateIdException } from '../exceptions/duplicate-id-exception'
 
 export interface PieceInterface {
   id: string
@@ -21,7 +23,7 @@ export interface PieceInterface {
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
 
-  metadata?: unknown
+  metadata: PieceMetadata
   content?: unknown
   tags: string[]
   isUnsynced: boolean
@@ -41,7 +43,7 @@ export class Piece {
   public readonly postRollDuration: number
   public readonly transitionType: TransitionType
 
-  public readonly metadata?: unknown
+  public readonly metadata: PieceMetadata
   public readonly content?: unknown
   public readonly tags: string[]
 
@@ -51,7 +53,8 @@ export class Piece {
   private executedAt: number
   private isUnsyncedPiece: boolean = false
   private isPieceInsertedOnAir: boolean
-  private timelineObjects: TimelineObject[]
+  private originalTimelineObjects: TimelineObject[]
+  private readonly insertedTimelineObjects: TimelineObject[] = []
 
   constructor(piece: PieceInterface) {
     this.id = piece.id
@@ -73,7 +76,7 @@ export class Piece {
     this.tags = piece.tags
     this.isUnsyncedPiece = piece.isUnsynced
     this.isPieceInsertedOnAir = piece.isInsertedOnAir ?? false
-    this.timelineObjects = piece.timelineObjects ? [...piece.timelineObjects] : []
+    this.originalTimelineObjects = piece.timelineObjects ? [...piece.timelineObjects] : []
 
     this.setExecutedAt(piece.executedAt ?? 0)
   }
@@ -85,7 +88,7 @@ export class Piece {
       // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
       this.executedAt = 0
     }
-    this.timelineObjects = [...ingestedPiece.timelineObjects]
+    this.originalTimelineObjects = [...ingestedPiece.timelineObjects]
   }
 
   public setExecutedAt(executedAt: number): void {
@@ -161,12 +164,24 @@ export class Piece {
     return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: unsyncedId})
   }
 
+  public copy(newPartId?: string): Piece {
+    const id: string = `${this.id}_COPY`
+    const partId: string = newPartId ?? this.partId
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: id, partId, isPlanned: false, insertedTimelineObjects: [] })
+  }
+
   public getTimelineObjects(): TimelineObject[] {
-    return [...this.timelineObjects]
+    return [...this.originalTimelineObjects, ...this.insertedTimelineObjects]
   }
 
   public insertTimelineObjects(timelineObjects: TimelineObject[]): void {
-    this.timelineObjects.push(...timelineObjects)
+    timelineObjects.forEach(timelineObjectToBeInserted => {
+      const containsDuplicateId: boolean = this.getTimelineObjects().some(timelineObject => timelineObject.id === timelineObjectToBeInserted.id)
+      if (containsDuplicateId) {
+        throw new DuplicateIdException(`A TimelineObject with id '${timelineObjectToBeInserted.id}' already exist on Piece ${this.id}`)
+      }
+    })
+    this.insertedTimelineObjects.push(...timelineObjects)
   }
 
   public hasEnded(timestamp: number): boolean {

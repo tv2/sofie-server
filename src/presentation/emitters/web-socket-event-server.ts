@@ -1,20 +1,25 @@
-import WebSocket, { WebSocketServer } from 'ws'
-import express from 'express'
+import express, { Express } from 'express'
 import * as http from 'http'
-import { RundownEvent } from '../value-objects/rundown-event'
-import { EventServer } from './interfaces/event-server'
-import { RundownEventObserver } from '../interfaces/rundown-event-observer'
-import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
-import { ActionTriggerEvent } from '../value-objects/action-trigger-event'
+import { Server } from 'http'
+import WebSocket, { Server as WsServer, WebSocketServer } from 'ws'
 import { Logger } from '../../logger/logger'
-import { MediaEventObserver } from '../interfaces/media-event-observer'
-import { MediaEvent } from '../value-objects/media-event'
-import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
-import { ConfigurationEvent } from '../value-objects/configuration-event'
-import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
-import { StatusMessageEvent } from '../value-objects/status-message-event'
 import { ActionEventObserver } from '../interfaces/action-event-observer'
+import { TriggerEventObserver } from '../interfaces/trigger-event-observer'
+import { MacroEventObserver } from '../interfaces/macro-event-observer'
+import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
+import { MediaEventObserver } from '../interfaces/media-event-observer'
+import { RundownEventObserver } from '../interfaces/rundown-event-observer'
+import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
 import { ActionEvent } from '../value-objects/action-event'
+import { TriggerEvent } from '../value-objects/trigger-event'
+import { MacroEvent } from '../value-objects/macro-event'
+import { ConfigurationEvent } from '../value-objects/configuration-event'
+import { MediaEvent } from '../value-objects/media-event'
+import { RundownEvent } from '../value-objects/rundown-event'
+import { StatusMessageEvent } from '../value-objects/status-message-event'
+import { EventServer } from './interfaces/event-server'
+import { DeviceEventObserver } from '../interfaces/device-event-observer'
+import { DeviceEvent } from '../value-objects/device-event'
 import { TypedEvent } from '../value-objects/typed-event'
 import { NtpEvent } from '../value-objects/ntp-event'
 import { NtpEventType } from '../enums/event-type'
@@ -25,20 +30,24 @@ export class WebSocketEventServer implements EventServer {
   public static getInstance(
     rundownEventObserver: RundownEventObserver,
     actionEventObserver: ActionEventObserver,
-    actionTriggerEventObserver: ActionTriggerEventObserver,
+    triggerEventObserver: TriggerEventObserver,
+    macroEventObserver: MacroEventObserver,
     mediaEventObserver: MediaEventObserver,
     configurationEventObserver: ConfigurationEventObserver,
     statusMessageEventObserver: StatusMessageEventObserver,
+    deviceEventObserver: DeviceEventObserver,
     logger: Logger
   ): EventServer {
     if (!this.instance) {
       this.instance = new WebSocketEventServer(
         rundownEventObserver,
         actionEventObserver,
-        actionTriggerEventObserver,
+        triggerEventObserver,
+        macroEventObserver,
         mediaEventObserver,
         configurationEventObserver,
         statusMessageEventObserver,
+        deviceEventObserver,
         logger
       )
     }
@@ -51,10 +60,12 @@ export class WebSocketEventServer implements EventServer {
   private constructor(
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionEventObserver: ActionEventObserver,
-    private readonly actionTriggerEventObserver: ActionTriggerEventObserver,
+    private readonly triggerEventObserver: TriggerEventObserver,
+    private readonly macroEventObserver: MacroEventObserver,
     private readonly mediaEventObserver: MediaEventObserver,
     private readonly configurationEventObserver: ConfigurationEventObserver,
     private readonly statusMessageEventObserver: StatusMessageEventObserver,
+    private readonly deviceEventObserver: DeviceEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -87,9 +98,9 @@ export class WebSocketEventServer implements EventServer {
   }
 
   private createWebSocketServer(port: number): WebSocketServer {
-    const app = express()
-    const server = http.createServer(app)
-    const webSocketServer = new WebSocketServer({ server })
+    const app: Express = express()
+    const server: Server = http.createServer(app)
+    const webSocketServer: WsServer = new WebSocketServer({ server })
 
     server.listen(port, () => {
       this.logger.info(`WebSocket server started on port: ${port}`)
@@ -105,8 +116,11 @@ export class WebSocketEventServer implements EventServer {
     this.actionEventObserver.subscribeToActionEvents((actionEvent: ActionEvent) => {
       webSocket.send(JSON.stringify(actionEvent))
     })
-    this.actionTriggerEventObserver.subscribeToActionTriggerEvents((actionTriggerEvent: ActionTriggerEvent) => {
-      webSocket.send(JSON.stringify(actionTriggerEvent))
+    this.triggerEventObserver.subscribeToTriggerEvents((triggerEvent: TriggerEvent) => {
+      webSocket.send(JSON.stringify(triggerEvent))
+    })
+    this.macroEventObserver.subscribeToMacroEvents((macro: MacroEvent) => {
+      webSocket.send(JSON.stringify(macro))
     })
     this.mediaEventObserver.subscribeToMediaEvents((mediaEvent: MediaEvent) => {
       webSocket.send(JSON.stringify(mediaEvent))
@@ -116,6 +130,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.statusMessageEventObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => {
       webSocket.send(JSON.stringify(statusMessageEvent))
+    })
+    this.deviceEventObserver.subscribeToDeviceEvents((deviceEvent: DeviceEvent) => {
+      webSocket.send(JSON.stringify(deviceEvent))
     })
 
     webSocket.onmessage = (message: WebSocket.MessageEvent): void => {

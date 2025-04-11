@@ -2,14 +2,18 @@ import { Part } from '../../../model/entities/part'
 import { Piece } from '../../../model/entities/piece'
 import { Owner } from '../../../model/enums/owner'
 import { InTransition } from '../../../model/value-objects/in-transition'
+import { SetNextDirection } from '../../../model/enums/set-next-direction'
+import { TakeMode } from '../../../model/enums/take-mode'
 
 export interface RundownService {
   deleteRundown(rundownId: string): Promise<void>
   activateRundown(rundownId: string): Promise<void>
   enterRehearsal(rundownId: string): Promise<void>
   deactivateRundown(rundownId: string): Promise<void>
+  setTakeMode(rundownId: string, takeMode: TakeMode): Promise<void>
   takeNext(rundownId: string): Promise<void>
-  setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void>
+  setNextFromIds(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void>
+  setNextFromDirection(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void>
   resetRundown(rundownId: string): Promise<void>
   insertPartAsOnAir(rundownId: string, part: Part): Promise<void>
   insertPartAsNext(rundownId: string, part: Part): Promise<void>

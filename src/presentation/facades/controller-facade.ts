@@ -7,11 +7,13 @@ import { TimelineController } from '../controllers/timeline-controller'
 import { ActionController } from '../controllers/action-controller'
 import { ConfigurationController } from '../controllers/configuration-controller'
 import { JsendResponseFormatter } from '../jsend-response-formatter'
-import { ActionTriggerController } from '../controllers/action-trigger-controller'
+import { TriggerController } from '../controllers/trigger-controller'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaController } from '../controllers/media-controller'
 import { SystemInformationController } from '../controllers/system-information-controller'
+import { DeviceController } from '../controllers/device-controller'
 import { LoggerController } from '../controllers/logger-controller'
+import { MacroController } from '../controllers/macro-controller'
 
 export class ControllerFacade {
   public static getControllers(): BaseController[] {
@@ -19,11 +21,13 @@ export class ControllerFacade {
       this.createRundownController(),
       this.createTimelineController(),
       this.createActionController(),
-      this.createActionTriggerController(),
+      this.createTriggerController(),
       this.createConfigurationController(),
       this.createMediaController(),
       this.createSystemInformationController(),
+      this.createDeviceController(),
       this.createLoggerController(),
+      this.createMacroController(),
     ]
   }
 
@@ -33,7 +37,7 @@ export class ControllerFacade {
       RepositoryFacade.createRundownRepository(),
       ServiceFacade.createIngestService(),
       ControllerFacade.createExpressErrorHandler(),
-      new JsendResponseFormatter()
+      new JsendResponseFormatter(), LoggerFacade.createLogger()
     )
   }
 
@@ -52,15 +56,21 @@ export class ControllerFacade {
   private static createActionController(): ActionController {
     return new ActionController(
       ServiceFacade.createActionService(),
-      RepositoryFacade.createActionRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
   }
 
-  private static createActionTriggerController(): ActionTriggerController {
-    return new ActionTriggerController(
-      ServiceFacade.createActionTriggerService(),
+  private static createTriggerController(): TriggerController {
+    return new TriggerController(
+      ServiceFacade.createTriggerService(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter()
+    )
+  }
+
+  private static createMacroController(): MacroController {
+    return new MacroController(ServiceFacade.createMacroService(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
@@ -99,6 +109,15 @@ export class ControllerFacade {
       new JsendResponseFormatter(),
       ControllerFacade.createExpressErrorHandler(),
       LoggerFacade.createLogger()
+    )
+  }
+
+  private static createDeviceController(): DeviceController {
+    return new DeviceController(
+      ServiceFacade.createDeviceService(),
+      RepositoryFacade.createVideoMixerDeviceRepository(),
+      ControllerFacade.createExpressErrorHandler(),
+      new JsendResponseFormatter(),
     )
   }
 }

@@ -4,6 +4,8 @@ import { Owner } from '../../model/enums/owner'
 import { ThrottledRundownException } from '../../model/exceptions/throttled-rundown-exception'
 import { InTransition } from '../../model/value-objects/in-transition'
 import { RundownService } from './interfaces/rundown-service'
+import { SetNextDirection } from '../../model/enums/set-next-direction'
+import { TakeMode } from '../../model/enums/take-mode'
 
 const RUNDOWN_THROTTLED_INTERVAL_MS: number = 500
 const RUNDOWN_THROTTLED_ERROR_TEXT: string = `Unable to do action. An action was already executed less than ${RUNDOWN_THROTTLED_INTERVAL_MS}ms ago`
@@ -19,7 +21,12 @@ export class ThrottledRundownService implements RundownService {
 
   private lastOperationTakenEpochTimestamp: number
 
-  constructor(private readonly rundownService: RundownService) {}
+  constructor(private readonly rundownService: RundownService) {
+  }
+
+  public setTakeMode(rundownId: string, takeMode: TakeMode): Promise<void> {
+    return this.rundownService.setTakeMode(rundownId, takeMode)
+  }
 
   private assertEnoughTimeHasPassed(): void {
     const now: number = Date.now()
@@ -55,8 +62,12 @@ export class ThrottledRundownService implements RundownService {
     return this.rundownService.deleteRundown(rundownId)
   }
 
-  public setNext(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
-    return this.rundownService.setNext(rundownId, segmentId, partId, owner)
+  public setNextFromIds(rundownId: string, segmentId: string, partId: string, owner?: Owner): Promise<void> {
+    return this.rundownService.setNextFromIds(rundownId, segmentId, partId, owner)
+  }
+
+  public setNextFromDirection(rundownId: string, direction: SetNextDirection, owner?: Owner): Promise<void> {
+    return this.rundownService.setNextFromDirection(rundownId, direction, owner)
   }
 
   public insertPartAsOnAir(rundownId: string, part: Part): Promise<void> {

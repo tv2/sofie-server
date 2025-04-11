@@ -1,10 +1,10 @@
-import { Response } from 'express'
-import { Exception } from '../model/exceptions/exception'
-import { ErrorCode } from '../model/enums/error-code'
-import { HttpStatusCode } from './http-status-code'
-import { HttpErrorHandler } from './interfaces/http-error-handler'
-import { Logger } from '../logger/logger'
-import { HttpResponseFormatter } from './interfaces/http-response-formatter'
+import {Response} from 'express'
+import {Exception} from '../model/exceptions/exception'
+import {ErrorCode} from '../model/enums/error-code'
+import {HttpStatusCode} from './http-status-code'
+import {HttpErrorHandler} from './interfaces/http-error-handler'
+import {Logger} from '../logger/logger'
+import {HttpResponseFormatter} from './interfaces/http-response-formatter'
 
 export class ExpressErrorHandler implements HttpErrorHandler {
 
@@ -13,6 +13,7 @@ export class ExpressErrorHandler implements HttpErrorHandler {
   constructor(private readonly httpResponseFormatter: HttpResponseFormatter, logger: Logger) {
     this.logger = logger.tag(ExpressErrorHandler.name)
   }
+
   public handleError(response: Response, exception: Exception): void {
     this.logger.data(exception).error(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
 
@@ -27,11 +28,21 @@ export class ExpressErrorHandler implements HttpErrorHandler {
       case ErrorCode.RUNDOWN_IS_ACTIVE:
       case ErrorCode.LAST_PART_IN_SEGMENT:
       case ErrorCode.TAKE_IS_BLOCKED:
-      case ErrorCode.SERVICE_UNAVAILABLE: {
+      case ErrorCode.SERVICE_UNAVAILABLE:
+      case ErrorCode.INVALID_ID: {
         return HttpStatusCode.BAD_REQUEST
       }
       case ErrorCode.NOT_FOUND: {
         return HttpStatusCode.NOT_FOUND
+      }
+      case ErrorCode.BAD_REQUEST: {
+        return HttpStatusCode.BAD_REQUEST
+      }
+      case ErrorCode.UNPROCESSABLE_ENTITY: {
+        return HttpStatusCode.UNPROCESSABLE_CONTENT
+      }
+      case ErrorCode.CONFLICT: {
+        return HttpStatusCode.CONFLICT
       }
       case ErrorCode.MISCONFIGURATION:
       case ErrorCode.DELETION_FAILED: {

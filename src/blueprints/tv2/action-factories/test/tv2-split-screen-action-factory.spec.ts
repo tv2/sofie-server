@@ -23,10 +23,11 @@ import {
   Tv2ActionManifestSplitScreenData,
   Tv2ActionManifestSplitScreenSourceType
 } from '../../value-objects/tv2-action-manifest-data'
-import { Tv2PieceType } from '../../enums/tv2-piece-type'
 import { Tv2Action, Tv2ActionContentType } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../model/enums/action-type'
 import { Tv2Logger } from '../../tv2-logger'
+import { PieceType } from '../../../../model/enums/piece-type'
+import { ObjectCloner } from '../../../../business-logic/services/interfaces/object-cloner'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   describe(Tv2SplitScreenActionFactory.prototype.createSplitScreenActions.name, () => {
@@ -43,7 +44,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 5,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -65,7 +66,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 10,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
                     template: 'sommerfugl', labels: ['Locator 1', 'Locator2alt'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -102,7 +103,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 5,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -124,7 +125,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 10,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -165,7 +166,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
           data: {
             rank: 5,
             userData: {
-              name: 'DVE UNKNOWN', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+              name: 'DVE UNKNOWN', pieceType: PieceType.SPLIT_SCREEN, config: {
                 template: 'some-unknown-template', labels: ['Locator1', 'Locator2'], sources: {
                   INP1: {
                     sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -187,7 +188,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
           data: {
             rank: 10,
             userData: {
-              name: 'DVE Sommerfugl', pieceType: Tv2PieceType.SPLIT_SCREEN, config: {
+              name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
                 template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                   INP1: {
                     sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -224,6 +225,7 @@ function createTestee(params?: {
   videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory,
   stringHashConverter?: Tv2StringHashConverter,
   assetPathHelper?: Tv2AssetPathHelper,
+  objectCloner?: ObjectCloner,
   logger?: Tv2Logger,
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
@@ -234,6 +236,7 @@ function createTestee(params?: {
     params?.videoClipTimelineObjectFactory ?? instance(mock<Tv2VideoClipTimelineObjectFactory>()),
     params?.stringHashConverter ?? new Tv2StringHashConverter(),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
+    params?.objectCloner ?? instance(mock<ObjectCloner>()),
     params?.logger ?? instance(createMockOfTv2Logger()),
   )
 }

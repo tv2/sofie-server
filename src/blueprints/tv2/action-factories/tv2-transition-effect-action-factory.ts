@@ -3,13 +3,13 @@ import {
   ActionArgumentType,
   MutateActionMethods,
   MutateActionType,
-  MutateActionWithPieceMethods
+  MutateActionWithPieceMethods,
 } from '../../../model/entities/action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Piece, PieceInterface } from '../../../model/entities/piece'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import {
   Tv2Action,
   Tv2ActionContentType,
@@ -36,16 +36,18 @@ import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
 import { InTransition } from '../../../model/value-objects/in-transition'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2Logger } from '../tv2-logger'
 import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
+import { OutputLayer } from '../../../model/enums/output-layer'
+import { PieceType } from '../../../model/enums/piece-type'
+
+const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 
 enum SpecialEffectName {
   MIX = 'Mix',
@@ -92,7 +94,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
           }
           throw exception
         }
-      })]
+      }),
+    ]
   }
 
   public isTransitionEffectAction(action: Tv2Action): action is Tv2TransitionEffectAction {
@@ -150,8 +153,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private isProgramPiece(piece: Piece): boolean {
-    const metadata: Tv2PieceMetadata = piece.metadata as Tv2PieceMetadata
-    const isPieceOnProgramOutputLayer: boolean = metadata.outputLayer === Tv2OutputLayer.PROGRAM
+    const isPieceOnProgramOutputLayer: boolean = piece.metadata.outputLayer === OutputLayer.PROGRAM
     const containsProgramTimelineObject: boolean = piece.getTimelineObjects().some(timelineObject => timelineObject.layer === this.videoMixerTimelineObjectFactory.getProgramLayer())
     return isPieceOnProgramOutputLayer && containsProgramTimelineObject
   }
@@ -163,13 +165,13 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return true
   }
 
-  private createPieceInterface(effectName: string, durationInFrames: number): Tv2PieceInterface {
+  private createPieceInterface(effectName: string, durationInFrames: number, piece: Partial<Tv2PieceInterface> = {}): Tv2PieceInterface {
     return {
       id: `${this.sanitizeStringForId(effectName)}TransitionActionPiece`,
-      name: `${effectName} transition`,
+      name: `${effectName}`,
       partId: '',
       rundownId: '',
-      layer: Tv2SourceLayer.JINGLE,
+      layer: Tv2PieceLayer.JINGLE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.IN_TRANSITION,
       isPlanned: false,
@@ -181,9 +183,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       isUnsynced: false,
       timelineObjects: [],
       metadata: {
-        type: Tv2PieceType.TRANSITION,
-        outputLayer: Tv2OutputLayer.SECONDARY
-      }
+        type: PieceType.TRANSITION,
+        outputLayer: OutputLayer.SECONDARY,
+      },
+      ...piece,
     }
   }
 
@@ -204,10 +207,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private mapToTransitionEffectNameForActionType(actionType: PieceActionType, effectName: string): string {
     switch (actionType) {
       case PieceActionType.INSERT_PIECE_AS_NEXT: {
-        return `${this.getEffectNamePrefix(effectName)}${effectName} on Next`
+        return `${effectName} on Next`
       }
       case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
-        return `${this.getEffectNamePrefix(effectName)}${effectName} and Take`
+        return `${effectName} and Take`
       }
       case PieceActionType.REPLACE_PIECE:
       case PieceActionType.INSERT_PIECE_AS_ON_AIR:
@@ -217,21 +220,13 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     }
   }
 
-  private getEffectNamePrefix(effectName: string): string {
-    const effectNamesWithoutPrefix: string[] = [SpecialEffectName.MIX, SpecialEffectName.DIP]
-    if (effectNamesWithoutPrefix.includes(effectName)) {
-      return ''
-    }
-    return 'Effect '
-  }
-
   private mapToTransitionEffectDescriptionForActionType(actionType: PieceActionType, effectName: string): string {
     switch (actionType) {
       case PieceActionType.INSERT_PIECE_AS_NEXT: {
-        return `Applies ${this.getEffectNamePrefix(effectName)}${effectName} on the next Take`
+        return `Applies ${effectName} on the next Take`
       }
       case PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE: {
-        return `Execute a Take with the ${this.getEffectNamePrefix(effectName)}${effectName} applied`
+        return `Execute a Take with the ${effectName} applied`
       }
       case PieceActionType.REPLACE_PIECE:
       case PieceActionType.INSERT_PIECE_AS_ON_AIR:
@@ -299,8 +294,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private createMixTransitionEffectAction(actionType: PieceActionType, durationInFrames: number): Tv2TransitionEffectAction {
-    const effectName: string = `Mix${durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames)
+    const effectName: string = `Mix ${durationInFrames}`
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.MIX,
@@ -310,8 +305,8 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   private createDipTransitionEffectAction(actionType: PieceActionType, durationInFrames: number, configuredDipInput: number): Tv2TransitionEffectAction {
-    const effectName: string = `Dip${durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames)
+    const effectName: string = `Dip ${durationInFrames}`
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       contentType: Tv2ActionContentType.TRANSITION,
       transitionEffectType: TransitionEffectType.DIP,
@@ -323,10 +318,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
-
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(breaker.name, breaker.durationInFrames)
+    const effectName: string = `Effect ${breaker.name}`
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, { metadata:  {type: PieceType.TRANSITION, outputLayer: OutputLayer.JINGLE}})
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
-    return this.createTransitionEffectAction(actionType, breaker.name, metadata, pieceInterface)
+    return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
 
   private findBreakerFromConfiguration(transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Breaker {

@@ -3,8 +3,8 @@ import { Part, PartInterface } from '../../../model/entities/part'
 import { PartActionType } from '../../../model/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import {
@@ -18,15 +18,16 @@ import {
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
+import { PieceMetadata } from '../../../model/value-objects/metadata'
+import { PieceType } from '../../../model/enums/piece-type'
+import { OutputLayer } from '../../../model/enums/output-layer'
 
 export class Tv2RemoteActionFactory extends ActionFactory {
 
@@ -92,9 +93,9 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     const videoMixerTimelineObjects: Tv2BlueprintTimelineObject[] = this.createVideoMixerTimelineObjects(source)
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
-    const metadata: Tv2PieceMetadata = {
-      type: Tv2PieceType.REMOTE,
-      outputLayer: Tv2OutputLayer.PROGRAM,
+    const metadata: PieceMetadata = {
+      type: PieceType.REMOTE,
+      outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: source.audioLayers,
         wantsToPersistAudio: source.wantsToPersistAudio,
@@ -107,7 +108,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       partId: parentPartId,
       rundownId: '',
       name: source.name,
-      layer: Tv2SourceLayer.REMOTE,
+      layer: Tv2PieceLayer.REMOTE,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
@@ -255,7 +256,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       duration: piece.getDuration(),
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
-      metadata: piece.metadata as Tv2PieceMetadata,
+      metadata: piece.metadata as PieceMetadata,
       tags: [],
       isUnsynced: false,
       timelineObjects: piece.getTimelineObjects()
@@ -276,7 +277,6 @@ export class Tv2RemoteActionFactory extends ActionFactory {
   }
 
   private isRemotePiece(piece: Piece): boolean {
-    const metadata: Tv2PieceMetadata | undefined = piece.metadata as Tv2PieceMetadata | undefined
-    return metadata?.type === Tv2PieceType.REMOTE
+    return piece.metadata.type === PieceType.REMOTE
   }
 }

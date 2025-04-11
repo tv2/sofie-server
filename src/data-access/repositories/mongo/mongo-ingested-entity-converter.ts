@@ -14,6 +14,7 @@ import {
 import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
 import { MongoId } from './mongo-entity-converter'
 import { Invalidity } from '../../../model/value-objects/invalidity'
+import { PieceMetadata } from '../../../model/value-objects/metadata'
 
 export interface MongoIngestedRundown extends MongoId {
   name: string
@@ -104,7 +105,7 @@ export interface MongoIngestedPiece extends MongoId {
   lifespan: string
   pieceType: string
   isPlanned?: boolean
-  metaData?: unknown // This is called "metaData" in the database, so we have to keep the spelling like this.
+  metaData: PieceMetadata // This is called "metaData" in the database, so we have to keep the spelling like this.
   content?: unknown
   tags?: string[]
   isUnsynced: boolean

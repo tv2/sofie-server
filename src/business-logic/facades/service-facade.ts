@@ -4,7 +4,6 @@ import { RepositoryFacade } from '../../data-access/facades/repository-facade'
 import { TimelineBuilder } from '../services/interfaces/timeline-builder'
 import { SuperflyTimelineBuilder } from '../services/superfly-timeline-builder'
 import { TimeoutCallbackScheduler } from '../services/timeout-callback-scheduler'
-import { JsonObjectCloner } from '../services/json-object-cloner'
 import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'
@@ -16,8 +15,8 @@ import { Tv2INewsIngestService } from '../services/tv2-inews-ingest-service'
 import { HttpService } from '../services/interfaces/http-service'
 import { GotHttpService } from '../services/got-http-service'
 import { IngestedEntityToEntityMapper } from '../services/ingested-entity-to-entity-mapper'
-import { ActionTriggerService } from '../services/interfaces/action-trigger-service'
-import { ActionTriggerServiceImplementation } from '../services/action-trigger-service-implementation'
+import { TriggerService } from '../services/interfaces/trigger-service'
+import { TriggerServiceImplementation } from '../services/trigger-service-implementation'
 import { LoggerFacade } from '../../logger/logger-facade'
 import { MediaDatabaseChangedService } from '../services/media-database-changed-service'
 import { ConfigurationService } from '../services/interfaces/configuration-service'
@@ -26,6 +25,8 @@ import { DeviceChangedService } from '../services/device-changed-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
+import { DeviceServiceImplementation } from '../services/device-service-implementation'
+import { DeviceService } from '../services/interfaces/device-service'
 import { PlayoutService } from '../services/interfaces/playoutService'
 import { PlayoutGatewayService } from '../services/playout-gateway-service'
 import { ThrottledRundownService } from '../services/throttled-rundown-service'
@@ -35,6 +36,9 @@ import { IngestDataChangeService } from '../services/ingest-data-change-service'
 import { ActionGenerationService } from '../services/action-generation-service'
 import { SynchronizedRundownService } from '../services/synchronized-rundown-service'
 import { AsyncLock } from '../async-lock'
+import { MacroServiceImplementation } from '../services/macro-service-implementation'
+import { MacroService } from '../services/interfaces/macro-service'
+import { HelperFacade } from './helper-facade'
 
 export class ServiceFacade {
 
@@ -57,7 +61,7 @@ export class ServiceFacade {
   }
 
   public static createTimelineBuilder(): TimelineBuilder {
-    const superflyTimelineBuilder: TimelineBuilder = new SuperflyTimelineBuilder(new JsonObjectCloner())
+    const superflyTimelineBuilder: TimelineBuilder = new SuperflyTimelineBuilder(HelperFacade.createObjectCloner())
     return new BlueprintTimelineBuilder(
       superflyTimelineBuilder,
       RepositoryFacade.createConfigurationRepository(),
@@ -76,10 +80,14 @@ export class ServiceFacade {
     )
   }
 
-  public static createActionTriggerService(): ActionTriggerService {
-    return new ActionTriggerServiceImplementation(
-      EventEmitterFacade.createActionTriggerEventEmitter(),
-      RepositoryFacade.createActionTriggerRepository()
+  public static createMacroService(): MacroService {
+    return new MacroServiceImplementation(EventEmitterFacade.createStatusMessageEventEmitter(), EventEmitterFacade.createMacroEventEmitter(), RepositoryFacade.createMacroRepository(), ServiceFacade.createActionService())
+  }
+
+  public static createTriggerService(): TriggerService {
+    return new TriggerServiceImplementation(
+      EventEmitterFacade.createTriggerEventEmitter(),
+      RepositoryFacade.createTriggerRepository()
     )
   }
 
@@ -152,7 +160,7 @@ export class ServiceFacade {
   public static createDeviceDataChangedService(): DataChangeService {
     return DeviceChangedService.getInstance(
       ServiceFacade.createStatusMessageService(),
-      RepositoryFacade.createDeviceRepository(),
+      RepositoryFacade.createCoreDeviceRepository(),
       RepositoryFacade.createDeviceDataChangedListener(),
       LoggerFacade.createLogger()
     )
@@ -173,6 +181,13 @@ export class ServiceFacade {
     return new StatusMessageServiceImplementation(
       EventEmitterFacade.createStatusMessageEventEmitter(),
       RepositoryFacade.createStatusMessageRepository()
+    )
+  }
+
+  public static createDeviceService(): DeviceService {
+    return new DeviceServiceImplementation(
+      RepositoryFacade.createDeviceRepository(),
+      EventEmitterFacade.createDeviceEventEmitter()
     )
   }
 }

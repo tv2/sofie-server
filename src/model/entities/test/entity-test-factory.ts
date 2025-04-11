@@ -3,11 +3,12 @@ import { Segment, SegmentInterface } from '../segment'
 import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
-import { Device } from '../device'
 import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
+import { Device } from '../device'
+import { DeviceType } from '../../enums/device-type'
 import { TransitionType } from '../../enums/transition-type'
 import { ActionManifest, PieceAction } from '../action'
 import { IngestedPart } from '../ingested-part'
@@ -15,6 +16,10 @@ import { IngestedPiece } from '../ingested-piece'
 import { IngestedRundown } from '../ingested-rundown'
 import { IngestedSegment } from '../ingested-segment'
 import { PieceActionType } from '../../enums/action-type'
+import { TakeMode } from '../../enums/take-mode'
+import { PieceType } from '../../enums/piece-type'
+import { ActionOperation, Macro, Operation, OperationType } from '../macro'
+import { TimelineObject } from '../timeline-object'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -27,6 +32,7 @@ export class EntityTestFactory {
       name: 'rundownName',
       segments: [],
       mode: RundownMode.INACTIVE,
+      takeMode: TakeMode.STANDARD,
       modifiedAt: Date.now(),
       showStyleVariantId: 'show-style-variant-id',
       baselineTimelineObjects: [],
@@ -151,6 +157,9 @@ export class EntityTestFactory {
       timelineObjects: [],
       tags: [],
       isUnsynced: false,
+      metadata: {
+        type: PieceType.UNKNOWN
+      },
       ...pieceInterface
     }
   }
@@ -168,7 +177,23 @@ export class EntityTestFactory {
       preRollDuration: 0,
       postRollDuration: 0,
       timelineObjects: [],
+      metadata: {
+        type: PieceType.UNKNOWN
+      },
       ...ingestedPiece
+    }
+  }
+
+  public static createTimelineObject(timelineObject: Partial<TimelineObject> = {}): TimelineObject {
+    return {
+      id: 'randomTimelineObjectId',
+      layer: 'randomLayer',
+      enable: {},
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: {}
+      },
+      ...timelineObject
     }
   }
 
@@ -179,6 +204,7 @@ export class EntityTestFactory {
       statusCode: StatusCode.UNKNOWN,
       statusMessage: '',
       isConnected: false,
+      type: DeviceType.ABSTRACT,
       ...device
     }
   }
@@ -212,6 +238,25 @@ export class EntityTestFactory {
         pieceInterface: this.createPieceInterface()
       },
       ...action
+    }
+  }
+
+  public static createMacro(macro?: Partial<Macro>): Macro {
+    return {
+      id: 'macroId',
+      name: 'macroName',
+      operations: [],
+      ...macro
+    }
+  }
+
+  public static createActionOperation(actionOperation?: Partial<ActionOperation>): Operation {
+    return {
+      actionId: 'actionId',
+      type: OperationType.ACTION,
+      actionArguments: undefined,
+      delayNextOperationMs: 0,
+      ...actionOperation,
     }
   }
 }

@@ -9,6 +9,7 @@ import { StatusMessageRepository } from '../../data-access/repositories/interfac
 import { StatusMessage } from '../../model/entities/status-message'
 import { StatusMessageDto } from '../dtos/status-message-dto'
 import { SystemInformationDto } from '../dtos/system-information-dto'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/systemInformation')
 export class SystemInformationController extends BaseController {
@@ -22,6 +23,7 @@ export class SystemInformationController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest()
   public async getSystemInformation(_request: Request, response: Response): Promise<void> {
     try {
@@ -32,6 +34,7 @@ export class SystemInformationController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/statusMessages')
   public async getStatusMessages(_request: Request, response: Response): Promise<void> {
     try {

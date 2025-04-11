@@ -9,12 +9,12 @@ import {
   Tv2VideoClipManifestData
 } from '../../value-objects/tv2-action-manifest-data'
 import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
-import { Tv2PieceType } from '../../enums/tv2-piece-type'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2Logger } from '../../tv2-logger'
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
-import { Tv2SourceLayer } from '../../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
+import { PieceType } from '../../../../model/enums/piece-type'
 
 describe(Tv2ActionManifestMapper.name, () => {
   describe(Tv2ActionManifestMapper.prototype.filterAndMapToSplitScreenManifestData.name, () => {
@@ -31,7 +31,7 @@ describe(Tv2ActionManifestMapper.name, () => {
               rank: 5,
               userData: {
                 name: 'DVE Sommerfugl',
-                pieceType: Tv2PieceType.SPLIT_SCREEN,
+                pieceType: PieceType.SPLIT_SCREEN,
                 config: {
                   template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                     INP1: {
@@ -55,7 +55,7 @@ describe(Tv2ActionManifestMapper.name, () => {
               rank: 10,
               userData: {
                 name: 'DVE Sommerfugl',
-                pieceType: Tv2PieceType.SPLIT_SCREEN,
+                pieceType: PieceType.SPLIT_SCREEN,
                 config: {
                   template: 'sommerfugl',
                   labels: ['Locator1', 'Locator2'],
@@ -168,7 +168,7 @@ describe(Tv2ActionManifestMapper.name, () => {
             actionId: 'studio0_overlay',
             data: {
               rank: 5,
-              sourceLayerId: Tv2SourceLayer.GRAPHICS_PILOT_OVERLAY,
+              pieceLayer: Tv2PieceLayer.GRAPHICS_PILOT_OVERLAY,
               name: 'overlay graphics A',
             }
           }),

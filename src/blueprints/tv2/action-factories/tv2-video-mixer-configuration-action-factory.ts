@@ -5,13 +5,13 @@ import {
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { Tv2Action, Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
 import { ActionFactory } from './action-factory'
+import { PieceType } from '../../../model/enums/piece-type'
+import { OutputLayer } from '../../../model/enums/output-layer'
 
 export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
 
@@ -35,7 +35,7 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
     const pieceInterface: Tv2PieceInterface = this.createVideoSwitcherPieceInterface({
       id: this.sanitizeStringForId(`downstreamKeyer${downstreamKeyerNumber}${actionName}Piece`),
       name: `DownstreamKeyer ${downstreamKeyerNumber} ${actionName}`,
-      layer: `${Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
+      layer: `${Tv2PieceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND}_${downstreamKeyerNumber}`,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       timelineObjects: [
         this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn)
@@ -60,7 +60,7 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
     return {
       partId: '',
       rundownId: '',
-      layer: Tv2SourceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
+      layer: Tv2PieceLayer.DOWNSTREAM_KEYER_ACTION_COMMAND,
       transitionType: TransitionType.NO_TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: false,
@@ -72,8 +72,8 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
-        type: Tv2PieceType.COMMAND,
-        outputLayer: Tv2OutputLayer.SECONDARY
+        type: PieceType.COMMAND,
+        outputLayer: OutputLayer.SECONDARY
       },
       ...pieceInterfaceWithRequiredValues
     }

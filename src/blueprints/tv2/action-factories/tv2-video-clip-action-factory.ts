@@ -4,8 +4,8 @@ import { PartActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2SourceLayer } from '../value-objects/tv2-layers'
-import { Tv2BlueprintTimelineObject, Tv2PieceMetadata } from '../value-objects/tv2-metadata'
+import { Tv2PieceLayer } from '../value-objects/tv2-layers'
+import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
@@ -16,9 +16,6 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Media } from '../../../model/entities/media'
 import { Tv2Action, Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
-import { Tv2PieceType } from '../enums/tv2-piece-type'
-import { Tv2OutputLayer } from '../enums/tv2-output-layer'
-import { Tv2AudioMode } from '../enums/tv2-audio-mode'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
@@ -27,6 +24,10 @@ import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
 import { ActionFactory } from './action-factory'
+import { PieceMetadata } from '../../../model/value-objects/metadata'
+import { PieceType } from '../../../model/enums/piece-type'
+import { OutputLayer } from '../../../model/enums/output-layer'
+import { AudioMode } from '../../../model/enums/audio-mode'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -68,8 +69,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
 
     const mediaPlayerSession: string = `${action.id}_${Date.now()}`
     videoClipAction.data.pieceInterfaces.map(pieceInterface => {
-      const pieceMetadata: Tv2PieceMetadata = pieceInterface.metadata as Tv2PieceMetadata
-      pieceMetadata.mediaPlayerSessions = [mediaPlayerSession]
+      pieceInterface.metadata.mediaPlayerSessions = [mediaPlayerSession]
 
       pieceInterface.timelineObjects.map(timelineObject => {
         const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
@@ -114,12 +114,12 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
   }
 
   private createVideoClipPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): Tv2PieceInterface {
-    const metadata: Tv2PieceMetadata = {
-      type: Tv2PieceType.VIDEO_CLIP,
-      outputLayer: Tv2OutputLayer.PROGRAM,
+    const metadata: PieceMetadata = {
+      type: PieceType.VIDEO_CLIP,
+      outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
-        acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioMode === Tv2AudioMode.VOICE_OVER
+        acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioMode === AudioMode.VOICE_OVER
       },
       sourceName: videoClipData.fileName
     }
@@ -133,7 +133,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       partId,
       rundownId: '',
       name: videoClipData.fileName,
-      layer: Tv2SourceLayer.VIDEO_CLIP,
+      layer: Tv2PieceLayer.VIDEO_CLIP,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.NO_TRANSITION,
       metadata,

@@ -2,9 +2,9 @@ import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 import { RundownEventService } from '../services/rundown-event-service'
 import { RundownEventEmitter } from '../../business-logic/services/interfaces/rundown-event-emitter'
 import { EventBuilderFacade } from './event-builder-facade'
-import { ActionTriggerEventEmitter } from '../../business-logic/services/interfaces/action-trigger-event-emitter'
-import { ActionTriggerEventService } from '../services/action-trigger-event-service'
-import { ActionTriggerEventObserver } from '../interfaces/action-trigger-event-observer'
+import { TriggerEventEmitter } from '../../business-logic/services/interfaces/trigger-event-emitter'
+import { TriggerEventService } from '../services/trigger-event-service'
+import { TriggerEventObserver } from '../interfaces/trigger-event-observer'
 import { MediaEventEmitter } from '../../business-logic/services/interfaces/media-event-emitter'
 import { MediaEventService } from '../services/media-event-service'
 import { MediaEventObserver } from '../interfaces/media-event-observer'
@@ -17,6 +17,12 @@ import { StatusMessageEventEmitter } from '../../business-logic/services/interfa
 import { ActionEventObserver } from '../interfaces/action-event-observer'
 import { ActionEventService } from '../services/action-event-service'
 import { ActionEventEmitter } from '../../business-logic/services/interfaces/action-event-emitter'
+import { DeviceEventEmitter } from '../../business-logic/services/interfaces/device-event-emitter'
+import { DeviceEventService } from '../services/device-event-service'
+import { DeviceEventObserver } from '../interfaces/device-event-observer'
+import { MacroEventObserver } from '../interfaces/macro-event-observer'
+import { MacroEventEmitter } from '../../business-logic/services/interfaces/macro-event-emitter'
+import { MacroEventService } from '../services/macro-event-service'
 
 export class EventEmitterFacade {
 
@@ -28,8 +34,12 @@ export class EventEmitterFacade {
     return RundownEventService.getInstance(EventBuilderFacade.createRundownEventBuilder())
   }
 
-  public static createActionTriggerEventEmitter(): ActionTriggerEventEmitter {
-    return ActionTriggerEventService.getInstance(EventBuilderFacade.createActionTriggerEventBuilder())
+  public static createTriggerEventEmitter(): TriggerEventEmitter {
+    return TriggerEventService.getInstance(EventBuilderFacade.createTriggerEventBuilder())
+  }
+
+  public static createMacroEventEmitter(): MacroEventEmitter {
+    return MacroEventService.getInstance(EventBuilderFacade.createMacroEventBuilder())
   }
 
   public static createActionEventEmitter(): ActionEventEmitter {
@@ -40,8 +50,12 @@ export class EventEmitterFacade {
     return ActionEventService.getInstance(EventBuilderFacade.createActionEventBuilder())
   }
 
-  public static createActionTriggerEventObserver(): ActionTriggerEventObserver {
-    return ActionTriggerEventService.getInstance(EventBuilderFacade.createActionTriggerEventBuilder())
+  public static createTriggerEventObserver(): TriggerEventObserver {
+    return TriggerEventService.getInstance(EventBuilderFacade.createTriggerEventBuilder())
+  }
+
+  public static createMacroEventObserver(): MacroEventObserver {
+    return MacroEventService.getInstance(EventBuilderFacade.createMacroEventBuilder())
   }
 
   public static createMediaEventEmitter(): MediaEventEmitter {
@@ -66,5 +80,13 @@ export class EventEmitterFacade {
 
   public static createStatusMessageEventObserver(): StatusMessageEventObserver {
     return StatusMessageEventService.getInstance(EventBuilderFacade.createStatusMessageEventBuilder())
+  }
+
+  public static createDeviceEventEmitter(): DeviceEventEmitter {
+    return DeviceEventService.getInstance(EventBuilderFacade.createDeviceEventBuilder())
+  }
+
+  public static createDeviceEventObserver(): DeviceEventObserver {
+    return DeviceEventService.getInstance(EventBuilderFacade.createDeviceEventBuilder())
   }
 }

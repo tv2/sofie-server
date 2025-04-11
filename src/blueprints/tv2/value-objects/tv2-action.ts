@@ -2,10 +2,11 @@ import { PartAction, PieceAction } from '../../../model/entities/action'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { Breaker, TransitionEffectType } from './tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
-import { Tv2AudioMode } from '../enums/tv2-audio-mode'
-import { Tv2BlueprintTimelineObject } from './tv2-metadata'
+import { Tv2BlueprintTimelineObject } from './tv2-blueprint-timeline-object'
+import { AudioMode } from '../../../model/enums/audio-mode'
 
 export enum Tv2ActionContentType {
+  SYSTEM = 'SYSTEM',
   CAMERA = 'CAMERA',
   REMOTE = 'REMOTE',
   VIDEO_CLIP = 'VIDEO_CLIP',
@@ -163,7 +164,7 @@ export type Tv2SplitScreenInsertSourceInputMetadata = {
   videoClip?: {
     timelineObjects: Tv2BlueprintTimelineObject[]
     mediaPlayerSession: string
-    audioMode: Tv2AudioMode
+    audioMode: AudioMode
   }
 }
 

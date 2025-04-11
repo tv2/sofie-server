@@ -22,6 +22,7 @@ import { Exception } from '../../model/exceptions/exception'
 import { ErrorCode } from '../../model/enums/error-code'
 import { Timeline } from '../../model/entities/timeline'
 import { MisconfigurationException } from '../../model/exceptions/misconfiguration-exception'
+import { DeviceType } from '../../model/enums/device-type'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -81,7 +82,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       },
       priority: BASELINE_PRIORITY,
       layer: '',
-      content: {}
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: undefined
+      }
     }
 
     return {
@@ -111,7 +115,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       enable: currentPartEnable,
       layer: '',
       autoNextEpochTime,
-      content: {}
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: undefined
+      }
     }
 
     activeGroup.children = activePart
@@ -247,7 +254,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       priority: MEDIUM_PRIORITY,
       isGroup: false,
       inGroup: parentGroup.id,
-      content: {}
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: undefined
+      }
     }
   }
 
@@ -266,7 +276,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         end: `#${controlForPiece.id}.end${piece.postRollDuration ? ` - ${piece.postRollDuration}` : ''}`,
       },
       layer: '',
-      content: {}
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: undefined
+      }
     }
   }
 
@@ -284,7 +297,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         start: `#${parentGroup.id}.start`,
       },
       layer: '',
-      content: {}
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: undefined
+      }
     }
   }
 
@@ -320,7 +336,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       },
       priority: LOOKAHEAD_PRIORITY,
       layer: '',
-      content: {}
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: undefined
+      }
     }
 
     timeline.timelineGroups.push(lookaheadTimelineObjectGroup)
@@ -371,7 +390,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     const lookAheadObjects: LookaheadTimelineObject[] = []
     let partToGetLookAheadObjectsFrom: Part = rundown.getNextPart()
 
-    for (let i = 0; i < layer.maximumLookaheadSearchDistance; i++) {
+    for (let i: number = 0; i < layer.maximumLookaheadSearchDistance; i++) {
       if (lookAheadObjects.length >= layer.amountOfLookaheadObjectsToFind) {
         return lookAheadObjects
       }
@@ -480,7 +499,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         }`,
       },
       layer: '',
-      content: {}
+      content: {
+        deviceType: DeviceType.ABSTRACT,
+        type: undefined
+      }
     }
 
     previousGroup.children = previousPart
@@ -514,7 +536,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
             start: piece.getExecutedAt(),
           },
           layer: piece.layer,
-          content: {}
+          content: {
+            deviceType: DeviceType.ABSTRACT,
+            type: undefined
+          }
         }
 
         infiniteGroup.children = piece.getTimelineObjects().flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))

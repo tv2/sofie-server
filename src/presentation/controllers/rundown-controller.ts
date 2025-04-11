@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController} from './base-controller'
 import { RundownService } from '../../business-logic/services/interfaces/rundown-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
@@ -11,6 +11,11 @@ import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { Owner } from '../../model/enums/owner'
 import { IngestService } from '../../business-logic/services/interfaces/ingest-service'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
+import { SetNextDirection } from '../../model/enums/set-next-direction'
+import { TakeMode } from '../../model/enums/take-mode'
+import { Tv2Logger } from '../../blueprints/tv2/tv2-logger'
+import { ErrorCode } from '../../model/enums/error-code'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -19,11 +24,14 @@ export class RundownController extends BaseController {
     private readonly rundownRepository: RundownRepository,
     private readonly ingestService: IngestService,
     private readonly httpErrorHandler: HttpErrorHandler,
-    private readonly httpResponseFormatter: HttpResponseFormatter
+    private readonly httpResponseFormatter: HttpResponseFormatter,
+    private readonly logger: Tv2Logger
   ) {
     super()
+    this.logger = logger.tag(this.constructor.name)
   }
 
+  @AuditLog()
   @GetRequest('/basic')
   public async getBasicRundowns(_request: Request, response: Response): Promise<void> {
     try {
@@ -34,6 +42,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/:rundownId')
   public async getRundown(request: Request, response: Response): Promise<void> {
     try {
@@ -45,6 +54,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/activate')
   public async activate(request: Request, response: Response): Promise<void> {
     try {
@@ -56,6 +66,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/rehearse')
   public async enterRehearsal(request: Request, response: Response): Promise<void> {
     try {
@@ -67,6 +78,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/deactivate')
   public async deactivate(request: Request, response: Response): Promise<void> {
     try {
@@ -78,6 +90,26 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
+  @PutRequest('/:rundownId/takeMode/:takeMode')
+  public async takeMode(request: Request, response: Response): Promise<void> {
+    try {
+      const rundownId: string = request.params.rundownId
+      const takeMode: TakeMode = TakeMode[request.params.takeMode as keyof typeof TakeMode]
+      if (takeMode === undefined) {
+        const errorMessage: string = `Rundown "${rundownId}" failed to set it's Take Mode, since "${request.params.takeMode}" isn't a valid input.`
+        this.logger.error(errorMessage)
+        response.send(this.httpResponseFormatter.formatErrorResponse(errorMessage, ErrorCode.BAD_REQUEST))
+        return
+      }
+      await this.rundownService.setTakeMode(rundownId, takeMode)
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully set Take Mode to ${takeMode}` ))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @AuditLog()
   @PutRequest('/:rundownId/takeNext')
   public async takeNext(request: Request, response: Response): Promise<void> {
     try {
@@ -89,19 +121,34 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/segments/:segmentId/parts/:partId/setNext')
-  public async setNext(request: Request, response: Response): Promise<void> {
+  public async setNextFromIds(request: Request, response: Response): Promise<void> {
     try {
       const rundownId: string = request.params.rundownId
       const segmentId: string = request.params.segmentId
       const partId: string = request.params.partId
-      await this.rundownService.setNext(rundownId, segmentId, partId, Owner.EXTERNAL)
+      await this.rundownService.setNextFromIds(rundownId, segmentId, partId, Owner.EXTERNAL)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Part "${partId}" is now set as next`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
 
+  @AuditLog()
+  @PutRequest('/:rundownId/setNext/:direction')
+  public async setNext(request: Request, response: Response): Promise<void> {
+    try {
+      const rundownId: string = request.params.rundownId
+      const setNextDirection: SetNextDirection = request.params.direction as SetNextDirection
+      await this.rundownService.setNextFromDirection(rundownId, setNextDirection, Owner.EXTERNAL)
+      response.send(this.httpResponseFormatter.formatSuccessResponse('Successfully set next'))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @AuditLog()
   @PutRequest('/:rundownId/reset')
   public async resetRundown(request: Request, response: Response): Promise<void> {
     try {
@@ -113,6 +160,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest('/:rundownId/reingest')
   public async reloadRundownData(request: Request, response: Response): Promise<void> {
     try {
@@ -124,6 +172,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @DeleteRequest('/:rundownId')
   public async deleteRundown(request: Request, response: Response): Promise<void> {
     try {
@@ -135,6 +184,7 @@ export class RundownController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/:rundownId/pieces/:pieceId/stop')
   public async stopPiece(request: Request, response: Response): Promise<void> {
     try {

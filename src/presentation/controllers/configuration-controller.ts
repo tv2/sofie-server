@@ -11,6 +11,7 @@ import { ConfigurationService } from '../../business-logic/services/interfaces/c
 import { ShelfConfigurationRepository } from '../../data-access/repositories/interfaces/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
 import { ShelfConfigurationDto } from '../dtos/shelf-configuration-dto'
+import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/configurations')
 export class ConfigurationController extends BaseController {
@@ -25,6 +26,7 @@ export class ConfigurationController extends BaseController {
     super()
   }
 
+  @AuditLog()
   @GetRequest('/studio')
   public async getStudio(_request: Request, response: Response): Promise<void> {
     try {
@@ -35,6 +37,7 @@ export class ConfigurationController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/blueprints')
   public async getBlueprintConfiguration(_request: Request, response: Response): Promise<void> {
     try {
@@ -48,6 +51,7 @@ export class ConfigurationController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/rundowns/:rundownId')
   public async getShowStyleVariant(request: Request, response: Response): Promise<void> {
     try {
@@ -59,6 +63,7 @@ export class ConfigurationController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PostRequest('/cache/clear')
   public clearConfigurationCache(_request: Request, response: Response): void {
     try {
@@ -69,6 +74,7 @@ export class ConfigurationController extends BaseController {
     }
   }
 
+  @AuditLog()
   @GetRequest('/shelfConfigurations')
   public async getShelfConfiguration(_request: Request, response: Response): Promise<void> {
     try {
@@ -79,6 +85,7 @@ export class ConfigurationController extends BaseController {
     }
   }
 
+  @AuditLog()
   @PutRequest('/shelfConfigurations')
   public async updateShelfConfiguration(request: Request, response: Response): Promise<void> {
     try {
@@ -86,7 +93,8 @@ export class ConfigurationController extends BaseController {
       const shelfConfiguration: ShelfConfiguration = {
         id: shelfConfigurationDto.id,
         actionPanelConfigurations: shelfConfigurationDto.actionPanelConfigurations,
-        staticActionIds: shelfConfigurationDto.staticActionIds
+        staticActionIds: shelfConfigurationDto.staticActionIds,
+        shouldShowShelf: shelfConfigurationDto.shouldShowShelf
       }
       const updatedShelfConfiguration: ShelfConfiguration = await this.configurationService.updateShelfConfiguration(shelfConfiguration)
       response.send(this.httpResponseFormatter.formatSuccessResponse(new ShelfConfigurationDto(updatedShelfConfiguration)))
