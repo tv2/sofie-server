@@ -38,33 +38,13 @@ export class EntityChangeDetector {
   }
 
   public hasPiecesWithChangedLifeSpan(segment: Segment, ingestedSegment: IngestedSegment): boolean {
-    const pieces: Piece[] = [...this.extractAllPiecesFromSegment(segment)]
-    const ingestedPieces: IngestedPiece[] = [...this.extractAllIngestedPiecesFromSegment(ingestedSegment)]
+    const pieces: Piece[] = segment.getParts().flatMap(part => part.getPieces())
+    const ingestedPieces: IngestedPiece[] = ingestedSegment.ingestedParts.flatMap(part => part.ingestedPieces)
 
     return pieces.some((piece) => {
       const ingestedPiece: IngestedPiece | undefined = ingestedPieces.find(ingestedPiece => ingestedPiece.id === piece.id)
       return ingestedPiece && this.doesIngestedPiecesDifferInLifeSpan(piece, ingestedPiece)
     })
-  }
-
-  public extractAllPiecesFromSegment(segment: Segment): readonly Piece[] {
-    const pieces: Piece[] = []
-    for (const part of segment.getParts()) {
-      for (const piece of part.getPieces()) {
-        pieces.push(piece)
-      }
-    }
-    return pieces
-  }
-
-  public extractAllIngestedPiecesFromSegment(ingestedSegment: IngestedSegment): readonly IngestedPiece[] {
-    const pieces: IngestedPiece[] = []
-    for (const ingestedPart of ingestedSegment.ingestedParts) {
-      for (const ingestedPiece of ingestedPart.ingestedPieces) {
-        pieces.push(ingestedPiece)
-      }
-    }
-    return pieces
   }
 
   public doesIngestedPartOnPartDifferFromIngestedPart(part: Part, ingestedPart: IngestedPart): boolean {
