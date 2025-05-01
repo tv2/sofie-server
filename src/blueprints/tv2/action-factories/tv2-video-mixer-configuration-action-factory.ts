@@ -12,6 +12,7 @@ import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
 
@@ -72,6 +73,9 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.VIDEO_CLIP
+        },
         type: PieceType.COMMAND,
         outputLayer: OutputLayer.SECONDARY
       },

@@ -33,6 +33,7 @@ import { Logger } from '../../../logger/logger'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 
@@ -101,6 +102,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
 
   private createFadePersistedAudioMetadata(): PieceMetadata {
     return {
+      playoutContent: {
+        type: PlayoutContentType.COMMAND
+      },
       type: PieceType.COMMAND,
       outputLayer: OutputLayer.AUDIO,
       sisyfosPersistMetaData: {
@@ -149,6 +153,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.COMMAND
+        },
         type: PieceType.COMMAND,
         outputLayer: OutputLayer.SECONDARY,
       },
@@ -266,6 +273,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
         type: PieceType.AUDIO,
         outputLayer: OutputLayer.AUDIO,
       },

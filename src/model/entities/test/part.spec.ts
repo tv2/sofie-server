@@ -11,6 +11,7 @@ import { IngestedPart } from '../ingested-part'
 import { Invalidity } from '../../value-objects/invalidity'
 import { InvalidPartException } from '../../exceptions/invalid-part-exception'
 import { PieceType } from '../../enums/piece-type'
+import { PlayoutContentType } from '../../enums/playout-content-type'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -2438,7 +2439,7 @@ describe(Part.name, () => {
 
   describe(Part.prototype.getStrippedClone.name, () => {
     it('copies the pieces', () => {
-      const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: PieceType.CAMERA }})
+      const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: PieceType.CAMERA, playoutContent: { type: PlayoutContentType.UNKNOWN } }})
       const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
       const clonedPart: Part = testee.getStrippedClone()
       expect(clonedPart.getPieces()[0].id).toContain('COPY')
@@ -2451,7 +2452,7 @@ describe(Part.name, () => {
     })
 
     function assertPartKeepsPiecesWithTypeWhenStripCloned(pieceType: PieceType): void {
-      const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: pieceType }})
+      const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: pieceType, playoutContent: { type: PlayoutContentType.UNKNOWN } }})
       const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
       const clonedPart: Part = testee.getStrippedClone()
       expect(clonedPart.getPieces()[0].metadata.type).toContain(pieceType)
@@ -2507,7 +2508,7 @@ describe(Part.name, () => {
   })
 
   function assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(pieceType: PieceType): void {
-    const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: pieceType }})
+    const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: pieceType, playoutContent: { type: PlayoutContentType.UNKNOWN } }})
     const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
     const clonedPart: Part = testee.getStrippedClone()
     expect(clonedPart.getPieces()).toHaveLength(0)

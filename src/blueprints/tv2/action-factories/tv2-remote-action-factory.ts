@@ -28,6 +28,7 @@ import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 export class Tv2RemoteActionFactory extends ActionFactory {
 
@@ -94,6 +95,10 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: PieceMetadata = {
+      playoutContent: {
+        type: PlayoutContentType.REMOTE,
+        source: source.name
+      },
       type: PieceType.REMOTE,
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {

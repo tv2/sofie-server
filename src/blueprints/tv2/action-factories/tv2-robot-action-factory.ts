@@ -19,6 +19,7 @@ import {
 import { ActionFactory } from './action-factory'
 import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 export class Tv2RobotActionFactory extends ActionFactory {
 
@@ -111,6 +112,9 @@ export class Tv2RobotActionFactory extends ActionFactory {
         this.robotTimelineObjectFactory.createCallPresetTimelineObject(preset)
       ],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.COMMAND
+        },
         type: PieceType.COMMAND,
         outputLayer: OutputLayer.SECONDARY
       }

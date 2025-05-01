@@ -52,6 +52,7 @@ import { Configuration } from '../../../model/entities/configuration'
 import { PieceInterface } from '../../../model/entities/piece'
 import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
   Tv2PieceLayer.GRAPHICS_IDENT,
@@ -217,6 +218,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.COMMAND
+        },
         type: PieceType.COMMAND,
         outputLayer: OutputLayer.SECONDARY,
       },
@@ -379,6 +383,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         ...videoMixerTimelineObjects
       ],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
         type: PieceType.GRAPHICS,
         outputLayer: OutputLayer.PROGRAM,
         sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
@@ -490,6 +497,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
       ],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.OVERLAY_GRAPHICS
+        },
         type: PieceType.OVERLAY_GRAPHICS,
         outputLayer: OutputLayer.OVERLAY
       }
@@ -523,6 +533,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
       ],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.OVERLAY_GRAPHICS
+        },
         type: PieceType.OVERLAY_GRAPHICS,
         outputLayer: OutputLayer.OVERLAY
       }
@@ -554,6 +567,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       pieceLifespan: overlayGraphicsData.lifespan,
       timelineObjects: [elementTimelineObjectFactory.createPilotGraphicsTimelineObject(blueprintConfiguration, overlayGraphicsData)],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.OVERLAY_GRAPHICS
+        },
         type: PieceType.OVERLAY_GRAPHICS,
         outputLayer: OutputLayer.OVERLAY
       }

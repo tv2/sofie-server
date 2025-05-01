@@ -46,6 +46,7 @@ import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PieceType } from '../../../model/enums/piece-type'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 
@@ -183,6 +184,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       isUnsynced: false,
       timelineObjects: [],
       metadata: {
+        playoutContent: {
+          type: PlayoutContentType.TRANSITION
+        },
         type: PieceType.TRANSITION,
         outputLayer: OutputLayer.SECONDARY,
       },
@@ -319,7 +323,15 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
     const effectName: string = `Effect ${breaker.name}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, { metadata:  {type: PieceType.TRANSITION, outputLayer: OutputLayer.JINGLE}})
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, {
+      metadata:{
+        playoutContent: {
+          type: PlayoutContentType.TRANSITION
+        },
+        type: PieceType.TRANSITION,
+        outputLayer: OutputLayer.JINGLE
+      }
+    })
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
     return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }

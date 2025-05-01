@@ -4,6 +4,7 @@ import { Breaker, TransitionEffectType } from './tv2-show-style-blueprint-config
 import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject } from './tv2-blueprint-timeline-object'
 import { AudioMode } from '../../../model/enums/audio-mode'
+import { SourcePlayoutContent } from '../../../model/value-objects/playout-content'
 
 export enum Tv2ActionContentType {
   SYSTEM = 'SYSTEM',
@@ -160,6 +161,7 @@ export interface Tv2SplitScreenInsertSourceInputAction extends Tv2PieceAction {
 export type Tv2SplitScreenInsertSourceInputMetadata = {
   inputIndex: number // zero-indexed
   videoMixerSource: number,
+  sourcePlayoutContent: SourcePlayoutContent
   audioTimelineObjects: Tv2BlueprintTimelineObject[]
   videoClip?: {
     timelineObjects: Tv2BlueprintTimelineObject[]

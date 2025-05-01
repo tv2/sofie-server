@@ -3,6 +3,7 @@ import { TimelineObject } from '../entities/timeline-object'
 import { AudioMode } from '../enums/audio-mode'
 import { PieceType } from '../enums/piece-type'
 import { OutputLayer } from '../enums/output-layer'
+import { PlayoutContent } from './playout-content'
 
 export interface SisyfosPersistenceMetadata {
   /**
@@ -28,7 +29,8 @@ export interface SisyfosPersistenceMetadata {
 }
 
 export interface PieceMetadata {
-  type: PieceType
+  playoutContent: PlayoutContent
+  type: PieceType // Deprecated - being replaced by PlayoutContent
   outputLayer?: OutputLayer
   sisyfosPersistMetaData?: SisyfosPersistenceMetadata // Blueprints saves it as "sisyfosPersistMetaData" so until we change Blueprints, we need to call it the same...
   audioMode?: AudioMode
