@@ -5,6 +5,7 @@ import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestedPiece } from '../../model/entities/ingested-piece'
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { Rundown } from '../../model/entities/rundown'
+import { Piece } from '../../model/entities/piece'
 
 export class EntityChangeDetector {
   public doesShallowRundownDifferFromIngestedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): boolean {
@@ -33,6 +34,37 @@ export class EntityChangeDetector {
       || segment.expectedDurationInMs !== ingestSegment.budgetDuration
       || segment.invalidity?.reason !== ingestSegment.invalidity?.reason
       || segment.definesShowStyleVariant !== ingestSegment.definesShowStyleVariant
+      || this.hasPiecesWithChangedLifeSpan(segment, ingestSegment)
+  }
+
+  public hasPiecesWithChangedLifeSpan(segment: Segment, ingestedSegment: IngestedSegment): boolean {
+    const pieces: Piece[] = [...this.extractAllPiecesFromSegment(segment)]
+    const ingestedPieces: IngestedPiece[] = [...this.extractAllIngestedPiecesFromSegment(ingestedSegment)]
+
+    return pieces.some((piece) => {
+      const ingestedPiece: IngestedPiece | undefined = ingestedPieces.find(ingestedPiece => ingestedPiece.id === piece.id)
+      return ingestedPiece && this.doesIngestedPiecesDifferInLifeSpan(piece, ingestedPiece)
+    })
+  }
+
+  public extractAllPiecesFromSegment(segment: Segment): readonly Piece[] {
+    const pieces: Piece[] = []
+    for (const part of segment.getParts()) {
+      for (const piece of part.getPieces()) {
+        pieces.push(piece)
+      }
+    }
+    return pieces
+  }
+
+  public extractAllIngestedPiecesFromSegment(ingestedSegment: IngestedSegment): readonly IngestedPiece[] {
+    const pieces: IngestedPiece[] = []
+    for (const ingestedPart of ingestedSegment.ingestedParts) {
+      for (const ingestedPiece of ingestedPart.ingestedPieces) {
+        pieces.push(ingestedPiece)
+      }
+    }
+    return pieces
   }
 
   public doesIngestedPartOnPartDifferFromIngestedPart(part: Part, ingestedPart: IngestedPart): boolean {
@@ -61,7 +93,6 @@ export class EntityChangeDetector {
   public doesIngestedPiecesDiffer(ingestedPieceA: IngestedPiece, ingestPieceB: IngestedPiece): boolean {
     return ingestedPieceA.name !== ingestPieceB.name
       || ingestedPieceA.layer !== ingestPieceB.layer
-      || ingestedPieceA.pieceLifespan !== ingestPieceB.pieceLifespan
       || ingestedPieceA.start !== ingestPieceB.start
       || ingestedPieceA.duration !== ingestPieceB.duration
       || ingestedPieceA.preRollDuration !== ingestPieceB.preRollDuration
@@ -70,5 +101,9 @@ export class EntityChangeDetector {
       || this.serializeComplexTypeForComparison(ingestedPieceA.timelineObjects) !== this.serializeComplexTypeForComparison(ingestPieceB.timelineObjects)
       || this.serializeComplexTypeForComparison(ingestedPieceA.metadata) !== this.serializeComplexTypeForComparison(ingestPieceB.metadata)
       || this.serializeComplexTypeForComparison(ingestedPieceA.content) !== this.serializeComplexTypeForComparison(ingestPieceB.content)
+  }
+
+  public doesIngestedPiecesDifferInLifeSpan(ingestedPieceA: Piece, ingestPieceB: IngestedPiece): boolean {
+    return ingestedPieceA.pieceLifespan !== ingestPieceB.pieceLifespan
   }
 }
