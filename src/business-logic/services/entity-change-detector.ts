@@ -35,25 +35,21 @@ export class EntityChangeDetector {
       || segment.expectedDurationInMs !== ingestSegment.budgetDuration
       || segment.invalidity?.reason !== ingestSegment.invalidity?.reason
       || segment.definesShowStyleVariant !== ingestSegment.definesShowStyleVariant
-      || this.hasPiecesWithChangedLifeSpan(segment, ingestSegment)
-      || this.hasIngestedSegmentASpanningPieceBeenRemoved(segment, ingestSegment)
+      || this.hasLifeSpanPieceChanges(segment, ingestSegment)
   }
 
-  public hasPiecesWithChangedLifeSpan(segment: Segment, ingestedSegment: IngestedSegment): boolean {
+  public hasLifeSpanPieceChanges(segment: Segment, ingestedSegment: IngestedSegment): boolean {
     const pieces: Piece[] = segment.getParts().flatMap(part => part.getPieces())
     const ingestedPieces: IngestedPiece[] = ingestedSegment.ingestedParts.flatMap(part => part.ingestedPieces)
+    const differingPieces: Piece[] = pieces.filter(piece => !ingestedPieces.some(ingestedPiece => ingestedPiece.id === piece.id))
 
-    return pieces.some((piece) => {
+    const hasNewSpanningPieces: boolean = differingPieces.some((piece) => piece.pieceLifespan !== PieceLifespan.WITHIN_PART)
+    const hasPiecesWithChangedLifespan: boolean = pieces.some((piece) => {
       const ingestedPiece: IngestedPiece | undefined = ingestedPieces.find(ingestedPiece => ingestedPiece.id === piece.id)
       return ingestedPiece && this.doesIngestedPiecesDifferInLifeSpan(piece, ingestedPiece)
     })
-  }
 
-  private hasIngestedSegmentASpanningPieceBeenRemoved(segment: Segment, ingestedSegment: IngestedSegment): boolean {
-    const pieces: Piece[] = segment.getParts().flatMap(part => part.getPieces())
-    const ingestedPieces: IngestedPiece[] = ingestedSegment.ingestedParts.flatMap(part => part.ingestedPieces)
-    const missingPieces = pieces.filter(piece => !ingestedPieces.some(ingestedPiece => ingestedPiece.id === piece.id))
-    return missingPieces.some((piece) => piece.pieceLifespan !== PieceLifespan.WITHIN_PART)
+    return hasPiecesWithChangedLifespan || hasNewSpanningPieces
   }
 
   public doesIngestedPartOnPartDifferFromIngestedPart(part: Part, ingestedPart: IngestedPart): boolean {
