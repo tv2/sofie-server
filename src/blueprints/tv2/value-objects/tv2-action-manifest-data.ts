@@ -36,7 +36,6 @@ export interface Tv2ActionManifestSplitScreenData {
   rank: number
   userData: {
     name: string
-    // TODO: Verify we don't need PieceType here
     config: {
       template: string
       labels: string[]
