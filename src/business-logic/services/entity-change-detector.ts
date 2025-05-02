@@ -1,12 +1,12 @@
-import { Segment } from '../../model/entities/segment'
-import { IngestedSegment } from '../../model/entities/ingested-segment'
-import { Part } from '../../model/entities/part'
-import { IngestedPart } from '../../model/entities/ingested-part'
-import { IngestedPiece } from '../../model/entities/ingested-piece'
-import { IngestedRundown } from '../../model/entities/ingested-rundown'
-import { Rundown } from '../../model/entities/rundown'
-import { Piece } from '../../model/entities/piece'
-import { PieceLifespan } from '../../model/enums/piece-lifespan'
+import {Segment} from '../../model/entities/segment'
+import {IngestedSegment} from '../../model/entities/ingested-segment'
+import {Part} from '../../model/entities/part'
+import {IngestedPart} from '../../model/entities/ingested-part'
+import {IngestedPiece} from '../../model/entities/ingested-piece'
+import {IngestedRundown} from '../../model/entities/ingested-rundown'
+import {Rundown} from '../../model/entities/rundown'
+import {Piece} from '../../model/entities/piece'
+import {PieceLifespan} from '../../model/enums/piece-lifespan'
 
 export class EntityChangeDetector {
   public doesShallowRundownDifferFromIngestedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): boolean {
@@ -38,18 +38,23 @@ export class EntityChangeDetector {
       || this.hasLifeSpanPieceChanges(segment, ingestSegment)
   }
 
-  public hasLifeSpanPieceChanges(segment: Segment, ingestedSegment: IngestedSegment): boolean {
+  private hasLifeSpanPieceChanges(segment: Segment, ingestedSegment: IngestedSegment): boolean {
     const pieces: Piece[] = segment.getParts().flatMap(part => part.getPieces())
     const ingestedPieces: IngestedPiece[] = ingestedSegment.ingestedParts.flatMap(part => part.ingestedPieces)
     const differingPieces: Piece[] = pieces.filter(piece => !ingestedPieces.some(ingestedPiece => ingestedPiece.id === piece.id))
+    const spanningLifeSpans: PieceLifespan[] = [PieceLifespan.SPANNING_UNTIL_RUNDOWN_END, PieceLifespan.SPANNING_UNTIL_SEGMENT_END, PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN]
 
-    const hasNewSpanningPieces: boolean = differingPieces.some((piece) => piece.pieceLifespan !== PieceLifespan.WITHIN_PART)
+    const hasNewSpanningPieces: boolean = differingPieces.some((piece) => spanningLifeSpans.includes(piece.pieceLifespan))
     const hasPiecesWithChangedLifespan: boolean = pieces.some((piece) => {
       const ingestedPiece: IngestedPiece | undefined = ingestedPieces.find(ingestedPiece => ingestedPiece.id === piece.id)
       return ingestedPiece && this.doesIngestedPiecesDifferInLifeSpan(piece, ingestedPiece)
     })
 
     return hasPiecesWithChangedLifespan || hasNewSpanningPieces
+  }
+
+  private doesIngestedPiecesDifferInLifeSpan(ingestedPieceA: Piece, ingestPieceB: IngestedPiece): boolean {
+    return ingestedPieceA.pieceLifespan !== ingestPieceB.pieceLifespan
   }
 
   public doesIngestedPartOnPartDifferFromIngestedPart(part: Part, ingestedPart: IngestedPart): boolean {
@@ -78,6 +83,7 @@ export class EntityChangeDetector {
   public doesIngestedPiecesDiffer(ingestedPieceA: IngestedPiece, ingestPieceB: IngestedPiece): boolean {
     return ingestedPieceA.name !== ingestPieceB.name
       || ingestedPieceA.layer !== ingestPieceB.layer
+      || ingestedPieceA.pieceLifespan !== ingestPieceB.pieceLifespan
       || ingestedPieceA.start !== ingestPieceB.start
       || ingestedPieceA.duration !== ingestPieceB.duration
       || ingestedPieceA.preRollDuration !== ingestPieceB.preRollDuration
@@ -86,9 +92,5 @@ export class EntityChangeDetector {
       || this.serializeComplexTypeForComparison(ingestedPieceA.timelineObjects) !== this.serializeComplexTypeForComparison(ingestPieceB.timelineObjects)
       || this.serializeComplexTypeForComparison(ingestedPieceA.metadata) !== this.serializeComplexTypeForComparison(ingestPieceB.metadata)
       || this.serializeComplexTypeForComparison(ingestedPieceA.content) !== this.serializeComplexTypeForComparison(ingestPieceB.content)
-  }
-
-  public doesIngestedPiecesDifferInLifeSpan(ingestedPieceA: Piece, ingestPieceB: IngestedPiece): boolean {
-    return ingestedPieceA.pieceLifespan !== ingestPieceB.pieceLifespan
   }
 }
