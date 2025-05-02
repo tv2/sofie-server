@@ -19,7 +19,6 @@ import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { AudioMode } from '../../../model/enums/audio-mode'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
@@ -189,7 +188,6 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         type: PlayoutContentType.REPLAY,
         source: source.name
       },
-      type: PieceType.REPLAY,
       outputLayer: OutputLayer.PROGRAM,
       audioMode: audioMode,
       sisyfosPersistMetaData: {
@@ -259,7 +257,6 @@ export class Tv2ReplayActionFactory extends ActionFactory {
           type: PlayoutContentType.REPLAY,
           source: source.name
         },
-        type: PieceType.REPLAY,
         outputLayer: OutputLayer.AUXILIARY
       }
     }
@@ -307,7 +304,6 @@ export class Tv2ReplayActionFactory extends ActionFactory {
           type: PlayoutContentType.REPLAY,
           source: source.name
         },
-        type: PieceType.REPLAY,
         outputLayer: OutputLayer.AUXILIARY
       }
     }

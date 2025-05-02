@@ -45,7 +45,6 @@ import { Tv2Logger } from '../tv2-logger'
 import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { OutputLayer } from '../../../model/enums/output-layer'
-import { PieceType } from '../../../model/enums/piece-type'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
@@ -187,7 +186,6 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.TRANSITION
         },
-        type: PieceType.TRANSITION,
         outputLayer: OutputLayer.SECONDARY,
       },
       ...piece,
@@ -328,7 +326,6 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.TRANSITION
         },
-        type: PieceType.TRANSITION,
         outputLayer: OutputLayer.JINGLE
       }
     })

@@ -17,7 +17,6 @@ import { IngestedRundown } from '../ingested-rundown'
 import { IngestedSegment } from '../ingested-segment'
 import { PieceActionType } from '../../enums/action-type'
 import { TakeMode } from '../../enums/take-mode'
-import { PieceType } from '../../enums/piece-type'
 import { ActionOperation, Macro, Operation, OperationType } from '../macro'
 import { TimelineObject } from '../timeline-object'
 import { PlayoutContentType } from '../../enums/playout-content-type'
@@ -161,8 +160,7 @@ export class EntityTestFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.UNKNOWN
-        },
-        type: PieceType.UNKNOWN
+        }
       },
       ...pieceInterface
     }
@@ -184,8 +182,7 @@ export class EntityTestFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.UNKNOWN
-        },
-        type: PieceType.UNKNOWN
+        }
       },
       ...ingestedPiece
     }

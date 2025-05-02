@@ -50,7 +50,6 @@ import { ActionFactory } from './action-factory'
 import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
 import { Configuration } from '../../../model/entities/configuration'
 import { PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
@@ -221,7 +220,6 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.COMMAND
         },
-        type: PieceType.COMMAND,
         outputLayer: OutputLayer.SECONDARY,
       },
       ...pieceInterfaceWithRequiredValues
@@ -386,7 +384,6 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
         },
-        type: PieceType.GRAPHICS,
         outputLayer: OutputLayer.PROGRAM,
         sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
       }
@@ -500,7 +497,6 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.OVERLAY_GRAPHICS
         },
-        type: PieceType.OVERLAY_GRAPHICS,
         outputLayer: OutputLayer.OVERLAY
       }
     })
@@ -536,7 +532,6 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.OVERLAY_GRAPHICS
         },
-        type: PieceType.OVERLAY_GRAPHICS,
         outputLayer: OutputLayer.OVERLAY
       }
     })
@@ -570,7 +565,6 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.OVERLAY_GRAPHICS
         },
-        type: PieceType.OVERLAY_GRAPHICS,
         outputLayer: OutputLayer.OVERLAY
       }
     })

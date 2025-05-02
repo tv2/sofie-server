@@ -54,7 +54,6 @@ import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
 import { Tv2Logger } from '../tv2-logger'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { AudioMode } from '../../../model/enums/audio-mode'
 import { ObjectCloner } from '../../../business-logic/services/interfaces/object-cloner'
@@ -178,7 +177,6 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
 
       const metadata: PieceMetadata = {
         playoutContent: this.createSplitScreenLayoutPlayoutContent(splitScreenConfiguration.name),
-        type: PieceType.SPLIT_SCREEN,
         outputLayer: OutputLayer.PROGRAM,
         splitScreen: {
           boxes,
@@ -502,7 +500,6 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         layout: splitScreenConfiguration.name,
         sources: splitScreenSourcesPlayoutContent
       },
-      type: PieceType.SPLIT_SCREEN,
       outputLayer: OutputLayer.PROGRAM,
       splitScreen: {
         boxes,
@@ -648,12 +645,12 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   }
 
   private recallLastPlannedSplitScreenPartPredicate(part: Part): boolean {
-    return part.isPlanned && this.doesPartHavePieceWithType(part, PieceType.SPLIT_SCREEN)
+    return part.isPlanned && this.doesPartHavePieceWithType(part, PlayoutContentType.SPLIT_SCREEN)
   }
 
-  private doesPartHavePieceWithType(part: Part, pieceType: PieceType): boolean {
+  private doesPartHavePieceWithType(part: Part, playoutContentType: PlayoutContentType): boolean {
     return part.getPieces().some(piece => {
-      return piece.metadata.type === pieceType
+      return piece.metadata.playoutContent.type === playoutContentType
     })
   }
 
@@ -769,11 +766,11 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       return false
     }
 
-    const isSplitScreenPart: boolean = this.doesPartHavePieceWithType(part, PieceType.SPLIT_SCREEN)
+    const isSplitScreenPart: boolean = this.doesPartHavePieceWithType(part, PlayoutContentType.SPLIT_SCREEN)
     if (isSplitScreenPart) { // If the Part is a split screen we can't use it to find the Video Clip we want to insert into the split screen.
       return false
     }
 
-    return this.doesPartHavePieceWithType(part, PieceType.VIDEO_CLIP)
+    return this.doesPartHavePieceWithType(part, PlayoutContentType.VIDEO_CLIP)
   }
 }

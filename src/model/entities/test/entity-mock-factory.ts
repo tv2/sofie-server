@@ -7,7 +7,6 @@ import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { TransitionType } from '../../enums/transition-type'
 import { PartTimings } from '../../value-objects/part-timings'
 import { RundownMode } from '../../enums/rundown-mode'
-import { PieceType } from '../../enums/piece-type'
 import { PlayoutContentType } from '../../enums/playout-content-type'
 
 export class EntityMockFactory {
@@ -240,8 +239,7 @@ export class EntityMockFactory {
     when(mockedPiece.metadata).thenReturn(pieceInterface.metadata ?? {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      },
-      type: PieceType.UNKNOWN
+      }
     })
 
     when(mockedPiece.getExecutedAt()).thenReturn(misc.executedAt ?? 0)

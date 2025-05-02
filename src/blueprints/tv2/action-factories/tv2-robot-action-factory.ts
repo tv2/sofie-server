@@ -17,7 +17,6 @@ import {
   Tv2RobotTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-robot-timeline-object-factory'
 import { ActionFactory } from './action-factory'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
@@ -115,7 +114,6 @@ export class Tv2RobotActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.COMMAND
         },
-        type: PieceType.COMMAND,
         outputLayer: OutputLayer.SECONDARY
       }
     }

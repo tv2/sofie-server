@@ -25,7 +25,6 @@ import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
 import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { AudioMode } from '../../../model/enums/audio-mode'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
@@ -119,7 +118,6 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       playoutContent: {
         type: PlayoutContentType.VIDEO_CLIP
       },
-      type: PieceType.VIDEO_CLIP,
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],

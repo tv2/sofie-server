@@ -17,7 +17,6 @@ import {
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
@@ -69,7 +68,6 @@ export class Tv2CameraActionFactory extends ActionFactory {
         type: PlayoutContentType.CAMERA,
         source: source.name
       },
-      type: PieceType.CAMERA,
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
