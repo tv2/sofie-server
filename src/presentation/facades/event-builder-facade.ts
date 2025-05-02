@@ -7,6 +7,7 @@ import { StatusMessageEventBuilder } from '../interfaces/status-message-event-bu
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
+import { PlayoutContentEventBuilder } from '../interfaces/playout-content-event-builder'
 
 export class EventBuilderFacade {
 
@@ -39,6 +40,10 @@ export class EventBuilderFacade {
   }
 
   public static createDeviceEventBuilder(): DeviceEventBuilder {
+    return new EventBuilder()
+  }
+
+  public static createPlayoutContentEventBuilder(): PlayoutContentEventBuilder {
     return new EventBuilder()
   }
 }

@@ -23,6 +23,8 @@ import { DeviceEvent } from '../value-objects/device-event'
 import { TypedEvent } from '../value-objects/typed-event'
 import { NtpEvent } from '../value-objects/ntp-event'
 import { NtpEventType } from '../enums/event-type'
+import { PlayoutContentEventObserver } from '../interfaces/playout-content-event-observer'
+import { PlayoutContentEvent } from '../value-objects/playout-content-event'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer
@@ -36,6 +38,7 @@ export class WebSocketEventServer implements EventServer {
     configurationEventObserver: ConfigurationEventObserver,
     statusMessageEventObserver: StatusMessageEventObserver,
     deviceEventObserver: DeviceEventObserver,
+    playoutContentEventObserver: PlayoutContentEventObserver,
     logger: Logger
   ): EventServer {
     if (!this.instance) {
@@ -48,6 +51,7 @@ export class WebSocketEventServer implements EventServer {
         configurationEventObserver,
         statusMessageEventObserver,
         deviceEventObserver,
+        playoutContentEventObserver,
         logger
       )
     }
@@ -66,6 +70,7 @@ export class WebSocketEventServer implements EventServer {
     private readonly configurationEventObserver: ConfigurationEventObserver,
     private readonly statusMessageEventObserver: StatusMessageEventObserver,
     private readonly deviceEventObserver: DeviceEventObserver,
+    private readonly playoutContentEventObserver: PlayoutContentEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -133,6 +138,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.deviceEventObserver.subscribeToDeviceEvents((deviceEvent: DeviceEvent) => {
       webSocket.send(JSON.stringify(deviceEvent))
+    })
+    this.playoutContentEventObserver.subscribeToPlayoutContentEvents((playoutContentEvent: PlayoutContentEvent) => {
+      webSocket.send(JSON.stringify(playoutContentEvent))
     })
 
     webSocket.onmessage = (message: WebSocket.MessageEvent): void => {
