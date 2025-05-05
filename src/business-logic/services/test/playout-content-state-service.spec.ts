@@ -1,7 +1,7 @@
 import { PlayoutContentStateService } from '../playout-content-state-service'
 import { PlayoutContentEventEmitter } from '../interfaces/playout-content-event-emitter'
 import { anything, capture, instance, mock, resetCalls, verify } from '@typestrong/ts-mockito'
-import { PlayoutContentService } from '../interfaces/playout-content-service'
+import { PlayoutContentUpdateService } from '../interfaces/playout-content-service'
 import { Rundown } from '../../../model/entities/rundown'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { Part } from '../../../model/entities/part'
@@ -24,7 +24,7 @@ describe(PlayoutContentStateService.name, () => {
       describe('there is no change in PlayoutContents', () => {
         it('does not emit a ProgramPlayoutContent', () => {
           const rundown: Rundown = EntityTestFactory.createRundown({})
-          const testee: PlayoutContentService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
+          const testee: PlayoutContentUpdateService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
 
           testee.updatePlayoutContentState(rundown)
 
@@ -33,7 +33,7 @@ describe(PlayoutContentStateService.name, () => {
 
         it('does not emit a PreviewPlayoutContent', () => {
           const rundown: Rundown = EntityTestFactory.createRundown({})
-          const testee: PlayoutContentService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
+          const testee: PlayoutContentUpdateService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
 
           testee.updatePlayoutContentState(rundown)
 
@@ -42,7 +42,7 @@ describe(PlayoutContentStateService.name, () => {
       })
 
       describe('there is a change in PlayoutContents', () => {
-        let testee: PlayoutContentService
+        let testee: PlayoutContentUpdateService
 
         beforeEach(() => {
           const activeRundownWithProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({
@@ -89,7 +89,7 @@ describe(PlayoutContentStateService.name, () => {
             }
           })
 
-          const testee: PlayoutContentService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
+          const testee: PlayoutContentUpdateService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
           testee.updatePlayoutContentState(rundownWithNoActivePart)
 
           verify(playoutContentEventEmitter.emitProgramPlayoutContentEvent(anything())).never()
@@ -112,7 +112,7 @@ describe(PlayoutContentStateService.name, () => {
             }
           })
 
-          const testee: PlayoutContentService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
+          const testee: PlayoutContentUpdateService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
           // To detect no change, we need to have called it once, then we need to call it again
           testee.updatePlayoutContentState(rundownWithProgramPlayoutContent)
           // By resetting the mock after the first call, we have a "clean slate" for our mock.
@@ -129,7 +129,7 @@ describe(PlayoutContentStateService.name, () => {
     describe('there is no change in PlayoutContents', () => {
       it('does not emit a ProgramPlayoutContentEvent', () => {
         const rundown: Rundown = createActiveRundownWithPlayoutContents()
-        const testee: PlayoutContentService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
+        const testee: PlayoutContentUpdateService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
 
         // To detect no change, we need to have called it once, then we need to call it again
         testee.updatePlayoutContentState(rundown)
@@ -142,7 +142,7 @@ describe(PlayoutContentStateService.name, () => {
 
       it('does not emit a PreviewPlayoutContentEvent', () => {
         const rundown: Rundown = createActiveRundownWithPlayoutContents()
-        const testee: PlayoutContentService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
+        const testee: PlayoutContentUpdateService = new PlayoutContentStateService(instance(playoutContentEventEmitter))
 
         // To detect no change, we need to have called it once, then we need to call it again
         testee.updatePlayoutContentState(rundown)
@@ -155,7 +155,7 @@ describe(PlayoutContentStateService.name, () => {
     })
 
     describe('there is a change to PlayoutContents in the active Part', () => {
-      let testee: PlayoutContentService
+      let testee: PlayoutContentUpdateService
 
       beforeEach(() => {
         // We need to set up some data, so there is actually going to be a change when called again.
@@ -233,7 +233,7 @@ describe(PlayoutContentStateService.name, () => {
     })
 
     describe('there is a change to PlayoutContents in the next Part', () => {
-      let testee: PlayoutContentService
+      let testee: PlayoutContentUpdateService
 
       beforeEach(() => {
         // We need to set up some data, so there is actually going to be a change when called again.

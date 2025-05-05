@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController} from './base-controller'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
 import { RundownService } from '../../business-logic/services/interfaces/rundown-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { Rundown } from '../../model/entities/rundown'
@@ -16,6 +16,8 @@ import { TakeMode } from '../../model/enums/take-mode'
 import { Tv2Logger } from '../../blueprints/tv2/tv2-logger'
 import { ErrorCode } from '../../model/enums/error-code'
 import { AuditLog } from '../decorators/audit-log-decorator'
+import { PlayoutContentReadService } from '../../business-logic/services/interfaces/playout-content-service'
+import { PlayoutContent } from '../../model/value-objects/playout-content'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
@@ -23,6 +25,7 @@ export class RundownController extends BaseController {
     private readonly rundownService: RundownService,
     private readonly rundownRepository: RundownRepository,
     private readonly ingestService: IngestService,
+    private readonly playoutContentService: PlayoutContentReadService,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter,
     private readonly logger: Tv2Logger
@@ -192,6 +195,21 @@ export class RundownController extends BaseController {
       const pieceId: string = request.params.pieceId
       await this.rundownService.stopPiece(rundownId, pieceId)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Piece "${pieceId}" was stopped` ))
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @AuditLog()
+  @GetRequest(':rundownId/playoutContents')
+  public getPlayoutContents(_request: Request, response: Response): void {
+    try {
+      const programPlayoutContentState: readonly PlayoutContent[] = this.playoutContentService.getProgramPlayoutContentState()
+      const previewPlayoutContentState: readonly PlayoutContent[] = this.playoutContentService.getPreviewPlayoutContentState()
+      response.send(this.httpResponseFormatter.formatSuccessResponse({
+        program: programPlayoutContentState,
+        preview: previewPlayoutContentState
+      }))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
