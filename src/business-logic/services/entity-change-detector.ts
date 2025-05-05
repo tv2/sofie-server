@@ -1,12 +1,12 @@
-import {Segment} from '../../model/entities/segment'
-import {IngestedSegment} from '../../model/entities/ingested-segment'
-import {Part} from '../../model/entities/part'
-import {IngestedPart} from '../../model/entities/ingested-part'
-import {IngestedPiece} from '../../model/entities/ingested-piece'
-import {IngestedRundown} from '../../model/entities/ingested-rundown'
-import {Rundown} from '../../model/entities/rundown'
-import {Piece} from '../../model/entities/piece'
-import {PieceLifespan} from '../../model/enums/piece-lifespan'
+import { Segment } from '../../model/entities/segment'
+import { IngestedSegment } from '../../model/entities/ingested-segment'
+import { Part } from '../../model/entities/part'
+import { IngestedPart } from '../../model/entities/ingested-part'
+import { IngestedPiece } from '../../model/entities/ingested-piece'
+import { IngestedRundown } from '../../model/entities/ingested-rundown'
+import { Rundown } from '../../model/entities/rundown'
+import { Piece } from '../../model/entities/piece'
+import { PieceLifespan } from '../../model/enums/piece-lifespan'
 
 export class EntityChangeDetector {
   public doesShallowRundownDifferFromIngestedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): boolean {
