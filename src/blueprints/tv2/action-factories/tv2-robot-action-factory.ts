@@ -1,10 +1,4 @@
-import {
-  Tv2Action,
-  Tv2ActionContentType,
-  Tv2ActionSubtype,
-  Tv2PieceAction,
-  Tv2RobotAction
-} from '../value-objects/tv2-action'
+import { Tv2Action, Tv2ActionSubtype, Tv2PieceAction, Tv2RobotAction } from '../value-objects/tv2-action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { PieceInterface } from '../../../model/entities/piece'
 import { Action, ActionArgumentType, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
@@ -43,7 +37,9 @@ export class Tv2RobotActionFactory extends ActionFactory {
         pieceInterface: {} as PieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.ROBOT,
+        playoutContent: {
+          type: PlayoutContentType.ROBOT
+        },
         actionSubtype: Tv2ActionSubtype.CALL_PRESET
       },
       argument: {
@@ -55,7 +51,7 @@ export class Tv2RobotActionFactory extends ActionFactory {
   }
 
   public isRobotAction(action: Tv2Action): action is Tv2RobotAction {
-    return action.metadata.contentType === Tv2ActionContentType.ROBOT
+    return action.metadata.playoutContent.type === PlayoutContentType.ROBOT
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {

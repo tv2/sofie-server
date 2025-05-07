@@ -6,7 +6,7 @@ import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timel
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
+import { Tv2CameraAction } from '../value-objects/tv2-action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import {
   Tv2AudioMixerTimelineObjectFactory
@@ -53,8 +53,10 @@ export class Tv2CameraActionFactory extends ActionFactory {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
       }, metadata: {
-        contentType: Tv2ActionContentType.CAMERA,
-        cameraNumber: cameraSource.name,
+        playoutContent: {
+          type: PlayoutContentType.CAMERA,
+          source: cameraSource.name
+        }
       },
     }
   }
@@ -146,8 +148,10 @@ export class Tv2CameraActionFactory extends ActionFactory {
         pieceInterfaces: [cameraPieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.CAMERA,
-        cameraNumber: cameraSource.name,
+        playoutContent: {
+          type: PlayoutContentType.CAMERA,
+          source: cameraSource.name
+        }
       },
     }
   }

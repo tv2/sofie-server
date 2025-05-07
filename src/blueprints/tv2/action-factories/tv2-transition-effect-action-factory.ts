@@ -12,7 +12,6 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import {
   Tv2Action,
-  Tv2ActionContentType,
   Tv2BreakerTransitionEffectActionMetadata,
   Tv2DipTransitionEffectActionMetadata,
   Tv2MixTransitionEffectActionMetadata,
@@ -99,7 +98,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   public isTransitionEffectAction(action: Tv2Action): action is Tv2TransitionEffectAction {
-    return action.metadata.contentType === Tv2ActionContentType.TRANSITION
+    return action.metadata.playoutContent.type === PlayoutContentType.TRANSITION
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -244,7 +243,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
    */
   private createEmptyMixTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
     const metadata: Tv2MixTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
       transitionEffectType: TransitionEffectType.MIX,
       durationInFrames: 0 // Default duration - To be overridden by APPLY ARGUMENTS
     }
@@ -272,7 +273,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
    */
   private createEmptyDipTransitionEffectAction(actionType: PieceActionType, dipInputSource: number): Tv2TransitionEffectAction {
     const metadata: Tv2DipTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
       transitionEffectType: TransitionEffectType.DIP,
       durationInFrames: 0, // Default duration - To be overridden by APPLY ARGUMENTS,
       dipInput: dipInputSource
@@ -299,7 +302,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const effectName: string = `Mix ${durationInFrames}`
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
       transitionEffectType: TransitionEffectType.MIX,
       durationInFrames
     }
@@ -310,7 +315,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const effectName: string = `Dip ${durationInFrames}`
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
       transitionEffectType: TransitionEffectType.DIP,
       durationInFrames,
       dipInput: configuredDipInput
@@ -344,7 +351,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private createBreakerTransitionEffectMetadata(breaker: Breaker, configuration: Tv2BlueprintConfiguration): Tv2BreakerTransitionEffectActionMetadata {
     const breakerDsk: Tv2DownstreamKeyer = this.findDownstreamKeyerFromConfiguration(configuration)
     return {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
       transitionEffectType: TransitionEffectType.BREAKER,
       casparCgPreRollDuration: configuration.studio.casparCgPreRollDuration,
       downstreamKeyer: breakerDsk,

@@ -25,7 +25,6 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-graphics-element-timeline-object-factory'
 import {
   Tv2Action,
-  Tv2ActionContentType,
   Tv2ActionSubtype,
   Tv2FullscreenGraphicsAction,
   Tv2PartAction,
@@ -79,7 +78,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   }
 
   public isGraphicsAction(action: Tv2Action): boolean {
-    return action.metadata.contentType === Tv2ActionContentType.GRAPHICS
+    return action.metadata.playoutContent.type === PlayoutContentType.GRAPHICS
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -195,7 +194,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface: {} as PieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
         actionSubtype: Tv2ActionSubtype.GRAPHICS_THEME_OUT
       },
     }
@@ -243,7 +244,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        }
       },
     }
   }
@@ -265,7 +268,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        }
       },
     }
   }
@@ -281,7 +286,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         layersToStopPiecesOn: TV2_GRAPHICS_LAYERS
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
         actionSubtype: Tv2ActionSubtype.GRAPHICS_CLEAR
       },
     }
@@ -298,7 +305,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         layersToStopPiecesOn: TV2_GRAPHICS_LAYERS
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
         actionSubtype: Tv2ActionSubtype.GRAPHICS_ALL_OUT
       },
     }
@@ -323,7 +332,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterfaces: [pieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
         sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
       }
     }
@@ -510,7 +521,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        }
       }
     }
   }
@@ -546,7 +559,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        }
       }
     }
   }
@@ -579,7 +594,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        }
       }
     }
   }

@@ -27,8 +27,8 @@ import { Media } from '../../model/entities/media'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
-import { Tv2ActionContentType } from '../../blueprints/tv2/value-objects/tv2-action'
 import { TakeMode } from '../../model/enums/take-mode'
+import { PlayoutContentType } from '../../model/enums/playout-content-type'
 
 const SYSTEM_ACTIONS_ID: string = 'SYSTEM_ACTIONS_ID'
 
@@ -41,7 +41,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -52,7 +54,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -63,7 +67,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -74,7 +80,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -85,7 +93,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -96,7 +106,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -107,7 +119,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -118,7 +132,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -129,7 +145,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
   {
@@ -140,7 +158,9 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      }
     }
   },
 ]

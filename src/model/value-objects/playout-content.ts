@@ -12,21 +12,22 @@ export type PlayoutContent =
   | ManusPlayoutContent
   | TransitionPlayoutContent
   | CommandPlayoutContent
+  | RobotPlayoutContent
   | UnknownPlayoutContent
 
 export type SourcePlayoutContent = CameraPlayoutContent | RemotePlayoutContent | ReplayPlayoutContent | UnknownPlayoutContent
 
-interface CameraPlayoutContent {
+export interface CameraPlayoutContent {
   type: PlayoutContentType.CAMERA
   source: string
 }
 
-interface RemotePlayoutContent {
+export interface RemotePlayoutContent {
   type: PlayoutContentType.REMOTE
   source: string
 }
 
-interface ReplayPlayoutContent {
+export interface ReplayPlayoutContent {
   type: PlayoutContentType.REPLAY
   source: string
 }
@@ -37,42 +38,46 @@ export interface SplitScreenPlayoutContent {
   sources: SourcePlayoutContent[]
 }
 
-interface GraphicsPlayoutContent {
+export interface GraphicsPlayoutContent {
   type: PlayoutContentType.GRAPHICS
 }
 
-interface OverlayGraphicsPlayoutContent {
+export interface OverlayGraphicsPlayoutContent {
   type: PlayoutContentType.OVERLAY_GRAPHICS
 }
 
-interface VideoPlayoutContent {
+export interface VideoPlayoutContent {
   type: PlayoutContentType.VIDEO_CLIP
 }
 
-interface VoiceOverPlayoutContent {
+export interface VoiceOverPlayoutContent {
   type: PlayoutContentType.VOICE_OVER
 }
 
-interface JinglePlayoutContent {
+export interface JinglePlayoutContent {
   type: PlayoutContentType.JINGLE
 }
 
-interface AudioPlayoutContent {
+export interface AudioPlayoutContent {
   type: PlayoutContentType.AUDIO
 }
 
-interface ManusPlayoutContent {
+export interface ManusPlayoutContent {
   type: PlayoutContentType.MANUS
 }
 
-interface TransitionPlayoutContent {
+export interface TransitionPlayoutContent {
   type: PlayoutContentType.TRANSITION
 }
 
-interface CommandPlayoutContent {
+export interface CommandPlayoutContent {
   type: PlayoutContentType.COMMAND
 }
 
-interface UnknownPlayoutContent {
+export interface RobotPlayoutContent {
+  type: PlayoutContentType.ROBOT
+}
+
+export interface UnknownPlayoutContent {
   type: PlayoutContentType.UNKNOWN
 }

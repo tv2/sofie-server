@@ -9,13 +9,7 @@ import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceActionType } from '../../../model/enums/action-type'
-import {
-  Tv2Action,
-  Tv2ActionContentType,
-  Tv2ActionSubtype,
-  Tv2AudioAction,
-  Tv2FadeAudioBedAction,
-} from '../value-objects/tv2-action'
+import { Tv2Action, Tv2ActionSubtype, Tv2AudioAction, Tv2FadeAudioBedAction, } from '../value-objects/tv2-action'
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
@@ -94,7 +88,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        }
       }
     }
   }
@@ -130,7 +126,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO,
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        }
       },
     }
   }
@@ -177,7 +175,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        }
       }
     }
   }
@@ -225,7 +225,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
         })
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        }
       },
     }
   }
@@ -250,7 +252,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        }
       },
     }
   }
@@ -295,7 +299,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO,
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
         actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED,
         defaultFadeDurationInFrames: blueprintConfiguration.studio.audioBedSettings.fadeOutDurationInFrames
       },
@@ -345,7 +351,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        }
       }
     }
   }
