@@ -23,6 +23,9 @@ import { DeviceEventObserver } from '../interfaces/device-event-observer'
 import { MacroEventObserver } from '../interfaces/macro-event-observer'
 import { MacroEventEmitter } from '../../business-logic/services/interfaces/macro-event-emitter'
 import { MacroEventService } from '../services/macro-event-service'
+import { PlayoutContentEventObserver } from '../interfaces/playout-content-event-observer'
+import { PlayoutContentEventService } from '../services/playout-content-event-service'
+import { PlayoutContentEventEmitter } from '../../business-logic/services/interfaces/playout-content-event-emitter'
 
 export class EventEmitterFacade {
 
@@ -88,5 +91,13 @@ export class EventEmitterFacade {
 
   public static createDeviceEventObserver(): DeviceEventObserver {
     return DeviceEventService.getInstance(EventBuilderFacade.createDeviceEventBuilder())
+  }
+
+  public static createPlayoutContentEventEmitter(): PlayoutContentEventEmitter {
+    return PlayoutContentEventService.getInstance(EventBuilderFacade.createPlayoutContentEventBuilder())
+  }
+
+  public static createPlayoutContentEventObserver(): PlayoutContentEventObserver {
+    return PlayoutContentEventService.getInstance(EventBuilderFacade.createPlayoutContentEventBuilder())
   }
 }

@@ -31,25 +31,22 @@ import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'
 import {
   ActionEventType,
-  TriggerEventType,
   ConfigurationEventType,
   DeviceEventType,
   IngestEventType,
   MacroEventType,
+  PlayoutContentEventType,
   RundownEventType,
-  StatusMessageEventType
+  StatusMessageEventType,
+  TriggerEventType
 } from '../enums/event-type'
 import { SegmentDto } from '../dtos/segment-dto'
 import { Segment } from '../../model/entities/segment'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
 import { Trigger } from '../../model/entities/trigger'
-import {
-  TriggerCreatedEvent,
-  TriggerDeletedEvent,
-  TriggerUpdatedEvent
-} from '../value-objects/trigger-event'
-import { TriggerDto} from '../dtos/trigger-dto'
+import { TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent } from '../value-objects/trigger-event'
+import { TriggerDto } from '../dtos/trigger-dto'
 import { RundownDto } from '../dtos/rundown-dto'
 import { Media } from '../../model/entities/media'
 import { MediaDto } from '../dtos/media-dto'
@@ -76,14 +73,13 @@ import {
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
 import { Macro } from '../../model/entities/macro'
-import {
-  MacroCreatedEvent,
-  MacroDeletedEvent,
-  MacroUpdatedEvent
-} from '../value-objects/macro-event'
+import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../value-objects/macro-event'
 import { MacroDto } from '../dtos/macro-dto'
+import { PlayoutContentEventBuilder } from '../interfaces/playout-content-event-builder'
+import { PlayoutContent } from '../../model/value-objects/playout-content'
+import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from '../value-objects/playout-content-event'
 
-export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder {
+export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder, PlayoutContentEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -424,6 +420,22 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
       type: MacroEventType.MACRO_UPDATED,
       timestamp: Date.now(),
       macro: new MacroDto(macro),
+    }
+  }
+
+  public buildProgramPlayoutContentEvent(playoutContents: PlayoutContent[]): ProgramPlayoutContentEvent {
+    return {
+      type: PlayoutContentEventType.PROGRAM_PLAYOUT_CONTENT,
+      timestamp: Date.now(),
+      playoutContents
+    }
+  }
+
+  public buildPreviewPlayoutContentEvent(playoutContents: PlayoutContent[]): PreviewPlayoutContentEvent {
+    return {
+      type: PlayoutContentEventType.PREVIEW_PLAYOUT_CONTENT,
+      timestamp: Date.now(),
+      playoutContents
     }
   }
 }

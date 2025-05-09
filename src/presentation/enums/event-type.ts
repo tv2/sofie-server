@@ -1,4 +1,11 @@
-export type EventType = RundownEventType | IngestEventType | ConfigurationEventType | TriggerEventType | DeviceEventType | NtpEventType
+export type EventType =
+  RundownEventType
+  | IngestEventType
+  | ConfigurationEventType
+  | TriggerEventType
+  | DeviceEventType
+  | NtpEventType
+  | PlayoutContentEventType
 
 export enum RundownEventType {
   ACTIVATED = 'ACTIVATED',
@@ -66,4 +73,9 @@ export enum DeviceEventType {
 
 export enum NtpEventType {
   NTP = 'NTP'
+}
+
+export enum PlayoutContentEventType {
+  PROGRAM_PLAYOUT_CONTENT = 'PROGRAM_PLAYOUT_CONTENT',
+  PREVIEW_PLAYOUT_CONTENT = 'PREVIEW_PLAYOUT_CONTENT'
 }

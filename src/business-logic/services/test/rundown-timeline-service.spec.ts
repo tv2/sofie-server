@@ -28,6 +28,7 @@ import { InTransition } from '../../../model/value-objects/in-transition'
 import { TakeIsBlockedException } from '../../../model/exceptions/take-is-blocked-exception'
 import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
 import { TakeMode } from '../../../model/enums/take-mode'
+import { PlayoutContentService } from '../interfaces/playout-content-service'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -650,7 +651,7 @@ describe(RundownTimelineService.name, () => {
         })
       })
     })
-    
+
     describe('when a take mode is selected', () => {
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
@@ -1170,7 +1171,8 @@ function createTestee(params?: {
   ingestService?: IngestService,
   playoutService?: PlayoutService,
   callbackScheduler?: CallbackScheduler
-  blueprint?: Blueprint
+  blueprint?: Blueprint,
+  playoutContentService?: PlayoutContentService,
   logger?: Logger
 }): RundownTimelineService {
   const timelineBuilderMock: TimelineBuilder = mock<TimelineBuilder>()
@@ -1186,6 +1188,7 @@ function createTestee(params?: {
     instance(params?.playoutService ?? createMockOfPlayoutService()) ,
     instance(params?.callbackScheduler ?? mock<CallbackScheduler>()),
     instance(params?.blueprint ?? mock<Blueprint>()),
+    instance(params?.playoutContentService ?? mock<PlayoutContentService>()),
     instance(params?.logger ?? createMockOfLogger()),
   )
 }
