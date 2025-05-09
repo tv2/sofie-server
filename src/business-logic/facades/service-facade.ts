@@ -39,7 +39,7 @@ import { AsyncLock } from '../async-lock'
 import { MacroServiceImplementation } from '../services/macro-service-implementation'
 import { MacroService } from '../services/interfaces/macro-service'
 import { HelperFacade } from './helper-facade'
-import { PlayoutContentService } from '../services/interfaces/playout-content-service'
+import { PlayoutContentReadService, PlayoutContentUpdateService } from '../services/interfaces/playout-content-service'
 import { PlayoutContentStateService } from '../services/playout-content-state-service'
 
 export class ServiceFacade {
@@ -57,7 +57,7 @@ export class ServiceFacade {
       ServiceFacade.createPlayoutService(),
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint(),
-      ServiceFacade.createPlayoutContentService(),
+      ServiceFacade.createPlayoutContentUpdateService(),
       LoggerFacade.createLogger(),
     )
     return ThrottledRundownService.getInstance(new SynchronizedRundownService(rundownTimelineService, this.rundownLock))
@@ -194,8 +194,14 @@ export class ServiceFacade {
     )
   }
 
-  public static createPlayoutContentService(): PlayoutContentService {
-    return new PlayoutContentStateService(
+  public static createPlayoutContentUpdateService(): PlayoutContentUpdateService {
+    return PlayoutContentStateService.getInstance(
+      EventEmitterFacade.createPlayoutContentEventEmitter()
+    )
+  }
+
+  public static createPlayoutContentReadService(): PlayoutContentReadService {
+    return PlayoutContentStateService.getInstance(
       EventEmitterFacade.createPlayoutContentEventEmitter()
     )
   }

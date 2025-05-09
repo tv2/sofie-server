@@ -24,7 +24,7 @@ import { TakeIsBlockedException } from '../../model/exceptions/take-is-blocked-e
 import { RundownCursor } from '../../model/value-objects/rundown-cursor'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
 import { TakeMode } from '../../model/enums/take-mode'
-import { PlayoutContentService } from './interfaces/playout-content-service'
+import { PlayoutContentUpdateService } from './interfaces/playout-content-service'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -39,7 +39,7 @@ export class RundownTimelineService implements RundownService {
     private readonly playoutService: PlayoutService,
     private readonly callbackScheduler: CallbackScheduler,
     private readonly blueprint: Blueprint,
-    private readonly playoutContentService: PlayoutContentService,
+    private readonly playoutContentService: PlayoutContentUpdateService,
     logger: Logger,
   ) {
     this.logger = logger.tag(this.constructor.name)

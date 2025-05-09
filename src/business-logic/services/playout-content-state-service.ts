@@ -1,14 +1,14 @@
 import { Rundown } from '../../model/entities/rundown'
-import { PlayoutContentService } from './interfaces/playout-content-service'
+import { PlayoutContentReadService, PlayoutContentUpdateService } from './interfaces/playout-content-service'
 import { PlayoutContentEventEmitter } from './interfaces/playout-content-event-emitter'
 import { PlayoutContent } from '../../model/value-objects/playout-content'
 import { RundownMode } from '../../model/enums/rundown-mode'
 
-export class PlayoutContentStateService implements PlayoutContentService {
+export class PlayoutContentStateService implements PlayoutContentUpdateService, PlayoutContentReadService {
 
-  private static instance: PlayoutContentService
+  private static instance: PlayoutContentUpdateService & PlayoutContentReadService
 
-  public static getInstance(playoutContentEventEmitter: PlayoutContentEventEmitter): PlayoutContentService {
+  public static getInstance(playoutContentEventEmitter: PlayoutContentEventEmitter): PlayoutContentUpdateService & PlayoutContentReadService {
     if (!this.instance) {
       this.instance = new PlayoutContentStateService(playoutContentEventEmitter)
     }
@@ -79,5 +79,13 @@ export class PlayoutContentStateService implements PlayoutContentService {
     }
     this.previewPlayoutContents = previewPlayoutContents
     this.playoutContentEventEmitter.emitPreviewPlayoutContentEvent(this.previewPlayoutContents)
+  }
+
+  public getProgramPlayoutContentState(): readonly PlayoutContent[] {
+    return this.programPlayoutContents
+  }
+
+  public getPreviewPlayoutContentState(): readonly PlayoutContent[] {
+    return this.previewPlayoutContents
   }
 }
