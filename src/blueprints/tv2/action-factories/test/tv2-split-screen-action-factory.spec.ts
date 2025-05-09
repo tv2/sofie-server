@@ -26,7 +26,6 @@ import {
 import { Tv2Action, Tv2ActionContentType } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../model/enums/action-type'
 import { Tv2Logger } from '../../tv2-logger'
-import { PieceType } from '../../../../model/enums/piece-type'
 import { ObjectCloner } from '../../../../business-logic/services/interfaces/object-cloner'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
@@ -44,7 +43,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 5,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -66,7 +65,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 10,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', config: {
                     template: 'sommerfugl', labels: ['Locator 1', 'Locator2alt'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -103,7 +102,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 5,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -125,7 +124,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 10,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -166,7 +165,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
           data: {
             rank: 5,
             userData: {
-              name: 'DVE UNKNOWN', pieceType: PieceType.SPLIT_SCREEN, config: {
+              name: 'DVE UNKNOWN', config: {
                 template: 'some-unknown-template', labels: ['Locator1', 'Locator2'], sources: {
                   INP1: {
                     sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -188,7 +187,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
           data: {
             rank: 10,
             userData: {
-              name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+              name: 'DVE Sommerfugl', config: {
                 template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                   INP1: {
                     sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,

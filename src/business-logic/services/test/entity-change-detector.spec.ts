@@ -11,7 +11,7 @@ import { IngestedPiece } from '../../../model/entities/ingested-piece'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { DeviceType } from '../../../model/enums/device-type'
-import { PieceType } from '../../../model/enums/piece-type'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 describe(EntityChangeDetector.name, () => {
   describe(EntityChangeDetector.prototype.doesShallowRundownDifferFromIngestedRundown.name, () => {
@@ -141,7 +141,7 @@ describe(EntityChangeDetector.name, () => {
       ['post-roll duration', { postRollDuration: 0 }, { postRollDuration: 100 }],
       ['transition type', { transitionType: TransitionType.NO_TRANSITION }, { transitionType: TransitionType.IN_TRANSITION }],
       ['timeline objects', { timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: {  deviceType: DeviceType.CASPAR_CG, type: undefined  } }] }, {  timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: {  deviceType: DeviceType.ATEM, type: undefined  } }]  }],
-      ['metadata', { metadata: undefined }, { metadata: { type: PieceType.UNKNOWN } }],
+      ['metadata', { metadata: undefined }, { metadata: { playoutContent: { type: PlayoutContentType.UNKNOWN } } }],
       ['content', { content: undefined }, { content: { foo: 'bar' } }],
     ]
     testCases.forEach(([attribute, pieceAttributes, ingestedPieceAttributes]) => {

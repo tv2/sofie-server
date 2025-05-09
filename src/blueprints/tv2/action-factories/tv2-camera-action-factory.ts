@@ -17,8 +17,8 @@ import {
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 export class Tv2CameraActionFactory extends ActionFactory {
 
@@ -64,7 +64,10 @@ export class Tv2CameraActionFactory extends ActionFactory {
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: PieceMetadata = {
-      type: PieceType.CAMERA,
+      playoutContent: {
+        type: PlayoutContentType.CAMERA,
+        source: source.name
+      },
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],

@@ -26,8 +26,8 @@ import { Action, MutateActionMethods, MutateActionType } from '../../../model/en
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 export class Tv2RemoteActionFactory extends ActionFactory {
 
@@ -94,7 +94,10 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: PieceMetadata = {
-      type: PieceType.REMOTE,
+      playoutContent: {
+        type: PlayoutContentType.REMOTE,
+        source: source.name
+      },
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: source.audioLayers,
@@ -277,6 +280,6 @@ export class Tv2RemoteActionFactory extends ActionFactory {
   }
 
   private isRemotePiece(piece: Piece): boolean {
-    return piece.metadata.type === PieceType.REMOTE
+    return piece.metadata.playoutContent.type === PlayoutContentType.REMOTE
   }
 }

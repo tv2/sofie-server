@@ -11,7 +11,7 @@ import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 import { Invalidity } from '../value-objects/invalidity'
 import { InvalidPartException } from '../exceptions/invalid-part-exception'
-import { PieceType } from '../enums/piece-type'
+import { PlayoutContentType } from '../enums/playout-content-type'
 
 export interface PartInterface {
   id: string
@@ -428,15 +428,15 @@ export class Part {
       },
       disableNextInTransition: false,
       pieces: this.pieces.filter(piece => [
-        PieceType.CAMERA,
-        PieceType.REMOTE,
-        PieceType.REPLAY,
-        PieceType.GRAPHICS,
-        PieceType.SPLIT_SCREEN,
-        PieceType.VIDEO_CLIP,
-        PieceType.VOICE_OVER,
-        PieceType.JINGLE,
-      ].includes(piece.metadata.type)).map(piece => piece.copy(newPartId))
+        PlayoutContentType.CAMERA,
+        PlayoutContentType.REMOTE,
+        PlayoutContentType.REPLAY,
+        PlayoutContentType.GRAPHICS,
+        PlayoutContentType.SPLIT_SCREEN,
+        PlayoutContentType.VIDEO_CLIP,
+        PlayoutContentType.VOICE_OVER,
+        PlayoutContentType.JINGLE,
+      ].includes(piece.metadata.playoutContent.type)).map(piece => piece.copy(newPartId))
     }
     return new Part(partInterface)
   }

@@ -31,8 +31,8 @@ import { Tv2ActionManifestAudioBedData } from '../value-objects/tv2-action-manif
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { Logger } from '../../../logger/logger'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 
@@ -101,7 +101,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
 
   private createFadePersistedAudioMetadata(): PieceMetadata {
     return {
-      type: PieceType.COMMAND,
+      playoutContent: {
+        type: PlayoutContentType.COMMAND
+      },
       outputLayer: OutputLayer.AUDIO,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
@@ -149,7 +151,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
-        type: PieceType.COMMAND,
+        playoutContent: {
+          type: PlayoutContentType.COMMAND
+        },
         outputLayer: OutputLayer.SECONDARY,
       },
       ...pieceInterfaceWithRequiredValues
@@ -266,7 +270,9 @@ export class Tv2AudioActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
-        type: PieceType.AUDIO,
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
         outputLayer: OutputLayer.AUDIO,
       },
       ...pieceInterfaceWithRequiredValues

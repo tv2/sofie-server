@@ -19,8 +19,8 @@ import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { AudioMode } from '../../../model/enums/audio-mode'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -184,7 +184,10 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     ]
 
     const metadata: PieceMetadata = {
-      type: PieceType.REPLAY,
+      playoutContent: {
+        type: PlayoutContentType.REPLAY,
+        source: source.name
+      },
       outputLayer: OutputLayer.PROGRAM,
       audioMode: audioMode,
       sisyfosPersistMetaData: {
@@ -250,7 +253,10 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.videoMixerSource, Tv2VideoMixerLayer.AR)
       ],
       metadata: {
-        type: PieceType.REPLAY,
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
         outputLayer: OutputLayer.AUXILIARY
       }
     }
@@ -294,7 +300,10 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.videoMixerSource, Tv2VideoMixerLayer.VIZ_OVERLAY_AUXILIARY)
       ],
       metadata: {
-        type: PieceType.REPLAY,
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
         outputLayer: OutputLayer.AUXILIARY
       }
     }
