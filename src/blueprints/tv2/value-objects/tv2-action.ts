@@ -12,6 +12,7 @@ import {
   VideoPlayoutContent
 } from '../../../model/value-objects/playout-content'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 export enum Tv2ActionSubtype {
   RECALL_SPLIT_SCREEN = 'RECALL_SPLIT_SCREEN',
@@ -31,6 +32,7 @@ export type Tv2Action = Tv2PartAction | Tv2PieceAction
 export interface Tv2PartAction extends PartAction {
   metadata: {
     playoutContent: PlayoutContent
+    outputChannel: OutputChannel
     actionSubtype?: Tv2ActionSubtype
   }
 }
@@ -45,6 +47,7 @@ export interface Tv2PieceAction extends PieceAction {
 export interface Tv2VideoClipAction extends Tv2PartAction {
   metadata: {
     playoutContent: VideoPlayoutContent
+    outputChannel: OutputChannel
     fileName: string
     configuredVideoClipPostRollDuration: number
   }
@@ -53,12 +56,14 @@ export interface Tv2VideoClipAction extends Tv2PartAction {
 export interface Tv2CameraAction extends Tv2PartAction {
   metadata: {
     playoutContent: CameraPlayoutContent
+    outputChannel: OutputChannel
   }
 }
 
 export interface Tv2RemoteAction extends Tv2PartAction {
   metadata: {
     playoutContent: RemotePlayoutContent
+    outputChannel: OutputChannel
   }
 }
 
@@ -66,6 +71,7 @@ export interface Tv2RecallLastPlannedRemoteAsNextAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT,
   metadata: {
     playoutContent: RemotePlayoutContent
+    outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
   }
 }
@@ -78,17 +84,20 @@ export type Tv2TransitionEffectActionMetadata = Tv2CutTransitionEffectActionMeta
 
 export interface Tv2CutTransitionEffectActionMetadata {
   playoutContent: TransitionPlayoutContent
+  outputChannel: OutputChannel
   transitionEffectType: TransitionEffectType.CUT
 }
 
 export interface Tv2MixTransitionEffectActionMetadata {
   playoutContent: TransitionPlayoutContent
+  outputChannel: OutputChannel
   transitionEffectType: TransitionEffectType.MIX
   durationInFrames: number
 }
 
 export interface Tv2DipTransitionEffectActionMetadata {
   playoutContent: TransitionPlayoutContent
+  outputChannel: OutputChannel
   transitionEffectType: TransitionEffectType.DIP
   durationInFrames: number,
   dipInput: number
@@ -96,6 +105,7 @@ export interface Tv2DipTransitionEffectActionMetadata {
 
 export interface Tv2BreakerTransitionEffectActionMetadata {
   playoutContent: TransitionPlayoutContent
+  outputChannel: OutputChannel
   transitionEffectType: TransitionEffectType.BREAKER
   casparCgPreRollDuration: number
   downstreamKeyer: Tv2DownstreamKeyer
@@ -106,12 +116,14 @@ export interface Tv2BreakerTransitionEffectActionMetadata {
 export interface Tv2AudioAction extends Tv2PieceAction {
   metadata: {
     playoutContent: AudioPlayoutContent
+    outputChannel: OutputChannel
   }
 }
 
 export interface Tv2FadeAudioBedAction extends Tv2PieceAction {
   metadata: {
     playoutContent:AudioPlayoutContent
+    outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED,
     defaultFadeDurationInFrames: number
   }
@@ -121,6 +133,7 @@ export interface Tv2SplitScreenAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     playoutContent: SplitScreenPlayoutContent
+    outputChannel: OutputChannel
   }
 }
 
@@ -128,6 +141,7 @@ export interface Tv2RecallSplitScreenAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     playoutContent: SplitScreenPlayoutContent
+    outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
   }
 }
@@ -136,6 +150,7 @@ export interface Tv2SplitScreenLayoutAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     playoutContent: SplitScreenPlayoutContent
+    outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
   }
 }
@@ -144,6 +159,7 @@ export interface Tv2SplitScreenInsertSourceInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
     playoutContent: SplitScreenPlayoutContent
+    outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT
     insertedContentType: PlayoutContentType
   } & Tv2SplitScreenInsertSourceInputMetadata
@@ -165,6 +181,7 @@ export interface Tv2SplitScreenInsertLastVideoClipInputAction extends Tv2PieceAc
   type: PieceActionType.REPLACE_PIECE
   metadata: {
     playoutContent: SplitScreenPlayoutContent
+    outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT
   } & Tv2SplitScreenInsertSourceInputMetadata
 }
@@ -172,18 +189,21 @@ export interface Tv2SplitScreenInsertLastVideoClipInputAction extends Tv2PieceAc
 export interface Tv2ReplayAction extends Tv2PartAction {
   metadata: {
     playoutContent: ReplayPlayoutContent
+    outputChannel: OutputChannel
   }
 }
 
 export interface Tv2ReplayAuxAction extends Tv2PieceAction {
   metadata: {
     playoutContent: ReplayPlayoutContent
+    outputChannel: OutputChannel
   }
 }
 
 export interface Tv2RobotAction extends Tv2PieceAction {
   metadata: {
     playoutContent: RobotPlayoutContent
+    outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.CALL_PRESET
   }
 }
@@ -191,6 +211,7 @@ export interface Tv2RobotAction extends Tv2PieceAction {
 export interface Tv2FullscreenGraphicsAction extends Tv2PartAction {
   metadata: {
     playoutContent: GraphicsPlayoutContent
+    outputChannel: OutputChannel
     sourceName: string
   }
 }

@@ -21,6 +21,7 @@ import { AudioMode } from '../../../model/enums/audio-mode'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -73,7 +74,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.REPLAY,
           source: source.name
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   }
@@ -100,7 +102,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.REPLAY,
           source: source.name
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -127,7 +130,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.REPLAY,
           source: source.name
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   }
@@ -154,7 +158,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.REPLAY,
           source: source.name
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -242,7 +247,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.REPLAY,
           source: source.name
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -292,7 +298,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.REPLAY,
           source: source.name
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }

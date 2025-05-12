@@ -45,6 +45,7 @@ import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 
@@ -246,6 +247,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       playoutContent: {
         type: PlayoutContentType.TRANSITION
       },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.MIX,
       durationInFrames: 0 // Default duration - To be overridden by APPLY ARGUMENTS
     }
@@ -276,6 +278,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       playoutContent: {
         type: PlayoutContentType.TRANSITION
       },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.DIP,
       durationInFrames: 0, // Default duration - To be overridden by APPLY ARGUMENTS,
       dipInput: dipInputSource
@@ -305,6 +308,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       playoutContent: {
         type: PlayoutContentType.TRANSITION
       },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.MIX,
       durationInFrames
     }
@@ -318,6 +322,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       playoutContent: {
         type: PlayoutContentType.TRANSITION
       },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.DIP,
       durationInFrames,
       dipInput: configuredDipInput
@@ -354,6 +359,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       playoutContent: {
         type: PlayoutContentType.TRANSITION
       },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.BREAKER,
       casparCgPreRollDuration: configuration.studio.casparCgPreRollDuration,
       downstreamKeyer: breakerDsk,

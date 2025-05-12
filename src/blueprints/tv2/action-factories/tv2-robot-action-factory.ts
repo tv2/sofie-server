@@ -13,6 +13,7 @@ import {
 import { ActionFactory } from './action-factory'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 export class Tv2RobotActionFactory extends ActionFactory {
 
@@ -40,6 +41,7 @@ export class Tv2RobotActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.ROBOT
         },
+        outputChannel: OutputChannel.PROGRAM,
         actionSubtype: Tv2ActionSubtype.CALL_PRESET
       },
       argument: {

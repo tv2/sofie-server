@@ -27,6 +27,7 @@ import { Logger } from '../../../logger/logger'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 
@@ -90,7 +91,8 @@ export class Tv2AudioActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.AUDIO
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -128,7 +130,8 @@ export class Tv2AudioActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.AUDIO
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -177,7 +180,8 @@ export class Tv2AudioActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.AUDIO
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -227,7 +231,8 @@ export class Tv2AudioActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.AUDIO
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -254,7 +259,8 @@ export class Tv2AudioActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.AUDIO
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -302,6 +308,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.AUDIO
         },
+        outputChannel: OutputChannel.PROGRAM,
         actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED,
         defaultFadeDurationInFrames: blueprintConfiguration.studio.audioBedSettings.fadeOutDurationInFrames
       },
@@ -353,7 +360,8 @@ export class Tv2AudioActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.AUDIO
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }

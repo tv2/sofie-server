@@ -28,6 +28,7 @@ import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { AudioMode } from '../../../model/enums/audio-mode'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -109,6 +110,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.VIDEO_CLIP
         },
+        outputChannel: OutputChannel.PREVIEW,
         fileName: videoClipData.fileName,
         configuredVideoClipPostRollDuration: configuration.studio.serverPostRollDuration
       }

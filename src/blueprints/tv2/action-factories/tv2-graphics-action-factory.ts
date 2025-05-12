@@ -51,6 +51,7 @@ import { Configuration } from '../../../model/entities/configuration'
 import { PieceInterface } from '../../../model/entities/piece'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
   Tv2PieceLayer.GRAPHICS_IDENT,
@@ -335,6 +336,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
         },
+        outputChannel: OutputChannel.PROGRAM,
         sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
       }
     }

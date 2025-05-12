@@ -22,6 +22,7 @@ import { PartActionType, PieceActionType } from '../../model/enums/action-type'
 import { Tv2ActionSubtype } from './value-objects/tv2-action'
 import { EntityTestFactory } from '../../model/entities/test/entity-test-factory'
 import { PlayoutContentType } from '../../model/enums/playout-content-type'
+import { OutputChannel } from '../../model/enums/output-channel'
 
 describe(Tv2ActionService.name, () => {
   describe(Tv2ActionService.prototype.generateActions.name, () => {
@@ -170,7 +171,8 @@ function createMockOfTv2AudioActionFactory(): Tv2AudioActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.AUDIO
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   ])
@@ -193,7 +195,8 @@ function createMockOfTv2CameraActionFactory(): Tv2CameraActionFactory {
         playoutContent: {
           type: PlayoutContentType.CAMERA,
           source: '1'
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   ])
@@ -216,7 +219,8 @@ function createMockOfTv2RemoteActionFactory(): Tv2RemoteActionFactory {
         playoutContent: {
           type: PlayoutContentType.REMOTE,
           source: ''
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   ])
@@ -259,7 +263,8 @@ function createMockOfTv2GraphicsActionFactory(): Tv2GraphicsActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   ])
@@ -282,6 +287,7 @@ function createMockOfTv2VideoClipActionFactory(): Tv2VideoClipActionFactory {
         playoutContent: {
           type: PlayoutContentType.VIDEO_CLIP
         },
+        outputChannel: OutputChannel.PREVIEW,
         fileName: 'some-file-name',
         configuredVideoClipPostRollDuration: 0,
       }
@@ -305,7 +311,8 @@ function createMockOfTv2VideoMixerConfigurationActionFactory(): Tv2VideoMixerCon
       metadata: {
         playoutContent: {
           type: PlayoutContentType.UNKNOWN
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   ])

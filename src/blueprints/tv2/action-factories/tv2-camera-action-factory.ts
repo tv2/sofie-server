@@ -19,6 +19,7 @@ import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 export class Tv2CameraActionFactory extends ActionFactory {
 
@@ -56,7 +57,8 @@ export class Tv2CameraActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.CAMERA,
           source: cameraSource.name
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       },
     }
   }
@@ -151,7 +153,8 @@ export class Tv2CameraActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.CAMERA,
           source: cameraSource.name
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }

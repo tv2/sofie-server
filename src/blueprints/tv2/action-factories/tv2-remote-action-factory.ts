@@ -27,6 +27,7 @@ import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 export class Tv2RemoteActionFactory extends ActionFactory {
 
@@ -85,7 +86,8 @@ export class Tv2RemoteActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.REMOTE,
           source: remoteSource.name
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       },
     }
   }
@@ -188,7 +190,8 @@ export class Tv2RemoteActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.REMOTE,
           source: remoteSource.name
-        }
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -205,6 +208,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
           type: PlayoutContentType.REMOTE,
           source: 'unknown_source'
         },
+        outputChannel: OutputChannel.PREVIEW,
         actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
       },
       data: {

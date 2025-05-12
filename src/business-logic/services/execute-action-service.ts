@@ -29,6 +29,7 @@ import { Configuration } from '../../model/entities/configuration'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
 import { TakeMode } from '../../model/enums/take-mode'
 import { PlayoutContentType } from '../../model/enums/playout-content-type'
+import { OutputChannel } from '../../model/enums/output-channel'
 
 const SYSTEM_ACTIONS_ID: string = 'SYSTEM_ACTIONS_ID'
 
@@ -43,7 +44,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -56,7 +58,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -69,7 +72,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -82,7 +86,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -95,7 +100,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -108,7 +114,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -121,7 +128,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -134,7 +142,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -147,7 +156,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -160,7 +170,8 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     metadata: {
       playoutContent: {
         type: PlayoutContentType.UNKNOWN
-      }
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
 ]

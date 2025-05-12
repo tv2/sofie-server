@@ -58,6 +58,7 @@ import { AudioMode } from '../../../model/enums/audio-mode'
 import { ObjectCloner } from '../../../business-logic/services/interfaces/object-cloner'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 import { SourcePlayoutContent, SplitScreenPlayoutContent } from '../../../model/value-objects/playout-content'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 
@@ -199,6 +200,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         },
         metadata: {
           playoutContent: this.createSplitScreenLayoutPlayoutContent(splitScreenConfiguration.name),
+          outputChannel: OutputChannel.PREVIEW,
           actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
         }
       }
@@ -322,6 +324,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
                 layout: '', // This action doesn't care about the layout nor the sources.
                 sources: []
               },
+              outputChannel: OutputChannel.UNKNOWN,
               actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
               insertedContentType,
               inputIndex,
@@ -547,7 +550,8 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
           type: PlayoutContentType.SPLIT_SCREEN,
           layout: '', // This action doesn't care about the layout nor the sources.
           sources: []
-        }
+        },
+        outputChannel: OutputChannel.PREVIEW
       },
       data: {
         partInterface: this.createPartInterface(partId, splitScreenConfiguration),
@@ -586,6 +590,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
           layout: '', // This action doesn't care about the layout nor the sources.
           sources: []
         },
+        outputChannel: OutputChannel.PREVIEW,
         actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
       },
       data: {
@@ -693,6 +698,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
           layout: '', // This action doesn't care about the layout nor the sources.
           sources: []
         },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT,
         inputIndex,
         videoMixerSource: A_B_SOURCE_INPUT_PLACEHOLDER,
