@@ -3,6 +3,7 @@ import { PlayoutContentType } from '../enums/playout-content-type'
 export type PlayoutContent =
   | SourcePlayoutContent
   | SplitScreenPlayoutContent
+  | SplitScreenInputPlayoutContent
   | GraphicsPlayoutContent
   | OverlayGraphicsPlayoutContent
   | VideoPlayoutContent
@@ -35,7 +36,13 @@ export interface ReplayPlayoutContent {
 export interface SplitScreenPlayoutContent {
   type: PlayoutContentType.SPLIT_SCREEN
   layout: string
-  sources: SourcePlayoutContent[]
+  inputPlayoutContents: Record<number, SplitScreenInputPlayoutContent>
+}
+
+export interface SplitScreenInputPlayoutContent {
+  type: PlayoutContentType.SPLIT_SCREEN_INPUT
+  inputIndex: number // zero-indexed
+  sourcePlayoutContent: SourcePlayoutContent
 }
 
 export interface GraphicsPlayoutContent {
