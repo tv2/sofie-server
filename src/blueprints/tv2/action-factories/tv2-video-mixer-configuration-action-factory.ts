@@ -7,7 +7,7 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2Action, Tv2ActionContentType, Tv2PieceAction } from '../value-objects/tv2-action'
+import { Tv2Action, Tv2PieceAction } from '../value-objects/tv2-action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { OutputLayer } from '../../../model/enums/output-layer'
@@ -50,7 +50,9 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.UNKNOWN
+        playoutContent: {
+          type: PlayoutContentType.COMMAND
+        }
       }
     }
   }

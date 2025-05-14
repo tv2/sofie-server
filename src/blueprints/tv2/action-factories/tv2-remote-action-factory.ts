@@ -9,7 +9,6 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import {
   Tv2Action,
-  Tv2ActionContentType,
   Tv2ActionSubtype,
   Tv2PartAction,
   Tv2RecallLastPlannedRemoteAsNextAction,
@@ -28,6 +27,7 @@ import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 export class Tv2RemoteActionFactory extends ActionFactory {
 
@@ -39,7 +39,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
   }
 
   public isRemoteAction(action: Tv2Action): action is Tv2RemoteAction {
-    return action.metadata.contentType === Tv2ActionContentType.REMOTE
+    return action.metadata.playoutContent.type === PlayoutContentType.REMOTE
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -83,8 +83,11 @@ export class Tv2RemoteActionFactory extends ActionFactory {
         pieceInterfaces: [remotePieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.REMOTE,
-        remoteNumber: remoteSource.name,
+        playoutContent: {
+          type: PlayoutContentType.REMOTE,
+          source: remoteSource.name
+        },
+        outputChannel: OutputChannel.PREVIEW
       },
     }
   }
@@ -184,8 +187,11 @@ export class Tv2RemoteActionFactory extends ActionFactory {
         pieceInterfaces: [remotePieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.REMOTE,
-        remoteNumber: remoteSource.name,
+        playoutContent: {
+          type: PlayoutContentType.REMOTE,
+          source: remoteSource.name
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -198,7 +204,11 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       description: 'Recalls the last live that has been on air.',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
-        contentType: Tv2ActionContentType.REMOTE,
+        playoutContent: {
+          type: PlayoutContentType.REMOTE,
+          source: 'unknown_source'
+        },
+        outputChannel: OutputChannel.PREVIEW,
         actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
       },
       data: {

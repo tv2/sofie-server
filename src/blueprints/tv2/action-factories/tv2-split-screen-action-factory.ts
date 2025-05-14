@@ -16,7 +16,6 @@ import {
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import {
   Tv2Action,
-  Tv2ActionContentType,
   Tv2ActionSubtype,
   Tv2RecallSplitScreenAction,
   Tv2SplitScreenAction,
@@ -59,6 +58,7 @@ import { AudioMode } from '../../../model/enums/audio-mode'
 import { ObjectCloner } from '../../../business-logic/services/interfaces/object-cloner'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
 import { SourcePlayoutContent, SplitScreenPlayoutContent } from '../../../model/value-objects/playout-content'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 
@@ -199,7 +199,8 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
           pieceInterfaces: [this.createSplitScreenPieceInterface(partId, splitScreenConfiguration.name, metadata, splitScreenLayoutTimelineObjects)]
         },
         metadata: {
-          contentType: Tv2ActionContentType.SPLIT_SCREEN,
+          playoutContent: this.createSplitScreenLayoutPlayoutContent(splitScreenConfiguration.name),
+          outputChannel: OutputChannel.PREVIEW,
           actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
         }
       }
@@ -293,15 +294,15 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     const replaySourcesWithoutVoiceOver: Tv2SourceMappingWithAudio[] = replaySources.filter(replaySource => !/EPSIO/i.test(replaySource.name))
 
     return [
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, Tv2ActionContentType.CAMERA, CAMERA_SOURCE_NAME),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, remoteSources, Tv2ActionContentType.REMOTE),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, feedSources, Tv2ActionContentType.REMOTE),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySources, Tv2ActionContentType.REPLAY, `${REPLAY_SOURCE_NAME} VO`, AudioMode.VOICE_OVER),
-      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySourcesWithoutVoiceOver, Tv2ActionContentType.REPLAY, REPLAY_SOURCE_NAME, AudioMode.FULL)
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, cameraSources, PlayoutContentType.CAMERA, CAMERA_SOURCE_NAME),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, remoteSources, PlayoutContentType.REMOTE),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, feedSources, PlayoutContentType.REMOTE),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySources, PlayoutContentType.REPLAY, `${REPLAY_SOURCE_NAME} VO`, AudioMode.VOICE_OVER),
+      ...this.createInsertToInputActionsForSources(blueprintConfiguration, replaySourcesWithoutVoiceOver, PlayoutContentType.REPLAY, REPLAY_SOURCE_NAME, AudioMode.FULL)
     ]
   }
 
-  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithAudio[], insertedContentType: Tv2ActionContentType, name: string = '', audioMode: AudioMode = AudioMode.FULL): Tv2SplitScreenInsertSourceInputAction[] {
+  private createInsertToInputActionsForSources(blueprintConfiguration: Tv2BlueprintConfiguration, sources: Tv2SourceMappingWithAudio[], insertedContentType: PlayoutContentType, name: string = '', audioMode: AudioMode = AudioMode.FULL): Tv2SplitScreenInsertSourceInputAction[] {
     const actions: Tv2SplitScreenInsertSourceInputAction[] = []
     for (let inputIndex: number = 0; inputIndex < NUMBER_OF_SPLIT_SCREEN_BOXES; inputIndex++) {
       const actionsForInput: Tv2SplitScreenInsertSourceInputAction[] = sources
@@ -318,7 +319,12 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
               pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()
             },
             metadata: {
-              contentType: Tv2ActionContentType.SPLIT_SCREEN,
+              playoutContent: {
+                type: PlayoutContentType.SPLIT_SCREEN,
+                layout: '', // This action doesn't care about the layout nor the sources.
+                sources: []
+              },
+              outputChannel: OutputChannel.UNKNOWN,
               actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
               insertedContentType,
               inputIndex,
@@ -540,7 +546,12 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       description: '',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
-        contentType: Tv2ActionContentType.SPLIT_SCREEN
+        playoutContent: {
+          type: PlayoutContentType.SPLIT_SCREEN,
+          layout: '', // This action doesn't care about the layout nor the sources.
+          sources: []
+        },
+        outputChannel: OutputChannel.PREVIEW
       },
       data: {
         partInterface: this.createPartInterface(partId, splitScreenConfiguration),
@@ -574,7 +585,12 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       description: 'Recalls the last planned DVE that has been on Air',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
-        contentType: Tv2ActionContentType.SPLIT_SCREEN,
+        playoutContent: {
+          type: PlayoutContentType.SPLIT_SCREEN,
+          layout: '', // This action doesn't care about the layout nor the sources.
+          sources: []
+        },
+        outputChannel: OutputChannel.PREVIEW,
         actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
       },
       data: {
@@ -677,7 +693,12 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       description: `Insert last Video Clip in DVE input ${this.createDisplayIndex(inputIndex)}`,
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
-        contentType: Tv2ActionContentType.SPLIT_SCREEN,
+        playoutContent: {
+          type: PlayoutContentType.SPLIT_SCREEN,
+          layout: '', // This action doesn't care about the layout nor the sources.
+          sources: []
+        },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT,
         inputIndex,
         videoMixerSource: A_B_SOURCE_INPUT_PLACEHOLDER,
