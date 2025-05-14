@@ -587,9 +587,8 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
         playoutContent: {
-          type: PlayoutContentType.SPLIT_SCREEN,
-          layout: '', // This action doesn't care about the layout nor the sources.
-          inputPlayoutContents: []
+          type: PlayoutContentType.RECALLED,
+          recalledType: PlayoutContentType.SPLIT_SCREEN
         },
         outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
@@ -633,8 +632,6 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     const pieceInterfaces: Tv2PieceInterface[] = historicPart.getPieces().map(piece => {
       return {
         id: `recall_last_split_screen_piece_${piece.id}`,
-        ingestedPieceId: '',
-        ingestedPartId: '',
         partId: partInterface.id,
         rundownId: '',
         name: piece.name,
@@ -652,6 +649,30 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         timelineObjects: piece.getTimelineObjects()
       }
     })
+
+    const recalledPlayoutContentPiece: Tv2PieceInterface = {
+      id: 'recall_last_split_screen_piece_recalled_split_screen',
+      partId: partInterface.id,
+      rundownId: '',
+      name: 'Recalled split screen',
+      layer: 'recalled_layer',
+      pieceLifespan: PieceLifespan.WITHIN_PART,
+      transitionType: TransitionType.NO_TRANSITION,
+      isPlanned: false,
+      start: 0,
+      preRollDuration: 0,
+      postRollDuration: 0,
+      metadata: {
+        playoutContent: {
+          type: PlayoutContentType.RECALLED,
+          recalledType: PlayoutContentType.SPLIT_SCREEN
+        }
+      },
+      tags: [],
+      isUnsynced: false,
+      timelineObjects: []
+    }
+    pieceInterfaces.push(recalledPlayoutContentPiece)
 
     const splitScreenAction: Tv2RecallSplitScreenAction = action as Tv2RecallSplitScreenAction
     splitScreenAction.data = {

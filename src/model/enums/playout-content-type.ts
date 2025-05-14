@@ -14,5 +14,6 @@ export enum PlayoutContentType {
   TRANSITION = 'TRANSITION',
   COMMAND = 'COMMAND',
   ROBOT = 'ROBOT',
+  RECALLED = 'RECALLED',
   UNKNOWN = 'UNKNOWN'
 }

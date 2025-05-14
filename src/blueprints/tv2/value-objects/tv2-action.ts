@@ -9,6 +9,7 @@ import {
   CameraPlayoutContent,
   GraphicsPlayoutContent,
   PlayoutContent,
+  RecalledPlayoutContent,
   RemotePlayoutContent,
   ReplayPlayoutContent,
   RobotPlayoutContent,
@@ -76,7 +77,7 @@ export interface Tv2RemoteAction extends Tv2PartAction {
 export interface Tv2RecallLastPlannedRemoteAsNextAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT,
   metadata: {
-    playoutContent: RemotePlayoutContent
+    playoutContent: RecalledPlayoutContent<PlayoutContentType.REMOTE>
     outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
   }
@@ -146,7 +147,7 @@ export interface Tv2SplitScreenAction extends Tv2PartAction {
 export interface Tv2RecallSplitScreenAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
-    playoutContent: SplitScreenPlayoutContent
+    playoutContent: RecalledPlayoutContent<PlayoutContentType.SPLIT_SCREEN>
     outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
   }

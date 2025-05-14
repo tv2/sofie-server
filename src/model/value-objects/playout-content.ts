@@ -14,6 +14,7 @@ export type PlayoutContent =
   | TransitionPlayoutContent
   | CommandPlayoutContent
   | RobotPlayoutContent
+  | RecalledPlayoutContent<PlayoutContentType>
   | UnknownPlayoutContent
 
 export type SourcePlayoutContent = CameraPlayoutContent | RemotePlayoutContent | ReplayPlayoutContent | UnknownPlayoutContent
@@ -83,6 +84,11 @@ export interface CommandPlayoutContent {
 
 export interface RobotPlayoutContent {
   type: PlayoutContentType.ROBOT
+}
+
+export interface RecalledPlayoutContent<RecalledType extends PlayoutContentType> {
+  type: PlayoutContentType.RECALLED
+  recalledType: RecalledType
 }
 
 export interface UnknownPlayoutContent {

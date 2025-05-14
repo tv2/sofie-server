@@ -38,8 +38,9 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     super()
   }
 
-  public isRemoteAction(action: Tv2Action): action is Tv2RemoteAction {
+  public isRemoteAction(action: Tv2Action): boolean {
     return action.metadata.playoutContent.type === PlayoutContentType.REMOTE
+      || action.metadata.actionSubtype === Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -205,10 +206,10 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
         playoutContent: {
-          type: PlayoutContentType.REMOTE,
-          source: 'unknown_source'
+          type: PlayoutContentType.RECALLED,
+          recalledType: PlayoutContentType.REMOTE
         },
-        outputChannel: OutputChannel.PREVIEW,
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
       },
       data: {
@@ -256,8 +257,6 @@ export class Tv2RemoteActionFactory extends ActionFactory {
 
     const pieceInterfaces: Tv2PieceInterface[] = historicPart.getPieces().map(piece => ({
       id: `recall_last_planned_remote_piece_${piece.id}`,
-      ingestedPieceId: '',
-      ingestedPartId: '',
       partId: partInterface.id,
       rundownId: '',
       name: piece.name,
@@ -274,6 +273,30 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       isUnsynced: false,
       timelineObjects: piece.getTimelineObjects()
     }))
+
+    const recallPlayoutContentPiece: Tv2PieceInterface = {
+      id: 'recall_last_planned_remote_piece_recalled_remote',
+      partId: partInterface.id,
+      rundownId: '',
+      name: 'Recalled remote',
+      layer: 'recalled_layer',
+      pieceLifespan: PieceLifespan.WITHIN_PART,
+      transitionType: TransitionType.NO_TRANSITION,
+      isPlanned: false,
+      start: 0,
+      preRollDuration: 0,
+      postRollDuration: 0,
+      metadata: {
+        playoutContent: {
+          type: PlayoutContentType.RECALLED,
+          recalledType: PlayoutContentType.REMOTE
+        }
+      },
+      tags: [],
+      isUnsynced: false,
+      timelineObjects: []
+    }
+    pieceInterfaces.push(recallPlayoutContentPiece)
 
     const recallLastPlannedRemoteAction: Tv2RecallLastPlannedRemoteAsNextAction = action as Tv2RecallLastPlannedRemoteAsNextAction
     return {
