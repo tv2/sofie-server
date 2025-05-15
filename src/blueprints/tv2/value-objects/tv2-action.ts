@@ -6,9 +6,16 @@ import { Tv2BlueprintTimelineObject } from './tv2-blueprint-timeline-object'
 import { AudioMode } from '../../../model/enums/audio-mode'
 import {
   AudioPlayoutContent,
-  CameraPlayoutContent, GraphicsPlayoutContent,
-  PlayoutContent, RemotePlayoutContent, ReplayPlayoutContent, RobotPlayoutContent, SourcePlayoutContent,
-  SplitScreenPlayoutContent, TransitionPlayoutContent,
+  CameraPlayoutContent,
+  GraphicsPlayoutContent,
+  PlayoutContent,
+  RecalledPlayoutContent,
+  RemotePlayoutContent,
+  ReplayPlayoutContent,
+  RobotPlayoutContent,
+  SplitScreenInputPlayoutContent,
+  SplitScreenPlayoutContent,
+  TransitionPlayoutContent,
   VideoPlayoutContent
 } from '../../../model/value-objects/playout-content'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
@@ -70,7 +77,7 @@ export interface Tv2RemoteAction extends Tv2PartAction {
 export interface Tv2RecallLastPlannedRemoteAsNextAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT,
   metadata: {
-    playoutContent: RemotePlayoutContent
+    playoutContent: RecalledPlayoutContent<PlayoutContentType.REMOTE>
     outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
   }
@@ -140,7 +147,7 @@ export interface Tv2SplitScreenAction extends Tv2PartAction {
 export interface Tv2RecallSplitScreenAction extends Tv2PartAction {
   type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
-    playoutContent: SplitScreenPlayoutContent
+    playoutContent: RecalledPlayoutContent<PlayoutContentType.SPLIT_SCREEN>
     outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
   }
@@ -158,7 +165,6 @@ export interface Tv2SplitScreenLayoutAction extends Tv2PartAction {
 export interface Tv2SplitScreenInsertSourceInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
-    playoutContent: SplitScreenPlayoutContent
     outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT
     insertedContentType: PlayoutContentType
@@ -166,9 +172,8 @@ export interface Tv2SplitScreenInsertSourceInputAction extends Tv2PieceAction {
 }
 
 export type Tv2SplitScreenInsertSourceInputMetadata = {
-  inputIndex: number // zero-indexed
+  playoutContent: SplitScreenInputPlayoutContent
   videoMixerSource: number,
-  sourcePlayoutContent: SourcePlayoutContent
   audioTimelineObjects: Tv2BlueprintTimelineObject[]
   videoClip?: {
     timelineObjects: Tv2BlueprintTimelineObject[]
@@ -180,7 +185,7 @@ export type Tv2SplitScreenInsertSourceInputMetadata = {
 export interface Tv2SplitScreenInsertLastVideoClipInputAction extends Tv2PieceAction {
   type: PieceActionType.REPLACE_PIECE
   metadata: {
-    playoutContent: SplitScreenPlayoutContent
+    playoutContent: SplitScreenInputPlayoutContent
     outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT
   } & Tv2SplitScreenInsertSourceInputMetadata

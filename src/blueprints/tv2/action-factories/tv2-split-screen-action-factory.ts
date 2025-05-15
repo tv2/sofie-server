@@ -57,7 +57,11 @@ import { OutputLayer } from '../../../model/enums/output-layer'
 import { AudioMode } from '../../../model/enums/audio-mode'
 import { ObjectCloner } from '../../../business-logic/services/interfaces/object-cloner'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
-import { SourcePlayoutContent, SplitScreenPlayoutContent } from '../../../model/value-objects/playout-content'
+import {
+  SourcePlayoutContent,
+  SplitScreenInputPlayoutContent,
+  SplitScreenPlayoutContent
+} from '../../../model/value-objects/playout-content'
 import { OutputChannel } from '../../../model/enums/output-channel'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
@@ -200,7 +204,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         },
         metadata: {
           playoutContent: this.createSplitScreenLayoutPlayoutContent(splitScreenConfiguration.name),
-          outputChannel: OutputChannel.PREVIEW,
+          outputChannel: OutputChannel.UNKNOWN,
           actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
         }
       }
@@ -211,12 +215,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     return {
       type: PlayoutContentType.SPLIT_SCREEN,
       layout,
-      sources: [
-        { type: PlayoutContentType.UNKNOWN },
-        { type: PlayoutContentType.UNKNOWN },
-        { type: PlayoutContentType.UNKNOWN },
-        { type: PlayoutContentType.UNKNOWN }
-      ] // We currently support four "boxes" so we need four PlayoutContents.
+      inputPlayoutContents: []
     }
   }
 
@@ -320,9 +319,9 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
             },
             metadata: {
               playoutContent: {
-                type: PlayoutContentType.SPLIT_SCREEN,
-                layout: '', // This action doesn't care about the layout nor the sources.
-                sources: []
+                type: PlayoutContentType.SPLIT_SCREEN_INPUT,
+                inputIndex,
+                sourcePlayoutContent: this.findSourcePlayoutContent(blueprintConfiguration, source)
               },
               outputChannel: OutputChannel.UNKNOWN,
               actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
@@ -330,7 +329,6 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
               inputIndex,
               videoMixerSource: source.videoMixerSource,
               audioTimelineObjects,
-              sourcePlayoutContent: this.findSourcePlayoutContent(blueprintConfiguration, source)
             }
           }
         })
@@ -384,11 +382,11 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     const splitScreenBoxes: SplitScreenBoxProperties[] = pieceMetadata.splitScreen.boxes
     const insertSourceInputMetadata: Tv2SplitScreenInsertSourceInputMetadata = action.metadata as Tv2SplitScreenInsertSourceInputMetadata
 
-    const boxIndex: number = this.getBoxIndex(insertSourceInputMetadata.inputIndex, pieceMetadata.config)
+    const boxIndex: number = this.getBoxIndex(insertSourceInputMetadata.playoutContent.inputIndex, pieceMetadata.config)
     const box: SplitScreenBoxProperties | undefined = splitScreenBoxes[boxIndex]
 
     if (!box?.enabled) {
-      this.throwExceptionForUnavailableSplitScreenBoxInput(box ? boxIndex: insertSourceInputMetadata.inputIndex, pieceMetadata.config.DVEName)
+      this.throwExceptionForUnavailableSplitScreenBoxInput(box ? boxIndex: insertSourceInputMetadata.playoutContent.inputIndex, pieceMetadata.config.DVEName)
     }
 
     const splitScreenBoxTimelineObject: Tv2BlueprintTimelineObject | undefined = splitScreenPieceFromRundown.getTimelineObjects()
@@ -426,7 +424,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     }
 
     if (pieceMetadata.playoutContent.type === PlayoutContentType.SPLIT_SCREEN) {
-      pieceMetadata.playoutContent.sources[insertSourceInputMetadata.inputIndex] = insertSourceInputMetadata.sourcePlayoutContent
+      pieceMetadata.playoutContent.inputPlayoutContents[insertSourceInputMetadata.playoutContent.inputIndex] = insertSourceInputMetadata.playoutContent
     }
 
     const splitScreenAction: Tv2SplitScreenInsertSourceInputAction = action as Tv2SplitScreenInsertSourceInputAction
@@ -488,14 +486,18 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       }
     })
 
-    const splitScreenSourcesPlayoutContent: SourcePlayoutContent[] = []
+    const splitScreenSourcesPlayoutContent: Record<number, SplitScreenInputPlayoutContent> = []
     const audioTimelineObjectsForBoxes: { [inputIndex: number]: Tv2BlueprintTimelineObject[] } = {}
 
     splitScreenManifestData.sources.forEach((source: Tv2SourceMappingWithAudio, input: SplitScreenBoxInput) => {
       const splitScreenInputIndex: number = this.mapSplitScreenBoxInputToNumber(input)
       audioTimelineObjectsForBoxes[splitScreenInputIndex] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(blueprintConfiguration, source)
       boxes[splitScreenInputIndex].source = source.videoMixerSource
-      splitScreenSourcesPlayoutContent.push(this.findSourcePlayoutContent(blueprintConfiguration, source))
+      splitScreenSourcesPlayoutContent[splitScreenInputIndex] = {
+        type: PlayoutContentType.SPLIT_SCREEN_INPUT,
+        inputIndex: splitScreenInputIndex,
+        sourcePlayoutContent: this.findSourcePlayoutContent(blueprintConfiguration, source)
+      }
     })
 
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = Object.values(audioTimelineObjectsForBoxes).flat()
@@ -504,9 +506,8 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       playoutContent: {
         type: PlayoutContentType.SPLIT_SCREEN,
         layout: splitScreenConfiguration.name,
-        sources: splitScreenSourcesPlayoutContent
+        inputPlayoutContents: splitScreenSourcesPlayoutContent
       },
-      outputLayer: OutputLayer.PROGRAM,
       splitScreen: {
         boxes,
         audioTimelineObjectsForBoxes,
@@ -548,10 +549,10 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.SPLIT_SCREEN,
-          layout: '', // This action doesn't care about the layout nor the sources.
-          sources: []
+          layout: splitScreenConfiguration.name,
+          inputPlayoutContents: splitScreenSourcesPlayoutContent
         },
-        outputChannel: OutputChannel.PREVIEW
+        outputChannel: OutputChannel.UNKNOWN
       },
       data: {
         partInterface: this.createPartInterface(partId, splitScreenConfiguration),
@@ -586,11 +587,10 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
         playoutContent: {
-          type: PlayoutContentType.SPLIT_SCREEN,
-          layout: '', // This action doesn't care about the layout nor the sources.
-          sources: []
+          type: PlayoutContentType.RECALLED,
+          recalledType: PlayoutContentType.SPLIT_SCREEN
         },
-        outputChannel: OutputChannel.PREVIEW,
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
       },
       data: {
@@ -632,8 +632,6 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     const pieceInterfaces: Tv2PieceInterface[] = historicPart.getPieces().map(piece => {
       return {
         id: `recall_last_split_screen_piece_${piece.id}`,
-        ingestedPieceId: '',
-        ingestedPartId: '',
         partId: partInterface.id,
         rundownId: '',
         name: piece.name,
@@ -651,6 +649,30 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         timelineObjects: piece.getTimelineObjects()
       }
     })
+
+    const recalledPlayoutContentPiece: Tv2PieceInterface = {
+      id: 'recall_last_split_screen_piece_recalled_split_screen',
+      partId: partInterface.id,
+      rundownId: '',
+      name: 'Recalled split screen',
+      layer: 'recalled_layer',
+      pieceLifespan: PieceLifespan.WITHIN_PART,
+      transitionType: TransitionType.NO_TRANSITION,
+      isPlanned: false,
+      start: 0,
+      preRollDuration: 0,
+      postRollDuration: 0,
+      metadata: {
+        playoutContent: {
+          type: PlayoutContentType.RECALLED,
+          recalledType: PlayoutContentType.SPLIT_SCREEN
+        }
+      },
+      tags: [],
+      isUnsynced: false,
+      timelineObjects: []
+    }
+    pieceInterfaces.push(recalledPlayoutContentPiece)
 
     const splitScreenAction: Tv2RecallSplitScreenAction = action as Tv2RecallSplitScreenAction
     splitScreenAction.data = {
@@ -694,13 +716,14 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       type: PieceActionType.REPLACE_PIECE,
       metadata: {
         playoutContent: {
-          type: PlayoutContentType.SPLIT_SCREEN,
-          layout: '', // This action doesn't care about the layout nor the sources.
-          sources: []
+          type: PlayoutContentType.SPLIT_SCREEN_INPUT,
+          inputIndex,
+          sourcePlayoutContent: {
+            type: PlayoutContentType.UNKNOWN
+          }
         },
         outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_LAST_VIDEO_CLIP_TO_INPUT,
-        inputIndex,
         videoMixerSource: A_B_SOURCE_INPUT_PLACEHOLDER,
         audioTimelineObjects,
         videoClip: {
@@ -708,7 +731,6 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
           timelineObjects: [],
           audioMode
         },
-        sourcePlayoutContent: { type: PlayoutContentType.UNKNOWN }
       },
       data: {
         pieceInterface: this.createEmptyPieceInterfaceToBeUpdatedByMutateActions()

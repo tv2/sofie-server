@@ -3,6 +3,7 @@ import { PlayoutContentType } from '../enums/playout-content-type'
 export type PlayoutContent =
   | SourcePlayoutContent
   | SplitScreenPlayoutContent
+  | SplitScreenInputPlayoutContent
   | GraphicsPlayoutContent
   | OverlayGraphicsPlayoutContent
   | VideoPlayoutContent
@@ -13,6 +14,7 @@ export type PlayoutContent =
   | TransitionPlayoutContent
   | CommandPlayoutContent
   | RobotPlayoutContent
+  | RecalledPlayoutContent<PlayoutContentType>
   | UnknownPlayoutContent
 
 export type SourcePlayoutContent = CameraPlayoutContent | RemotePlayoutContent | ReplayPlayoutContent | UnknownPlayoutContent
@@ -35,7 +37,13 @@ export interface ReplayPlayoutContent {
 export interface SplitScreenPlayoutContent {
   type: PlayoutContentType.SPLIT_SCREEN
   layout: string
-  sources: SourcePlayoutContent[]
+  inputPlayoutContents: Record<number, SplitScreenInputPlayoutContent>
+}
+
+export interface SplitScreenInputPlayoutContent {
+  type: PlayoutContentType.SPLIT_SCREEN_INPUT
+  inputIndex: number // zero-indexed
+  sourcePlayoutContent: SourcePlayoutContent
 }
 
 export interface GraphicsPlayoutContent {
@@ -76,6 +84,11 @@ export interface CommandPlayoutContent {
 
 export interface RobotPlayoutContent {
   type: PlayoutContentType.ROBOT
+}
+
+export interface RecalledPlayoutContent<RecalledType extends PlayoutContentType> {
+  type: PlayoutContentType.RECALLED
+  recalledType: RecalledType
 }
 
 export interface UnknownPlayoutContent {
