@@ -81,9 +81,6 @@ export class Piece {
     this.isUnsyncedPiece = piece.isUnsynced
     this.isPieceInsertedOnAir = piece.isInsertedOnAir ?? false
     this.originalTimelineObjects = piece.timelineObjects ? [...piece.timelineObjects] : []
-
-    this.executedAt = piece.executedAt ?? 0
-
   }
 
   public resetFromIngestedPiece(ingestedPiece: IngestedPiece): void {
