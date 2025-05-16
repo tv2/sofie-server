@@ -47,6 +47,7 @@ export interface Tv2PartAction extends PartAction {
 export interface Tv2PieceAction extends PieceAction {
   metadata: {
     playoutContent: PlayoutContent
+    outputChannel: OutputChannel
     actionSubtype?: Tv2ActionSubtype
   }
 }

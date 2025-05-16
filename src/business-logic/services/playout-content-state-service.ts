@@ -3,6 +3,9 @@ import { PlayoutContentReadService, PlayoutContentUpdateService } from './interf
 import { PlayoutContentEventEmitter } from './interfaces/playout-content-event-emitter'
 import { PlayoutContent } from '../../model/value-objects/playout-content'
 import { RundownMode } from '../../model/enums/rundown-mode'
+import { PlayoutContentType } from '../../model/enums/playout-content-type'
+
+const INFINITE_PIECES_PLAYOUT_CONTENT_TYPES: PlayoutContentType[] = [PlayoutContentType.DOWNSTREAM_KEYER]
 
 export class PlayoutContentStateService implements PlayoutContentUpdateService, PlayoutContentReadService {
 
@@ -55,7 +58,16 @@ export class PlayoutContentStateService implements PlayoutContentUpdateService, 
       this.resetProgramPlayoutContents()
       return
     }
-    const programPlayoutContents: PlayoutContent[] = rundown.getActivePart().getPieces().map(piece => piece.metadata.playoutContent)
+
+    const infinitePiecesPlayoutContents: PlayoutContent[] = rundown.getInfinitePieces()
+      .filter(piece => INFINITE_PIECES_PLAYOUT_CONTENT_TYPES.includes(piece.metadata.playoutContent.type))
+      .map(piece => piece.metadata.playoutContent)
+
+    const programPlayoutContents: PlayoutContent[] = rundown.getActivePart().getPieces()
+      .filter(piece => !INFINITE_PIECES_PLAYOUT_CONTENT_TYPES.includes(piece.metadata.playoutContent.type))
+      .map(piece => piece.metadata.playoutContent)
+      .concat(infinitePiecesPlayoutContents)
+
     if (this.areArraysEqual(this.programPlayoutContents, programPlayoutContents)) {
       return
     }

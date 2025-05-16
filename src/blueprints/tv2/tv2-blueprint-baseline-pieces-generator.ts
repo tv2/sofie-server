@@ -35,7 +35,6 @@ export class Tv2BlueprintBaselinePiecesGenerator implements BlueprintBaselinePie
 
   private createBaselineDownstreamKeyerPieces(rundownId: string, studioConfiguration: Tv2StudioBlueprintConfiguration): Piece[] {
     return studioConfiguration.videoMixerBasicConfiguration.downstreamKeyers
-      .filter(downstreamKeyer => downstreamKeyer.defaultOn)
       .map(downstreamKeyer => {
         const downstreamKeyerNumber: string = String(downstreamKeyer.index + 1)
         const pieceInterface: Tv2PieceInterface = {
@@ -52,11 +51,13 @@ export class Tv2BlueprintBaselinePiecesGenerator implements BlueprintBaselinePie
           preRollDuration: 0,
           postRollDuration: 0,
           timelineObjects: [
-            this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
+            this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, downstreamKeyer.defaultOn)
           ],
           metadata: {
             playoutContent: {
-              type: PlayoutContentType.COMMAND // TODO
+              type: PlayoutContentType.DOWNSTREAM_KEYER,
+              identifier: downstreamKeyerNumber,
+              isOn: downstreamKeyer.defaultOn
             }
           },
           tags: []

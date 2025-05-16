@@ -12,6 +12,8 @@ import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
+import { DownstreamKeyerPlayoutContent } from '../../../model/value-objects/playout-content'
 
 export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
 
@@ -40,6 +42,10 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
       timelineObjects: [
         this.videoSwitcherTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, isOn)
       ]
+    }, {
+      type: PlayoutContentType.DOWNSTREAM_KEYER,
+      identifier: downstreamKeyerNumber,
+      isOn
     })
     return {
       id: this.sanitizeStringForId(`downstreamKeyer${downstreamKeyerNumber}${actionName}Action`),
@@ -51,14 +57,17 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
       },
       metadata: {
         playoutContent: {
-          type: PlayoutContentType.COMMAND
-        }
+          type: PlayoutContentType.DOWNSTREAM_KEYER,
+          identifier: downstreamKeyerNumber,
+          isOn
+        },
+        outputChannel: OutputChannel.UNKNOWN
       }
     }
   }
 
 
-  private createVideoSwitcherPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>): Tv2PieceInterface {
+  private createVideoSwitcherPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>, playoutContent: DownstreamKeyerPlayoutContent): Tv2PieceInterface {
     return {
       partId: '',
       rundownId: '',
@@ -74,9 +83,7 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [],
       metadata: {
-        playoutContent: {
-          type: PlayoutContentType.COMMAND
-        },
+        playoutContent,
         outputLayer: OutputLayer.SECONDARY
       },
       ...pieceInterfaceWithRequiredValues

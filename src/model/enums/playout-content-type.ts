@@ -15,5 +15,6 @@ export enum PlayoutContentType {
   COMMAND = 'COMMAND',
   ROBOT = 'ROBOT',
   RECALLED = 'RECALLED',
+  DOWNSTREAM_KEYER = 'DOWNSTREAM_KEYER',
   UNKNOWN = 'UNKNOWN'
 }
