@@ -127,7 +127,12 @@ export class ServiceFacade {
   }
 
   public static createIngestRundownSynchronizer(): IngestRundownSynchronizer {
-    return new IngestRundownSynchronizer(new IngestedEntityToEntityMapper(), ServiceFacade.createEntityChangeDetector())
+    return new IngestRundownSynchronizer(
+      new IngestedEntityToEntityMapper(),
+      ServiceFacade.createEntityChangeDetector(),
+      BlueprintsFacade.createBlueprint(),
+      RepositoryFacade.createConfigurationRepository()
+    )
   }
 
   public static createEntityChangeDetector(): EntityChangeDetector {

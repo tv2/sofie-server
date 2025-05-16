@@ -6,6 +6,10 @@ import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper
 import { IngestedPart } from '../../model/entities/ingested-part'
 import { EntityChangeDetector } from './entity-change-detector'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
+import { Blueprint } from '../../model/value-objects/blueprint'
+import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
+import { Configuration } from '../../model/entities/configuration'
+import { Piece } from '../../model/entities/piece'
 
 export interface RundownSynchronizeResult {
   readonly updatedRundown: Rundown | undefined
@@ -21,10 +25,12 @@ export class IngestRundownSynchronizer {
   constructor(
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     private readonly ingestEntityDiffer: EntityChangeDetector,
+    private readonly blueprint: Blueprint,
+    private readonly configurationRepository: ConfigurationRepository
   ) {}
 
-  public synchronizeRundown(rundown: Rundown, ingestedRundown: IngestedRundown): RundownSynchronizeResult {
-    const updatedRundown: Rundown | undefined = this.getUpdatedRundown(rundown, ingestedRundown)
+  public async synchronizeRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<RundownSynchronizeResult> {
+    const updatedRundown: Rundown | undefined = await this.getUpdatedRundown(rundown, ingestedRundown)
 
     const createdSegments: readonly Segment[] = this.getCreatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
     const updatedSegments: readonly Segment[] = this.getUpdatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
@@ -54,7 +60,11 @@ export class IngestRundownSynchronizer {
     }
   }
 
-  private getUpdatedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Rundown | undefined {
+  private async getUpdatedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<Rundown | undefined> {
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const baselinePiecesForRundown: Piece[] = this.blueprint.generateBaselinePieces(rundown.id, configuration)
+    rundown.updateBaselinePieces(baselinePiecesForRundown)
+
     if (this.ingestEntityDiffer.doesShallowRundownDifferFromIngestedRundown(rundown, ingestedRundown)) {
       return this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(rundown, ingestedRundown)
     }

@@ -51,9 +51,10 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
       throw new NotFoundException(`No Rundown found in database for RundownId ${rundownId}`)
     }
 
+    const baselinePieces: Piece[] = await this.mongoPieceRepository.getPiecesFromIds(mongoRundown.baselinePieceIds)
     const infinitePieces: Piece[] = await this.mongoPieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
     const segments: Segment[] = await this.mongoSegmentRepository.getSegments(mongoRundown._id)
-    return this.mongoEntityConverter.convertToRundown(mongoRundown, segments, infinitePieces)
+    return this.mongoEntityConverter.convertToRundown(mongoRundown, segments, baselinePieces, infinitePieces)
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {
@@ -66,7 +67,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     const parts: readonly Part[] = segments.flatMap(segment => segment.getParts())
     const savePartQueries: readonly AnyBulkWriteOperation<MongoPart>[] = this.mongoPartRepository.buildSavePartQueries(parts)
     const deleteOrphanedPartsQuery: AnyBulkWriteOperation<MongoPart> = this.mongoPartRepository.buildDeleteOrphanedPartsForRundownQuery(rundown.id, parts)
-    const pieces: readonly Piece[] = parts.flatMap(part => part.getPieces())
+    const pieces: readonly Piece[] = rundown.getBaselinePieces().concat(parts.flatMap(part => part.getPieces()))
     const savePieceQueries: readonly AnyBulkWriteOperation<MongoPiece>[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
     const deleteOrphanedPiecesQuery: AnyBulkWriteOperation<MongoPiece> = this.mongoPieceRepository.buildDeleteOrphanedPiecesForRundownQuery(rundown.id, pieces.concat(rundown.getInfinitePieces()))
 

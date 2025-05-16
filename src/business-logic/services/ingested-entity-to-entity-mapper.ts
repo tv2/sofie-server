@@ -24,6 +24,7 @@ export class IngestedEntityToEntityMapper {
       takeMode: TakeMode.STANDARD,
       modifiedAt: ingestedRundown.modifiedAt,
       baselineTimelineObjects: ingestedRundown.baselineTimelineObjects,
+      baselinePieces: [],
       timing: ingestedRundown.timings
     })
   }
@@ -46,6 +47,7 @@ export class IngestedEntityToEntityMapper {
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),
       segments: [...rundownToUpdate.getSegments()],
+      baselinePieces: rundownToUpdate.getBaselinePieces(),
       alreadyActiveProperties
     })
   }

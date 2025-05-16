@@ -36,6 +36,7 @@ export class EntityTestFactory {
       modifiedAt: Date.now(),
       showStyleVariantId: 'show-style-variant-id',
       baselineTimelineObjects: [],
+      baselinePieces: [],
       history: [],
       timing: { type: RundownTimingType.UNSCHEDULED },
       ...rundownInterface,
