@@ -288,6 +288,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       start: 0,
       preRollDuration: 0,
       postRollDuration: 0,
+      takenOffAirTimestamp: 0,
       metadata: {
         playoutContent: {
           type: PlayoutContentType.RECALLED,

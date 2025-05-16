@@ -665,6 +665,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       start: 0,
       preRollDuration: 0,
       postRollDuration: 0,
+      takenOffAirTimestamp: 0,
       metadata: {
         playoutContent: {
           type: PlayoutContentType.RECALLED,
