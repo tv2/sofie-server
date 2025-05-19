@@ -202,13 +202,15 @@ export class ServiceFacade {
 
   public static createPlayoutContentUpdateService(): PlayoutContentUpdateService {
     return PlayoutContentStateService.getInstance(
-      EventEmitterFacade.createPlayoutContentEventEmitter()
+      EventEmitterFacade.createPlayoutContentEventEmitter(),
+      RepositoryFacade.createPlayoutContentRepository()
     )
   }
 
   public static createPlayoutContentReadService(): PlayoutContentReadService {
     return PlayoutContentStateService.getInstance(
-      EventEmitterFacade.createPlayoutContentEventEmitter()
+      EventEmitterFacade.createPlayoutContentEventEmitter(),
+      RepositoryFacade.createPlayoutContentRepository()
     )
   }
 }

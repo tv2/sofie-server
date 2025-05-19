@@ -323,7 +323,7 @@ export class ExecuteActionService implements ActionService {
         return this.mutateActionWithConfiguration(mutateActionMethods, action, rundownId)
       }
       case MutateActionType.PLAYOUT_CONTENT: {
-        return this.mutateActionWithPlayoutConfiguration(mutateActionMethods, action)
+        return this.mutateActionWithPlayoutContent(mutateActionMethods, action)
       }
       default: {
         return action
@@ -370,7 +370,7 @@ export class ExecuteActionService implements ActionService {
     return mutateActionsMethods.updateWithConfiguration(action, configuration, rundown.getShowStyleVariantId())
   }
 
-  private mutateActionWithPlayoutConfiguration(mutateActionMethods: MutateActionWithPlayoutContent, action: Action): Action {
+  private mutateActionWithPlayoutContent(mutateActionMethods: MutateActionWithPlayoutContent, action: Action): Action {
     const playoutContent: PlayoutContent | undefined = this.playoutContentService.getProgramPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
     ?? this.playoutContentService.getPreviewPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
 

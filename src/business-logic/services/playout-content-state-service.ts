@@ -4,6 +4,7 @@ import { PlayoutContentEventEmitter } from './interfaces/playout-content-event-e
 import { PlayoutContent } from '../../model/value-objects/playout-content'
 import { RundownMode } from '../../model/enums/rundown-mode'
 import { PlayoutContentType } from '../../model/enums/playout-content-type'
+import { PlayoutContentRepository } from '../../data-access/repositories/interfaces/playout-content-repository'
 
 const INFINITE_PIECES_PLAYOUT_CONTENT_TYPES: PlayoutContentType[] = [PlayoutContentType.DOWNSTREAM_KEYER]
 
@@ -11,9 +12,12 @@ export class PlayoutContentStateService implements PlayoutContentUpdateService, 
 
   private static instance: PlayoutContentUpdateService & PlayoutContentReadService
 
-  public static getInstance(playoutContentEventEmitter: PlayoutContentEventEmitter): PlayoutContentUpdateService & PlayoutContentReadService {
+  public static getInstance(
+    playoutContentEventEmitter: PlayoutContentEventEmitter,
+    playoutContentRepository: PlayoutContentRepository
+  ): PlayoutContentUpdateService & PlayoutContentReadService {
     if (!this.instance) {
-      this.instance = new PlayoutContentStateService(playoutContentEventEmitter)
+      this.instance = new PlayoutContentStateService(playoutContentEventEmitter, playoutContentRepository)
     }
     return this.instance
   }
@@ -21,18 +25,32 @@ export class PlayoutContentStateService implements PlayoutContentUpdateService, 
   private programPlayoutContents: PlayoutContent[] = []
   private previewPlayoutContents: PlayoutContent[] = []
 
-  constructor(private readonly playoutContentEventEmitter: PlayoutContentEventEmitter) {
+  constructor(
+    private readonly playoutContentEventEmitter: PlayoutContentEventEmitter,
+    private readonly playoutContentRepository: PlayoutContentRepository
+  ) {
   }
 
-  public updatePlayoutContentState(rundown: Rundown): void {
+  public async initialize(): Promise<void> {
+    await this.updatePlayoutContentsFromDatabase()
+  }
+
+  private async updatePlayoutContentsFromDatabase(): Promise<void> {
+    this.programPlayoutContents = await this.playoutContentRepository.getProgramPlayoutContents()
+    this.previewPlayoutContents = await this.playoutContentRepository.getPreviewPlayoutContents()
+  }
+
+  public async updatePlayoutContentState(rundown: Rundown): Promise<void> {
     if (rundown.getMode() == RundownMode.INACTIVE) {
       this.resetProgramPlayoutContents()
       this.resetPreviewPlayoutContents()
+      await this.savePlayoutContents()
       return
     }
 
     this.updateProgramPlayoutContents(rundown)
     this.updatePreviewPlayoutContents(rundown)
+    await this.savePlayoutContents()
   }
 
   private resetProgramPlayoutContents(): void {
@@ -51,6 +69,10 @@ export class PlayoutContentStateService implements PlayoutContentUpdateService, 
 
     this.previewPlayoutContents = []
     this.playoutContentEventEmitter.emitPreviewPlayoutContentEvent(this.previewPlayoutContents)
+  }
+
+  private async savePlayoutContents(): Promise<void> {
+    await this.playoutContentRepository.savePlayoutContents(this.programPlayoutContents, this.previewPlayoutContents)
   }
 
   private updateProgramPlayoutContents(rundown: Rundown): void {
