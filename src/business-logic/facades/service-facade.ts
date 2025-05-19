@@ -79,7 +79,8 @@ export class ServiceFacade {
       RepositoryFacade.createMediaRepository(),
       RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createRundownService(),
-      BlueprintsFacade.createBlueprint()
+      BlueprintsFacade.createBlueprint(),
+      ServiceFacade.createPlayoutContentReadService()
     )
   }
 

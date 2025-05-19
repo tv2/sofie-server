@@ -20,6 +20,7 @@ import { Rundown } from '../../../model/entities/rundown'
 import { Owner } from '../../../model/enums/owner'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
+import { PlayoutContentReadService } from '../interfaces/playout-content-service'
 
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
@@ -389,7 +390,8 @@ function createTestee(
     mediaRepository?: MediaRepository,
     configurationRepository?: ConfigurationRepository,
     rundownService?: RundownService,
-    blueprint?: Blueprint
+    blueprint?: Blueprint,
+    playoutContentService?: PlayoutContentReadService
   },
   misc?: {
     action?: Action
@@ -401,6 +403,7 @@ function createTestee(
   const configurationRepository: ConfigurationRepository = params?.configurationRepository ?? mock<ConfigurationRepository>()
   const rundownService: RundownService = params?.rundownService ?? mock<RundownService>()
   const blueprint: Blueprint = params?.blueprint ?? mock<Blueprint>()
+  const playoutContentService: PlayoutContentReadService = params?.playoutContentService ?? mock<PlayoutContentReadService>()
 
   if (misc?.action) {
     when(actionRepository.getAction(misc.action.id)).thenReturn(Promise.resolve(misc.action))
@@ -412,6 +415,7 @@ function createTestee(
     instance(mediaRepository),
     instance(configurationRepository),
     instance(rundownService),
-    instance(blueprint)
+    instance(blueprint),
+    instance(playoutContentService)
   )
 }

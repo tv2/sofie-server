@@ -4,6 +4,7 @@ import { Piece, PieceInterface } from './piece'
 import { Media } from './media'
 import { InTransition } from '../value-objects/in-transition'
 import { Configuration } from './configuration'
+import { PlayoutContent } from '../value-objects/playout-content'
 
 export interface Action {
   id: string
@@ -69,14 +70,21 @@ export interface PieceAction extends Action {
   }
 }
 
-export type MutateActionMethods = MutateActionWithPieceMethods | MutateActionWithMedia | MutateActionWithHistoricPartMethods | MutateActionWithArgumentsMethods | MutateActionWithConfiguration
+export type MutateActionMethods =
+  MutateActionWithPieceMethods
+  | MutateActionWithMedia
+  | MutateActionWithHistoricPartMethods
+  | MutateActionWithArgumentsMethods
+  | MutateActionWithConfiguration
+  | MutateActionWithPlayoutContent
 
 export enum MutateActionType {
   PIECE = 'PIECE',
   MEDIA = 'MEDIA',
   HISTORIC_PART= 'HISTORIC_PART',
   APPLY_ARGUMENTS = 'APPLY_ARGUMENTS',
-  CONFIGURATION = 'CONFIGURATION'
+  CONFIGURATION = 'CONFIGURATION',
+  PLAYOUT_CONTENT = 'PLAYOUT_CONTENT'
 }
 
 export interface MutateActionWithPieceMethods {
@@ -105,6 +113,12 @@ export interface MutateActionWithArgumentsMethods {
 export interface MutateActionWithConfiguration {
   type: MutateActionType.CONFIGURATION,
   updateWithConfiguration: (action: Action, configuration: Configuration, showStyleVariantId: string) => Action
+}
+
+export interface MutateActionWithPlayoutContent {
+  type: MutateActionType.PLAYOUT_CONTENT,
+  updateActionWithPlayoutContent: (action: Action, playoutContent: PlayoutContent) => Action,
+  playoutContentPredicate: (playoutContent: PlayoutContent) => boolean
 }
 
 /**

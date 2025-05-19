@@ -7,6 +7,7 @@ import { AudioMode } from '../../../model/enums/audio-mode'
 import {
   AudioPlayoutContent,
   CameraPlayoutContent,
+  DownstreamKeyerPlayoutContent,
   GraphicsPlayoutContent,
   PlayoutContent,
   RecalledPlayoutContent,
@@ -31,7 +32,8 @@ export enum Tv2ActionSubtype {
   CALL_PRESET = 'CALL_PRESET',
   GRAPHICS_THEME_OUT = 'GRAPHICS_THEME_OUT',
   GRAPHICS_CLEAR = 'GRAPHICS_CLEAR',
-  GRAPHICS_ALL_OUT = 'GRAPHICS_ALL_OUT'
+  GRAPHICS_ALL_OUT = 'GRAPHICS_ALL_OUT',
+  TOGGLE_DOWNSTREAM_KEYER = 'TOGGLE_DOWNSTREAM_KEYER'
 }
 
 export type Tv2Action = Tv2PartAction | Tv2PieceAction
@@ -219,5 +221,14 @@ export interface Tv2FullscreenGraphicsAction extends Tv2PartAction {
     playoutContent: GraphicsPlayoutContent
     outputChannel: OutputChannel
     sourceName: string
+  }
+}
+
+export interface Tv2ToggleDownstreamKeyerAction extends Tv2PieceAction {
+  metadata: {
+    playoutContent: DownstreamKeyerPlayoutContent,
+    outputChannel: OutputChannel,
+    actionSubtype: Tv2ActionSubtype.TOGGLE_DOWNSTREAM_KEYER
+    downstreamKeyerConfiguration: Tv2DownstreamKeyer
   }
 }

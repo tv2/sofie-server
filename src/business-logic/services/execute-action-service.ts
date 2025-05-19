@@ -8,6 +8,7 @@ import {
   MutateActionWithHistoricPartMethods,
   MutateActionWithMedia,
   MutateActionWithPieceMethods,
+  MutateActionWithPlayoutContent,
   PartAction,
   PieceAction,
   SystemAction,
@@ -30,6 +31,8 @@ import { SetNextDirection } from '../../model/enums/set-next-direction'
 import { TakeMode } from '../../model/enums/take-mode'
 import { PlayoutContentType } from '../../model/enums/playout-content-type'
 import { OutputChannel } from '../../model/enums/output-channel'
+import { PlayoutContentReadService } from './interfaces/playout-content-service'
+import { PlayoutContent } from '../../model/value-objects/playout-content'
 
 const SYSTEM_ACTIONS_ID: string = 'SYSTEM_ACTIONS_ID'
 
@@ -183,7 +186,8 @@ export class ExecuteActionService implements ActionService {
     private readonly mediaRepository: MediaRepository,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly rundownService: RundownService,
-    private readonly blueprint: Blueprint
+    private readonly blueprint: Blueprint,
+    private readonly playoutContentService: PlayoutContentReadService
   ) {}
 
   public async getActionsForRundown(rundownId :string): Promise<Action[]> {
@@ -318,6 +322,9 @@ export class ExecuteActionService implements ActionService {
       case MutateActionType.CONFIGURATION: {
         return this.mutateActionWithConfiguration(mutateActionMethods, action, rundownId)
       }
+      case MutateActionType.PLAYOUT_CONTENT: {
+        return this.mutateActionWithPlayoutConfiguration(mutateActionMethods, action)
+      }
       default: {
         return action
       }
@@ -361,6 +368,17 @@ export class ExecuteActionService implements ActionService {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
     return mutateActionsMethods.updateWithConfiguration(action, configuration, rundown.getShowStyleVariantId())
+  }
+
+  private mutateActionWithPlayoutConfiguration(mutateActionMethods: MutateActionWithPlayoutContent, action: Action): Action {
+    const playoutContent: PlayoutContent | undefined = this.playoutContentService.getProgramPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
+    ?? this.playoutContentService.getPreviewPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
+
+    if (!playoutContent) {
+      return action
+    }
+
+    return mutateActionMethods.updateActionWithPlayoutContent(action, playoutContent)
   }
 
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
