@@ -256,6 +256,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       isUnsynced: false,
       start: 0,
       duration: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
@@ -277,6 +278,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       isUnsynced: false,
       start: piece.getStart(),
       duration: piece.getDuration(),
+      takenOffAirTimestamp: 0,
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
       tags: [],
@@ -641,6 +643,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
         isPlanned: false,
         start: piece.getStart(),
         duration: piece.getDuration(),
+        takenOffAirTimestamp: 0,
         preRollDuration: piece.preRollDuration,
         postRollDuration: piece.postRollDuration,
         metadata: piece.metadata,
@@ -662,6 +665,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       start: 0,
       preRollDuration: 0,
       postRollDuration: 0,
+      takenOffAirTimestamp: 0,
       metadata: {
         playoutContent: {
           type: PlayoutContentType.RECALLED,

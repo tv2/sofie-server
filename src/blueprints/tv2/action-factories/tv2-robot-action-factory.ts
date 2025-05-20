@@ -101,6 +101,7 @@ export class Tv2RobotActionFactory extends ActionFactory {
       isPlanned: false,
       start: 0,
       duration: 100,
+      takenOffAirTimestamp: 0,
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],

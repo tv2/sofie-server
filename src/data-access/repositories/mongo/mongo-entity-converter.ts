@@ -124,6 +124,7 @@ export interface MongoPiece extends MongoId {
   preRollDuration: number
   postRollDuration: number
   executedAt?: number
+  takenOffAirTimestamp?: number
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
 
@@ -397,6 +398,7 @@ export class MongoEntityConverter {
     return new Piece({
       ...mongoPiece,
       id: mongoPiece._id,
+      takenOffAirTimestamp: mongoPiece.takenOffAirTimestamp ?? 0,
       isInsertedOnAir: mongoPiece.isInsertedOnAir,
     })
   }
@@ -415,6 +417,7 @@ export class MongoEntityConverter {
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
       executedAt: piece.getExecutedAt(),
+      takenOffAirTimestamp: piece.getTakenOffAirTimestamp(),
       transitionType: piece.transitionType,
       timelineObjects: piece.getTimelineObjects(),
       metadata: piece.metadata,

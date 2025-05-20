@@ -147,6 +147,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       isUnsynced: false,
       start: 0,
       duration: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: configuration.studio.casparCgPreRollDuration,
       postRollDuration: 0,
       tags: [],

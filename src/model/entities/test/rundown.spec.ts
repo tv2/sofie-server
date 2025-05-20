@@ -772,7 +772,7 @@ describe(Rundown.name, () => {
 
           testee.takeNext()
 
-          verify(mockFirstPiece.resetExecutedAt()).once()
+          verify(mockFirstPiece.resetExecution()).once()
         })
       })
     })

@@ -89,6 +89,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
       start: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       metadata,

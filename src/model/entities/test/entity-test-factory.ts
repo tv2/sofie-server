@@ -149,6 +149,7 @@ export class EntityTestFactory {
       layer: 'some_layer',
       name: 'pieceName',
       start: 0,
+      takenOffAirTimestamp: 0,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: true,
       preRollDuration: 0,

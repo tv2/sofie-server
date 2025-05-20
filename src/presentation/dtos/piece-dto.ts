@@ -9,6 +9,7 @@ export class PieceDto {
   public readonly start: number
   public readonly duration?: number
   public readonly executedAt: number
+  public readonly takenOffAirTimestamp: number
   public readonly layer: string
   public readonly isPlanned: boolean
   public readonly createdFromActionId?: string
@@ -21,8 +22,9 @@ export class PieceDto {
     this.rundownId = piece.rundownId
     this.name = piece.name
     this.start = piece.getStart()
-    this.duration = piece.getDuration()
+    this.duration = piece.getExpectedDuration()
     this.executedAt = piece.getExecutedAt()
+    this.takenOffAirTimestamp = piece.getTakenOffAirTimestamp()
     this.layer = piece.layer
     this.isPlanned = piece.isPlanned
     this.createdFromActionId = piece.createdFromActionId
