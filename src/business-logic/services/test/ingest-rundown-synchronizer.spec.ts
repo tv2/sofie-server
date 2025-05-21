@@ -112,7 +112,7 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when segments are partless they are deleted', () => {
-      it('returns a list of the deleted segments', () => {
+      it('returns a list of the deleted segments', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
