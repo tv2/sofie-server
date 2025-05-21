@@ -6,27 +6,30 @@ import { EntityTestFactory } from '../../../model/entities/test/entity-test-fact
 import { IngestedRundown } from '../../../model/entities/ingested-rundown'
 import { RundownMode } from '../../../model/enums/rundown-mode'
 import { TakeMode } from '../../../model/enums/take-mode'
+import { Blueprint } from '../../../model/value-objects/blueprint'
+import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
+import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 
 describe(IngestRundownSynchronizer.name, () => {
   describe(IngestRundownSynchronizer.prototype.synchronizeRundown.name, () => {
     describe('when the rundown metadata is unchanged', () => {
-      it('does not return an updated rundown', () => {
+      it('does not return an updated rundown', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({ id: 'rundown-a', modifiedAt: 0 })
         const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({ id: 'rundown-a', modifiedAt: 0 })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.updatedRundown).toBeUndefined()
       })
 
       describe('when segments has changes', () => {
-        it('does not return an updated rundown', () => {
+        it('does not return an updated rundown', async () => {
           const rundown: Rundown = EntityTestFactory.createRundown({ id: 'rundown-a', modifiedAt: 0, segments: [] })
           const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({ id: 'rundown-a', modifiedAt: 0, ingestedSegments: [EntityTestFactory.createIngestedSegment()] })
           const testee: IngestRundownSynchronizer = createTestee()
 
-          const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+          const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
           expect(result.updatedRundown).toBeUndefined()
         })
@@ -34,22 +37,22 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when the rundown mode has changed', () => {
-      it('returns a rundown with the new metadata', () => {
+      it('returns a rundown with the new metadata', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({ id: 'rundown-a', modifiedAt: 0, showStyleVariantId: 'show-style-variant-a' })
         const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({ id: 'rundown-a', modifiedAt: 100, showStyleVariantId: 'show-style-variant-b' })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.updatedRundown?.getLastTimeModified()).toBe(100)
       })
 
-      it('returns a rundown with the same rundown mode', () => {
+      it('returns a rundown with the same rundown mode', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({ id: 'rundown-a', modifiedAt: 0, showStyleVariantId: 'show-style-variant-a', mode: RundownMode.ACTIVE })
         const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({ id: 'rundown-a', modifiedAt: 100, showStyleVariantId: 'show-style-variant-b' })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.updatedRundown?.getMode()).toBe(RundownMode.ACTIVE)
       })
@@ -64,12 +67,12 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when a rundown has been modified through ingest', () => {
-      it('will preserve its takeMode', () => {
+      it('will preserve its takeMode', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({ id: 'rundown-a', modifiedAt: 0, showStyleVariantId: 'show-style-variant-a', mode: RundownMode.ACTIVE, takeMode: TakeMode.RECALL })
         const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({ id: 'rundown-a', modifiedAt: 100, showStyleVariantId: 'show-style-variant-b' })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.updatedRundown?.getTakeMode()).toBe(TakeMode.RECALL)
       })
@@ -77,7 +80,7 @@ describe(IngestRundownSynchronizer.name, () => {
 
 
     describe('when one or more segments are deleted', () => {
-      it('returns a list of the deleted segments', () => {
+      it('returns a list of the deleted segments', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
@@ -97,7 +100,7 @@ describe(IngestRundownSynchronizer.name, () => {
         })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.deletedSegments.length).toBe(3)
         expect(result.deletedSegments).toEqual(expect.arrayContaining([
@@ -108,7 +111,7 @@ describe(IngestRundownSynchronizer.name, () => {
       })
 
       describe('when the deleted segments have parts', () => {
-        it('does not include the parts in the deleted parts list', () => {
+        it('does not include the parts in the deleted parts list', async () => {
           const rundown: Rundown = EntityTestFactory.createRundown({
             id: 'rundown-a',
             segments: [
@@ -128,7 +131,7 @@ describe(IngestRundownSynchronizer.name, () => {
           })
           const testee: IngestRundownSynchronizer = createTestee()
 
-          const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+          const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
           expect(result.deletedParts.length).toBe(0)
         })
@@ -136,7 +139,7 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when one or more segments are created', () => {
-      it('returns a list of the created segments', () => {
+      it('returns a list of the created segments', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
@@ -156,7 +159,7 @@ describe(IngestRundownSynchronizer.name, () => {
         })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.createdSegments.length).toBe(3)
         expect(result.createdSegments).toEqual(expect.arrayContaining([
@@ -167,7 +170,7 @@ describe(IngestRundownSynchronizer.name, () => {
       })
 
       describe('when the created segments have parts', () => {
-        it('only includes the parts in the created segments list', () => {
+        it('only includes the parts in the created segments list', async () => {
           const rundown: Rundown = EntityTestFactory.createRundown({
             id: 'rundown-a',
             segments: [
@@ -187,7 +190,7 @@ describe(IngestRundownSynchronizer.name, () => {
           })
           const testee: IngestRundownSynchronizer = createTestee()
 
-          const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+          const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
           expect(result.createdParts.length).toBe(0)
           expect(result.createdSegments.flatMap(segment => segment.getParts())).toEqual(expect.arrayContaining([
@@ -200,7 +203,7 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when one or more segments are updated', () => {
-      it('returns a list of the updated segments', () => {
+      it('returns a list of the updated segments', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
@@ -223,7 +226,7 @@ describe(IngestRundownSynchronizer.name, () => {
         })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.updatedSegments.length).toBe(3)
         expect(result.updatedSegments).toEqual(expect.arrayContaining([
@@ -234,7 +237,7 @@ describe(IngestRundownSynchronizer.name, () => {
       })
 
       describe('when the updated segments have updated parts', () => {
-        it('only includes the updated parts in the updated segment lists', () => {
+        it('only includes the updated parts in the updated segment lists', async () => {
           const rundown: Rundown = EntityTestFactory.createRundown({
             id: 'rundown-a',
             segments: [
@@ -257,7 +260,7 @@ describe(IngestRundownSynchronizer.name, () => {
           })
           const testee: IngestRundownSynchronizer = createTestee()
 
-          const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+          const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
           expect(result.updatedParts.length).toBe(0)
           expect(result.updatedSegments.flatMap(segment => segment.getParts())).toEqual(expect.arrayContaining([
@@ -270,7 +273,7 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when a part is created on an unaffected segment', () => {
-      it('returns a part created-list that holds the created part', () => {
+      it('returns a part created-list that holds the created part', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
@@ -285,7 +288,7 @@ describe(IngestRundownSynchronizer.name, () => {
         })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.createdParts.length).toBe(1)
         expect(result.createdParts).toEqual(expect.arrayContaining([expect.objectContaining({ id: 'part-a' })]))
@@ -293,7 +296,7 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when a part is deleted on an unaffected segment', () => {
-      it('returns a part deleted-list that holds the deleted part', () => {
+      it('returns a part deleted-list that holds the deleted part', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
@@ -308,7 +311,7 @@ describe(IngestRundownSynchronizer.name, () => {
         })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.deletedParts.length).toBe(1)
         expect(result.deletedParts).toEqual(expect.arrayContaining([expect.objectContaining({ id: 'part-a' })]))
@@ -316,7 +319,7 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when a part is updated on an unaffected segment', () => {
-      it('returns a part updated-list that holds the updated part', () => {
+      it('returns a part updated-list that holds the updated part', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
@@ -333,14 +336,14 @@ describe(IngestRundownSynchronizer.name, () => {
         })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.updatedParts.length).toBe(1)
         expect(result.updatedParts).toEqual(expect.arrayContaining([expect.objectContaining({ id: 'part-a', name: 'A2' })]))
       })
 
       describe('when the part is on air', () => {
-        it('marks the on air part for deletion and creates a new part with the updated data', () => {
+        it('marks the on air part for deletion and creates a new part with the updated data', async () => {
           const rundown: Rundown = EntityTestFactory.createRundown({
             id: 'rundown-a',
             segments: [
@@ -357,7 +360,7 @@ describe(IngestRundownSynchronizer.name, () => {
           })
           const testee: IngestRundownSynchronizer = createTestee()
 
-          const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+          const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
           expect(result.updatedParts.length).toBe(0)
           expect(result.createdParts.length).toBe(1)
@@ -369,7 +372,7 @@ describe(IngestRundownSynchronizer.name, () => {
     })
 
     describe('when a part is unplanned', () => {
-      it('ignores the part', () => {
+      it('ignores the part', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
@@ -384,7 +387,7 @@ describe(IngestRundownSynchronizer.name, () => {
         })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.deletedParts.length).toBe(0)
       })
@@ -392,9 +395,28 @@ describe(IngestRundownSynchronizer.name, () => {
   })
 })
 
-function createTestee(params: { ingestedEntityToEntityMapper?: IngestedEntityToEntityMapper, entityChangeDetector?: EntityChangeDetector } = {}): IngestRundownSynchronizer {
+function createTestee(
+  params: {
+    ingestedEntityToEntityMapper?: IngestedEntityToEntityMapper,
+    entityChangeDetector?: EntityChangeDetector,
+    blueprint?: Blueprint,
+    configurationRepository?: ConfigurationRepository
+  } = {}
+): IngestRundownSynchronizer {
+  let blueprint: Blueprint
+  if (!params.blueprint) {
+    const mockBlueprint: Blueprint = mock<Blueprint>()
+    when(mockBlueprint.generateBaselinePieces(anything(), anything())).thenReturn([])
+    blueprint = instance(mockBlueprint)
+  } else {
+    blueprint = params.blueprint
+  }
+
+
   return new IngestRundownSynchronizer(
     params.ingestedEntityToEntityMapper ?? new IngestedEntityToEntityMapper(),
     params.entityChangeDetector ?? new EntityChangeDetector(),
+    blueprint,
+    params.configurationRepository ?? instance(mock<ConfigurationRepository>())
   )
 }

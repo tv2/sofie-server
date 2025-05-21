@@ -1,5 +1,5 @@
 import {
-  Blueprint,
+  Blueprint, BlueprintBaselinePieces,
   BlueprintGenerateActions,
   BlueprintGetEndStateForPart,
   BlueprintOnTimelineGenerate, BlueprintValidateConfiguration
@@ -12,14 +12,17 @@ import { Configuration } from '../../model/entities/configuration'
 import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
 import { Tv2Action } from './value-objects/tv2-action'
 import { StatusMessage } from '../../model/entities/status-message'
+import { Piece } from '../../model/entities/piece'
 
 export class Tv2Blueprint implements Blueprint {
   constructor(
     private readonly endStateForPartService: BlueprintGetEndStateForPart,
     private readonly onTimelineGenerateService: BlueprintOnTimelineGenerate,
     private readonly actionsService: BlueprintGenerateActions,
-    private readonly configurationValidator: BlueprintValidateConfiguration
-  ) {}
+    private readonly configurationValidator: BlueprintValidateConfiguration,
+    private readonly baselinePiecesGenerator: BlueprintBaselinePieces
+  ) {
+  }
 
   public getEndStateForPart(
     part: Part,
@@ -64,5 +67,9 @@ export class Tv2Blueprint implements Blueprint {
 
   public validateConfiguration(configuration: Configuration): StatusMessage[] {
     return this.configurationValidator.validateConfiguration(configuration)
+  }
+
+  public generateBaselinePieces(rundownId: string, configuration: Configuration): Piece[] {
+    return this.baselinePiecesGenerator.generateBaselinePieces(rundownId, configuration)
   }
 }

@@ -49,6 +49,7 @@ export interface MongoRundown extends MongoId {
   mode: RundownMode
   takeMode: TakeMode
   baselineTimelineObjects: TimelineObject[]
+  baselinePieceIds: string[]
   modifiedAt: number
 
   persistentState?: RundownPersistentState
@@ -218,7 +219,7 @@ export class MongoEntityConverter {
     this.logger = logger.tag(MongoEntityConverter.name)
   }
 
-  public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], infinitePieces?: Piece[]): Rundown {
+  public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], baselinePieces: Piece[], infinitePieces?: Piece[]): Rundown {
     const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = [RundownMode.ACTIVE, RundownMode.REHEARSAL].includes(mongoRundown.mode)
       ? {
         activeCursor: this.convertMongoRundownCursorToRundownCursor(mongoRundown.activeCursor, segments),
@@ -233,6 +234,7 @@ export class MongoEntityConverter {
       mode: mongoRundown.mode ?? RundownMode.INACTIVE,
       takeMode: mongoRundown.takeMode ?? TakeMode.STANDARD,
       baselineTimelineObjects: mongoRundown.baselineTimelineObjects,
+      baselinePieces,
       segments,
       modifiedAt: mongoRundown.modifiedAt,
       persistentState: mongoRundown.persistentState,
@@ -274,6 +276,7 @@ export class MongoEntityConverter {
       showStyleVariantId: rundown.getShowStyleVariantId(),
       segmentIds: rundown.getSegments().map(segment => segment.id),
       baselineTimelineObjects: rundown.getBaseline(),
+      baselinePieceIds: rundown.getBaselinePieces().map(piece => piece.id),
       modifiedAt: rundown.getLastTimeModified(),
 
       persistentState: rundown.getPersistentState(),

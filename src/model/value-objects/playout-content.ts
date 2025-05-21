@@ -15,6 +15,7 @@ export type PlayoutContent =
   | CommandPlayoutContent
   | RobotPlayoutContent
   | RecalledPlayoutContent<PlayoutContentType>
+  | DownstreamKeyerPlayoutContent
   | UnknownPlayoutContent
 
 export type SourcePlayoutContent = CameraPlayoutContent | RemotePlayoutContent | ReplayPlayoutContent | UnknownPlayoutContent
@@ -89,6 +90,12 @@ export interface RobotPlayoutContent {
 export interface RecalledPlayoutContent<RecalledType extends PlayoutContentType> {
   type: PlayoutContentType.RECALLED
   recalledType: RecalledType
+}
+
+export interface DownstreamKeyerPlayoutContent {
+  type: PlayoutContentType.DOWNSTREAM_KEYER
+  identifier: string
+  isOn: boolean
 }
 
 export interface UnknownPlayoutContent {

@@ -2664,6 +2664,224 @@ describe(Rundown.name, () => {
       })
     })
 
+    describe('Rundown has a baseline Piece', () => {
+      describe('There are no other infinite Pieces for the baseline Piece layer', () => {
+        it('includes the baseline Piece in the infinitePieces', () => {
+          const rundownId: string = 'randomRundownId'
+          const baselinePiece: Piece = EntityTestFactory.createPiece({ id: 'baselinePiece', rundownId, layer: 'baselineLayer', pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
+          const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart, nextPart] })
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            id: rundownId,
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: activePart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              infinitePieces: new Map()
+            }
+          }))
+          testee.updateBaselinePieces([baselinePiece])
+
+          testee.takeNext()
+
+          expect(testee.getInfinitePieces()).toContain(baselinePiece)
+        })
+
+        describe('the baseline Piece is already in infinite Pieces', () => {
+          it('does not change the executedAt of the baseline Piece', () => {
+            jest.useFakeTimers().setSystemTime(Date.now())
+            const rundownId: string = 'randomRundownId'
+            const baselinePiece: Piece = EntityTestFactory.createPiece({ id: 'baselinePiece', rundownId, layer: 'baselineLayer', pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+
+            const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
+            const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart, nextPart] })
+
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+              id: rundownId,
+              segments: [segment],
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  part: activePart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: nextPart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                infinitePieces: new Map()
+              }
+            }))
+            testee.updateBaselinePieces([baselinePiece])
+            testee.takeNext()
+            jest.advanceTimersByTime(1000)
+
+            const baselineExecutedAt: number = baselinePiece.getExecutedAt()
+            testee.takeNext()
+            expect(baselinePiece.getExecutedAt()).toBe(baselineExecutedAt)
+          })
+        })
+
+        describe('the baseline Piece is being added to infinite Pieces', () => {
+          it('sets the executedAt of the baseline Piece', () => {
+            const rundownId: string = 'randomRundownId'
+            const baselinePiece: Piece = EntityTestFactory.createPiece({ id: 'baselinePiece', rundownId, layer: 'baselineLayer', pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+
+            const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
+            const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart, nextPart] })
+
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+              id: rundownId,
+              segments: [segment],
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  part: activePart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: nextPart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                infinitePieces: new Map()
+              }
+            }))
+            testee.updateBaselinePieces([baselinePiece])
+
+            expect(baselinePiece.getExecutedAt()).toBe(0)
+            testee.takeNext()
+            expect(baselinePiece.getExecutedAt()).toBeGreaterThan(0)
+          })
+        })
+      })
+
+      describe('There is another infinite Piece on the baseline Piece layer', () => {
+        it('does not include the baseline Piece in infinite Pieces', () => {
+          const rundownId: string = 'randomRundownId'
+          const pieceLayer: string = 'somePieceLayer'
+          const baselinePiece: Piece = EntityTestFactory.createPiece({ id: 'baselinePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'infinitePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE })
+
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
+          const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart, nextPart] })
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            id: rundownId,
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: activePart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: nextPart,
+                segment,
+                owner: Owner.SYSTEM
+              },
+              infinitePieces: new Map([[pieceLayer, infinitePiece]])
+            }
+          }))
+          testee.updateBaselinePieces([baselinePiece])
+          testee.takeNext()
+
+          expect(testee.getInfinitePieces()).not.toContain(baselinePiece)
+        })
+
+        describe('The baseline Piece was already in infinite Pieces', () => {
+          it('Removes the baseline Piece from infinite Pieces', () => {
+            const rundownId: string = 'randomRundownId'
+            const pieceLayer: string = 'somePieceLayer'
+            const baselinePiece: Piece = EntityTestFactory.createPiece({ id: 'baselinePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+            const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'infinitePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE })
+
+            const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [infinitePiece] })
+            const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart, nextPart] })
+
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+              id: rundownId,
+              segments: [segment],
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  part: activePart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: nextPart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                infinitePieces: new Map([[pieceLayer, baselinePiece]])
+              }
+            }))
+            testee.updateBaselinePieces([baselinePiece])
+
+            expect(testee.getInfinitePieces()).toContain(baselinePiece)
+            testee.takeNext()
+
+            expect(testee.getInfinitePieces()).not.toContain(baselinePiece)
+          })
+
+          it('Resets the executedAt of the baseline Piece', () => {
+            const rundownId: string = 'randomRundownId'
+            const pieceLayer: string = 'somePieceLayer'
+            const baselinePiece: Piece = EntityTestFactory.createPiece({ id: 'baselinePiece', executedAt: 1000, rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
+            const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'infinitePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE })
+
+            const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
+            const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [infinitePiece] })
+            const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart, nextPart] })
+
+            const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+              id: rundownId,
+              segments: [segment],
+              mode: RundownMode.ACTIVE,
+              alreadyActiveProperties: {
+                activeCursor: {
+                  part: activePart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                nextCursor: {
+                  part: nextPart,
+                  segment,
+                  owner: Owner.SYSTEM
+                },
+                infinitePieces: new Map([[pieceLayer, baselinePiece]])
+              }
+            }))
+            testee.updateBaselinePieces([baselinePiece])
+
+            expect(baselinePiece.getExecutedAt()).toBeGreaterThan(0)
+            testee.takeNext()
+            expect(baselinePiece.getExecutedAt()).toBe(0)
+          })
+        })
+      })
+    })
   })
 
   describe(Rundown.prototype.getPartAfter.name, () => {

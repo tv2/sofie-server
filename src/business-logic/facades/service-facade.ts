@@ -79,7 +79,8 @@ export class ServiceFacade {
       RepositoryFacade.createMediaRepository(),
       RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createRundownService(),
-      BlueprintsFacade.createBlueprint()
+      BlueprintsFacade.createBlueprint(),
+      ServiceFacade.createPlayoutContentReadService()
     )
   }
 
@@ -127,7 +128,12 @@ export class ServiceFacade {
   }
 
   public static createIngestRundownSynchronizer(): IngestRundownSynchronizer {
-    return new IngestRundownSynchronizer(new IngestedEntityToEntityMapper(), ServiceFacade.createEntityChangeDetector())
+    return new IngestRundownSynchronizer(
+      new IngestedEntityToEntityMapper(),
+      ServiceFacade.createEntityChangeDetector(),
+      BlueprintsFacade.createBlueprint(),
+      RepositoryFacade.createConfigurationRepository()
+    )
   }
 
   public static createEntityChangeDetector(): EntityChangeDetector {
@@ -196,13 +202,15 @@ export class ServiceFacade {
 
   public static createPlayoutContentUpdateService(): PlayoutContentUpdateService {
     return PlayoutContentStateService.getInstance(
-      EventEmitterFacade.createPlayoutContentEventEmitter()
+      EventEmitterFacade.createPlayoutContentEventEmitter(),
+      RepositoryFacade.createPlayoutContentRepository()
     )
   }
 
   public static createPlayoutContentReadService(): PlayoutContentReadService {
     return PlayoutContentStateService.getInstance(
-      EventEmitterFacade.createPlayoutContentEventEmitter()
+      EventEmitterFacade.createPlayoutContentEventEmitter(),
+      RepositoryFacade.createPlayoutContentRepository()
     )
   }
 }

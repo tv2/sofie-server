@@ -198,6 +198,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
         },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.GRAPHICS_THEME_OUT
       },
     }
@@ -248,7 +249,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
-        }
+        },
+        outputChannel: OutputChannel.UNKNOWN,
       },
     }
   }
@@ -272,7 +274,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
-        }
+        },
+        outputChannel: OutputChannel.UNKNOWN
       },
     }
   }
@@ -291,6 +294,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
         },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.GRAPHICS_CLEAR
       },
     }
@@ -310,6 +314,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
         },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.GRAPHICS_ALL_OUT
       },
     }
@@ -526,7 +531,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
-        }
+        },
+        outputChannel: OutputChannel.UNKNOWN,
       }
     }
   }
@@ -564,7 +570,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
-        }
+        },
+        outputChannel: OutputChannel.UNKNOWN
       }
     }
   }
@@ -599,7 +606,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.GRAPHICS
-        }
+        },
+        outputChannel: OutputChannel.UNKNOWN
       }
     }
   }

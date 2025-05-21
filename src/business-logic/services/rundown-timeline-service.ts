@@ -97,7 +97,7 @@ export class RundownTimelineService implements RundownService {
   }
 
   private async saveRundown(rundown: Rundown): Promise<void> {
-    this.playoutContentService.updatePlayoutContentState(rundown)
+    await this.playoutContentService.updatePlayoutContentState(rundown)
     await this.rundownRepository.saveRundown(rundown)
   }
 

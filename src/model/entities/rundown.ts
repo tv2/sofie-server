@@ -36,6 +36,7 @@ export interface RundownInterface {
   showStyleVariantId: string
   segments: Segment[]
   baselineTimelineObjects: TimelineObject[]
+  baselinePieces: Piece[]
   mode: RundownMode
   takeMode: TakeMode
   modifiedAt: number
@@ -56,6 +57,7 @@ const MAXIMUM_HISTORY_ENTRIES: number = 30
 
 export class Rundown extends BasicRundown {
   private readonly baselineTimelineObjects: TimelineObject[]
+  private baselinePieces: Piece[]
   private segments: Segment[]
 
   private activeCursor?: RundownCursor
@@ -75,6 +77,7 @@ export class Rundown extends BasicRundown {
     super(rundown.id, rundown.name, rundown.mode, rundown.takeMode, rundown.modifiedAt, rundown.timing)
     this.segments = rundown.segments ? [...rundown.segments].sort(this.compareSegments) : []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
+    this.baselinePieces = rundown.baselinePieces ?? []
     this.showStyleVariantId = rundown.showStyleVariantId
     this.history = rundown.history ?? []
     this.persistentState = rundown.persistentState
@@ -427,6 +430,7 @@ export class Rundown extends BasicRundown {
     layersWithPieces = this.addSpanningPiecesNotOnLayersFromActiveSegment(layersWithPieces)
     layersWithPieces = this.addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces)
 
+    this.addBaselinePiecesNotOnLayers(layersWithPieces)
     this.resetOutlivedInfinitePieces(Array.from(layersWithPieces.values()))
     this.setInfinitePieces(layersWithPieces)
   }
@@ -510,6 +514,16 @@ export class Rundown extends BasicRundown {
       layersWithPieces = this.addPiecesToLayers(piecesSpanningSegment, layersWithPieces)
     }
     return layersWithPieces
+  }
+
+  private addBaselinePiecesNotOnLayers(layersWithPieces: Map<string, Piece>): void {
+    this.baselinePieces.filter(baselinePiece => !layersWithPieces.has(baselinePiece.layer))
+      .forEach(baselinePiece => {
+        if (!baselinePiece.getExecutedAt()) {
+          baselinePiece.setExecutedAt(Date.now())
+        }
+        layersWithPieces.set(baselinePiece.layer, baselinePiece)
+      })
   }
 
   private setInfinitePieces(layersWithPieces: Map<string, Piece>): void {
@@ -1052,5 +1066,13 @@ export class Rundown extends BasicRundown {
 
     partsToPruneIds.forEach(partId => this.getActiveSegment().removePart(partId))
     return partsToPruneIds
+  }
+
+  public getBaselinePieces(): Piece[] {
+    return this.baselinePieces
+  }
+
+  public updateBaselinePieces(baselinePieces: Piece[]): void {
+    this.baselinePieces = baselinePieces.filter(piece => piece.rundownId === this.id)
   }
 }

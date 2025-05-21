@@ -3,14 +3,21 @@ import { PlayoutContentReadService, PlayoutContentUpdateService } from './interf
 import { PlayoutContentEventEmitter } from './interfaces/playout-content-event-emitter'
 import { PlayoutContent } from '../../model/value-objects/playout-content'
 import { RundownMode } from '../../model/enums/rundown-mode'
+import { PlayoutContentType } from '../../model/enums/playout-content-type'
+import { PlayoutContentRepository } from '../../data-access/repositories/interfaces/playout-content-repository'
+
+const INFINITE_PIECES_PLAYOUT_CONTENT_TYPES: PlayoutContentType[] = [PlayoutContentType.DOWNSTREAM_KEYER]
 
 export class PlayoutContentStateService implements PlayoutContentUpdateService, PlayoutContentReadService {
 
   private static instance: PlayoutContentUpdateService & PlayoutContentReadService
 
-  public static getInstance(playoutContentEventEmitter: PlayoutContentEventEmitter): PlayoutContentUpdateService & PlayoutContentReadService {
+  public static getInstance(
+    playoutContentEventEmitter: PlayoutContentEventEmitter,
+    playoutContentRepository: PlayoutContentRepository
+  ): PlayoutContentUpdateService & PlayoutContentReadService {
     if (!this.instance) {
-      this.instance = new PlayoutContentStateService(playoutContentEventEmitter)
+      this.instance = new PlayoutContentStateService(playoutContentEventEmitter, playoutContentRepository)
     }
     return this.instance
   }
@@ -18,18 +25,32 @@ export class PlayoutContentStateService implements PlayoutContentUpdateService, 
   private programPlayoutContents: PlayoutContent[] = []
   private previewPlayoutContents: PlayoutContent[] = []
 
-  constructor(private readonly playoutContentEventEmitter: PlayoutContentEventEmitter) {
+  constructor(
+    private readonly playoutContentEventEmitter: PlayoutContentEventEmitter,
+    private readonly playoutContentRepository: PlayoutContentRepository
+  ) {
   }
 
-  public updatePlayoutContentState(rundown: Rundown): void {
+  public async initialize(): Promise<void> {
+    await this.updatePlayoutContentsFromDatabase()
+  }
+
+  private async updatePlayoutContentsFromDatabase(): Promise<void> {
+    this.programPlayoutContents = await this.playoutContentRepository.getProgramPlayoutContents()
+    this.previewPlayoutContents = await this.playoutContentRepository.getPreviewPlayoutContents()
+  }
+
+  public async updatePlayoutContentState(rundown: Rundown): Promise<void> {
     if (rundown.getMode() == RundownMode.INACTIVE) {
       this.resetProgramPlayoutContents()
       this.resetPreviewPlayoutContents()
+      await this.savePlayoutContents()
       return
     }
 
     this.updateProgramPlayoutContents(rundown)
     this.updatePreviewPlayoutContents(rundown)
+    await this.savePlayoutContents()
   }
 
   private resetProgramPlayoutContents(): void {
@@ -50,12 +71,25 @@ export class PlayoutContentStateService implements PlayoutContentUpdateService, 
     this.playoutContentEventEmitter.emitPreviewPlayoutContentEvent(this.previewPlayoutContents)
   }
 
+  private async savePlayoutContents(): Promise<void> {
+    await this.playoutContentRepository.savePlayoutContents(this.programPlayoutContents, this.previewPlayoutContents)
+  }
+
   private updateProgramPlayoutContents(rundown: Rundown): void {
     if (!rundown.isActivePartSet()) {
       this.resetProgramPlayoutContents()
       return
     }
-    const programPlayoutContents: PlayoutContent[] = rundown.getActivePart().getPieces().map(piece => piece.metadata.playoutContent)
+
+    const infinitePiecesPlayoutContents: PlayoutContent[] = rundown.getInfinitePieces()
+      .filter(piece => INFINITE_PIECES_PLAYOUT_CONTENT_TYPES.includes(piece.metadata.playoutContent.type))
+      .map(piece => piece.metadata.playoutContent)
+
+    const programPlayoutContents: PlayoutContent[] = rundown.getActivePart().getPieces()
+      .filter(piece => !INFINITE_PIECES_PLAYOUT_CONTENT_TYPES.includes(piece.metadata.playoutContent.type))
+      .map(piece => piece.metadata.playoutContent)
+      .concat(infinitePiecesPlayoutContents)
+
     if (this.areArraysEqual(this.programPlayoutContents, programPlayoutContents)) {
       return
     }

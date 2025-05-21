@@ -336,6 +336,7 @@ function createMockOfTv2SplitScreenActionFactory(): Tv2SplitScreenActionFactory 
           layout: '',
           inputPlayoutContents: []
         },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
       }
     }
@@ -376,7 +377,8 @@ function createMockOfTv2RobotActionFactory(): Tv2RobotActionFactory {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.ROBOT
-        }
+        },
+        outputChannel: OutputChannel.UNKNOWN
       }
     }
   ])

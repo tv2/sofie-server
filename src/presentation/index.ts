@@ -93,6 +93,7 @@ async function connectToDatabase(): Promise<void> {
 
 async function startSystemServices(): Promise<void> {
   await ServiceFacade.createIngestChangeService().initialize()
+  await ServiceFacade.createPlayoutContentUpdateService().initialize()
   ServiceFacade.createIngestService()
   ServiceFacade.createMediaDataChangeService()
   ServiceFacade.createDeviceDataChangedService()
