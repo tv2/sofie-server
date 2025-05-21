@@ -520,7 +520,7 @@ export class Rundown extends BasicRundown {
     this.baselinePieces.filter(baselinePiece => !layersWithPieces.has(baselinePiece.layer))
       .forEach(baselinePiece => {
         if (!baselinePiece.getExecutedAt()) {
-          baselinePiece.setExecutedAt(Date.now())
+          baselinePiece.putOnAir(Date.now())
         }
         layersWithPieces.set(baselinePiece.layer, baselinePiece)
       })
