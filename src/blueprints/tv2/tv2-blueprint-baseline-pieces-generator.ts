@@ -50,6 +50,7 @@ export class Tv2BlueprintBaselinePiecesGenerator implements BlueprintBaselinePie
           start: 0,
           preRollDuration: 0,
           postRollDuration: 0,
+          takenOffAirTimestamp: 0,
           timelineObjects: [
             this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, downstreamKeyer.defaultOn)
           ],

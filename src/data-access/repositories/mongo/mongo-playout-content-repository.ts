@@ -24,8 +24,6 @@ export class MongoPlayoutContentRepository extends BaseMongoRepository<MongoPlay
   }
 
   public async savePlayoutContents(programPlayoutContents: PlayoutContent[], previewPlayoutContent: PlayoutContent[]): Promise<void> {
-    console.log(programPlayoutContents)
-    console.log(previewPlayoutContent)
     this.assertDatabaseConnection(this.savePlayoutContents.name)
     await this.getCollection().updateOne({ _id: PROGRAM_PLAYOUT_CONTENT_ID }, {
       $set: {
