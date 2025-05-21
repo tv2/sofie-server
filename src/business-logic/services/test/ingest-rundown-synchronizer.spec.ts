@@ -100,7 +100,7 @@ describe(IngestRundownSynchronizer.name, () => {
         })
         const testee: IngestRundownSynchronizer = createTestee()
 
-        const result: RundownSynchronizeResult = testee.synchronizeRundown(rundown, ingestedRundown)
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
         expect(result.deletedSegments.length).toBe(3)
         expect(result.deletedSegments).toEqual(expect.arrayContaining([

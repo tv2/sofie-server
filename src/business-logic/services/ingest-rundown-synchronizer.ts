@@ -30,7 +30,7 @@ export class IngestRundownSynchronizer {
   ) {}
 
   public async synchronizeRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<RundownSynchronizeResult> {
-    const partLessIngestedSegmentIds = this.getPartlessSegmentIds(ingestedRundown.ingestedSegments)
+    const partLessIngestedSegmentIds: ReadonlySet<string> = this.getPartlessSegmentIds(ingestedRundown.ingestedSegments)
     const updatedRundown: Rundown | undefined = await this.getUpdatedRundown(rundown, ingestedRundown)
 
     const createdSegments: readonly Segment[] = this.getCreatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
