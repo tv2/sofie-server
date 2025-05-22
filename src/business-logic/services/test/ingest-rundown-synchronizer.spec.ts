@@ -85,10 +85,42 @@ describe(IngestRundownSynchronizer.name, () => {
           id: 'rundown-a',
           segments: [
             EntityTestFactory.createSegment({ id: 'segment-a' }),
-            EntityTestFactory.createSegment({ id: 'segment-b' }),
+            EntityTestFactory.createSegment({ id: 'segment-b', parts: [EntityTestFactory.createPart({ segmentId: 'segment-b' })] }),
             EntityTestFactory.createSegment({ id: 'segment-c' }),
             EntityTestFactory.createSegment({ id: 'segment-d' }),
-            EntityTestFactory.createSegment({ id: 'segment-e' }),
+            EntityTestFactory.createSegment({ id: 'segment-e', parts: [EntityTestFactory.createPart({ segmentId: 'segment-e' })] }),
+          ],
+        })
+        const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({
+          id: 'rundown-a',
+          ingestedSegments: [
+            EntityTestFactory.createIngestedSegment({ id: 'segment-b', ingestedParts: [EntityTestFactory.createIngestedPart({ id: 'part-b', segmentId: 'segment-b' })] }),
+            EntityTestFactory.createIngestedSegment({ id: 'segment-e', ingestedParts: [EntityTestFactory.createIngestedPart({ id: 'part-e', segmentId: 'segment-e' })] }),
+          ],
+        })
+        const testee: IngestRundownSynchronizer = createTestee()
+
+        const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
+
+        expect(result.deletedSegments.length).toBe(3)
+        expect(result.deletedSegments).toEqual(expect.arrayContaining([
+          expect.objectContaining({ id: 'segment-a' }),
+          expect.objectContaining({ id: 'segment-c' }),
+          expect.objectContaining({ id: 'segment-d' }),
+        ]))
+      })
+    })
+
+    describe('when segments are partless they are deleted', () => {
+      it('returns a list of the deleted segments', async () => {
+        const rundown: Rundown = EntityTestFactory.createRundown({
+          id: 'rundown-a',
+          segments: [
+            EntityTestFactory.createSegment({ id: 'segment-a' }),
+            EntityTestFactory.createSegment({ id: 'segment-b', parts: [EntityTestFactory.createPart({ segmentId: 'segment-b' })] }),
+            EntityTestFactory.createSegment({ id: 'segment-c' }),
+            EntityTestFactory.createSegment({ id: 'segment-d' }),
+            EntityTestFactory.createSegment({ id: 'segment-e', parts: [EntityTestFactory.createPart({ segmentId: 'segment-e' })] }),
           ],
         })
         const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({
@@ -102,11 +134,13 @@ describe(IngestRundownSynchronizer.name, () => {
 
         const result: RundownSynchronizeResult = await testee.synchronizeRundown(rundown, ingestedRundown)
 
-        expect(result.deletedSegments.length).toBe(3)
+        expect(result.deletedSegments.length).toBe(5)
         expect(result.deletedSegments).toEqual(expect.arrayContaining([
           expect.objectContaining({ id: 'segment-a' }),
+          expect.objectContaining({ id: 'segment-b' }),
           expect.objectContaining({ id: 'segment-c' }),
           expect.objectContaining({ id: 'segment-d' }),
+          expect.objectContaining({ id: 'segment-e' }),
         ]))
       })
 
@@ -217,10 +251,10 @@ describe(IngestRundownSynchronizer.name, () => {
         const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({
           id: 'rundown-a',
           ingestedSegments: [
-            EntityTestFactory.createIngestedSegment({ id: 'segment-a', name: 'A2' }),
+            EntityTestFactory.createIngestedSegment({ id: 'segment-a', name: 'A2', ingestedParts: [EntityTestFactory.createIngestedPart({ id: 'part-a', segmentId: 'segment-a' })] }),
             EntityTestFactory.createIngestedSegment({ id: 'segment-b', name: 'B1' }),
-            EntityTestFactory.createIngestedSegment({ id: 'segment-c', name: 'C2' }),
-            EntityTestFactory.createIngestedSegment({ id: 'segment-d', name: 'D2' }),
+            EntityTestFactory.createIngestedSegment({ id: 'segment-c', name: 'C2', ingestedParts: [EntityTestFactory.createIngestedPart({ id: 'part-c', segmentId: 'segment-c' })] }),
+            EntityTestFactory.createIngestedSegment({ id: 'segment-d', name: 'D2', ingestedParts: [EntityTestFactory.createIngestedPart({ id: 'part-d', segmentId: 'segment-d' })] }),
             EntityTestFactory.createIngestedSegment({ id: 'segment-e', name: 'E1' }),
           ],
         })
