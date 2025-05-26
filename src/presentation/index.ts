@@ -98,7 +98,7 @@ async function startSystemServices(): Promise<void> {
   ServiceFacade.createMediaDataChangeService()
   ServiceFacade.createDeviceDataChangedService()
   ServiceFacade.createConfigurationDataChangedService()
-  ServiceFacade.createDeviceService()
+  await ServiceFacade.createDeviceService().initialize()
 }
 
 startSofieServer().catch((error) => LoggerFacade.createLogger().tag('startup').data(error).error('Unable to start Sofie Server'))

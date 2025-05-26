@@ -7,7 +7,7 @@ import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
-import { Device } from '../device'
+import { CoreDeviceConfiguration, DeviceConfiguration } from '../device-configuration'
 import { DeviceType } from '../../enums/device-type'
 import { TransitionType } from '../../enums/transition-type'
 import { ActionManifest, PieceAction } from '../action'
@@ -203,7 +203,7 @@ export class EntityTestFactory {
     }
   }
 
-  public static createDevice(device: Partial<Device> = {}): Device {
+  public static createCoreDeviceConfiguration(device: Partial<CoreDeviceConfiguration> = {}): CoreDeviceConfiguration {
     return {
       id: 'deviceId',
       name: 'deviceName',
@@ -213,6 +213,15 @@ export class EntityTestFactory {
       type: DeviceType.ABSTRACT,
       ...device
     }
+  }
+
+  public static createDeviceConfiguration(deviceConfiguration: Partial<DeviceConfiguration> = {}): DeviceConfiguration {
+    return {
+      id: 'random-device-configuration-id',
+      name: 'random-device-configuration-name',
+      type: DeviceType.ABSTRACT,
+      ...deviceConfiguration
+    } as DeviceConfiguration
   }
 
   public static createStatusMessage(statusMessage: Partial<StatusMessage> = {}): StatusMessage {

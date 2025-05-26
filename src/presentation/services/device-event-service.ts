@@ -1,9 +1,9 @@
 import { DeviceCreatedEvent, DeviceDeletedEvent, DeviceEvent, DeviceUpdatedEvent } from '../value-objects/device-event'
 import { DeviceEventEmitter } from '../../business-logic/services/interfaces/device-event-emitter'
 import { DeviceEventObserver } from '../interfaces/device-event-observer'
-import { Device } from '../../model/entities/device'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { Device } from '../../model/entities/devices/device'
 
 export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserver {
 

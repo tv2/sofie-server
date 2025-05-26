@@ -1,4 +1,3 @@
-import {Device} from '../../model/entities/device'
 import {
   DeviceCreatedEvent,
   DeviceDeletedEvent,
@@ -6,6 +5,7 @@ import {
   VideoMixerConfigurationUpdatedEvent
 } from '../value-objects/device-event'
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { Device } from '../../model/entities/devices/device'
 
 export interface DeviceEventBuilder {
   buildDeviceCreatedEvent(device: Device): DeviceCreatedEvent

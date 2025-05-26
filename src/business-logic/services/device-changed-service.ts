@@ -5,8 +5,8 @@ import { StatusCode } from '../../model/enums/status-code'
 import { Logger } from '../../logger/logger'
 import { StatusMessageService } from './interfaces/status-message-service'
 import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
-import { Device } from '../../model/entities/device'
-import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
+import { CoreDeviceConfiguration } from '../../model/entities/device-configuration'
+import { DeviceConfigurationRepository } from '../../data-access/repositories/interfaces/device-configuration-repository'
 import { DeviceType } from '../../model/enums/device-type'
 
 // TODO: Find a way to translate
@@ -19,8 +19,8 @@ export class DeviceChangedService implements DataChangeService {
 
   public static getInstance(
     statusMessageService: StatusMessageService,
-    deviceRepository: DeviceRepository,
-    deviceChangedListener: DataChangedListener<Device>,
+    deviceRepository: DeviceConfigurationRepository,
+    deviceChangedListener: DataChangedListener<CoreDeviceConfiguration>,
     logger: Logger
   ): DataChangeService {
     if (!this.instance) {
@@ -38,8 +38,8 @@ export class DeviceChangedService implements DataChangeService {
 
   constructor(
     private readonly statusMessageService: StatusMessageService,
-    private readonly deviceRepository: DeviceRepository,
-    deviceChangedListener: DataChangedListener<Device>,
+    private readonly deviceRepository: DeviceConfigurationRepository,
+    deviceChangedListener: DataChangedListener<CoreDeviceConfiguration>,
     logger: Logger
   ) {
     this.logger = logger.tag(DeviceChangedService.name)
@@ -53,14 +53,14 @@ export class DeviceChangedService implements DataChangeService {
   }
 
   private async updateStatusMessageFromCurrentDeviceStatus(): Promise<void> {
-    const devices: Device[] = await this.deviceRepository.getDevices()
+    const devices: CoreDeviceConfiguration[] = await this.deviceRepository.getDeviceConfigurations() as unknown as CoreDeviceConfiguration[]
     await Promise.all(devices.map(device => this.onDeviceUpdated(device)))
 
-    const statusMessagesForDevices: StatusMessage[] = devices.map(device => this.convertDeviceToStatusMessage(device))
+    const statusMessagesForDevices: StatusMessage[] = devices.map(device => this.convertDeviceConfigurationToStatusMessage(device))
     await this.statusMessageService.deleteStatusMessagesWithIdPrefixNotInCollection(DEVICE_STATUS_MESSAGE_PREFIX, statusMessagesForDevices)
   }
 
-  private listenForStatusMessageChanges(deviceChangedListener: DataChangedListener<Device>): void {
+  private listenForStatusMessageChanges(deviceChangedListener: DataChangedListener<CoreDeviceConfiguration>): void {
     deviceChangedListener.onCreated(device => {
       this.onDeviceUpdated(device).catch(error => this.logger.data(error).error(`Failed processing device created event for device '${device.name}' with id '${device.id}'.`))
     })
@@ -72,37 +72,37 @@ export class DeviceChangedService implements DataChangeService {
     })
   }
 
-  private async onDeviceUpdated(device: Device): Promise<void> {
-    if (!device.isConnected) {
-      device.statusCode = StatusCode.BAD
-      device.statusMessage = NOT_CONNECTED_MESSAGE
+  private async onDeviceUpdated(deviceConfiguration: CoreDeviceConfiguration): Promise<void> {
+    if (!deviceConfiguration.isConnected) {
+      deviceConfiguration.statusCode = StatusCode.BAD
+      deviceConfiguration.statusMessage = NOT_CONNECTED_MESSAGE
     }
 
-    await this.statusMessageService.updateStatusMessage(this.convertDeviceToStatusMessage(device))
+    await this.statusMessageService.updateStatusMessage(this.convertDeviceConfigurationToStatusMessage(deviceConfiguration))
   }
 
-  private convertDeviceToStatusMessage(device: Device): StatusMessage {
+  private convertDeviceConfigurationToStatusMessage(deviceConfiguration: CoreDeviceConfiguration): StatusMessage {
     return {
-      id: `${DEVICE_STATUS_MESSAGE_PREFIX}${device.id}`,
-      statusCode: device.statusCode,
-      title: device.name,
-      message: this.getDeviceMessage(device)
+      id: `${DEVICE_STATUS_MESSAGE_PREFIX}${deviceConfiguration.id}`,
+      statusCode: deviceConfiguration.statusCode,
+      title: deviceConfiguration.name,
+      message: this.getDeviceConfigurationMessage(deviceConfiguration)
     }
   }
 
-  private getDeviceMessage(device: Device): string {
-    if (device.statusMessage) {
-      return device.statusMessage
+  private getDeviceConfigurationMessage(deviceConfiguration: CoreDeviceConfiguration): string {
+    if (deviceConfiguration.statusMessage) {
+      return deviceConfiguration.statusMessage
     }
-    if (device.statusCode === StatusCode.GOOD) {
+    if (deviceConfiguration.statusCode === StatusCode.GOOD) {
       return 'The device is in a good state.'
     }
     return ''
   }
 
-  private async onDeviceDeleted(deviceId: string): Promise<void> {
-    const deletedDevice: Device = {
-      id: deviceId,
+  private async onDeviceDeleted(deviceConfigurationId: string): Promise<void> {
+    const deletedDeviceConfiguration: CoreDeviceConfiguration = {
+      id: deviceConfigurationId,
       name: '',
       statusMessage: 'Device was deleted',
       statusCode: StatusCode.GOOD,
@@ -110,6 +110,6 @@ export class DeviceChangedService implements DataChangeService {
       type: DeviceType.ABSTRACT
     }
 
-    await this.statusMessageService.updateStatusMessage(this.convertDeviceToStatusMessage(deletedDevice))
+    await this.statusMessageService.updateStatusMessage(this.convertDeviceConfigurationToStatusMessage(deletedDeviceConfiguration))
   }
 }

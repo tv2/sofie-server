@@ -1,13 +1,11 @@
-import {Device} from '../../../model/entities/device'
+import {DeviceConfiguration} from '../../../model/entities/device-configuration'
+import { Device } from '../../../model/entities/devices/device'
 
 export interface DeviceService {
-  getDevices(): Promise<Device[]>
-
-  getDevice(deviceId: string): Promise<Device>
-
-  create(device: Device): Promise<void>
-
-  update(device: Device): Promise<void>
-
-  delete(deviceId: string): Promise<void>
+  initialize(): Promise<void>
+  getDevice(deviceId: string): Device
+  getDevices(): Device[]
+  create(deviceConfiguration: DeviceConfiguration): Promise<void>
+  update(deviceConfiguration: DeviceConfiguration): Promise<void>
+  delete(deviceConfigurationId: string): Promise<void>
 }

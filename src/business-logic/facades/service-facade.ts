@@ -25,7 +25,7 @@ import { DeviceChangedService } from '../services/device-changed-service'
 import { ConfigurationChangedService } from '../services/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
-import { DeviceServiceImplementation } from '../services/device-service-implementation'
+import { DeviceManager } from '../services/device-manager'
 import { DeviceService } from '../services/interfaces/device-service'
 import { PlayoutService } from '../services/interfaces/playoutService'
 import { PlayoutGatewayService } from '../services/playout-gateway-service'
@@ -41,6 +41,7 @@ import { MacroService } from '../services/interfaces/macro-service'
 import { HelperFacade } from './helper-facade'
 import { PlayoutContentReadService, PlayoutContentUpdateService } from '../services/interfaces/playout-content-service'
 import { PlayoutContentStateService } from '../services/playout-content-state-service'
+import { DeviceFactory } from '../services/device-factory'
 
 export class ServiceFacade {
 
@@ -169,8 +170,8 @@ export class ServiceFacade {
   public static createDeviceDataChangedService(): DataChangeService {
     return DeviceChangedService.getInstance(
       ServiceFacade.createStatusMessageService(),
-      RepositoryFacade.createCoreDeviceRepository(),
-      RepositoryFacade.createDeviceDataChangedListener(),
+      RepositoryFacade.createCoreConfigurationDeviceRepository(),
+      RepositoryFacade.createDeviceConfigurationDataChangedListener(),
       LoggerFacade.createLogger()
     )
   }
@@ -194,9 +195,10 @@ export class ServiceFacade {
   }
 
   public static createDeviceService(): DeviceService {
-    return new DeviceServiceImplementation(
-      RepositoryFacade.createDeviceRepository(),
-      EventEmitterFacade.createDeviceEventEmitter()
+    return DeviceManager.getInstance(
+      RepositoryFacade.createDeviceConfigurationRepository(),
+      EventEmitterFacade.createDeviceEventEmitter(),
+      ServiceFacade.createDeviceFactory()
     )
   }
 
@@ -212,5 +214,9 @@ export class ServiceFacade {
       EventEmitterFacade.createPlayoutContentEventEmitter(),
       RepositoryFacade.createPlayoutContentRepository()
     )
+  }
+
+  public static createDeviceFactory(): DeviceFactory {
+    return new DeviceFactory(EventEmitterFacade.createStatusMessageEventEmitter())
   }
 }

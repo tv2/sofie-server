@@ -1,19 +1,19 @@
 import { DataChangedListener } from '../interfaces/data-changed-listener'
-import { MongoDevice, MongoEntityConverter } from './mongo-entity-converter'
+import { MongoDeviceConfiguration, MongoEntityConverter } from './mongo-entity-converter'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { ChangeStream, ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
 import { Logger } from '../../../logger/logger'
-import { Device } from '../../../model/entities/device'
+import { CoreDeviceConfiguration } from '../../../model/entities/device-configuration'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
-export class MongoDeviceChangedListener extends BaseMongoRepository<MongoDevice> implements DataChangedListener<Device> {
+export class MongoDeviceChangedListener extends BaseMongoRepository<MongoDeviceConfiguration> implements DataChangedListener<CoreDeviceConfiguration> {
 
   private readonly logger: Logger
-  private onCreatedCallback: (device: Device) => void
-  private onUpdatedCallback: (device: Device) => void
+  private onCreatedCallback: (device: CoreDeviceConfiguration) => void
+  private onUpdatedCallback: (device: CoreDeviceConfiguration) => void
   private onDeletedCallback: (deviceId: string) => void
 
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter, logger: Logger) {
@@ -24,28 +24,28 @@ export class MongoDeviceChangedListener extends BaseMongoRepository<MongoDevice>
 
   private listenForChanges(): void {
     const options: ChangeStreamOptions = { fullDocument: 'updateLookup' }
-    const changeStream: ChangeStream = this.getCollection().watch<MongoDevice, ChangeStreamDocument<MongoDevice>>([], options)
-    changeStream.on('change', (change: ChangeStreamDocument<MongoDevice>) => this.onChange(change))
+    const changeStream: ChangeStream = this.getCollection().watch<MongoDeviceConfiguration, ChangeStreamDocument<MongoDeviceConfiguration>>([], options)
+    changeStream.on('change', (change: ChangeStreamDocument<MongoDeviceConfiguration>) => this.onChange(change))
     this.logger.debug('Listening for Device collection changes...')
   }
 
-  private onChange(change: ChangeStreamDocument<MongoDevice>): void {
+  private onChange(change: ChangeStreamDocument<MongoDeviceConfiguration>): void {
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
-        const mongoDevice: MongoDevice = change.fullDocument
-        this.onCreatedCallback(this.mongoEntityConverter.convertToDeviceInterface(mongoDevice))
+        const mongoDevice: MongoDeviceConfiguration = change.fullDocument
+        this.onCreatedCallback(this.mongoEntityConverter.convertToCoreDeviceConfiguration(mongoDevice))
         return
       }
       case MongoChangeEvent.UPDATE: {
-        const mongoDevice: MongoDevice | undefined = change.fullDocument
+        const mongoDevice: MongoDeviceConfiguration | undefined = change.fullDocument
         if (!mongoDevice) {
           return
         }
-        this.onUpdatedCallback(this.mongoEntityConverter.convertToDeviceInterface(mongoDevice))
+        this.onUpdatedCallback(this.mongoEntityConverter.convertToCoreDeviceConfiguration(mongoDevice))
         return
       }
       case MongoChangeEvent.DELETE: {
-        const deleteChange: ChangeStreamDeleteDocument<MongoDevice> = change as ChangeStreamDeleteDocument<MongoDevice>
+        const deleteChange: ChangeStreamDeleteDocument<MongoDeviceConfiguration> = change as ChangeStreamDeleteDocument<MongoDeviceConfiguration>
         const deviceId: string = deleteChange.documentKey._id
         this.onDeletedCallback(deviceId)
       }
@@ -56,11 +56,11 @@ export class MongoDeviceChangedListener extends BaseMongoRepository<MongoDevice>
     return DEVICE_COLLECTION_NAME
   }
 
-  public onCreated(onCreatedCallback: (data: Device) => void): void {
+  public onCreated(onCreatedCallback: (data: CoreDeviceConfiguration) => void): void {
     this.onCreatedCallback = onCreatedCallback
   }
 
-  public onUpdated(onUpdatedCallback: (data: Device) => void): void {
+  public onUpdated(onUpdatedCallback: (data: CoreDeviceConfiguration) => void): void {
     this.onUpdatedCallback = onUpdatedCallback
   }
 

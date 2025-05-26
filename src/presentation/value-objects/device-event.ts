@@ -1,7 +1,7 @@
 import { DeviceEventType } from '../enums/event-type'
 import { TypedEvent } from './typed-event'
-import { Device } from '../../model/entities/device'
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { DeviceDto } from '../dtos/device-dto'
 
 export type DeviceEvent = DeviceCreatedEvent | DeviceUpdatedEvent | DeviceDeletedEvent | VideoMixerConfigurationUpdatedEvent
 
@@ -12,12 +12,12 @@ export interface DeviceIdEvent extends TypedEvent {
 
 export interface DeviceCreatedEvent extends TypedEvent {
   type: DeviceEventType.DEVICE_CREATED
-  device: Device
+  device: DeviceDto
 }
 
 export interface DeviceUpdatedEvent extends TypedEvent {
   type: DeviceEventType.DEVICE_UPDATED
-  device: Device
+  device: DeviceDto
 }
 
 export interface DeviceDeletedEvent extends DeviceIdEvent {

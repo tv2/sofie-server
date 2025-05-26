@@ -32,7 +32,7 @@ import { Invalidity } from '../../../model/value-objects/invalidity'
 import { Logger } from '../../../logger/logger'
 import { Action, ActionArgument } from '../../../model/entities/action'
 import { ActionType } from '../../../model/enums/action-type'
-import { Device } from '../../../model/entities/device'
+import { CoreDeviceConfiguration } from '../../../model/entities/device-configuration'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TakeMode } from '../../../model/enums/take-mode'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
@@ -200,7 +200,7 @@ export interface MongoAction extends MongoId {
   argument?: ActionArgument
 }
 
-export interface MongoDevice extends MongoId {
+export interface MongoDeviceConfiguration extends MongoId {
   name: string
   type: DeviceType
   status: {
@@ -528,18 +528,18 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDeviceInterface(mongoDevice: MongoDevice): Device {
-    const statusMessage: string = mongoDevice.status.messages && mongoDevice.status.messages.length > 0
-      ? mongoDevice.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
+  public convertToCoreDeviceConfiguration(mongoDeviceConfiguration: MongoDeviceConfiguration): CoreDeviceConfiguration {
+    const statusMessage: string = mongoDeviceConfiguration.status.messages && mongoDeviceConfiguration.status.messages.length > 0
+      ? mongoDeviceConfiguration.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
       : ''
 
     return {
-      id: mongoDevice._id,
-      name: mongoDevice.name,
-      isConnected: mongoDevice.connected,
-      statusCode: this.getStatusCode(mongoDevice.status.statusCode),
+      id: mongoDeviceConfiguration._id,
+      name: mongoDeviceConfiguration.name,
+      isConnected: mongoDeviceConfiguration.connected,
+      statusCode: this.getStatusCode(mongoDeviceConfiguration.status.statusCode),
       statusMessage,
-      type: mongoDevice.type
+      type: mongoDeviceConfiguration.type
     }
   }
 
@@ -562,8 +562,8 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDeviceInterfaces(mongoDevices: MongoDevice[]): Device[] {
-    return mongoDevices.map(mongoDevice => this.convertToDeviceInterface(mongoDevice))
+  public convertToCoreDeviceConfigurations(mongoDeviceConfigurations: MongoDeviceConfiguration[]): CoreDeviceConfiguration[] {
+    return mongoDeviceConfigurations.map(mongoDeviceConfiguration => this.convertToCoreDeviceConfiguration(mongoDeviceConfiguration))
   }
 
   public convertToAction(mongoAction: MongoAction): Action {

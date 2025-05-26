@@ -63,7 +63,6 @@ import { Action } from '../../model/entities/action'
 import { ActionsUpdatedEvent } from '../value-objects/action-event'
 import { ActionDto } from '../dtos/action-dto'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
-import { Device } from '../../model/entities/device'
 import {
   DeviceCreatedEvent,
   DeviceDeletedEvent,
@@ -78,6 +77,8 @@ import { MacroDto } from '../dtos/macro-dto'
 import { PlayoutContentEventBuilder } from '../interfaces/playout-content-event-builder'
 import { PlayoutContent } from '../../model/value-objects/playout-content'
 import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from '../value-objects/playout-content-event'
+import { Device } from '../../model/entities/devices/device'
+import { DeviceDto } from '../dtos/device-dto'
 
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder, PlayoutContentEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
@@ -371,7 +372,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
     return {
       type: DeviceEventType.DEVICE_CREATED,
       timestamp: Date.now(),
-      device
+      device: new DeviceDto(device)
     }
   }
 
@@ -379,7 +380,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
     return {
       type: DeviceEventType.DEVICE_UPDATED,
       timestamp: Date.now(),
-      device
+      device: new DeviceDto(device)
     }
   }
 

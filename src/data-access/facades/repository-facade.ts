@@ -59,7 +59,7 @@ import { MongoShelfRepository } from '../repositories/mongo/mongo-shelf-reposito
 import { MongoDeviceChangedListener } from '../repositories/mongo/mongo-device-changed-listener'
 import { StatusMessageRepository } from '../repositories/interfaces/status-message-repository'
 import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status-message-repository'
-import { MongoCoreDeviceRepository } from '../repositories/mongo/mongo-core-device-repository'
+import { MongoCoreDeviceConfigurationRepository } from '../repositories/mongo/mongo-core-device-configuration-repository'
 import { ShowStyle } from '../../model/entities/show-style'
 import { MongoShowStyleChangedListener } from '../repositories/mongo/mongo-show-style-changed-listener'
 import { Database } from '../repositories/interfaces/database'
@@ -71,9 +71,9 @@ import { RundownAggregateRepository } from '../repositories/interfaces/rundown-a
 import { IngestedPiece } from '../../model/entities/ingested-piece'
 import { PieceRepository } from '../repositories/interfaces/piece-repository'
 import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-ingested-piece-changed-listener'
-import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
-import { DeviceRepository } from '../repositories/interfaces/device-repository'
-import { Device } from '../../model/entities/device'
+import { MongoDeviceConfigurationRepository } from '../repositories/mongo/mongo-device-configuration-repository'
+import { DeviceConfigurationRepository } from '../repositories/interfaces/device-configuration-repository'
+import { CoreDeviceConfiguration } from '../../model/entities/device-configuration'
 import { VideoMixerDeviceRepository } from '../repositories/interfaces/video-mixer-device-repository'
 import { MongoVideoMixerDeviceRepository } from '../repositories/mongo/mongo-video-mixer-device-repository'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
@@ -287,7 +287,7 @@ export class RepositoryFacade {
     return new MongoSystemInformationRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
   }
 
-  public static createDeviceDataChangedListener(): DataChangedListener<Device> {
+  public static createDeviceConfigurationDataChangedListener(): DataChangedListener<CoreDeviceConfiguration> {
     return new MongoDeviceChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       new MongoEntityConverter(LoggerFacade.createLogger()),
@@ -295,16 +295,16 @@ export class RepositoryFacade {
     )
   }
 
-  public static createCoreDeviceRepository(): DeviceRepository {
-    return new MongoCoreDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
+  public static createCoreConfigurationDeviceRepository(): DeviceConfigurationRepository {
+    return new MongoCoreDeviceConfigurationRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
   }
 
   public static createStatusMessageRepository(): StatusMessageRepository {
     return new MongoStatusMessageRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
   }
 
-  public static createDeviceRepository(): DeviceRepository {
-    return new MongoDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()),
+  public static createDeviceConfigurationRepository(): DeviceConfigurationRepository {
+    return new MongoDeviceConfigurationRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()),
       this.createUuidGenerator() )
   }
 
