@@ -100,6 +100,18 @@ export class DeviceController extends BaseController {
   }
 
   @AuditLog()
+  @PostRequest('/:deviceConfigurationId/reconnect')
+  public reconnectDevice(request: Request, response: Response): void {
+    try {
+      const deviceConfigurationId: string = request.params.deviceConfigurationId
+      this.deviceService.reconnect(deviceConfigurationId)
+      response.send(this.httpResponseFormatter.formatSuccessResponse())
+    } catch (error) {
+      this.httpErrorHandler.handleError(response, error as Exception)
+    }
+  }
+
+  @AuditLog()
   @GetRequest('/videoMixers/configurations')
   public async getVideoMixerConfiguration(_request: Request, response: Response): Promise<void> {
     try {

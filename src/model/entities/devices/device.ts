@@ -38,6 +38,7 @@ export abstract class Device {
     if (this.configuration.isDisabled) {
       return
     }
+    this.shouldTerminate = false
     this.updateStatus(StatusCode.WARNING, 'Connecting...')
     this.connectToDevice(
       () => this.onDeviceConnectedCallback(),

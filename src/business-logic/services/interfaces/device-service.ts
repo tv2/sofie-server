@@ -8,4 +8,5 @@ export interface DeviceService {
   create(deviceConfiguration: DeviceConfiguration): Promise<void>
   update(deviceConfiguration: DeviceConfiguration): Promise<void>
   delete(deviceConfigurationId: string): Promise<void>
+  reconnect(deviceConfigurationId: string): void
 }

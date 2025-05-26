@@ -2,13 +2,14 @@ import { DeviceManager } from '../device-manager'
 import {
   DeviceConfigurationRepository
 } from '../../../data-access/repositories/interfaces/device-configuration-repository'
-import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
+import { anything, instance, mock, resetCalls, verify, when } from '@typestrong/ts-mockito'
 import { DeviceEventEmitter } from '../interfaces/device-event-emitter'
 import { DeviceFactory } from '../device-factory'
 import { DeviceService } from '../interfaces/device-service'
 import { DeviceConfiguration } from '../../../model/entities/device-configuration'
 import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
 import { Device } from '../../../model/entities/devices/device'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 
 describe(DeviceManager.name, () => {
   describe(DeviceManager.prototype.create.name, () => {
@@ -208,6 +209,36 @@ describe(DeviceManager.name, () => {
       await testee.delete(deviceConfiguration.id)
 
       verify(deviceEventEmitter.emitDeviceDeletedEvent(deviceConfiguration.id)).once()
+    })
+  })
+
+  describe(DeviceManager.prototype.reconnect.name, () => {
+    describe('it does not have a Device for the parsed id', () => {
+      it('throws a NotFoundException', () => {
+        const nonExistingDeviceId: string = 'nonExistingDeviceId'
+        const testee: DeviceService = createTestee()
+        expect(() => testee.reconnect(nonExistingDeviceId)).toThrow(NotFoundException)
+      })
+    })
+
+    it('reconnects the device', async () => {
+      const deviceConfiguration: DeviceConfiguration = EntityTestFactory.createDeviceConfiguration()
+      const deviceConfigurationRepository: DeviceConfigurationRepository = mock<DeviceConfigurationRepository>()
+      when(deviceConfigurationRepository.getDeviceConfigurations()).thenReturn(Promise.resolve([deviceConfiguration]))
+
+      const device: Device = mock(Device)
+      when(device.getId()).thenReturn(deviceConfiguration.id)
+
+      const deviceFactory: DeviceFactory = mock(DeviceFactory)
+      when(deviceFactory.createDevice(deviceConfiguration, anything())).thenReturn(instance(device))
+
+      const testee: DeviceService = createTestee({ deviceConfigurationRepository, deviceFactory })
+      await testee.initialize()
+      resetCalls(device)
+
+      testee.reconnect(deviceConfiguration.id)
+
+      verify(device.disconnect()).calledBefore(device.connect())
     })
   })
 })

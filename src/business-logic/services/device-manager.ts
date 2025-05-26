@@ -89,4 +89,13 @@ export class DeviceManager implements DeviceService {
     await this.deviceConfigurationRepository.delete(deviceConfigurationId)
     this.deviceEventEmitter.emitDeviceDeletedEvent(deviceConfigurationId)
   }
+
+  public reconnect(deviceConfigurationId: string): void {
+    const device: Device | undefined = this.devices.find(device => device.getId() === deviceConfigurationId)
+    if (!device) {
+      throw new NotFoundException(`Unable to reconnect to Device. No Device found for ${deviceConfigurationId}`)
+    }
+    device.disconnect()
+    device.connect()
+  }
 }
