@@ -116,7 +116,6 @@ export class ControllerFacade {
 
   private static createDeviceController(): DeviceController {
     return new DeviceController(
-      ServiceFacade.createDeviceService(),
       RepositoryFacade.createVideoMixerDeviceRepository(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter(),
