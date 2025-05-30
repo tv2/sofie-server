@@ -87,7 +87,7 @@ function docker(args: string[]): void {
 function initReplicaSet(): void {
   docker([
     'exec',
-    'sofie-mongodb',
+    'alba-mongodb',
     'mongosh',
     '"mongodb://127.0.0.1:3001/"',
     '--quiet',
@@ -100,13 +100,13 @@ function startMongoContainer(): void {
   if (/^win/i.test(process.platform)) {
     docker([
       'run', '--rm',
-      '--name', 'sofie-mongodb',
+      '--name', 'alba-mongodb',
       '-v', '.\\database\\dumps:/dumps',
-      '-v', 'sofie-mongodb-data:/data/db',
-      '-v', 'sofie-mongodb-config:/data/configdb',
+      '-v', 'alba-mongodb-data:/data/db',
+      '-v', 'alba-mongodb-config:/data/configdb',
       '-p', '3001:3001',
       // requires mongodb-tools installed
-      // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
+      // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/alba?replicaSet=rs0\\"', '--quiet\\""',
       // '--health-interval=1s',
       '-d',
       'mongo:6.0.1',
@@ -117,13 +117,13 @@ function startMongoContainer(): void {
   } else {
     docker([
       'run', '--rm',
-      '--name', 'sofie-mongodb',
+      '--name', 'alba-mongodb',
       '-v', './database/dumps:/dumps',
-      '-v', 'sofie-mongodb-data:/data/db',
-      '-v', 'sofie-mongodb-config:/data/configdb',
+      '-v', 'alba-mongodb-data:/data/db',
+      '-v', 'alba-mongodb-config:/data/configdb',
       '-p', '3001:3001',
       // requires mongodb-tools installed
-      // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/sofie?replicaSet=rs0\\"', '--quiet\\""',
+      // '--health-cmd', '"test', '\\"echo', '\'db.stats().ok\'', '|', 'mongosh', '\\"mongodb://127.0.0.1:3001/alba?replicaSet=rs0\\"', '--quiet\\""',
       // '--health-interval=1s',
       '-d',
       'mongo:6.0.1',
@@ -137,7 +137,7 @@ function startMongoContainer(): void {
 function stopMongoContainer(): void {
   docker([
     'stop',
-    'sofie-mongodb',
+    'alba-mongodb',
     '-t', '2'
   ])
 }
@@ -145,7 +145,7 @@ function stopMongoContainer(): void {
 function restartMongoContainer(): void {
   docker([
     'restart',
-    'sofie-mongodb',
+    'alba-mongodb',
     '-t','2'
   ])
 }
@@ -153,12 +153,12 @@ function restartMongoContainer(): void {
 function dropMongoContainer(): void {
   docker([
     'rm', '-f', '-v',
-    'sofie-mongodb',
+    'alba-mongodb',
   ])
 }
 
 function spyOnDatabase(): void {
-  new MongoClient('mongodb://localhost:3001/sofie?replicaSet=rs0')
+  new MongoClient('mongodb://localhost:3001/alba?replicaSet=rs0')
     .connect().then( (client) => {
       const changeStream: ChangeStream = client.watch()
       changeStream.on('change', (change) => console.dir(change))
@@ -170,7 +170,7 @@ function seedDatabase(): void {
   // Seed the database with content from ./db/dumps/meteor
   docker([
     'exec',
-    'sofie-mongodb',
+    'alba-mongodb',
     'mongorestore',
     '"mongodb://127.0.0.1:3001/?replicaSet=rs0"',
     '--oplogReplay',

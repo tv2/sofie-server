@@ -416,7 +416,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
   }
 
   /**
-   * Sofie is unfortunately (at the time of writing) designed with an Atem in mind.
+   * Alba is unfortunately (at the time of writing) designed with an Atem in mind.
    * This means that we need to convert the TriCaster input into an "Atem accepted value" so the rest of the system can work with it.
    */
   private mapTriCasterInputToNumber(input: string): number {

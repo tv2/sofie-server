@@ -1,13 +1,13 @@
 Goal
 ===
 
-Transfer data from Meteor's MongoDB to a containerized instance of MongoDB then maintain and operate with it for the purpose of `sofie-server` project.
+Transfer data from Meteor's MongoDB to a containerized instance of MongoDB then maintain and operate with it for the purpose of `alba-server` project.
 
 Pre-requisites
 ===
 
 - `tv-automation-server-core` codebase running
-- `sofie-server` codebase running
+- `alba-server` codebase running
 - `docker` installed
 - `ts-node` installed ( `yarn global add ts-node typescript` )
 - mongodb-tools for running cli commands (optional)
@@ -28,13 +28,13 @@ yarn watch
 Once the server is running, open second terminal and run the following command:
 
 ```bash
-cd sofie-server
+cd alba-server
 yarn run dump-database
 ```
 *note*: equivalent to the above command is:
 
 ```bash
-cd sofie-server/db/dumps
+cd alba-server/db/dumps
 mongodump "mongodb://localhost:3001" --oplog --out=./meteor
 ```
 
@@ -45,7 +45,7 @@ this will create a dump of the database in the `meteor` sub-folder (git excluded
 3. Open third terminal:
 
 ```bash
-cd sofie-server
+cd alba-server
 yarn run start-database
 ```
 
@@ -75,11 +75,11 @@ mongorestore "mongodb://localhost:3001/?replicaSet=rs0" --oplogReplay ./meteor
 7. From that point on, you can start the server as usual:
 
 ```bash
-cd sofie-server
+cd alba-server
 yarn watch
 ```
 
-Now you should have a working server with the database restored from the dump and sofie-server should be running off meteor.
+Now you should have a working server with the database restored from the dump and alba-server should be running off meteor.
 
 Example of the sequence of commands:
 
@@ -92,7 +92,7 @@ yarn watch
 
 ```bash
 # in terminal two
-cd sofie-server
+cd alba-server
 yarn run dump-database
 # now you can hit Ctrl-C in terminal one
 

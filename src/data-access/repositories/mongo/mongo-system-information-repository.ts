@@ -20,7 +20,7 @@ export class MongoSystemInformationRepository extends BaseMongoRepository<MongoS
   public async getSystemInformation(): Promise<SystemInformation> {
     const mongoSystemInformation: MongoSystemInformation | null = await this.getCollection().findOne<MongoSystemInformation>()
     if (!mongoSystemInformation) {
-      throw new NotFoundException('No SystemInformation found. Has Sofie been set up correctly?')
+      throw new NotFoundException('No SystemInformation found. Has Alba been set up correctly?')
     }
     return this.mongoEntityConverter.convertSystemInformation(mongoSystemInformation)
   }
