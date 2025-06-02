@@ -36,8 +36,10 @@ export class ControllerFacade {
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
       ServiceFacade.createIngestService(),
+      ServiceFacade.createPlayoutContentReadService(),
       ControllerFacade.createExpressErrorHandler(),
-      new JsendResponseFormatter(), LoggerFacade.createLogger()
+      new JsendResponseFormatter(),
+      LoggerFacade.createLogger()
     )
   }
 

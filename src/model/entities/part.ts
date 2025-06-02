@@ -11,7 +11,7 @@ import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 import { Invalidity } from '../value-objects/invalidity'
 import { InvalidPartException } from '../exceptions/invalid-part-exception'
-import { PieceType } from '../enums/piece-type'
+import { PlayoutContentType } from '../enums/playout-content-type'
 
 export interface PartInterface {
   id: string
@@ -130,7 +130,7 @@ export class Part {
     const now: number = Date.now()
     this.executedAt = now
     this.playedDuration = 0
-    this.pieces.forEach((piece) => piece.setExecutedAt(now + piece.getStart()))
+    this.pieces.forEach((piece) => piece.putOnAir(now + piece.getStart()))
   }
 
   private assertValidity(operationName: string): void {
@@ -203,6 +203,7 @@ export class Part {
     if (this.isPartOnAir) {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
       unPlannedPiece.setStart(timeSincePutOnAir)
+      unPlannedPiece.putOnAir(this.executedAt + timeSincePutOnAir)
       unPlannedPiece.markAsInsertedOnAir()
 
       this.stopOverlappingPiecesOnSameLayer(unPlannedPiece)
@@ -213,13 +214,14 @@ export class Part {
   }
 
   private stopOverlappingPiecesOnSameLayer(referencePiece: Piece): void {
+    const now: number = Date.now()
     this.pieces.filter(piece => piece.layer === referencePiece.layer && this.doPiecesOverlap(referencePiece, piece))
-      .forEach(stoppablePiece => stoppablePiece.stop())
+      .forEach(stoppablePiece => stoppablePiece.takeOffAir(now))
   }
 
   private doPiecesOverlap(pieceA: Piece, pieceB: Piece): boolean {
-    const pieceAEnd: number = pieceA.getStart() + (pieceA.getDuration() ?? Infinity)
-    const pieceBEnd: number = pieceB.getStart() + (pieceB.getDuration() ?? Infinity)
+    const pieceAEnd: number = pieceA.getStart() + (pieceA.getDuration() || Infinity)
+    const pieceBEnd: number = pieceB.getStart() + (pieceB.getDuration() || Infinity)
     return pieceA.getStart() <= pieceBEnd && pieceAEnd >= pieceB.getStart()
   }
 
@@ -428,15 +430,15 @@ export class Part {
       },
       disableNextInTransition: false,
       pieces: this.pieces.filter(piece => [
-        PieceType.CAMERA,
-        PieceType.REMOTE,
-        PieceType.REPLAY,
-        PieceType.GRAPHICS,
-        PieceType.SPLIT_SCREEN,
-        PieceType.VIDEO_CLIP,
-        PieceType.VOICE_OVER,
-        PieceType.JINGLE,
-      ].includes(piece.metadata.type)).map(piece => piece.copy(newPartId))
+        PlayoutContentType.CAMERA,
+        PlayoutContentType.REMOTE,
+        PlayoutContentType.REPLAY,
+        PlayoutContentType.GRAPHICS,
+        PlayoutContentType.SPLIT_SCREEN,
+        PlayoutContentType.VIDEO_CLIP,
+        PlayoutContentType.VOICE_OVER,
+        PlayoutContentType.JINGLE,
+      ].includes(piece.metadata.playoutContent.type)).map(piece => piece.copy(newPartId))
     }
     return new Part(partInterface)
   }

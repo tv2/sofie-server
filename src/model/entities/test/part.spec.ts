@@ -10,7 +10,8 @@ import { IngestedPiece } from '../ingested-piece'
 import { IngestedPart } from '../ingested-part'
 import { Invalidity } from '../../value-objects/invalidity'
 import { InvalidPartException } from '../../exceptions/invalid-part-exception'
-import { PieceType } from '../../enums/piece-type'
+import { PlayoutContentType } from '../../enums/playout-content-type'
+import { PlayoutContent } from '../../value-objects/playout-content'
 
 describe(Part.name, () => {
   describe(Part.prototype.getTimings.name, () => {
@@ -183,13 +184,15 @@ describe(Part.name, () => {
         expect(testee.getPieces()).toContain(unplannedPiece)
       })
 
-      describe('there is already a Piece on the layer of the inserted Piece', () => {
+      describe('there is an overlapping piece on the layer of the inserted piece', () => {
         describe('the Part is On Air', () => {
+          beforeEach(() => jest.useFakeTimers({ now: 500 }))
+          afterEach(() => jest.useRealTimers())
+
           it('keeps the existing Piece on the Part', () => {
             const layer: string = 'someLayer'
-            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
-            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
-
+            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', executedAt: 200, isPlanned: true, start: 200, duration: 0, layer })
+            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, duration: 200, layer })
             const testee: Part = new Part({ id: 'partId', isOnAir: true, pieces: [existingPiece] } as PartInterface)
 
             expect(testee.getPieces()).toContain(existingPiece)
@@ -201,24 +204,24 @@ describe(Part.name, () => {
 
           it('stops the existing Piece', () => {
             const layer: string = 'someLayer'
-            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
-            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
+            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', executedAt: 200, isPlanned: true, start: 200, duration: 0, layer })
+            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, duration: 200, layer })
 
-            const testee: Part = new Part({ id: 'partId', isOnAir: true, pieces: [existingPiece] } as PartInterface)
+            const testee: Part = new Part(EntityTestFactory.createPartInterface({ id: 'partId', isOnAir: true, pieces: [existingPiece] }))
 
-            expect(existingPiece.getDuration()).toBeUndefined()
+            expect(existingPiece.getDuration()).toBe(0)
 
             testee.insertPiece(unplannedPiece)
 
-            expect(existingPiece.getDuration()).not.toBeUndefined()
+            expect(existingPiece.getDuration()).toBeGreaterThan(0)
           })
         })
 
         describe('the Part is not On Air', () => {
           it('removes the existing Piece from the Part', () => {
             const layer: string = 'someLayer'
-            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, layer })
-            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', isPlanned: true, layer })
+            const existingPiece: Piece = EntityTestFactory.createPiece({ id: 'existingPiece', executedAt: 200, isPlanned: true, start: 200, duration: 0, layer })
+            const unplannedPiece: Piece = EntityTestFactory.createPiece({ id: 'unplannedPiece', partId: '', isPlanned: false, duration: 200, layer })
 
             const testee: Part = new Part({ id: 'partId', isOnAir: false, pieces: [existingPiece] } as PartInterface)
 
@@ -2438,7 +2441,7 @@ describe(Part.name, () => {
 
   describe(Part.prototype.getStrippedClone.name, () => {
     it('copies the pieces', () => {
-      const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: PieceType.CAMERA }})
+      const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: { type: PlayoutContentType.CAMERA, source: '' } }})
       const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
       const clonedPart: Part = testee.getStrippedClone()
       expect(clonedPart.getPieces()[0].id).toContain('COPY')
@@ -2446,88 +2449,94 @@ describe(Part.name, () => {
 
     describe('Part has a CAMERA Piece', () => {
       it('keeps the Piece', () => {
-        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.CAMERA)
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PlayoutContentType.CAMERA)
       })
     })
 
-    function assertPartKeepsPiecesWithTypeWhenStripCloned(pieceType: PieceType): void {
-      const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: pieceType }})
+    function assertPartKeepsPiecesWithTypeWhenStripCloned(playoutContentType: PlayoutContentType): void {
+      const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: createPlayoutContent(playoutContentType) }})
       const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
       const clonedPart: Part = testee.getStrippedClone()
-      expect(clonedPart.getPieces()[0].metadata.type).toContain(pieceType)
+      expect(clonedPart.getPieces()[0].metadata.playoutContent.type).toContain(playoutContentType)
     }
 
     describe('Part has a REMOTE Piece', () => {
       it('keeps the Piece', () => {
-        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.REMOTE)
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PlayoutContentType.REMOTE)
       })
     })
 
     describe('Part has a REPLAY Piece', () => {
       it('keeps the Piece', () => {
-        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.REPLAY)
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PlayoutContentType.REPLAY)
       })
     })
 
     describe('Part has a GRAPHICS Piece', () => {
       it('keeps the Piece', () => {
-        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.GRAPHICS)
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PlayoutContentType.GRAPHICS)
       })
     })
 
     describe('Part has a SPLIT_SCREEN Piece', () => {
       it('keeps the Piece', () => {
-        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.SPLIT_SCREEN)
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PlayoutContentType.SPLIT_SCREEN)
       })
     })
 
     describe('Part has a VIDEO_CLIP Piece', () => {
       it('keeps the Piece', () => {
-        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.VIDEO_CLIP)
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PlayoutContentType.VIDEO_CLIP)
       })
     })
 
     describe('Part has a VOICE_OVER Piece', () => {
       it('keeps the Piece', () => {
-        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.VOICE_OVER)
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PlayoutContentType.VOICE_OVER)
       })
     })
 
     describe('Part has a JINGLE Piece', () => {
       it('keeps the Piece', () => {
-        assertPartKeepsPiecesWithTypeWhenStripCloned(PieceType.JINGLE)
+        assertPartKeepsPiecesWithTypeWhenStripCloned(PlayoutContentType.JINGLE)
       })
     })
 
     describe('Part has a AUDIO Piece', () => {
       it('does not keeps the Piece', () => {
-        assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PieceType.AUDIO)
+        assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PlayoutContentType.AUDIO)
       })
     })
   })
 
-  function assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(pieceType: PieceType): void {
-    const piece: Piece = EntityTestFactory.createPiece({ metadata: { type: pieceType }})
+  function assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(playoutContentType: PlayoutContentType): void {
+    const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: createPlayoutContent(playoutContentType) }})
     const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
     const clonedPart: Part = testee.getStrippedClone()
     expect(clonedPart.getPieces()).toHaveLength(0)
   }
 
+  function createPlayoutContent(playoutContentType: PlayoutContentType): PlayoutContent {
+    return {
+      type: playoutContentType
+    } as PlayoutContent
+  }
+
   describe('Part has a MANUS Piece', () => {
     it('does not keeps the Piece', () => {
-      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PieceType.MANUS)
+      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PlayoutContentType.MANUS)
     })
   })
 
   describe('Part has a COMMAND Piece', () => {
     it('does not keeps the Piece', () => {
-      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PieceType.COMMAND)
+      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PlayoutContentType.COMMAND)
     })
   })
 
   describe('Part has a UNKNOWN Piece', () => {
     it('does not keeps the Piece', () => {
-      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PieceType.UNKNOWN)
+      assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(PlayoutContentType.UNKNOWN)
     })
   })
 })

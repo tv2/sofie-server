@@ -17,9 +17,9 @@ import { IngestedRundown } from '../ingested-rundown'
 import { IngestedSegment } from '../ingested-segment'
 import { PieceActionType } from '../../enums/action-type'
 import { TakeMode } from '../../enums/take-mode'
-import { PieceType } from '../../enums/piece-type'
 import { ActionOperation, Macro, Operation, OperationType } from '../macro'
 import { TimelineObject } from '../timeline-object'
+import { PlayoutContentType } from '../../enums/playout-content-type'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -36,6 +36,7 @@ export class EntityTestFactory {
       modifiedAt: Date.now(),
       showStyleVariantId: 'show-style-variant-id',
       baselineTimelineObjects: [],
+      baselinePieces: [],
       history: [],
       timing: { type: RundownTimingType.UNSCHEDULED },
       ...rundownInterface,
@@ -149,6 +150,7 @@ export class EntityTestFactory {
       layer: 'some_layer',
       name: 'pieceName',
       start: 0,
+      takenOffAirTimestamp: 0,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       isPlanned: true,
       preRollDuration: 0,
@@ -158,7 +160,9 @@ export class EntityTestFactory {
       tags: [],
       isUnsynced: false,
       metadata: {
-        type: PieceType.UNKNOWN
+        playoutContent: {
+          type: PlayoutContentType.UNKNOWN
+        }
       },
       ...pieceInterface
     }
@@ -178,7 +182,9 @@ export class EntityTestFactory {
       postRollDuration: 0,
       timelineObjects: [],
       metadata: {
-        type: PieceType.UNKNOWN
+        playoutContent: {
+          type: PlayoutContentType.UNKNOWN
+        }
       },
       ...ingestedPiece
     }

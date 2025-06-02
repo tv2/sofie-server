@@ -23,11 +23,11 @@ import {
   Tv2ActionManifestSplitScreenData,
   Tv2ActionManifestSplitScreenSourceType
 } from '../../value-objects/tv2-action-manifest-data'
-import { Tv2Action, Tv2ActionContentType } from '../../value-objects/tv2-action'
+import { Tv2Action } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../model/enums/action-type'
 import { Tv2Logger } from '../../tv2-logger'
-import { PieceType } from '../../../../model/enums/piece-type'
 import { ObjectCloner } from '../../../../business-logic/services/interfaces/object-cloner'
+import { PlayoutContentType } from '../../../../model/enums/playout-content-type'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   describe(Tv2SplitScreenActionFactory.prototype.createSplitScreenActions.name, () => {
@@ -44,7 +44,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 5,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -66,7 +66,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 10,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', config: {
                     template: 'sommerfugl', labels: ['Locator 1', 'Locator2alt'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -87,7 +87,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
 
           const result: Tv2Action[] = testee.createSplitScreenActions(blueprintConfiguration, actionManifests)
 
-          expect(result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.contentType === Tv2ActionContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)).toHaveLength(2)
+          expect(result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.playoutContent.type === PlayoutContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)).toHaveLength(2)
         })
       })
 
@@ -103,7 +103,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 5,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -125,7 +125,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
               data: {
                 rank: 10,
                 userData: {
-                  name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+                  name: 'DVE Sommerfugl', config: {
                     template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                       INP1: {
                         sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -145,7 +145,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
           ]
 
           const result: Tv2Action[] = testee.createSplitScreenActions(blueprintConfiguration, actionManifests)
-          const splitScreenActions: Tv2Action[] = result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.contentType === Tv2ActionContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)
+          const splitScreenActions: Tv2Action[] = result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.playoutContent.type === PlayoutContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)
 
           expect(splitScreenActions).toHaveLength(1)
           expect(splitScreenActions[0].rank).toBe(5)
@@ -166,7 +166,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
           data: {
             rank: 5,
             userData: {
-              name: 'DVE UNKNOWN', pieceType: PieceType.SPLIT_SCREEN, config: {
+              name: 'DVE UNKNOWN', config: {
                 template: 'some-unknown-template', labels: ['Locator1', 'Locator2'], sources: {
                   INP1: {
                     sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -188,7 +188,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
           data: {
             rank: 10,
             userData: {
-              name: 'DVE Sommerfugl', pieceType: PieceType.SPLIT_SCREEN, config: {
+              name: 'DVE Sommerfugl', config: {
                 template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                   INP1: {
                     sourceType: Tv2ActionManifestSplitScreenSourceType.CAMERA,
@@ -209,7 +209,7 @@ describe(Tv2SplitScreenActionFactory.name, () => {
 
 
       const result: Tv2Action[] = testee.createSplitScreenActions(blueprintConfiguration, actionManifests)
-      const splitScreenActions: Tv2Action[] = result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.contentType === Tv2ActionContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)
+      const splitScreenActions: Tv2Action[] = result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.playoutContent.type === PlayoutContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)
 
       expect(splitScreenActions).toHaveLength(1)
       expect(splitScreenActions[0].rank).toBe(10)

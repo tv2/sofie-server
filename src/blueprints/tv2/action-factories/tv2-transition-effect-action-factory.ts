@@ -12,7 +12,6 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import {
   Tv2Action,
-  Tv2ActionContentType,
   Tv2BreakerTransitionEffectActionMetadata,
   Tv2DipTransitionEffectActionMetadata,
   Tv2MixTransitionEffectActionMetadata,
@@ -45,7 +44,8 @@ import { Tv2Logger } from '../tv2-logger'
 import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { OutputLayer } from '../../../model/enums/output-layer'
-import { PieceType } from '../../../model/enums/piece-type'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 
@@ -99,7 +99,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   }
 
   public isTransitionEffectAction(action: Tv2Action): action is Tv2TransitionEffectAction {
-    return action.metadata.contentType === Tv2ActionContentType.TRANSITION
+    return action.metadata.playoutContent.type === PlayoutContentType.TRANSITION
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -177,13 +177,16 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       isPlanned: false,
       start: 0,
       duration: Math.max(this.frameTimeConverter.convertFramesToMilliseconds(durationInFrames), 0),
+      takenOffAirTimestamp: 0,
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
       isUnsynced: false,
       timelineObjects: [],
       metadata: {
-        type: PieceType.TRANSITION,
+        playoutContent: {
+          type: PlayoutContentType.TRANSITION
+        },
         outputLayer: OutputLayer.SECONDARY,
       },
       ...piece,
@@ -242,7 +245,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
    */
   private createEmptyMixTransitionEffectAction(actionType: PieceActionType): Tv2TransitionEffectAction {
     const metadata: Tv2MixTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.MIX,
       durationInFrames: 0 // Default duration - To be overridden by APPLY ARGUMENTS
     }
@@ -270,7 +276,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
    */
   private createEmptyDipTransitionEffectAction(actionType: PieceActionType, dipInputSource: number): Tv2TransitionEffectAction {
     const metadata: Tv2DipTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.DIP,
       durationInFrames: 0, // Default duration - To be overridden by APPLY ARGUMENTS,
       dipInput: dipInputSource
@@ -297,7 +306,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const effectName: string = `Mix ${durationInFrames}`
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.MIX,
       durationInFrames
     }
@@ -308,7 +320,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const effectName: string = `Dip ${durationInFrames}`
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.DIP,
       durationInFrames,
       dipInput: configuredDipInput
@@ -319,7 +334,14 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private createBreakerTransitionEffectAction(actionType: PieceActionType, transitionEffect: BreakerTransitionEffect, configuration: Tv2BlueprintConfiguration): Tv2TransitionEffectAction {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
     const effectName: string = `Effect ${breaker.name}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, { metadata:  {type: PieceType.TRANSITION, outputLayer: OutputLayer.JINGLE}})
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, {
+      metadata:{
+        playoutContent: {
+          type: PlayoutContentType.TRANSITION
+        },
+        outputLayer: OutputLayer.JINGLE
+      }
+    })
     const metadata: Tv2BreakerTransitionEffectActionMetadata = this.createBreakerTransitionEffectMetadata(breaker, configuration)
     return this.createTransitionEffectAction(actionType, effectName, metadata, pieceInterface)
   }
@@ -335,7 +357,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private createBreakerTransitionEffectMetadata(breaker: Breaker, configuration: Tv2BlueprintConfiguration): Tv2BreakerTransitionEffectActionMetadata {
     const breakerDsk: Tv2DownstreamKeyer = this.findDownstreamKeyerFromConfiguration(configuration)
     return {
-      contentType: Tv2ActionContentType.TRANSITION,
+      playoutContent: {
+        type: PlayoutContentType.TRANSITION
+      },
+      outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.BREAKER,
       casparCgPreRollDuration: configuration.studio.casparCgPreRollDuration,
       downstreamKeyer: breakerDsk,

@@ -13,13 +13,14 @@ import { FrameTimeConverter } from '../../helpers/frame-time-converter'
 import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
 import {
   Tv2Action,
-  Tv2ActionContentType,
   Tv2BreakerTransitionEffectActionMetadata,
   Tv2TransitionEffectAction
 } from '../../value-objects/tv2-action'
 import { MutateActionMethods, MutateActionType, MutateActionWithPieceMethods } from '../../../../model/entities/action'
 import { Breaker, TransitionEffectType } from '../../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
+import { PlayoutContentType } from '../../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../../model/enums/output-channel'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   describe(Tv2TransitionEffectActionFactory.prototype.getMutateActionMethods.name, () => {
@@ -54,7 +55,10 @@ function createBreakerActionMetadata(durationInFrames: number, casparCgPreRollDu
     } as Breaker,
     casparCgPreRollDuration: casparCgPreRollDurationInMs,
     breakerFolder: '',
-    contentType: Tv2ActionContentType.TRANSITION,
+    playoutContent: {
+      type: PlayoutContentType.TRANSITION
+    },
+    outputChannel: OutputChannel.UNKNOWN,
     transitionEffectType: TransitionEffectType.BREAKER,
     downstreamKeyer: {} as Tv2DownstreamKeyer
   }

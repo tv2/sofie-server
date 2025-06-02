@@ -20,6 +20,7 @@ export interface PieceInterface {
   preRollDuration: number
   postRollDuration: number
   executedAt?: number
+  takenOffAirTimestamp: number
   transitionType: TransitionType
   timelineObjects: TimelineObject[]
 
@@ -49,8 +50,9 @@ export class Piece {
 
   private partId: string
   private start: number
-  private duration?: number
+  private expectedDuration?: number
   private executedAt: number
+  private takenOffAirTimestamp: number
   private isUnsyncedPiece: boolean = false
   private isPieceInsertedOnAir: boolean
   private originalTimelineObjects: TimelineObject[]
@@ -66,7 +68,9 @@ export class Piece {
     this.isPlanned = piece.isPlanned
     this.createdFromActionId = piece.createdFromActionId
     this.start = piece.start
-    this.duration = piece.duration
+    this.expectedDuration = piece.duration
+    this.executedAt = piece.executedAt ?? 0
+    this.takenOffAirTimestamp = piece.takenOffAirTimestamp
     this.preRollDuration = piece.preRollDuration
     this.postRollDuration = piece.postRollDuration
     this.transitionType = piece.transitionType
@@ -77,37 +81,48 @@ export class Piece {
     this.isUnsyncedPiece = piece.isUnsynced
     this.isPieceInsertedOnAir = piece.isInsertedOnAir ?? false
     this.originalTimelineObjects = piece.timelineObjects ? [...piece.timelineObjects] : []
-
-    this.setExecutedAt(piece.executedAt ?? 0)
   }
 
   public resetFromIngestedPiece(ingestedPiece: IngestedPiece): void {
     this.start = ingestedPiece.start
-    this.duration = ingestedPiece.duration
+    this.expectedDuration = ingestedPiece.duration
     if (this.pieceLifespan === PieceLifespan.WITHIN_PART) {
       // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
-      this.executedAt = 0
+      this.resetExecution()
     }
     this.originalTimelineObjects = [...ingestedPiece.timelineObjects]
   }
 
-  public setExecutedAt(executedAt: number): void {
-    this.executedAt = executedAt
+  public putOnAir(putOnAirTimestamp: number): void {
+    if (this.executedAt) {
+      return
+    }
+    this.executedAt = putOnAirTimestamp
   }
 
-  public resetExecutedAt(): void {
+  public takeOffAir(takenOffAirTimestamp: number): void {
+    if (this.executedAt === 0) {
+      return
+    }
+    const pieceDuration: number = this.expectedDuration || Infinity
+    const expectedTakenOffAirTimestamp: number = this.takenOffAirTimestamp ? this.takenOffAirTimestamp : this.executedAt + pieceDuration
+    if (expectedTakenOffAirTimestamp < takenOffAirTimestamp) {
+      return
+    }
+    this.takenOffAirTimestamp = takenOffAirTimestamp
+  }
+
+  public resetExecution(): void {
     this.executedAt = 0
+    this.takenOffAirTimestamp = 0
   }
 
   public getExecutedAt(): number {
     return this.executedAt
   }
 
-  public stop(): void {
-    if (this.duration && this.duration + this.executedAt < Date.now()) {
-      return
-    }
-    this.duration = Date.now() - this.executedAt
+  public getTakenOffAirTimestamp(): number {
+    return this.takenOffAirTimestamp
   }
 
   public markAsUnsyncedWithUnsyncedPart(): void {
@@ -148,7 +163,14 @@ export class Piece {
   }
 
   public getDuration(): number | undefined {
-    return this.duration
+    if (this.executedAt > 0 && this.takenOffAirTimestamp > 0) {
+      return this.takenOffAirTimestamp - this.executedAt
+    }
+    return this.expectedDuration
+  }
+
+  public getExpectedDuration(): number {
+    return this.expectedDuration ?? 0
   }
 
   public isInsertedOnAir(): boolean {
@@ -188,7 +210,8 @@ export class Piece {
     if (!this.executedAt) {
       return false
     }
-    const durationInMs: number = this.duration ? this.duration : Infinity
-    return this.executedAt + durationInMs <= timestamp
+    const pieceDuration: number = this.expectedDuration || Infinity
+    const expectedTakenOffAirTimestamp: number = this.takenOffAirTimestamp ? this.takenOffAirTimestamp : this.executedAt + pieceDuration
+    return expectedTakenOffAirTimestamp <= timestamp
   }
 }

@@ -3,7 +3,7 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
 import { PartInterface } from '../../../model/entities/part'
-import { Tv2ActionContentType, Tv2ReplayAction, Tv2ReplayAuxAction } from '../value-objects/tv2-action'
+import { Tv2ReplayAction, Tv2ReplayAuxAction } from '../value-objects/tv2-action'
 import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
@@ -19,8 +19,9 @@ import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { AudioMode } from '../../../model/enums/audio-mode'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
@@ -70,7 +71,11 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         ]
       },
       metadata: {
-        contentType: Tv2ActionContentType.REPLAY
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   }
@@ -94,7 +99,11 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         ]
       },
       metadata: {
-        contentType: Tv2ActionContentType.REPLAY
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -118,7 +127,11 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         ]
       },
       metadata: {
-        contentType: Tv2ActionContentType.REPLAY
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   }
@@ -142,7 +155,11 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         ]
       },
       metadata: {
-        contentType: Tv2ActionContentType.REPLAY
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -184,7 +201,10 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     ]
 
     const metadata: PieceMetadata = {
-      type: PieceType.REPLAY,
+      playoutContent: {
+        type: PlayoutContentType.REPLAY,
+        source: source.name
+      },
       outputLayer: OutputLayer.PROGRAM,
       audioMode: audioMode,
       sisyfosPersistMetaData: {
@@ -203,6 +223,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       isPlanned: false,
       start: 0,
       duration: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       metadata,
@@ -224,7 +245,11 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         pieceInterface: this.createStudioAuxPieceInterface(source),
       },
       metadata: {
-        contentType: Tv2ActionContentType.REPLAY
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -242,6 +267,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       isPlanned: false,
       start: 0,
       duration: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
@@ -250,7 +276,10 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.videoMixerSource, Tv2VideoMixerLayer.AR)
       ],
       metadata: {
-        type: PieceType.REPLAY,
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
         outputLayer: OutputLayer.AUXILIARY
       }
     }
@@ -268,7 +297,11 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         pieceInterface: this.createVizAuxPieceInterface(source),
       },
       metadata: {
-        contentType: Tv2ActionContentType.REPLAY
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -286,6 +319,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       isPlanned: false,
       start: 0,
       duration: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
@@ -294,7 +328,10 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(source.videoMixerSource, Tv2VideoMixerLayer.VIZ_OVERLAY_AUXILIARY)
       ],
       metadata: {
-        type: PieceType.REPLAY,
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: source.name
+        },
         outputLayer: OutputLayer.AUXILIARY
       }
     }

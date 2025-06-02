@@ -15,7 +15,7 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Media } from '../../../model/entities/media'
-import { Tv2Action, Tv2ActionContentType, Tv2VideoClipAction } from '../value-objects/tv2-action'
+import { Tv2Action, Tv2VideoClipAction } from '../value-objects/tv2-action'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'
@@ -25,9 +25,10 @@ import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
 import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
 import { AudioMode } from '../../../model/enums/audio-mode'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
@@ -43,7 +44,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
   }
 
   public isVideoClipAction(action: Tv2Action): boolean {
-    return [Tv2ActionContentType.VIDEO_CLIP].includes(action.metadata.contentType)
+    return [PlayoutContentType.VIDEO_CLIP].includes(action.metadata.playoutContent.type)
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -59,8 +60,8 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
 
   private updateVideoClipAction(action: Action, media?: Media): Action {
     const videoClipAction: Tv2VideoClipAction = action as Tv2VideoClipAction
-    if (videoClipAction.metadata.contentType !== Tv2ActionContentType.VIDEO_CLIP) {
-      throw new Tv2UnexpectedActionException(`Expected action with id '${videoClipAction.id}' to have a video clip content type instead of '${videoClipAction.metadata.contentType}'.`)
+    if (videoClipAction.metadata.playoutContent.type !== PlayoutContentType.VIDEO_CLIP) {
+      throw new Tv2UnexpectedActionException(`Expected action with id '${videoClipAction.id}' to have a video clip content type instead of '${videoClipAction.metadata.playoutContent.type}'.`)
     }
 
     videoClipAction.data.partInterface.expectedDuration = media?.duration
@@ -106,7 +107,10 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
         ]
       },
       metadata: {
-        contentType: Tv2ActionContentType.VIDEO_CLIP,
+        playoutContent: {
+          type: PlayoutContentType.VIDEO_CLIP
+        },
+        outputChannel: OutputChannel.PREVIEW,
         fileName: videoClipData.fileName,
         configuredVideoClipPostRollDuration: configuration.studio.serverPostRollDuration
       }
@@ -115,7 +119,9 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
 
   private createVideoClipPieceInterface(configuration: Tv2BlueprintConfiguration, partId: string, videoClipData: Tv2VideoClipManifestData): Tv2PieceInterface {
     const metadata: PieceMetadata = {
-      type: PieceType.VIDEO_CLIP,
+      playoutContent: {
+        type: PlayoutContentType.VIDEO_CLIP
+      },
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
@@ -141,6 +147,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       isUnsynced: false,
       start: 0,
       duration: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: configuration.studio.casparCgPreRollDuration,
       postRollDuration: 0,
       tags: [],

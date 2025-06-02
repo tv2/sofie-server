@@ -1,7 +1,6 @@
 import { Tv2SourceMappingWithAudio } from './tv2-studio-blueprint-configuration'
 import { Tv2PieceLayer } from './tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { PieceType } from '../../../model/enums/piece-type'
 import { AudioMode } from '../../../model/enums/audio-mode'
 
 export type Tv2ActionManifestData =
@@ -37,7 +36,6 @@ export interface Tv2ActionManifestSplitScreenData {
   rank: number
   userData: {
     name: string
-    pieceType: PieceType
     config: {
       template: string
       labels: string[]

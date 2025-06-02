@@ -9,7 +9,6 @@ import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import {
   Tv2Action,
-  Tv2ActionContentType,
   Tv2ActionSubtype,
   Tv2PartAction,
   Tv2RecallLastPlannedRemoteAsNextAction,
@@ -26,8 +25,9 @@ import { Action, MutateActionMethods, MutateActionType } from '../../../model/en
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 export class Tv2RemoteActionFactory extends ActionFactory {
 
@@ -38,8 +38,9 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     super()
   }
 
-  public isRemoteAction(action: Tv2Action): action is Tv2RemoteAction {
-    return action.metadata.contentType === Tv2ActionContentType.REMOTE
+  public isRemoteAction(action: Tv2Action): boolean {
+    return action.metadata.playoutContent.type === PlayoutContentType.REMOTE
+      || action.metadata.actionSubtype === Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -83,8 +84,11 @@ export class Tv2RemoteActionFactory extends ActionFactory {
         pieceInterfaces: [remotePieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.REMOTE,
-        remoteNumber: remoteSource.name,
+        playoutContent: {
+          type: PlayoutContentType.REMOTE,
+          source: remoteSource.name
+        },
+        outputChannel: OutputChannel.PREVIEW
       },
     }
   }
@@ -94,7 +98,10 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: PieceMetadata = {
-      type: PieceType.REMOTE,
+      playoutContent: {
+        type: PlayoutContentType.REMOTE,
+        source: source.name
+      },
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: source.audioLayers,
@@ -113,6 +120,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
       start: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       metadata,
@@ -181,8 +189,11 @@ export class Tv2RemoteActionFactory extends ActionFactory {
         pieceInterfaces: [remotePieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.REMOTE,
-        remoteNumber: remoteSource.name,
+        playoutContent: {
+          type: PlayoutContentType.REMOTE,
+          source: remoteSource.name
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -195,7 +206,11 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       description: 'Recalls the last live that has been on air.',
       type: PartActionType.INSERT_PART_AS_NEXT,
       metadata: {
-        contentType: Tv2ActionContentType.REMOTE,
+        playoutContent: {
+          type: PlayoutContentType.RECALLED,
+          recalledType: PlayoutContentType.REMOTE
+        },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
       },
       data: {
@@ -243,8 +258,6 @@ export class Tv2RemoteActionFactory extends ActionFactory {
 
     const pieceInterfaces: Tv2PieceInterface[] = historicPart.getPieces().map(piece => ({
       id: `recall_last_planned_remote_piece_${piece.id}`,
-      ingestedPieceId: '',
-      ingestedPartId: '',
       partId: partInterface.id,
       rundownId: '',
       name: piece.name,
@@ -254,6 +267,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       isPlanned: false,
       start: piece.getStart(),
       duration: piece.getDuration(),
+      takenOffAirTimestamp: 0,
       preRollDuration: piece.preRollDuration,
       postRollDuration: piece.postRollDuration,
       metadata: piece.metadata as PieceMetadata,
@@ -261,6 +275,31 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       isUnsynced: false,
       timelineObjects: piece.getTimelineObjects()
     }))
+
+    const recallPlayoutContentPiece: Tv2PieceInterface = {
+      id: 'recall_last_planned_remote_piece_recalled_remote',
+      partId: partInterface.id,
+      rundownId: '',
+      name: 'Recalled remote',
+      layer: 'recalled_layer',
+      pieceLifespan: PieceLifespan.WITHIN_PART,
+      transitionType: TransitionType.NO_TRANSITION,
+      isPlanned: false,
+      start: 0,
+      preRollDuration: 0,
+      postRollDuration: 0,
+      takenOffAirTimestamp: 0,
+      metadata: {
+        playoutContent: {
+          type: PlayoutContentType.RECALLED,
+          recalledType: PlayoutContentType.REMOTE
+        }
+      },
+      tags: [],
+      isUnsynced: false,
+      timelineObjects: []
+    }
+    pieceInterfaces.push(recallPlayoutContentPiece)
 
     const recallLastPlannedRemoteAction: Tv2RecallLastPlannedRemoteAsNextAction = action as Tv2RecallLastPlannedRemoteAsNextAction
     return {
@@ -277,6 +316,6 @@ export class Tv2RemoteActionFactory extends ActionFactory {
   }
 
   private isRemotePiece(piece: Piece): boolean {
-    return piece.metadata.type === PieceType.REMOTE
+    return piece.metadata.playoutContent.type === PlayoutContentType.REMOTE
   }
 }

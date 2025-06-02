@@ -1,10 +1,4 @@
-import {
-  Tv2Action,
-  Tv2ActionContentType,
-  Tv2ActionSubtype,
-  Tv2PieceAction,
-  Tv2RobotAction
-} from '../value-objects/tv2-action'
+import { Tv2Action, Tv2ActionSubtype, Tv2PieceAction, Tv2RobotAction } from '../value-objects/tv2-action'
 import { PieceActionType } from '../../../model/enums/action-type'
 import { PieceInterface } from '../../../model/entities/piece'
 import { Action, ActionArgumentType, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
@@ -17,8 +11,9 @@ import {
   Tv2RobotTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-robot-timeline-object-factory'
 import { ActionFactory } from './action-factory'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 export class Tv2RobotActionFactory extends ActionFactory {
 
@@ -43,7 +38,10 @@ export class Tv2RobotActionFactory extends ActionFactory {
         pieceInterface: {} as PieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.ROBOT,
+        playoutContent: {
+          type: PlayoutContentType.ROBOT
+        },
+        outputChannel: OutputChannel.PROGRAM,
         actionSubtype: Tv2ActionSubtype.CALL_PRESET
       },
       argument: {
@@ -55,7 +53,7 @@ export class Tv2RobotActionFactory extends ActionFactory {
   }
 
   public isRobotAction(action: Tv2Action): action is Tv2RobotAction {
-    return action.metadata.contentType === Tv2ActionContentType.ROBOT
+    return action.metadata.playoutContent.type === PlayoutContentType.ROBOT
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -103,6 +101,7 @@ export class Tv2RobotActionFactory extends ActionFactory {
       isPlanned: false,
       start: 0,
       duration: 100,
+      takenOffAirTimestamp: 0,
       postRollDuration: 0,
       preRollDuration: 0,
       tags: [],
@@ -111,7 +110,9 @@ export class Tv2RobotActionFactory extends ActionFactory {
         this.robotTimelineObjectFactory.createCallPresetTimelineObject(preset)
       ],
       metadata: {
-        type: PieceType.COMMAND,
+        playoutContent: {
+          type: PlayoutContentType.COMMAND
+        },
         outputLayer: OutputLayer.SECONDARY
       }
     }

@@ -78,6 +78,9 @@ export class Tv2ActionService implements BlueprintGenerateActions {
     if (this.graphicsActionFactory.isGraphicsAction(action)) {
       return this.graphicsActionFactory.getMutateActionMethods(action)
     }
+    if (this.videoMixerActionFactory.isVideoMixerAction(action)) {
+      return this.videoMixerActionFactory.getMutateActionMethods(action)
+    }
     return []
   }
 

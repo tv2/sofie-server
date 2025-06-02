@@ -80,6 +80,8 @@ import { EventEmitterFacade } from '../../presentation/facades/event-emitter-fac
 import { MongoExpectedPlayoutItemRepository } from '../repositories/mongo/mongo-expected-playout-item-repository'
 import { MongoMacroRepository } from '../repositories/mongo/mongo-macro-repository'
 import { MacroRepository } from '../repositories/interfaces/macro-repository'
+import { PlayoutContentRepository } from '../repositories/interfaces/playout-content-repository'
+import { MongoPlayoutContentRepository } from '../repositories/mongo/mongo-playout-content-repository'
 
 export class RepositoryFacade {
   public static getDatabase(): Database {
@@ -316,5 +318,9 @@ export class RepositoryFacade {
 
   public static createVideoMixerDeviceRepository(): VideoMixerDeviceRepository {
     return new MongoVideoMixerDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), EventEmitterFacade.createDeviceEventEmitter())
+  }
+
+  public static createPlayoutContentRepository(): PlayoutContentRepository {
+    return new MongoPlayoutContentRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
   }
 }

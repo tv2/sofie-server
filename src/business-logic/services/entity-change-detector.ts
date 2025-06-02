@@ -5,6 +5,8 @@ import { IngestedPart } from '../../model/entities/ingested-part'
 import { IngestedPiece } from '../../model/entities/ingested-piece'
 import { IngestedRundown } from '../../model/entities/ingested-rundown'
 import { Rundown } from '../../model/entities/rundown'
+import { Piece } from '../../model/entities/piece'
+import { PieceLifespan } from '../../model/enums/piece-lifespan'
 
 export class EntityChangeDetector {
   public doesShallowRundownDifferFromIngestedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): boolean {
@@ -33,6 +35,26 @@ export class EntityChangeDetector {
       || segment.expectedDurationInMs !== ingestSegment.budgetDuration
       || segment.invalidity?.reason !== ingestSegment.invalidity?.reason
       || segment.definesShowStyleVariant !== ingestSegment.definesShowStyleVariant
+      || this.hasLifeSpanPieceChanges(segment, ingestSegment)
+  }
+
+  private hasLifeSpanPieceChanges(segment: Segment, ingestedSegment: IngestedSegment): boolean {
+    const pieces: Piece[] = segment.getParts().flatMap(part => part.getPieces())
+    const ingestedPieces: IngestedPiece[] = ingestedSegment.ingestedParts.flatMap(part => part.ingestedPieces)
+    const differingPieces: Piece[] = pieces.filter(piece => !ingestedPieces.some(ingestedPiece => ingestedPiece.id === piece.id))
+    const spanningLifeSpans: PieceLifespan[] = [PieceLifespan.SPANNING_UNTIL_RUNDOWN_END, PieceLifespan.SPANNING_UNTIL_SEGMENT_END, PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN]
+
+    const hasNewSpanningPieces: boolean = differingPieces.some((piece) => spanningLifeSpans.includes(piece.pieceLifespan))
+    const hasPiecesWithChangedLifespan: boolean = pieces.some((piece) => {
+      const ingestedPiece: IngestedPiece | undefined = ingestedPieces.find(ingestedPiece => ingestedPiece.id === piece.id)
+      return ingestedPiece && this.doesIngestedPiecesDifferInLifeSpan(piece, ingestedPiece)
+    })
+
+    return hasPiecesWithChangedLifespan || hasNewSpanningPieces
+  }
+
+  private doesIngestedPiecesDifferInLifeSpan(ingestedPieceA: Piece, ingestPieceB: IngestedPiece): boolean {
+    return ingestedPieceA.pieceLifespan !== ingestPieceB.pieceLifespan
   }
 
   public doesIngestedPartOnPartDifferFromIngestedPart(part: Part, ingestedPart: IngestedPart): boolean {

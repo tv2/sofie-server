@@ -6,6 +6,10 @@ import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper
 import { IngestedPart } from '../../model/entities/ingested-part'
 import { EntityChangeDetector } from './entity-change-detector'
 import { IngestedSegment } from '../../model/entities/ingested-segment'
+import { Blueprint } from '../../model/value-objects/blueprint'
+import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
+import { Configuration } from '../../model/entities/configuration'
+import { Piece } from '../../model/entities/piece'
 
 export interface RundownSynchronizeResult {
   readonly updatedRundown: Rundown | undefined
@@ -21,14 +25,17 @@ export class IngestRundownSynchronizer {
   constructor(
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     private readonly ingestEntityDiffer: EntityChangeDetector,
+    private readonly blueprint: Blueprint,
+    private readonly configurationRepository: ConfigurationRepository
   ) {}
 
-  public synchronizeRundown(rundown: Rundown, ingestedRundown: IngestedRundown): RundownSynchronizeResult {
-    const updatedRundown: Rundown | undefined = this.getUpdatedRundown(rundown, ingestedRundown)
+  public async synchronizeRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<RundownSynchronizeResult> {
+    const partlessIngestedSegmentIds: ReadonlySet<string> = this.getPartlessSegmentIds(ingestedRundown.ingestedSegments)
+    const updatedRundown: Rundown | undefined = await this.getUpdatedRundown(rundown, ingestedRundown)
 
     const createdSegments: readonly Segment[] = this.getCreatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
-    const updatedSegments: readonly Segment[] = this.getUpdatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
-    const deletedSegments: readonly Segment[] = this.getDeletedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
+    const updatedSegments: readonly Segment[] = this.getUpdatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments, partlessIngestedSegmentIds)
+    const deletedSegments: readonly Segment[] = this.getDeletedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments, partlessIngestedSegmentIds)
 
     const affectedSegmentIds: ReadonlySet<string> = new Set([
       ...createdSegments.map(segment => segment.id),
@@ -54,7 +61,11 @@ export class IngestRundownSynchronizer {
     }
   }
 
-  private getUpdatedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Rundown | undefined {
+  private async getUpdatedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<Rundown | undefined> {
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const baselinePiecesForRundown: Piece[] = this.blueprint.generateBaselinePieces(rundown.id, configuration)
+    rundown.updateBaselinePieces(baselinePiecesForRundown)
+
     if (this.ingestEntityDiffer.doesShallowRundownDifferFromIngestedRundown(rundown, ingestedRundown)) {
       return this.ingestedEntityToEntityMapper.updateRundownFromIngestedRundown(rundown, ingestedRundown)
     }
@@ -67,9 +78,9 @@ export class IngestRundownSynchronizer {
       .map(ingestedSegment => this.ingestedEntityToEntityMapper.convertIngestedSegmentToSegment(ingestedSegment))
   }
 
-  private getUpdatedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[]): readonly Segment[] {
+  private getUpdatedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[], partlessIngestedSegmentIds: ReadonlySet<string>): readonly Segment[] {
     return ingestedSegments.reduce<readonly Segment[]>((updatedSegments, ingestedSegment) => {
-      const segment: Segment | undefined = segments.find(segment => segment.id === ingestedSegment.id)
+      const segment: Segment | undefined = segments.find(segment => segment.id === ingestedSegment.id && !partlessIngestedSegmentIds.has(segment.id))
       if (!segment) {
         return updatedSegments
       }
@@ -83,9 +94,13 @@ export class IngestRundownSynchronizer {
     }, [])
   }
 
-  private getDeletedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[]): readonly Segment[] {
+  private getDeletedSegments(segments: readonly Segment[], ingestedSegments: readonly IngestedSegment[], partlessIngestedSegmentIds: ReadonlySet<string>): readonly Segment[] {
     const ingestedSegmentIds: ReadonlySet<string> = new Set(ingestedSegments.map(ingestedSegment => ingestedSegment.id))
-    return segments.filter(segment => !segment.isUnsynced() && !ingestedSegmentIds.has(segment.id))
+    return segments.filter(segment => !segment.isUnsynced() && !ingestedSegmentIds.has(segment.id) || partlessIngestedSegmentIds.has(segment.id))
+  }
+
+  private getPartlessSegmentIds(ingestedSegments: readonly IngestedSegment[]): ReadonlySet<string> {
+    return new Set(ingestedSegments.filter(segment => segment.ingestedParts.length === 0).map(segment => segment.id))
   }
 
   private getCreatedParts(parts: readonly Part[], ingestedParts: readonly IngestedPart[], affectedSegmentIds: ReadonlySet<string>): readonly Part[] {

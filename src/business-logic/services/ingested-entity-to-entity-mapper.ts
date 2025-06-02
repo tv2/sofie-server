@@ -24,6 +24,7 @@ export class IngestedEntityToEntityMapper {
       takeMode: TakeMode.STANDARD,
       modifiedAt: ingestedRundown.modifiedAt,
       baselineTimelineObjects: ingestedRundown.baselineTimelineObjects,
+      baselinePieces: [],
       timing: ingestedRundown.timings
     })
   }
@@ -46,6 +47,7 @@ export class IngestedEntityToEntityMapper {
       timing: ingestedRundown.timings,
       persistentState: rundownToUpdate.getPersistentState(),
       segments: [...rundownToUpdate.getSegments()],
+      baselinePieces: rundownToUpdate.getBaselinePieces(),
       alreadyActiveProperties
     })
   }
@@ -170,6 +172,7 @@ export class IngestedEntityToEntityMapper {
       isPlanned: true,
       start: ingestedPiece.start,
       duration: ingestedPiece.duration,
+      takenOffAirTimestamp: 0,
       preRollDuration: ingestedPiece.preRollDuration,
       postRollDuration: ingestedPiece.postRollDuration,
       transitionType: ingestedPiece.transitionType,
@@ -200,7 +203,8 @@ export class IngestedEntityToEntityMapper {
       content: ingestedPiece.content,
       tags: pieceToBeUpdated.tags,
       isUnsynced: pieceToBeUpdated.isUnsynced(),
-      executedAt: pieceToBeUpdated.getExecutedAt()
+      executedAt: pieceToBeUpdated.getExecutedAt(),
+      takenOffAirTimestamp: pieceToBeUpdated.getTakenOffAirTimestamp(),
     })
   }
 }

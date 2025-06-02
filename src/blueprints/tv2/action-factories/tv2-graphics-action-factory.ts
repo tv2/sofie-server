@@ -25,7 +25,6 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-graphics-element-timeline-object-factory'
 import {
   Tv2Action,
-  Tv2ActionContentType,
   Tv2ActionSubtype,
   Tv2FullscreenGraphicsAction,
   Tv2PartAction,
@@ -50,8 +49,9 @@ import { ActionFactory } from './action-factory'
 import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
 import { Configuration } from '../../../model/entities/configuration'
 import { PieceInterface } from '../../../model/entities/piece'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
   Tv2PieceLayer.GRAPHICS_IDENT,
@@ -79,7 +79,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   }
 
   public isGraphicsAction(action: Tv2Action): boolean {
-    return action.metadata.contentType === Tv2ActionContentType.GRAPHICS
+    return action.metadata.playoutContent.type === PlayoutContentType.GRAPHICS
   }
 
   public getMutateActionMethods(action: Tv2Action): MutateActionMethods[] {
@@ -195,7 +195,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface: {} as PieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.GRAPHICS_THEME_OUT
       },
     }
@@ -212,12 +215,15 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       isUnsynced: false,
       start: 0,
       duration: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
       timelineObjects: [],
       metadata: {
-        type: PieceType.COMMAND,
+        playoutContent: {
+          type: PlayoutContentType.COMMAND
+        },
         outputLayer: OutputLayer.SECONDARY,
       },
       ...pieceInterfaceWithRequiredValues
@@ -241,7 +247,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.UNKNOWN,
       },
     }
   }
@@ -263,7 +272,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.UNKNOWN
       },
     }
   }
@@ -279,7 +291,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         layersToStopPiecesOn: TV2_GRAPHICS_LAYERS
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.GRAPHICS_CLEAR
       },
     }
@@ -296,7 +311,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         layersToStopPiecesOn: TV2_GRAPHICS_LAYERS
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.GRAPHICS_ALL_OUT
       },
     }
@@ -321,7 +339,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterfaces: [pieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.PROGRAM,
         sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
       }
     }
@@ -379,7 +400,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         ...videoMixerTimelineObjects
       ],
       metadata: {
-        type: PieceType.GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
         outputLayer: OutputLayer.PROGRAM,
         sourceName: this.getFullscreenGraphicsSourceName(graphicsData)
       }
@@ -490,7 +513,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
       ],
       metadata: {
-        type: PieceType.OVERLAY_GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.OVERLAY_GRAPHICS
+        },
         outputLayer: OutputLayer.OVERLAY
       }
     })
@@ -504,7 +529,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.UNKNOWN,
       }
     }
   }
@@ -523,7 +551,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(downstreamKeyer, true)
       ],
       metadata: {
-        type: PieceType.OVERLAY_GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.OVERLAY_GRAPHICS
+        },
         outputLayer: OutputLayer.OVERLAY
       }
     })
@@ -538,7 +568,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.UNKNOWN
       }
     }
   }
@@ -554,7 +587,9 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       pieceLifespan: overlayGraphicsData.lifespan,
       timelineObjects: [elementTimelineObjectFactory.createPilotGraphicsTimelineObject(blueprintConfiguration, overlayGraphicsData)],
       metadata: {
-        type: PieceType.OVERLAY_GRAPHICS,
+        playoutContent: {
+          type: PlayoutContentType.OVERLAY_GRAPHICS
+        },
         outputLayer: OutputLayer.OVERLAY
       }
     })
@@ -569,7 +604,10 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.UNKNOWN
       }
     }
   }

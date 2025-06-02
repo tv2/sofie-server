@@ -9,13 +9,7 @@ import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
 import { PieceActionType } from '../../../model/enums/action-type'
-import {
-  Tv2Action,
-  Tv2ActionContentType,
-  Tv2ActionSubtype,
-  Tv2AudioAction,
-  Tv2FadeAudioBedAction,
-} from '../value-objects/tv2-action'
+import { Tv2Action, Tv2ActionSubtype, Tv2AudioAction, Tv2FadeAudioBedAction, } from '../value-objects/tv2-action'
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
@@ -31,8 +25,9 @@ import { Tv2ActionManifestAudioBedData } from '../value-objects/tv2-action-manif
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { Logger } from '../../../logger/logger'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 
@@ -94,14 +89,19 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
 
   private createFadePersistedAudioMetadata(): PieceMetadata {
     return {
-      type: PieceType.COMMAND,
+      playoutContent: {
+        type: PlayoutContentType.COMMAND
+      },
       outputLayer: OutputLayer.AUDIO,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
@@ -128,7 +128,10 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO,
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -144,12 +147,15 @@ export class Tv2AudioActionFactory extends ActionFactory {
       isUnsynced: false,
       start: 0,
       duration: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
       timelineObjects: [],
       metadata: {
-        type: PieceType.COMMAND,
+        playoutContent: {
+          type: PlayoutContentType.COMMAND
+        },
         outputLayer: OutputLayer.SECONDARY,
       },
       ...pieceInterfaceWithRequiredValues
@@ -173,7 +179,10 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }
@@ -221,7 +230,10 @@ export class Tv2AudioActionFactory extends ActionFactory {
         })
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -246,7 +258,10 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }
@@ -261,12 +276,15 @@ export class Tv2AudioActionFactory extends ActionFactory {
       isPlanned: false,
       isUnsynced: false,
       start: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       tags: [],
       timelineObjects: [],
       metadata: {
-        type: PieceType.AUDIO,
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
         outputLayer: OutputLayer.AUDIO,
       },
       ...pieceInterfaceWithRequiredValues
@@ -289,7 +307,10 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO,
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
+        outputChannel: OutputChannel.PROGRAM,
         actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED,
         defaultFadeDurationInFrames: blueprintConfiguration.studio.audioBedSettings.fadeOutDurationInFrames
       },
@@ -339,7 +360,10 @@ export class Tv2AudioActionFactory extends ActionFactory {
         pieceInterface
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   }

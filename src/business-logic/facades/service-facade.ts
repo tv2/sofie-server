@@ -39,6 +39,8 @@ import { AsyncLock } from '../async-lock'
 import { MacroServiceImplementation } from '../services/macro-service-implementation'
 import { MacroService } from '../services/interfaces/macro-service'
 import { HelperFacade } from './helper-facade'
+import { PlayoutContentReadService, PlayoutContentUpdateService } from '../services/interfaces/playout-content-service'
+import { PlayoutContentStateService } from '../services/playout-content-state-service'
 
 export class ServiceFacade {
 
@@ -55,6 +57,7 @@ export class ServiceFacade {
       ServiceFacade.createPlayoutService(),
       TimeoutCallbackScheduler.getInstance(LoggerFacade.createLogger()),
       BlueprintsFacade.createBlueprint(),
+      ServiceFacade.createPlayoutContentUpdateService(),
       LoggerFacade.createLogger(),
     )
     return ThrottledRundownService.getInstance(new SynchronizedRundownService(rundownTimelineService, this.rundownLock))
@@ -76,7 +79,8 @@ export class ServiceFacade {
       RepositoryFacade.createMediaRepository(),
       RepositoryFacade.createConfigurationRepository(),
       ServiceFacade.createRundownService(),
-      BlueprintsFacade.createBlueprint()
+      BlueprintsFacade.createBlueprint(),
+      ServiceFacade.createPlayoutContentReadService()
     )
   }
 
@@ -124,7 +128,12 @@ export class ServiceFacade {
   }
 
   public static createIngestRundownSynchronizer(): IngestRundownSynchronizer {
-    return new IngestRundownSynchronizer(new IngestedEntityToEntityMapper(), ServiceFacade.createEntityChangeDetector())
+    return new IngestRundownSynchronizer(
+      new IngestedEntityToEntityMapper(),
+      ServiceFacade.createEntityChangeDetector(),
+      BlueprintsFacade.createBlueprint(),
+      RepositoryFacade.createConfigurationRepository()
+    )
   }
 
   public static createEntityChangeDetector(): EntityChangeDetector {
@@ -188,6 +197,20 @@ export class ServiceFacade {
     return new DeviceServiceImplementation(
       RepositoryFacade.createDeviceRepository(),
       EventEmitterFacade.createDeviceEventEmitter()
+    )
+  }
+
+  public static createPlayoutContentUpdateService(): PlayoutContentUpdateService {
+    return PlayoutContentStateService.getInstance(
+      EventEmitterFacade.createPlayoutContentEventEmitter(),
+      RepositoryFacade.createPlayoutContentRepository()
+    )
+  }
+
+  public static createPlayoutContentReadService(): PlayoutContentReadService {
+    return PlayoutContentStateService.getInstance(
+      EventEmitterFacade.createPlayoutContentEventEmitter(),
+      RepositoryFacade.createPlayoutContentRepository()
     )
   }
 }

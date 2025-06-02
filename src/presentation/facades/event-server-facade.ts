@@ -14,6 +14,7 @@ export class EventServerFacade {
       EventEmitterFacade.createConfigurationEventObserver(),
       EventEmitterFacade.createStatusMessageEventObserver(),
       EventEmitterFacade.createDeviceEventObserver(),
+      EventEmitterFacade.createPlayoutContentEventObserver(),
       LoggerFacade.createLogger()
     )
   }

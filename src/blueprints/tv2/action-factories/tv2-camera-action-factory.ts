@@ -6,7 +6,7 @@ import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timel
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 import { TransitionType } from '../../../model/enums/transition-type'
-import { Tv2ActionContentType, Tv2CameraAction } from '../value-objects/tv2-action'
+import { Tv2CameraAction } from '../value-objects/tv2-action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import {
   Tv2AudioMixerTimelineObjectFactory
@@ -17,8 +17,9 @@ import {
 import { TimelineEnable } from '../../../model/entities/timeline-enable'
 import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { PieceType } from '../../../model/enums/piece-type'
 import { OutputLayer } from '../../../model/enums/output-layer'
+import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { OutputChannel } from '../../../model/enums/output-channel'
 
 export class Tv2CameraActionFactory extends ActionFactory {
 
@@ -53,8 +54,11 @@ export class Tv2CameraActionFactory extends ActionFactory {
         partInterface: partInterface,
         pieceInterfaces: [cameraPieceInterface]
       }, metadata: {
-        contentType: Tv2ActionContentType.CAMERA,
-        cameraNumber: cameraSource.name,
+        playoutContent: {
+          type: PlayoutContentType.CAMERA,
+          source: cameraSource.name
+        },
+        outputChannel: OutputChannel.PREVIEW
       },
     }
   }
@@ -64,7 +68,10 @@ export class Tv2CameraActionFactory extends ActionFactory {
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = this.audioMixerTimelineObjectFactory.createTimelineObjectsForSource(configuration, source)
 
     const metadata: PieceMetadata = {
-      type: PieceType.CAMERA,
+      playoutContent: {
+        type: PlayoutContentType.CAMERA,
+        source: source.name
+      },
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
@@ -82,6 +89,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
       start: 0,
+      takenOffAirTimestamp: 0,
       preRollDuration: 0,
       postRollDuration: 0,
       metadata,
@@ -143,8 +151,11 @@ export class Tv2CameraActionFactory extends ActionFactory {
         pieceInterfaces: [cameraPieceInterface]
       },
       metadata: {
-        contentType: Tv2ActionContentType.CAMERA,
-        cameraNumber: cameraSource.name,
+        playoutContent: {
+          type: PlayoutContentType.CAMERA,
+          source: cameraSource.name
+        },
+        outputChannel: OutputChannel.PROGRAM
       },
     }
   }

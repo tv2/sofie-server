@@ -8,6 +8,7 @@ import {
   MutateActionWithHistoricPartMethods,
   MutateActionWithMedia,
   MutateActionWithPieceMethods,
+  MutateActionWithPlayoutContent,
   PartAction,
   PieceAction,
   SystemAction,
@@ -27,8 +28,11 @@ import { Media } from '../../model/entities/media'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../model/entities/configuration'
 import { SetNextDirection } from '../../model/enums/set-next-direction'
-import { Tv2ActionContentType } from '../../blueprints/tv2/value-objects/tv2-action'
 import { TakeMode } from '../../model/enums/take-mode'
+import { PlayoutContentType } from '../../model/enums/playout-content-type'
+import { OutputChannel } from '../../model/enums/output-channel'
+import { PlayoutContentReadService } from './interfaces/playout-content-service'
+import { PlayoutContent } from '../../model/value-objects/playout-content'
 
 const SYSTEM_ACTIONS_ID: string = 'SYSTEM_ACTIONS_ID'
 
@@ -41,7 +45,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -52,7 +59,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -63,7 +73,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -74,7 +87,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -85,7 +101,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -96,7 +115,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -107,7 +129,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -118,7 +143,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -129,7 +157,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
   {
@@ -140,7 +171,10 @@ const SYSTEM_ACTIONS: SystemAction[] = [
     rank: 0,
     data: undefined,
     metadata: {
-      contentType: Tv2ActionContentType.SYSTEM,
+      playoutContent: {
+        type: PlayoutContentType.UNKNOWN
+      },
+      outputChannel: OutputChannel.UNKNOWN
     }
   },
 ]
@@ -152,7 +186,8 @@ export class ExecuteActionService implements ActionService {
     private readonly mediaRepository: MediaRepository,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly rundownService: RundownService,
-    private readonly blueprint: Blueprint
+    private readonly blueprint: Blueprint,
+    private readonly playoutContentService: PlayoutContentReadService
   ) {}
 
   public async getActionsForRundown(rundownId :string): Promise<Action[]> {
@@ -287,6 +322,9 @@ export class ExecuteActionService implements ActionService {
       case MutateActionType.CONFIGURATION: {
         return this.mutateActionWithConfiguration(mutateActionMethods, action, rundownId)
       }
+      case MutateActionType.PLAYOUT_CONTENT: {
+        return this.mutateActionWithPlayoutContent(mutateActionMethods, action)
+      }
       default: {
         return action
       }
@@ -332,6 +370,17 @@ export class ExecuteActionService implements ActionService {
     return mutateActionsMethods.updateWithConfiguration(action, configuration, rundown.getShowStyleVariantId())
   }
 
+  private mutateActionWithPlayoutContent(mutateActionMethods: MutateActionWithPlayoutContent, action: Action): Action {
+    const playoutContent: PlayoutContent | undefined = this.playoutContentService.getProgramPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
+    ?? this.playoutContentService.getPreviewPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
+
+    if (!playoutContent) {
+      return action
+    }
+
+    return mutateActionMethods.updateActionWithPlayoutContent(action, playoutContent)
+  }
+
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {
     const part: Part = this.createPartFromAction(partAction, rundownId)
     await this.rundownService.insertPartAsOnAir(rundownId, part)
@@ -364,7 +413,7 @@ export class ExecuteActionService implements ActionService {
 
   private async insertPieceAsOnAir(pieceAction: PieceAction, rundownId: string): Promise<void> {
     const piece: Piece = this.createPieceFromAction(pieceAction, rundownId)
-    piece.setExecutedAt(Date.now())
+    piece.putOnAir(Date.now())
     await this.rundownService.insertPieceAsOnAir(rundownId, piece, pieceAction.data.layersToStopPiecesOn)
   }
 

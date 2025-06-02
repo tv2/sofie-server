@@ -19,8 +19,10 @@ import { Tv2SplitScreenActionFactory } from './action-factories/tv2-split-screen
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 import { Tv2RobotActionFactory } from './action-factories/tv2-robot-action-factory'
 import { PartActionType, PieceActionType } from '../../model/enums/action-type'
-import { Tv2ActionContentType, Tv2ActionSubtype } from './value-objects/tv2-action'
+import { Tv2ActionSubtype } from './value-objects/tv2-action'
 import { EntityTestFactory } from '../../model/entities/test/entity-test-factory'
+import { PlayoutContentType } from '../../model/enums/playout-content-type'
+import { OutputChannel } from '../../model/enums/output-channel'
 
 describe(Tv2ActionService.name, () => {
   describe(Tv2ActionService.prototype.generateActions.name, () => {
@@ -31,16 +33,16 @@ describe(Tv2ActionService.name, () => {
 
         const result: Action[] = testee.generateActions(configuration, 'showstyleid', [])
 
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.AUDIO }) })]))
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.CAMERA }) })]))
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.REMOTE }) })]))
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.TRANSITION }) })]))
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.GRAPHICS }) })]))
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.VIDEO_CLIP }) })]))
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.UNKNOWN }) })])) // Video mixer action
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.SPLIT_SCREEN }) })]))
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.REPLAY }) })]))
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.ROBOT }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.AUDIO } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.CAMERA, source: '1' } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.REMOTE, source: '' } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.TRANSITION } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.GRAPHICS } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.VIDEO_CLIP } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.UNKNOWN } }) })])) // Video mixer action
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.SPLIT_SCREEN, layout: '', inputPlayoutContents: [] } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.REPLAY } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.ROBOT } }) })]))
       })
     })
 
@@ -63,16 +65,16 @@ describe(Tv2ActionService.name, () => {
 
           const result: Action[] = testee.generateActions(configuration, 'showstyleid', [])
 
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.AUDIO }) })]))
-          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.CAMERA }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.REMOTE }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.TRANSITION }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.GRAPHICS }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.VIDEO_CLIP }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.UNKNOWN }) })])) // Video mixer action
-          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.SPLIT_SCREEN }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.REPLAY }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.ROBOT }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.AUDIO } }) })]))
+          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.CAMERA, source: '1' } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.REMOTE, source: '' } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.TRANSITION } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.GRAPHICS } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.VIDEO_CLIP } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.UNKNOWN } }) })])) // Video mixer action
+          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.SPLIT_SCREEN } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.REPLAY } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.ROBOT } }) })]))
         })
       })
 
@@ -94,16 +96,16 @@ describe(Tv2ActionService.name, () => {
 
           const result: Action[] = testee.generateActions(configuration, 'showstyleid', [])
 
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.AUDIO }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.CAMERA }) })]))
-          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.REMOTE }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.TRANSITION }) })]))
-          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.GRAPHICS }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.VIDEO_CLIP }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.UNKNOWN }) })])) // Video mixer action
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.SPLIT_SCREEN }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.REPLAY }) })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ contentType: Tv2ActionContentType.ROBOT }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.AUDIO } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.CAMERA, source: '1' } }) })]))
+          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.REMOTE } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.TRANSITION } }) })]))
+          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.GRAPHICS } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.VIDEO_CLIP } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.UNKNOWN } }) })])) // Video mixer action
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.SPLIT_SCREEN, layout: '', inputPlayoutContents: [] } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.REPLAY } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.ROBOT } }) })]))
         })
       })
     })
@@ -167,7 +169,10 @@ function createMockOfTv2AudioActionFactory(): Tv2AudioActionFactory {
         pieceInterface: EntityTestFactory.createPieceInterface(),
       },
       metadata: {
-        contentType: Tv2ActionContentType.AUDIO
+        playoutContent: {
+          type: PlayoutContentType.AUDIO
+        },
+        outputChannel: OutputChannel.PROGRAM
       }
     }
   ])
@@ -187,8 +192,11 @@ function createMockOfTv2CameraActionFactory(): Tv2CameraActionFactory {
         pieceInterfaces: [],
       },
       metadata: {
-        contentType: Tv2ActionContentType.CAMERA,
-        cameraNumber: '1'
+        playoutContent: {
+          type: PlayoutContentType.CAMERA,
+          source: '1'
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   ])
@@ -208,7 +216,11 @@ function createMockOfTv2RemoteActionFactory(): Tv2RemoteActionFactory {
         pieceInterfaces: [],
       },
       metadata: {
-        contentType: Tv2ActionContentType.REMOTE
+        playoutContent: {
+          type: PlayoutContentType.REMOTE,
+          source: ''
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   ])
@@ -227,7 +239,9 @@ function createMockOfTv2TransitionEffectActionFactory(): Tv2TransitionEffectActi
         pieceInterface: EntityTestFactory.createPieceInterface(),
       },
       metadata: {
-        contentType: Tv2ActionContentType.TRANSITION
+        playoutContent: {
+          type: PlayoutContentType.TRANSITION
+        }
       }
     }
   ])
@@ -247,7 +261,10 @@ function createMockOfTv2GraphicsActionFactory(): Tv2GraphicsActionFactory {
         pieceInterfaces: [],
       },
       metadata: {
-        contentType: Tv2ActionContentType.GRAPHICS
+        playoutContent: {
+          type: PlayoutContentType.GRAPHICS
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   ])
@@ -267,7 +284,10 @@ function createMockOfTv2VideoClipActionFactory(): Tv2VideoClipActionFactory {
         pieceInterfaces: [],
       },
       metadata: {
-        contentType: Tv2ActionContentType.VIDEO_CLIP,
+        playoutContent: {
+          type: PlayoutContentType.VIDEO_CLIP
+        },
+        outputChannel: OutputChannel.PREVIEW,
         fileName: 'some-file-name',
         configuredVideoClipPostRollDuration: 0,
       }
@@ -289,7 +309,10 @@ function createMockOfTv2VideoMixerConfigurationActionFactory(): Tv2VideoMixerCon
         pieceInterfaces: [],
       },
       metadata: {
-        contentType: Tv2ActionContentType.UNKNOWN,
+        playoutContent: {
+          type: PlayoutContentType.UNKNOWN
+        },
+        outputChannel: OutputChannel.PREVIEW
       }
     }
   ])
@@ -308,7 +331,12 @@ function createMockOfTv2SplitScreenActionFactory(): Tv2SplitScreenActionFactory 
         pieceInterface: EntityTestFactory.createPieceInterface(),
       },
       metadata: {
-        contentType: Tv2ActionContentType.SPLIT_SCREEN,
+        playoutContent: {
+          type: PlayoutContentType.SPLIT_SCREEN,
+          layout: '',
+          inputPlayoutContents: []
+        },
+        outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
       }
     }
@@ -326,7 +354,9 @@ function createMockOfTv2ReplayActionFactory(): Tv2ReplayActionFactory {
       rank: 0,
       data: {},
       metadata: {
-        contentType: Tv2ActionContentType.REPLAY
+        playoutContent: {
+          type: PlayoutContentType.REPLAY
+        }
       }
     }
   ])
@@ -345,7 +375,10 @@ function createMockOfTv2RobotActionFactory(): Tv2RobotActionFactory {
         pieceInterface: EntityTestFactory.createPieceInterface(),
       },
       metadata: {
-        contentType: Tv2ActionContentType.ROBOT
+        playoutContent: {
+          type: PlayoutContentType.ROBOT
+        },
+        outputChannel: OutputChannel.UNKNOWN
       }
     }
   ])

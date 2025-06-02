@@ -14,7 +14,6 @@ import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-c
 import { Tv2Logger } from '../../tv2-logger'
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
-import { PieceType } from '../../../../model/enums/piece-type'
 
 describe(Tv2ActionManifestMapper.name, () => {
   describe(Tv2ActionManifestMapper.prototype.filterAndMapToSplitScreenManifestData.name, () => {
@@ -31,7 +30,6 @@ describe(Tv2ActionManifestMapper.name, () => {
               rank: 5,
               userData: {
                 name: 'DVE Sommerfugl',
-                pieceType: PieceType.SPLIT_SCREEN,
                 config: {
                   template: 'sommerfugl', labels: ['Locator1', 'Locator2'], sources: {
                     INP1: {
@@ -55,7 +53,6 @@ describe(Tv2ActionManifestMapper.name, () => {
               rank: 10,
               userData: {
                 name: 'DVE Sommerfugl',
-                pieceType: PieceType.SPLIT_SCREEN,
                 config: {
                   template: 'sommerfugl',
                   labels: ['Locator1', 'Locator2'],
