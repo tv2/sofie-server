@@ -1,9 +1,8 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
-import { MongoDevice, MongoEntityConverter, MongoId } from './mongo-entity-converter'
+import { MongoCoreDevice, MongoEntityConverter, MongoId } from './mongo-entity-converter'
 import { DeviceRepository } from '../interfaces/device-repository'
-import { Device } from '../../../model/entities/device'
-import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { CoreDevice } from '../../../model/entities/device'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
@@ -13,29 +12,13 @@ export class MongoCoreDeviceRepository extends BaseMongoRepository<MongoId> impl
     super(mongoDatabase)
   }
 
-  public delete(_deviceId: string): Promise<void> {
-    throw new UnsupportedOperationException(this.delete.name)
-  }
-
-  public update(_device: Device): Promise<void> {
-    throw new UnsupportedOperationException(this.getDevice.name)
-  }
-
-  public getDevice(_deviceId: string): Promise<Device> {
-    throw new UnsupportedOperationException(this.getDevice.name)
-  }
-
-  public save(_device: Device): Promise<void> {
-    throw new UnsupportedOperationException(this.save.name)
-  }
-
   protected getCollectionName(): string {
     return DEVICE_COLLECTION_NAME
   }
 
-  public async getDevices(): Promise<Device[]> {
+  public async getDevices(): Promise<CoreDevice[]> {
     this.assertDatabaseConnection(MongoCoreDeviceRepository.prototype.getDevices.name)
-    const mongoDevices: MongoDevice[] = await this.getCollection().find<MongoDevice>({}).toArray()
-    return this.mongoEntityConverter.convertToDeviceInterfaces(mongoDevices)
+    const mongoDevices: MongoCoreDevice[] = await this.getCollection().find<MongoCoreDevice>({}).toArray()
+    return this.mongoEntityConverter.convertToCoreDeviceInterfaces(mongoDevices)
   }
 }

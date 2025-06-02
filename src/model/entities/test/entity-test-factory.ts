@@ -7,7 +7,6 @@ import { StatusCode } from '../../enums/status-code'
 import { StatusMessage } from '../status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
-import { Device } from '../device'
 import { DeviceType } from '../../enums/device-type'
 import { TransitionType } from '../../enums/transition-type'
 import { ActionManifest, PieceAction } from '../action'
@@ -20,6 +19,7 @@ import { TakeMode } from '../../enums/take-mode'
 import { ActionOperation, Macro, Operation, OperationType } from '../macro'
 import { TimelineObject } from '../timeline-object'
 import { PlayoutContentType } from '../../enums/playout-content-type'
+import { CoreDevice } from '../device'
 
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
@@ -203,7 +203,7 @@ export class EntityTestFactory {
     }
   }
 
-  public static createDevice(device: Partial<Device> = {}): Device {
+  public static createCoreDevice(device: Partial<CoreDevice> = {}): CoreDevice {
     return {
       id: 'deviceId',
       name: 'deviceName',

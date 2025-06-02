@@ -1,7 +1,6 @@
-import { DeviceCreatedEvent, DeviceDeletedEvent, DeviceEvent, DeviceUpdatedEvent } from '../value-objects/device-event'
+import { DeviceEvent } from '../value-objects/device-event'
 import { DeviceEventEmitter } from '../../business-logic/services/interfaces/device-event-emitter'
 import { DeviceEventObserver } from '../interfaces/device-event-observer'
-import { Device } from '../../model/entities/device'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
 
@@ -24,21 +23,6 @@ export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserv
 
   public subscribeToDeviceEvents(onDeviceEventCallback: (deviceEvent: DeviceEvent) => void): void {
     this.callbacks.push(onDeviceEventCallback)
-  }
-
-  public emitDeviceCreatedEvent(device: Device): void {
-    const event: DeviceCreatedEvent = this.deviceEventBuilder.buildDeviceCreatedEvent(device)
-    this.emitDeviceEvent(event)
-  }
-
-  public emitDeviceUpdatedEvent(device: Device): void {
-    const event: DeviceUpdatedEvent = this.deviceEventBuilder.buildDeviceUpdatedEvent(device)
-    this.emitDeviceEvent(event)
-  }
-
-  public emitDeviceDeletedEvent(deviceId: string): void {
-    const event: DeviceDeletedEvent = this.deviceEventBuilder.buildDeviceDeletedEvent(deviceId)
-    this.emitDeviceEvent(event)
   }
 
   public emitVideoMixerConfigurationUpdated(videoMixerConfiguration: VideoMixerConfiguration): void {
