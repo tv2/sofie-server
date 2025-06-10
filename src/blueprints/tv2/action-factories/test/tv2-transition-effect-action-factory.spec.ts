@@ -1,27 +1,35 @@
-import { Tv2TransitionEffectActionFactory } from '../tv2-transition-effect-action-factory'
+import {Tv2TransitionEffectActionFactory} from '../tv2-transition-effect-action-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
-import { Tv2CasparCgTimelineObjectFactory } from '../../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import {Tv2CasparCgTimelineObjectFactory} from '../../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
-import { anything, instance, mock, when } from '@typestrong/ts-mockito'
-import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
-import { Tv2Logger } from '../../tv2-logger'
-import { FrameTimeConverter } from '../../helpers/frame-time-converter'
-import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
+import {anything, instance, mock, when} from '@typestrong/ts-mockito'
+import {Tv2AssetPathHelper} from '../../helpers/tv2-asset-path-helper'
+import {Tv2Logger} from '../../tv2-logger'
+import {FrameTimeConverter} from '../../helpers/frame-time-converter'
+import {EntityTestFactory} from '../../../../model/entities/test/entity-test-factory'
 import {
   Tv2Action,
   Tv2BreakerTransitionEffectActionMetadata,
+  Tv2MixTransitionEffectActionMetadata,
   Tv2TransitionEffectAction,
   Tv2TransitionEffectActionMetadata
 } from '../../value-objects/tv2-action'
-import { MutateActionMethods, MutateActionType, MutateActionWithArgumentsMethods, MutateActionWithPieceMethods } from '../../../../model/entities/action'
-import { Breaker, TransitionEffectType } from '../../value-objects/tv2-show-style-blueprint-configuration'
-import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
-import { PlayoutContentType } from '../../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../../model/enums/output-channel'
+import {
+  Action,
+  MutateActionMethods,
+  MutateActionType,
+  MutateActionWithArgumentsMethods,
+  MutateActionWithPieceMethods
+} from '../../../../model/entities/action'
+import {Breaker, TransitionEffectType} from '../../value-objects/tv2-show-style-blueprint-configuration'
+import {Tv2DownstreamKeyer} from '../../value-objects/tv2-studio-blueprint-configuration'
+import {PlayoutContentType} from '../../../../model/enums/playout-content-type'
+import {OutputChannel} from '../../../../model/enums/output-channel'
+import {PieceActionType} from '../../../../model/enums/action-type'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   describe(Tv2TransitionEffectActionFactory.prototype.getMutateActionMethods.name, () => {
@@ -46,12 +54,25 @@ describe(Tv2TransitionEffectActionFactory.name, () => {
         testBlockTakeDurationForBreakerAction(breakerActionMetadata, 2100)
       })
     })
+
     describe('it mutates a MixTransitionEffectAction', () => {
-      describe('with a duration of 400 frames to be 250 frames', () => {
-        it('should have a blockTakeDuration of 10000 ms, since the max is 250 frames', () => {
-          const mixTransitionEffect: Tv2TransitionEffectActionMetadata = createTransitionActionMetadata(400)
-          testBlockTakeDurationForMixAction(mixTransitionEffect, 10000)
-        })
+      it('has a duration of 50 frames when set to 50 frames ', () => {
+        const mutatedAction: Action = getMutatedMixTransitionEffectAction(50)
+        const result: Tv2MixTransitionEffectActionMetadata = mutatedAction.metadata as Tv2MixTransitionEffectActionMetadata
+
+        expect(result.durationInFrames).toBe(50)
+      })
+      it('has a duration of 250 frames when set to 250 frames ', () => {
+        const mutatedAction: Action = getMutatedMixTransitionEffectAction(250)
+        const result: Tv2MixTransitionEffectActionMetadata = mutatedAction.metadata as Tv2MixTransitionEffectActionMetadata
+
+        expect(result.durationInFrames).toBe(250)
+      })
+      it('has a duration of 250 frames when set to 400 frames ', () => {
+        const mutatedAction: Action = getMutatedMixTransitionEffectAction(400)
+        const result: Tv2MixTransitionEffectActionMetadata = mutatedAction.metadata as Tv2MixTransitionEffectActionMetadata
+
+        expect(result.durationInFrames).toBe(250)
       })
     })
   })
@@ -95,42 +116,28 @@ function testBlockTakeDurationForBreakerAction(breakerActionMetadata: Tv2Breaker
 
   const frameRate: number = 25
   const testee: Tv2TransitionEffectActionFactory = createTestee({ videoMixerTimelineObjectFactory, frameTimeConverter: new FrameTimeConverter(frameRate) })
-  const pieceMutateActionMethods: MutateActionWithPieceMethods = getPieceMutateActionMethods(testee, action)
+  const pieceMutateActionMethods: MutateActionWithPieceMethods = getMutateActionWithMethods(testee, action, MutateActionType.PIECE) as MutateActionWithPieceMethods
   const result: Tv2TransitionEffectAction = pieceMutateActionMethods.updateActionWithPiece(action, EntityTestFactory.createPiece()) as Tv2TransitionEffectAction
 
   expect(result.data.partInTransition?.blockTakeDuration).toBe(expectedBlockTakeDuration)
 }
 
-function testBlockTakeDurationForMixAction(mixActionMetadata: Tv2TransitionEffectActionMetadata, expectedBlockTakeDuration: number): void {
-  const randomSourceInput: number = 1
-  const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = mock<Tv2VideoMixerTimelineObjectFactory>()
-  when(videoMixerTimelineObjectFactory.findProgramSourceInputFromPiece(anything())).thenReturn(randomSourceInput)
-
-  const action: Tv2TransitionEffectAction = EntityTestFactory.createPieceAction({ metadata: mixActionMetadata,
+function getMutatedMixTransitionEffectAction(durationInFrames: number): Action {
+  const mixTransitionEffectMetadata: Tv2TransitionEffectActionMetadata = createTransitionActionMetadata(0)
+  const action: Tv2TransitionEffectAction = EntityTestFactory.createPieceAction({ type: PieceActionType.INSERT_PIECE_AS_NEXT, metadata: mixTransitionEffectMetadata,
   }) as Tv2TransitionEffectAction
-
+  const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = mock<Tv2VideoMixerTimelineObjectFactory>()
   const frameRate: number = 25
   const testee: Tv2TransitionEffectActionFactory = createTestee({ videoMixerTimelineObjectFactory, frameTimeConverter: new FrameTimeConverter(frameRate) })
-  const mutatedActionWithMethods: MutateActionWithArgumentsMethods = getMutateActionWithArgumentMethods(testee, action)
-  const result: Tv2TransitionEffectAction = mutatedActionWithMethods.updateActionWithArguments(action, 400) as Tv2TransitionEffectAction
-
-  expect(result.data.partInTransition?.blockTakeDuration).toBe(expectedBlockTakeDuration)
+  const mutatedActionWithMethods: MutateActionWithArgumentsMethods = getMutateActionWithMethods(testee, action, MutateActionType.APPLY_ARGUMENTS) as MutateActionWithArgumentsMethods
+  return mutatedActionWithMethods.updateActionWithArguments(action, durationInFrames)
 }
 
-function getPieceMutateActionMethods(transitionEffectActionFactory: Tv2TransitionEffectActionFactory, action: Tv2Action): MutateActionWithPieceMethods {
+function getMutateActionWithMethods(transitionEffectActionFactory: Tv2TransitionEffectActionFactory, action: Tv2Action, mutateActionType: MutateActionType): MutateActionMethods {
   const mutateActionMethods: MutateActionMethods[] = transitionEffectActionFactory.getMutateActionMethods(action)
-  const pieceMutateActionMethods: MutateActionWithPieceMethods | undefined = mutateActionMethods.find(m => m.type === MutateActionType.PIECE) as MutateActionWithPieceMethods | undefined
-  if (!pieceMutateActionMethods) {
-    throw new Error('No PieceMutateActionsFound')
-  }
-  return pieceMutateActionMethods
-}
-
-function getMutateActionWithArgumentMethods(transitionEffectActionFactory: Tv2TransitionEffectActionFactory, action: Tv2Action): MutateActionWithArgumentsMethods {
-  const mutateActionMethods: MutateActionMethods[] = transitionEffectActionFactory.getMutateActionMethods(action)
-  const mutateActionWithMethods: MutateActionWithArgumentsMethods | undefined = mutateActionMethods.find(m => m.type === MutateActionType.APPLY_ARGUMENTS) as MutateActionWithArgumentsMethods | undefined
+  const mutateActionWithMethods: MutateActionMethods | undefined = mutateActionMethods.find(m => m.type === mutateActionType) as MutateActionMethods | undefined
   if (!mutateActionWithMethods) {
-    throw new Error('No MutateActionWithArgumentsMethodsFound')
+    throw new Error('No MutateActionMethodsFound')
   }
   return mutateActionWithMethods
 }
