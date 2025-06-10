@@ -3,9 +3,9 @@ import { Logger, LogLevel } from '../../logger/logger'
 import { Request, Response } from 'express'
 import { ExhaustiveCaseChecker } from '../../business-logic/exhaustive-case-checker'
 import { Exception } from '../../model/exceptions/exception'
-import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { HttpErrorHandler } from '../interfaces/http-error-handler'
-import { AuditLog } from '../decorators/audit-log-decorator'
+import { HttpResponseFormatter } from '../../presentation/interfaces/http-response-formatter'
+import { HttpErrorHandler } from '../../presentation/interfaces/http-error-handler'
+import { AuditLog } from '../../presentation/decorators/audit-log-decorator'
 
 @RestController('/loggers')
 export class LoggerController extends BaseController {

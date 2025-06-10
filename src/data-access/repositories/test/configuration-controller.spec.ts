@@ -1,6 +1,6 @@
 import { instance, mock, verify } from '@typestrong/ts-mockito'
 import { ConfigurationRepository } from '../interfaces/configuration-repository'
-import { ConfigurationController } from '../../../presentation/controllers/configuration-controller'
+import { ConfigurationController } from '../../../rundown-execution/application/controllers/configuration-controller'
 import { Request, Response } from 'express'
 import { ShowStyleVariantRepository } from '../interfaces/show-style-variant-repository'
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'

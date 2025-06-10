@@ -1,6 +1,6 @@
 import cors from 'cors'
 import express, { Express, NextFunction, Request, Response, Router } from 'express'
-import { BaseController } from './presentation/controllers/base-controller'
+import { BaseController } from './cross-cutting-concerns/application/base-controller'
 import { ControllerFacade } from './presentation/facades/controller-facade'
 import { EventServerFacade } from './presentation/facades/event-server-facade'
 import { ServiceFacade } from './business-logic/facades/service-facade'
@@ -9,7 +9,7 @@ import { LoggerFacade } from './logger/logger-facade'
 import { RepositoryFacade } from './data-access/facades/repository-facade'
 import bodyParser from 'body-parser'
 
-export * from './presentation/controllers/rundown-controller'
+export * from './rundown-execution/application/controllers/rundown-controller'
 
 const REST_API_PORT: number = 3005
 const RUNDOWN_EVENT_SERVER_PORT: number = 3006

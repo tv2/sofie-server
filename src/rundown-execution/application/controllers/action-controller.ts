@@ -1,12 +1,12 @@
-import { BaseController, GetRequest, PutRequest, RestController } from './base-controller'
+import { BaseController, GetRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
 import { Request, Response } from 'express'
-import { ActionService } from '../../business-logic/services/interfaces/action-service'
-import { Action } from '../../model/entities/action'
-import { HttpErrorHandler } from '../interfaces/http-error-handler'
-import { Exception } from '../../model/exceptions/exception'
-import { ActionDto } from '../../rundown-execution/application/dtos/action-dto'
-import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { AuditLog } from '../decorators/audit-log-decorator'
+import { ActionService } from '../../../business-logic/services/interfaces/action-service'
+import { Action } from '../../../model/entities/action'
+import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { Exception } from '../../../model/exceptions/exception'
+import { ActionDto } from '../dtos/action-dto'
+import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
 
 interface ExecuteActionRequestBody {
   actionArguments: unknown

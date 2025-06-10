@@ -1,12 +1,12 @@
-import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from './base-controller'
-import { HttpErrorHandler } from '../interfaces/http-error-handler'
-import { Exception } from '../../model/exceptions/exception'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
+import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { Exception } from '../../../model/exceptions/exception'
 import { Request, Response } from 'express'
-import { Trigger } from '../../model/entities/trigger'
-import { TriggerDto } from '../../rundown-execution/application/dtos/trigger-dto'
-import { TriggerService } from '../../business-logic/services/interfaces/trigger-service'
-import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { AuditLog } from '../decorators/audit-log-decorator'
+import { Trigger } from '../../../model/entities/trigger'
+import { TriggerDto } from '../dtos/trigger-dto'
+import { TriggerService } from '../../../business-logic/services/interfaces/trigger-service'
+import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
 
 @RestController('/triggers')
 export class TriggerController extends BaseController {

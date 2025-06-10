@@ -1,11 +1,11 @@
-import { BaseController, GetRequest, RestController } from './base-controller'
-import { TimelineRepository } from '../../data-access/repositories/interfaces/timeline-repository'
+import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
+import { TimelineRepository } from '../../../data-access/repositories/interfaces/timeline-repository'
 import { Request, Response } from 'express'
-import { Timeline } from '../../model/entities/timeline'
-import { HttpErrorHandler } from '../interfaces/http-error-handler'
-import { Exception } from '../../model/exceptions/exception'
-import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { AuditLog } from '../decorators/audit-log-decorator'
+import { Timeline } from '../../../model/entities/timeline'
+import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { Exception } from '../../../model/exceptions/exception'
+import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
 
 @RestController('/timelines')
 export class TimelineController extends BaseController {

@@ -1,9 +1,9 @@
 import { ActionController } from '../action-controller'
 import { anything, instance, mock, verify } from '@typestrong/ts-mockito'
 import { Request, Response } from 'express'
-import { ActionService } from '../../../business-logic/services/interfaces/action-service'
-import { HttpErrorHandler } from '../../interfaces/http-error-handler'
-import { HttpResponseFormatter } from '../../interfaces/http-response-formatter'
+import { ActionService } from '../../../../business-logic/services/interfaces/action-service'
+import { HttpErrorHandler } from '../../../../presentation/interfaces/http-error-handler'
+import { HttpResponseFormatter } from '../../../../presentation/interfaces/http-response-formatter'
 
 describe(ActionController.name, () => {
   describe(ActionController.prototype.executeAction.name, () => {

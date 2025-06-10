@@ -1,13 +1,13 @@
-import { BaseController, GetRequest, RestController } from './base-controller'
+import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
 import { Request, Response } from 'express'
-import { MediaRepository } from '../../data-access/repositories/interfaces/media-repository'
-import { HttpErrorHandler } from '../interfaces/http-error-handler'
-import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
-import { Media } from '../../model/entities/media'
-import { Exception } from '../../model/exceptions/exception'
-import { NotFoundException } from '../../model/exceptions/not-found-exception'
-import { MediaDto } from '../../rundown-execution/application/dtos/media-dto'
-import { AuditLog } from '../decorators/audit-log-decorator'
+import { MediaRepository } from '../../../data-access/repositories/interfaces/media-repository'
+import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { Media } from '../../../model/entities/media'
+import { Exception } from '../../../model/exceptions/exception'
+import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { MediaDto } from '../dtos/media-dto'
+import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
 
 @RestController('/media')
 export class MediaController extends BaseController {
