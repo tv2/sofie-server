@@ -5,7 +5,7 @@ import { Exception } from '../../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { VideoMixerDeviceRepository } from '../../../data-access/repositories/interfaces/video-mixer-device-repository'
 import { VideoMixerConfiguration } from '../../../model/value-objects/video-mixer-configuration'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/devices')
 export class DeviceController extends BaseController {

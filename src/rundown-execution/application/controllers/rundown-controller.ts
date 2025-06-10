@@ -15,7 +15,7 @@ import { SetNextDirection } from '../../../model/enums/set-next-direction'
 import { TakeMode } from '../../../model/enums/take-mode'
 import { Tv2Logger } from '../../../blueprints/tv2/tv2-logger'
 import { ErrorCode } from '../../../model/enums/error-code'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 import { PlayoutContentReadService } from '../../../business-logic/services/interfaces/playout-content-service'
 import { PlayoutContent } from '../../../model/value-objects/playout-content'
 

@@ -5,7 +5,7 @@ import { Timeline } from '../../../model/entities/timeline'
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
 import { Exception } from '../../../model/exceptions/exception'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/timelines')
 export class TimelineController extends BaseController {

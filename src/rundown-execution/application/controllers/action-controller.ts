@@ -6,7 +6,7 @@ import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-ha
 import { Exception } from '../../../model/exceptions/exception'
 import { ActionDto } from '../dtos/action-dto'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 interface ExecuteActionRequestBody {
   actionArguments: unknown

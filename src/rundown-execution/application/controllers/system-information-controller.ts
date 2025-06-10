@@ -9,7 +9,7 @@ import { StatusMessageRepository } from '../../../data-access/repositories/inter
 import { StatusMessage } from '../../../model/entities/status-message'
 import { StatusMessageDto } from '../dtos/status-message-dto'
 import { SystemInformationDto } from '../dtos/system-information-dto'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/systemInformation')
 export class SystemInformationController extends BaseController {

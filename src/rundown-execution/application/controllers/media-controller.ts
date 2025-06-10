@@ -7,7 +7,7 @@ import { Media } from '../../../model/entities/media'
 import { Exception } from '../../../model/exceptions/exception'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
 import { MediaDto } from '../dtos/media-dto'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/media')
 export class MediaController extends BaseController {

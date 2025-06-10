@@ -11,7 +11,7 @@ import { ConfigurationService } from '../../../business-logic/services/interface
 import { ShelfConfigurationRepository } from '../../../data-access/repositories/interfaces/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../../model/entities/shelf-configuration'
 import { ShelfConfigurationDto } from '../dtos/shelf-configuration-dto'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/configurations')
 export class ConfigurationController extends BaseController {

@@ -1,5 +1,5 @@
-import { Logger } from '../../logger/logger'
-import { LoggerFacade } from '../../logger/logger-facade'
+import { Logger } from '../../../logger/logger'
+import { LoggerFacade } from '../../../logger/logger-facade'
 
 interface IncomingRequest {
   req?: {

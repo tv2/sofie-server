@@ -6,7 +6,7 @@ import { MacroDto } from '../dtos/macro-dto'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { MacroService } from '../../../business-logic/services/interfaces/macro-service'
 import { Macro } from '../../../model/entities/macro'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/macros')
 export class MacroController extends BaseController {

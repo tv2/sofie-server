@@ -6,7 +6,7 @@ import { Trigger } from '../../../model/entities/trigger'
 import { TriggerDto } from '../dtos/trigger-dto'
 import { TriggerService } from '../../../business-logic/services/interfaces/trigger-service'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
-import { AuditLog } from '../../../presentation/decorators/audit-log-decorator'
+import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/triggers')
 export class TriggerController extends BaseController {
