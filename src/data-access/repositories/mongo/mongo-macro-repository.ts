@@ -3,7 +3,7 @@ import { Macro } from '../../../rundown-execution/domain/entities/macro'
 import { MongoDatabase } from './mongo-database'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MacroRepository } from '../interfaces/macro-repository'
-import { UuidGenerator } from '../interfaces/uuid-generator'
+import { UuidGenerator } from '../../../cross-cutting-concerns/infrastructure/uuid-generator'
 import { MongoId } from './mongo-entity-converter'
 import { InvalidIdException } from '../../../rundown-execution/domain/exceptions/invalid-id-exception'
 

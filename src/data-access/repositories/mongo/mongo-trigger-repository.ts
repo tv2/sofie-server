@@ -2,7 +2,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { TriggerRepository } from '../interfaces/trigger-repository'
 import { Trigger } from '../../../rundown-execution/domain/entities/trigger'
 import { MongoDatabase } from './mongo-database'
-import { UuidGenerator } from '../interfaces/uuid-generator'
+import { UuidGenerator } from '../../../cross-cutting-concerns/infrastructure/uuid-generator'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoId } from './mongo-entity-converter'
 

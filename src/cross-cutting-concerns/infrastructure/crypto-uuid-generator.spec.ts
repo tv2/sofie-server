@@ -1,4 +1,4 @@
-import { CryptoUuidGenerator } from '../crypto-uuid-generator'
+import { CryptoUuidGenerator } from './crypto-uuid-generator'
 
 describe(CryptoUuidGenerator.name, () => {
   describe(CryptoUuidGenerator.prototype.validateUuid.name, () => {

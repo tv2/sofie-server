@@ -2,7 +2,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { ShelfConfigurationRepository } from '../interfaces/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../../rundown-execution/domain/entities/shelf-configuration'
-import { UuidGenerator } from '../interfaces/uuid-generator'
+import { UuidGenerator } from '../../../cross-cutting-concerns/infrastructure/uuid-generator'
 import { MongoId } from './mongo-entity-converter'
 
 const SHELF_CONFIGURATION_COLLECTION_NAME: string = 'shelfConfiguration'

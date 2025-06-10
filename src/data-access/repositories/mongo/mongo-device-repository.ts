@@ -1,7 +1,7 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { DeviceRepository } from '../interfaces/device-repository'
 import { MongoDatabase } from './mongo-database'
-import { UuidGenerator } from '../interfaces/uuid-generator'
+import { UuidGenerator } from '../../../cross-cutting-concerns/infrastructure/uuid-generator'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoCoreDevice } from './mongo-entity-converter'
 import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
