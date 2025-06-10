@@ -71,7 +71,6 @@ import { RundownAggregateRepository } from '../repositories/interfaces/rundown-a
 import { IngestedPiece } from '../../rundown-execution/domain/entities/ingested-piece'
 import { PieceRepository } from '../repositories/interfaces/piece-repository'
 import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-ingested-piece-changed-listener'
-import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
 import { DeviceRepository } from '../repositories/interfaces/device-repository'
 import { VideoMixerDeviceRepository } from '../repositories/interfaces/video-mixer-device-repository'
 import { MongoVideoMixerDeviceRepository } from '../repositories/mongo/mongo-video-mixer-device-repository'
@@ -301,11 +300,6 @@ export class RepositoryFacade {
 
   public static createStatusMessageRepository(): StatusMessageRepository {
     return new MongoStatusMessageRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()))
-  }
-
-  public static createDeviceRepository(): DeviceRepository {
-    return new MongoDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()),
-      this.createUuidGenerator() )
   }
 
   private static createUuidGenerator(): UuidGenerator {
