@@ -1,19 +1,19 @@
-import {DeviceChangedService} from '../device-changed-service'
-import {anything, capture, instance, mock, when} from '@typestrong/ts-mockito'
-import {DataChangedListener} from '../../../data-access/repositories/interfaces/data-changed-listener'
-import {Logger} from '../../../logger/logger'
-import {StatusMessageService} from '../interfaces/status-message-service'
-import {StatusCode} from '../../../model/enums/status-code'
-import {Device} from '../../../model/entities/device'
-import {DeviceRepository} from '../../../data-access/repositories/interfaces/device-repository'
-import {EntityTestFactory} from '../../../model/entities/test/entity-test-factory'
+import { DeviceChangedService } from '../device-changed-service'
+import { anything, capture, instance, mock, when } from '@typestrong/ts-mockito'
+import { DataChangedListener } from '../../../data-access/repositories/interfaces/data-changed-listener'
+import { Logger } from '../../../logger/logger'
+import { StatusMessageService } from '../interfaces/status-message-service'
+import { StatusCode } from '../../../model/enums/status-code'
+import { DeviceRepository } from '../../../data-access/repositories/interfaces/device-repository'
+import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
+import { CoreDevice } from '../../../model/entities/device'
 
 const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 
 describe(DeviceChangedService.name, () => {
   it('calls the StatusMessageService with a StatusMessage that has the same id as the Device', () => {
-    const device: Device = EntityTestFactory.createDevice({id: 'deviceId'})
-    const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
+    const device: CoreDevice = EntityTestFactory.createCoreDevice({id: 'deviceId'})
+    const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
     const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
@@ -25,8 +25,8 @@ describe(DeviceChangedService.name, () => {
   })
 
   it('calls the StatusMessageService with a StatusMessage that has the Device name as title', () => {
-    const device: Device = EntityTestFactory.createDevice({statusMessage: 'some Message'})
-    const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
+    const device: CoreDevice = EntityTestFactory.createCoreDevice({statusMessage: 'some Message'})
+    const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
     const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
@@ -39,8 +39,8 @@ describe(DeviceChangedService.name, () => {
 
   describe('the Device is not connected', () => {
     it('calls the StatusMessageService with a StatusCode BAD', () => {
-      const device: Device = EntityTestFactory.createDevice({isConnected: false, statusCode: StatusCode.UNKNOWN})
-      const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
+      const device: CoreDevice = EntityTestFactory.createCoreDevice({isConnected: false, statusCode: StatusCode.UNKNOWN})
+      const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
       const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
@@ -52,8 +52,8 @@ describe(DeviceChangedService.name, () => {
     })
 
     it('calls the StatusMessageService with a NOT_CONNECTED message', () => {
-      const device: Device = EntityTestFactory.createDevice({isConnected: false, statusMessage: 'some message'})
-      const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
+      const device: CoreDevice = EntityTestFactory.createCoreDevice({isConnected: false, statusMessage: 'some message'})
+      const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
       const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
@@ -67,8 +67,8 @@ describe(DeviceChangedService.name, () => {
 
   describe('the Device is connected', () => {
     it('calls the StatusMessageService with a StatusMessage with a StatusCode matching the Device status', () => {
-      const device: Device = EntityTestFactory.createDevice({isConnected: true, statusCode: StatusCode.WARNING})
-      const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
+      const device: CoreDevice = EntityTestFactory.createCoreDevice({isConnected: true, statusCode: StatusCode.WARNING})
+      const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
       const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
@@ -80,8 +80,8 @@ describe(DeviceChangedService.name, () => {
     })
 
     it('calls the StatusMessageService with a StatusMessage with a message matching the Device status message', () => {
-      const device: Device = EntityTestFactory.createDevice({isConnected: true, statusMessage: 'Some message'})
-      const deviceDataChangedListener: DataChangedListener<Device> = createDeviceChangedListenerMock(device)
+      const device: CoreDevice = EntityTestFactory.createCoreDevice({isConnected: true, statusMessage: 'Some message'})
+      const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
       const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
@@ -97,7 +97,7 @@ describe(DeviceChangedService.name, () => {
 function createTestee(params?: {
   statusMessageService?: StatusMessageService,
   deviceRepository?: DeviceRepository,
-  deviceDataChangedListener?: DataChangedListener<Device>,
+  deviceDataChangedListener?: DataChangedListener<CoreDevice>,
   logger?: Logger
 }): DeviceChangedService {
   let deviceRepository: DeviceRepository
@@ -112,13 +112,13 @@ function createTestee(params?: {
   return new DeviceChangedService(
     instance(params?.statusMessageService ?? mock<StatusMessageService>()),
     instance(deviceRepository),
-    instance(params?.deviceDataChangedListener ?? mock<DataChangedListener<Device>>()),
+    instance(params?.deviceDataChangedListener ?? mock<DataChangedListener<CoreDevice>>()),
     instance(params?.logger ?? mock<Logger>())
   )
 }
 
-function createDeviceChangedListenerMock(device: Device): DataChangedListener<Device> {
-  const deviceDataChangedListener: DataChangedListener<Device> = mock<DataChangedListener<Device>>()
+function createDeviceChangedListenerMock(device: CoreDevice): DataChangedListener<CoreDevice> {
+  const deviceDataChangedListener: DataChangedListener<CoreDevice> = mock<DataChangedListener<CoreDevice>>()
   when(deviceDataChangedListener.onUpdated(anything())).thenCall(callback => callback(device))
   return deviceDataChangedListener
 }

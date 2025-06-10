@@ -1,14 +1,14 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { DeviceRepository } from '../interfaces/device-repository'
-import { Device } from '../../../model/entities/device'
 import { MongoDatabase } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { MongoDevice } from './mongo-entity-converter'
+import { MongoCoreDevice } from './mongo-entity-converter'
+import { CoreDevice } from '../../../model/entities/device'
 
 const DEVICE_COLLECTION_NAME: string = 'externalDevices'
 
-export class MongoDeviceRepository extends BaseMongoRepository<MongoDevice> implements DeviceRepository {
+export class MongoDeviceRepository extends BaseMongoRepository<MongoCoreDevice> implements DeviceRepository {
 
   constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
@@ -18,23 +18,23 @@ export class MongoDeviceRepository extends BaseMongoRepository<MongoDevice> impl
     return DEVICE_COLLECTION_NAME
   }
 
-  public async getDevices(): Promise<Device[]> {
+  public async getDevices(): Promise<CoreDevice[]> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.getDevices.name)
-    return await this.getCollection().find<Device>({}).toArray()
+    return await this.getCollection().find<CoreDevice>({}).toArray()
   }
 
-  public async getDevice(deviceId: string): Promise<Device> {
+  public async getDevice(deviceId: string): Promise<CoreDevice> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.getDevice.name)
-    const device: Device | null = await this.getCollection().findOne<Device>({id: deviceId})
+    const device: CoreDevice | null = await this.getCollection().findOne<CoreDevice>({id: deviceId})
     if (!device) {
       throw new NotFoundException(`Unable to find device with id '${deviceId}'.`)
     }
     return device
   }
 
-  public async save(device: Device | Omit<Device, 'id'>): Promise<void> {
+  public async save(device: CoreDevice | Omit<CoreDevice, 'id'>): Promise<void> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.save.name)
-    const deviceWithId: Device = {
+    const deviceWithId: CoreDevice = {
       ...device,
       id: this.uuidGenerator.generateUuid(),
     }
@@ -42,7 +42,7 @@ export class MongoDeviceRepository extends BaseMongoRepository<MongoDevice> impl
   }
 
 
-  public async update(device: Device): Promise<void> {
+  public async update(device: CoreDevice): Promise<void> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.update.name)
     await this.getCollection().updateOne({id: device.id}, {$set: device}, {upsert: true})
   }

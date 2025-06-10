@@ -32,10 +32,10 @@ import { Invalidity } from '../../../model/value-objects/invalidity'
 import { Logger } from '../../../logger/logger'
 import { Action, ActionArgument } from '../../../model/entities/action'
 import { ActionType } from '../../../model/enums/action-type'
-import { Device } from '../../../model/entities/device'
 import { DeviceType } from '../../../model/enums/device-type'
 import { TakeMode } from '../../../model/enums/take-mode'
 import { PieceMetadata } from '../../../model/value-objects/metadata'
+import { CoreDevice } from '../../../model/entities/device'
 
 
 export interface MongoId {
@@ -200,7 +200,7 @@ export interface MongoAction extends MongoId {
   argument?: ActionArgument
 }
 
-export interface MongoDevice extends MongoId {
+export interface MongoCoreDevice extends MongoId {
   name: string
   type: DeviceType
   status: {
@@ -528,7 +528,7 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDeviceInterface(mongoDevice: MongoDevice): Device {
+  public convertToCoreDeviceInterface(mongoDevice: MongoCoreDevice): CoreDevice {
     const statusMessage: string = mongoDevice.status.messages && mongoDevice.status.messages.length > 0
       ? mongoDevice.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
       : ''
@@ -562,8 +562,8 @@ export class MongoEntityConverter {
     }
   }
 
-  public convertToDeviceInterfaces(mongoDevices: MongoDevice[]): Device[] {
-    return mongoDevices.map(mongoDevice => this.convertToDeviceInterface(mongoDevice))
+  public convertToCoreDeviceInterfaces(mongoDevices: MongoCoreDevice[]): CoreDevice[] {
+    return mongoDevices.map(mongoDevice => this.convertToCoreDeviceInterface(mongoDevice))
   }
 
   public convertToAction(mongoAction: MongoAction): Action {

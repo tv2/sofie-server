@@ -63,11 +63,7 @@ import { Action } from '../../model/entities/action'
 import { ActionsUpdatedEvent } from '../value-objects/action-event'
 import { ActionDto } from '../dtos/action-dto'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
-import { Device } from '../../model/entities/device'
 import {
-  DeviceCreatedEvent,
-  DeviceDeletedEvent,
-  DeviceUpdatedEvent,
   VideoMixerConfigurationUpdatedEvent
 } from '../value-objects/device-event'
 import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
@@ -364,30 +360,6 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
       timestamp: Date.now(),
       rundownId,
       actions: actions.map(action => new ActionDto(action))
-    }
-  }
-
-  public buildDeviceCreatedEvent(device: Device): DeviceCreatedEvent {
-    return {
-      type: DeviceEventType.DEVICE_CREATED,
-      timestamp: Date.now(),
-      device
-    }
-  }
-
-  public buildDeviceUpdatedEvent(device: Device): DeviceUpdatedEvent {
-    return {
-      type: DeviceEventType.DEVICE_UPDATED,
-      timestamp: Date.now(),
-      device
-    }
-  }
-
-  public buildDeviceDeletedEvent(deviceId: string): DeviceDeletedEvent {
-    return {
-      type: DeviceEventType.DEVICE_DELETED,
-      timestamp: Date.now(),
-      deviceId
     }
   }
 

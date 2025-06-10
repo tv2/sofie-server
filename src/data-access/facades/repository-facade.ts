@@ -73,7 +73,6 @@ import { PieceRepository } from '../repositories/interfaces/piece-repository'
 import { MongoIngestedPieceChangedListener } from '../repositories/mongo/mongo-ingested-piece-changed-listener'
 import { MongoDeviceRepository } from '../repositories/mongo/mongo-device-repository'
 import { DeviceRepository } from '../repositories/interfaces/device-repository'
-import { Device } from '../../model/entities/device'
 import { VideoMixerDeviceRepository } from '../repositories/interfaces/video-mixer-device-repository'
 import { MongoVideoMixerDeviceRepository } from '../repositories/mongo/mongo-video-mixer-device-repository'
 import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
@@ -82,6 +81,7 @@ import { MongoMacroRepository } from '../repositories/mongo/mongo-macro-reposito
 import { MacroRepository } from '../repositories/interfaces/macro-repository'
 import { PlayoutContentRepository } from '../repositories/interfaces/playout-content-repository'
 import { MongoPlayoutContentRepository } from '../repositories/mongo/mongo-playout-content-repository'
+import { CoreDevice } from '../../model/entities/device'
 
 export class RepositoryFacade {
   public static getDatabase(): Database {
@@ -287,7 +287,7 @@ export class RepositoryFacade {
     return new MongoSystemInformationRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), new MongoEntityConverter(LoggerFacade.createLogger()))
   }
 
-  public static createDeviceDataChangedListener(): DataChangedListener<Device> {
+  public static createDeviceDataChangedListener(): DataChangedListener<CoreDevice> {
     return new MongoDeviceChangedListener(
       MongoDatabase.getInstance(LoggerFacade.createLogger()),
       new MongoEntityConverter(LoggerFacade.createLogger()),
