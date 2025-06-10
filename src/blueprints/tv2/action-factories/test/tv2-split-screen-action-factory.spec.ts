@@ -18,16 +18,16 @@ import { Tv2StringHashConverter } from '../../helpers/tv2-string-hash-converter'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
-import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
+import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import {
   Tv2ActionManifestSplitScreenData,
   Tv2ActionManifestSplitScreenSourceType
 } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2Action } from '../../value-objects/tv2-action'
-import { PartActionType } from '../../../../model/enums/action-type'
+import { PartActionType } from '../../../../rundown-execution/domain/enums/action-type'
 import { Tv2Logger } from '../../tv2-logger'
 import { ObjectCloner } from '../../../../business-logic/services/interfaces/object-cloner'
-import { PlayoutContentType } from '../../../../model/enums/playout-content-type'
+import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   describe(Tv2SplitScreenActionFactory.prototype.createSplitScreenActions.name, () => {

@@ -8,7 +8,7 @@ import {
   Tv2SplitScreenManifestData,
   Tv2VideoClipManifestData
 } from '../../value-objects/tv2-action-manifest-data'
-import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
+import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2Logger } from '../../tv2-logger'

@@ -1,5 +1,5 @@
 import { ConfigurationRepository } from '../interfaces/configuration-repository'
-import { Configuration } from '../../../model/entities/configuration'
+import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 
 export class CachedConfigurationRepository implements ConfigurationRepository {
   private static instance: ConfigurationRepository

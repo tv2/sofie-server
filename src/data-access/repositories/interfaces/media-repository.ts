@@ -1,4 +1,4 @@
-import { Media } from '../../../model/entities/media'
+import { Media } from '../../../rundown-execution/domain/entities/media'
 
 export interface MediaRepository {
   getMedia(): Promise<Media[]>

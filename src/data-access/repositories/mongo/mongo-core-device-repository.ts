@@ -2,7 +2,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { MongoCoreDevice, MongoEntityConverter, MongoId } from './mongo-entity-converter'
 import { DeviceRepository } from '../interfaces/device-repository'
-import { CoreDevice } from '../../../model/entities/device'
+import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 

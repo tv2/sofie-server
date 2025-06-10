@@ -1,4 +1,4 @@
-import { Part } from '../../../model/entities/part'
+import { Part } from '../../../rundown-execution/domain/entities/part'
 
 export interface PartRepository {
   getPart(partId: string): Promise<Part>

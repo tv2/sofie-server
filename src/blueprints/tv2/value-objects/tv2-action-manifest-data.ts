@@ -1,7 +1,7 @@
 import { Tv2SourceMappingWithAudio } from './tv2-studio-blueprint-configuration'
 import { Tv2PieceLayer } from './tv2-layers'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { AudioMode } from '../../../model/enums/audio-mode'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
 
 export type Tv2ActionManifestData =
   | Tv2ActionManifestVideoClipData

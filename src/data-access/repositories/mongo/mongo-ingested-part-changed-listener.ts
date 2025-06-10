@@ -8,7 +8,7 @@ import {
 } from './mongo-ingested-entity-converter'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
-import { IngestedPart } from '../../../model/entities/ingested-part'
+import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
 import { Logger } from '../../../logger/logger'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest changed this to "ingestedParts"

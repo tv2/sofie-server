@@ -1,5 +1,5 @@
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
-import { Rundown } from '../../model/entities/rundown'
+import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
@@ -25,8 +25,8 @@ import {
   SegmentUnsyncedEvent,
   SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
-import { Piece } from '../../model/entities/piece'
-import { Part } from '../../model/entities/part'
+import { Piece } from '../../rundown-execution/domain/entities/piece'
+import { Part } from '../../rundown-execution/domain/entities/part'
 import { PartDto } from '../../rundown-execution/application/dtos/part-dto'
 import { PieceDto } from '../../rundown-execution/application/dtos/piece-dto'
 import {
@@ -41,38 +41,38 @@ import {
   TriggerEventType
 } from '../enums/event-type'
 import { SegmentDto } from '../../rundown-execution/application/dtos/segment-dto'
-import { Segment } from '../../model/entities/segment'
+import { Segment } from '../../rundown-execution/domain/entities/segment'
 import { BasicRundownDto } from '../../rundown-execution/application/dtos/basic-rundown-dto'
 import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
-import { Trigger } from '../../model/entities/trigger'
+import { Trigger } from '../../rundown-execution/domain/entities/trigger'
 import { TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent } from '../value-objects/trigger-event'
 import { TriggerDto } from '../../rundown-execution/application/dtos/trigger-dto'
 import { RundownDto } from '../../rundown-execution/application/dtos/rundown-dto'
-import { Media } from '../../model/entities/media'
+import { Media } from '../../rundown-execution/domain/entities/media'
 import { MediaDto } from '../../rundown-execution/application/dtos/media-dto'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
-import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
+import { ShelfConfiguration } from '../../rundown-execution/domain/entities/shelf-configuration'
 import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
-import { StatusMessage } from '../../model/entities/status-message'
+import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
 import { StatusMessageEvent } from '../value-objects/status-message-event'
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
-import { Action } from '../../model/entities/action'
+import { Action } from '../../rundown-execution/domain/entities/action'
 import { ActionsUpdatedEvent } from '../value-objects/action-event'
 import { ActionDto } from '../../rundown-execution/application/dtos/action-dto'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import {
   VideoMixerConfigurationUpdatedEvent
 } from '../value-objects/device-event'
-import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { VideoMixerConfiguration } from '../../rundown-execution/domain/value-objects/video-mixer-configuration'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
-import { Macro } from '../../model/entities/macro'
+import { Macro } from '../../rundown-execution/domain/entities/macro'
 import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../value-objects/macro-event'
 import { MacroDto } from '../../rundown-execution/application/dtos/macro-dto'
 import { PlayoutContentEventBuilder } from '../interfaces/playout-content-event-builder'
-import { PlayoutContent } from '../../model/value-objects/playout-content'
+import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from '../value-objects/playout-content-event'
 
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder, PlayoutContentEventBuilder {

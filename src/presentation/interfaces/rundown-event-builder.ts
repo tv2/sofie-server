@@ -1,4 +1,4 @@
-import { Rundown } from '../../model/entities/rundown'
+import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import {
   PartCreatedEvent,
   PartDeletedEvent,
@@ -24,9 +24,9 @@ import {
   SegmentUnsyncedEvent,
   SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
-import { Piece } from '../../model/entities/piece'
-import { Part } from '../../model/entities/part'
-import { Segment } from '../../model/entities/segment'
+import { Piece } from '../../rundown-execution/domain/entities/piece'
+import { Part } from '../../rundown-execution/domain/entities/part'
+import { Segment } from '../../rundown-execution/domain/entities/segment'
 
 export interface RundownEventBuilder {
   buildActivateEvent(rundown: Rundown): RundownActivatedEvent

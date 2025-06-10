@@ -1,7 +1,7 @@
 import { ActionEventEmitter } from '../../business-logic/services/interfaces/action-event-emitter'
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
 import { ActionEvent, ActionsUpdatedEvent } from '../value-objects/action-event'
-import { Action } from '../../model/entities/action'
+import { Action } from '../../rundown-execution/domain/entities/action'
 import { ActionEventObserver } from '../interfaces/action-event-observer'
 
 export class ActionEventService implements ActionEventEmitter, ActionEventObserver {

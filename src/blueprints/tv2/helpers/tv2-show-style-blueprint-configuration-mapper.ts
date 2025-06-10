@@ -11,9 +11,9 @@ import {
   Tv2ShowStyleBlueprintConfiguration,
   Tv2ShowStyleVariantBlueprintConfiguration
 } from '../value-objects/tv2-show-style-blueprint-configuration'
-import { ShowStyle } from '../../../model/entities/show-style'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
+import { ShowStyle } from '../../../rundown-execution/domain/entities/show-style'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/show-style-variant'
 
 interface CoreShowStyleBlueprintConfiguration {
   GfxDefaults: CoreGraphicsDefault[]

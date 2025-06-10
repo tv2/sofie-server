@@ -3,10 +3,10 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { PieceActionType } from '../../../model/enums/action-type'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
-import { TransitionType } from '../../../model/enums/transition-type'
+import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
 import {
   Tv2Action,
   Tv2ActionSubtype,
@@ -15,11 +15,11 @@ import {
 } from '../value-objects/tv2-action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
-import { OutputLayer } from '../../../model/enums/output-layer'
-import { PlayoutContentType } from '../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../model/enums/output-channel'
-import { DownstreamKeyerPlayoutContent, PlayoutContent } from '../../../model/value-objects/playout-content'
-import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import { OutputLayer } from '../../../rundown-execution/domain/enums/output-layer'
+import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
+import { DownstreamKeyerPlayoutContent, PlayoutContent } from '../../../rundown-execution/domain/value-objects/playout-content'
+import { Action, MutateActionMethods, MutateActionType } from '../../../rundown-execution/domain/entities/action'
 
 export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
 

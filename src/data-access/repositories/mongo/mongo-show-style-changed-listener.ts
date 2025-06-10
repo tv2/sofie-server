@@ -1,10 +1,10 @@
 import { DataChangedListener } from '../interfaces/data-changed-listener'
-import { ShowStyle } from '../../../model/entities/show-style'
+import { ShowStyle } from '../../../rundown-execution/domain/entities/show-style'
 import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { Logger } from '../../../logger/logger'
-import { UnsupportedOperationException } from '../../../model/exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 import { MongoShowStyle } from './mongo-entity-converter'
 
 const SHOW_STYLE_COLLECTION_NAME: string = 'showStyleBases'

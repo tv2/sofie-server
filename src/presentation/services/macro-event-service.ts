@@ -6,7 +6,7 @@ import {
   MacroEvent,
   MacroUpdatedEvent
 } from '../value-objects/macro-event'
-import { Macro } from '../../model/entities/macro'
+import { Macro } from '../../rundown-execution/domain/entities/macro'
 
 export class MacroEventService implements MacroEventEmitter, MacroEventObserver {
   private static instance: MacroEventService

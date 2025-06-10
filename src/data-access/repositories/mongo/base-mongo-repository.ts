@@ -1,6 +1,6 @@
 import { MongoDatabase } from './mongo-database'
 import { AnyBulkWriteOperation, ClientSession, Collection } from 'mongodb'
-import { DatabaseNotConnectedException } from '../../../model/exceptions/database-not-connected-exception'
+import { DatabaseNotConnectedException } from '../../../rundown-execution/domain/exceptions/database-not-connected-exception'
 import { MongoId } from './mongo-entity-converter'
 
 export abstract class BaseMongoRepository<Model extends MongoId> {

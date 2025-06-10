@@ -1,20 +1,20 @@
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { TransitionType } from '../../../model/enums/transition-type'
-import { PartTimings } from '../../../model/value-objects/part-timings'
-import { IngestedPiece } from '../../../model/entities/ingested-piece'
-import { IngestedPart } from '../../../model/entities/ingested-part'
-import { IngestedSegment } from '../../../model/entities/ingested-segment'
-import { IngestedRundown } from '../../../model/entities/ingested-rundown'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
+import { PartTimings } from '../../../rundown-execution/domain/value-objects/part-timings'
+import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
+import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
+import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
+import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
 import {
   BackwardRundownTiming,
   ForwardRundownTiming,
   RundownTiming,
   UnscheduledRundownTiming
-} from '../../../model/value-objects/rundown-timing'
-import { RundownTimingType } from '../../../model/enums/rundown-timing-type'
+} from '../../../rundown-execution/domain/value-objects/rundown-timing'
+import { RundownTimingType } from '../../../rundown-execution/domain/enums/rundown-timing-type'
 import { MongoId } from './mongo-entity-converter'
-import { Invalidity } from '../../../model/value-objects/invalidity'
-import { PieceMetadata } from '../../../model/value-objects/metadata'
+import { Invalidity } from '../../../rundown-execution/domain/value-objects/invalidity'
+import { PieceMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
 
 export interface MongoIngestedRundown extends MongoId {
   name: string

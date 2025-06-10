@@ -1,6 +1,6 @@
 import { TypedEvent } from './typed-event'
 import { PlayoutContentEventType } from '../enums/event-type'
-import { PlayoutContent } from '../../model/value-objects/playout-content'
+import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 
 export type PlayoutContentEvent = ProgramPlayoutContentEvent | PreviewPlayoutContentEvent
 

@@ -1,4 +1,4 @@
-import { UnexpectedCaseException } from '../model/exceptions/unexpected-case-exception'
+import { UnexpectedCaseException } from '../rundown-execution/domain/exceptions/unexpected-case-exception'
 
 export class ExhaustiveCaseChecker {
   /*

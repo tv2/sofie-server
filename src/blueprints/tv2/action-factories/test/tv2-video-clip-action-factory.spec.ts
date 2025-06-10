@@ -13,7 +13,7 @@ import { Tv2VideoClipAction } from '../../value-objects/tv2-action'
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
 import { Tv2ActionManifestVideoClipData } from '../../value-objects/tv2-action-manifest-data'
-import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
+import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-video-clip-timeline-object-factory'

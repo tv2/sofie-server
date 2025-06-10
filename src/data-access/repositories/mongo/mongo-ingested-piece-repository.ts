@@ -1,6 +1,6 @@
 import { IngestedPieceRepository } from '../interfaces/ingested-piece-repository'
 import { BaseMongoRepository } from './base-mongo-repository'
-import { IngestedPiece } from '../../../model/entities/ingested-piece'
+import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedEntityConverter, MongoIngestedPiece } from './mongo-ingested-entity-converter'
 

@@ -1,14 +1,14 @@
 import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
-import { TimelineEnable } from '../../../../model/entities/timeline-enable'
+import { TimelineEnable } from '../../../../rundown-execution/domain/entities/timeline-enable'
 import {
   SplitScreenBoxProperties,
   SplitScreenLayoutProperties
 } from '../../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintTimelineObject, } from '../../value-objects/tv2-blueprint-timeline-object'
-import { Piece } from '../../../../model/entities/piece'
+import { Piece } from '../../../../rundown-execution/domain/entities/piece'
 import { Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
-import { TimelineObjectMetadata } from '../../../../model/value-objects/metadata'
+import { TimelineObjectMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
 
 export interface Tv2VideoMixerTimelineObjectFactory {
   createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): Tv2BlueprintTimelineObject

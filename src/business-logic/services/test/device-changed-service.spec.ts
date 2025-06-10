@@ -3,10 +3,10 @@ import { anything, capture, instance, mock, when } from '@typestrong/ts-mockito'
 import { DataChangedListener } from '../../../data-access/repositories/interfaces/data-changed-listener'
 import { Logger } from '../../../logger/logger'
 import { StatusMessageService } from '../interfaces/status-message-service'
-import { StatusCode } from '../../../model/enums/status-code'
+import { StatusCode } from '../../../rundown-execution/domain/enums/status-code'
 import { DeviceRepository } from '../../../data-access/repositories/interfaces/device-repository'
-import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
-import { CoreDevice } from '../../../model/entities/device'
+import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
+import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
 
 const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 

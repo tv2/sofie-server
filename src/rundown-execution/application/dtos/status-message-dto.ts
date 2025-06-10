@@ -1,5 +1,5 @@
-import { StatusMessage } from '../../../model/entities/status-message'
-import { StatusCode } from '../../../model/enums/status-code'
+import { StatusMessage } from '../../domain/entities/status-message'
+import { StatusCode } from '../../domain/enums/status-code'
 
 export class StatusMessageDto {
 

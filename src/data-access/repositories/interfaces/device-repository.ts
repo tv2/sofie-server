@@ -1,4 +1,4 @@
-import { CoreDevice } from '../../../model/entities/device'
+import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
 
 export interface DeviceRepository {
   getDevices(): Promise<CoreDevice[]>

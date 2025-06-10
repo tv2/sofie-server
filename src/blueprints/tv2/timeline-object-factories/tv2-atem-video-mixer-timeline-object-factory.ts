@@ -21,18 +21,18 @@ import {
   SuperSourceProperties
 } from '../../timeline-state-resolver-types/atem-types'
 import { Tv2AtemLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
-import { DeviceType } from '../../../model/enums/device-type'
-import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
+import { TimelineEnable } from '../../../rundown-execution/domain/entities/timeline-enable'
 import {
   SplitScreenBoxProperties,
   SplitScreenLayoutProperties
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Piece } from '../../../model/entities/piece'
-import { TimelineObject } from '../../../model/entities/timeline-object'
+import { Piece } from '../../../rundown-execution/domain/entities/piece'
+import { TimelineObject } from '../../../rundown-execution/domain/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2Logger } from '../tv2-logger'
-import { TimelineObjectMetadata } from '../../../model/value-objects/metadata'
+import { TimelineObjectMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
 
 const ATEM_PREFIX: string = 'atem_'
 

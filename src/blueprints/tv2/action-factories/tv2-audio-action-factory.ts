@@ -4,11 +4,11 @@ import {
   ActionManifest,
   MutateActionMethods,
   MutateActionType
-} from '../../../model/entities/action'
+} from '../../../rundown-execution/domain/entities/action'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { TransitionType } from '../../../model/enums/transition-type'
-import { PieceActionType } from '../../../model/enums/action-type'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
+import { PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
 import { Tv2Action, Tv2ActionSubtype, Tv2AudioAction, Tv2FadeAudioBedAction, } from '../value-objects/tv2-action'
 import {
   Tv2AudioMixerTimelineObjectFactory
@@ -24,10 +24,10 @@ import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { Tv2ActionManifestAudioBedData } from '../value-objects/tv2-action-manifest-data'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { Logger } from '../../../logger/logger'
-import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { OutputLayer } from '../../../model/enums/output-layer'
-import { PlayoutContentType } from '../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../model/enums/output-channel'
+import { PieceMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
+import { OutputLayer } from '../../../rundown-execution/domain/enums/output-layer'
+import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
 
 const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 

@@ -1,13 +1,13 @@
 import { DataChangeService } from './interfaces/data-change-service'
 import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
-import { StatusMessage } from '../../model/entities/status-message'
-import { StatusCode } from '../../model/enums/status-code'
+import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
+import { StatusCode } from '../../rundown-execution/domain/enums/status-code'
 import { Logger } from '../../logger/logger'
 import { StatusMessageService } from './interfaces/status-message-service'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 import { DeviceRepository } from '../../data-access/repositories/interfaces/device-repository'
-import { DeviceType } from '../../model/enums/device-type'
-import { CoreDevice } from '../../model/entities/device'
+import { DeviceType } from '../../rundown-execution/domain/enums/device-type'
+import { CoreDevice } from '../../rundown-execution/domain/entities/device'
 
 // TODO: Find a way to translate
 const NOT_CONNECTED_MESSAGE: string = 'Not connected'

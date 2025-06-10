@@ -1,8 +1,8 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { StudioRepository } from '../interfaces/studio-repository'
-import { Studio } from '../../../model/entities/studio'
+import { Studio } from '../../../rundown-execution/domain/entities/studio'
 import { MongoDatabase } from './mongo-database'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoEntityConverter, MongoStudio } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'studios'

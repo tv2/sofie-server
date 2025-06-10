@@ -1,9 +1,9 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { Part } from '../../../model/entities/part'
+import { Part } from '../../../rundown-execution/domain/entities/part'
 import { MongoDatabase } from './mongo-database'
 import { AnyBulkWriteOperation, } from 'mongodb'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { Piece } from '../../../model/entities/piece'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
+import { Piece } from '../../../rundown-execution/domain/entities/piece'
 import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 import { MongoPieceRepository } from './mongo-piece-repository'
 

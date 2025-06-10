@@ -1,11 +1,11 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { ShowStyleRepository } from '../interfaces/show-style-repository'
-import { ShowStyle } from '../../../model/entities/show-style'
+import { ShowStyle } from '../../../rundown-execution/domain/entities/show-style'
 import { MongoDatabase } from './mongo-database'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoEntityConverter, MongoShowStyle } from './mongo-entity-converter'
 import { ShowStyleVariantRepository } from '../interfaces/show-style-variant-repository'
-import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
+import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/show-style-variant'
 
 const COLLECTION_NAME: string = 'showStyleBases'
 

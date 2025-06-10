@@ -7,12 +7,12 @@ import {
   SisyfosType
 } from '../../timeline-state-resolver-types/sisyfos-types'
 import { Tv2SisyfosLayer } from '../value-objects/tv2-layers'
-import { DeviceType } from '../../../model/enums/device-type'
+import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../timeline-state-resolver-types/abstract-types'
 import { Tv2VideoClipManifestData } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
-import { AudioMode } from '../../../model/enums/audio-mode'
+import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
 
 export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerTimelineObjectFactory {
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, audioMode?: AudioMode): SisyfosTimelineObject[] {

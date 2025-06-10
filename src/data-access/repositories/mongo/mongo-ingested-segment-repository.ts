@@ -1,10 +1,10 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { IngestedSegmentRepository } from '../interfaces/ingested-segment-repository'
-import { IngestedSegment } from '../../../model/entities/ingested-segment'
+import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedEntityConverter, MongoIngestedSegment } from './mongo-ingested-entity-converter'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
-import { IngestedPart } from '../../../model/entities/ingested-part'
+import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest rename to "ingestedSegments".
 

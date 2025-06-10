@@ -1,10 +1,10 @@
 import { IngestedEntityToEntityMapper } from '../ingested-entity-to-entity-mapper'
-import { Part } from '../../../model/entities/part'
-import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
-import { IngestedPart } from '../../../model/entities/ingested-part'
-import { IngestedPiece } from '../../../model/entities/ingested-piece'
-import { Segment } from '../../../model/entities/segment'
-import { IngestedSegment } from '../../../model/entities/ingested-segment'
+import { Part } from '../../../rundown-execution/domain/entities/part'
+import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
+import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
+import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
+import { Segment } from '../../../rundown-execution/domain/entities/segment'
+import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
 
 describe(IngestedEntityToEntityMapper.name, () => {
   describe(IngestedEntityToEntityMapper.prototype.updateSegmentWithIngestedSegment, () => {

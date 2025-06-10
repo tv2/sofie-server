@@ -1,9 +1,9 @@
-import { Segment } from '../../../model/entities/segment'
+import { Segment } from '../../../rundown-execution/domain/entities/segment'
 import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { AnyBulkWriteOperation, } from 'mongodb'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { Part } from '../../../model/entities/part'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
+import { Part } from '../../../rundown-execution/domain/entities/part'
 import { MongoEntityConverter, MongoSegment } from './mongo-entity-converter'
 import { MongoPartRepository } from './mongo-part-repository'
 

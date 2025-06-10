@@ -1,5 +1,5 @@
 import { TriggerService } from './interfaces/trigger-service'
-import { Trigger } from '../../model/entities/trigger'
+import { Trigger } from '../../rundown-execution/domain/entities/trigger'
 import { TriggerRepository } from '../../data-access/repositories/interfaces/trigger-repository'
 import { TriggerEventEmitter } from './interfaces/trigger-event-emitter'
 

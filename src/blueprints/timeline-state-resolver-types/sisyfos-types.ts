@@ -1,5 +1,5 @@
-import { DeviceType } from '../../model/enums/device-type'
-import { TimelineObject } from '../../model/entities/timeline-object'
+import { DeviceType } from '../../rundown-execution/domain/enums/device-type'
+import { TimelineObject } from '../../rundown-execution/domain/entities/timeline-object'
 
 // These values are taken from TSR
 export type SisyfosTimelineObject = SisyfosChannelTimelineObject | SisyfosChannelsTimelineObject

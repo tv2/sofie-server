@@ -1,4 +1,4 @@
-import { Macro, Operation } from '../../../model/entities/macro'
+import { Macro, Operation } from '../../domain/entities/macro'
 
 export class MacroDto {
   public readonly id: string

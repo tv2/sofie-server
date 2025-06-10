@@ -1,11 +1,11 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { Macro } from '../../../model/entities/macro'
+import { Macro } from '../../../rundown-execution/domain/entities/macro'
 import { MongoDatabase } from './mongo-database'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MacroRepository } from '../interfaces/macro-repository'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { MongoId } from './mongo-entity-converter'
-import { InvalidIdException } from '../../../model/exceptions/invalid-id-exception'
+import { InvalidIdException } from '../../../rundown-execution/domain/exceptions/invalid-id-exception'
 
 const COLLECTION_NAME: string = 'macros'
 export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> implements MacroRepository {

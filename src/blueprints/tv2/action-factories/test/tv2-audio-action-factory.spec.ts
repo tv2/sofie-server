@@ -6,7 +6,7 @@ import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockit
 import {
   Tv2AudioBedTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-audio-bed-timeline-object-factory'
-import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
+import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'

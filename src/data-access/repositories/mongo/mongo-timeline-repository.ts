@@ -1,8 +1,8 @@
 import { TimelineRepository } from '../interfaces/timeline-repository'
 import { BaseMongoRepository } from './base-mongo-repository'
-import { Timeline } from '../../../model/entities/timeline'
+import { Timeline } from '../../../rundown-execution/domain/entities/timeline'
 import { MongoDatabase } from './mongo-database'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoEntityConverter, MongoTimeline } from './mongo-entity-converter'
 
 const TIMELINE_COLLECTION_NAME: string = 'timeline'

@@ -1,10 +1,10 @@
 import { RundownAggregateRepository } from '../interfaces/rundown-aggregate-repository'
-import { Rundown } from '../../../model/entities/rundown'
-import { BasicRundown } from '../../../model/entities/basic-rundown'
+import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
+import { BasicRundown } from '../../../rundown-execution/domain/entities/basic-rundown'
 import { Logger } from '../../../logger/logger'
-import { Segment } from '../../../model/entities/segment'
-import { Part } from '../../../model/entities/part'
-import { Piece } from '../../../model/entities/piece'
+import { Segment } from '../../../rundown-execution/domain/entities/segment'
+import { Part } from '../../../rundown-execution/domain/entities/part'
+import { Piece } from '../../../rundown-execution/domain/entities/piece'
 
 export class CachedRundownAggregateRepository implements RundownAggregateRepository {
 

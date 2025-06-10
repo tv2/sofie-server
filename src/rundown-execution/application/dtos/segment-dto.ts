@@ -1,6 +1,6 @@
 import { PartDto } from './part-dto'
-import { Segment } from '../../../model/entities/segment'
-import { Invalidity } from '../../../model/value-objects/invalidity'
+import { Segment } from '../../domain/entities/segment'
+import { Invalidity } from '../../domain/value-objects/invalidity'
 
 export class SegmentDto {
   public readonly id: string

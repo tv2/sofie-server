@@ -4,9 +4,9 @@ import { MongoDatabase } from '../mongo-database'
 import { UuidGenerator } from '../../interfaces/uuid-generator'
 import { Collection } from 'mongodb'
 import { MongoId } from '../mongo-entity-converter'
-import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
-import { Macro } from '../../../../model/entities/macro'
-import { InvalidIdException } from '../../../../model/exceptions/invalid-id-exception'
+import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
+import { Macro } from '../../../../rundown-execution/domain/entities/macro'
+import { InvalidIdException } from '../../../../rundown-execution/domain/exceptions/invalid-id-exception'
 
 const UUID: string = 'random-uuid'
 

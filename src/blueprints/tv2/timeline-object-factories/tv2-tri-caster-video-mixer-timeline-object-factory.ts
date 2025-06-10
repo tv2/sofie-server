@@ -10,8 +10,8 @@ import {
   SplitScreenLayoutProperties
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Piece } from '../../../model/entities/piece'
-import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { Piece } from '../../../rundown-execution/domain/entities/piece'
+import { TimelineEnable } from '../../../rundown-execution/domain/entities/timeline-enable'
 import {
   TriCasterLayer,
   TriCasterLayerName,
@@ -25,12 +25,12 @@ import {
   TriCasterTransition,
   TriCasterType
 } from '../../timeline-state-resolver-types/tri-caster-type'
-import { DeviceType } from '../../../model/enums/device-type'
+import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
 import { AtemSourceIndex } from '../../timeline-state-resolver-types/atem-types'
 import { AtemToTriCasterSplitScreenConverter } from '../helpers/atem-to-tricaster-split-screen-converter'
-import { TimelineObject } from '../../../model/entities/timeline-object'
+import { TimelineObject } from '../../../rundown-execution/domain/entities/timeline-object'
 import { Tv2Logger } from '../tv2-logger'
-import { TimelineObjectMetadata } from '../../../model/value-objects/metadata'
+import { TimelineObjectMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
 
 interface TriCasterTransitionEffectProperties {
   input: number

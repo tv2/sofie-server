@@ -1,7 +1,7 @@
-import { Part, PartMetadata } from '../../../model/entities/part'
+import { Part, PartMetadata } from '../../domain/entities/part'
 import { PieceDto } from './piece-dto'
-import { AutoNext } from '../../../model/value-objects/auto-next'
-import { Invalidity } from '../../../model/value-objects/invalidity'
+import { AutoNext } from '../../domain/value-objects/auto-next'
+import { Invalidity } from '../../domain/value-objects/invalidity'
 
 export class PartDto {
   public readonly id: string

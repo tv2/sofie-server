@@ -2,9 +2,9 @@ import { ShowStyleVariantRepository } from '../interfaces/show-style-variant-rep
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { RundownRepository } from '../interfaces/rundown-repository'
-import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
-import { Rundown } from '../../../model/entities/rundown'
+import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/show-style-variant'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
+import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
 import { MongoEntityConverter, MongoShowStyleVariant } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'showStyleVariants'

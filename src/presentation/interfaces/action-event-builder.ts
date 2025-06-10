@@ -1,4 +1,4 @@
-import { Action } from '../../model/entities/action'
+import { Action } from '../../rundown-execution/domain/entities/action'
 import { ActionsUpdatedEvent } from '../value-objects/action-event'
 
 export interface ActionEventBuilder {

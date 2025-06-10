@@ -1,5 +1,5 @@
 import { ConfigurationEventEmitter } from '../../business-logic/services/interfaces/configuration-event-emitter'
-import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
+import { ShelfConfiguration } from '../../rundown-execution/domain/entities/shelf-configuration'
 import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
 import { ConfigurationEvent, ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'

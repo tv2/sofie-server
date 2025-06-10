@@ -1,6 +1,6 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MediaRepository } from '../interfaces/media-repository'
-import { Media } from '../../../model/entities/media'
+import { Media } from '../../../rundown-execution/domain/entities/media'
 import { MongoDatabase } from './mongo-database'
 import { MongoEntityConverter, MongoMedia } from './mongo-entity-converter'
 

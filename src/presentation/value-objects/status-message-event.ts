@@ -1,5 +1,5 @@
 import { TypedEvent } from './typed-event'
-import { StatusMessage } from '../../model/entities/status-message'
+import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
 import { StatusMessageEventType } from '../enums/event-type'
 
 export interface StatusMessageEvent extends TypedEvent {

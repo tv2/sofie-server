@@ -1,7 +1,7 @@
 import { Tv2VideoMixerTimelineObjectFactory } from './interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2AtemVideoMixerTimelineObjectFactory } from './tv2-atem-video-mixer-timeline-object-factory'
 import { Tv2LoggerFacade } from '../tv2-logger-facade'
-import { DeviceType } from '../../../model/enums/device-type'
+import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
 import { Tv2TriCasterVideoMixerTimelineObjectFactory } from './tv2-tri-caster-video-mixer-timeline-object-factory'
 import { AtemToTriCasterSplitScreenConverter } from '../helpers/atem-to-tricaster-split-screen-converter'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'

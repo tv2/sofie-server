@@ -1,9 +1,9 @@
 import { SegmentDto } from './segment-dto'
-import { Rundown } from '../../../model/entities/rundown'
+import { Rundown } from '../../domain/entities/rundown'
 import { PieceDto } from './piece-dto'
-import { RundownTiming } from '../../../model/value-objects/rundown-timing'
-import { RundownMode } from '../../../model/enums/rundown-mode'
-import { TakeMode } from '../../../model/enums/take-mode'
+import { RundownTiming } from '../../domain/value-objects/rundown-timing'
+import { RundownMode } from '../../domain/enums/rundown-mode'
+import { TakeMode } from '../../domain/enums/take-mode'
 
 export class RundownDto {
   public readonly id: string

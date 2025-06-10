@@ -4,7 +4,7 @@ import {
   TelemetricsType
 } from '../../timeline-state-resolver-types/telemetrics-type'
 import { Tv2TelemetricsLayer } from '../value-objects/tv2-layers'
-import { DeviceType } from '../../../model/enums/device-type'
+import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
 
 export class Tv2TelemetricsTimelineObjectFactory implements Tv2RobotTimelineObjectFactory {
 

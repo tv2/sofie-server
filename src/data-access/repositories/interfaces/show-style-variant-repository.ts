@@ -1,4 +1,4 @@
-import { ShowStyleVariant } from '../../../model/entities/show-style-variant'
+import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/show-style-variant'
 
 export interface ShowStyleVariantRepository {
   getShowStyleVariantsForShowStyle(showStyleId: string): Promise<ShowStyleVariant[]>

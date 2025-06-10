@@ -1,9 +1,9 @@
-import { Rundown } from '../../model/entities/rundown'
+import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { PlayoutContentReadService, PlayoutContentUpdateService } from './interfaces/playout-content-service'
 import { PlayoutContentEventEmitter } from './interfaces/playout-content-event-emitter'
-import { PlayoutContent } from '../../model/value-objects/playout-content'
-import { RundownMode } from '../../model/enums/rundown-mode'
-import { PlayoutContentType } from '../../model/enums/playout-content-type'
+import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
+import { RundownMode } from '../../rundown-execution/domain/enums/rundown-mode'
+import { PlayoutContentType } from '../../rundown-execution/domain/enums/playout-content-type'
 import { PlayoutContentRepository } from '../../data-access/repositories/interfaces/playout-content-repository'
 
 const INFINITE_PIECES_PLAYOUT_CONTENT_TYPES: PlayoutContentType[] = [PlayoutContentType.DOWNSTREAM_KEYER]

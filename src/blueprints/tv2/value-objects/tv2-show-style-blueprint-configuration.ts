@@ -1,4 +1,4 @@
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
 
 export interface Tv2ShowStyleBlueprintConfiguration {
   graphicsDefault: GraphicsDefault

@@ -1,6 +1,6 @@
 import { DeviceEventType } from '../enums/event-type'
 import { TypedEvent } from './typed-event'
-import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { VideoMixerConfiguration } from '../../rundown-execution/domain/value-objects/video-mixer-configuration'
 
 export type DeviceEvent = VideoMixerConfigurationUpdatedEvent
 

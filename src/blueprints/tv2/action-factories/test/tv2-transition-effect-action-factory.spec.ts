@@ -10,17 +10,17 @@ import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
 import { Tv2Logger } from '../../tv2-logger'
 import { FrameTimeConverter } from '../../helpers/frame-time-converter'
-import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
+import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import {
   Tv2Action,
   Tv2BreakerTransitionEffectActionMetadata,
   Tv2TransitionEffectAction
 } from '../../value-objects/tv2-action'
-import { MutateActionMethods, MutateActionType, MutateActionWithPieceMethods } from '../../../../model/entities/action'
+import { MutateActionMethods, MutateActionType, MutateActionWithPieceMethods } from '../../../../rundown-execution/domain/entities/action'
 import { Breaker, TransitionEffectType } from '../../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
-import { PlayoutContentType } from '../../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../../model/enums/output-channel'
+import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   describe(Tv2TransitionEffectActionFactory.prototype.getMutateActionMethods.name, () => {

@@ -1,11 +1,11 @@
-import { Part } from '../../model/entities/part'
-import { Piece } from '../../model/entities/piece'
-import { Owner } from '../../model/enums/owner'
-import { InTransition } from '../../model/value-objects/in-transition'
+import { Part } from '../../rundown-execution/domain/entities/part'
+import { Piece } from '../../rundown-execution/domain/entities/piece'
+import { Owner } from '../../rundown-execution/domain/enums/owner'
+import { InTransition } from '../../rundown-execution/domain/value-objects/in-transition'
 import { RundownService } from './interfaces/rundown-service'
 import { AsyncLock } from '../async-lock'
-import { SetNextDirection } from '../../model/enums/set-next-direction'
-import { TakeMode } from '../../model/enums/take-mode'
+import { SetNextDirection } from '../../rundown-execution/domain/enums/set-next-direction'
+import { TakeMode } from '../../rundown-execution/domain/enums/take-mode'
 
 export class SynchronizedRundownService implements RundownService {
 

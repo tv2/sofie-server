@@ -1,10 +1,10 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
-import { IngestedPart } from '../../../model/entities/ingested-part'
+import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
 import { MongoDatabase } from './mongo-database'
 import { MongoIngestedEntityConverter, MongoIngestedPart } from './mongo-ingested-entity-converter'
 import { IngestedPieceRepository } from '../interfaces/ingested-piece-repository'
-import { IngestedPiece } from '../../../model/entities/ingested-piece'
+import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest rename to "ingestedParts"
 

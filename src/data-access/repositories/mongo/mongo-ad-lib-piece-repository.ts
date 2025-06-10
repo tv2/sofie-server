@@ -1,6 +1,6 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { ActionManifestRepository } from '../interfaces/action-manifest-repository'
-import { ActionManifest } from '../../../model/entities/action'
+import { ActionManifest } from '../../../rundown-execution/domain/entities/action'
 import { MongoDatabase } from './mongo-database'
 import { Filter } from 'mongodb'
 import { MongoId } from './mongo-entity-converter'

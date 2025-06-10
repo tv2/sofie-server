@@ -1,4 +1,4 @@
-import { Blueprint } from '../../model/value-objects/blueprint'
+import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprint'
 import { Tv2Blueprint } from './tv2-blueprint'
 import { Tv2EndStateForPartService } from './tv2-end-state-for-part-service'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'

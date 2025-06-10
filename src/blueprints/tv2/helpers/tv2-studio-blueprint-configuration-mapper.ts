@@ -1,4 +1,4 @@
-import { Studio } from '../../../model/entities/studio'
+import { Studio } from '../../../rundown-execution/domain/entities/studio'
 import {
   AudioBedSettings,
   Tv2DownstreamKeyerRole,
@@ -12,7 +12,7 @@ import {
   Tv2VizPilotGraphics,
   VideoMixerType
 } from '../value-objects/tv2-studio-blueprint-configuration'
-import { DeviceType } from '../../../model/enums/device-type'
+import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
 
 interface CoreStudioBlueprintConfiguration {
   SourcesCam: CoreSourceMappingWithSound[] // Cameras

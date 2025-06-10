@@ -1,10 +1,10 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { ActionRepository } from '../interfaces/action-repository'
-import { Action } from '../../../model/entities/action'
+import { Action } from '../../../rundown-execution/domain/entities/action'
 import { MongoDatabase } from './mongo-database'
 import { DeleteResult, UnorderedBulkOperation } from 'mongodb'
-import { DeletionFailedException } from '../../../model/exceptions/deletion-failed-exception'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { DeletionFailedException } from '../../../rundown-execution/domain/exceptions/deletion-failed-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoAction, MongoEntityConverter } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'actions'

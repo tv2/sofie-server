@@ -2,7 +2,7 @@ import { MediaEventEmitter } from '../../business-logic/services/interfaces/medi
 import { MediaEventObserver } from '../interfaces/media-event-observer'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaEvent, MediaUpdatedEvent } from '../value-objects/media-event'
-import { Media } from '../../model/entities/media'
+import { Media } from '../../rundown-execution/domain/entities/media'
 
 export class MediaEventService implements MediaEventEmitter, MediaEventObserver {
   private static instance: MediaEventService

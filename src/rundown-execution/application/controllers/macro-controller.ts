@@ -1,11 +1,11 @@
 import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
 import { Request, Response } from 'express'
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
-import { Exception } from '../../../model/exceptions/exception'
+import { Exception } from '../../domain/exceptions/exception'
 import { MacroDto } from '../dtos/macro-dto'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { MacroService } from '../../../business-logic/services/interfaces/macro-service'
-import { Macro } from '../../../model/entities/macro'
+import { Macro } from '../../domain/entities/macro'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/macros')

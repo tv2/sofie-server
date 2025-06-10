@@ -1,9 +1,9 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { Piece } from '../../../model/entities/piece'
+import { Piece } from '../../../rundown-execution/domain/entities/piece'
 import { MongoDatabase } from './mongo-database'
 import { AnyBulkWriteOperation, } from 'mongodb'
 import { MongoEntityConverter, MongoPiece } from './mongo-entity-converter'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 
 const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 

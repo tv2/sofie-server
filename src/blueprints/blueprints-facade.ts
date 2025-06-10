@@ -1,4 +1,4 @@
-import { Blueprint } from '../model/value-objects/blueprint'
+import { Blueprint } from '../rundown-execution/domain/value-objects/blueprint'
 import { Tv2BlueprintsFacade } from './tv2/tv2-blueprints-facade'
 
 /*

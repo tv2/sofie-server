@@ -1,9 +1,9 @@
-import { PartAction, PieceAction } from '../../../model/entities/action'
-import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
+import { PartAction, PieceAction } from '../../../rundown-execution/domain/entities/action'
+import { PartActionType, PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
 import { Breaker, TransitionEffectType } from './tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject } from './tv2-blueprint-timeline-object'
-import { AudioMode } from '../../../model/enums/audio-mode'
+import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
 import {
   AudioPlayoutContent,
   CameraPlayoutContent,
@@ -18,9 +18,9 @@ import {
   SplitScreenPlayoutContent,
   TransitionPlayoutContent,
   VideoPlayoutContent
-} from '../../../model/value-objects/playout-content'
-import { PlayoutContentType } from '../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../model/enums/output-channel'
+} from '../../../rundown-execution/domain/value-objects/playout-content'
+import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
 
 export enum Tv2ActionSubtype {
   RECALL_SPLIT_SCREEN = 'RECALL_SPLIT_SCREEN',

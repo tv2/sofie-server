@@ -4,11 +4,11 @@ import {
   MutateActionMethods,
   MutateActionType,
   MutateActionWithPieceMethods,
-} from '../../../model/entities/action'
-import { PieceActionType } from '../../../model/enums/action-type'
-import { Piece, PieceInterface } from '../../../model/entities/piece'
-import { TransitionType } from '../../../model/enums/transition-type'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+} from '../../../rundown-execution/domain/entities/action'
+import { PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { Piece, PieceInterface } from '../../../rundown-execution/domain/entities/piece'
+import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import {
   Tv2Action,
@@ -31,9 +31,9 @@ import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
-import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { TimelineEnable } from '../../../rundown-execution/domain/entities/timeline-enable'
 import { Tv2DownstreamKeyer, Tv2DownstreamKeyerRole } from '../value-objects/tv2-studio-blueprint-configuration'
-import { InTransition } from '../../../model/value-objects/in-transition'
+import { InTransition } from '../../../rundown-execution/domain/value-objects/in-transition'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { Tv2AssetPathHelper } from '../helpers/tv2-asset-path-helper'
 import {
@@ -43,9 +43,9 @@ import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timel
 import { Tv2Logger } from '../tv2-logger'
 import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
-import { OutputLayer } from '../../../model/enums/output-layer'
-import { PlayoutContentType } from '../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../model/enums/output-channel'
+import { OutputLayer } from '../../../rundown-execution/domain/enums/output-layer'
+import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 

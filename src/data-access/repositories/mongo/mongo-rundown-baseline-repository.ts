@@ -1,8 +1,8 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'
-import { TimelineObject } from '../../../model/entities/timeline-object'
+import { TimelineObject } from '../../../rundown-execution/domain/entities/timeline-object'
 import { MongoDatabase } from './mongo-database'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoTimeline } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'rundownBaselineObjs'

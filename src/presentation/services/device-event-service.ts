@@ -2,7 +2,7 @@ import { DeviceEvent } from '../value-objects/device-event'
 import { DeviceEventEmitter } from '../../business-logic/services/interfaces/device-event-emitter'
 import { DeviceEventObserver } from '../interfaces/device-event-observer'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
-import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-configuration'
+import { VideoMixerConfiguration } from '../../rundown-execution/domain/value-objects/video-mixer-configuration'
 
 export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserver {
 

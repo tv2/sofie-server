@@ -1,5 +1,5 @@
 import { BaseMongoRepository } from './base-mongo-repository'
-import { PlayoutContent } from '../../../model/value-objects/playout-content'
+import { PlayoutContent } from '../../../rundown-execution/domain/value-objects/playout-content'
 import { PlayoutContentRepository } from '../interfaces/playout-content-repository'
 import { MongoId } from './mongo-entity-converter'
 import { MongoDatabase } from './mongo-database'

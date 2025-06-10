@@ -1,4 +1,4 @@
-import { PlayoutContent } from '../../../model/value-objects/playout-content'
+import { PlayoutContent } from '../../../rundown-execution/domain/value-objects/playout-content'
 
 export interface PlayoutContentRepository {
   savePlayoutContents(programPlayoutContents: PlayoutContent[], previewPlayoutContent: PlayoutContent[]): Promise<void>

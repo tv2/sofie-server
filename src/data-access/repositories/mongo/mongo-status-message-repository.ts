@@ -1,8 +1,8 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { StatusMessageRepository } from '../interfaces/status-message-repository'
-import { StatusMessage } from '../../../model/entities/status-message'
+import { StatusMessage } from '../../../rundown-execution/domain/entities/status-message'
 import { MongoDatabase } from './mongo-database'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoId } from './mongo-entity-converter'
 
 const STATUS_MESSAGE_COLLECTION_NAME: string = 'statusMessages'

@@ -1,4 +1,4 @@
-import { SisyfosPersistenceMetadata } from '../../../model/value-objects/metadata'
+import { SisyfosPersistenceMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
 
 // These values are taken from "PartEndStateExt" in Blueprints
 export interface Tv2PartEndState {

@@ -1,6 +1,6 @@
 import { HttpResponseFormatter } from './interfaces/http-response-formatter'
-import { ErrorCode } from '../model/enums/error-code'
-import { Exception } from '../model/exceptions/exception'
+import { ErrorCode } from '../rundown-execution/domain/enums/error-code'
+import { Exception } from '../rundown-execution/domain/exceptions/exception'
 
 enum RequestStatus {
   ERROR = 'ERROR',

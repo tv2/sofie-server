@@ -1,4 +1,4 @@
-import { Timeline } from '../../../model/entities/timeline'
+import { Timeline } from '../../../rundown-execution/domain/entities/timeline'
 
 export interface TimelineRepository {
   getTimeline(): Promise<Timeline>

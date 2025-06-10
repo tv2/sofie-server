@@ -1,6 +1,6 @@
 import { Tv2ShowStyleBlueprintConfigurationMapper } from './tv2-show-style-blueprint-configuration-mapper'
 import { Tv2StudioBlueprintConfigurationMapper } from './tv2-studio-blueprint-configuration-mapper'
-import { Configuration } from '../../../model/entities/configuration'
+import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 
 export class Tv2ConfigurationMapper {

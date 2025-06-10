@@ -1,19 +1,19 @@
 import { Tv2Action, Tv2ActionSubtype, Tv2PieceAction, Tv2RobotAction } from '../value-objects/tv2-action'
-import { PieceActionType } from '../../../model/enums/action-type'
-import { PieceInterface } from '../../../model/entities/piece'
-import { Action, ActionArgumentType, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import { PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { PieceInterface } from '../../../rundown-execution/domain/entities/piece'
+import { Action, ActionArgumentType, MutateActionMethods, MutateActionType } from '../../../rundown-execution/domain/entities/action'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { TransitionType } from '../../../model/enums/transition-type'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import {
   Tv2RobotTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-robot-timeline-object-factory'
 import { ActionFactory } from './action-factory'
-import { OutputLayer } from '../../../model/enums/output-layer'
-import { PlayoutContentType } from '../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../model/enums/output-channel'
+import { OutputLayer } from '../../../rundown-execution/domain/enums/output-layer'
+import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
 
 export class Tv2RobotActionFactory extends ActionFactory {
 

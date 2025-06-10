@@ -1,16 +1,16 @@
-import { BlueprintOnTimelineGenerate } from '../../model/value-objects/blueprint'
-import { RundownPersistentState } from '../../model/value-objects/rundown-persistent-state'
-import { Part } from '../../model/entities/part'
+import { BlueprintOnTimelineGenerate } from '../../rundown-execution/domain/value-objects/blueprint'
+import { RundownPersistentState } from '../../rundown-execution/domain/value-objects/rundown-persistent-state'
+import { Part } from '../../rundown-execution/domain/entities/part'
 import { Tv2SisyfosLayer } from './value-objects/tv2-layers'
 import { Tv2MediaPlayerSession, Tv2RundownPersistentState } from './value-objects/tv2-rundown-persistent-state'
-import { TimelineObject, TimelineObjectGroup } from '../../model/entities/timeline-object'
+import { TimelineObject, TimelineObjectGroup } from '../../rundown-execution/domain/entities/timeline-object'
 import { Tv2PartEndState } from './value-objects/tv2-part-end-state'
 import { Tv2SisyfosPersistentLayerFinder } from './helpers/tv2-sisyfos-persistent-layer-finder'
-import { UnsupportedOperationException } from '../../model/exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 import { Tv2BlueprintTimelineObject } from './value-objects/tv2-blueprint-timeline-object'
 import { Tv2MediaPlayer } from './value-objects/tv2-studio-blueprint-configuration'
-import { Timeline } from '../../model/entities/timeline'
-import { DeviceType } from '../../model/enums/device-type'
+import { Timeline } from '../../rundown-execution/domain/entities/timeline'
+import { DeviceType } from '../../rundown-execution/domain/enums/device-type'
 import {
   AtemAuxTimelineObject,
   AtemMixEffectTimelineObject,
@@ -18,10 +18,10 @@ import {
   AtemType
 } from '../timeline-state-resolver-types/atem-types'
 import { A_B_SOURCE_INPUT_PLACEHOLDER, A_B_SOURCE_LAYERS } from './value-objects/tv2-a-b-source-layers'
-import { Configuration } from '../../model/entities/configuration'
+import { Configuration } from '../../rundown-execution/domain/entities/configuration'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { SisyfosChannelsTimelineObject, SisyfosType } from '../timeline-state-resolver-types/sisyfos-types'
-import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
+import { OnTimelineGenerateResult } from '../../rundown-execution/domain/value-objects/on-timeline-generate-result'
 import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
 import {
   TriCasterInputName,

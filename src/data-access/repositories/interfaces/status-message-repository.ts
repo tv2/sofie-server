@@ -1,4 +1,4 @@
-import { StatusMessage } from '../../../model/entities/status-message'
+import { StatusMessage } from '../../../rundown-execution/domain/entities/status-message'
 
 export interface StatusMessageRepository {
   getStatusMessage(id: string): Promise<StatusMessage>

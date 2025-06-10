@@ -3,7 +3,7 @@ import {
   Tv2GraphicsType,
   Tv2StudioBlueprintConfiguration,
 } from '../value-objects/tv2-studio-blueprint-configuration'
-import { DeviceType } from '../../../model/enums/device-type'
+import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 
 export class Tv2BlueprintConfigurationTestFactory {

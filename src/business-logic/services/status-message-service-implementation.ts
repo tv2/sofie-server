@@ -1,9 +1,9 @@
-import { StatusMessage } from '../../model/entities/status-message'
+import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
 import { StatusMessageService } from './interfaces/status-message-service'
 import { StatusMessageEventEmitter } from './interfaces/status-message-event-emitter'
 import { StatusMessageRepository } from '../../data-access/repositories/interfaces/status-message-repository'
-import { StatusCode } from '../../model/enums/status-code'
-import { NotFoundException } from '../../model/exceptions/not-found-exception'
+import { StatusCode } from '../../rundown-execution/domain/enums/status-code'
+import { NotFoundException } from '../../rundown-execution/domain/exceptions/not-found-exception'
 
 export class StatusMessageServiceImplementation implements StatusMessageService {
 

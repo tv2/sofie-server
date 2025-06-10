@@ -3,16 +3,16 @@ import {
   BlueprintGenerateActions,
   BlueprintGetEndStateForPart,
   BlueprintOnTimelineGenerate, BlueprintValidateConfiguration
-} from '../../model/value-objects/blueprint'
-import { RundownPersistentState } from '../../model/value-objects/rundown-persistent-state'
-import { Part } from '../../model/entities/part'
-import { PartEndState } from '../../model/value-objects/part-end-state'
-import { Timeline } from '../../model/entities/timeline'
-import { Configuration } from '../../model/entities/configuration'
-import { Action, ActionManifest, MutateActionMethods } from '../../model/entities/action'
+} from '../../rundown-execution/domain/value-objects/blueprint'
+import { RundownPersistentState } from '../../rundown-execution/domain/value-objects/rundown-persistent-state'
+import { Part } from '../../rundown-execution/domain/entities/part'
+import { PartEndState } from '../../rundown-execution/domain/value-objects/part-end-state'
+import { Timeline } from '../../rundown-execution/domain/entities/timeline'
+import { Configuration } from '../../rundown-execution/domain/entities/configuration'
+import { Action, ActionManifest, MutateActionMethods } from '../../rundown-execution/domain/entities/action'
 import { Tv2Action } from './value-objects/tv2-action'
-import { StatusMessage } from '../../model/entities/status-message'
-import { Piece } from '../../model/entities/piece'
+import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
+import { Piece } from '../../rundown-execution/domain/entities/piece'
 
 export class Tv2Blueprint implements Blueprint {
   constructor(

@@ -1,4 +1,4 @@
-import { Action } from '../../../model/entities/action'
+import { Action } from '../../../rundown-execution/domain/entities/action'
 
 export interface ActionService {
   getActionsForRundown(rundownId: string): Promise<Action[]>

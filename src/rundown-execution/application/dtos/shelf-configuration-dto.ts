@@ -1,4 +1,4 @@
-import { ShelfConfiguration, ShelfActionPanelConfiguration } from '../../../model/entities/shelf-configuration'
+import { ShelfConfiguration, ShelfActionPanelConfiguration } from '../../domain/entities/shelf-configuration'
 
 export class ShelfConfigurationDto {
   public readonly id: string

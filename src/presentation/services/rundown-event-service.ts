@@ -26,10 +26,10 @@ import {
 } from '../value-objects/rundown-event'
 import { RundownEventEmitter } from '../../business-logic/services/interfaces/rundown-event-emitter'
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
-import { Rundown } from '../../model/entities/rundown'
-import { Piece } from '../../model/entities/piece'
-import { Part } from '../../model/entities/part'
-import { Segment } from '../../model/entities/segment'
+import { Rundown } from '../../rundown-execution/domain/entities/rundown'
+import { Piece } from '../../rundown-execution/domain/entities/piece'
+import { Part } from '../../rundown-execution/domain/entities/part'
+import { Segment } from '../../rundown-execution/domain/entities/segment'
 import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 
 export class RundownEventService implements RundownEventEmitter, RundownEventObserver {

@@ -1,5 +1,5 @@
-import { Action, ActionArgument } from '../../../model/entities/action'
-import { ActionType } from '../../../model/enums/action-type'
+import { Action, ActionArgument } from '../../domain/entities/action'
+import { ActionType } from '../../domain/enums/action-type'
 
 export class ActionDto {
 

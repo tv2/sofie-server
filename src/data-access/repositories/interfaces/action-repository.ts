@@ -1,4 +1,4 @@
-import { Action } from '../../../model/entities/action'
+import { Action } from '../../../rundown-execution/domain/entities/action'
 
 export interface ActionRepository {
   getAction(actionId: string): Promise<Action>

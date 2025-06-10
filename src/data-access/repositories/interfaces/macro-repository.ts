@@ -1,4 +1,4 @@
-import { Macro } from '../../../model/entities/macro'
+import { Macro } from '../../../rundown-execution/domain/entities/macro'
 
 export interface MacroRepository {
   getMacro(macroId: string): Promise<Macro>

@@ -1,10 +1,10 @@
 import { ConfigurationRepository } from '../interfaces/configuration-repository'
-import { Configuration } from '../../../model/entities/configuration'
+import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { StudioRepository } from '../interfaces/studio-repository'
 import { ShowStyleRepository } from '../interfaces/show-style-repository'
-import { ShowStyle } from '../../../model/entities/show-style'
-import { Studio } from '../../../model/entities/studio'
-import {UnsupportedOperationException} from '../../../model/exceptions/unsupported-operation-exception'
+import { ShowStyle } from '../../../rundown-execution/domain/entities/show-style'
+import { Studio } from '../../../rundown-execution/domain/entities/studio'
+import {UnsupportedOperationException} from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 
 // Alba currently only uses one hardcoded studio.
 const STUDIO_ID: string = 'studio0'

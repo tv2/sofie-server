@@ -1,10 +1,10 @@
 import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
 import { Request, Response } from 'express'
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
-import { Exception } from '../../../model/exceptions/exception'
+import { Exception } from '../../domain/exceptions/exception'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { VideoMixerDeviceRepository } from '../../../data-access/repositories/interfaces/video-mixer-device-repository'
-import { VideoMixerConfiguration } from '../../../model/value-objects/video-mixer-configuration'
+import { VideoMixerConfiguration } from '../../domain/value-objects/video-mixer-configuration'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/devices')

@@ -1,7 +1,7 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { ShelfConfigurationRepository } from '../interfaces/shelf-configuration-repository'
-import { ShelfConfiguration } from '../../../model/entities/shelf-configuration'
+import { ShelfConfiguration } from '../../../rundown-execution/domain/entities/shelf-configuration'
 import { UuidGenerator } from '../interfaces/uuid-generator'
 import { MongoId } from './mongo-entity-converter'
 

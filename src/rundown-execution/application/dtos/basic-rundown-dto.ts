@@ -1,7 +1,7 @@
-import { BasicRundown } from '../../../model/entities/basic-rundown'
-import { RundownTiming } from '../../../model/value-objects/rundown-timing'
-import { RundownMode } from '../../../model/enums/rundown-mode'
-import { TakeMode } from '../../../model/enums/take-mode'
+import { BasicRundown } from '../../domain/entities/basic-rundown'
+import { RundownTiming } from '../../domain/value-objects/rundown-timing'
+import { RundownMode } from '../../domain/enums/rundown-mode'
+import { TakeMode } from '../../domain/enums/take-mode'
 
 export class BasicRundownDto {
   public readonly id: string

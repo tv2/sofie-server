@@ -1,5 +1,5 @@
-import { TimelineObject } from '../../model/entities/timeline-object'
-import { DeviceType } from '../../model/enums/device-type'
+import { TimelineObject } from '../../rundown-execution/domain/entities/timeline-object'
+import { DeviceType } from '../../rundown-execution/domain/enums/device-type'
 
 export interface TriCasterMixEffectTimelineObject extends TimelineObject {
   content: {

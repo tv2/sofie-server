@@ -1,4 +1,4 @@
-import { Trigger } from '../../../model/entities/trigger'
+import { Trigger } from '../../../rundown-execution/domain/entities/trigger'
 
 export interface TriggerEventEmitter {
   emitTriggerCreatedEvent(trigger: Trigger): void

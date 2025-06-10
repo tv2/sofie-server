@@ -1,12 +1,12 @@
-import { Action } from '../../../model/entities/action'
+import { Action } from '../../../rundown-execution/domain/entities/action'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
-import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
-import { PartInterface } from '../../../model/entities/part'
+import { PartActionType, PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { PartInterface } from '../../../rundown-execution/domain/entities/part'
 import { Tv2ReplayAction, Tv2ReplayAuxAction } from '../value-objects/tv2-action'
 import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../value-objects/tv2-layers'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { TransitionType } from '../../../model/enums/transition-type'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import {
   Tv2VideoMixerTimelineObjectFactory
@@ -14,14 +14,14 @@ import {
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-audio-mixer-timeline-object-factory'
-import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { TimelineEnable } from '../../../rundown-execution/domain/entities/timeline-enable'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
-import { AudioMode } from '../../../model/enums/audio-mode'
-import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { OutputLayer } from '../../../model/enums/output-layer'
-import { PlayoutContentType } from '../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../model/enums/output-channel'
+import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
+import { PieceMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
+import { OutputLayer } from '../../../rundown-execution/domain/enums/output-layer'
+import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
 
 const EPSIO_REGEX: RegExp = /EPSIO/i
 

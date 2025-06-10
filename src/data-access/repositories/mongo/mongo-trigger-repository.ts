@@ -1,9 +1,9 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { TriggerRepository } from '../interfaces/trigger-repository'
-import { Trigger } from '../../../model/entities/trigger'
+import { Trigger } from '../../../rundown-execution/domain/entities/trigger'
 import { MongoDatabase } from './mongo-database'
 import { UuidGenerator } from '../interfaces/uuid-generator'
-import { NotFoundException } from '../../../model/exceptions/not-found-exception'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoId } from './mongo-entity-converter'
 
 const ACTION_TRIGGER_COLLECTION: string = 'triggers'

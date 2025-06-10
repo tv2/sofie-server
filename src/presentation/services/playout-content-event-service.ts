@@ -1,6 +1,6 @@
 import { PlayoutContentEventEmitter } from '../../business-logic/services/interfaces/playout-content-event-emitter'
 import { PlayoutContentEventObserver } from '../interfaces/playout-content-event-observer'
-import { PlayoutContent } from '../../model/value-objects/playout-content'
+import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 import {
   PlayoutContentEvent,
   PreviewPlayoutContentEvent,

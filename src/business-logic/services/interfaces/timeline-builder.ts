@@ -1,6 +1,6 @@
-import { Rundown } from '../../../model/entities/rundown'
-import { Timeline } from '../../../model/entities/timeline'
-import { Studio } from '../../../model/entities/studio'
+import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
+import { Timeline } from '../../../rundown-execution/domain/entities/timeline'
+import { Studio } from '../../../rundown-execution/domain/entities/studio'
 
 export interface TimelineBuilder {
   getBaseTimeline(): Timeline

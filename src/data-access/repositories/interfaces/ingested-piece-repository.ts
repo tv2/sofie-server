@@ -1,4 +1,4 @@
-import { IngestedPiece } from '../../../model/entities/ingested-piece'
+import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
 
 export interface IngestedPieceRepository {
   getIngestedPiecesForRundown(rundownId: string): Promise<IngestedPiece[]>

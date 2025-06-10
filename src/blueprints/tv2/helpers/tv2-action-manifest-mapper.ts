@@ -1,5 +1,5 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { ActionManifest } from '../../../model/entities/action'
+import { ActionManifest } from '../../../rundown-execution/domain/entities/action'
 import {
   SplitScreenBoxInput,
   Tv2ActionManifestData,
@@ -16,10 +16,10 @@ import {
 } from '../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
 import { ExhaustiveCaseChecker } from '../../../business-logic/exhaustive-case-checker'
 import { Tv2Logger } from '../tv2-logger'
-import { AudioMode } from '../../../model/enums/audio-mode'
+import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
 
 const SPLIT_SCREEN_ACTION_MANIFEST_ID: string = 'select_dve'
 const VIDEO_CLIP_ACTION_MANIFEST_ID: string = 'select_server_clip'

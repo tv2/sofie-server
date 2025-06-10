@@ -1,15 +1,15 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
+import { Action, MutateActionMethods, MutateActionType } from '../../../rundown-execution/domain/entities/action'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
-import { TransitionType } from '../../../model/enums/transition-type'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
+import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { PartActionType, PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
 import {
   Tv2DownstreamKeyer,
   Tv2DownstreamKeyerRole,
   Tv2GraphicsType
 } from '../value-objects/tv2-studio-blueprint-configuration'
-import { PartInterface } from '../../../model/entities/part'
+import { PartInterface } from '../../../rundown-execution/domain/entities/part'
 import { GraphicsTemplate } from '../value-objects/tv2-show-style-blueprint-configuration'
 import {
   Tv2AudioMixerTimelineObjectFactory
@@ -18,8 +18,8 @@ import {
   Tv2VideoMixerTimelineObjectFactory,
   VideoMixerWipeTransitionSettings
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
-import { TimelineObject } from '../../../model/entities/timeline-object'
-import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { TimelineObject } from '../../../rundown-execution/domain/entities/timeline-object'
+import { TimelineEnable } from '../../../rundown-execution/domain/entities/timeline-enable'
 import {
   Tv2GraphicsElementTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-graphics-element-timeline-object-factory'
@@ -47,11 +47,11 @@ import { Tv2ActionManifestMapper } from '../helpers/tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../value-objects/tv2-action-manifest'
 import { ActionFactory } from './action-factory'
 import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
-import { Configuration } from '../../../model/entities/configuration'
-import { PieceInterface } from '../../../model/entities/piece'
-import { OutputLayer } from '../../../model/enums/output-layer'
-import { PlayoutContentType } from '../../../model/enums/playout-content-type'
-import { OutputChannel } from '../../../model/enums/output-channel'
+import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
+import { PieceInterface } from '../../../rundown-execution/domain/entities/piece'
+import { OutputLayer } from '../../../rundown-execution/domain/enums/output-layer'
+import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
 
 const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
   Tv2PieceLayer.GRAPHICS_IDENT,

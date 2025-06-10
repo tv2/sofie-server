@@ -3,9 +3,9 @@ import { StatusMessageService } from '../interfaces/status-message-service'
 import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { StatusMessageEventEmitter } from '../interfaces/status-message-event-emitter'
 import { StatusMessageRepository } from '../../../data-access/repositories/interfaces/status-message-repository'
-import { EntityTestFactory } from '../../../model/entities/test/entity-test-factory'
-import { StatusCode } from '../../../model/enums/status-code'
-import { StatusMessage } from '../../../model/entities/status-message'
+import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
+import { StatusCode } from '../../../rundown-execution/domain/enums/status-code'
+import { StatusMessage } from '../../../rundown-execution/domain/entities/status-message'
 
 describe(StatusMessageServiceImplementation.name, () => {
   describe(StatusMessageServiceImplementation.prototype.updateStatusMessage.name, () => {

@@ -1,19 +1,19 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, MutateActionMethods, MutateActionType } from '../../../model/entities/action'
-import { PartActionType, PieceActionType } from '../../../model/enums/action-type'
-import { Piece } from '../../../model/entities/piece'
-import { Part, PartInterface } from '../../../model/entities/part'
+import { Action, MutateActionMethods, MutateActionType } from '../../../rundown-execution/domain/entities/action'
+import { PartActionType, PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { Piece } from '../../../rundown-execution/domain/entities/piece'
+import { Part, PartInterface } from '../../../rundown-execution/domain/entities/part'
 import {
   SplitScreenBoxProperties,
   SplitScreenConfiguration
 } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
-import { PieceLifespan } from '../../../model/enums/piece-lifespan'
-import { TransitionType } from '../../../model/enums/transition-type'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
+import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
-import { TimelineEnable } from '../../../model/entities/timeline-enable'
+import { TimelineEnable } from '../../../rundown-execution/domain/entities/timeline-enable'
 import {
   Tv2Action,
   Tv2ActionSubtype,
@@ -52,17 +52,17 @@ import { ActionFactory } from './action-factory'
 import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
 import { Tv2Logger } from '../tv2-logger'
 import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-action-exception'
-import { PieceMetadata } from '../../../model/value-objects/metadata'
-import { OutputLayer } from '../../../model/enums/output-layer'
-import { AudioMode } from '../../../model/enums/audio-mode'
+import { PieceMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
+import { OutputLayer } from '../../../rundown-execution/domain/enums/output-layer'
+import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
 import { ObjectCloner } from '../../../business-logic/services/interfaces/object-cloner'
-import { PlayoutContentType } from '../../../model/enums/playout-content-type'
+import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
 import {
   SourcePlayoutContent,
   SplitScreenInputPlayoutContent,
   SplitScreenPlayoutContent
-} from '../../../model/value-objects/playout-content'
-import { OutputChannel } from '../../../model/enums/output-channel'
+} from '../../../rundown-execution/domain/value-objects/playout-content'
+import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 

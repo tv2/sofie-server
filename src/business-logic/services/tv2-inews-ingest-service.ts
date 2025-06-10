@@ -1,9 +1,9 @@
 import { IngestService } from './interfaces/ingest-service'
 import { HttpService } from './interfaces/http-service'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
-import { Rundown } from '../../model/entities/rundown'
-import { ServiceUnavailableException } from '../../model/exceptions/service-unavailable-exception'
-import { NotFoundException } from '../../model/exceptions/not-found-exception'
+import { Rundown } from '../../rundown-execution/domain/entities/rundown'
+import { ServiceUnavailableException } from '../../rundown-execution/domain/exceptions/service-unavailable-exception'
+import { NotFoundException } from '../../rundown-execution/domain/exceptions/not-found-exception'
 import { HttpError, HttpErrorCode } from '../http-error'
 
 const INEWS_HOST: string = process.env.INEWS_HOST ?? 'localhost:3007'

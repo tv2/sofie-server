@@ -1,5 +1,5 @@
-import { PieceInterface } from '../../../model/entities/piece'
-import { PieceMetadata } from '../../../model/value-objects/metadata'
+import { PieceInterface } from '../../../rundown-execution/domain/entities/piece'
+import { PieceMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
 
 export interface Tv2PieceInterface extends PieceInterface {
   metadata: PieceMetadata

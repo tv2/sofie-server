@@ -1,5 +1,5 @@
 import { ActionManifestRepository } from '../interfaces/action-manifest-repository'
-import { ActionManifest } from '../../../model/entities/action'
+import { ActionManifest } from '../../../rundown-execution/domain/entities/action'
 
 export class MongoActionManifestRepository implements ActionManifestRepository {
 

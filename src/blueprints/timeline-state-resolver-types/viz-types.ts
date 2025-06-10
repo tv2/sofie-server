@@ -1,5 +1,5 @@
-import { DeviceType } from '../../model/enums/device-type'
-import { TimelineObject } from '../../model/entities/timeline-object'
+import { DeviceType } from '../../rundown-execution/domain/enums/device-type'
+import { TimelineObject } from '../../rundown-execution/domain/entities/timeline-object'
 
 export const enum VizMseTransitionType {
   DELAY = 0

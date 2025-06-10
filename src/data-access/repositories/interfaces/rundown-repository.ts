@@ -1,5 +1,5 @@
-import { Rundown } from '../../../model/entities/rundown'
-import { BasicRundown } from '../../../model/entities/basic-rundown'
+import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
+import { BasicRundown } from '../../../rundown-execution/domain/entities/basic-rundown'
 
 export interface RundownRepository {
   getBasicRundowns(): Promise<BasicRundown[]>

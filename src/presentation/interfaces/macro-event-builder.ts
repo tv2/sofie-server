@@ -1,4 +1,4 @@
-import { Macro } from '../../model/entities/macro'
+import { Macro } from '../../rundown-execution/domain/entities/macro'
 import {
   MacroCreatedEvent,
   MacroDeletedEvent,

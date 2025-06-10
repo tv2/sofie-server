@@ -1,10 +1,10 @@
-import { Rundown } from '../../model/entities/rundown'
-import { Timeline } from '../../model/entities/timeline'
-import { Configuration } from '../../model/entities/configuration'
-import { OnTimelineGenerateResult } from '../../model/value-objects/on-timeline-generate-result'
+import { Rundown } from '../../rundown-execution/domain/entities/rundown'
+import { Timeline } from '../../rundown-execution/domain/entities/timeline'
+import { Configuration } from '../../rundown-execution/domain/entities/configuration'
+import { OnTimelineGenerateResult } from '../../rundown-execution/domain/value-objects/on-timeline-generate-result'
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { TimelineBuilder } from './interfaces/timeline-builder'
-import { Blueprint } from '../../model/value-objects/blueprint'
+import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprint'
 
 export class BlueprintTimelineBuilder implements TimelineBuilder {
 

@@ -19,7 +19,7 @@ import {
   Tv2ActionManifestOverlayGraphicsData
 } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-configuration-test-factory'
-import { EntityTestFactory } from '../../../../model/entities/test/entity-test-factory'
+import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import {
   Tv2EmptyGraphicsCommandTimelineObjectFactory
 } from '../../timeline-object-factories/tv2-empty-graphics-command-timeline-object-factory'
@@ -28,7 +28,7 @@ import { Tv2DownstreamKeyerRole } from '../../value-objects/tv2-studio-blueprint
 import {
   Tv2GraphicsElementTimelineObjectFactory
 } from '../../timeline-object-factories/interfaces/tv2-graphics-element-timeline-object-factory'
-import { DeviceType } from '../../../../model/enums/device-type'
+import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
 import { Tv2Logger } from '../../tv2-logger'
 
