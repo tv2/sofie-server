@@ -57,7 +57,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository<Mon
         break
       }
       case MongoChangeEvent.UPDATE: {
-        // These are all SofieServer changes. We don't care to listen for those.
+        // These are all AlbaServer changes. We don't care to listen for those.
         break
       }
     }

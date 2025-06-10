@@ -2,7 +2,7 @@ import { Blueprint } from '../model/value-objects/blueprint'
 import { Tv2BlueprintsFacade } from './tv2/tv2-blueprints-facade'
 
 /*
- ATTENTION: The Blueprints layer is NOT allowed to know anything from the rest of SofieServer except from the Model layer.
+ ATTENTION: The Blueprints layer is NOT allowed to know anything from the rest of AlbaServer except from the Model layer.
  If you find your self calling Facades from the other layers to instantiate your Blueprint then you are doing something wrong!
  The quickest way to assert you are not violating this contract is to ensure that your Blueprint don't have any imports from any of the other layers.
 

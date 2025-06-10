@@ -11,7 +11,7 @@ import { SisyfosPersistenceMetadata } from '../../model/value-objects/metadata'
 
 /*
  Disclaimer: The code in this file is almost a 1 to 1 copy of the code of the corresponding implementations in Blueprints.
- Minimal effort has been put into refactoring it - only to the extent that it works with the new data model of SofieServer.
+ Minimal effort has been put into refactoring it - only to the extent that it works with the new data model of AlbaServer.
  */
 export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
 

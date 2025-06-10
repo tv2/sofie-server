@@ -16,7 +16,7 @@ const RUNDOWN_EVENT_SERVER_PORT: number = 3006
 
 const controllers: BaseController[] = ControllerFacade.getControllers()
 
-class SofieServer {
+class AlbaServer {
   public server: Express
 
   constructor() {
@@ -66,7 +66,7 @@ class SofieServer {
   }
 }
 
-async function startSofieServer(): Promise<void> {
+async function startAlbaServer(): Promise<void> {
   await connectToDatabase()
   await startSystemServices()
   attachExpressServerToPort(REST_API_PORT)
@@ -74,7 +74,7 @@ async function startSofieServer(): Promise<void> {
 }
 
 function attachExpressServerToPort(port: number): void {
-  new SofieServer().server.listen(port, () => {
+  new AlbaServer().server.listen(port, () => {
     const logger: Logger = LoggerFacade.createLogger().tag('startup')
     return logger.info(`Express is listening at http://localhost:${port}`)
   })
@@ -100,4 +100,4 @@ async function startSystemServices(): Promise<void> {
   ServiceFacade.createConfigurationDataChangedService()
 }
 
-startSofieServer().catch((error) => LoggerFacade.createLogger().tag('startup').data(error).error('Unable to start Sofie Server'))
+startAlbaServer().catch((error) => LoggerFacade.createLogger().tag('startup').data(error).error('Unable to start Alba Server'))
