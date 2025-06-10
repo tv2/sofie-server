@@ -1,6 +1,6 @@
 import { TypedEvent } from './typed-event'
 import { MacroEventType } from '../enums/event-type'
-import { MacroDto } from '../dtos/macro-dto'
+import { MacroDto } from '../../rundown-execution/application/dtos/macro-dto'
 
 export type MacroEvent = MacroCreatedEvent | MacroUpdatedEvent | MacroDeletedEvent
 

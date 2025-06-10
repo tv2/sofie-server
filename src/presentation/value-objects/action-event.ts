@@ -1,6 +1,6 @@
 import { TypedEvent } from './typed-event'
 import { ActionEventType } from '../enums/event-type'
-import { ActionDto } from '../dtos/action-dto'
+import { ActionDto } from '../../rundown-execution/application/dtos/action-dto'
 
 export type ActionEvent = ActionsUpdatedEvent
 

@@ -1,4 +1,4 @@
-import { SystemInformation } from '../../model/entities/system-information'
+import { SystemInformation } from '../../../model/entities/system-information'
 
 export class SystemInformationDto {
 

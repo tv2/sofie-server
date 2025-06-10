@@ -10,7 +10,7 @@ import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { ConfigurationService } from '../../business-logic/services/interfaces/configuration-service'
 import { ShelfConfigurationRepository } from '../../data-access/repositories/interfaces/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../model/entities/shelf-configuration'
-import { ShelfConfigurationDto } from '../dtos/shelf-configuration-dto'
+import { ShelfConfigurationDto } from '../../rundown-execution/application/dtos/shelf-configuration-dto'
 import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/configurations')

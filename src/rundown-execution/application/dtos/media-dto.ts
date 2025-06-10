@@ -1,4 +1,4 @@
-import { Media } from '../../model/entities/media'
+import { Media } from '../../../model/entities/media'
 
 export class MediaDto {
   public readonly id: string

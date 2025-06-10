@@ -2,7 +2,7 @@ import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, Res
 import { Request, Response } from 'express'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
-import { MacroDto } from '../dtos/macro-dto'
+import { MacroDto } from '../../rundown-execution/application/dtos/macro-dto'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { MacroService } from '../../business-logic/services/interfaces/macro-service'
 import { Macro } from '../../model/entities/macro'

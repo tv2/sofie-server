@@ -7,8 +7,8 @@ import { SystemInformation } from '../../model/entities/system-information'
 import { Exception } from '../../model/exceptions/exception'
 import { StatusMessageRepository } from '../../data-access/repositories/interfaces/status-message-repository'
 import { StatusMessage } from '../../model/entities/status-message'
-import { StatusMessageDto } from '../dtos/status-message-dto'
-import { SystemInformationDto } from '../dtos/system-information-dto'
+import { StatusMessageDto } from '../../rundown-execution/application/dtos/status-message-dto'
+import { SystemInformationDto } from '../../rundown-execution/application/dtos/system-information-dto'
 import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/systemInformation')

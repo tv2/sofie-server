@@ -27,8 +27,8 @@ import {
 } from '../value-objects/rundown-event'
 import { Piece } from '../../model/entities/piece'
 import { Part } from '../../model/entities/part'
-import { PartDto } from '../dtos/part-dto'
-import { PieceDto } from '../dtos/piece-dto'
+import { PartDto } from '../../rundown-execution/application/dtos/part-dto'
+import { PieceDto } from '../../rundown-execution/application/dtos/piece-dto'
 import {
   ActionEventType,
   ConfigurationEventType,
@@ -40,16 +40,16 @@ import {
   StatusMessageEventType,
   TriggerEventType
 } from '../enums/event-type'
-import { SegmentDto } from '../dtos/segment-dto'
+import { SegmentDto } from '../../rundown-execution/application/dtos/segment-dto'
 import { Segment } from '../../model/entities/segment'
-import { BasicRundownDto } from '../dtos/basic-rundown-dto'
+import { BasicRundownDto } from '../../rundown-execution/application/dtos/basic-rundown-dto'
 import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
 import { Trigger } from '../../model/entities/trigger'
 import { TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent } from '../value-objects/trigger-event'
-import { TriggerDto } from '../dtos/trigger-dto'
-import { RundownDto } from '../dtos/rundown-dto'
+import { TriggerDto } from '../../rundown-execution/application/dtos/trigger-dto'
+import { RundownDto } from '../../rundown-execution/application/dtos/rundown-dto'
 import { Media } from '../../model/entities/media'
-import { MediaDto } from '../dtos/media-dto'
+import { MediaDto } from '../../rundown-execution/application/dtos/media-dto'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
@@ -61,7 +61,7 @@ import { StatusMessageEvent } from '../value-objects/status-message-event'
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
 import { Action } from '../../model/entities/action'
 import { ActionsUpdatedEvent } from '../value-objects/action-event'
-import { ActionDto } from '../dtos/action-dto'
+import { ActionDto } from '../../rundown-execution/application/dtos/action-dto'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import {
   VideoMixerConfigurationUpdatedEvent
@@ -70,7 +70,7 @@ import { VideoMixerConfiguration } from '../../model/value-objects/video-mixer-c
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
 import { Macro } from '../../model/entities/macro'
 import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../value-objects/macro-event'
-import { MacroDto } from '../dtos/macro-dto'
+import { MacroDto } from '../../rundown-execution/application/dtos/macro-dto'
 import { PlayoutContentEventBuilder } from '../interfaces/playout-content-event-builder'
 import { PlayoutContent } from '../../model/value-objects/playout-content'
 import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from '../value-objects/playout-content-event'

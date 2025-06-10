@@ -6,7 +6,7 @@ import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { Media } from '../../model/entities/media'
 import { Exception } from '../../model/exceptions/exception'
 import { NotFoundException } from '../../model/exceptions/not-found-exception'
-import { MediaDto } from '../dtos/media-dto'
+import { MediaDto } from '../../rundown-execution/application/dtos/media-dto'
 import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/media')

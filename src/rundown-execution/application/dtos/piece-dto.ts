@@ -1,5 +1,5 @@
-import { Piece } from '../../model/entities/piece'
-import { PieceLifespan } from '../../model/enums/piece-lifespan'
+import { Piece } from '../../../model/entities/piece'
+import { PieceLifespan } from '../../../model/enums/piece-lifespan'
 
 export class PieceDto {
   public readonly id: string

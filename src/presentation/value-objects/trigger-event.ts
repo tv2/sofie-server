@@ -1,6 +1,6 @@
 import { TypedEvent } from './typed-event'
 import { TriggerEventType } from '../enums/event-type'
-import { TriggerDto } from '../dtos/trigger-dto'
+import { TriggerDto } from '../../rundown-execution/application/dtos/trigger-dto'
 
 export type TriggerEvent = TriggerCreatedEvent | TriggerUpdatedEvent | TriggerDeletedEvent
 

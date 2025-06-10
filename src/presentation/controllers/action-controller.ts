@@ -4,7 +4,7 @@ import { ActionService } from '../../business-logic/services/interfaces/action-s
 import { Action } from '../../model/entities/action'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Exception } from '../../model/exceptions/exception'
-import { ActionDto } from '../dtos/action-dto'
+import { ActionDto } from '../../rundown-execution/application/dtos/action-dto'
 import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { AuditLog } from '../decorators/audit-log-decorator'
 
