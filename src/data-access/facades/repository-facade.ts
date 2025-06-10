@@ -49,7 +49,7 @@ import { TriggerRepository } from '../repositories/interfaces/trigger-repository
 import { MongoTriggerRepository } from '../repositories/mongo/mongo-trigger-repository'
 import { CryptoUuidGenerator } from '../repositories/crypto-uuid-generator'
 import { UuidGenerator } from '../repositories/interfaces/uuid-generator'
-import { LoggerFacade } from '../../logger/logger-facade'
+import { LoggerFacade } from '../../cross-cutting-concerns/application/logger-facade'
 import { MongoMediaChangedListener } from '../repositories/mongo/mongo-media-changed-listener'
 import { Media } from '../../rundown-execution/domain/entities/media'
 import { SystemInformationRepository } from '../repositories/interfaces/system-information-repository'

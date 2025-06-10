@@ -8,7 +8,7 @@ import { ActionController } from '../../rundown-execution/application/controller
 import { ConfigurationController } from '../../rundown-execution/application/controllers/configuration-controller'
 import { JsendResponseFormatter } from '../jsend-response-formatter'
 import { TriggerController } from '../../rundown-execution/application/controllers/trigger-controller'
-import { LoggerFacade } from '../../logger/logger-facade'
+import { LoggerFacade } from '../../cross-cutting-concerns/application/logger-facade'
 import { MediaController } from '../../rundown-execution/application/controllers/media-controller'
 import { SystemInformationController } from '../../rundown-execution/application/controllers/system-information-controller'
 import { DeviceController } from '../../rundown-execution/application/controllers/device-controller'

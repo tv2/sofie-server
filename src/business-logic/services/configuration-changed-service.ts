@@ -6,7 +6,7 @@ import { StatusMessage } from '../../rundown-execution/domain/entities/status-me
 import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
 import { Configuration } from '../../rundown-execution/domain/entities/configuration'
 import { StatusMessageService } from './interfaces/status-message-service'
-import { Logger } from '../../logger/logger'
+import { Logger } from '../../cross-cutting-concerns/application/logger'
 import { UnsupportedOperationException } from '../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 import { ShowStyleVariant } from '../../rundown-execution/domain/entities/show-style-variant'
 

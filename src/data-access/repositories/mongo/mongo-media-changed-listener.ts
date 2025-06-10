@@ -1,6 +1,6 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { DataChangedListener } from '../interfaces/data-changed-listener'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { MongoDatabase } from './mongo-database'
 import {
   ChangeStream,

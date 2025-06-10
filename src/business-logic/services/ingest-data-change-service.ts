@@ -6,7 +6,7 @@ import { IngestedSegment } from '../../rundown-execution/domain/entities/ingeste
 import { IngestedPart } from '../../rundown-execution/domain/entities/ingested-part'
 import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { NotFoundException } from '../../rundown-execution/domain/exceptions/not-found-exception'
-import { Logger } from '../../logger/logger'
+import { Logger } from '../../cross-cutting-concerns/application/logger'
 import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
 import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
 import { SegmentRepository } from '../../data-access/repositories/interfaces/segment-repository'

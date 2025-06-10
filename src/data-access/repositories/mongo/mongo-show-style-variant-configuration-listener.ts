@@ -1,7 +1,7 @@
 import { BaseMongoRepository } from './base-mongo-repository'
 import { DataChangedListener } from '../interfaces/data-changed-listener'
 import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/show-style-variant'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { MongoDatabase } from './mongo-database'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'

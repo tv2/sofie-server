@@ -9,7 +9,7 @@ import {
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 
 const INGESTED_PIECE_COLLECTION_NAME: string = 'pieces' // TODO: Once we control ingest changed this to "ingestedPieces"
 

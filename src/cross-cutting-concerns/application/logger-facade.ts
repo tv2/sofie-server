@@ -1,5 +1,5 @@
 import { Logger } from './logger'
-import { ConsoleLogger } from './console-logger'
+import { ConsoleLogger } from '../infrastructure/console-logger'
 
 export class LoggerFacade {
   public static createLogger(): Logger {

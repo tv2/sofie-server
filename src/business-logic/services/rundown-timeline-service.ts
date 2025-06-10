@@ -18,7 +18,7 @@ import { IngestedRundownRepository } from '../../data-access/repositories/interf
 import { RundownMode } from '../../rundown-execution/domain/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../rundown-execution/domain/exceptions/already-rehearsal-exception'
 import { IngestService } from './interfaces/ingest-service'
-import { Logger } from '../../logger/logger'
+import { Logger } from '../../cross-cutting-concerns/application/logger'
 import { PlayoutService } from './interfaces/playoutService'
 import { TakeIsBlockedException } from '../../rundown-execution/domain/exceptions/take-is-blocked-exception'
 import { RundownCursor } from '../../rundown-execution/domain/value-objects/rundown-cursor'

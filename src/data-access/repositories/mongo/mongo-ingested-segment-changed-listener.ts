@@ -10,7 +10,7 @@ import {
 } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest changed this to "ingestedSegments"
 

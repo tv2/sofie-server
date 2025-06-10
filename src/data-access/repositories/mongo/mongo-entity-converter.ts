@@ -29,7 +29,7 @@ import { SystemInformation } from '../../../rundown-execution/domain/entities/sy
 import { StatusCode } from '../../../rundown-execution/domain/enums/status-code'
 import { RundownMode } from '../../../rundown-execution/domain/enums/rundown-mode'
 import { Invalidity } from '../../../rundown-execution/domain/value-objects/invalidity'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { Action, ActionArgument } from '../../../rundown-execution/domain/entities/action'
 import { ActionType } from '../../../rundown-execution/domain/enums/action-type'
 import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'

@@ -3,7 +3,7 @@ import { ShowStyle } from '../../../rundown-execution/domain/entities/show-style
 import { MongoDatabase } from './mongo-database'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 import { MongoShowStyle } from './mongo-entity-converter'
 

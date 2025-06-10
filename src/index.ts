@@ -4,8 +4,8 @@ import { BaseController } from './cross-cutting-concerns/application/base-contro
 import { ControllerFacade } from './presentation/facades/controller-facade'
 import { EventServerFacade } from './presentation/facades/event-server-facade'
 import { ServiceFacade } from './business-logic/facades/service-facade'
-import { Logger } from './logger/logger'
-import { LoggerFacade } from './logger/logger-facade'
+import { Logger } from './cross-cutting-concerns/application/logger'
+import { LoggerFacade } from './cross-cutting-concerns/application/logger-facade'
 import { RepositoryFacade } from './data-access/facades/repository-facade'
 import bodyParser from 'body-parser'
 

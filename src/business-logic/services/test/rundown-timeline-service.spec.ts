@@ -22,7 +22,7 @@ import { RundownMode } from '../../../rundown-execution/domain/enums/rundown-mod
 import { AlreadyRehearsalException } from '../../../rundown-execution/domain/exceptions/already-rehearsal-exception'
 import { IngestService } from '../interfaces/ingest-service'
 import { RundownService } from '../interfaces/rundown-service'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { PlayoutService } from '../interfaces/playoutService'
 import { InTransition } from '../../../rundown-execution/domain/value-objects/in-transition'
 import { TakeIsBlockedException } from '../../../rundown-execution/domain/exceptions/take-is-blocked-exception'

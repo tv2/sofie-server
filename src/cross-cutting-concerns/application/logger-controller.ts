@@ -1,5 +1,5 @@
 import { BaseController, PutRequest, RestController } from './base-controller'
-import { Logger, LogLevel } from '../../logger/logger'
+import { Logger, LogLevel } from './logger'
 import { Request, Response } from 'express'
 import { ExhaustiveCaseChecker } from '../../business-logic/exhaustive-case-checker'
 import { Exception } from '../../rundown-execution/domain/exceptions/exception'

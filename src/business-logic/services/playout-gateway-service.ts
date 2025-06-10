@@ -1,6 +1,6 @@
 import { PlayoutService } from './interfaces/playoutService'
 import { HttpService } from './interfaces/http-service'
-import { Logger } from '../../logger/logger'
+import { Logger } from '../../cross-cutting-concerns/application/logger'
 
 const PLAYOUT_GATEWAY_HOST: string = process.env.PLAYOUT_GATEWAY_HOST ?? 'localhost:3009'
 

@@ -4,7 +4,7 @@ import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
 import { ChangeStream, ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'

@@ -10,7 +10,7 @@ import { MongoIngestedEntityConverter, MongoIngestedRundown } from './mongo-inge
 import { MongoDatabase } from './mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
-import { Logger } from '../../../logger/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/logger'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest changed this to "ingestedRundowns"
 
