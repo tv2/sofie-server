@@ -25,7 +25,7 @@ const PLAYOUT_GATEWAY_POSTFIX: string = 'PlayoutCoreParent'
 const VIDEO_MIXER_NAME: string = 'atem'
 
 /**
- * This Repository only exists to fetch the hostname and port of the configured VideoMixer (currently hardcoded to Atem) while device settings reside in Sofie.
+ * This Repository only exists to fetch the hostname and port of the configured VideoMixer (currently hardcoded to Atem) while device settings reside in Sofie Core.
  * Once proper device settings are introduced in Alba this SHOULD be deleted!
  */
 export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDevice> implements VideoMixerDeviceRepository {

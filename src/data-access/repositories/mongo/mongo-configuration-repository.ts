@@ -6,9 +6,9 @@ import { ShowStyle } from '../../../model/entities/show-style'
 import { Studio } from '../../../model/entities/studio'
 import {UnsupportedOperationException} from '../../../model/exceptions/unsupported-operation-exception'
 
-// Sofie currently only uses one hardcoded studio.
+// Alba currently only uses one hardcoded studio.
 const STUDIO_ID: string = 'studio0'
-// Sofie currently only uses one hardcoded showStyle.
+// Alba currently only uses one hardcoded showStyle.
 const SHOW_STYLE_ID: string = 'show0'
 
 export class MongoConfigurationRepository implements ConfigurationRepository {

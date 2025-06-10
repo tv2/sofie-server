@@ -1,1 +1,1 @@
-Sofie Server
+Alba Server
