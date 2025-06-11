@@ -1,5 +1,5 @@
-import { DataChangeService } from './interfaces/data-change-service'
-import { MediaEventEmitter } from './interfaces/media-event-emitter'
+import { DataChangeService } from '../../rundown-execution/application/data-change-service'
+import { MediaEventEmitter } from '../../business-logic/services/interfaces/media-event-emitter'
 import { DataChangedListener } from '../../cross-cutting-concerns/application/data-changed-listener'
 import { Media } from '../../rundown-execution/domain/entities/media'
 import { UnsupportedOperationException } from '../../rundown-execution/domain/exceptions/unsupported-operation-exception'
