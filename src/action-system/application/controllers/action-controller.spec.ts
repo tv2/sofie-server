@@ -2,7 +2,7 @@ import { ActionController } from './action-controller'
 import { anything, instance, mock, verify } from '@typestrong/ts-mockito'
 import { Request, Response } from 'express'
 import { ActionService } from '../interfaces/action-service'
-import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 
 describe(ActionController.name, () => {

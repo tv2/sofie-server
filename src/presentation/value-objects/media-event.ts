@@ -1,6 +1,6 @@
 import { IngestEventType } from '../enums/event-type'
 import { MediaDto } from '../../rundown-execution/application/dtos/media-dto'
-import { TypedEvent } from './typed-event'
+import { TypedEvent } from '../../cross-cutting-concerns/application/value-objects/typed-event'
 
 
 export type MediaEvent = MediaCreatedEvent | MediaUpdatedEvent | MediaDeletedEvent

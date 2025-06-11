@@ -1,6 +1,6 @@
 import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/controllers/base-controller'
 import { Request, Response } from 'express'
-import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { Exception } from '../../domain/exceptions/exception'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { VideoMixerDeviceRepository } from '../../domain/repositories/video-mixer-device-repository'

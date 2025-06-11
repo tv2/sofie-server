@@ -2,7 +2,7 @@ import { BaseController, GetRequest, PutRequest, RestController } from '../../..
 import { Request, Response } from 'express'
 import { ActionService } from '../interfaces/action-service'
 import { Action } from '../../domain/entities/action'
-import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { ActionDto } from '../dtos/action-dto'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'

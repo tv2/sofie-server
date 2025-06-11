@@ -1,5 +1,5 @@
 import { EventType, IngestEventType, RundownEventType } from '../enums/event-type'
-import { TypedEvent } from './typed-event'
+import { TypedEvent } from '../../cross-cutting-concerns/application/value-objects/typed-event'
 import { PartDto } from '../../rundown-execution/application/dtos/part-dto'
 import { PieceDto } from '../../rundown-execution/application/dtos/piece-dto'
 import { SegmentDto } from '../../rundown-execution/application/dtos/segment-dto'

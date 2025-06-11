@@ -1,4 +1,4 @@
-import { TypedEvent } from './typed-event'
+import { TypedEvent } from '../../cross-cutting-concerns/application/value-objects/typed-event'
 import { PlayoutContentEventType } from '../enums/event-type'
 import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 

@@ -1,10 +1,10 @@
 import { BaseController, PutRequest, RestController } from './base-controller'
 import { Logger, LogLevel } from '../interfaces/logger'
 import { Request, Response } from 'express'
-import { ExhaustiveCaseChecker } from '../../domain/exhaustive-case-checker'
+import { ExhaustiveCaseChecker } from '../../domain/services/exhaustive-case-checker'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
-import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/loggers')

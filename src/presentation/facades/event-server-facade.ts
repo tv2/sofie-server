@@ -1,5 +1,5 @@
-import { EventServer } from '../emitters/interfaces/event-server'
-import { WebSocketEventServer } from '../emitters/web-socket-event-server'
+import { EventServer } from '../../cross-cutting-concerns/infrastructure/interfaces/event-server'
+import { WebSocketEventServer } from '../../cross-cutting-concerns/application/services/web-socket-event-server'
 import { EventEmitterFacade } from './event-emitter-facade'
 import { LoggerFacade } from '../../cross-cutting-concerns/application/logger-facade'
 

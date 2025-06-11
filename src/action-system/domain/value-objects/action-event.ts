@@ -1,4 +1,4 @@
-import { TypedEvent } from '../../../presentation/value-objects/typed-event'
+import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 import { ActionEventType } from '../../../presentation/enums/event-type'
 import { ActionDto } from '../../application/dtos/action-dto'
 

@@ -5,7 +5,7 @@ import { Timeline } from '../entities/timeline'
 import { Configuration } from '../entities/configuration'
 import { OnTimelineGenerateResult } from './on-timeline-generate-result'
 import { Action, ActionManifest, MutateActionMethods } from '../../../action-system/domain/entities/action'
-import { StatusMessage } from '../entities/status-message'
+import { StatusMessage } from '../../../cross-cutting-concerns/domain/entities/status-message'
 import { Piece } from '../entities/piece'
 
 export type Blueprint = BlueprintOnTimelineGenerate & BlueprintGetEndStateForPart & BlueprintGenerateActions & BlueprintValidateConfiguration & BlueprintBaselinePieces

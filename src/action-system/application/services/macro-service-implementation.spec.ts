@@ -7,7 +7,7 @@ import { EntityTestFactory } from '../../../rundown-execution/domain/entities/te
 import { ActionService } from '../interfaces/action-service'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { ErrorCode } from '../../../rundown-execution/domain/enums/error-code'
-import { StatusMessageEventEmitter } from '../../../rundown-execution/application/interfaces/status-message-event-emitter'
+import { StatusMessageEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/status-message-event-emitter'
 
 describe(MacroServiceImplementation.name, () => {
   describe(MacroServiceImplementation.prototype.createMacro.name, () => {

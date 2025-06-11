@@ -11,7 +11,7 @@ import { Timeline } from '../../rundown-execution/domain/entities/timeline'
 import { Configuration } from '../../rundown-execution/domain/entities/configuration'
 import { Action, ActionManifest, MutateActionMethods } from '../../action-system/domain/entities/action'
 import { Tv2Action } from './value-objects/tv2-action'
-import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
+import { StatusMessage } from '../../cross-cutting-concerns/domain/entities/status-message'
 import { Piece } from '../../rundown-execution/domain/entities/piece'
 
 export class Tv2Blueprint implements Blueprint {

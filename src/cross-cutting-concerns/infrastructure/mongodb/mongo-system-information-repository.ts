@@ -1,9 +1,9 @@
-import { SystemInformation } from '../../../domain/entities/system-information'
-import { SystemInformationRepository } from '../../../domain/repositories/system-information-repository'
-import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
-import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { MongoEntityConverter, MongoSystemInformation } from './mongo-entity-converter'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { SystemInformation } from '../../domain/value-objects/system-information'
+import { SystemInformationRepository } from '../../domain/repositories/system-information-repository'
+import { BaseMongoRepository } from './base-mongo-repository'
+import { MongoDatabase } from './mongo-database'
+import { MongoEntityConverter, MongoSystemInformation } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
+import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 
 const SYSTEM_INFORMATION_COLLECTION_NAME: string = 'coreSystem'
 

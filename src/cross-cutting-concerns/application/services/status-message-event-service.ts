@@ -1,6 +1,6 @@
 import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
-import { StatusMessageEventEmitter } from '../../rundown-execution/application/interfaces/status-message-event-emitter'
-import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
+import { StatusMessageEventEmitter } from '../interfaces/status-message-event-emitter'
+import { StatusMessage } from '../../domain/entities/status-message'
 import { StatusMessageEvent } from '../value-objects/status-message-event'
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
 

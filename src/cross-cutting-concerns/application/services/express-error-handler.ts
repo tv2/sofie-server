@@ -1,10 +1,10 @@
 import {Response} from 'express'
-import {Exception} from '../rundown-execution/domain/exceptions/exception'
-import {ErrorCode} from '../rundown-execution/domain/enums/error-code'
-import {HttpStatusCode} from './http-status-code'
-import {HttpErrorHandler} from './interfaces/http-error-handler'
-import {Logger} from '../cross-cutting-concerns/application/interfaces/logger'
-import {HttpResponseFormatter} from './interfaces/http-response-formatter'
+import {Exception} from '../../../rundown-execution/domain/exceptions/exception'
+import {ErrorCode} from '../../../rundown-execution/domain/enums/error-code'
+import {HttpStatusCode} from '../enums/http-status-code'
+import {HttpErrorHandler} from '../interfaces/http-error-handler'
+import {Logger} from '../interfaces/logger'
+import {HttpResponseFormatter} from '../../../presentation/interfaces/http-response-formatter'
 
 export class ExpressErrorHandler implements HttpErrorHandler {
 

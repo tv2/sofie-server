@@ -1,5 +1,5 @@
 import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/controllers/base-controller'
-import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
+import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { Request, Response } from 'express'
 import { Trigger } from '../../domain/entities/trigger'

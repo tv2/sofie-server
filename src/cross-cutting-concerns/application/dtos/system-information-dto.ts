@@ -1,4 +1,4 @@
-import { SystemInformation } from '../../domain/entities/system-information'
+import { SystemInformation } from '../../domain/value-objects/system-information'
 
 export class SystemInformationDto {
 

@@ -1,4 +1,4 @@
-import { TypedEvent } from '../../../presentation/value-objects/typed-event'
+import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 import { TriggerEventType } from '../../../presentation/enums/event-type'
 import { TriggerDto } from '../../application/dtos/trigger-dto'
 

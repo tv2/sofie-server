@@ -1,4 +1,4 @@
-import { TypedEvent } from '../../../presentation/value-objects/typed-event'
+import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 import { MacroEventType } from '../../../presentation/enums/event-type'
 import { MacroDto } from '../../application/dtos/macro-dto'
 

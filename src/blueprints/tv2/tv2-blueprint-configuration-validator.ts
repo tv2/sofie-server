@@ -1,10 +1,10 @@
 import { Configuration } from '../../rundown-execution/domain/entities/configuration'
-import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
+import { StatusMessage } from '../../cross-cutting-concerns/domain/entities/status-message'
 import { BlueprintValidateConfiguration } from '../../rundown-execution/domain/value-objects/blueprint'
 import { Tv2ConfigurationMapper } from './helpers/tv2-configuration-mapper'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2ShowStyleBlueprintConfiguration } from './value-objects/tv2-show-style-blueprint-configuration'
-import { StatusCode } from '../../rundown-execution/domain/enums/status-code'
+import { StatusCode } from '../../cross-cutting-concerns/domain/enums/status-code'
 import { ShowStyleVariant } from '../../rundown-execution/domain/entities/show-style-variant'
 import { CoreShowStyleVariantBlueprintConfiguration } from './helpers/tv2-show-style-blueprint-configuration-mapper'
 

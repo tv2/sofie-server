@@ -55,7 +55,7 @@ import { Tv2UnexpectedActionException } from '../exceptions/tv2-unexpected-actio
 import { PieceMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
 import { OutputLayer } from '../../../rundown-execution/domain/enums/output-layer'
 import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
-import { ObjectCloner } from '../../../cross-cutting-concerns/domain/object-cloner'
+import { ObjectCloner } from '../../../cross-cutting-concerns/domain/services/object-cloner'
 import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
 import {
   SourcePlayoutContent,

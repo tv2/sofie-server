@@ -5,8 +5,8 @@ import { MacroEventEmitter } from '../interfaces/macro-event-emitter'
 import { ActionService } from '../interfaces/action-service'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
-import { StatusMessageEventEmitter } from '../../../rundown-execution/application/interfaces/status-message-event-emitter'
-import { StatusCode } from '../../../rundown-execution/domain/enums/status-code'
+import { StatusMessageEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/status-message-event-emitter'
+import { StatusCode } from '../../../cross-cutting-concerns/domain/enums/status-code'
 
 export class MacroServiceImplementation implements MacroService {
   constructor(

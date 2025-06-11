@@ -1,4 +1,4 @@
-import { TypedEvent } from './typed-event'
+import { TypedEvent } from '../../cross-cutting-concerns/application/value-objects/typed-event'
 import { ConfigurationEventType } from '../enums/event-type'
 import { ShelfConfiguration } from '../../rundown-execution/domain/entities/shelf-configuration'
 

@@ -1,5 +1,5 @@
 import { DeviceType } from '../enums/device-type'
-import { StatusCode } from '../enums/status-code'
+import { StatusCode } from '../../../cross-cutting-concerns/domain/enums/status-code'
 
 export interface CoreDevice {
   type: DeviceType

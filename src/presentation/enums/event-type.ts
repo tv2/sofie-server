@@ -1,3 +1,4 @@
+// TODO: Get rid of event type. It is only Rundown events that uses it for internal type definitions.
 export type EventType =
   RundownEventType
   | IngestEventType
@@ -65,9 +66,6 @@ export enum StatusMessageEventType {
 }
 
 export enum DeviceEventType {
-  DEVICE_CREATED = 'DEVICE_CREATED',
-  DEVICE_UPDATED = 'DEVICE_UPDATED',
-  DEVICE_DELETED = 'DEVICE_DELETED',
   VIDEO_MIXER_CONFIGURATION_UPDATED = 'VIDEO_MIXER_CONFIGURATION_UPDATED'
 }
 
