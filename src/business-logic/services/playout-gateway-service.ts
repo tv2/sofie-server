@@ -1,4 +1,4 @@
-import { PlayoutService } from './interfaces/playoutService'
+import { PlayoutService } from './interfaces/playout-service'
 import { HttpService } from '../../cross-cutting-concerns/application/http-service'
 import { Logger } from '../../cross-cutting-concerns/application/logger'
 
