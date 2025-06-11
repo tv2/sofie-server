@@ -1,12 +1,12 @@
-import { Segment } from '../../rundown-execution/domain/entities/segment'
-import { IngestedSegment } from '../../rundown-execution/domain/entities/ingested-segment'
-import { Part } from '../../rundown-execution/domain/entities/part'
-import { IngestedPart } from '../../rundown-execution/domain/entities/ingested-part'
-import { IngestedPiece } from '../../rundown-execution/domain/entities/ingested-piece'
-import { IngestedRundown } from '../../rundown-execution/domain/entities/ingested-rundown'
-import { Rundown } from '../../rundown-execution/domain/entities/rundown'
-import { Piece } from '../../rundown-execution/domain/entities/piece'
-import { PieceLifespan } from '../../rundown-execution/domain/enums/piece-lifespan'
+import { Segment } from '../../../rundown-execution/domain/entities/segment'
+import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
+import { Part } from '../../../rundown-execution/domain/entities/part'
+import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
+import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
+import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
+import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
+import { Piece } from '../../../rundown-execution/domain/entities/piece'
+import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
 
 export class EntityChangeDetector {
   public doesShallowRundownDifferFromIngestedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): boolean {
