@@ -4,7 +4,7 @@ import { RundownRepository } from '../../rundown-execution/domain/repositories/r
 import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { ServiceUnavailableException } from '../../rundown-execution/domain/exceptions/service-unavailable-exception'
 import { NotFoundException } from '../../rundown-execution/domain/exceptions/not-found-exception'
-import { HttpError, HttpErrorCode } from '../http-error'
+import { HttpError, HttpErrorCode } from '../../cross-cutting-concerns/application/http-error'
 
 const INEWS_HOST: string = process.env.INEWS_HOST ?? 'localhost:3007'
 

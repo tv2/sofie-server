@@ -1,6 +1,6 @@
 import { HttpService } from '../application/http-service'
 import got from 'got'
-import { HttpError, HttpErrorCode } from '../../business-logic/http-error'
+import { HttpError, HttpErrorCode } from '../application/http-error'
 
 export class GotHttpService implements HttpService {
 
