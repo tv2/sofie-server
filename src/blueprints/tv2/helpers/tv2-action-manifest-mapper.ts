@@ -17,7 +17,7 @@ import {
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
-import { ExhaustiveCaseChecker } from '../../../business-logic/exhaustive-case-checker'
+import { ExhaustiveCaseChecker } from '../../../cross-cutting-concerns/domain/exhaustive-case-checker'
 import { Tv2Logger } from '../tv2-logger'
 import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
 

@@ -13,7 +13,7 @@ import { TransitionType } from '../../rundown-execution/domain/enums/transition-
 import { PartTimings } from '../../rundown-execution/domain/value-objects/part-timings'
 import { PieceLifespan } from '../../rundown-execution/domain/enums/piece-lifespan'
 import { UnsupportedOperationException } from '../../rundown-execution/domain/exceptions/unsupported-operation-exception'
-import { ExhaustiveCaseChecker } from '../exhaustive-case-checker'
+import { ExhaustiveCaseChecker } from '../../cross-cutting-concerns/domain/exhaustive-case-checker'
 import { ObjectCloner } from '../../cross-cutting-concerns/domain/object-cloner'
 import { Studio } from '../../rundown-execution/domain/entities/studio'
 import { StudioLayer } from '../../rundown-execution/domain/value-objects/studio-layer'
