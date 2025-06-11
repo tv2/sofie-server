@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
 import { RundownService } from '../rundown-service'
-import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
+import { RundownRepository } from '../../domain/repositories/rundown-repository'
 import { Rundown } from '../../domain/entities/rundown'
 import { RundownDto } from '../dtos/rundown-dto'
 import { Exception } from '../../domain/exceptions/exception'

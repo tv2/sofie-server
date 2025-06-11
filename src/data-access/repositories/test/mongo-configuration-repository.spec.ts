@@ -1,7 +1,7 @@
 import {instance, mock} from '@typestrong/ts-mockito'
-import {MongoConfigurationRepository} from '../mongo/mongo-configuration-repository'
-import {StudioRepository} from '../interfaces/studio-repository'
-import {ShowStyleRepository} from '../interfaces/show-style-repository'
+import {MongoConfigurationRepository} from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-configuration-repository'
+import {StudioRepository} from '../../../rundown-execution/domain/repositories/studio-repository'
+import {ShowStyleRepository} from '../../../rundown-execution/domain/repositories/show-style-repository'
 
 describe(MongoConfigurationRepository.name, () => {
   describe(MongoConfigurationRepository.prototype.clearConfigurationCache.name, () => {

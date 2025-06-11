@@ -5,7 +5,7 @@ import {
   MongoIngestedEntityConverter,
   MongoIngestedPart,
   MongoIngestedSegment
-} from './mongo-ingested-entity-converter'
+} from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'

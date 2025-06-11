@@ -1,6 +1,6 @@
 import { DataChangedListener } from '../interfaces/data-changed-listener'
 import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { MongoIngestedEntityConverter, MongoIngestedSegment } from './mongo-ingested-entity-converter'
+import { MongoIngestedEntityConverter, MongoIngestedSegment } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
 import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import {
   ChangeStream,

@@ -1,10 +1,10 @@
 import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { Configuration } from '../../rundown-execution/domain/entities/configuration'
 import { Action, ActionManifest } from '../../rundown-execution/domain/entities/action'
-import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
-import { ActionManifestRepository } from '../../data-access/repositories/interfaces/action-manifest-repository'
+import { ConfigurationRepository } from '../../rundown-execution/domain/repositories/configuration-repository'
+import { ActionManifestRepository } from '../../rundown-execution/domain/repositories/action-manifest-repository'
 import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprint'
-import { ActionRepository } from '../../data-access/repositories/interfaces/action-repository'
+import { ActionRepository } from '../../rundown-execution/domain/repositories/action-repository'
 import { ActionEventEmitter } from './interfaces/action-event-emitter'
 
 export class ActionGenerationService {

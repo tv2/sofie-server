@@ -1,6 +1,6 @@
 import { IngestService } from './interfaces/ingest-service'
 import { HttpService } from '../../cross-cutting-concerns/application/http-service'
-import { RundownRepository } from '../../data-access/repositories/interfaces/rundown-repository'
+import { RundownRepository } from '../../rundown-execution/domain/repositories/rundown-repository'
 import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { ServiceUnavailableException } from '../../rundown-execution/domain/exceptions/service-unavailable-exception'
 import { NotFoundException } from '../../rundown-execution/domain/exceptions/not-found-exception'

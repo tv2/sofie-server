@@ -2,7 +2,7 @@ import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastruct
 import { IngestedSegmentRepository } from '../interfaces/ingested-segment-repository'
 import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
 import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { MongoIngestedEntityConverter, MongoIngestedSegment } from './mongo-ingested-entity-converter'
+import { MongoIngestedEntityConverter, MongoIngestedSegment } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
 import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
 import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
 

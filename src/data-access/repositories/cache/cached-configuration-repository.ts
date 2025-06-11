@@ -1,4 +1,4 @@
-import { ConfigurationRepository } from '../interfaces/configuration-repository'
+import { ConfigurationRepository } from '../../../rundown-execution/domain/repositories/configuration-repository'
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 
 export class CachedConfigurationRepository implements ConfigurationRepository {

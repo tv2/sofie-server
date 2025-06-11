@@ -1,7 +1,7 @@
 import * as mongodb from 'mongodb'
 import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../rundown-execution/domain/exceptions/database-not-connected-exception'
-import { MongoId } from '../../../data-access/repositories/mongo/mongo-entity-converter'
+import { MongoId } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { Logger } from '../../application/logger'
 import { Database } from '../database'
 

@@ -1,6 +1,6 @@
 import { CachedRundownAggregateRepository } from '../cache/cached-rundown-aggregate-repository'
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
-import { RundownAggregateRepository } from '../interfaces/rundown-aggregate-repository'
+import { RundownAggregateRepository } from '../../../rundown-execution/domain/repositories/rundown-aggregate-repository'
 import { Rundown, RundownInterface } from '../../../rundown-execution/domain/entities/rundown'
 import { Logger } from '../../../cross-cutting-concerns/application/logger'
 

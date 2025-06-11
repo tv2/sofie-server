@@ -7,7 +7,7 @@ import { IngestedRundown } from '../../../rundown-execution/domain/entities/inge
 import { RundownMode } from '../../../rundown-execution/domain/enums/rundown-mode'
 import { TakeMode } from '../../../rundown-execution/domain/enums/take-mode'
 import { Blueprint } from '../../../rundown-execution/domain/value-objects/blueprint'
-import { ConfigurationRepository } from '../../../data-access/repositories/interfaces/configuration-repository'
+import { ConfigurationRepository } from '../../../rundown-execution/domain/repositories/configuration-repository'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 
 describe(IngestRundownSynchronizer.name, () => {

@@ -1,5 +1,5 @@
 import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
-import { TimelineRepository } from '../../../data-access/repositories/interfaces/timeline-repository'
+import { TimelineRepository } from '../../domain/repositories/timeline-repository'
 import { Request, Response } from 'express'
 import { Timeline } from '../../domain/entities/timeline'
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'

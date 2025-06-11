@@ -1,5 +1,5 @@
 import { MacroService } from './interfaces/macro-service'
-import { MacroRepository } from '../../data-access/repositories/interfaces/macro-repository'
+import { MacroRepository } from '../../rundown-execution/domain/repositories/macro-repository'
 import { Macro, Operation, OperationType } from '../../rundown-execution/domain/entities/macro'
 import { MacroEventEmitter } from './interfaces/macro-event-emitter'
 import { ActionService } from './interfaces/action-service'

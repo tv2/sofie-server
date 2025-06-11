@@ -4,7 +4,7 @@ import { PlayoutContentEventEmitter } from './interfaces/playout-content-event-e
 import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 import { RundownMode } from '../../rundown-execution/domain/enums/rundown-mode'
 import { PlayoutContentType } from '../../rundown-execution/domain/enums/playout-content-type'
-import { PlayoutContentRepository } from '../../data-access/repositories/interfaces/playout-content-repository'
+import { PlayoutContentRepository } from '../../rundown-execution/domain/repositories/playout-content-repository'
 
 const INFINITE_PIECES_PLAYOUT_CONTENT_TYPES: PlayoutContentType[] = [PlayoutContentType.DOWNSTREAM_KEYER]
 

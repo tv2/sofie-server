@@ -1,5 +1,5 @@
 import { MacroServiceImplementation } from '../macro-service-implementation'
-import { MacroRepository } from '../../../data-access/repositories/interfaces/macro-repository'
+import { MacroRepository } from '../../../rundown-execution/domain/repositories/macro-repository'
 import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { MacroEventEmitter } from '../interfaces/macro-event-emitter'
 import { Macro, Operation } from '../../../rundown-execution/domain/entities/macro'

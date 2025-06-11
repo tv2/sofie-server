@@ -4,7 +4,7 @@ import { DataChangedListener } from '../../../data-access/repositories/interface
 import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { StatusMessageService } from '../interfaces/status-message-service'
 import { StatusCode } from '../../../rundown-execution/domain/enums/status-code'
-import { DeviceRepository } from '../../../data-access/repositories/interfaces/device-repository'
+import { DeviceRepository } from '../../../rundown-execution/domain/repositories/device-repository'
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
 

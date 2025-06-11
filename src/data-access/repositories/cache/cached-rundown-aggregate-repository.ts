@@ -1,4 +1,4 @@
-import { RundownAggregateRepository } from '../interfaces/rundown-aggregate-repository'
+import { RundownAggregateRepository } from '../../../rundown-execution/domain/repositories/rundown-aggregate-repository'
 import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
 import { BasicRundown } from '../../../rundown-execution/domain/entities/basic-rundown'
 import { Logger } from '../../../cross-cutting-concerns/application/logger'

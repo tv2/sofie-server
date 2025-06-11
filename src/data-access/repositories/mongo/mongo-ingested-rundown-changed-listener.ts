@@ -6,7 +6,7 @@ import {
   ChangeStreamDocument,
   ChangeStreamOptions,
 } from 'mongodb'
-import { MongoIngestedEntityConverter, MongoIngestedRundown } from './mongo-ingested-entity-converter'
+import { MongoIngestedEntityConverter, MongoIngestedRundown } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
 import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'

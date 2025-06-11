@@ -1,6 +1,6 @@
 import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
 import { Request, Response } from 'express'
-import { MediaRepository } from '../../../data-access/repositories/interfaces/media-repository'
+import { MediaRepository } from '../../domain/repositories/media-repository'
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { Media } from '../../domain/entities/media'

@@ -2,7 +2,7 @@ import { IngestedPieceRepository } from '../interfaces/ingested-piece-repository
 import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
 import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { MongoIngestedEntityConverter, MongoIngestedPiece } from './mongo-ingested-entity-converter'
+import { MongoIngestedEntityConverter, MongoIngestedPiece } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
 
 const INGESTED_PIECE_COLLECTION_NAME: string = 'pieces' // TODO: Once we control ingest renamed to "ingestedPieces".
 

@@ -7,7 +7,7 @@ import { IngestedPart } from '../../rundown-execution/domain/entities/ingested-p
 import { EntityChangeDetector } from './entity-change-detector'
 import { IngestedSegment } from '../../rundown-execution/domain/entities/ingested-segment'
 import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprint'
-import { ConfigurationRepository } from '../../data-access/repositories/interfaces/configuration-repository'
+import { ConfigurationRepository } from '../../rundown-execution/domain/repositories/configuration-repository'
 import { Configuration } from '../../rundown-execution/domain/entities/configuration'
 import { Piece } from '../../rundown-execution/domain/entities/piece'
 

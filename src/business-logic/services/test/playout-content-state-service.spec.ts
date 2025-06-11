@@ -11,7 +11,7 @@ import { PlayoutContent } from '../../../rundown-execution/domain/value-objects/
 import { Piece } from '../../../rundown-execution/domain/entities/piece'
 import { Owner } from '../../../rundown-execution/domain/enums/owner'
 import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
-import { PlayoutContentRepository } from '../../../data-access/repositories/interfaces/playout-content-repository'
+import { PlayoutContentRepository } from '../../../rundown-execution/domain/repositories/playout-content-repository'
 
 describe(PlayoutContentStateService.name, () => {
   describe(PlayoutContentStateService.prototype.updatePlayoutContentState.name, () => {

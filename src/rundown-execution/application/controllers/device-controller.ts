@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'
 import { Exception } from '../../domain/exceptions/exception'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
-import { VideoMixerDeviceRepository } from '../../../data-access/repositories/interfaces/video-mixer-device-repository'
+import { VideoMixerDeviceRepository } from '../../domain/repositories/video-mixer-device-repository'
 import { VideoMixerConfiguration } from '../../domain/value-objects/video-mixer-configuration'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
