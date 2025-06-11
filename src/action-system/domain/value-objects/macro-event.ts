@@ -1,5 +1,5 @@
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
-import { MacroEventType } from '../../../presentation/event-type'
+import { MacroEventType } from '../../../leftovers/event-type'
 import { MacroDto } from '../../application/dtos/macro-dto'
 
 export type MacroEvent = MacroCreatedEvent | MacroUpdatedEvent | MacroDeletedEvent

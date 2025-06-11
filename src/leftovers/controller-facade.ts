@@ -1,6 +1,6 @@
 import { RundownController } from '../rundown-execution/application/controllers/rundown-controller'
-import { ServiceFacade } from '../business-logic/facades/service-facade'
-import { RepositoryFacade } from '../data-access/facades/repository-facade'
+import { ServiceFacade } from './service-facade'
+import { RepositoryFacade } from './repository-facade'
 import { ExpressErrorHandler } from '../cross-cutting-concerns/application/services/express-error-handler'
 import { BaseController } from '../cross-cutting-concerns/application/controllers/base-controller'
 import { TimelineController } from '../rundown-execution/application/controllers/timeline-controller'

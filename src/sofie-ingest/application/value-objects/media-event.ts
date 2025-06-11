@@ -1,4 +1,4 @@
-import { IngestEventType } from '../../../presentation/event-type'
+import { IngestEventType } from '../../../leftovers/event-type'
 import { MediaDto } from '../../../rundown-execution/application/dtos/media-dto'
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 

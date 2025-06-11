@@ -1,5 +1,5 @@
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
-import { ActionEventType } from '../../../presentation/event-type'
+import { ActionEventType } from '../../../leftovers/event-type'
 import { ActionDto } from '../../application/dtos/action-dto'
 
 export type ActionEvent = ActionsUpdatedEvent

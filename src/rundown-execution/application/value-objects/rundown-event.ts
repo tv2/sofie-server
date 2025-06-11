@@ -1,4 +1,4 @@
-import { EventType, IngestEventType, RundownEventType } from '../../../presentation/event-type'
+import { EventType, IngestEventType, RundownEventType } from '../../../leftovers/event-type'
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 import { PartDto } from '../dtos/part-dto'
 import { PieceDto } from '../dtos/piece-dto'

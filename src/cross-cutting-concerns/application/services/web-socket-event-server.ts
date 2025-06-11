@@ -22,7 +22,7 @@ import { DeviceEventObserver } from '../../../rundown-execution/application/inte
 import { DeviceEvent } from '../../../rundown-execution/application/value-objects/device-event'
 import { TypedEvent } from '../value-objects/typed-event'
 import { NtpEvent } from '../value-objects/ntp-event'
-import { NtpEventType } from '../../../presentation/event-type'
+import { NtpEventType } from '../../../leftovers/event-type'
 import { PlayoutContentEventObserver } from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
 import { PlayoutContentEvent } from '../../../rundown-execution/application/value-objects/playout-content-event'
 

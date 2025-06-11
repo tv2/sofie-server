@@ -1,4 +1,4 @@
-import { DeviceEventType } from '../../../presentation/event-type'
+import { DeviceEventType } from '../../../leftovers/event-type'
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 import { VideoMixerConfiguration } from '../../domain/value-objects/video-mixer-configuration'
 
