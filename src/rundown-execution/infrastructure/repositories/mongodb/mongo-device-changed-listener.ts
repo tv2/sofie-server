@@ -3,7 +3,7 @@ import { MongoCoreDevice, MongoEntityConverter } from './mongo-entity-converter'
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { ChangeStream, ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
-import { MongoChangeEvent } from '../../../../data-access/repositories/mongo/mongo-enums'
+import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-enums'
 import { Logger } from '../../../../cross-cutting-concerns/application/logger'
 import { CoreDevice } from '../../../domain/entities/device'
 

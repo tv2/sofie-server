@@ -7,7 +7,7 @@ import {
   MongoIngestedSegment
 } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
-import { MongoChangeEvent } from './mongo-enums'
+import { MongoChangeEvent } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-enums'
 import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
 import { Logger } from '../../../cross-cutting-concerns/application/logger'
 

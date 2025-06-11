@@ -9,7 +9,7 @@ import {
   ChangeStreamInsertDocument,
   ChangeStreamOptions, ChangeStreamReplaceDocument, ChangeStreamUpdateDocument
 } from 'mongodb'
-import { MongoChangeEvent } from '../../../../data-access/repositories/mongo/mongo-enums'
+import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-enums'
 import { MongoMedia } from './mongo-entity-converter'
 import { Media } from '../../../domain/entities/media'
 import { MediaRepository } from '../../../domain/repositories/media-repository'
