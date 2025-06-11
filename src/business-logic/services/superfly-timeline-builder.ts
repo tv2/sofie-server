@@ -14,7 +14,7 @@ import { PartTimings } from '../../rundown-execution/domain/value-objects/part-t
 import { PieceLifespan } from '../../rundown-execution/domain/enums/piece-lifespan'
 import { UnsupportedOperationException } from '../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 import { ExhaustiveCaseChecker } from '../exhaustive-case-checker'
-import { ObjectCloner } from './interfaces/object-cloner'
+import { ObjectCloner } from '../../cross-cutting-concerns/domain/object-cloner'
 import { Studio } from '../../rundown-execution/domain/entities/studio'
 import { StudioLayer } from '../../rundown-execution/domain/value-objects/studio-layer'
 import { LookaheadMode } from '../../rundown-execution/domain/enums/lookahead-mode'

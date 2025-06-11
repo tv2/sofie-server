@@ -36,7 +36,7 @@ import { SynchronizedRundownService } from '../services/synchronized-rundown-ser
 import { AsyncLock } from '../async-lock'
 import { MacroServiceImplementation } from '../services/macro-service-implementation'
 import { MacroService } from '../services/interfaces/macro-service'
-import { HelperFacade } from './helper-facade'
+import { HelperFacade } from '../../cross-cutting-concerns/application/helper-facade'
 import { PlayoutContentReadService, PlayoutContentUpdateService } from '../services/interfaces/playout-content-service'
 import { PlayoutContentStateService } from '../services/playout-content-state-service'
 

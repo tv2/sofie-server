@@ -1,4 +1,4 @@
-import { ObjectCloner } from './interfaces/object-cloner'
+import { ObjectCloner } from '../domain/object-cloner'
 
 export class DeepPropertyObjectCloner implements ObjectCloner {
   // Implementation found at: https://plainenglish.io/blog/deep-clone-an-object-and-preserve-its-type-with-typescript-d488c35e5574

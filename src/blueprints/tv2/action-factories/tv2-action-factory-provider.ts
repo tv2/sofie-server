@@ -16,7 +16,7 @@ import { Tv2StringHashConverter } from '../helpers/tv2-string-hash-converter'
 import { FrameTimeConverter } from '../helpers/frame-time-converter'
 import { Tv2ConfigurationMapper } from '../helpers/tv2-configuration-mapper'
 import { LoggerFacade } from '../../../cross-cutting-concerns/application/logger-facade'
-import { HelperFacade } from '../../../business-logic/facades/helper-facade'
+import { HelperFacade } from '../../../cross-cutting-concerns/application/helper-facade'
 import { TimelineObjectFactoryProvider } from '../timeline-object-factories/timeline-object-factory-provider'
 
 
