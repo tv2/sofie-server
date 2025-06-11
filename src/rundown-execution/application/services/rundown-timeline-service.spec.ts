@@ -28,7 +28,7 @@ import { InTransition } from '../../domain/value-objects/in-transition'
 import { TakeIsBlockedException } from '../../domain/exceptions/take-is-blocked-exception'
 import { UnsupportedOperationException } from '../../domain/exceptions/unsupported-operation-exception'
 import { TakeMode } from '../../domain/enums/take-mode'
-import { PlayoutContentUpdateService } from '../../../business-logic/services/interfaces/playout-content-service'
+import { PlayoutContentUpdateService } from '../playout-content-service'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {

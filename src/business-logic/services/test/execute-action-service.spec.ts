@@ -20,7 +20,7 @@ import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
 import { Owner } from '../../../rundown-execution/domain/enums/owner'
 import { RundownMode } from '../../../rundown-execution/domain/enums/rundown-mode'
 import { ConfigurationRepository } from '../../../rundown-execution/domain/repositories/configuration-repository'
-import { PlayoutContentReadService } from '../interfaces/playout-content-service'
+import { PlayoutContentReadService } from '../../../rundown-execution/application/playout-content-service'
 
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {

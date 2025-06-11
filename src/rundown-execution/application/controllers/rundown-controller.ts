@@ -16,7 +16,7 @@ import { TakeMode } from '../../domain/enums/take-mode'
 import { Tv2Logger } from '../../../blueprints/tv2/tv2-logger'
 import { ErrorCode } from '../../domain/enums/error-code'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
-import { PlayoutContentReadService } from '../../../business-logic/services/interfaces/playout-content-service'
+import { PlayoutContentReadService } from '../playout-content-service'
 import { PlayoutContent } from '../../domain/value-objects/playout-content'
 
 @RestController('/rundowns')

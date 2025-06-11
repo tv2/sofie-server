@@ -31,7 +31,7 @@ import { SetNextDirection } from '../../rundown-execution/domain/enums/set-next-
 import { TakeMode } from '../../rundown-execution/domain/enums/take-mode'
 import { PlayoutContentType } from '../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../rundown-execution/domain/enums/output-channel'
-import { PlayoutContentReadService } from './interfaces/playout-content-service'
+import { PlayoutContentReadService } from '../../rundown-execution/application/playout-content-service'
 import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 
 const SYSTEM_ACTIONS_ID: string = 'SYSTEM_ACTIONS_ID'

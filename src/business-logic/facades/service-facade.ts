@@ -37,8 +37,8 @@ import { AsyncLock } from '../../cross-cutting-concerns/application/async-lock'
 import { MacroServiceImplementation } from '../services/macro-service-implementation'
 import { MacroService } from '../services/interfaces/macro-service'
 import { HelperFacade } from '../../cross-cutting-concerns/application/helper-facade'
-import { PlayoutContentReadService, PlayoutContentUpdateService } from '../services/interfaces/playout-content-service'
-import { PlayoutContentStateService } from '../services/playout-content-state-service'
+import { PlayoutContentReadService, PlayoutContentUpdateService } from '../../rundown-execution/application/playout-content-service'
+import { PlayoutContentStateService } from '../../rundown-execution/application/playout-content-state-service'
 
 export class ServiceFacade {
 

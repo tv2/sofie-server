@@ -24,7 +24,7 @@ import { TakeIsBlockedException } from '../../domain/exceptions/take-is-blocked-
 import { RundownCursor } from '../../domain/value-objects/rundown-cursor'
 import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'
-import { PlayoutContentUpdateService } from '../../../business-logic/services/interfaces/playout-content-service'
+import { PlayoutContentUpdateService } from '../playout-content-service'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
