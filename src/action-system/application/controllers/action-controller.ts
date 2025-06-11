@@ -5,7 +5,7 @@ import { Action } from '../../domain/entities/action'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { ActionDto } from '../dtos/action-dto'
-import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 interface ExecuteActionRequestBody {

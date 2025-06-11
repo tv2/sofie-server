@@ -1,5 +1,5 @@
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
-import { TriggerEventType } from '../../../presentation/enums/event-type'
+import { TriggerEventType } from '../../../presentation/event-type'
 import { TriggerDto } from '../../application/dtos/trigger-dto'
 
 export type TriggerEvent = TriggerCreatedEvent | TriggerUpdatedEvent | TriggerDeletedEvent

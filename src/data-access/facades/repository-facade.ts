@@ -74,7 +74,7 @@ import { MongoIngestedPieceChangedListener } from '../../sofie-ingest/infrastruc
 import { DeviceRepository } from '../../rundown-execution/domain/repositories/device-repository'
 import { VideoMixerDeviceRepository } from '../../rundown-execution/domain/repositories/video-mixer-device-repository'
 import { MongoVideoMixerDeviceRepository } from '../../rundown-execution/infrastructure/repositories/mongodb/mongo-video-mixer-device-repository'
-import { EventEmitterFacade } from '../../presentation/facades/event-emitter-facade'
+import { EventEmitterFacade } from '../../presentation/event-emitter-facade'
 import { MongoExpectedPlayoutItemRepository } from '../../rundown-execution/infrastructure/repositories/mongodb/mongo-expected-playout-item-repository'
 import { MongoMacroRepository } from '../../action-system/infrastructure/repositories/mongodb/mongo-macro-repository'
 import { MacroRepository } from '../../action-system/domain/repositories/macro-repository'

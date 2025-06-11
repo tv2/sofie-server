@@ -4,7 +4,7 @@ import { Request, Response } from 'express'
 import { Timeline } from '../../domain/entities/timeline'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { Exception } from '../../domain/exceptions/exception'
-import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/timelines')

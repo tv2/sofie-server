@@ -2,7 +2,7 @@ import { BaseController, GetRequest, RestController } from '../../../cross-cutti
 import { Request, Response } from 'express'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { Exception } from '../../domain/exceptions/exception'
-import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { VideoMixerDeviceRepository } from '../../domain/repositories/video-mixer-device-repository'
 import { VideoMixerConfiguration } from '../../domain/value-objects/video-mixer-configuration'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'

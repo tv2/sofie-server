@@ -1,4 +1,4 @@
-import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { ErrorCode } from '../../../rundown-execution/domain/enums/error-code'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 

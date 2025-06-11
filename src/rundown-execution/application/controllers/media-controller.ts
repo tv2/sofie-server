@@ -2,7 +2,7 @@ import { BaseController, GetRequest, RestController } from '../../../cross-cutti
 import { Request, Response } from 'express'
 import { MediaRepository } from '../../domain/repositories/media-repository'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
-import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { Media } from '../../domain/entities/media'
 import { Exception } from '../../domain/exceptions/exception'
 import { NotFoundException } from '../../domain/exceptions/not-found-exception'

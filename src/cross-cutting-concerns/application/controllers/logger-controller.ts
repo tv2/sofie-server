@@ -3,7 +3,7 @@ import { Logger, LogLevel } from '../interfaces/logger'
 import { Request, Response } from 'express'
 import { ExhaustiveCaseChecker } from '../../domain/services/exhaustive-case-checker'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
-import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { AuditLog } from '../decorators/audit-log-decorator'
 

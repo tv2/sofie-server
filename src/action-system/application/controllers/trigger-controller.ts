@@ -5,7 +5,7 @@ import { Request, Response } from 'express'
 import { Trigger } from '../../domain/entities/trigger'
 import { TriggerDto } from '../dtos/trigger-dto'
 import { TriggerService } from '../interfaces/trigger-service'
-import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
+import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
 @RestController('/triggers')
