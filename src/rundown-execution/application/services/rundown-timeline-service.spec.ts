@@ -23,7 +23,7 @@ import { AlreadyRehearsalException } from '../../domain/exceptions/already-rehea
 import { IngestService } from '../../../sofie-ingest/application/ingest-service'
 import { RundownService } from '../rundown-service'
 import { Logger } from '../../../cross-cutting-concerns/application/logger'
-import { PlayoutService } from '../../../business-logic/services/interfaces/playout-service'
+import { PlayoutService } from '../playout-service'
 import { InTransition } from '../../domain/value-objects/in-transition'
 import { TakeIsBlockedException } from '../../domain/exceptions/take-is-blocked-exception'
 import { UnsupportedOperationException } from '../../domain/exceptions/unsupported-operation-exception'

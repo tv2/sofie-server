@@ -8,6 +8,7 @@ import { PlayoutContentRepository } from '../../rundown-execution/domain/reposit
 
 const INFINITE_PIECES_PLAYOUT_CONTENT_TYPES: PlayoutContentType[] = [PlayoutContentType.DOWNSTREAM_KEYER]
 
+// TODO: Determine if this should be moved to Alba TV 2 server.
 export class PlayoutContentStateService implements PlayoutContentUpdateService, PlayoutContentReadService {
 
   private static instance: PlayoutContentUpdateService & PlayoutContentReadService
@@ -97,6 +98,7 @@ export class PlayoutContentStateService implements PlayoutContentUpdateService, 
     this.playoutContentEventEmitter.emitProgramPlayoutContentEvent(this.programPlayoutContents)
   }
 
+  // TODO: This can be simplified by only checking the occurrences from arrayOne in arrayTwo as they have the same length.
   private areArraysEqual(arrayOne: unknown[], arrayTwo: unknown[]): boolean {
     if (arrayOne.length !== arrayTwo.length) {
       return false
