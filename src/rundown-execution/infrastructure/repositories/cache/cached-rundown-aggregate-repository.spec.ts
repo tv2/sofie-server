@@ -1,8 +1,8 @@
-import { CachedRundownAggregateRepository } from '../../../rundown-execution/infrastructure/repositories/cache/cached-rundown-aggregate-repository'
+import { CachedRundownAggregateRepository } from './cached-rundown-aggregate-repository'
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
-import { RundownAggregateRepository } from '../../../rundown-execution/domain/repositories/rundown-aggregate-repository'
-import { Rundown, RundownInterface } from '../../../rundown-execution/domain/entities/rundown'
-import { Logger } from '../../../cross-cutting-concerns/application/logger'
+import { RundownAggregateRepository } from '../../../domain/repositories/rundown-aggregate-repository'
+import { Rundown, RundownInterface } from '../../../domain/entities/rundown'
+import { Logger } from '../../../../cross-cutting-concerns/application/logger'
 
 describe(CachedRundownAggregateRepository.name, () => {
   describe(CachedRundownAggregateRepository.prototype.getRundown.name, () => {
