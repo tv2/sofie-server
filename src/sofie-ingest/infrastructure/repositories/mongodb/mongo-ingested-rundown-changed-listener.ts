@@ -1,5 +1,5 @@
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
-import { DataChangedListener } from '../../../../cross-cutting-concerns/application/data-changed-listener'
+import { DataChangedListener } from '../../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import {
   ChangeStream,
   ChangeStreamDeleteDocument,
@@ -10,7 +10,7 @@ import { MongoIngestedEntityConverter, MongoIngestedRundown } from '../../../../
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
 import { IngestedRundown } from '../../../../rundown-execution/domain/entities/ingested-rundown'
-import { Logger } from '../../../../cross-cutting-concerns/application/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest changed this to "ingestedRundowns"
 

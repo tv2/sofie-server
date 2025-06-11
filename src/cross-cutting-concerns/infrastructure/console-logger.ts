@@ -1,4 +1,4 @@
-import { Logger, LogLevel } from '../application/logger'
+import { Logger, LogLevel } from '../application/interfaces/logger'
 import { ConsoleVault, NodeEnvironmentLogger } from '@tv2media/logger/node'
 import { PlainTextFormat } from '@tv2media/logger'
 

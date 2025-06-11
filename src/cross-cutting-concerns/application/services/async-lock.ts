@@ -1,4 +1,4 @@
-import { Logger } from './logger'
+import { Logger } from '../interfaces/logger'
 
 interface EnqueuedOperation {
   operation: () => Promise<void>

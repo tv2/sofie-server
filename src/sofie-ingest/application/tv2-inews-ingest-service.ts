@@ -1,10 +1,10 @@
 import { IngestService } from './ingest-service'
-import { HttpService } from '../../cross-cutting-concerns/application/http-service'
+import { HttpService } from '../../cross-cutting-concerns/application/interfaces/http-service'
 import { RundownRepository } from '../../rundown-execution/domain/repositories/rundown-repository'
 import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { ServiceUnavailableException } from '../../rundown-execution/domain/exceptions/service-unavailable-exception'
 import { NotFoundException } from '../../rundown-execution/domain/exceptions/not-found-exception'
-import { HttpError, HttpErrorCode } from '../../cross-cutting-concerns/application/http-error'
+import { HttpError, HttpErrorCode } from '../../cross-cutting-concerns/application/exceptions/http-error'
 
 const INEWS_HOST: string = process.env.INEWS_HOST ?? 'localhost:3007'
 

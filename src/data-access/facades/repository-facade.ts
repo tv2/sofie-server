@@ -23,7 +23,7 @@ import { ShowStyleVariantRepository } from '../../rundown-execution/domain/repos
 import { MongoShowStyleVariantRepository } from '../../rundown-execution/infrastructure/repositories/mongodb/mongo-show-style-variant-repository'
 import { ActionRepository } from '../../action-system/domain/repositories/action-repository'
 import { MongoActionRepository } from '../../action-system/infrastructure/repositories/mongodb/mongo-action-repository'
-import { DataChangedListener } from '../../cross-cutting-concerns/application/data-changed-listener'
+import { DataChangedListener } from '../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import { MongoIngestedSegmentChangedListener } from '../../sofie-ingest/infrastructure/repositories/mongodb/mongo-ingested-segment-changed-listener'
 import { MongoIngestedPartChangedListener } from '../../sofie-ingest/infrastructure/repositories/mongodb/mongo-ingested-part-changed-listener'
 import { MongoIngestedRundownChangedListener } from '../../sofie-ingest/infrastructure/repositories/mongodb/mongo-ingested-rundown-changed-listener'
@@ -48,7 +48,7 @@ import { IngestedSegment } from '../../rundown-execution/domain/entities/ingeste
 import { TriggerRepository } from '../../action-system/domain/repositories/trigger-repository'
 import { MongoTriggerRepository } from '../../action-system/infrastructure/repositories/mongodb/mongo-trigger-repository'
 import { CryptoUuidGenerator } from '../../cross-cutting-concerns/infrastructure/crypto-uuid-generator'
-import { UuidGenerator } from '../../cross-cutting-concerns/infrastructure/uuid-generator'
+import { UuidGenerator } from '../../cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
 import { LoggerFacade } from '../../cross-cutting-concerns/application/logger-facade'
 import { MongoMediaChangedListener } from '../../rundown-execution/infrastructure/repositories/mongodb/mongo-media-changed-listener'
 import { Media } from '../../rundown-execution/domain/entities/media'
@@ -62,7 +62,7 @@ import { MongoStatusMessageRepository } from '../../rundown-execution/infrastruc
 import { MongoCoreDeviceRepository } from '../../rundown-execution/infrastructure/repositories/mongodb/mongo-core-device-repository'
 import { ShowStyle } from '../../rundown-execution/domain/entities/show-style'
 import { MongoShowStyleChangedListener } from '../../rundown-execution/infrastructure/repositories/mongodb/mongo-show-style-changed-listener'
-import { Database } from '../../cross-cutting-concerns/infrastructure/database'
+import { Database } from '../../cross-cutting-concerns/infrastructure/interfaces/database'
 import { ShowStyleVariant } from '../../rundown-execution/domain/entities/show-style-variant'
 import {
   MongoShowStyleVariantConfigurationListener

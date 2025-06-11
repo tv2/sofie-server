@@ -2,7 +2,7 @@ import { RundownController } from '../../rundown-execution/application/controlle
 import { ServiceFacade } from '../../business-logic/facades/service-facade'
 import { RepositoryFacade } from '../../data-access/facades/repository-facade'
 import { ExpressErrorHandler } from '../express-error-handler'
-import { BaseController } from '../../cross-cutting-concerns/application/base-controller'
+import { BaseController } from '../../cross-cutting-concerns/application/controllers/base-controller'
 import { TimelineController } from '../../rundown-execution/application/controllers/timeline-controller'
 import { ActionController } from '../../action-system/application/controllers/action-controller'
 import { ConfigurationController } from '../../rundown-execution/application/controllers/configuration-controller'
@@ -12,7 +12,7 @@ import { LoggerFacade } from '../../cross-cutting-concerns/application/logger-fa
 import { MediaController } from '../../rundown-execution/application/controllers/media-controller'
 import { SystemInformationController } from '../../rundown-execution/application/controllers/system-information-controller'
 import { DeviceController } from '../../rundown-execution/application/controllers/device-controller'
-import { LoggerController } from '../../cross-cutting-concerns/application/logger-controller'
+import { LoggerController } from '../../cross-cutting-concerns/application/controllers/logger-controller'
 import { MacroController } from '../../action-system/application/controllers/macro-controller'
 
 export class ControllerFacade {

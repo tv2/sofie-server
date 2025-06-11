@@ -1,6 +1,6 @@
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
-import { DataChangedListener } from '../../../../cross-cutting-concerns/application/data-changed-listener'
-import { Logger } from '../../../../cross-cutting-concerns/application/logger'
+import { DataChangedListener } from '../../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import {
   ChangeStream,

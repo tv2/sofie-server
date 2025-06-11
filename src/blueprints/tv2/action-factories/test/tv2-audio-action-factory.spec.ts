@@ -13,7 +13,7 @@ import { Tv2BlueprintConfigurationTestFactory } from '../../test/tv2-blueprint-c
 import { Tv2AudioAction } from '../../value-objects/tv2-action'
 import { FrameTimeConverter } from '../../helpers/frame-time-converter'
 import { Tv2ActionManifestAudioBedData } from '../../value-objects/tv2-action-manifest-data'
-import { Logger } from '../../../../cross-cutting-concerns/application/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 import { Tv2CasparCgTimelineObjectFactory } from '../../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { Tv2AssetPathHelper } from '../../helpers/tv2-asset-path-helper'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'

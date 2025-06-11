@@ -1,7 +1,7 @@
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { DeviceRepository } from '../../../domain/repositories/device-repository'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/uuid-generator'
+import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
 import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
 import { MongoCoreDevice } from './mongo-entity-converter'
 import { CoreDevice } from '../../../domain/entities/device'

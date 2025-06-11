@@ -2,7 +2,7 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { ShelfConfigurationRepository } from '../../../domain/repositories/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../../domain/entities/shelf-configuration'
-import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/uuid-generator'
+import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
 import { MongoId } from './mongo-entity-converter'
 
 const SHELF_CONFIGURATION_COLLECTION_NAME: string = 'shelfConfiguration'

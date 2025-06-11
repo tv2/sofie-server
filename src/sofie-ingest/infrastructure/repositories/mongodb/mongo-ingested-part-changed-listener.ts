@@ -1,5 +1,5 @@
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
-import { DataChangedListener } from '../../../../cross-cutting-concerns/application/data-changed-listener'
+import { DataChangedListener } from '../../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import {
   MongoIngestedEntityConverter,
@@ -9,7 +9,7 @@ import {
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
 import { IngestedPart } from '../../../../rundown-execution/domain/entities/ingested-part'
-import { Logger } from '../../../../cross-cutting-concerns/application/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest changed this to "ingestedParts"
 

@@ -1,4 +1,4 @@
-import { Logger } from './logger'
+import { Logger } from './interfaces/logger'
 import { ConsoleLogger } from '../infrastructure/console-logger'
 
 export class LoggerFacade {

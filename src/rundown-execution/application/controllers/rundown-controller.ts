@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
+import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/controllers/base-controller'
 import { RundownService } from '../interfaces/rundown-service'
 import { RundownRepository } from '../../domain/repositories/rundown-repository'
 import { Rundown } from '../../domain/entities/rundown'

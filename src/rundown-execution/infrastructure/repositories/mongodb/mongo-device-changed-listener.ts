@@ -1,10 +1,10 @@
-import { DataChangedListener } from '../../../../cross-cutting-concerns/application/data-changed-listener'
+import { DataChangedListener } from '../../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import { MongoCoreDevice, MongoEntityConverter } from './mongo-entity-converter'
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { ChangeStream, ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
-import { Logger } from '../../../../cross-cutting-concerns/application/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 import { CoreDevice } from '../../../domain/entities/device'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'

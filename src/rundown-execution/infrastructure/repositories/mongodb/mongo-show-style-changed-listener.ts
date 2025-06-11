@@ -1,9 +1,9 @@
-import { DataChangedListener } from '../../../../cross-cutting-concerns/application/data-changed-listener'
+import { DataChangedListener } from '../../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import { ShowStyle } from '../../../domain/entities/show-style'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
-import { Logger } from '../../../../cross-cutting-concerns/application/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 import { UnsupportedOperationException } from '../../../domain/exceptions/unsupported-operation-exception'
 import { MongoShowStyle } from './mongo-entity-converter'
 

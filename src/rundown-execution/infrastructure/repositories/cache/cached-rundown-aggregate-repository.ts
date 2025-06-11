@@ -1,7 +1,7 @@
 import { RundownAggregateRepository } from '../../../domain/repositories/rundown-aggregate-repository'
 import { Rundown } from '../../../domain/entities/rundown'
 import { BasicRundown } from '../../../domain/entities/basic-rundown'
-import { Logger } from '../../../../cross-cutting-concerns/application/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 import { Segment } from '../../../domain/entities/segment'
 import { Part } from '../../../domain/entities/part'
 import { Piece } from '../../../domain/entities/piece'

@@ -1,4 +1,4 @@
-import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
+import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/controllers/base-controller'
 import { TimelineRepository } from '../../domain/repositories/timeline-repository'
 import { Request, Response } from 'express'
 import { Timeline } from '../../domain/entities/timeline'

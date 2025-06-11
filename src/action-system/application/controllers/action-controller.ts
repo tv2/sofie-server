@@ -1,4 +1,4 @@
-import { BaseController, GetRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
+import { BaseController, GetRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/controllers/base-controller'
 import { Request, Response } from 'express'
 import { ActionService } from '../interfaces/action-service'
 import { Action } from '../../domain/entities/action'

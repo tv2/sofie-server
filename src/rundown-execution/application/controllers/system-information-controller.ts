@@ -1,4 +1,4 @@
-import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
+import { BaseController, GetRequest, RestController } from '../../../cross-cutting-concerns/application/controllers/base-controller'
 import { SystemInformationRepository } from '../../domain/repositories/system-information-repository'
 import { Request, Response } from 'express'
 import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-handler'

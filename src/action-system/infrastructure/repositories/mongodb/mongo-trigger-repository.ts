@@ -2,7 +2,7 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { TriggerRepository } from '../../../domain/repositories/trigger-repository'
 import { Trigger } from '../../../domain/entities/trigger'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/uuid-generator'
+import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
 import { NotFoundException } from '../../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoId } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 

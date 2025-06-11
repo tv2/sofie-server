@@ -2,8 +2,8 @@ import * as mongodb from 'mongodb'
 import { Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../../../rundown-execution/domain/exceptions/database-not-connected-exception'
 import { MongoId } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
-import { Logger } from '../../application/logger'
-import { Database } from '../database'
+import { Logger } from '../../application/interfaces/logger'
+import { Database } from '../interfaces/database'
 
 const MONGO_CONNECTION_STRING: string = process.env.MONGO_URL ?? 'mongodb://localhost:3001'
 const MONGO_DB_NAME: string = getMongoDatabaseName()
