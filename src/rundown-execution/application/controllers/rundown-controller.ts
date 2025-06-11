@@ -13,7 +13,7 @@ import { IngestService } from '../../../sofie-ingest/application/interfaces/inge
 import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'
-import { Tv2Logger } from '../../../blueprints/tv2/tv2-logger'
+import { Tv2Logger } from '../../../blueprints/domain/interfaces/tv2-logger'
 import { ErrorCode } from '../../domain/enums/error-code'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 import { PlayoutContentReadService } from '../interfaces/playout-content-service'

@@ -1,5 +1,5 @@
 import { Blueprint } from '../rundown-execution/domain/value-objects/blueprint'
-import { Tv2BlueprintsFacade } from './tv2/tv2-blueprints-facade'
+import { Tv2BlueprintsFacade } from './domain/tv2-blueprints-facade'
 
 /*
  ATTENTION: The Blueprints layer is NOT allowed to know anything from the rest of AlbaServer except from the Model layer.
