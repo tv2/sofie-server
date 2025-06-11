@@ -1,10 +1,10 @@
-import { ThrottledRundownService } from '../throttled-rundown-service'
+import { ThrottledRundownService } from './throttled-rundown-service'
 import { anything, instance, mock, verify } from '@typestrong/ts-mockito'
-import { ThrottledRundownException } from '../../../rundown-execution/domain/exceptions/throttled-rundown-exception'
-import { RundownService } from '../interfaces/rundown-service'
-import { Part } from '../../../rundown-execution/domain/entities/part'
-import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
-import { Piece } from '../../../rundown-execution/domain/entities/piece'
+import { ThrottledRundownException } from '../../domain/exceptions/throttled-rundown-exception'
+import { RundownService } from '../rundown-service'
+import { Part } from '../../domain/entities/part'
+import { EntityTestFactory } from '../../domain/entities/test/entity-test-factory'
+import { Piece } from '../../domain/entities/piece'
 
 describe(ThrottledRundownService.name, () => {
   beforeEach(() => jest.useFakeTimers())

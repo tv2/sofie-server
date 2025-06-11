@@ -1,11 +1,11 @@
-import { Part } from '../../rundown-execution/domain/entities/part'
-import { Piece } from '../../rundown-execution/domain/entities/piece'
-import { Owner } from '../../rundown-execution/domain/enums/owner'
-import { InTransition } from '../../rundown-execution/domain/value-objects/in-transition'
-import { RundownService } from './interfaces/rundown-service'
-import { AsyncLock } from '../async-lock'
-import { SetNextDirection } from '../../rundown-execution/domain/enums/set-next-direction'
-import { TakeMode } from '../../rundown-execution/domain/enums/take-mode'
+import { Part } from '../../domain/entities/part'
+import { Piece } from '../../domain/entities/piece'
+import { Owner } from '../../domain/enums/owner'
+import { InTransition } from '../../domain/value-objects/in-transition'
+import { RundownService } from '../rundown-service'
+import { AsyncLock } from '../../../business-logic/async-lock'
+import { SetNextDirection } from '../../domain/enums/set-next-direction'
+import { TakeMode } from '../../domain/enums/take-mode'
 
 export class SynchronizedRundownService implements RundownService {
 

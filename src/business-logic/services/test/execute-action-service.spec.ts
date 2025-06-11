@@ -9,7 +9,7 @@ import {
 import { PartActionType, PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
 import { Part, PartInterface } from '../../../rundown-execution/domain/entities/part'
 import { ActionRepository } from '../../../data-access/repositories/interfaces/action-repository'
-import { RundownService } from '../interfaces/rundown-service'
+import { RundownService } from '../../../rundown-execution/application/rundown-service'
 import { RundownRepository } from '../../../data-access/repositories/interfaces/rundown-repository'
 import { Blueprint } from '../../../rundown-execution/domain/value-objects/blueprint'
 import { anyOfClass, anyString, anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'

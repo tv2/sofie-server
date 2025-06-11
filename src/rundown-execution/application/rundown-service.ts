@@ -1,9 +1,9 @@
-import { Part } from '../../../rundown-execution/domain/entities/part'
-import { Piece } from '../../../rundown-execution/domain/entities/piece'
-import { Owner } from '../../../rundown-execution/domain/enums/owner'
-import { InTransition } from '../../../rundown-execution/domain/value-objects/in-transition'
-import { SetNextDirection } from '../../../rundown-execution/domain/enums/set-next-direction'
-import { TakeMode } from '../../../rundown-execution/domain/enums/take-mode'
+import { Part } from '../domain/entities/part'
+import { Piece } from '../domain/entities/piece'
+import { Owner } from '../domain/enums/owner'
+import { InTransition } from '../domain/value-objects/in-transition'
+import { SetNextDirection } from '../domain/enums/set-next-direction'
+import { TakeMode } from '../domain/enums/take-mode'
 
 export interface RundownService {
   deleteRundown(rundownId: string): Promise<void>

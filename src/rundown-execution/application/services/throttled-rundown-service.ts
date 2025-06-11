@@ -1,11 +1,11 @@
-import { Part } from '../../rundown-execution/domain/entities/part'
-import { Piece } from '../../rundown-execution/domain/entities/piece'
-import { Owner } from '../../rundown-execution/domain/enums/owner'
-import { ThrottledRundownException } from '../../rundown-execution/domain/exceptions/throttled-rundown-exception'
-import { InTransition } from '../../rundown-execution/domain/value-objects/in-transition'
-import { RundownService } from './interfaces/rundown-service'
-import { SetNextDirection } from '../../rundown-execution/domain/enums/set-next-direction'
-import { TakeMode } from '../../rundown-execution/domain/enums/take-mode'
+import { Part } from '../../domain/entities/part'
+import { Piece } from '../../domain/entities/piece'
+import { Owner } from '../../domain/enums/owner'
+import { ThrottledRundownException } from '../../domain/exceptions/throttled-rundown-exception'
+import { InTransition } from '../../domain/value-objects/in-transition'
+import { RundownService } from '../rundown-service'
+import { SetNextDirection } from '../../domain/enums/set-next-direction'
+import { TakeMode } from '../../domain/enums/take-mode'
 
 const RUNDOWN_THROTTLED_INTERVAL_MS: number = 500
 const RUNDOWN_THROTTLED_ERROR_TEXT: string = `Unable to do action. An action was already executed less than ${RUNDOWN_THROTTLED_INTERVAL_MS}ms ago`
