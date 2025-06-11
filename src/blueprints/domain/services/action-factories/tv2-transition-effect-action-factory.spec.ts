@@ -25,11 +25,11 @@ import {
   MutateActionWithArgumentsMethods,
   MutateActionWithPieceMethods
 } from '../../../../action-system/domain/entities/action'
-import {Breaker, TransitionEffectType} from '../../value-objects/tv2-show-style-blueprint-configuration'
-import {Tv2DownstreamKeyer} from '../../value-objects/tv2-studio-blueprint-configuration'
-import {PlayoutContentType} from '../../../../rundown-execution/domain/enums/playout-content-type'
-import {OutputChannel} from '../../../../rundown-execution/domain/enums/output-channel'
-import {PieceActionType} from '../../../../model/enums/action-type'
+import { Breaker, TransitionEffectType } from '../../value-objects/tv2-show-style-blueprint-configuration'
+import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
+import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
+import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
+import { PieceActionType } from '../../../../action-system/domain/enums/action-type'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   describe(Tv2TransitionEffectActionFactory.prototype.getMutateActionMethods.name, () => {
