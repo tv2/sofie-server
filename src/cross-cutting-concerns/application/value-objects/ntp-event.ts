@@ -1,5 +1,6 @@
 import { TypedEvent } from './typed-event'
-import { NtpEventType } from '../../../leftovers/event-type'
+
+import {NtpEventType} from '../enums/ntp-event-type'
 
 export interface NtpEvent extends TypedEvent {
   type: NtpEventType

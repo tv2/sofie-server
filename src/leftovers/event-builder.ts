@@ -37,7 +37,6 @@ import {
   MacroEventType,
   PlayoutContentEventType,
   RundownEventType,
-  StatusMessageEventType,
   TriggerEventType
 } from './event-type'
 import { SegmentDto } from '../rundown-execution/application/dtos/segment-dto'
@@ -74,6 +73,7 @@ import { MacroDto } from '../action-system/application/dtos/macro-dto'
 import { PlayoutContentEventBuilder } from '../rundown-execution/application/interfaces/playout-content-event-builder'
 import { PlayoutContent } from '../rundown-execution/domain/value-objects/playout-content'
 import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from '../rundown-execution/application/value-objects/playout-content-event'
+import { StatusMessageEventType } from '../cross-cutting-concerns/application/enums/status-message-event-type'
 
 // TODO: Split into multiples for each context module.
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder, PlayoutContentEventBuilder {

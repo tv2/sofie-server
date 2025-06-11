@@ -1,4 +1,6 @@
 // TODO: Get rid of event type. It is only Rundown events that uses it for internal type definitions.
+import {NtpEventType} from '../cross-cutting-concerns/application/enums/ntp-event-type'
+
 export type EventType =
   RundownEventType
   | IngestEventType
@@ -61,16 +63,8 @@ export enum MacroEventType {
   MACRO_DELETED = 'MACRO_DELETED',
 }
 
-export enum StatusMessageEventType {
-  STATUS_MESSAGE = 'STATUS_MESSAGE'
-}
-
 export enum DeviceEventType {
   VIDEO_MIXER_CONFIGURATION_UPDATED = 'VIDEO_MIXER_CONFIGURATION_UPDATED'
-}
-
-export enum NtpEventType {
-  NTP = 'NTP'
 }
 
 export enum PlayoutContentEventType {
