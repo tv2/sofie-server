@@ -1,10 +1,10 @@
-import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
-import { IngestedPartRepository } from '../interfaces/ingested-part-repository'
-import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
-import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { MongoIngestedEntityConverter, MongoIngestedPart } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
-import { IngestedPieceRepository } from '../interfaces/ingested-piece-repository'
-import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
+import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
+import { IngestedPartRepository } from '../../../domain/repositories/ingested-part-repository'
+import { IngestedPart } from '../../../../rundown-execution/domain/entities/ingested-part'
+import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
+import { MongoIngestedEntityConverter, MongoIngestedPart } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
+import { IngestedPieceRepository } from '../../../domain/repositories/ingested-piece-repository'
+import { IngestedPiece } from '../../../../rundown-execution/domain/entities/ingested-piece'
 
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest rename to "ingestedParts"
 

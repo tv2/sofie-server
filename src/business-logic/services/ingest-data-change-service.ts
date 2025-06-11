@@ -7,7 +7,7 @@ import { IngestedPart } from '../../rundown-execution/domain/entities/ingested-p
 import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { NotFoundException } from '../../rundown-execution/domain/exceptions/not-found-exception'
 import { Logger } from '../../cross-cutting-concerns/application/logger'
-import { IngestedRundownRepository } from '../../data-access/repositories/interfaces/ingested-rundown-repository'
+import { IngestedRundownRepository } from '../../sofie-ingest/domain/repositories/ingested-rundown-repository'
 import { RundownRepository } from '../../rundown-execution/domain/repositories/rundown-repository'
 import { SegmentRepository } from '../../rundown-execution/domain/repositories/segment-repository'
 import { PartRepository } from '../../rundown-execution/domain/repositories/part-repository'

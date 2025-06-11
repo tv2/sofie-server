@@ -10,7 +10,7 @@ import { CallbackScheduler } from '../../../business-logic/services/interfaces/c
 import { EntityMockFactory } from '../../domain/entities/test/entity-mock-factory'
 import { Blueprint } from '../../domain/value-objects/blueprint'
 import { AlreadyActivatedException } from '../../domain/exceptions/already-activated-exception'
-import { IngestedRundownRepository } from '../../../data-access/repositories/interfaces/ingested-rundown-repository'
+import { IngestedRundownRepository } from '../../../sofie-ingest/domain/repositories/ingested-rundown-repository'
 import { Piece } from '../../domain/entities/piece'
 import { Part } from '../../domain/entities/part'
 import { EntityTestFactory } from '../../domain/entities/test/entity-test-factory'
