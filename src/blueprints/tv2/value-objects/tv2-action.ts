@@ -1,5 +1,5 @@
-import { PartAction, PieceAction } from '../../../rundown-execution/domain/entities/action'
-import { PartActionType, PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { PartAction, PieceAction } from '../../../action-system/domain/entities/action'
+import { PartActionType, PieceActionType } from '../../../action-system/domain/enums/action-type'
 import { Breaker, TransitionEffectType } from './tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from './tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject } from './tv2-blueprint-timeline-object'

@@ -43,10 +43,10 @@ import {
 import { SegmentDto } from '../../rundown-execution/application/dtos/segment-dto'
 import { Segment } from '../../rundown-execution/domain/entities/segment'
 import { BasicRundownDto } from '../../rundown-execution/application/dtos/basic-rundown-dto'
-import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
-import { Trigger } from '../../rundown-execution/domain/entities/trigger'
-import { TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent } from '../value-objects/trigger-event'
-import { TriggerDto } from '../../rundown-execution/application/dtos/trigger-dto'
+import { TriggerEventBuilder } from '../../action-system/application/interfaces/trigger-event-builder'
+import { Trigger } from '../../action-system/domain/entities/trigger'
+import { TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent } from '../../action-system/domain/value-objects/trigger-event'
+import { TriggerDto } from '../../action-system/application/dtos/trigger-dto'
 import { RundownDto } from '../../rundown-execution/application/dtos/rundown-dto'
 import { Media } from '../../rundown-execution/domain/entities/media'
 import { MediaDto } from '../../rundown-execution/application/dtos/media-dto'
@@ -58,23 +58,24 @@ import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-e
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
 import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
 import { StatusMessageEvent } from '../value-objects/status-message-event'
-import { ActionEventBuilder } from '../interfaces/action-event-builder'
-import { Action } from '../../rundown-execution/domain/entities/action'
-import { ActionsUpdatedEvent } from '../value-objects/action-event'
-import { ActionDto } from '../../rundown-execution/application/dtos/action-dto'
+import { ActionEventBuilder } from '../../action-system/application/interfaces/action-event-builder'
+import { Action } from '../../action-system/domain/entities/action'
+import { ActionsUpdatedEvent } from '../../action-system/domain/value-objects/action-event'
+import { ActionDto } from '../../action-system/application/dtos/action-dto'
 import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import {
   VideoMixerConfigurationUpdatedEvent
 } from '../value-objects/device-event'
 import { VideoMixerConfiguration } from '../../rundown-execution/domain/value-objects/video-mixer-configuration'
-import { MacroEventBuilder } from '../interfaces/macro-event-builder'
-import { Macro } from '../../rundown-execution/domain/entities/macro'
-import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../value-objects/macro-event'
-import { MacroDto } from '../../rundown-execution/application/dtos/macro-dto'
+import { MacroEventBuilder } from '../../action-system/application/interfaces/macro-event-builder'
+import { Macro } from '../../action-system/domain/entities/macro'
+import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../../action-system/domain/value-objects/macro-event'
+import { MacroDto } from '../../action-system/application/dtos/macro-dto'
 import { PlayoutContentEventBuilder } from '../interfaces/playout-content-event-builder'
 import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from '../value-objects/playout-content-event'
 
+// TODO: Split into multiples for each context module.
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder, PlayoutContentEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {

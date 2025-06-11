@@ -4,8 +4,8 @@ import {
   MutateActionMethods,
   MutateActionType,
   MutateActionWithPieceMethods,
-} from '../../../rundown-execution/domain/entities/action'
-import { PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+} from '../../../action-system/domain/entities/action'
+import { PieceActionType } from '../../../action-system/domain/enums/action-type'
 import { Piece, PieceInterface } from '../../../rundown-execution/domain/entities/piece'
 import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
 import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'

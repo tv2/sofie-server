@@ -17,7 +17,7 @@ import { IngestedEntityToEntityMapper } from '../../business-logic/services/inge
 import { Segment } from '../../rundown-execution/domain/entities/segment'
 import { TimelineBuilder } from '../../business-logic/services/interfaces/timeline-builder'
 import { TimelineRepository } from '../../rundown-execution/domain/repositories/timeline-repository'
-import { ActionGenerationService } from '../../business-logic/services/action-generation-service'
+import { ActionGenerationService } from '../../action-system/application/services/action-generation-service'
 import { Part } from '../../rundown-execution/domain/entities/part'
 import { Timeline } from '../../rundown-execution/domain/entities/timeline'
 import { AsyncLock } from '../../cross-cutting-concerns/application/async-lock'

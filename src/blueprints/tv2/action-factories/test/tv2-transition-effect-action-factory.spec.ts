@@ -16,7 +16,7 @@ import {
   Tv2BreakerTransitionEffectActionMetadata,
   Tv2TransitionEffectAction
 } from '../../value-objects/tv2-action'
-import { MutateActionMethods, MutateActionType, MutateActionWithPieceMethods } from '../../../../rundown-execution/domain/entities/action'
+import { MutateActionMethods, MutateActionType, MutateActionWithPieceMethods } from '../../../../action-system/domain/entities/action'
 import { Breaker, TransitionEffectType } from '../../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'

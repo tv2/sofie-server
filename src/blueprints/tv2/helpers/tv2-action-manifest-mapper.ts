@@ -1,5 +1,5 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { ActionManifest } from '../../../rundown-execution/domain/entities/action'
+import { ActionManifest } from '../../../action-system/domain/entities/action'
 import {
   SplitScreenBoxInput,
   Tv2ActionManifestData,

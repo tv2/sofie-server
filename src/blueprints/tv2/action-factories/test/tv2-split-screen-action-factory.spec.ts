@@ -24,7 +24,7 @@ import {
   Tv2ActionManifestSplitScreenSourceType
 } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2Action } from '../../value-objects/tv2-action'
-import { PartActionType } from '../../../../rundown-execution/domain/enums/action-type'
+import { PartActionType } from '../../../../action-system/domain/enums/action-type'
 import { Tv2Logger } from '../../tv2-logger'
 import { ObjectCloner } from '../../../../cross-cutting-concerns/domain/object-cloner'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'

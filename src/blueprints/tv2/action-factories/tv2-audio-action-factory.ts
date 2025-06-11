@@ -4,11 +4,11 @@ import {
   ActionManifest,
   MutateActionMethods,
   MutateActionType
-} from '../../../rundown-execution/domain/entities/action'
+} from '../../../action-system/domain/entities/action'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
 import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
-import { PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { PieceActionType } from '../../../action-system/domain/enums/action-type'
 import { Tv2Action, Tv2ActionSubtype, Tv2AudioAction, Tv2FadeAudioBedAction, } from '../value-objects/tv2-action'
 import {
   Tv2AudioMixerTimelineObjectFactory

@@ -4,7 +4,7 @@ import {
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { Tv2DownstreamKeyer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
-import { PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { PieceActionType } from '../../../action-system/domain/enums/action-type'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
 import {
@@ -19,7 +19,7 @@ import { OutputLayer } from '../../../rundown-execution/domain/enums/output-laye
 import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
 import { DownstreamKeyerPlayoutContent, PlayoutContent } from '../../../rundown-execution/domain/value-objects/playout-content'
-import { Action, MutateActionMethods, MutateActionType } from '../../../rundown-execution/domain/entities/action'
+import { Action, MutateActionMethods, MutateActionType } from '../../../action-system/domain/entities/action'
 
 export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
 

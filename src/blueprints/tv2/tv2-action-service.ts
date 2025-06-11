@@ -1,6 +1,6 @@
 import { BlueprintGenerateActions } from '../../rundown-execution/domain/value-objects/blueprint'
 import { Configuration } from '../../rundown-execution/domain/entities/configuration'
-import { Action, MutateActionMethods } from '../../rundown-execution/domain/entities/action'
+import { Action, MutateActionMethods } from '../../action-system/domain/entities/action'
 import { Tv2BlueprintConfiguration } from './value-objects/tv2-blueprint-configuration'
 import { Tv2CameraActionFactory } from './action-factories/tv2-camera-action-factory'
 import { Tv2Action } from './value-objects/tv2-action'

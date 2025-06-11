@@ -1,5 +1,5 @@
 import { PartInterface } from '../../../rundown-execution/domain/entities/part'
-import { PartActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { PartActionType } from '../../../action-system/domain/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'

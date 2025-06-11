@@ -1,6 +1,6 @@
 import { Piece } from '../../../rundown-execution/domain/entities/piece'
 import { Part, PartInterface } from '../../../rundown-execution/domain/entities/part'
-import { PartActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { PartActionType } from '../../../action-system/domain/enums/action-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
@@ -21,7 +21,7 @@ import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../timeline-object-factories/interfaces/tv2-video-mixer-timeline-object-factory'
 import { TimelineEnable } from '../../../rundown-execution/domain/entities/timeline-enable'
-import { Action, MutateActionMethods, MutateActionType } from '../../../rundown-execution/domain/entities/action'
+import { Action, MutateActionMethods, MutateActionType } from '../../../action-system/domain/entities/action'
 import { Tv2PieceInterface } from '../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { PieceMetadata } from '../../../rundown-execution/domain/value-objects/metadata'

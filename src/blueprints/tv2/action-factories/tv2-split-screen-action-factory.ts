@@ -1,6 +1,6 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, MutateActionMethods, MutateActionType } from '../../../rundown-execution/domain/entities/action'
-import { PartActionType, PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { Action, MutateActionMethods, MutateActionType } from '../../../action-system/domain/entities/action'
+import { PartActionType, PieceActionType } from '../../../action-system/domain/enums/action-type'
 import { Piece } from '../../../rundown-execution/domain/entities/piece'
 import { Part, PartInterface } from '../../../rundown-execution/domain/entities/part'
 import {

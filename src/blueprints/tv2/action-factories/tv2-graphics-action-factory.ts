@@ -1,9 +1,9 @@
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { Action, MutateActionMethods, MutateActionType } from '../../../rundown-execution/domain/entities/action'
+import { Action, MutateActionMethods, MutateActionType } from '../../../action-system/domain/entities/action'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
 import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
 import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
-import { PartActionType, PieceActionType } from '../../../rundown-execution/domain/enums/action-type'
+import { PartActionType, PieceActionType } from '../../../action-system/domain/enums/action-type'
 import {
   Tv2DownstreamKeyer,
   Tv2DownstreamKeyerRole,
