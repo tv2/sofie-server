@@ -1,4 +1,4 @@
-import { ShelfConfiguration } from '../../../rundown-execution/domain/entities/shelf-configuration'
+import { ShelfConfiguration } from '../entities/shelf-configuration'
 
 // TODO: Move to Alba TV 2 server
 export interface ShelfConfigurationRepository {

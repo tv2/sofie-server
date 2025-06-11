@@ -1,9 +1,9 @@
-import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
-import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { ShelfConfigurationRepository } from '../interfaces/shelf-configuration-repository'
-import { ShelfConfiguration } from '../../../rundown-execution/domain/entities/shelf-configuration'
-import { UuidGenerator } from '../../../cross-cutting-concerns/infrastructure/uuid-generator'
-import { MongoId } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
+import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
+import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
+import { ShelfConfigurationRepository } from '../../../domain/repositories/shelf-configuration-repository'
+import { ShelfConfiguration } from '../../../domain/entities/shelf-configuration'
+import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/uuid-generator'
+import { MongoId } from './mongo-entity-converter'
 
 const SHELF_CONFIGURATION_COLLECTION_NAME: string = 'shelfConfiguration'
 const SHELF_CONFIGURATION_ID: string = 'SHELF_CONFIGURATION_ID' // The system only support having a single Shelf.

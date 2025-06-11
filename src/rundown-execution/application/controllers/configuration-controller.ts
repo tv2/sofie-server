@@ -8,7 +8,7 @@ import { ShowStyleVariantRepository } from '../../domain/repositories/show-style
 import { ShowStyleVariant } from '../../domain/entities/show-style-variant'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { ConfigurationService } from '../../../business-logic/services/interfaces/configuration-service'
-import { ShelfConfigurationRepository } from '../../../data-access/repositories/interfaces/shelf-configuration-repository'
+import { ShelfConfigurationRepository } from '../../domain/repositories/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../domain/entities/shelf-configuration'
 import { ShelfConfigurationDto } from '../dtos/shelf-configuration-dto'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
