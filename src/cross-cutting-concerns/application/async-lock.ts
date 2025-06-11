@@ -1,4 +1,4 @@
-import { Logger } from '../cross-cutting-concerns/application/logger'
+import { Logger } from './logger'
 
 interface EnqueuedOperation {
   operation: () => Promise<void>

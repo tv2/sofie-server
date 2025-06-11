@@ -20,7 +20,7 @@ import { TimelineRepository } from '../../rundown-execution/domain/repositories/
 import { ActionGenerationService } from './action-generation-service'
 import { Part } from '../../rundown-execution/domain/entities/part'
 import { Timeline } from '../../rundown-execution/domain/entities/timeline'
-import { AsyncLock } from '../async-lock'
+import { AsyncLock } from '../../cross-cutting-concerns/application/async-lock'
 import { PieceRepository } from '../../rundown-execution/domain/repositories/piece-repository'
 import { IngestedPiece } from '../../rundown-execution/domain/entities/ingested-piece'
 

@@ -3,7 +3,7 @@ import { Piece } from '../../domain/entities/piece'
 import { Owner } from '../../domain/enums/owner'
 import { InTransition } from '../../domain/value-objects/in-transition'
 import { RundownService } from '../rundown-service'
-import { AsyncLock } from '../../../business-logic/async-lock'
+import { AsyncLock } from '../../../cross-cutting-concerns/application/async-lock'
 import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'
 
