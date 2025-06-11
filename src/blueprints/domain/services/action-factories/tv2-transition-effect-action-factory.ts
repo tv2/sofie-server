@@ -48,6 +48,7 @@ import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/p
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
+const MAX_FRAME_DURATION_LIMIT: number = 250 // The maximum allowed transition duration in frames.
 
 enum SpecialEffectName {
   MIX = 'Mix',
@@ -123,7 +124,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
             }
             const transitionEffectAction: Tv2TransitionEffectAction = action as Tv2TransitionEffectAction
             const metadata: Tv2DipTransitionEffectActionMetadata =  transitionEffectAction.metadata as Tv2DipTransitionEffectActionMetadata
-            return this.createDipTransitionEffectAction(transitionEffectAction.type, actionArguments, metadata.dipInput)
+            return this.createDipTransitionEffectAction(transitionEffectAction.type, this.getBoundedTransitionFrameDuration(actionArguments), metadata.dipInput)
           }
         })
         break
@@ -136,7 +137,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
               throw new Tv2MisconfigurationException(`MixTransitionAction expects 'actionArguments' to be an integer. ${actionArguments} is not an integer.`)
             }
             const transitionEffectAction: Tv2TransitionEffectAction = action as Tv2TransitionEffectAction
-            return this.createMixTransitionEffectAction(transitionEffectAction.type, actionArguments)
+            return this.createMixTransitionEffectAction(transitionEffectAction.type, this.getBoundedTransitionFrameDuration(actionArguments))
           }
         })
         break
@@ -150,6 +151,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     }
     mutateActionMethods.push(updateTransitionMutateAction)
     return mutateActionMethods
+  }
+
+  private getBoundedTransitionFrameDuration(frameDuration: number): number {
+    return Math.min(Math.max(frameDuration, 0), MAX_FRAME_DURATION_LIMIT)
   }
 
   private isProgramPiece(piece: Piece): boolean {
