@@ -1,4 +1,4 @@
-import { IngestService } from './interfaces/ingest-service'
+import { IngestService } from './ingest-service'
 import { HttpService } from '../../cross-cutting-concerns/application/http-service'
 import { RundownRepository } from '../../rundown-execution/domain/repositories/rundown-repository'
 import { Rundown } from '../../rundown-execution/domain/entities/rundown'

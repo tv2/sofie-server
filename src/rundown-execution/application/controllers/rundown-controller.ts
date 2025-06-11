@@ -9,7 +9,7 @@ import { HttpErrorHandler } from '../../../presentation/interfaces/http-error-ha
 import { BasicRundown } from '../../domain/entities/basic-rundown'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { Owner } from '../../domain/enums/owner'
-import { IngestService } from '../../../business-logic/services/interfaces/ingest-service'
+import { IngestService } from '../../../sofie-ingest/application/ingest-service'
 import { HttpResponseFormatter } from '../../../presentation/interfaces/http-response-formatter'
 import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'

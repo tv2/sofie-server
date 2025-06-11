@@ -17,7 +17,7 @@ import { AlreadyActivatedException } from '../../domain/exceptions/already-activ
 import { IngestedRundownRepository } from '../../../sofie-ingest/domain/repositories/ingested-rundown-repository'
 import { RundownMode } from '../../domain/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../domain/exceptions/already-rehearsal-exception'
-import { IngestService } from '../../../business-logic/services/interfaces/ingest-service'
+import { IngestService } from '../../../sofie-ingest/application/ingest-service'
 import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { PlayoutService } from '../../../business-logic/services/interfaces/playout-service'
 import { TakeIsBlockedException } from '../../domain/exceptions/take-is-blocked-exception'
