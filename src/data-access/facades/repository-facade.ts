@@ -1,6 +1,6 @@
 import { RundownRepository } from '../repositories/interfaces/rundown-repository'
 import { MongoRundownAggregateRepository } from '../repositories/mongo/mongo-rundown-aggregate-repository'
-import { MongoDatabase } from '../repositories/mongo/mongo-database'
+import { MongoDatabase } from '../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { MongoIngestedEntityConverter } from '../repositories/mongo/mongo-ingested-entity-converter'
 import { SegmentRepository } from '../repositories/interfaces/segment-repository'
 import { MongoSegmentRepository } from '../repositories/mongo/mongo-segment-repository'
@@ -62,7 +62,7 @@ import { MongoStatusMessageRepository } from '../repositories/mongo/mongo-status
 import { MongoCoreDeviceRepository } from '../repositories/mongo/mongo-core-device-repository'
 import { ShowStyle } from '../../rundown-execution/domain/entities/show-style'
 import { MongoShowStyleChangedListener } from '../repositories/mongo/mongo-show-style-changed-listener'
-import { Database } from '../repositories/interfaces/database'
+import { Database } from '../../cross-cutting-concerns/infrastructure/database'
 import { ShowStyleVariant } from '../../rundown-execution/domain/entities/show-style-variant'
 import {
   MongoShowStyleVariantConfigurationListener

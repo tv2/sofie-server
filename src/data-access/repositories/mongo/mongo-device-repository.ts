@@ -1,6 +1,6 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { DeviceRepository } from '../interfaces/device-repository'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { UuidGenerator } from '../../../cross-cutting-concerns/infrastructure/uuid-generator'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MongoCoreDevice } from './mongo-entity-converter'

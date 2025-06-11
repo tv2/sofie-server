@@ -1,7 +1,7 @@
 import { SystemInformation } from '../../../rundown-execution/domain/entities/system-information'
 import { SystemInformationRepository } from '../interfaces/system-information-repository'
-import { BaseMongoRepository } from './base-mongo-repository'
-import { MongoDatabase } from './mongo-database'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { MongoEntityConverter, MongoSystemInformation } from './mongo-entity-converter'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 

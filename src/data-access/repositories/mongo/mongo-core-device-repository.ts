@@ -1,5 +1,5 @@
-import { BaseMongoRepository } from './base-mongo-repository'
-import { MongoDatabase } from './mongo-database'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { MongoCoreDevice, MongoEntityConverter, MongoId } from './mongo-entity-converter'
 import { DeviceRepository } from '../interfaces/device-repository'
 import { CoreDevice } from '../../../rundown-execution/domain/entities/device'

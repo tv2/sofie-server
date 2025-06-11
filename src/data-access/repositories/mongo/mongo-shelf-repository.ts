@@ -1,5 +1,5 @@
-import { BaseMongoRepository } from './base-mongo-repository'
-import { MongoDatabase } from './mongo-database'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { ShelfConfigurationRepository } from '../interfaces/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../../rundown-execution/domain/entities/shelf-configuration'
 import { UuidGenerator } from '../../../cross-cutting-concerns/infrastructure/uuid-generator'

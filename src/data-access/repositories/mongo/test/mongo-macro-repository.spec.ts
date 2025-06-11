@@ -1,6 +1,6 @@
 import { MongoMacroRepository } from '../mongo-macro-repository'
 import { anyString, anything, capture, instance, mock, when } from '@typestrong/ts-mockito'
-import { MongoDatabase } from '../mongo-database'
+import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/uuid-generator'
 import { Collection } from 'mongodb'
 import { MongoId } from '../mongo-entity-converter'

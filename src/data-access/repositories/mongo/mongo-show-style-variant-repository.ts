@@ -1,6 +1,6 @@
 import { ShowStyleVariantRepository } from '../interfaces/show-style-variant-repository'
-import { BaseMongoRepository } from './base-mongo-repository'
-import { MongoDatabase } from './mongo-database'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { RundownRepository } from '../interfaces/rundown-repository'
 import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/show-style-variant'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'

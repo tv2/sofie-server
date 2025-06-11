@@ -1,4 +1,4 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { DataChangedListener } from '../interfaces/data-changed-listener'
 import {
   ChangeStream,
@@ -7,7 +7,7 @@ import {
   ChangeStreamOptions,
 } from 'mongodb'
 import { MongoIngestedEntityConverter, MongoIngestedRundown } from './mongo-ingested-entity-converter'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { MongoChangeEvent } from './mongo-enums'
 import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
 import { Logger } from '../../../cross-cutting-concerns/application/logger'

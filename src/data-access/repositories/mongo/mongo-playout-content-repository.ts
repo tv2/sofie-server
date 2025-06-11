@@ -1,8 +1,8 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { PlayoutContent } from '../../../rundown-execution/domain/value-objects/playout-content'
 import { PlayoutContentRepository } from '../interfaces/playout-content-repository'
 import { MongoId } from './mongo-entity-converter'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 
 
 const PLAYOUT_CONTENT_COLLECTION_NAME: string = 'playoutContents'

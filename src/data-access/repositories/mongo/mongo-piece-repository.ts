@@ -1,6 +1,6 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { Piece } from '../../../rundown-execution/domain/entities/piece'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { AnyBulkWriteOperation, } from 'mongodb'
 import { MongoEntityConverter, MongoPiece } from './mongo-entity-converter'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'

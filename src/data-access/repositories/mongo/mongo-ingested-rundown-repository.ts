@@ -1,9 +1,9 @@
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import {
   MongoIngestedEntityConverter,
   MongoIngestedRundown,
 } from './mongo-ingested-entity-converter'
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { IngestedRundownRepository } from '../interfaces/ingested-rundown-repository'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { RundownBaselineRepository } from '../interfaces/rundown-baseline-repository'

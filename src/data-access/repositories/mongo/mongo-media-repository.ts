@@ -1,7 +1,7 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { MediaRepository } from '../interfaces/media-repository'
 import { Media } from '../../../rundown-execution/domain/entities/media'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { MongoEntityConverter, MongoMedia } from './mongo-entity-converter'
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'

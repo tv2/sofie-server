@@ -1,6 +1,6 @@
 import { Segment } from '../../../rundown-execution/domain/entities/segment'
-import { MongoDatabase } from './mongo-database'
-import { BaseMongoRepository } from './base-mongo-repository'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { AnyBulkWriteOperation, } from 'mongodb'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { Part } from '../../../rundown-execution/domain/entities/part'

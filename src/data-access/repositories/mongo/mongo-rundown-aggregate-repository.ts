@@ -1,6 +1,6 @@
 import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
-import { MongoDatabase } from './mongo-database'
-import { BaseMongoRepository } from './base-mongo-repository'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { BasicRundown } from '../../../rundown-execution/domain/entities/basic-rundown'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { AnyBulkWriteOperation, ClientSession } from 'mongodb'

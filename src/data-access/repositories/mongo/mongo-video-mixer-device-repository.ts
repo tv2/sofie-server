@@ -1,6 +1,6 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { VideoMixerDeviceRepository } from '../interfaces/video-mixer-device-repository'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { VideoMixerConfiguration } from '../../../rundown-execution/domain/value-objects/video-mixer-configuration'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { DeviceEventEmitter } from '../../../business-logic/services/interfaces/device-event-emitter'

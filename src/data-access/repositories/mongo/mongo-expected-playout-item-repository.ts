@@ -1,7 +1,7 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { MongoId } from './mongo-entity-converter'
 import { AnyBulkWriteOperation } from 'mongodb'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 
 const EXPECTED_PLAYOUT_ITEMS_COLLECTION_NAME: string = 'expectedPlayoutItems'
 

@@ -1,7 +1,7 @@
 import { ActionManifestRepository } from '../interfaces/action-manifest-repository'
 import { ActionManifest } from '../../../rundown-execution/domain/entities/action'
-import { MongoDatabase } from './mongo-database'
-import { BaseMongoRepository } from './base-mongo-repository'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 
 const AD_LIB_ACTIONS_COLLECTION: string = 'adLibActions'
 

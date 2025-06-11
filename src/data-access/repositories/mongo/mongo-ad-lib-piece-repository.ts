@@ -1,7 +1,7 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { ActionManifestRepository } from '../interfaces/action-manifest-repository'
 import { ActionManifest } from '../../../rundown-execution/domain/entities/action'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { Filter } from 'mongodb'
 import { MongoId } from './mongo-entity-converter'
 

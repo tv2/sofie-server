@@ -1,6 +1,6 @@
-import { BaseMongoRepository } from './base-mongo-repository'
+import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { Macro } from '../../../rundown-execution/domain/entities/macro'
-import { MongoDatabase } from './mongo-database'
+import { MongoDatabase } from '../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 import { MacroRepository } from '../interfaces/macro-repository'
 import { UuidGenerator } from '../../../cross-cutting-concerns/infrastructure/uuid-generator'
