@@ -3,7 +3,7 @@ import { RundownTimelineService } from '../../rundown-execution/application/serv
 import { RepositoryFacade } from '../../data-access/facades/repository-facade'
 import { TimelineBuilder } from '../services/interfaces/timeline-builder'
 import { SuperflyTimelineBuilder } from '../services/superfly-timeline-builder'
-import { TimeoutCallbackScheduler } from '../services/timeout-callback-scheduler'
+import { TimeoutCallbackScheduler } from '../../cross-cutting-concerns/application/timeout-callback-scheduler'
 import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
 import { ExecuteActionService } from '../services/execute-action-service'

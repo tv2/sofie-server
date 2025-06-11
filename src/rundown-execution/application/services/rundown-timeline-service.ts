@@ -5,7 +5,7 @@ import { TimelineRepository } from '../../domain/repositories/timeline-repositor
 import { TimelineBuilder } from '../../../business-logic/services/interfaces/timeline-builder'
 import { Timeline } from '../../domain/entities/timeline'
 import { Piece } from '../../domain/entities/piece'
-import { CallbackScheduler } from '../../../business-logic/services/interfaces/callback-scheduler'
+import { CallbackScheduler } from '../../../cross-cutting-concerns/application/callback-scheduler'
 import { RundownService } from '../rundown-service'
 import { ActiveRundownException } from '../../domain/exceptions/active-rundown-exception'
 import { Blueprint } from '../../domain/value-objects/blueprint'

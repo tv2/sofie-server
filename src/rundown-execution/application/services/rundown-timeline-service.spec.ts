@@ -6,7 +6,7 @@ import { TimelineRepository } from '../../domain/repositories/timeline-repositor
 import { TimelineBuilder } from '../../../business-logic/services/interfaces/timeline-builder'
 import { ActiveRundownException } from '../../domain/exceptions/active-rundown-exception'
 import { RundownTimelineService } from './rundown-timeline-service'
-import { CallbackScheduler } from '../../../business-logic/services/interfaces/callback-scheduler'
+import { CallbackScheduler } from '../../../cross-cutting-concerns/application/callback-scheduler'
 import { EntityMockFactory } from '../../domain/entities/test/entity-mock-factory'
 import { Blueprint } from '../../domain/value-objects/blueprint'
 import { AlreadyActivatedException } from '../../domain/exceptions/already-activated-exception'
