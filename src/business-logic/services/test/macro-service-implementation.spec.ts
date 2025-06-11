@@ -1,13 +1,13 @@
 import { MacroServiceImplementation } from '../macro-service-implementation'
 import { MacroRepository } from '../../../rundown-execution/domain/repositories/macro-repository'
 import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
-import { MacroEventEmitter } from '../interfaces/macro-event-emitter'
+import { MacroEventEmitter } from '../../../rundown-execution/application/macro-event-emitter'
 import { Macro, Operation } from '../../../rundown-execution/domain/entities/macro'
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { ActionService } from '../interfaces/action-service'
 import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { ErrorCode } from '../../../rundown-execution/domain/enums/error-code'
-import { StatusMessageEventEmitter } from '../interfaces/status-message-event-emitter'
+import { StatusMessageEventEmitter } from '../../../rundown-execution/application/status-message-event-emitter'
 
 describe(MacroServiceImplementation.name, () => {
   describe(MacroServiceImplementation.prototype.createMacro.name, () => {

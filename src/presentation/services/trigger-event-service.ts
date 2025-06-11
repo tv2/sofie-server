@@ -1,4 +1,4 @@
-import { TriggerEventEmitter } from '../../business-logic/services/interfaces/trigger-event-emitter'
+import { TriggerEventEmitter } from '../../rundown-execution/application/trigger-event-emitter'
 import { TriggerEventObserver } from '../interfaces/trigger-event-observer'
 import { Trigger } from '../../rundown-execution/domain/entities/trigger'
 import {

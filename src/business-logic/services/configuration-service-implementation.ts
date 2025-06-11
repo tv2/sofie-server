@@ -1,6 +1,6 @@
 import { ShelfConfiguration } from '../../rundown-execution/domain/entities/shelf-configuration'
 import { ConfigurationService } from './interfaces/configuration-service'
-import { ConfigurationEventEmitter } from './interfaces/configuration-event-emitter'
+import { ConfigurationEventEmitter } from '../../rundown-execution/application/configuration-event-emitter'
 import { ShelfConfigurationRepository } from '../../rundown-execution/domain/repositories/shelf-configuration-repository'
 
 export class ConfigurationServiceImplementation implements ConfigurationService {

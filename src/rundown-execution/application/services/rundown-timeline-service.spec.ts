@@ -1,6 +1,6 @@
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown } from '../../domain/entities/rundown'
-import { RundownEventEmitter } from '../../../business-logic/services/interfaces/rundown-event-emitter'
+import { RundownEventEmitter } from '../rundown-event-emitter'
 import { RundownRepository } from '../../domain/repositories/rundown-repository'
 import { TimelineRepository } from '../../domain/repositories/timeline-repository'
 import { TimelineBuilder } from '../../../business-logic/services/interfaces/timeline-builder'

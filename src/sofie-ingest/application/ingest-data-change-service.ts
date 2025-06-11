@@ -12,7 +12,7 @@ import { RundownRepository } from '../../rundown-execution/domain/repositories/r
 import { SegmentRepository } from '../../rundown-execution/domain/repositories/segment-repository'
 import { PartRepository } from '../../rundown-execution/domain/repositories/part-repository'
 import { BasicRundown } from '../../rundown-execution/domain/entities/basic-rundown'
-import { RundownEventEmitter } from '../../business-logic/services/interfaces/rundown-event-emitter'
+import { RundownEventEmitter } from '../../rundown-execution/application/rundown-event-emitter'
 import { IngestedEntityToEntityMapper } from '../../business-logic/services/ingested-entity-to-entity-mapper'
 import { Segment } from '../../rundown-execution/domain/entities/segment'
 import { TimelineBuilder } from '../../business-logic/services/interfaces/timeline-builder'

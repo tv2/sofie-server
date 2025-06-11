@@ -1,4 +1,4 @@
-import { RundownEventEmitter } from '../../../business-logic/services/interfaces/rundown-event-emitter'
+import { RundownEventEmitter } from '../rundown-event-emitter'
 import { RundownRepository } from '../../domain/repositories/rundown-repository'
 import { Rundown } from '../../domain/entities/rundown'
 import { TimelineRepository } from '../../domain/repositories/timeline-repository'

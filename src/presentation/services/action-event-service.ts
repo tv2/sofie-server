@@ -1,4 +1,4 @@
-import { ActionEventEmitter } from '../../business-logic/services/interfaces/action-event-emitter'
+import { ActionEventEmitter } from '../../rundown-execution/application/action-event-emitter'
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
 import { ActionEvent, ActionsUpdatedEvent } from '../value-objects/action-event'
 import { Action } from '../../rundown-execution/domain/entities/action'

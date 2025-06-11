@@ -3,7 +3,7 @@ import { VideoMixerDeviceRepository } from '../../../domain/repositories/video-m
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { VideoMixerConfiguration } from '../../../domain/value-objects/video-mixer-configuration'
 import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
-import { DeviceEventEmitter } from '../../../../business-logic/services/interfaces/device-event-emitter'
+import { DeviceEventEmitter } from '../../../application/device-event-emitter'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
 

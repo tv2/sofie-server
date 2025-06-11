@@ -1,4 +1,4 @@
-import { Media } from '../../../rundown-execution/domain/entities/media'
+import { Media } from '../domain/entities/media'
 
 export interface MediaEventEmitter {
   emitMediaCreated(media: Media): void

@@ -1,7 +1,7 @@
-import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
-import { Part } from '../../../rundown-execution/domain/entities/part'
-import { Piece } from '../../../rundown-execution/domain/entities/piece'
-import { Segment } from '../../../rundown-execution/domain/entities/segment'
+import { Rundown } from '../domain/entities/rundown'
+import { Part } from '../domain/entities/part'
+import { Piece } from '../domain/entities/piece'
+import { Segment } from '../domain/entities/segment'
 
 export interface RundownEventEmitter {
   emitActivateEvent(rundown: Rundown): void

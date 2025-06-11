@@ -5,7 +5,7 @@ import { ConfigurationRepository } from '../../rundown-execution/domain/reposito
 import { ActionManifestRepository } from '../../rundown-execution/domain/repositories/action-manifest-repository'
 import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprint'
 import { ActionRepository } from '../../rundown-execution/domain/repositories/action-repository'
-import { ActionEventEmitter } from './interfaces/action-event-emitter'
+import { ActionEventEmitter } from '../../rundown-execution/application/action-event-emitter'
 
 export class ActionGenerationService {
   constructor(

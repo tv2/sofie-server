@@ -1,4 +1,4 @@
-import { Macro } from '../../../rundown-execution/domain/entities/macro'
+import { Macro } from '../domain/entities/macro'
 
 export interface MacroEventEmitter {
   emitMacroCreatedEvent(macro: Macro): void
