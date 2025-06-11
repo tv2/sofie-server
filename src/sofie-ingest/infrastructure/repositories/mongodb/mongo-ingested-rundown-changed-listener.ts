@@ -8,7 +8,7 @@ import {
 } from 'mongodb'
 import { MongoIngestedEntityConverter, MongoIngestedRundown } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-enums'
+import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
 import { IngestedRundown } from '../../../../rundown-execution/domain/entities/ingested-rundown'
 import { Logger } from '../../../../cross-cutting-concerns/application/logger'
 

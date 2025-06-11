@@ -5,7 +5,7 @@ import { VideoMixerConfiguration } from '../../../domain/value-objects/video-mix
 import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
 import { DeviceEventEmitter } from '../../../../business-logic/services/interfaces/device-event-emitter'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
-import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-enums'
+import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
 
 interface MongoDevice {
   _id: string

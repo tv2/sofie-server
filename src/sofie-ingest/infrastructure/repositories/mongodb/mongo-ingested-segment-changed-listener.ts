@@ -8,7 +8,7 @@ import {
   ChangeStreamDocument,
   ChangeStreamOptions,
 } from 'mongodb'
-import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-enums'
+import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
 import { IngestedSegment } from '../../../../rundown-execution/domain/entities/ingested-segment'
 import { Logger } from '../../../../cross-cutting-concerns/application/logger'
 
