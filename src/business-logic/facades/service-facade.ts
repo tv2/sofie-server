@@ -20,7 +20,7 @@ import { TriggerServiceImplementation } from '../services/trigger-service-implem
 import { LoggerFacade } from '../../cross-cutting-concerns/application/logger-facade'
 import { MediaDatabaseChangedService } from '../../sofie-ingest/application/media-database-changed-service'
 import { ConfigurationService } from '../services/interfaces/configuration-service'
-import { ConfigurationServiceImplementation } from '../services/configuration-service-implementation'
+import { ConfigurationServiceImplementation } from '../../rundown-execution/application/configuration-service-implementation'
 import { DeviceChangedService } from '../../sofie-ingest/application/device-changed-service'
 import { ConfigurationChangedService } from '../../sofie-ingest/application/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'

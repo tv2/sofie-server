@@ -1,7 +1,7 @@
-import { ShelfConfiguration } from '../../rundown-execution/domain/entities/shelf-configuration'
-import { ConfigurationService } from './interfaces/configuration-service'
-import { ConfigurationEventEmitter } from '../../rundown-execution/application/configuration-event-emitter'
-import { ShelfConfigurationRepository } from '../../rundown-execution/domain/repositories/shelf-configuration-repository'
+import { ShelfConfiguration } from '../domain/entities/shelf-configuration'
+import { ConfigurationService } from '../../business-logic/services/interfaces/configuration-service'
+import { ConfigurationEventEmitter } from './configuration-event-emitter'
+import { ShelfConfigurationRepository } from '../domain/repositories/shelf-configuration-repository'
 
 export class ConfigurationServiceImplementation implements ConfigurationService {
 
