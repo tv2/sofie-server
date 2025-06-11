@@ -1,4 +1,4 @@
-import { PlayoutContent } from '../../../rundown-execution/domain/value-objects/playout-content'
+import { PlayoutContent } from '../domain/value-objects/playout-content'
 
 export interface PlayoutContentEventEmitter {
   emitProgramPlayoutContentEvent(programPlayoutContents: PlayoutContent[]): void

@@ -25,7 +25,7 @@ import { MacroEventEmitter } from '../../business-logic/services/interfaces/macr
 import { MacroEventService } from '../services/macro-event-service'
 import { PlayoutContentEventObserver } from '../interfaces/playout-content-event-observer'
 import { PlayoutContentEventService } from '../services/playout-content-event-service'
-import { PlayoutContentEventEmitter } from '../../business-logic/services/interfaces/playout-content-event-emitter'
+import { PlayoutContentEventEmitter } from '../../rundown-execution/application/playout-content-event-emitter'
 
 export class EventEmitterFacade {
 

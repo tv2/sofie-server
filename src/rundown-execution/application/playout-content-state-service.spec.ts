@@ -1,5 +1,5 @@
 import { PlayoutContentStateService } from './playout-content-state-service'
-import { PlayoutContentEventEmitter } from '../../business-logic/services/interfaces/playout-content-event-emitter'
+import { PlayoutContentEventEmitter } from './playout-content-event-emitter'
 import { anything, capture, instance, mock, resetCalls, verify } from '@typestrong/ts-mockito'
 import { PlayoutContentUpdateService } from './playout-content-service'
 import { Rundown } from '../domain/entities/rundown'
