@@ -1,4 +1,4 @@
-import { Trigger } from '../domain/entities/trigger'
+import { Trigger } from '../../domain/entities/trigger'
 
 export interface TriggerEventEmitter {
   emitTriggerCreatedEvent(trigger: Trigger): void

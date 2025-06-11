@@ -1,7 +1,7 @@
 import { StatusMessageServiceImplementation } from './status-message-service-implementation'
 import { StatusMessageService } from './interfaces/status-message-service'
 import { anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
-import { StatusMessageEventEmitter } from '../../rundown-execution/application/status-message-event-emitter'
+import { StatusMessageEventEmitter } from '../../rundown-execution/application/interfaces/status-message-event-emitter'
 import { StatusMessageRepository } from '../../rundown-execution/domain/repositories/status-message-repository'
 import { EntityTestFactory } from '../../rundown-execution/domain/entities/test/entity-test-factory'
 import { StatusCode } from '../../rundown-execution/domain/enums/status-code'

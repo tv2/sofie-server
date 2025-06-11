@@ -1,4 +1,4 @@
-import { ConfigurationEventEmitter } from '../../rundown-execution/application/configuration-event-emitter'
+import { ConfigurationEventEmitter } from '../../rundown-execution/application/interfaces/configuration-event-emitter'
 import { ShelfConfiguration } from '../../rundown-execution/domain/entities/shelf-configuration'
 import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
 import { ConfigurationEvent, ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'

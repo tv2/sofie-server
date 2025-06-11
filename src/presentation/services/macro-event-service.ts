@@ -1,4 +1,4 @@
-import { MacroEventEmitter } from '../../rundown-execution/application/macro-event-emitter'
+import { MacroEventEmitter } from '../../rundown-execution/application/interfaces/macro-event-emitter'
 import { MacroEventObserver } from '../interfaces/macro-event-observer'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
 import {

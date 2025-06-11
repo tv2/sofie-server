@@ -18,7 +18,7 @@ import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprin
 import { ActionRepository } from '../../rundown-execution/domain/repositories/action-repository'
 import { PartActionType, PieceActionType, SystemActionType } from '../../rundown-execution/domain/enums/action-type'
 import { UnsupportedOperationException } from '../../rundown-execution/domain/exceptions/unsupported-operation-exception'
-import { RundownService } from '../../rundown-execution/application/rundown-service'
+import { RundownService } from '../../rundown-execution/application/interfaces/rundown-service'
 import { Part, PartInterface } from '../../rundown-execution/domain/entities/part'
 import { Piece, PieceInterface } from '../../rundown-execution/domain/entities/piece'
 import { RundownRepository } from '../../rundown-execution/domain/repositories/rundown-repository'
@@ -31,7 +31,7 @@ import { SetNextDirection } from '../../rundown-execution/domain/enums/set-next-
 import { TakeMode } from '../../rundown-execution/domain/enums/take-mode'
 import { PlayoutContentType } from '../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../rundown-execution/domain/enums/output-channel'
-import { PlayoutContentReadService } from '../../rundown-execution/application/playout-content-service'
+import { PlayoutContentReadService } from '../../rundown-execution/application/interfaces/playout-content-service'
 import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 
 const SYSTEM_ACTIONS_ID: string = 'SYSTEM_ACTIONS_ID'

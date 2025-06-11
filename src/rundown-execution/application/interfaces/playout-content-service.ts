@@ -1,5 +1,5 @@
-import { Rundown } from '../domain/entities/rundown'
-import { PlayoutContent } from '../domain/value-objects/playout-content'
+import { Rundown } from '../../domain/entities/rundown'
+import { PlayoutContent } from '../../domain/value-objects/playout-content'
 
 export interface PlayoutContentUpdateService {
   initialize(): Promise<void>

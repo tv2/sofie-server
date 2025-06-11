@@ -9,7 +9,7 @@ import {
 import { PartActionType, PieceActionType } from '../../rundown-execution/domain/enums/action-type'
 import { Part, PartInterface } from '../../rundown-execution/domain/entities/part'
 import { ActionRepository } from '../../rundown-execution/domain/repositories/action-repository'
-import { RundownService } from '../../rundown-execution/application/rundown-service'
+import { RundownService } from '../../rundown-execution/application/interfaces/rundown-service'
 import { RundownRepository } from '../../rundown-execution/domain/repositories/rundown-repository'
 import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprint'
 import { anyOfClass, anyString, anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
@@ -20,7 +20,7 @@ import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { Owner } from '../../rundown-execution/domain/enums/owner'
 import { RundownMode } from '../../rundown-execution/domain/enums/rundown-mode'
 import { ConfigurationRepository } from '../../rundown-execution/domain/repositories/configuration-repository'
-import { PlayoutContentReadService } from '../../rundown-execution/application/playout-content-service'
+import { PlayoutContentReadService } from '../../rundown-execution/application/interfaces/playout-content-service'
 
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {

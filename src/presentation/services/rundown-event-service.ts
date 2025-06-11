@@ -24,7 +24,7 @@ import {
   SegmentUnsyncedEvent,
   SegmentUpdatedEvent,
 } from '../value-objects/rundown-event'
-import { RundownEventEmitter } from '../../rundown-execution/application/rundown-event-emitter'
+import { RundownEventEmitter } from '../../rundown-execution/application/interfaces/rundown-event-emitter'
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
 import { Rundown } from '../../rundown-execution/domain/entities/rundown'
 import { Piece } from '../../rundown-execution/domain/entities/piece'

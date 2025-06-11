@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/base-controller'
-import { RundownService } from '../rundown-service'
+import { RundownService } from '../interfaces/rundown-service'
 import { RundownRepository } from '../../domain/repositories/rundown-repository'
 import { Rundown } from '../../domain/entities/rundown'
 import { RundownDto } from '../dtos/rundown-dto'
@@ -16,7 +16,7 @@ import { TakeMode } from '../../domain/enums/take-mode'
 import { Tv2Logger } from '../../../blueprints/tv2/tv2-logger'
 import { ErrorCode } from '../../domain/enums/error-code'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
-import { PlayoutContentReadService } from '../playout-content-service'
+import { PlayoutContentReadService } from '../interfaces/playout-content-service'
 import { PlayoutContent } from '../../domain/value-objects/playout-content'
 
 @RestController('/rundowns')

@@ -1,4 +1,4 @@
-import { DataChangeService } from '../../rundown-execution/application/data-change-service'
+import { DataChangeService } from '../../rundown-execution/application/interfaces/data-change-service'
 import { DataChangedListener } from '../../cross-cutting-concerns/application/data-changed-listener'
 import { ShowStyle } from '../../rundown-execution/domain/entities/show-style'
 import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprint'

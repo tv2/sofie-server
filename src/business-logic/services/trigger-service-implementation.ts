@@ -1,7 +1,7 @@
 import { TriggerService } from './interfaces/trigger-service'
 import { Trigger } from '../../rundown-execution/domain/entities/trigger'
 import { TriggerRepository } from '../../rundown-execution/domain/repositories/trigger-repository'
-import { TriggerEventEmitter } from '../../rundown-execution/application/trigger-event-emitter'
+import { TriggerEventEmitter } from '../../rundown-execution/application/interfaces/trigger-event-emitter'
 
 export class TriggerServiceImplementation implements TriggerService {
 

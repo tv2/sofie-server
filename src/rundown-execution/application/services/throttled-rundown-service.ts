@@ -3,7 +3,7 @@ import { Piece } from '../../domain/entities/piece'
 import { Owner } from '../../domain/enums/owner'
 import { ThrottledRundownException } from '../../domain/exceptions/throttled-rundown-exception'
 import { InTransition } from '../../domain/value-objects/in-transition'
-import { RundownService } from '../rundown-service'
+import { RundownService } from '../interfaces/rundown-service'
 import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'
 

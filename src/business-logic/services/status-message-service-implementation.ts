@@ -1,6 +1,6 @@
 import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
 import { StatusMessageService } from './interfaces/status-message-service'
-import { StatusMessageEventEmitter } from '../../rundown-execution/application/status-message-event-emitter'
+import { StatusMessageEventEmitter } from '../../rundown-execution/application/interfaces/status-message-event-emitter'
 import { StatusMessageRepository } from '../../rundown-execution/domain/repositories/status-message-repository'
 import { StatusCode } from '../../rundown-execution/domain/enums/status-code'
 import { NotFoundException } from '../../rundown-execution/domain/exceptions/not-found-exception'

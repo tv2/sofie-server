@@ -1,6 +1,6 @@
 import { anyString, anything, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Rundown } from '../../domain/entities/rundown'
-import { RundownEventEmitter } from '../rundown-event-emitter'
+import { RundownEventEmitter } from '../interfaces/rundown-event-emitter'
 import { RundownRepository } from '../../domain/repositories/rundown-repository'
 import { TimelineRepository } from '../../domain/repositories/timeline-repository'
 import { TimelineBuilder } from '../../../business-logic/services/interfaces/timeline-builder'
@@ -21,14 +21,14 @@ import { TimelineObject, TimelineObjectGroup } from '../../domain/entities/timel
 import { RundownMode } from '../../domain/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../domain/exceptions/already-rehearsal-exception'
 import { IngestService } from '../../../sofie-ingest/application/ingest-service'
-import { RundownService } from '../rundown-service'
+import { RundownService } from '../interfaces/rundown-service'
 import { Logger } from '../../../cross-cutting-concerns/application/logger'
-import { PlayoutService } from '../playout-service'
+import { PlayoutService } from '../interfaces/playout-service'
 import { InTransition } from '../../domain/value-objects/in-transition'
 import { TakeIsBlockedException } from '../../domain/exceptions/take-is-blocked-exception'
 import { UnsupportedOperationException } from '../../domain/exceptions/unsupported-operation-exception'
 import { TakeMode } from '../../domain/enums/take-mode'
-import { PlayoutContentUpdateService } from '../playout-content-service'
+import { PlayoutContentUpdateService } from '../interfaces/playout-content-service'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {

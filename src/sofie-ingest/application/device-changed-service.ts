@@ -1,4 +1,4 @@
-import { DataChangeService } from '../../rundown-execution/application/data-change-service'
+import { DataChangeService } from '../../rundown-execution/application/interfaces/data-change-service'
 import { DataChangedListener } from '../../cross-cutting-concerns/application/data-changed-listener'
 import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
 import { StatusCode } from '../../rundown-execution/domain/enums/status-code'

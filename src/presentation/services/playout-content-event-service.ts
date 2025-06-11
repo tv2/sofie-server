@@ -1,4 +1,4 @@
-import { PlayoutContentEventEmitter } from '../../rundown-execution/application/playout-content-event-emitter'
+import { PlayoutContentEventEmitter } from '../../rundown-execution/application/interfaces/playout-content-event-emitter'
 import { PlayoutContentEventObserver } from '../interfaces/playout-content-event-observer'
 import { PlayoutContent } from '../../rundown-execution/domain/value-objects/playout-content'
 import {

@@ -1,11 +1,11 @@
 import { MacroService } from './interfaces/macro-service'
 import { MacroRepository } from '../../rundown-execution/domain/repositories/macro-repository'
 import { Macro, Operation, OperationType } from '../../rundown-execution/domain/entities/macro'
-import { MacroEventEmitter } from '../../rundown-execution/application/macro-event-emitter'
+import { MacroEventEmitter } from '../../rundown-execution/application/interfaces/macro-event-emitter'
 import { ActionService } from './interfaces/action-service'
 import { Exception } from '../../rundown-execution/domain/exceptions/exception'
 import { UnsupportedOperationException } from '../../rundown-execution/domain/exceptions/unsupported-operation-exception'
-import { StatusMessageEventEmitter } from '../../rundown-execution/application/status-message-event-emitter'
+import { StatusMessageEventEmitter } from '../../rundown-execution/application/interfaces/status-message-event-emitter'
 import { StatusCode } from '../../rundown-execution/domain/enums/status-code'
 
 export class MacroServiceImplementation implements MacroService {
