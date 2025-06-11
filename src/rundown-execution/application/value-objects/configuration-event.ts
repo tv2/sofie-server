@@ -1,6 +1,6 @@
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
-import { ConfigurationEventType } from '../../../leftovers/event-type'
 import { ShelfConfiguration } from '../../domain/entities/shelf-configuration'
+import {ConfigurationEventType} from '../enums/configuration-event-type'
 
 export type ConfigurationEvent = ShelfConfigurationUpdatedEvent
 

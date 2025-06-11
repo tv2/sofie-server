@@ -5,7 +5,7 @@ import {
   TriggerCreatedEvent, TriggerDeletedEvent,
   TriggerEvent,
   TriggerUpdatedEvent
-} from '../../domain/value-objects/trigger-event'
+} from '../value-objects/trigger-event'
 import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
 
 export class TriggerEventService implements TriggerEventEmitter, TriggerEventObserver {

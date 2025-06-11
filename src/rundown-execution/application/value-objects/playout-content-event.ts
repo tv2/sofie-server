@@ -1,6 +1,6 @@
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
-import { PlayoutContentEventType } from '../../../leftovers/event-type'
 import { PlayoutContent } from '../../domain/value-objects/playout-content'
+import {PlayoutContentEventType} from '../enums/playout-content-event-type'
 
 export type PlayoutContentEvent = ProgramPlayoutContentEvent | PreviewPlayoutContentEvent
 

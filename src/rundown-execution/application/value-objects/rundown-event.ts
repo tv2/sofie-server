@@ -1,13 +1,13 @@
-import { EventType, IngestEventType, RundownEventType } from '../../../leftovers/event-type'
-import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
-import { PartDto } from '../dtos/part-dto'
-import { PieceDto } from '../dtos/piece-dto'
-import { SegmentDto } from '../dtos/segment-dto'
-import { BasicRundownDto } from '../dtos/basic-rundown-dto'
-import { RundownDto } from '../dtos/rundown-dto'
+import {TypedEvent} from '../../../cross-cutting-concerns/application/value-objects/typed-event'
+import {PartDto} from '../dtos/part-dto'
+import {PieceDto} from '../dtos/piece-dto'
+import {SegmentDto} from '../dtos/segment-dto'
+import {BasicRundownDto} from '../dtos/basic-rundown-dto'
+import {RundownDto} from '../dtos/rundown-dto'
+import { RundownEventType } from '../enums/rundown-event-type'
 
 export interface RundownEvent extends TypedEvent {
-  type: EventType
+  type: RundownEventType
   rundownId: string
 }
 
@@ -72,58 +72,58 @@ export interface RundownInfinitePiecesUpdatedEvent extends RundownEvent {
 }
 
 export interface RundownCreatedEvent extends RundownEvent {
-  type: IngestEventType.RUNDOWN_CREATED
+  type: RundownEventType.RUNDOWN_CREATED
   rundown: RundownDto
 }
 
 export interface RundownUpdatedEvent extends RundownEvent {
-  type: IngestEventType.RUNDOWN_UPDATED
+  type: RundownEventType.RUNDOWN_UPDATED
   basicRundown: BasicRundownDto
 }
 
 export interface RundownDeletedEvent extends RundownEvent {
-  type: IngestEventType.RUNDOWN_DELETED
+  type: RundownEventType.RUNDOWN_DELETED
 }
 
 export interface SegmentCreatedEvent extends RundownEvent {
-  type: IngestEventType.SEGMENT_CREATED
+  type: RundownEventType.SEGMENT_CREATED
   segment: SegmentDto
 }
 
 export interface SegmentUpdatedEvent extends RundownEvent {
-  type: IngestEventType.SEGMENT_UPDATED
+  type: RundownEventType.SEGMENT_UPDATED
   segment: SegmentDto
 }
 
 export interface SegmentDeletedEvent extends RundownEvent {
-  type: IngestEventType.SEGMENT_DELETED
+  type: RundownEventType.SEGMENT_DELETED
   segmentId: string
 }
 
 export interface SegmentUnsyncedEvent extends RundownEvent {
-  type: IngestEventType.SEGMENT_UNSYNCED
+  type: RundownEventType.SEGMENT_UNSYNCED
   unsyncedSegment: SegmentDto
   originalSegmentId: string
 }
 
 export interface PartCreatedEvent extends RundownEvent {
-  type: IngestEventType.PART_CREATED
+  type: RundownEventType.PART_CREATED
   part: PartDto
 }
 
 export interface PartUpdatedEvent extends RundownEvent {
-  type: IngestEventType.PART_UPDATED
+  type: RundownEventType.PART_UPDATED
   part: PartDto
 }
 
 export interface PartDeletedEvent extends RundownEvent {
-  type: IngestEventType.PART_DELETED
+  type: RundownEventType.PART_DELETED
   segmentId: string
   partId: string
 }
 
 export interface PartUnsyncedEvent extends RundownEvent {
-  type: IngestEventType.PART_UNSYNCED
+  type: RundownEventType.PART_UNSYNCED
   part: PartDto
   originalPartId: string
 }

@@ -29,22 +29,12 @@ import { Piece } from '../rundown-execution/domain/entities/piece'
 import { Part } from '../rundown-execution/domain/entities/part'
 import { PartDto } from '../rundown-execution/application/dtos/part-dto'
 import { PieceDto } from '../rundown-execution/application/dtos/piece-dto'
-import {
-  ActionEventType,
-  ConfigurationEventType,
-  DeviceEventType,
-  IngestEventType,
-  MacroEventType,
-  PlayoutContentEventType,
-  RundownEventType,
-  TriggerEventType
-} from './event-type'
 import { SegmentDto } from '../rundown-execution/application/dtos/segment-dto'
 import { Segment } from '../rundown-execution/domain/entities/segment'
 import { BasicRundownDto } from '../rundown-execution/application/dtos/basic-rundown-dto'
 import { TriggerEventBuilder } from '../action-system/application/interfaces/trigger-event-builder'
 import { Trigger } from '../action-system/domain/entities/trigger'
-import { TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent } from '../action-system/domain/value-objects/trigger-event'
+import { TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent } from '../action-system/application/value-objects/trigger-event'
 import { TriggerDto } from '../action-system/application/dtos/trigger-dto'
 import { RundownDto } from '../rundown-execution/application/dtos/rundown-dto'
 import { Media } from '../rundown-execution/domain/entities/media'
@@ -59,7 +49,7 @@ import { StatusMessage } from '../cross-cutting-concerns/domain/entities/status-
 import { StatusMessageEvent } from '../cross-cutting-concerns/application/value-objects/status-message-event'
 import { ActionEventBuilder } from '../action-system/application/interfaces/action-event-builder'
 import { Action } from '../action-system/domain/entities/action'
-import { ActionsUpdatedEvent } from '../action-system/domain/value-objects/action-event'
+import { ActionsUpdatedEvent } from '../action-system/application/value-objects/action-event'
 import { ActionDto } from '../action-system/application/dtos/action-dto'
 import { DeviceEventBuilder } from '../rundown-execution/application/interfaces/device-event-builder'
 import {
@@ -68,12 +58,20 @@ import {
 import { VideoMixerConfiguration } from '../rundown-execution/domain/value-objects/video-mixer-configuration'
 import { MacroEventBuilder } from '../action-system/application/interfaces/macro-event-builder'
 import { Macro } from '../action-system/domain/entities/macro'
-import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../action-system/domain/value-objects/macro-event'
+import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../action-system/application/value-objects/macro-event'
 import { MacroDto } from '../action-system/application/dtos/macro-dto'
 import { PlayoutContentEventBuilder } from '../rundown-execution/application/interfaces/playout-content-event-builder'
 import { PlayoutContent } from '../rundown-execution/domain/value-objects/playout-content'
 import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from '../rundown-execution/application/value-objects/playout-content-event'
 import { StatusMessageEventType } from '../cross-cutting-concerns/application/enums/status-message-event-type'
+import { ActionEventType } from '../action-system/application/enums/action-event-type'
+import { TriggerEventType } from '../action-system/application/enums/trigger-event-type'
+import { MacroEventType } from '../action-system/application/enums/macro-event-type'
+import { PlayoutContentEventType } from '../rundown-execution/application/enums/playout-content-event-type'
+import { ConfigurationEventType } from '../rundown-execution/application/enums/configuration-event-type'
+import { DeviceEventType } from '../rundown-execution/application/enums/device-event-type'
+import { RundownEventType } from '../rundown-execution/application/enums/rundown-event-type'
+import { MediaEventType } from '../sofie-ingest/application/enums/media-event-type'
 
 // TODO: Split into multiples for each context module.
 export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, TriggerEventBuilder, MediaEventBuilder, ConfigurationEventBuilder, StatusMessageEventBuilder, DeviceEventBuilder, MacroEventBuilder, PlayoutContentEventBuilder {
@@ -192,7 +190,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildRundownCreatedEvent(rundown: Rundown): RundownCreatedEvent {
     return {
-      type: IngestEventType.RUNDOWN_CREATED,
+      type: RundownEventType.RUNDOWN_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       rundown: new RundownDto(rundown),
@@ -201,7 +199,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildRundownUpdatedEvent(rundown: Rundown): RundownUpdatedEvent {
     return {
-      type: IngestEventType.RUNDOWN_UPDATED,
+      type: RundownEventType.RUNDOWN_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       basicRundown: new BasicRundownDto(rundown),
@@ -210,7 +208,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildRundownDeletedEvent(rundownId: string): RundownDeletedEvent {
     return {
-      type: IngestEventType.RUNDOWN_DELETED,
+      type: RundownEventType.RUNDOWN_DELETED,
       timestamp: Date.now(),
       rundownId: rundownId,
     }
@@ -218,7 +216,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildSegmentCreatedEvent(rundown: Rundown, segment: Segment): SegmentCreatedEvent {
     return {
-      type: IngestEventType.SEGMENT_CREATED,
+      type: RundownEventType.SEGMENT_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       segment: new SegmentDto(segment),
@@ -227,7 +225,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildSegmentUpdatedEvent(rundown: Rundown, segment: Segment): SegmentUpdatedEvent {
     return {
-      type: IngestEventType.SEGMENT_UPDATED,
+      type: RundownEventType.SEGMENT_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       segment: new SegmentDto(segment),
@@ -236,7 +234,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildSegmentDeletedEvent(rundown: Rundown, segmentId: string): SegmentDeletedEvent {
     return {
-      type: IngestEventType.SEGMENT_DELETED,
+      type: RundownEventType.SEGMENT_DELETED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       segmentId,
@@ -245,7 +243,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildSegmentUnsyncedEvent(rundown: Rundown, unsyncedSegment: Segment, originalSegmentId: string): SegmentUnsyncedEvent {
     return {
-      type: IngestEventType.SEGMENT_UNSYNCED,
+      type: RundownEventType.SEGMENT_UNSYNCED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       unsyncedSegment: new SegmentDto(unsyncedSegment),
@@ -255,7 +253,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildPartCreatedEvent(rundown: Rundown, part: Part): PartCreatedEvent {
     return {
-      type: IngestEventType.PART_CREATED,
+      type: RundownEventType.PART_CREATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       part: new PartDto(part),
@@ -264,7 +262,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildPartUpdatedEvent(rundown: Rundown, part: Part): PartUpdatedEvent {
     return {
-      type: IngestEventType.PART_UPDATED,
+      type: RundownEventType.PART_UPDATED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       part: new PartDto(part),
@@ -273,7 +271,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildPartDeletedEvent(rundown: Rundown, segmentId: string, partId: string): PartDeletedEvent {
     return {
-      type: IngestEventType.PART_DELETED,
+      type: RundownEventType.PART_DELETED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       segmentId,
@@ -283,7 +281,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildPartUnsyncedEvent(rundown: Rundown, unsyncedPart: Part, originalPartId: string): PartUnsyncedEvent {
     return {
-      type: IngestEventType.PART_UNSYNCED,
+      type: RundownEventType.PART_UNSYNCED,
       timestamp: Date.now(),
       rundownId: rundown.id,
       part: new PartDto(unsyncedPart),
@@ -293,7 +291,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildMediaCreatedEvent(media: Media): MediaCreatedEvent {
     return {
-      type: IngestEventType.MEDIA_CREATED,
+      type: MediaEventType.MEDIA_CREATED,
       timestamp: Date.now(),
       media: new MediaDto(media),
     }
@@ -301,7 +299,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildMediaUpdatedEvent(media: Media): MediaUpdatedEvent {
     return {
-      type: IngestEventType.MEDIA_UPDATED,
+      type: MediaEventType.MEDIA_UPDATED,
       timestamp: Date.now(),
       media: new MediaDto(media),
     }
@@ -309,7 +307,7 @@ export class EventBuilder implements RundownEventBuilder, ActionEventBuilder, Tr
 
   public buildMediaDeletedEvent(mediaId: string): MediaDeletedEvent {
     return {
-      type: IngestEventType.MEDIA_DELETED,
+      type: MediaEventType.MEDIA_DELETED,
       timestamp: Date.now(),
       mediaId: mediaId,
     }
