@@ -20,13 +20,13 @@ import { TriggerServiceImplementation } from '../services/trigger-service-implem
 import { LoggerFacade } from '../../cross-cutting-concerns/application/logger-facade'
 import { MediaDatabaseChangedService } from '../../sofie-ingest/application/media-database-changed-service'
 import { ConfigurationService } from '../../rundown-execution/application/interfaces/configuration-service'
-import { ConfigurationServiceImplementation } from '../../rundown-execution/application/configuration-service-implementation'
+import { ConfigurationServiceImplementation } from '../../rundown-execution/application/services/configuration-service-implementation'
 import { DeviceChangedService } from '../../sofie-ingest/application/device-changed-service'
 import { ConfigurationChangedService } from '../../sofie-ingest/application/configuration-changed-service'
 import { StatusMessageService } from '../services/interfaces/status-message-service'
 import { StatusMessageServiceImplementation } from '../services/status-message-service-implementation'
 import { PlayoutService } from '../../rundown-execution/application/interfaces/playout-service'
-import { PlayoutGatewayService } from '../../rundown-execution/application/playout-gateway-service'
+import { PlayoutGatewayService } from '../../rundown-execution/application/services/playout-gateway-service'
 import { ThrottledRundownService } from '../../rundown-execution/application/services/throttled-rundown-service'
 import { IngestRundownSynchronizer } from '../../sofie-ingest/application/ingest-rundown-synchronizer'
 import { EntityChangeDetector } from '../../sofie-ingest/domain/entity-change-detector'
@@ -38,7 +38,7 @@ import { MacroServiceImplementation } from '../services/macro-service-implementa
 import { MacroService } from '../services/interfaces/macro-service'
 import { HelperFacade } from '../../cross-cutting-concerns/application/helper-facade'
 import { PlayoutContentReadService, PlayoutContentUpdateService } from '../../rundown-execution/application/interfaces/playout-content-service'
-import { PlayoutContentStateService } from '../../rundown-execution/application/playout-content-state-service'
+import { PlayoutContentStateService } from '../../rundown-execution/application/services/playout-content-state-service'
 
 export class ServiceFacade {
 

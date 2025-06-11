@@ -1,7 +1,7 @@
-import { ShelfConfiguration } from '../domain/entities/shelf-configuration'
-import { ConfigurationService } from './interfaces/configuration-service'
-import { ConfigurationEventEmitter } from './interfaces/configuration-event-emitter'
-import { ShelfConfigurationRepository } from '../domain/repositories/shelf-configuration-repository'
+import { ShelfConfiguration } from '../../domain/entities/shelf-configuration'
+import { ConfigurationService } from '../interfaces/configuration-service'
+import { ConfigurationEventEmitter } from '../interfaces/configuration-event-emitter'
+import { ShelfConfigurationRepository } from '../../domain/repositories/shelf-configuration-repository'
 
 export class ConfigurationServiceImplementation implements ConfigurationService {
 

@@ -1,8 +1,8 @@
 import { ConfigurationServiceImplementation } from './configuration-service-implementation'
-import { ConfigurationEventEmitter } from './interfaces/configuration-event-emitter'
-import { ShelfConfigurationRepository } from '../domain/repositories/shelf-configuration-repository'
+import { ConfigurationEventEmitter } from '../interfaces/configuration-event-emitter'
+import { ShelfConfigurationRepository } from '../../domain/repositories/shelf-configuration-repository'
 import { anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
-import { ShelfConfiguration } from '../domain/entities/shelf-configuration'
+import { ShelfConfiguration } from '../../domain/entities/shelf-configuration'
 
 describe(ConfigurationServiceImplementation.name, () => {
   describe(ConfigurationServiceImplementation.prototype.updateShelfConfiguration.name, () => {
