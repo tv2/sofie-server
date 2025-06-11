@@ -74,13 +74,15 @@ import { MongoIngestedPieceChangedListener } from '../sofie-ingest/infrastructur
 import { DeviceRepository } from '../rundown-execution/domain/repositories/device-repository'
 import { VideoMixerDeviceRepository } from '../rundown-execution/domain/repositories/video-mixer-device-repository'
 import { MongoVideoMixerDeviceRepository } from '../rundown-execution/infrastructure/repositories/mongodb/mongo-video-mixer-device-repository'
-import { EventEmitterFacade } from './event-emitter-facade'
 import { MongoExpectedPlayoutItemRepository } from '../rundown-execution/infrastructure/repositories/mongodb/mongo-expected-playout-item-repository'
 import { MongoMacroRepository } from '../action-system/infrastructure/repositories/mongodb/mongo-macro-repository'
 import { MacroRepository } from '../action-system/domain/repositories/macro-repository'
 import { PlayoutContentRepository } from '../rundown-execution/domain/repositories/playout-content-repository'
 import { MongoPlayoutContentRepository } from '../rundown-execution/infrastructure/repositories/mongodb/mongo-playout-content-repository'
 import { CoreDevice } from '../rundown-execution/domain/entities/device'
+import {
+  RundownExecutionEventEmitterFacade
+} from '../rundown-execution/application/facades/rundown-execution-event-emitter-facade'
 
 export class RepositoryFacade {
   public static getDatabase(): Database {
@@ -311,7 +313,7 @@ export class RepositoryFacade {
   }
 
   public static createVideoMixerDeviceRepository(): VideoMixerDeviceRepository {
-    return new MongoVideoMixerDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), EventEmitterFacade.createDeviceEventEmitter())
+    return new MongoVideoMixerDeviceRepository(MongoDatabase.getInstance(LoggerFacade.createLogger()), RundownExecutionEventEmitterFacade.getDeviceEventEmitter())
   }
 
   public static createPlayoutContentRepository(): PlayoutContentRepository {
