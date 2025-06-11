@@ -1,6 +1,6 @@
 import { DeviceChangedService } from '../device-changed-service'
 import { anything, capture, instance, mock, when } from '@typestrong/ts-mockito'
-import { DataChangedListener } from '../../../data-access/repositories/interfaces/data-changed-listener'
+import { DataChangedListener } from '../../../cross-cutting-concerns/application/data-changed-listener'
 import { Logger } from '../../../cross-cutting-concerns/application/logger'
 import { StatusMessageService } from '../interfaces/status-message-service'
 import { StatusCode } from '../../../rundown-execution/domain/enums/status-code'

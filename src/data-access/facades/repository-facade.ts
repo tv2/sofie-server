@@ -23,7 +23,7 @@ import { ShowStyleVariantRepository } from '../../rundown-execution/domain/repos
 import { MongoShowStyleVariantRepository } from '../../rundown-execution/infrastructure/repositories/mongodb/mongo-show-style-variant-repository'
 import { ActionRepository } from '../../rundown-execution/domain/repositories/action-repository'
 import { MongoActionRepository } from '../../rundown-execution/infrastructure/repositories/mongodb/mongo-action-repository'
-import { DataChangedListener } from '../repositories/interfaces/data-changed-listener'
+import { DataChangedListener } from '../../cross-cutting-concerns/application/data-changed-listener'
 import { MongoIngestedSegmentChangedListener } from '../repositories/mongo/mongo-ingested-segment-changed-listener'
 import { MongoIngestedPartChangedListener } from '../repositories/mongo/mongo-ingested-part-changed-listener'
 import { MongoIngestedRundownChangedListener } from '../repositories/mongo/mongo-ingested-rundown-changed-listener'

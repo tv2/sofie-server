@@ -1,5 +1,5 @@
 import { DataChangeService } from './interfaces/data-change-service'
-import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
+import { DataChangedListener } from '../../cross-cutting-concerns/application/data-changed-listener'
 import { ShowStyle } from '../../rundown-execution/domain/entities/show-style'
 import { Blueprint } from '../../rundown-execution/domain/value-objects/blueprint'
 import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'

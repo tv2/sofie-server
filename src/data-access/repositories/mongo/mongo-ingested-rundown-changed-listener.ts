@@ -1,5 +1,5 @@
 import { BaseMongoRepository } from '../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
-import { DataChangedListener } from '../interfaces/data-changed-listener'
+import { DataChangedListener } from '../../../cross-cutting-concerns/application/data-changed-listener'
 import {
   ChangeStream,
   ChangeStreamDeleteDocument,

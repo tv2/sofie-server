@@ -1,4 +1,4 @@
-import { DataChangedListener } from '../../../../data-access/repositories/interfaces/data-changed-listener'
+import { DataChangedListener } from '../../../../cross-cutting-concerns/application/data-changed-listener'
 import { ShowStyle } from '../../../domain/entities/show-style'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'

@@ -1,5 +1,5 @@
 import { DataChangeService } from './interfaces/data-change-service'
-import { DataChangedListener } from '../../data-access/repositories/interfaces/data-changed-listener'
+import { DataChangedListener } from '../../cross-cutting-concerns/application/data-changed-listener'
 import { StatusMessage } from '../../rundown-execution/domain/entities/status-message'
 import { StatusCode } from '../../rundown-execution/domain/enums/status-code'
 import { Logger } from '../../cross-cutting-concerns/application/logger'
