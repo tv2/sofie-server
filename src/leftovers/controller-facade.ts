@@ -2,7 +2,6 @@ import { RundownController } from '../rundown-execution/application/controllers/
 import { ServiceFacade } from './service-facade'
 import { RepositoryFacade } from './repository-facade'
 import { ExpressErrorHandler } from '../cross-cutting-concerns/application/services/express-error-handler'
-import { BaseController } from '../cross-cutting-concerns/application/controllers/base-controller'
 import { TimelineController } from '../rundown-execution/application/controllers/timeline-controller'
 import { ActionController } from '../action-system/application/controllers/action-controller'
 import { ConfigurationController } from '../rundown-execution/application/controllers/configuration-controller'
@@ -16,22 +15,8 @@ import { LoggerController } from '../cross-cutting-concerns/application/controll
 import { MacroController } from '../action-system/application/controllers/macro-controller'
 
 export class ControllerFacade {
-  public static getControllers(): BaseController[] {
-    return [
-      this.createRundownController(),
-      this.createTimelineController(),
-      this.createActionController(),
-      this.createTriggerController(),
-      this.createConfigurationController(),
-      this.createMediaController(),
-      this.createSystemInformationController(),
-      this.createDeviceController(),
-      this.createLoggerController(),
-      this.createMacroController(),
-    ]
-  }
 
-  private static createRundownController(): RundownController {
+  public static createRundownController(): RundownController {
     return new RundownController(
       ServiceFacade.createRundownService(),
       RepositoryFacade.createRundownRepository(),
@@ -47,7 +32,7 @@ export class ControllerFacade {
     return new ExpressErrorHandler(new JsendResponseFormatter(), LoggerFacade.createLogger())
   }
 
-  private static createTimelineController(): TimelineController {
+  public static createTimelineController(): TimelineController {
     return new TimelineController(
       RepositoryFacade.createTimelineRepository(),
       ControllerFacade.createExpressErrorHandler(),
@@ -55,7 +40,7 @@ export class ControllerFacade {
     )
   }
 
-  private static createActionController(): ActionController {
+  public static createActionController(): ActionController {
     return new ActionController(
       ServiceFacade.createActionService(),
       ControllerFacade.createExpressErrorHandler(),
@@ -63,7 +48,7 @@ export class ControllerFacade {
     )
   }
 
-  private static createTriggerController(): TriggerController {
+  public static createTriggerController(): TriggerController {
     return new TriggerController(
       ServiceFacade.createTriggerService(),
       ControllerFacade.createExpressErrorHandler(),
@@ -71,14 +56,14 @@ export class ControllerFacade {
     )
   }
 
-  private static createMacroController(): MacroController {
+  public static createMacroController(): MacroController {
     return new MacroController(ServiceFacade.createMacroService(),
       ControllerFacade.createExpressErrorHandler(),
       new JsendResponseFormatter()
     )
   }
 
-  private static createConfigurationController(): ConfigurationController {
+  public static createConfigurationController(): ConfigurationController {
     return new ConfigurationController(
       ServiceFacade.createConfigurationService(),
       RepositoryFacade.createConfigurationRepository(),
@@ -89,7 +74,7 @@ export class ControllerFacade {
     )
   }
 
-  private static createMediaController(): MediaController {
+  public static createMediaController(): MediaController {
     return new MediaController(
       RepositoryFacade.createMediaRepository(),
       ControllerFacade.createExpressErrorHandler(),
@@ -97,7 +82,7 @@ export class ControllerFacade {
     )
   }
 
-  private static createSystemInformationController(): SystemInformationController {
+  public static createSystemInformationController(): SystemInformationController {
     return new SystemInformationController(
       RepositoryFacade.createSystemInformationRepository(),
       RepositoryFacade.createStatusMessageRepository(),
@@ -106,7 +91,7 @@ export class ControllerFacade {
     )
   }
 
-  private static createLoggerController(): LoggerController {
+  public static createLoggerController(): LoggerController {
     return new LoggerController(
       new JsendResponseFormatter(),
       ControllerFacade.createExpressErrorHandler(),
@@ -114,7 +99,7 @@ export class ControllerFacade {
     )
   }
 
-  private static createDeviceController(): DeviceController {
+  public static createDeviceController(): DeviceController {
     return new DeviceController(
       RepositoryFacade.createVideoMixerDeviceRepository(),
       ControllerFacade.createExpressErrorHandler(),

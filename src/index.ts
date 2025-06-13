@@ -39,9 +39,24 @@ async function startSystemServices(): Promise<void> {
 
 
 async function startRestServer(logger: Logger): Promise<void> {
-  const controllers: BaseController[] = ControllerFacade.getControllers()
+  const controllers: readonly BaseController[] = getRestControllers()
   const restServer: ExpressRestServer = new ExpressRestServer(controllers, logger)
   await restServer.start(REST_API_PORT)
+}
+
+function getRestControllers(): readonly BaseController[] {
+  return [
+    ControllerFacade.createRundownController(),
+    ControllerFacade.createTimelineController(),
+    ControllerFacade.createActionController(),
+    ControllerFacade.createTriggerController(),
+    ControllerFacade.createConfigurationController(),
+    ControllerFacade.createMediaController(),
+    ControllerFacade.createSystemInformationController(),
+    ControllerFacade.createDeviceController(),
+    ControllerFacade.createLoggerController(),
+    ControllerFacade.createMacroController(),
+  ]
 }
 
 async function startEventServer(): Promise<void> {
