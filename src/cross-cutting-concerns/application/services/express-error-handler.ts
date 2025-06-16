@@ -1,0 +1,59 @@
+import {Response} from 'express'
+import {Exception} from '../../../rundown-execution/domain/exceptions/exception'
+import {ErrorCode} from '../../../rundown-execution/domain/enums/error-code'
+import {HttpStatusCode} from '../enums/http-status-code'
+import {HttpErrorHandler} from '../interfaces/http-error-handler'
+import {Logger} from '../interfaces/logger'
+import {HttpResponseFormatter} from '../interfaces/http-response-formatter'
+
+export class ExpressErrorHandler implements HttpErrorHandler {
+
+  private readonly logger: Logger
+
+  constructor(private readonly httpResponseFormatter: HttpResponseFormatter, logger: Logger) {
+    this.logger = logger.tag(ExpressErrorHandler.name)
+  }
+
+  public handleError(response: Response, exception: Exception): void {
+    this.logger.data(exception).error(`Caught Exception: "${exception.errorCode}". Message: ${exception.message}`)
+
+    response.status(this.getStatusCode(exception.errorCode)).send(this.httpResponseFormatter.formatErrorResponseFromException(exception))
+  }
+
+  private getStatusCode(errorCode: ErrorCode): number {
+    switch (errorCode) {
+      case ErrorCode.NOT_ACTIVATED:
+      case ErrorCode.ALREADY_ACTIVATED:
+      case ErrorCode.END_OF_RUNDOWN:
+      case ErrorCode.RUNDOWN_IS_ACTIVE:
+      case ErrorCode.LAST_PART_IN_SEGMENT:
+      case ErrorCode.TAKE_IS_BLOCKED:
+      case ErrorCode.SERVICE_UNAVAILABLE:
+      case ErrorCode.INVALID_ID: {
+        return HttpStatusCode.BAD_REQUEST
+      }
+      case ErrorCode.NOT_FOUND: {
+        return HttpStatusCode.NOT_FOUND
+      }
+      case ErrorCode.BAD_REQUEST: {
+        return HttpStatusCode.BAD_REQUEST
+      }
+      case ErrorCode.UNPROCESSABLE_ENTITY: {
+        return HttpStatusCode.UNPROCESSABLE_CONTENT
+      }
+      case ErrorCode.CONFLICT: {
+        return HttpStatusCode.CONFLICT
+      }
+      case ErrorCode.MISCONFIGURATION:
+      case ErrorCode.DELETION_FAILED: {
+        return HttpStatusCode.INTERNAL_SERVER_ERROR
+      }
+      case ErrorCode.DATABASE_NOT_CONNECTED: {
+        return HttpStatusCode.SERVICE_UNAVAILABLE
+      }
+      default: {
+        return HttpStatusCode.INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+}

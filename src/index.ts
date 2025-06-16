@@ -1,15 +1,15 @@
 import cors from 'cors'
 import express, { Express, NextFunction, Request, Response, Router } from 'express'
-import { BaseController } from './presentation/controllers/base-controller'
-import { ControllerFacade } from './presentation/facades/controller-facade'
-import { EventServerFacade } from './presentation/facades/event-server-facade'
-import { ServiceFacade } from './business-logic/facades/service-facade'
-import { Logger } from './logger/logger'
-import { LoggerFacade } from './logger/logger-facade'
-import { RepositoryFacade } from './data-access/facades/repository-facade'
+import { BaseController } from './cross-cutting-concerns/application/controllers/base-controller'
+import { ControllerFacade } from './leftovers/controller-facade'
+import { EventServerFacade } from './leftovers/event-server-facade'
+import { ServiceFacade } from './leftovers/service-facade'
+import { Logger } from './cross-cutting-concerns/application/interfaces/logger'
+import { LoggerFacade } from './cross-cutting-concerns/application/logger-facade'
+import { RepositoryFacade } from './leftovers/repository-facade'
 import bodyParser from 'body-parser'
 
-export * from './presentation/controllers/rundown-controller'
+export * from './rundown-execution/application/controllers/rundown-controller'
 
 const REST_API_PORT: number = 3005
 const RUNDOWN_EVENT_SERVER_PORT: number = 3006

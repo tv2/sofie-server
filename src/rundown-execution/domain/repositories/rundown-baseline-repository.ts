@@ -1,0 +1,5 @@
+import { TimelineObject } from '../entities/timeline-object'
+
+export interface RundownBaselineRepository {
+  getRundownBaseline(rundownId: string): Promise<TimelineObject[]>
+}

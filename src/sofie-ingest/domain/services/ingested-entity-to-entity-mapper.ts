@@ -1,0 +1,210 @@
+import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
+import { Piece } from '../../../rundown-execution/domain/entities/piece'
+import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
+import { Part } from '../../../rundown-execution/domain/entities/part'
+import { PartTimings } from '../../../rundown-execution/domain/value-objects/part-timings'
+import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
+import { Segment } from '../../../rundown-execution/domain/entities/segment'
+import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
+import { Rundown, RundownAlreadyActiveProperties } from '../../../rundown-execution/domain/entities/rundown'
+import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
+import { RundownMode } from '../../../rundown-execution/domain/enums/rundown-mode'
+import { TakeMode } from '../../../rundown-execution/domain/enums/take-mode'
+
+export class IngestedEntityToEntityMapper {
+
+  public convertIngestedRundownToRundown(ingestedRundown: IngestedRundown): Rundown {
+    return new Rundown({
+      id: ingestedRundown.id,
+      name: ingestedRundown.name,
+      showStyleVariantId: ingestedRundown.showStyleVariantId,
+      segments: [],
+      history: [],
+      mode: RundownMode.INACTIVE,
+      takeMode: TakeMode.STANDARD,
+      modifiedAt: ingestedRundown.modifiedAt,
+      baselineTimelineObjects: ingestedRundown.baselineTimelineObjects,
+      baselinePieces: [],
+      timing: ingestedRundown.timings
+    })
+  }
+
+  public updateRundownFromIngestedRundown(rundownToUpdate: Rundown, ingestedRundown: IngestedRundown): Rundown {
+    const alreadyActiveProperties: RundownAlreadyActiveProperties | undefined = rundownToUpdate.isActive() || rundownToUpdate.isRehearsal()
+      ? {
+        activeCursor: rundownToUpdate.getActiveCursor(),
+        nextCursor: rundownToUpdate.getNextCursor(),
+        infinitePieces: rundownToUpdate.getInfinitePiecesMap()
+      }
+      : undefined
+
+    return new Rundown({
+      ...ingestedRundown,
+      id: rundownToUpdate.id,
+      mode: rundownToUpdate.getMode(),
+      takeMode: rundownToUpdate.getTakeMode(),
+      history: rundownToUpdate.getHistory(),
+      timing: ingestedRundown.timings,
+      persistentState: rundownToUpdate.getPersistentState(),
+      segments: [...rundownToUpdate.getSegments()],
+      baselinePieces: rundownToUpdate.getBaselinePieces(),
+      alreadyActiveProperties
+    })
+  }
+
+  public convertIngestedSegmentToSegment(ingestedSegment: IngestedSegment): Segment {
+    return new Segment({
+      id: ingestedSegment.id,
+      rundownId: ingestedSegment.rundownId,
+      name: ingestedSegment.name,
+      rank: ingestedSegment.rank,
+      isHidden: ingestedSegment.isHidden,
+      referenceTag: ingestedSegment.referenceTag,
+      metadata: ingestedSegment.metadata,
+      isOnAir: false,
+      isNext: false,
+      isUnsynced: false,
+      expectedDurationInMs: ingestedSegment.budgetDuration,
+      definesShowStyleVariant: ingestedSegment.definesShowStyleVariant ?? false,
+      parts: ingestedSegment.ingestedParts.map(ingestedPart => this.convertIngestedPartToPart(ingestedPart)),
+    })
+  }
+
+  public updateSegmentWithIngestedSegment(segmentToBeUpdated: Segment, ingestedSegment: IngestedSegment): Segment {
+    return new Segment({
+      ...ingestedSegment,
+      id: segmentToBeUpdated.id,
+      isOnAir: segmentToBeUpdated.isOnAir(),
+      isNext: segmentToBeUpdated.isNext(),
+      isUnsynced: false, // Updated are never unsynced since Core removes and adds new Segments instead of updating them
+      expectedDurationInMs: ingestedSegment.budgetDuration,
+      executedAtEpochTime: segmentToBeUpdated.getExecutedAtEpochTime(),
+      parts: this.mergePartsWithIngestedParts(segmentToBeUpdated.getParts(), ingestedSegment.ingestedParts)
+    })
+  }
+
+  private mergePartsWithIngestedParts(parts: readonly Part[], ingestedParts: readonly IngestedPart[]): Part[] {
+    const existingPartsMap: Readonly<Record<string, Part>> = Object.fromEntries(parts.map(part => [part.id, part]))
+    const updatedPartsMap: Readonly<Record<string, Part>> = ingestedParts.reduce((updatedPartsMap, ingestedPart) => {
+      const part: Part | undefined = existingPartsMap[ingestedPart.id]
+      return {
+        ...updatedPartsMap,
+        [ingestedPart.id]: part ? this.updatePartWithIngestedPart(part, ingestedPart) : this.convertIngestedPartToPart(ingestedPart)
+      }
+    }, existingPartsMap)
+    return Object.values(updatedPartsMap)
+  }
+
+  public convertIngestedPartToPart(ingestedPart: IngestedPart): Part {
+    return new Part({
+      id: ingestedPart.id,
+      rundownId: ingestedPart.rundownId,
+      segmentId: ingestedPart.segmentId,
+      name: ingestedPart.name,
+      rank: ingestedPart.rank,
+      isOnAir: false,
+      isNext: false,
+      isUnsynced: false,
+      isUntimed: ingestedPart.isUntimed,
+      pieces: ingestedPart.ingestedPieces.map((ingestedPiece: IngestedPiece) => this.convertIngestedPieceToPiece(ingestedPiece)),
+      expectedDuration: ingestedPart.expectedDuration,
+      invalidity: ingestedPart.invalidity,
+      inTransition: ingestedPart.inTransition,
+      outTransition: ingestedPart.outTransition,
+      autoNext: ingestedPart.autoNext,
+      disableNextInTransition: ingestedPart.disableNextInTransition,
+      ingestedPart
+    })
+  }
+
+  public updatePartWithIngestedPart(partToBeUpdated: Part, ingestedPart: IngestedPart): Part {
+    if (partToBeUpdated.isOnAir()) {
+      return partToBeUpdated
+    }
+    const updatedPieces: Piece[] = ingestedPart.ingestedPieces.map(ingestedPiece => {
+      const existingPiece: Piece | undefined = partToBeUpdated.getPieces().find(piece => piece.id === ingestedPiece.id)
+      return existingPiece
+        ? this.updatePieceWithIngestedPiece(existingPiece, ingestedPiece)
+        : this.convertIngestedPieceToPiece(ingestedPiece)
+    })
+
+    const updatedPart: Part = new Part({
+      ...ingestedPart,
+      id: partToBeUpdated.id,
+      segmentId: partToBeUpdated.getSegmentId(),
+      name: ingestedPart.name,
+      rank: ingestedPart.rank,
+      isOnAir: partToBeUpdated.isOnAir(),
+      isNext: false, // The Rundown always updates its own NextCursor, so we don't need to remember that value
+      isUnsynced: false, // Updated are never unsynced since Core removes and adds new Parts instead of updating them
+      pieces: updatedPieces,
+      executedAt: partToBeUpdated.getExecutedAt(),
+      playedDuration: partToBeUpdated.getPlayedDuration(),
+      endState: partToBeUpdated.getEndState(),
+      timings: this.getPartTimings(partToBeUpdated),
+      ingestedPart
+    })
+
+    const unplannedPiecesToKeep: Piece[] = partToBeUpdated.getPieces().filter(piece => !piece.isPlanned)
+    unplannedPiecesToKeep.forEach(unplannedPiece => updatedPart.insertPiece(unplannedPiece))
+
+    return updatedPart
+  }
+
+  private getPartTimings(part: Part): PartTimings | undefined {
+    try {
+      return part.getTimings()
+    } catch (error) {
+      if (!(error instanceof UnsupportedOperationException)) {
+        throw error
+      }
+    }
+  }
+
+  private convertIngestedPieceToPiece(ingestedPiece: IngestedPiece): Piece {
+    return new Piece({
+      id: ingestedPiece.id,
+      partId: ingestedPiece.partId,
+      rundownId: ingestedPiece.rundownId,
+      name: ingestedPiece.name,
+      layer: ingestedPiece.layer,
+      pieceLifespan: ingestedPiece.pieceLifespan,
+      isPlanned: true,
+      start: ingestedPiece.start,
+      duration: ingestedPiece.duration,
+      takenOffAirTimestamp: 0,
+      preRollDuration: ingestedPiece.preRollDuration,
+      postRollDuration: ingestedPiece.postRollDuration,
+      transitionType: ingestedPiece.transitionType,
+      timelineObjects: ingestedPiece.timelineObjects,
+      metadata: ingestedPiece.metadata,
+      content: ingestedPiece.content,
+      tags: [],
+      isUnsynced: false
+    })
+  }
+
+  private updatePieceWithIngestedPiece(pieceToBeUpdated: Piece, ingestedPiece: IngestedPiece): Piece {
+    return new Piece({
+      id: pieceToBeUpdated.id,
+      partId: pieceToBeUpdated.getPartId(),
+      rundownId: pieceToBeUpdated.rundownId,
+      name: ingestedPiece.name,
+      layer: ingestedPiece.layer,
+      pieceLifespan: ingestedPiece.pieceLifespan,
+      isPlanned: pieceToBeUpdated.isPlanned,
+      start: ingestedPiece.start,
+      duration: ingestedPiece.duration,
+      preRollDuration: ingestedPiece.preRollDuration,
+      postRollDuration: ingestedPiece.postRollDuration,
+      transitionType: ingestedPiece.transitionType,
+      timelineObjects: ingestedPiece.timelineObjects,
+      metadata: ingestedPiece.metadata,
+      content: ingestedPiece.content,
+      tags: pieceToBeUpdated.tags,
+      isUnsynced: pieceToBeUpdated.isUnsynced(),
+      executedAt: pieceToBeUpdated.getExecutedAt(),
+      takenOffAirTimestamp: pieceToBeUpdated.getTakenOffAirTimestamp(),
+    })
+  }
+}

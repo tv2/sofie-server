@@ -1,0 +1,8 @@
+import { Trigger } from '../entities/trigger'
+
+export interface TriggerRepository {
+  getTriggers(): Promise<Trigger[]>
+  createTrigger(trigger: Omit<Trigger, 'id'>): Promise<Trigger>
+  updateTrigger(trigger: Trigger): Promise<Trigger>
+  deleteTrigger(triggerId: string): Promise<void>
+}
