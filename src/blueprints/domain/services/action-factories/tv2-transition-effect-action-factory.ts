@@ -40,12 +40,12 @@ import {
   Tv2VideoClipTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-clip-timeline-object-factory'
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
-import { Tv2Logger } from '../../interfaces/tv2-logger'
 import { ActionFactory } from './action-factory'
 import { FrameTimeConverter } from '../frame-time-converter'
 import { OutputLayer } from '../../../../rundown-execution/domain/enums/output-layer'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 const MAX_FRAME_DURATION_LIMIT: number = 250 // The maximum allowed transition duration in frames.
@@ -56,7 +56,8 @@ enum SpecialEffectName {
 }
 
 export class Tv2TransitionEffectActionFactory extends ActionFactory {
-  private readonly logger: Tv2Logger
+
+  private readonly logger: Logger
 
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
@@ -64,7 +65,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly assetPathHelper: Tv2AssetPathHelper,
     private readonly frameTimeConverter: FrameTimeConverter,
-    logger: Tv2Logger
+    logger: Logger
   ) {
     super()
     this.logger = logger.tag(Tv2TransitionEffectActionFactory.name)

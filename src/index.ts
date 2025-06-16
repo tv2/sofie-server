@@ -65,7 +65,6 @@ import {
 } from './blueprints/domain/services/timeline-object-factories/timeline-object-factory-provider'
 import {Tv2ActionService} from './blueprints/domain/services/tv2-action-service'
 import {Tv2ActionFactoryProvider} from './blueprints/domain/services/action-factories/tv2-action-factory-provider'
-import {Tv2LoggerFacade} from './blueprints/infrastructure/tv2-logger-facade'
 import {ConfigurationRepository} from './rundown-execution/domain/repositories/configuration-repository'
 import {
   MongoConfigurationRepository
@@ -275,7 +274,7 @@ async function main(logger: Logger): Promise<void> {
   const rundownAsyncLock: AsyncLock = new AsyncLock(logger)
 
   // Services
-  const blueprint: Blueprint = createBlueprint()
+  const blueprint: Blueprint = createBlueprint(objectCloner, logger)
   const timelineBuilder: TimelineBuilder = createTimelineBuilder(objectCloner, configurationRepository, blueprint)
   const ingestService: IngestService = new Tv2INewsIngestService(httpService, rundownAggregateRepository)
   const playoutService: PlayoutService = new PlayoutGatewayService(httpService, logger)
@@ -343,17 +342,18 @@ function createIngestedRundownRepository(mongoDatabase: MongoDatabase, rundownBa
   return new MongoIngestedRundownRepository(mongoDatabase, ingestedEntityConverter, rundownBaselineRepository, ingestedSegmentRepository, ingestedPartRepository, ingestedPieceRepository)
 }
 
-function createBlueprint(): Blueprint {
+function createBlueprint(objectCloner: ObjectCloner, logger: Logger): Blueprint {
   const configurationMapper: Tv2ConfigurationMapper = new Tv2ConfigurationMapper(
     new Tv2StudioBlueprintConfigurationMapper(),
     new Tv2ShowStyleBlueprintConfigurationMapper()
   )
   const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
+  const timelineObjectFactoryProvider: TimelineObjectFactoryProvider = new TimelineObjectFactoryProvider(logger)
 
   const tv2ActionService: Tv2ActionService = new Tv2ActionService(
     configurationMapper,
-    new Tv2ActionFactoryProvider(configurationMapper, new TimelineObjectFactoryProvider()),
-    Tv2LoggerFacade.createLogger(),
+    new Tv2ActionFactoryProvider(configurationMapper, timelineObjectFactoryProvider, objectCloner, logger),
+    logger
   )
 
   return new Tv2Blueprint(
@@ -361,7 +361,7 @@ function createBlueprint(): Blueprint {
     new Tv2OnTimelineGenerateService(configurationMapper, sisyfosPersistentLayerFinder),
     tv2ActionService,
     new Tv2BlueprintConfigurationValidator(configurationMapper),
-    new Tv2BlueprintBaselinePiecesGenerator(new Tv2StudioBlueprintConfigurationMapper(), new TimelineObjectFactoryProvider())
+    new Tv2BlueprintBaselinePiecesGenerator(new Tv2StudioBlueprintConfigurationMapper(), timelineObjectFactoryProvider)
   )
 }
 
@@ -434,5 +434,5 @@ function createConfigurationDataChangeService(mongoDatabase: MongoDatabase, blue
   return new ConfigurationChangedService(blueprint, statusMessageService, configurationRepository, showStyleConfigurationDataChangeListener, showStyleVariantConfigurationChangedListener, logger)
 }
 
-const logger: Logger = new ConsoleLogger().tag('startup')
-main(logger).catch(error => logger.data(error).error('Failed starting up Alba server.'))
+const consoleLogger: Logger = new ConsoleLogger().tag('startup')
+main(consoleLogger).catch(error => consoleLogger.data(error).error('Failed starting up Alba server.'))

@@ -31,15 +31,15 @@ import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-con
 import { Piece } from '../../../../rundown-execution/domain/entities/piece'
 import { TimelineObject } from '../../../../rundown-execution/domain/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
-import { Tv2Logger } from '../../interfaces/tv2-logger'
 import { TimelineObjectMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const ATEM_PREFIX: string = 'atem_'
 
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
-  private readonly logger: Tv2Logger
+  private readonly logger: Logger
 
-  constructor(logger: Tv2Logger) {
+  constructor(logger: Logger) {
     this.logger = logger.tag(Tv2AtemVideoMixerTimelineObjectFactory.name)
   }
 
