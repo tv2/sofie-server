@@ -5,21 +5,6 @@ import { Media } from '../../../rundown-execution/domain/entities/media'
 
 export class MediaDatabaseChangedService implements DataChangeService {
 
-  private static instance: DataChangeService
-
-  public static getInstance(
-    mediaEventEmitter: MediaEventEmitter,
-    mediaChangedListener: DataChangedListener<Media>
-  ): DataChangeService {
-    if (!this.instance) {
-      this.instance = new MediaDatabaseChangedService(
-        mediaEventEmitter,
-        mediaChangedListener
-      )
-    }
-    return this.instance
-  }
-
   constructor(private readonly mediaEventEmitter: MediaEventEmitter, mediaChangedListener: DataChangedListener<Media>) {
     this.listenForMediaChanges(mediaChangedListener)
   }

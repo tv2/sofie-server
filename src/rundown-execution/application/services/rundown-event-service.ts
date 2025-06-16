@@ -33,18 +33,10 @@ import { Segment } from '../../domain/entities/segment'
 import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 
 export class RundownEventService implements RundownEventEmitter, RundownEventObserver {
-  private static instance: RundownEventService
-
-  public static getInstance(rundownEventBuilder: RundownEventBuilder): RundownEventService {
-    if (!this.instance) {
-      this.instance = new RundownEventService(rundownEventBuilder)
-    }
-    return this.instance
-  }
 
   private readonly callbacks: ((rundownEvent: RundownEvent) => void)[] = []
 
-  private constructor(private readonly rundownEventBuilder: RundownEventBuilder) {}
+  constructor(private readonly rundownEventBuilder: RundownEventBuilder) {}
 
   private emitRundownEvent(rundownEvent: RundownEvent): void {
     this.callbacks.forEach(callback => callback(rundownEvent))

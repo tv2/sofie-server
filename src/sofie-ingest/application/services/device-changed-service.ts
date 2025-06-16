@@ -14,24 +14,6 @@ const NOT_CONNECTED_MESSAGE: string = 'Not connected'
 const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 
 export class DeviceChangedService implements DataChangeService {
-  private static instance: DataChangeService
-
-  public static getInstance(
-    statusMessageService: StatusMessageService,
-    deviceRepository: DeviceRepository,
-    deviceChangedListener: DataChangedListener<CoreDevice>,
-    logger: Logger
-  ): DataChangeService {
-    if (!this.instance) {
-      this.instance = new DeviceChangedService(
-        statusMessageService,
-        deviceRepository,
-        deviceChangedListener,
-        logger
-      )
-    }
-    return this.instance
-  }
 
   private readonly logger: Logger
 

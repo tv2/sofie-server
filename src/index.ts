@@ -224,10 +224,10 @@ async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
   const objectCloner: ObjectCloner = new DeepPropertyObjectCloner()
   const httpService: HttpService = new GotHttpService()
-  const timeoutCallbackScheduler: CallbackScheduler = TimeoutCallbackScheduler.getInstance(logger)
+  const timeoutCallbackScheduler: CallbackScheduler = new TimeoutCallbackScheduler(logger)
 
   // Repository setup
-  const mongoDatabase: MongoDatabase = MongoDatabase.getInstance(logger)
+  const mongoDatabase: MongoDatabase = new MongoDatabase(logger)
   const mongoEntityConverter: MongoEntityConverter = new MongoEntityConverter(logger)
 
   const systemInformationRepository: SystemInformationRepository = new MongoSystemInformationRepository(mongoDatabase, mongoEntityConverter)
@@ -251,16 +251,16 @@ async function main(logger: Logger): Promise<void> {
 
   // Event builders and event services
   const rundownExecutionEventBuilder: RundownExecutionEventBuilder = new RundownExecutionEventBuilder()
-  const rundownEventService: RundownEventService = RundownEventService.getInstance(rundownExecutionEventBuilder)
-  const configurationEventService: ConfigurationEventService = ConfigurationEventService.getInstance(rundownExecutionEventBuilder)
+  const rundownEventService: RundownEventService = new RundownEventService(rundownExecutionEventBuilder)
+  const configurationEventService: ConfigurationEventService = new ConfigurationEventService(rundownExecutionEventBuilder)
   const deviceEventService: DeviceEventService = new DeviceEventService(rundownExecutionEventBuilder)
-  const playoutContentEventService: PlayoutContentEventService = PlayoutContentEventService.getInstance(rundownExecutionEventBuilder)
+  const playoutContentEventService: PlayoutContentEventService = new PlayoutContentEventService(rundownExecutionEventBuilder)
 
   const crossCuttingConcernsEventBuilder: CrossCuttingConcernsEventBuilder = new CrossCuttingConcernsEventBuilder()
-  const statusMessageEventService: StatusMessageEventService = StatusMessageEventService.getInstance(crossCuttingConcernsEventBuilder)
+  const statusMessageEventService: StatusMessageEventService = new StatusMessageEventService(crossCuttingConcernsEventBuilder)
 
   const actionSystemEventBuilder: ActionSystemEventBuilder = new ActionSystemEventBuilder()
-  const actionEventService: ActionEventService = ActionEventService.getInstance(actionSystemEventBuilder)
+  const actionEventService: ActionEventService = new ActionEventService(actionSystemEventBuilder)
   const triggerEventService: TriggerEventService = new TriggerEventService(actionSystemEventBuilder)
   const macroEventService: MacroEventService = new MacroEventService(actionSystemEventBuilder)
 
@@ -310,7 +310,7 @@ async function main(logger: Logger): Promise<void> {
 
   // System setup
   const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController], logger)
-  const eventServer: EventServer = WebSocketEventServer.getInstance(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, logger)
+  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, logger)
 
   // System startup
   await mongoDatabase.connect()

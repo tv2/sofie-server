@@ -5,18 +5,9 @@ import { Action } from '../../domain/entities/action'
 import { ActionEventObserver } from '../interfaces/action-event-observer'
 
 export class ActionEventService implements ActionEventEmitter, ActionEventObserver {
-  private static instance: ActionEventService
-
-  public static getInstance(actionEventBuilder: ActionEventBuilder): ActionEventService {
-    if (!this.instance) {
-      this.instance = new ActionEventService(actionEventBuilder)
-    }
-    return this.instance
-  }
-
   private readonly callbacks: ((actionEvent: ActionEvent) => void)[] = []
 
-  private constructor(private readonly actionEventBuilder: ActionEventBuilder) {
+  constructor(private readonly actionEventBuilder: ActionEventBuilder) {
   }
 
   private emitActionEvents(actionEvent: ActionEvent): void {

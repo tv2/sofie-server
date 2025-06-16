@@ -9,14 +9,6 @@ import {
 import { Macro } from '../../domain/entities/macro'
 
 export class MacroEventService implements MacroEventEmitter, MacroEventObserver {
-  private static instance: MacroEventService
-
-  public static getInstance(macroEventBuilder: MacroEventBuilder): MacroEventService {
-    if (!this.instance) {
-      this.instance = new MacroEventService(macroEventBuilder)
-    }
-    return this.instance
-  }
 
   private readonly callbacks: ((macroEvent: MacroEvent) => void)[] = []
 

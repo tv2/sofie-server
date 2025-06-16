@@ -13,29 +13,6 @@ const CONFIGURATION_STATUS_MESSAGE_ID_PREFIX: string = 'INVALID_CONFIGURATION_'
 
 export class ConfigurationChangedService implements DataChangeService {
 
-  private static instance: DataChangeService
-
-  public static getInstance(
-    blueprint: Blueprint,
-    statusMessageService: StatusMessageService,
-    configurationRepository: ConfigurationRepository,
-    showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>,
-    showStyleVariantConfigurationChangedListener: DataChangedListener<ShowStyleVariant>,
-    logger: Logger
-  ): DataChangeService {
-    if (!this.instance) {
-      this.instance = new ConfigurationChangedService(
-        blueprint,
-        statusMessageService,
-        configurationRepository,
-        showStyleConfigurationChangedListener,
-        showStyleVariantConfigurationChangedListener,
-        logger
-      )
-    }
-    return this.instance
-  }
-
   private readonly logger: Logger
 
   constructor(

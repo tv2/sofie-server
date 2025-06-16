@@ -27,41 +27,11 @@ import { PlayoutContentEvent } from '../../../rundown-execution/application/valu
 import {NtpEventType} from '../enums/ntp-event-type'
 
 export class WebSocketEventServer implements EventServer {
-  private static instance: EventServer
-
-  public static getInstance(
-    rundownEventObserver: RundownEventObserver,
-    actionEventObserver: ActionEventObserver,
-    triggerEventObserver: TriggerEventObserver,
-    macroEventObserver: MacroEventObserver,
-    mediaEventObserver: MediaEventObserver,
-    configurationEventObserver: ConfigurationEventObserver,
-    statusMessageEventObserver: StatusMessageEventObserver,
-    deviceEventObserver: DeviceEventObserver,
-    playoutContentEventObserver: PlayoutContentEventObserver,
-    logger: Logger
-  ): EventServer {
-    if (!this.instance) {
-      this.instance = new WebSocketEventServer(
-        rundownEventObserver,
-        actionEventObserver,
-        triggerEventObserver,
-        macroEventObserver,
-        mediaEventObserver,
-        configurationEventObserver,
-        statusMessageEventObserver,
-        deviceEventObserver,
-        playoutContentEventObserver,
-        logger
-      )
-    }
-    return this.instance
-  }
 
   private readonly logger: Logger
   private webSocketServer?: WebSocket.Server
 
-  private constructor(
+  constructor(
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionEventObserver: ActionEventObserver,
     private readonly triggerEventObserver: TriggerEventObserver,
