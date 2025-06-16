@@ -1,5 +1,5 @@
 import { Logger } from '../interfaces/logger'
-import { LoggerFacade } from '../logger-facade'
+import {ConsoleLogger} from '../../infrastructure/services/console-logger'
 
 interface IncomingRequest {
   req?: {
@@ -9,7 +9,7 @@ interface IncomingRequest {
 }
 
 export function AuditLog(): MethodDecorator {
-  const logger: Logger = LoggerFacade.createLogger()
+  const logger: Logger = new ConsoleLogger()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (_target: unknown, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<any>): void => {

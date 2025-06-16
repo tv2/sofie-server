@@ -7,7 +7,6 @@ import { ConfigurationRepository } from '../../../rundown-execution/domain/repos
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { StatusMessageService } from '../../../cross-cutting-concerns/application/interfaces/status-message-service'
 import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
-import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/show-style-variant'
 
 const CONFIGURATION_STATUS_MESSAGE_ID_PREFIX: string = 'INVALID_CONFIGURATION_'
@@ -39,22 +38,21 @@ export class ConfigurationChangedService implements DataChangeService {
 
   private readonly logger: Logger
 
-  private constructor(
+  constructor(
     private readonly blueprint: Blueprint,
     private readonly statusMessageService: StatusMessageService,
     private readonly configurationRepository: ConfigurationRepository,
-    showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>,
-    showStyleVariantConfigurationChangedListener: DataChangedListener<ShowStyleVariant>,
+    private readonly showStyleConfigurationChangedListener: DataChangedListener<ShowStyle>,
+    private readonly showStyleVariantConfigurationChangedListener: DataChangedListener<ShowStyleVariant>,
     logger: Logger
   ) {
     this.logger = logger.tag(ConfigurationChangedService.name)
-    this.validateConfiguration().catch(error => this.logger.data(error).error('Failed to validate configuration'))
-    this.validateConfigurationOnChange(showStyleConfigurationChangedListener)
-    this.validateConfigurationOnChange(showStyleVariantConfigurationChangedListener)
   }
 
-  public initialize(): Promise<void> {
-    throw new UnsupportedOperationException('Not implemented')
+  public async initialize(): Promise<void> {
+    await this.validateConfiguration().catch(error => this.logger.data(error).error('Failed to validate configuration'))
+    this.validateConfigurationOnChange(this.showStyleConfigurationChangedListener)
+    this.validateConfigurationOnChange(this.showStyleVariantConfigurationChangedListener)
   }
 
   private validateConfigurationOnChange<T>(dataChangedListener: DataChangedListener<T>): void {
