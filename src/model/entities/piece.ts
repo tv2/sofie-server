@@ -94,6 +94,7 @@ export class Piece {
   }
 
   public putOnAir(putOnAirTimestamp: number): void {
+    this.takenOffAirTimestamp = 0
     if (this.executedAt) {
       return
     }

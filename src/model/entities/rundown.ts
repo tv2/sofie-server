@@ -50,7 +50,7 @@ export interface RundownInterface {
 export interface RundownAlreadyActiveProperties {
   activeCursor: RundownCursor | undefined
   nextCursor: RundownCursor | undefined
-  infinitePieces: Map<string, Piece>
+  infinitePieces: Map<string, Piece[]>
 }
 
 const MAXIMUM_HISTORY_ENTRIES: number = 30
@@ -65,7 +65,7 @@ export class Rundown extends BasicRundown {
 
   private previousPart?: Part
 
-  private infinitePieces: Map<string, Piece> = new Map()
+  private infinitePieces: Map<string, Piece[]> = new Map()
 
   private persistentState?: RundownPersistentState
 
@@ -412,31 +412,25 @@ export class Rundown extends BasicRundown {
     this.assertNotUndefined(this.activeCursor, 'active Part')
 
     const now: number = Date.now()
-    let layersWithPieces: Map<string, Piece> = new Map(
-      this.activeCursor.part
-        .getPieces()
+    const layersWithPieces: Map<string, Piece[]> = new Map(
+      this.getActivePart().getPieces()
         .filter(piece => !piece.hasEnded(now))
-        .map((piece) => [piece.layer, piece])
+        .map(piece => [piece.layer, [piece]])
     )
 
-    const piecesToCheckIfTheyHaveBeenOutlived: Piece[] = this.findOldInfinitePiecesNotOnLayers(
-      new Set(layersWithPieces.keys())
-    )
-    const piecesThatAreNotOutlived: Piece[] = piecesToCheckIfTheyHaveBeenOutlived.filter(
-      (piece) => !this.isPieceOutlived(piece)
-    )
-    layersWithPieces = this.addPiecesToLayers(piecesThatAreNotOutlived, layersWithPieces)
+    const piecesThatAreNotOutlived: Piece[] = this.findOldNotOutlivedInfinitePieces()
+    this.addPiecesToLayers(piecesThatAreNotOutlived, layersWithPieces)
 
-    layersWithPieces = this.addSpanningPiecesNotOnLayersFromActiveSegment(layersWithPieces)
-    layersWithPieces = this.addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces)
+    this.addSpanningPiecesNotOnLayersFromActiveSegment(layersWithPieces)
+    this.addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces)
 
     this.addBaselinePiecesNotOnLayers(layersWithPieces)
-    this.resetOutlivedInfinitePieces(Array.from(layersWithPieces.values()))
+    this.resetOldInfinitePieces(layersWithPieces)
     this.setInfinitePieces(layersWithPieces)
   }
 
-  private findOldInfinitePiecesNotOnLayers(layers: Set<string>): Piece[] {
-    return Array.from(this.infinitePieces.values()).filter((oldPiece) => !layers.has(oldPiece.layer))
+  private findOldNotOutlivedInfinitePieces(): Piece[] {
+    return Array.from(this.infinitePieces.values()).flatMap((oldList: Piece[]) => oldList).filter(oldPiece => !this.isPieceOutlived(oldPiece))
   }
 
   private isPieceOutlived(piece: Piece): boolean {
@@ -461,7 +455,7 @@ export class Rundown extends BasicRundown {
       }
       case PieceLifespan.SPANNING_UNTIL_RUNDOWN_END:
       case PieceLifespan.SPANNING_UNTIL_SEGMENT_END: {
-        // We always mark SPANNING as outlived because even it if isn't we need to check if there is another SPANNING Piece between this Piece and the active Part.
+        // We always mark SPANNING as outlived because even if it isn't we need to check if there is another SPANNING Piece between this Piece and the active Part.
         return true
       }
       default: {
@@ -470,26 +464,41 @@ export class Rundown extends BasicRundown {
     }
   }
 
-  private resetOutlivedInfinitePieces(piecesThatHasNotBeenOutlived: Piece[]): void {
-    const pieceIdsThatHasNotBeenOutlived: string[] = piecesThatHasNotBeenOutlived.map((piece) => piece.id)
-    Array.from(this.infinitePieces.values())
-      .filter((piece) => !pieceIdsThatHasNotBeenOutlived.includes(piece.id))
-      .forEach((piece) => piece.resetExecution())
+  private resetOldInfinitePieces(newInfinitePieces: Map<string, Piece[]>): void {
+    this.infinitePieces.forEach((oldList: Piece[], layer: string) => {
+      const newList: Piece[] | undefined = newInfinitePieces.get(layer)
+      if (!newList) {
+        oldList.forEach(piece => piece.resetExecution())
+        return
+      }
+
+      oldList.filter(piece => newList.every(p => p.id !== piece.id))
+        .forEach(piece => piece.resetExecution())
+    })
   }
 
-  private addPiecesToLayers(pieces: Piece[], layersWithPieces: Map<string, Piece>): Map<string, Piece> {
+  private addPiecesToLayers(pieces: Piece[], layersWithPieces: Map<string, Piece[]>): Map<string, Piece[]> {
     pieces.forEach((piece) => {
-      if (layersWithPieces.has(piece.layer)) {
-        throw new Error(
-          `${piece.pieceLifespan}: Trying to add an infinite Piece to a layer that already have an infinite Piece`
-        )
+      const newList: Piece[] | undefined = layersWithPieces.get(piece.layer)
+      if (!newList) {
+        layersWithPieces.set(piece.layer, [piece])
+        return
       }
-      layersWithPieces.set(piece.layer, piece)
+
+      if (this.getActivePart().getTimings().delayStartOfPiecesDuration === 0) {
+        return
+      }
+
+      if (piece.id === newList[0].id) {
+        return
+      }
+      piece.takeOffAir(newList[0].getExecutedAt() + this.getActivePart().getTimings().delayStartOfPiecesDuration)
+      layersWithPieces.set(piece.layer, [...newList, piece])
     })
     return layersWithPieces
   }
 
-  private addSpanningPiecesNotOnLayersFromActiveSegment(layersWithPieces: Map<string, Piece>): Map<string, Piece> {
+  private addSpanningPiecesNotOnLayersFromActiveSegment(layersWithPieces: Map<string, Piece[]>): Map<string, Piece[]> {
     this.assertNotUndefined(this.activeCursor, 'active Cursor')
 
     const piecesToAdd: Piece[] = this.activeCursor.segment
@@ -505,7 +514,7 @@ export class Rundown extends BasicRundown {
     return piece
   }
 
-  private addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces: Map<string, Piece>): Map<string, Piece> {
+  private addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces: Map<string, Piece[]>): Map<string, Piece[]> {
     const indexOfActiveSegment: number = this.segments.findIndex((segment) => segment.id === this.activeCursor?.segment?.id)
     for (let i: number = indexOfActiveSegment - 1; i >= 0; i--) {
       const piecesSpanningSegment: Piece[] = this.segments[i]
@@ -516,23 +525,24 @@ export class Rundown extends BasicRundown {
     return layersWithPieces
   }
 
-  private addBaselinePiecesNotOnLayers(layersWithPieces: Map<string, Piece>): void {
+  private addBaselinePiecesNotOnLayers(layersWithPieces: Map<string, Piece[]>): void {
     this.baselinePieces.filter(baselinePiece => !layersWithPieces.has(baselinePiece.layer))
       .forEach(baselinePiece => {
         if (!baselinePiece.getExecutedAt()) {
           baselinePiece.putOnAir(Date.now())
         }
-        layersWithPieces.set(baselinePiece.layer, baselinePiece)
+        layersWithPieces.set(baselinePiece.layer, [baselinePiece])
       })
   }
 
-  private setInfinitePieces(layersWithPieces: Map<string, Piece>): void {
+  private setInfinitePieces(layersWithPieces: Map<string, Piece[]>): void {
     this.infinitePieces = new Map()
-    layersWithPieces.forEach((piece: Piece, layer: string) => {
-      if (piece.pieceLifespan === PieceLifespan.WITHIN_PART) {
+    layersWithPieces.forEach((pieceList: Piece[], layer: string) => {
+      const infinitePieces: Piece[] = pieceList.filter(piece => piece.pieceLifespan !== PieceLifespan.WITHIN_PART)
+      if (infinitePieces.length === 0) {
         return
       }
-      this.infinitePieces.set(layer, piece)
+      this.infinitePieces.set(layer, infinitePieces)
     })
   }
 
@@ -888,18 +898,18 @@ export class Rundown extends BasicRundown {
   }
 
   private markInfinitePiecesFromPartUnsynced(partId: string): void {
-    const infinitePiecesFromPart: Piece[] = [...this.infinitePieces.values()].filter(piece => piece.getPartId() === partId)
+    const infinitePiecesFromPart: Piece[] = this.getInfinitePieces().flatMap(list => list).filter(piece => piece.getPartId() === partId)
     infinitePiecesFromPart.map(piece => {
       piece.markAsUnsynced()
       return piece.getUnsyncedCopy()
-    }).forEach(unsyncedPiece => this.infinitePieces.set(unsyncedPiece.layer, unsyncedPiece))
+    }).forEach(unsyncedPiece => this.infinitePieces.set(unsyncedPiece.layer, [unsyncedPiece]))
   }
 
   public getInfinitePieces(): Piece[] {
-    return Array.from(this.infinitePieces.values())
+    return Array.from(this.infinitePieces.values()).flatMap(array => array)
   }
 
-  public getInfinitePiecesMap(): Map<string, Piece> {
+  public getInfinitePiecesMap(): Map<string, Piece[]> {
     return this.infinitePieces
   }
 
@@ -966,7 +976,7 @@ export class Rundown extends BasicRundown {
     this.assertActive(this.stopActivePiecesOnLayers.name)
     const piecesToStop: Piece[] = [
       ...this.getActiveCursor()?.part.getPieces().filter(piece => layers.includes(piece.layer) && !piece.hasEnded(Date.now())) ?? [],
-      ...layers.map(layer => this.infinitePieces.get(layer)).filter((piece): piece is Piece => !!piece)
+      ...layers.map(layer => this.infinitePieces.get(layer)).flatMap(pieceList => pieceList).filter((piece): piece is Piece => !!piece)
     ]
 
     const now: number = Date.now()
