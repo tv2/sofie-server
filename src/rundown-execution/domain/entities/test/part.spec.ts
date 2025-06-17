@@ -682,7 +682,7 @@ describe(Part.name, () => {
                     const lowerPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration: number = 20
                     const piece: Piece = EntityMockFactory.createPiece({
                       preRollDuration:
-												lowerPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration,
+                        lowerPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration,
                     })
                     const testee: Part = new Part({
                       pieces: [piece],
@@ -711,7 +711,7 @@ describe(Part.name, () => {
                     const lowerPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration: number = 20
                     const piece: Piece = EntityMockFactory.createPiece({
                       preRollDuration:
-												lowerPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration,
+                        lowerPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration,
                     })
                     const testee: Part = new Part({
                       pieces: [piece],
@@ -770,7 +770,7 @@ describe(Part.name, () => {
                     const higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration: number = 200
                     const preRollPiece: Piece = EntityMockFactory.createPiece({
                       preRollDuration:
-												higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration,
+                        higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration,
                     })
                     const testee: Part = new Part({
                       pieces: [preRollPiece],
@@ -805,7 +805,7 @@ describe(Part.name, () => {
                     const higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration: number = 200
                     const preRollPiece: Piece = EntityMockFactory.createPiece({
                       preRollDuration:
-												higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration,
+                        higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration,
                     })
                     const testee: Part = new Part({
                       pieces: [preRollPiece],
@@ -1018,7 +1018,7 @@ describe(Part.name, () => {
                   const preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 50
                   const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                     preRollDuration:
-											preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                      preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                   })
                   const testee: Part = new Part({
                     inTransition: { keepPreviousPartAliveDuration },
@@ -1044,7 +1044,7 @@ describe(Part.name, () => {
                     const preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 50
                     const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                       preRollDuration:
-												preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                        preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                     })
                     const testee: Part = new Part({
                       inTransition: { keepPreviousPartAliveDuration },
@@ -1074,7 +1074,7 @@ describe(Part.name, () => {
                       const preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 50
                       const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                         preRollDuration:
-													preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                          preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                       })
                       const testee: Part = new Part({
                         inTransition: { keepPreviousPartAliveDuration },
@@ -1101,7 +1101,7 @@ describe(Part.name, () => {
                       const preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 50
                       const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                         preRollDuration:
-													preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                          preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                       })
                       const testee: Part = new Part({
                         inTransition: { keepPreviousPartAliveDuration },
@@ -1128,7 +1128,7 @@ describe(Part.name, () => {
                     const preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 50
                     const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                       preRollDuration:
-												preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                        preRollDurationLowerThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                     })
                     const testee: Part = new Part({
                       inTransition: { keepPreviousPartAliveDuration, delayPiecesDuration },
@@ -1156,7 +1156,7 @@ describe(Part.name, () => {
                   const preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 200
                   const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                     preRollDuration:
-											preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                      preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                   })
                   const testee: Part = new Part({
                     inTransition: { keepPreviousPartAliveDuration },
@@ -1182,7 +1182,7 @@ describe(Part.name, () => {
                     const preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 200
                     const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                       preRollDuration:
-												preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                        preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                     })
                     const testee: Part = new Part({
                       inTransition: { keepPreviousPartAliveDuration },
@@ -1212,7 +1212,7 @@ describe(Part.name, () => {
                       const preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 200
                       const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                         preRollDuration:
-													preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                          preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                       })
                       const testee: Part = new Part({
                         inTransition: { keepPreviousPartAliveDuration },
@@ -1241,7 +1241,7 @@ describe(Part.name, () => {
                       const preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 200
                       const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                         preRollDuration:
-													preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                          preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                       })
                       const testee: Part = new Part({
                         inTransition: { keepPreviousPartAliveDuration },
@@ -1271,7 +1271,7 @@ describe(Part.name, () => {
                     const preRollDurationMinusDelayPiecesDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration: number = 200
                     const pieceWithPreRoll: Piece = EntityMockFactory.createPiece({
                       preRollDuration:
-												preRollDurationMinusDelayPiecesDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
+                        preRollDurationMinusDelayPiecesDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration,
                     })
                     const testee: Part = new Part({
                       inTransition: { keepPreviousPartAliveDuration, delayPiecesDuration },
@@ -1701,7 +1701,7 @@ describe(Part.name, () => {
                       const previousPart: Part = EntityMockFactory.createPart({
                         outTransition: {
                           keepAliveDuration:
-														keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration,
+                            keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration,
                         },
                       })
 
@@ -1732,7 +1732,7 @@ describe(Part.name, () => {
                           {
                             outTransition: {
                               keepAliveDuration:
-																keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration,
+                                keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration,
                             },
                           },
                           { partTimings: { postRollDuration } }
@@ -1764,7 +1764,7 @@ describe(Part.name, () => {
                         const previousPart: Part = EntityMockFactory.createPart({
                           outTransition: {
                             keepAliveDuration:
-															keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration,
+                              keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration,
                           },
                         })
 
@@ -1821,7 +1821,7 @@ describe(Part.name, () => {
                           {
                             outTransition: {
                               keepAliveDuration:
-																keepAliveDurationHigherThanPreRollDuration,
+                                keepAliveDurationHigherThanPreRollDuration,
                             },
                           },
                           { partTimings: { postRollDuration } }
@@ -1901,7 +1901,7 @@ describe(Part.name, () => {
                       const previousPart: Part = EntityMockFactory.createPart({
                         outTransition: {
                           keepAliveDuration:
-														keepAliveDurationLowerThanPreRollDurationMinusDelayPiecesDuration,
+                            keepAliveDurationLowerThanPreRollDurationMinusDelayPiecesDuration,
                         },
                       })
 
@@ -1929,7 +1929,7 @@ describe(Part.name, () => {
                           {
                             outTransition: {
                               keepAliveDuration:
-																keepAliveDurationLowerThanPreRollDurationMinusDelayPiecesDuration,
+                                keepAliveDurationLowerThanPreRollDurationMinusDelayPiecesDuration,
                             },
                           },
                           { partTimings: { postRollDuration } }
@@ -1960,7 +1960,7 @@ describe(Part.name, () => {
                         const previousPart: Part = EntityMockFactory.createPart({
                           outTransition: {
                             keepAliveDuration:
-															keepAliveDurationLowerThanPreRollDurationMinusDelayPiecesDuration,
+                              keepAliveDurationLowerThanPreRollDurationMinusDelayPiecesDuration,
                           },
                         })
 
@@ -2015,7 +2015,7 @@ describe(Part.name, () => {
                           {
                             outTransition: {
                               keepAliveDuration:
-																keepAliveDurationLowerThanPreRollDuration,
+                                keepAliveDurationLowerThanPreRollDuration,
                             },
                           },
                           { partTimings: { postRollDuration } }
