@@ -16,7 +16,6 @@ import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/p
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
 
 export class Tv2RobotActionFactory extends ActionFactory {
-
   constructor(private readonly robotTimelineObjectFactory: Tv2RobotTimelineObjectFactory) {
     super()
   }

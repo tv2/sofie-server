@@ -10,7 +10,6 @@ interface ExpectedPlayoutItem extends MongoId {
 }
 
 export class MongoExpectedPlayoutItemRepository extends BaseMongoRepository<ExpectedPlayoutItem> {
-
   constructor(protected mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
   }

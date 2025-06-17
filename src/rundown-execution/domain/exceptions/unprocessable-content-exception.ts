@@ -1,5 +1,5 @@
-import {Exception} from './exception'
-import {ErrorCode} from '../enums/error-code'
+import { Exception } from './exception'
+import { ErrorCode } from '../enums/error-code'
 
 export class UnprocessableContentException extends Exception {
   constructor(message: string) {

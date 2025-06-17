@@ -52,17 +52,17 @@ export class MacroServiceImplementation implements MacroService {
     const operation: Operation = macro.operations[index]
     try {
       await this.executeOperation(rundownId, operation)
-      setTimeout(() =>
-      {
-        this.executeOperationAtIndex(rundownId, macro, index + 1).catch((err: Error) => {throw err})
+      setTimeout(() => {
+        this.executeOperationAtIndex(rundownId, macro, index + 1).catch((err: Error) => {
+          throw err
+        })
       }, operation.delayNextOperationMs)
-    }
-    catch (error: unknown) {
+    } catch (error: unknown) {
       let errorMessage: string = 'The operation failed for an unknown reason.'
       if (error instanceof Exception) {
         errorMessage = error.message
       }
-      this.statusMessageEventEmitter.emitStatusMessageEvent({id: 'operationFailed', message: errorMessage, statusCode: StatusCode.GOOD, title: 'Operation Failed'})
+      this.statusMessageEventEmitter.emitStatusMessageEvent({ id: 'operationFailed', message: errorMessage, statusCode: StatusCode.GOOD, title: 'Operation Failed' })
     }
   }
 

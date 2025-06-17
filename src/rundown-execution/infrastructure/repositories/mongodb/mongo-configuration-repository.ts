@@ -4,7 +4,7 @@ import { StudioRepository } from '../../../domain/repositories/studio-repository
 import { ShowStyleRepository } from '../../../domain/repositories/show-style-repository'
 import { ShowStyle } from '../../../domain/entities/show-style'
 import { Studio } from '../../../domain/entities/studio'
-import {UnsupportedOperationException} from '../../../domain/exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../../domain/exceptions/unsupported-operation-exception'
 
 // Alba currently only uses one hardcoded studio.
 const STUDIO_ID: string = 'studio0'
@@ -12,7 +12,6 @@ const STUDIO_ID: string = 'studio0'
 const SHOW_STYLE_ID: string = 'show0'
 
 export class MongoConfigurationRepository implements ConfigurationRepository {
-
   constructor(
     private readonly studioRepository: StudioRepository,
     private readonly showStyleRepository: ShowStyleRepository

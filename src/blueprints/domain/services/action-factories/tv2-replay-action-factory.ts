@@ -26,7 +26,6 @@ import { OutputChannel } from '../../../../rundown-execution/domain/enums/output
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
 export class Tv2ReplayActionFactory extends ActionFactory {
-
   constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
@@ -35,7 +34,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
   }
 
   public createReplayActions(configuration: Tv2BlueprintConfiguration): Action[] {
-    return configuration.studio.replaySources.flatMap(replaySource => {
+    return configuration.studio.replaySources.flatMap((replaySource) => {
       const actions: Action[] = [
         this.createReplayActionWithVoiceOverAsNext(configuration, replaySource),
         this.createReplayActionWithVoiceOverAsOnAir(configuration, replaySource),

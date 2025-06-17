@@ -30,7 +30,7 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.CASPAR_CG
     type: CasparCgType.MEDIA
-    file: string,
+    file: string
     loop?: boolean
     seek?: number
     inPoint?: number

@@ -18,12 +18,11 @@ import {
 } from '../../interfaces/timeline-object-factories/tv2-graphics-split-screen-timeline-object-factory'
 import { Tv2RobotTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-robot-timeline-object-factory'
 import { Tv2TelemetricsTimelineObjectFactory } from './tv2-telemetrics-timeline-object-factory'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const FRAME_RATE: number = 25
 
 export class TimelineObjectFactoryProvider {
-
   private readonly logger: Logger
 
   constructor(logger: Logger) {

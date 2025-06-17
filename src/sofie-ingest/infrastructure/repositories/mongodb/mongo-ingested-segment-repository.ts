@@ -9,7 +9,6 @@ import { IngestedPart } from '../../../../rundown-execution/domain/entities/inge
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest rename to "ingestedSegments".
 
 export class MongoIngestedSegmentRepository extends BaseMongoRepository<MongoIngestedSegment> implements IngestedSegmentRepository {
-
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,

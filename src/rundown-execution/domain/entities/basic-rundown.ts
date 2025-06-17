@@ -1,6 +1,6 @@
 import { RundownTiming } from '../value-objects/rundown-timing'
 import { RundownMode } from '../enums/rundown-mode'
-import {TakeMode} from '../enums/take-mode'
+import { TakeMode } from '../enums/take-mode'
 
 export class BasicRundown {
   public readonly id: string

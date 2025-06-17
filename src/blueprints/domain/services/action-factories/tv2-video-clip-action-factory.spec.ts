@@ -16,7 +16,7 @@ import { EntityTestFactory } from '../../../../rundown-execution/domain/entities
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-clip-timeline-object-factory'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2VideoClipActionFactory.name, () => {
   describe(Tv2VideoClipActionFactory.prototype.createVideoClipActions.name, () => {
@@ -71,10 +71,10 @@ describe(Tv2VideoClipActionFactory.name, () => {
 })
 
 function createTestee(params?: {
-  actionManifestMapper?: Tv2ActionManifestMapper,
-  logger?: Logger,
-  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
-  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
+  actionManifestMapper?: Tv2ActionManifestMapper
+  logger?: Logger
+  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
+  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
   videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory
 }): Tv2VideoClipActionFactory {
   return new Tv2VideoClipActionFactory(

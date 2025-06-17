@@ -2,7 +2,6 @@ import { StatusMessage } from '../../domain/entities/status-message'
 import { StatusCode } from '../../domain/enums/status-code'
 
 export class StatusMessageDto {
-
   public readonly id: string
   public readonly title: string
   public readonly message: string

@@ -1,15 +1,15 @@
-import {Tv2TransitionEffectActionFactory} from './tv2-transition-effect-action-factory'
+import { Tv2TransitionEffectActionFactory } from './tv2-transition-effect-action-factory'
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-mixer-timeline-object-factory'
-import {Tv2CasparCgTimelineObjectFactory} from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-audio-mixer-timeline-object-factory'
-import {anything, instance, mock, when} from '@typestrong/ts-mockito'
-import {Tv2AssetPathHelper} from '../tv2-asset-path-helper'
-import {FrameTimeConverter} from '../frame-time-converter'
-import {EntityTestFactory} from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
+import { anything, instance, mock, when } from '@typestrong/ts-mockito'
+import { Tv2AssetPathHelper } from '../tv2-asset-path-helper'
+import { FrameTimeConverter } from '../frame-time-converter'
+import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import {
   Tv2Action,
   Tv2BreakerTransitionEffectActionMetadata,
@@ -29,7 +29,7 @@ import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-con
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
 import { PieceActionType } from '../../../../action-system/domain/enums/action-type'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   describe(Tv2TransitionEffectActionFactory.prototype.getMutateActionMethods.name, () => {
@@ -79,7 +79,7 @@ describe(Tv2TransitionEffectActionFactory.name, () => {
 })
 
 function createBreakerActionMetadata(durationInFrames: number, casparCgPreRollDurationInMs: number): Tv2BreakerTransitionEffectActionMetadata {
-  return  {
+  return {
     breaker: {
       durationInFrames
     } as Breaker,
@@ -143,11 +143,11 @@ function getMutateActionWithMethods(transitionEffectActionFactory: Tv2Transition
 }
 
 function createTestee(params?: {
-  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
-  casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory,
-  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
-  assetPathHelper?: Tv2AssetPathHelper,
-  frameTimeConverter?: FrameTimeConverter,
+  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
+  casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory
+  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
+  assetPathHelper?: Tv2AssetPathHelper
+  frameTimeConverter?: FrameTimeConverter
   logger?: Logger
 }): Tv2TransitionEffectActionFactory {
   return new Tv2TransitionEffectActionFactory(

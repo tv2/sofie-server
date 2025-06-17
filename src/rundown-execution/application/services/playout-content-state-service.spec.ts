@@ -23,7 +23,7 @@ describe(PlayoutContentStateService.name, () => {
 
     describe('the Rundown is not active', () => {
       describe('there is no change in PlayoutContents', () => {
-        it('does not emit a ProgramPlayoutContent', async () => {
+        it('does not emit a ProgramPlayoutContent', async() => {
           const rundown: Rundown = EntityTestFactory.createRundown({})
           const testee: PlayoutContentUpdateService = createTestee({ playoutContentEventEmitter: instance(playoutContentEventEmitter) })
 
@@ -32,7 +32,7 @@ describe(PlayoutContentStateService.name, () => {
           verify(playoutContentEventEmitter.emitProgramPlayoutContentEvent(anything())).never()
         })
 
-        it('does not emit a PreviewPlayoutContent', async () => {
+        it('does not emit a PreviewPlayoutContent', async() => {
           const rundown: Rundown = EntityTestFactory.createRundown({})
           const testee: PlayoutContentUpdateService = createTestee({ playoutContentEventEmitter: instance(playoutContentEventEmitter) })
 
@@ -45,7 +45,7 @@ describe(PlayoutContentStateService.name, () => {
       describe('there is a change in PlayoutContents', () => {
         let testee: PlayoutContentUpdateService
 
-        beforeEach(async () => {
+        beforeEach(async() => {
           const activeRundownWithProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({
             program: [{ type: PlayoutContentType.AUDIO }],
             preview: [{ type: PlayoutContentType.COMMAND }]
@@ -56,7 +56,7 @@ describe(PlayoutContentStateService.name, () => {
           resetCalls(playoutContentEventEmitter)
         })
 
-        it('emits an empty ProgramPlayoutContentEvent', async () => {
+        it('emits an empty ProgramPlayoutContentEvent', async() => {
           const rundown: Rundown = EntityTestFactory.createRundown({ mode: RundownMode.INACTIVE })
           await testee.updatePlayoutContentState(rundown)
 
@@ -64,7 +64,7 @@ describe(PlayoutContentStateService.name, () => {
           expect(programPlayoutContents).toHaveLength(0)
         })
 
-        it('emits an empty PreviewPlayoutContentEvent', async () => {
+        it('emits an empty PreviewPlayoutContentEvent', async() => {
           const rundown: Rundown = EntityTestFactory.createRundown({ mode: RundownMode.INACTIVE })
           await testee.updatePlayoutContentState(rundown)
 
@@ -76,7 +76,7 @@ describe(PlayoutContentStateService.name, () => {
 
     describe('there is no active Part', () => {
       describe('the programPlayoutContents is already empty', () => {
-        it('does not emit a ProgramPlayoutContentEvent', async () => {
+        it('does not emit a ProgramPlayoutContentEvent', async() => {
           const rundownWithNoActivePart: Rundown = EntityTestFactory.createRundown({
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -98,8 +98,8 @@ describe(PlayoutContentStateService.name, () => {
       })
 
       describe('the programPlayoutContents is not empty', () => {
-        it('emits an empty ProgramPlayoutEvent', async () => {
-          const rundownWithProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [{ type: PlayoutContentType.COMMAND }]})
+        it('emits an empty ProgramPlayoutEvent', async() => {
+          const rundownWithProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [{ type: PlayoutContentType.COMMAND }] })
           const rundownWithNoActivePart: Rundown = EntityTestFactory.createRundown({
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -128,7 +128,7 @@ describe(PlayoutContentStateService.name, () => {
     })
 
     describe('there is no change in PlayoutContents', () => {
-      it('does not emit a ProgramPlayoutContentEvent', async () => {
+      it('does not emit a ProgramPlayoutContentEvent', async() => {
         const rundown: Rundown = createActiveRundownWithPlayoutContents()
         const testee: PlayoutContentUpdateService = createTestee({ playoutContentEventEmitter: instance(playoutContentEventEmitter) })
 
@@ -141,7 +141,7 @@ describe(PlayoutContentStateService.name, () => {
         verify(playoutContentEventEmitter.emitProgramPlayoutContentEvent(anything())).never()
       })
 
-      it('does not emit a PreviewPlayoutContentEvent', async () => {
+      it('does not emit a PreviewPlayoutContentEvent', async() => {
         const rundown: Rundown = createActiveRundownWithPlayoutContents()
         const testee: PlayoutContentUpdateService = createTestee({ playoutContentEventEmitter: instance(playoutContentEventEmitter) })
 
@@ -158,16 +158,16 @@ describe(PlayoutContentStateService.name, () => {
     describe('there is a change to PlayoutContents in the active Part', () => {
       let testee: PlayoutContentUpdateService
 
-      beforeEach(async () => {
+      beforeEach(async() => {
         // We need to set up some data, so there is actually going to be a change when called again.
-        const rundownWithSetupProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [{ type: PlayoutContentType.CAMERA, source: 'setupCameraSource' }]})
+        const rundownWithSetupProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [{ type: PlayoutContentType.CAMERA, source: 'setupCameraSource' }] })
         testee = createTestee({ playoutContentEventEmitter: instance(playoutContentEventEmitter) })
         await testee.updatePlayoutContentState(rundownWithSetupProgramPlayoutContent)
         // We need to reset the mock so each test has a clean slate.
         resetCalls(playoutContentEventEmitter)
       })
 
-      it('does not emit a PreviewPlayoutContentEvent', async () => {
+      it('does not emit a PreviewPlayoutContentEvent', async() => {
         const rundownWithoutNextPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ preview: [] })
         await testee.updatePlayoutContentState(rundownWithoutNextPlayoutContent)
 
@@ -176,7 +176,7 @@ describe(PlayoutContentStateService.name, () => {
 
       describe('it emits a ProgramPlayoutContentEvent', () => {
         describe('active Part has zero Pieces', () => {
-          it('emits an empty array of PlayoutContents', async () => {
+          it('emits an empty array of PlayoutContents', async() => {
             const rundownWithoutProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [] })
             await testee.updatePlayoutContentState(rundownWithoutProgramPlayoutContent)
 
@@ -186,7 +186,7 @@ describe(PlayoutContentStateService.name, () => {
         })
 
         describe('active Part has one Piece', () => {
-          it('emits an array of one PlayoutContent', async () => {
+          it('emits an array of one PlayoutContent', async() => {
             const programPlayoutContents: PlayoutContent[] = [{ type: PlayoutContentType.CAMERA, source: 'someSource' }]
             const rundown: Rundown = createActiveRundownWithPlayoutContents({ program: programPlayoutContents })
 
@@ -198,7 +198,7 @@ describe(PlayoutContentStateService.name, () => {
         })
 
         describe('active Part has two Pieces', () => {
-          it('emits an array of two PlayoutContents', async () => {
+          it('emits an array of two PlayoutContents', async() => {
             const programPlayoutContents: PlayoutContent[] = [
               { type: PlayoutContentType.CAMERA, source: 'someSource' },
               { type: PlayoutContentType.GRAPHICS }
@@ -213,12 +213,12 @@ describe(PlayoutContentStateService.name, () => {
         })
 
         describe('active Part has five Pieces', () => {
-          it('emits an array of five PlayoutContents', async () => {
+          it('emits an array of five PlayoutContents', async() => {
             const programPlayoutContents: PlayoutContent[] = [
               { type: PlayoutContentType.CAMERA, source: 'someSource' },
               { type: PlayoutContentType.GRAPHICS },
               { type: PlayoutContentType.AUDIO },
-              { type: PlayoutContentType.REMOTE, source: 'someRemoteSource'},
+              { type: PlayoutContentType.REMOTE, source: 'someRemoteSource' },
               { type: PlayoutContentType.COMMAND }
             ]
 
@@ -236,16 +236,16 @@ describe(PlayoutContentStateService.name, () => {
     describe('there is a change to PlayoutContents in the next Part', () => {
       let testee: PlayoutContentUpdateService
 
-      beforeEach(async () => {
+      beforeEach(async() => {
         // We need to set up some data, so there is actually going to be a change when called again.
-        const rundownWithSetupPreviewPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ preview: [{ type: PlayoutContentType.CAMERA, source: 'setupCameraSource' }]})
+        const rundownWithSetupPreviewPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ preview: [{ type: PlayoutContentType.CAMERA, source: 'setupCameraSource' }] })
         testee = createTestee({ playoutContentEventEmitter: instance(playoutContentEventEmitter) })
         await testee.updatePlayoutContentState(rundownWithSetupPreviewPlayoutContent)
         // We need to reset the mock so each test has a clean slate.
         resetCalls(playoutContentEventEmitter)
       })
 
-      it('does not emit a ProgramPlayoutContentEvent', async () => {
+      it('does not emit a ProgramPlayoutContentEvent', async() => {
         const rundownWithoutNextPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [] })
         await testee.updatePlayoutContentState(rundownWithoutNextPlayoutContent)
 
@@ -254,7 +254,7 @@ describe(PlayoutContentStateService.name, () => {
 
       describe('it emits a PreviewPlayoutContentEvent', () => {
         describe('next Part has zero Pieces', () => {
-          it('emits an empty array of PlayoutContents', async () => {
+          it('emits an empty array of PlayoutContents', async() => {
             const rundownWithoutPreviewPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ preview: [] })
             await testee.updatePlayoutContentState(rundownWithoutPreviewPlayoutContent)
 
@@ -264,7 +264,7 @@ describe(PlayoutContentStateService.name, () => {
         })
 
         describe('next Part has one Piece', () => {
-          it('emits an array of one PlayoutContent', async () => {
+          it('emits an array of one PlayoutContent', async() => {
             const previewPlayoutContents: PlayoutContent[] = [{ type: PlayoutContentType.REMOTE, source: 'remoteSource' }]
             const rundown: Rundown = createActiveRundownWithPlayoutContents({ preview: previewPlayoutContents })
             await testee.updatePlayoutContentState(rundown)
@@ -275,7 +275,7 @@ describe(PlayoutContentStateService.name, () => {
         })
 
         describe('next Part has two Pieces', () => {
-          it('emits an array of two PlayoutContents', async () => {
+          it('emits an array of two PlayoutContents', async() => {
             const previewPlayoutContents: PlayoutContent[] = [
               { type: PlayoutContentType.REMOTE, source: 'remoteSource' },
               { type: PlayoutContentType.MANUS }
@@ -289,7 +289,7 @@ describe(PlayoutContentStateService.name, () => {
         })
 
         describe('next Part has five Pieces', () => {
-          it('emits an array of five PlayoutContents', async () => {
+          it('emits an array of five PlayoutContents', async() => {
             const previewPlayoutContents: PlayoutContent[] = [
               { type: PlayoutContentType.REMOTE, source: 'remoteSource' },
               { type: PlayoutContentType.MANUS },
@@ -310,7 +310,7 @@ describe(PlayoutContentStateService.name, () => {
 })
 
 function createTestee(params?: {
-  playoutContentEventEmitter?: PlayoutContentEventEmitter,
+  playoutContentEventEmitter?: PlayoutContentEventEmitter
   playoutContentRepository?: PlayoutContentRepository
 }): PlayoutContentUpdateService {
   return new PlayoutContentStateService(
@@ -320,8 +320,8 @@ function createTestee(params?: {
 }
 
 function createActiveRundownWithPlayoutContents(playoutContents?: { program?: PlayoutContent[], preview?: PlayoutContent[] }): Rundown {
-  const programPieces: Piece[] = playoutContents?.program?.map(playoutContent => EntityTestFactory.createPiece({ metadata: { playoutContent }})) ?? []
-  const previewPieces: Piece[] = playoutContents?.preview?.map(playoutContent => EntityTestFactory.createPiece({ metadata: { playoutContent }})) ?? []
+  const programPieces: Piece[] = playoutContents?.program?.map(playoutContent => EntityTestFactory.createPiece({ metadata: { playoutContent } })) ?? []
+  const previewPieces: Piece[] = playoutContents?.preview?.map(playoutContent => EntityTestFactory.createPiece({ metadata: { playoutContent } })) ?? []
 
   const activePart: Part = EntityTestFactory.createPart({
     pieces: programPieces

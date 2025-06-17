@@ -64,5 +64,5 @@ function createTestee(params?: {
   sisyfosPersistentLayerFinder?: Tv2SisyfosPersistentLayerFinder
 }): Tv2EndStateForPartService {
   const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = params?.sisyfosPersistentLayerFinder ?? instance(mock(Tv2SisyfosPersistentLayerFinder))
-  return  new Tv2EndStateForPartService(sisyfosPersistentLayerFinder)
+  return new Tv2EndStateForPartService(sisyfosPersistentLayerFinder)
 }

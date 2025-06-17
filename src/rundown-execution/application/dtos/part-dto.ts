@@ -38,7 +38,7 @@ export class PartDto {
     this.autoNext = part.autoNext
     this.isPlanned = part.isPlanned
     this.metadata = part.metadata
-    this.pieces = part.getPieces().map((piece) => new PieceDto(piece))
-    this.replacedPlannedPieces = part.getReplacedPlannedPieces().map((piece) => new PieceDto(piece))
+    this.pieces = part.getPieces().map(piece => new PieceDto(piece))
+    this.replacedPlannedPieces = part.getReplacedPlannedPieces().map(piece => new PieceDto(piece))
   }
 }

@@ -121,7 +121,7 @@ describe(Part.name, () => {
         ingestedPieces: [
           createShallowIngestedPiece(plannedPieceOne.id),
           createShallowIngestedPiece(plannedPieceTwo.id)
-        ] as Readonly<IngestedPiece[]>
+        ] as readonly IngestedPiece[]
       } as IngestedPart } as PartInterface)
 
       expect(testee.getPieces()).toContain(unPlannedPieceOne)
@@ -780,9 +780,9 @@ describe(Part.name, () => {
 
                     const result: PartTimings = testee.getTimings()
                     expect(result.previousPartContinueIntoPartDuration).toBe(
-                      higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration +
-												autoNextOverlap +
-												postRollDuration
+                      higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration
+                      + autoNextOverlap
+                      + postRollDuration
                     )
                   })
                 })
@@ -815,9 +815,9 @@ describe(Part.name, () => {
 
                     const result: PartTimings = testee.getTimings()
                     expect(result.previousPartContinueIntoPartDuration).toBe(
-                      higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration +
-												autoNextOverlap +
-												postRollDuration
+                      higherPreRollDurationThanAutoNextOverlapPlusKeepAliveDuration
+                      + autoNextOverlap
+                      + postRollDuration
                     )
                   })
                 })
@@ -1223,9 +1223,9 @@ describe(Part.name, () => {
 
                       const result: PartTimings = testee.getTimings()
                       expect(result.previousPartContinueIntoPartDuration).toBe(
-                        preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration +
-													keepPreviousPartAliveDuration +
-													postRollDuration
+                        preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration
+                        + keepPreviousPartAliveDuration
+                        + postRollDuration
                       )
                     })
                   })
@@ -1252,8 +1252,8 @@ describe(Part.name, () => {
 
                       const result: PartTimings = testee.getTimings()
                       expect(result.previousPartContinueIntoPartDuration).toBe(
-                        preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration +
-													keepPreviousPartAliveDuration
+                        preRollDurationHigherThanKeepAliveDurationMinusKeepPreviousPartAliveDuration
+                        + keepPreviousPartAliveDuration
                       )
                     })
                   })
@@ -1444,10 +1444,10 @@ describe(Part.name, () => {
 
                       const result: PartTimings = testee.getTimings()
                       expect(result.previousPartContinueIntoPartDuration).toBe(
-                        preRollDuration -
-													delayPiecesDuration +
-													keepPreviousPartAliveDuration +
-													postRollDuration
+                        preRollDuration
+                        - delayPiecesDuration
+                        + keepPreviousPartAliveDuration
+                        + postRollDuration
                       )
                     })
                   })
@@ -1719,8 +1719,8 @@ describe(Part.name, () => {
 
                       const result: PartTimings = testee.getTimings()
                       expect(result.delayStartOfPiecesDuration).toBe(
-                        keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration +
-													delayPiecesDuration
+                        keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration
+                        + delayPiecesDuration
                       )
                     })
 
@@ -1752,8 +1752,8 @@ describe(Part.name, () => {
 
                         const result: PartTimings = testee.getTimings()
                         expect(result.previousPartContinueIntoPartDuration).toBe(
-                          keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration +
-														postRollDuration
+                          keepAliveDurationHigherThanPreRollDurationMinusDelayPiecesDuration
+                          + postRollDuration
                         )
                       })
                     })
@@ -2353,9 +2353,9 @@ describe(Part.name, () => {
     })
 
     describe('the Part is planned', () => {
-      it('marks the Part as unsynced',() => {
+      it('marks the Part as unsynced', () => {
         const ingestedPart: IngestedPart = {} as IngestedPart
-        const testee: Part = new Part({ isUnsynced: false, ingestedPart,  segmentId: 'someSegmentId' } as PartInterface)
+        const testee: Part = new Part({ isUnsynced: false, ingestedPart, segmentId: 'someSegmentId' } as PartInterface)
         expect(testee.isUnsynced()).toBeFalsy()
         testee.markAsUnsynced()
         expect(testee.isUnsynced()).toBeTruthy()
@@ -2441,7 +2441,7 @@ describe(Part.name, () => {
 
   describe(Part.prototype.getStrippedClone.name, () => {
     it('copies the pieces', () => {
-      const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: { type: PlayoutContentType.CAMERA, source: '' } }})
+      const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: { type: PlayoutContentType.CAMERA, source: '' } } })
       const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
       const clonedPart: Part = testee.getStrippedClone()
       expect(clonedPart.getPieces()[0].id).toContain('COPY')
@@ -2454,7 +2454,7 @@ describe(Part.name, () => {
     })
 
     function assertPartKeepsPiecesWithTypeWhenStripCloned(playoutContentType: PlayoutContentType): void {
-      const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: createPlayoutContent(playoutContentType) }})
+      const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: createPlayoutContent(playoutContentType) } })
       const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
       const clonedPart: Part = testee.getStrippedClone()
       expect(clonedPart.getPieces()[0].metadata.playoutContent.type).toContain(playoutContentType)
@@ -2510,7 +2510,7 @@ describe(Part.name, () => {
   })
 
   function assertPartDoesNotKeepPiecesWithTypeWhenStripCloned(playoutContentType: PlayoutContentType): void {
-    const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: createPlayoutContent(playoutContentType) }})
+    const piece: Piece = EntityTestFactory.createPiece({ metadata: { playoutContent: createPlayoutContent(playoutContentType) } })
     const testee: Part = EntityTestFactory.createPart({ pieces: [piece] })
     const clonedPart: Part = testee.getStrippedClone()
     expect(clonedPart.getPieces()).toHaveLength(0)

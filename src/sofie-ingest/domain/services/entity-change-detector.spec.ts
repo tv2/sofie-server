@@ -31,7 +31,7 @@ describe(EntityChangeDetector.name, () => {
       ['rank', { showStyleVariantId: 'variant-a' }, { showStyleVariantId: 'variant-b' }],
       ['modification timestamp', { modifiedAt: 100 }, { modifiedAt: 200 }],
       ['timing', { timing: { type: RundownTimingType.UNSCHEDULED } }, { timings: { type: RundownTimingType.BACKWARD, expectedEndEpochTime: Date.now() } }],
-      ['baseline', { baselineTimelineObjects: [{ id: '', layer: 'layer-1', enable: { start: 0 }, content: { deviceType: DeviceType.CASPAR_CG, type: undefined }}] }, { baselineTimelineObjects: [{ id: '', layer: 'layer-1', enable: { start: 0 }, content: {  deviceType: DeviceType.ATEM, type: undefined  }}] }],
+      ['baseline', { baselineTimelineObjects: [{ id: '', layer: 'layer-1', enable: { start: 0 }, content: { deviceType: DeviceType.CASPAR_CG, type: undefined } }] }, { baselineTimelineObjects: [{ id: '', layer: 'layer-1', enable: { start: 0 }, content: { deviceType: DeviceType.ATEM, type: undefined } }] }],
     ]
     testCases.forEach(([attribute, rundownAttributes, ingestedRundownAttributes]) => {
       describe(`when the ingested rundown has a different ${attribute} than the rundown`, () => {
@@ -140,7 +140,7 @@ describe(EntityChangeDetector.name, () => {
       ['pre-roll duration', { preRollDuration: 0 }, { preRollDuration: 100 }],
       ['post-roll duration', { postRollDuration: 0 }, { postRollDuration: 100 }],
       ['transition type', { transitionType: TransitionType.NO_TRANSITION }, { transitionType: TransitionType.IN_TRANSITION }],
-      ['timeline objects', { timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: {  deviceType: DeviceType.CASPAR_CG, type: undefined  } }] }, {  timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: {  deviceType: DeviceType.ATEM, type: undefined  } }]  }],
+      ['timeline objects', { timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: { deviceType: DeviceType.CASPAR_CG, type: undefined } }] }, { timelineObjects: [{ id: '', layer: 'layer-x', enable: { start: 0 }, content: { deviceType: DeviceType.ATEM, type: undefined } }] }],
       ['metadata', { metadata: undefined }, { metadata: { playoutContent: { type: PlayoutContentType.UNKNOWN } } }],
       ['content', { content: undefined }, { content: { foo: 'bar' } }],
     ]

@@ -9,7 +9,6 @@ import {
 import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
 
 export class TriggerEventService implements TriggerEventEmitter, TriggerEventObserver {
-
   private readonly callbacks: ((triggerEvent: TriggerEvent) => void)[] = []
 
   constructor(private readonly triggerEventBuilder: TriggerEventBuilder) { }

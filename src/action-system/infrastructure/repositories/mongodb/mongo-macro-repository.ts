@@ -9,7 +9,6 @@ import { InvalidIdException } from '../../../../rundown-execution/domain/excepti
 
 const COLLECTION_NAME: string = 'macros'
 export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> implements MacroRepository {
-
   constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
@@ -20,7 +19,7 @@ export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> i
 
   public async getMacro(macroId: string): Promise<Macro> {
     this.assertDatabaseConnection(this.getMacro.name)
-    const macro: Macro | null = await this.getCollection().findOne<Macro>({_id: macroId})
+    const macro: Macro | null = await this.getCollection().findOne<Macro>({ _id: macroId })
     if (macro === null) {
       throw new NotFoundException(`No Macro found for MacroId ${macroId}`)
     }
@@ -32,7 +31,6 @@ export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> i
     return this.getCollection()
       .find<Macro>({})
       .toArray()
-
   }
 
   public async createMacro(macro: Macro): Promise<Macro> {
@@ -47,12 +45,12 @@ export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> i
       id: macro.id && macro.id.length > 0 ? macro.id : this.uuidGenerator.generateUuid(),
     }
 
-    const doesMacroWithIdAlreadyExist: boolean = (await this.getCollection().countDocuments({ id: macroToBeSaved.id })) > 0
+    const doesMacroWithIdAlreadyExist: boolean = await this.getCollection().countDocuments({ id: macroToBeSaved.id }) > 0
     if (doesMacroWithIdAlreadyExist) {
       throw new InvalidIdException(`"${macroToBeSaved.id}" already exist`)
     }
 
-    await this.getCollection().insertOne({...macroToBeSaved, _id: macroToBeSaved.id})
+    await this.getCollection().insertOne({ ...macroToBeSaved, _id: macroToBeSaved.id })
     return macroToBeSaved
   }
 
@@ -61,12 +59,12 @@ export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> i
     if (!await this.doesMacroExist(macro.id)) {
       throw new NotFoundException(`Can't update macro ${macro.id}. It does not exist in the database`)
     }
-    await this.getCollection().updateOne({id: macro.id}, {$set: macro})
+    await this.getCollection().updateOne({ id: macro.id }, { $set: macro })
     return macro
   }
 
   private async doesMacroExist(macroId: string): Promise<boolean> {
-    return (await this.getCollection().countDocuments({ _id: macroId })) === 1
+    return await this.getCollection().countDocuments({ _id: macroId }) === 1
   }
 
   public async deleteMacro(macroId: string): Promise<void> {

@@ -30,7 +30,7 @@ import {
 } from '../../interfaces/timeline-object-factories/tv2-graphics-element-timeline-object-factory'
 import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2GraphicsActionFactory.name, () => {
   describe(Tv2GraphicsActionFactory.prototype.createGraphicsActions.name, () => {
@@ -175,11 +175,11 @@ describe(Tv2GraphicsActionFactory.name, () => {
 })
 
 function createTestee(params?: {
-  actionManifestMapper?: Tv2ActionManifestMapper,
-  graphicsTimelineObjectFactoryFactory?: Tv2GraphicsTimelineObjectFactoryFactory,
+  actionManifestMapper?: Tv2ActionManifestMapper
+  graphicsTimelineObjectFactoryFactory?: Tv2GraphicsTimelineObjectFactoryFactory
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
-  stringHashConverter?: Tv2StringHashConverter,
+  stringHashConverter?: Tv2StringHashConverter
   configurationMapper?: Tv2ConfigurationMapper
 }): Tv2GraphicsActionFactory {
   return new Tv2GraphicsActionFactory(

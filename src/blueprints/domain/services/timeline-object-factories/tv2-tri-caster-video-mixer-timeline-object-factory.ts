@@ -30,7 +30,7 @@ import { AtemSourceIndex } from '../../value-objects/timeline-state-resolver-typ
 import { AtemToTriCasterSplitScreenConverter } from '../atem-to-tricaster-split-screen-converter'
 import { TimelineObject } from '../../../../rundown-execution/domain/entities/timeline-object'
 import { TimelineObjectMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 interface TriCasterTransitionEffectProperties {
   input: number
@@ -41,7 +41,6 @@ interface TriCasterTransitionEffectProperties {
 const TRI_CASTER_PREFIX: string = 'triCaster_'
 
 export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
-
   private readonly logger: Logger
 
   constructor(private readonly atemToTriCasterSplitScreenConverter: AtemToTriCasterSplitScreenConverter, logger: Logger) {
@@ -146,7 +145,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
 
   private convertFramesToSeconds(frames: number): number {
     const frameRate: number = 25
-    const durationInMilliseconds: number = (1000 / frameRate) * frames
+    const durationInMilliseconds: number = 1000 / frameRate * frames
     return durationInMilliseconds / 1000
   }
 

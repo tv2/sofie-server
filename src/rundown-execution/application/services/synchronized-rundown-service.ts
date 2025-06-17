@@ -8,7 +8,6 @@ import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'
 
 export class SynchronizedRundownService implements RundownService {
-
   constructor(private readonly rundownService: RundownService, private readonly rundownLock: AsyncLock) {
   }
 

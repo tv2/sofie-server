@@ -14,7 +14,6 @@ function getMongoDatabaseName(): string {
 }
 
 export class MongoDatabase implements Database {
-
   private readonly logger: Logger
   private client: mongodb.MongoClient
   private db: mongodb.Db

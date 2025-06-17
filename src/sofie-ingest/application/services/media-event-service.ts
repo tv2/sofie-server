@@ -5,7 +5,6 @@ import { MediaCreatedEvent, MediaDeletedEvent, MediaEvent, MediaUpdatedEvent } f
 import { Media } from '../../../rundown-execution/domain/entities/media'
 
 export class MediaEventService implements MediaEventEmitter, MediaEventObserver {
-
   private readonly callbacks: ((mediaEvent: MediaEvent) => void)[] = []
 
   constructor(private readonly mediaEventBuilder: MediaEventBuilder) { }

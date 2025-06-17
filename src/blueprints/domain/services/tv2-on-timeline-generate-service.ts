@@ -37,7 +37,6 @@ const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
 
 export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate {
-
   constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder
@@ -78,10 +77,10 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       return
     }
 
-    const sisyfosPersistedLevelsTimelineObject: TimelineObject =
-      this.createSisyfosPersistedLevelsTimelineObject(activePart, previousPart, rundownPersistentState)
+    const sisyfosPersistedLevelsTimelineObject: TimelineObject
+      = this.createSisyfosPersistedLevelsTimelineObject(activePart, previousPart, rundownPersistentState)
     const activeTimelineObjectGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
-      (timelineObject) => timelineObject.id.includes('active_group_')
+      timelineObject => timelineObject.id.includes('active_group_')
     )
     if (!activeTimelineObjectGroup) {
       throw new UnsupportedOperationException('No active group found. This should not be possible')
@@ -102,8 +101,8 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     rundownPersistentState: Tv2RundownPersistentState
   ): SisyfosChannelsTimelineObject {
     const previousPartEndState: Tv2PartEndState = previousPart?.getEndState() as Tv2PartEndState
-    const layersWantingToPersistFromPreviousPart: string[] =
-        previousPartEndState && !rundownPersistentState.isNewSegment
+    const layersWantingToPersistFromPreviousPart: string[]
+        = previousPartEndState && !rundownPersistentState.isNewSegment
           ? previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
           : []
     const layersToPersist: string[] = this.sisyfosPersistentLayerFinder.findLayersToPersist(
@@ -121,7 +120,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
         deviceType: DeviceType.SISYFOS,
         type: SisyfosType.CHANNELS,
         overridePriority: 1,
-        channels: layersToPersist.map((layer) => ({
+        channels: layersToPersist.map(layer => ({
           mappedLayer: layer,
           isPgm: 1,
         })),
@@ -153,7 +152,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
 
   private assignMediaPlayersForPreviousGroup(previousGroup: TimelineObjectGroup, mediaPlayerSessionsInUse: Tv2MediaPlayerSession[]): void {
     const timelineObjects: TimelineObject[] = this.flattenNestedTimelineObjectChildren(previousGroup)
-    timelineObjects.forEach(timelineObject => {
+    timelineObjects.forEach((timelineObject) => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
       if (!blueprintTimelineObject.metaData || !blueprintTimelineObject.metaData.mediaPlayerSession) {
         return
@@ -168,7 +167,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
 
   private assignMediaPlayersForGroup(group: TimelineObjectGroup, mediaPlayerSessionsInUse: Tv2MediaPlayerSession[], availableMediaPlayers: Tv2MediaPlayer[]): void {
     const timelineObjects: TimelineObject[] = this.flattenNestedTimelineObjectChildren(group)
-    timelineObjects.forEach(timelineObject => {
+    timelineObjects.forEach((timelineObject) => {
       const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
       if (!blueprintTimelineObject.metaData || !blueprintTimelineObject.metaData.mediaPlayerSession) {
         return
@@ -191,15 +190,15 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
   }
 
   private findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions: Tv2MediaPlayerSession[], group: TimelineObjectGroup): Tv2MediaPlayerSession[] {
-    return assignedMediaPlayerSessions.filter(mediaPlayerSession => {
+    return assignedMediaPlayerSessions.filter((mediaPlayerSession) => {
       return group.children.some(child => this.doesTimelineObjectHaveMediaPlayerSessionWithId(child, mediaPlayerSession.sessionId))
     })
   }
 
   private doesTimelineObjectHaveMediaPlayerSessionWithId(timelineObject: TimelineObject, sessionId: string): boolean {
-    const doesChildrenHaveMediaPlayerSession: boolean =
-      timelineObject.children?.some((child: TimelineObject) => this.doesTimelineObjectHaveMediaPlayerSessionWithId(child, sessionId))
-      ?? false
+    const doesChildrenHaveMediaPlayerSession: boolean
+      = timelineObject.children?.some((child: TimelineObject) => this.doesTimelineObjectHaveMediaPlayerSessionWithId(child, sessionId))
+        ?? false
     const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
     const hasMediaPlayerSession: boolean = blueprintTimelineObject.metaData?.mediaPlayerSession === sessionId
 
@@ -242,7 +241,6 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
   private getCasparCgPlayerClipLayer(mediaPlayer: Tv2MediaPlayer): string {
     return `casparcg_player_clip_${mediaPlayer.name}`
   }
-
 
   private updateCasparCgProgramWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
     if (timelineObject.content.deviceType !== DeviceType.CASPAR_CG) {
@@ -324,7 +322,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
   private isTriCasterTimelineObject(timelineObject: Tv2BlueprintTimelineObject, contentType: TriCasterType.MIX_OUTPUT): timelineObject is TriCasterMixOutputTimelineObject
   private isTriCasterTimelineObject(timelineObject: Tv2BlueprintTimelineObject, contentType: TriCasterType.ME): timelineObject is TriCasterMixEffectTimelineObject
   private isTriCasterTimelineObject(timelineObject: Tv2BlueprintTimelineObject, contentType: TriCasterType): timelineObject is TriCasterMixOutputTimelineObject | TriCasterMixEffectTimelineObject {
-    return timelineObject.content.deviceType === DeviceType.TRICASTER  && timelineObject.content.type === contentType
+    return timelineObject.content.deviceType === DeviceType.TRICASTER && timelineObject.content.type === contentType
   }
 
   private updateTriCasterSplitScreenBoxesWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {

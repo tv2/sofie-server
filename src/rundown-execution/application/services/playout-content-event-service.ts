@@ -9,7 +9,6 @@ import {
 import { PlayoutContentEventBuilder } from '../interfaces/playout-content-event-builder'
 
 export class PlayoutContentEventService implements PlayoutContentEventEmitter, PlayoutContentEventObserver {
-
   private readonly callbacks: ((playoutContentEvent: PlayoutContentEvent) => void)[] = []
 
   constructor(private readonly playoutContentEventBuilder: PlayoutContentEventBuilder) {

@@ -63,8 +63,8 @@ describe(Tv2AudioActionFactory.name, () => {
           const result: Tv2AudioAction[] = testee.createAudioActions(blueprintConfiguration, actionManifests)
 
           expect(result).toEqual(expect.arrayContaining([
-            expect.objectContaining({name: 'Audio bed A'}),
-            expect.objectContaining({name: 'Audio bed B'}),
+            expect.objectContaining({ name: 'Audio bed A' }),
+            expect.objectContaining({ name: 'Audio bed B' }),
           ]))
         })
 
@@ -102,8 +102,8 @@ describe(Tv2AudioActionFactory.name, () => {
             })
             const result: Tv2AudioAction[] = testee.createAudioActions(blueprintConfiguration, actionManifests)
 
-            expect(result).toEqual(expect.arrayContaining([expect.objectContaining({name: 'Audio bed A', rank: 5 })]))
-            expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({name: 'Audio bed A', rank: 10 })]))
+            expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'Audio bed A', rank: 5 })]))
+            expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ name: 'Audio bed A', rank: 10 })]))
           })
         })
       })
@@ -156,8 +156,8 @@ describe(Tv2AudioActionFactory.name, () => {
           })
           const result: Tv2AudioAction[] = testee.createAudioActions(blueprintConfiguration, actionManifests)
 
-          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({name: 'Audio bed A' })]))
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({name: 'Audio bed B' })]))
+          expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ name: 'Audio bed A' })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'Audio bed B' })]))
         })
       })
     })
@@ -165,9 +165,9 @@ describe(Tv2AudioActionFactory.name, () => {
 })
 
 function createTestee(params: {
-  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
-  audioBedTimelineObjectFactory?: Tv2AudioBedTimelineObjectFactory,
-  frameTimeConverter?: FrameTimeConverter,
+  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
+  audioBedTimelineObjectFactory?: Tv2AudioBedTimelineObjectFactory
+  frameTimeConverter?: FrameTimeConverter
   logger?: Logger
 } = {}): Tv2AudioActionFactory {
   return new Tv2AudioActionFactory(

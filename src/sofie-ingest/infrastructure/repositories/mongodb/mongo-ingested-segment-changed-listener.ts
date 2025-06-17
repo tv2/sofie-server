@@ -15,7 +15,6 @@ import { Logger } from '../../../../cross-cutting-concerns/application/interface
 const INGESTED_SEGMENT_COLLECTION_NAME: string = 'segments' // TODO: Once we control ingest changed this to "ingestedSegments"
 
 export class MongoIngestedSegmentChangedListener extends BaseMongoRepository<MongoIngestedSegment> implements DataChangedListener<IngestedSegment> {
-
   private readonly logger: Logger
   private onCreatedCallback: (segment: IngestedSegment) => void
   private onUpdatedCallback: (segment: IngestedSegment) => void

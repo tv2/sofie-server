@@ -5,7 +5,6 @@ import { ConfigurationEvent, ShelfConfigurationUpdatedEvent } from '../value-obj
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
 
 export class ConfigurationEventService implements ConfigurationEventEmitter, ConfigurationEventObserver {
-
   private readonly callbacks: ((configurationEvent: ConfigurationEvent) => void)[] = []
 
   constructor(private readonly configurationEventBuilder: ConfigurationEventBuilder) { }

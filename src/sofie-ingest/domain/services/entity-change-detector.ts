@@ -44,7 +44,7 @@ export class EntityChangeDetector {
     const differingPieces: Piece[] = pieces.filter(piece => !ingestedPieces.some(ingestedPiece => ingestedPiece.id === piece.id))
     const spanningLifeSpans: PieceLifespan[] = [PieceLifespan.SPANNING_UNTIL_RUNDOWN_END, PieceLifespan.SPANNING_UNTIL_SEGMENT_END, PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN]
 
-    const hasNewSpanningPieces: boolean = differingPieces.some((piece) => spanningLifeSpans.includes(piece.pieceLifespan))
+    const hasNewSpanningPieces: boolean = differingPieces.some(piece => spanningLifeSpans.includes(piece.pieceLifespan))
     const hasPiecesWithChangedLifespan: boolean = pieces.some((piece) => {
       const ingestedPiece: IngestedPiece | undefined = ingestedPieces.find(ingestedPiece => ingestedPiece.id === piece.id)
       return ingestedPiece && this.doesIngestedPiecesDifferInLifeSpan(piece, ingestedPiece)

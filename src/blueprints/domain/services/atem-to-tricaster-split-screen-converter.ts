@@ -19,12 +19,12 @@ export class AtemToTriCasterSplitScreenConverter {
 
   private convertPositionX(atemX: number): number {
     const positionPercentage: number = atemX / ATEM_WIDTH
-    return (positionPercentage * TRICASTER_WIDTH) / 100
+    return positionPercentage * TRICASTER_WIDTH / 100
   }
 
   private convertPositionY(atemY: number): number {
     const positionPercentage: number = atemY / ATEM_HEIGHT
-    return ((positionPercentage * 2) / 100) * -1
+    return positionPercentage * 2 / 100 * -1
   }
 
   public convertScale(atemSize: number): NonNullable<TriCasterLayer['scale']> {
@@ -58,11 +58,11 @@ export class AtemToTriCasterSplitScreenConverter {
     }
   }
 
-  private isAllCropZero(crop: { cropTop: number; cropBottom: number; cropLeft: number; cropRight: number }): boolean {
+  private isAllCropZero(crop: { cropTop: number, cropBottom: number, cropLeft: number, cropRight: number }): boolean {
     return crop.cropTop === 0 && crop.cropBottom === 0 && crop.cropLeft === 0 && crop.cropRight === 0
   }
 
   private getPercentage(part: number, whole: number): number {
-    return (part / whole) * 100
+    return part / whole * 100
   }
 }

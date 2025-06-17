@@ -16,7 +16,7 @@ import { AudioMode } from '../../../../rundown-execution/domain/enums/audio-mode
 
 export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerTimelineObjectFactory {
   public createTimelineObjectsForSource(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio, audioMode?: AudioMode): SisyfosTimelineObject[] {
-    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.audioLayers.map(sisyfosLayer => {
+    const sisyfosChannelTimelineObjects: SisyfosChannelTimelineObject[] = source.audioLayers.map((sisyfosLayer) => {
       return {
         id: `${source.id}_${this.generateRandomWholeNumber()}`,
         enable: {
@@ -26,7 +26,7 @@ export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerT
         content: {
           deviceType: DeviceType.SISYFOS,
           type: SisyfosType.CHANNEL,
-          isPgm: audioMode === AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER: SisyfosFaderState.ON
+          isPgm: audioMode === AudioMode.VOICE_OVER ? SisyfosFaderState.VOICE_OVER : SisyfosFaderState.ON
         }
       }
     })
@@ -61,7 +61,7 @@ export class Tv2SisyfosAudioMixerTimelineObjectFactory implements Tv2AudioMixerT
     return this.buildStudioMicrophonesTimelineObject(configuration, SisyfosFaderState.ON, priority, priority)
   }
 
-  private buildStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, sisyfosFaderState:  SisyfosFaderState, priority: number, overridePriority: number): SisyfosChannelsTimelineObject {
+  private buildStudioMicrophonesTimelineObject(configuration: Tv2BlueprintConfiguration, sisyfosFaderState: SisyfosFaderState, priority: number, overridePriority: number): SisyfosChannelsTimelineObject {
     return {
       id: `studio_microphones_${this.generateRandomWholeNumber()}`,
       enable: {

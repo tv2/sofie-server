@@ -9,7 +9,6 @@ import { CoreDevice } from '../../../domain/entities/device'
 const DEVICE_COLLECTION_NAME: string = 'externalDevices'
 
 export class MongoDeviceRepository extends BaseMongoRepository<MongoCoreDevice> implements DeviceRepository {
-
   constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
@@ -25,7 +24,7 @@ export class MongoDeviceRepository extends BaseMongoRepository<MongoCoreDevice> 
 
   public async getDevice(deviceId: string): Promise<CoreDevice> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.getDevice.name)
-    const device: CoreDevice | null = await this.getCollection().findOne<CoreDevice>({id: deviceId})
+    const device: CoreDevice | null = await this.getCollection().findOne<CoreDevice>({ id: deviceId })
     if (!device) {
       throw new NotFoundException(`Unable to find device with id '${deviceId}'.`)
     }
@@ -38,17 +37,16 @@ export class MongoDeviceRepository extends BaseMongoRepository<MongoCoreDevice> 
       ...device,
       id: this.uuidGenerator.generateUuid(),
     }
-    await this.getCollection().updateOne({id: deviceWithId.id}, {$set: deviceWithId}, {upsert: true})
+    await this.getCollection().updateOne({ id: deviceWithId.id }, { $set: deviceWithId }, { upsert: true })
   }
-
 
   public async update(device: CoreDevice): Promise<void> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.update.name)
-    await this.getCollection().updateOne({id: device.id}, {$set: device}, {upsert: true})
+    await this.getCollection().updateOne({ id: device.id }, { $set: device }, { upsert: true })
   }
 
   public async delete(deviceId: string): Promise<void> {
     this.assertDatabaseConnection(MongoDeviceRepository.prototype.delete.name)
-    await this.getCollection().deleteOne({id: deviceId})
+    await this.getCollection().deleteOne({ id: deviceId })
   }
 }

@@ -3,18 +3,17 @@ import { TimelineObject } from '../../../../rundown-execution/domain/entities/ti
 
 export interface AtemMixEffectTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.ATEM,
+    deviceType: DeviceType.ATEM
     type: AtemType.ME
     me: AtemMixEffectWithTransition | AtemMixEffectWithPreview
   }
 }
 
-
 export interface AtemMixEffectWithTransition {
   type: AtemMixEffectType.TRANSITION
   input: number
-  transition: AtemTransition,
-  transitionSettings?: AtemTransitionSettings,
+  transition: AtemTransition
+  transitionSettings?: AtemTransitionSettings
 }
 
 export interface AtemMixEffectWithPreview {
@@ -25,7 +24,7 @@ export interface AtemMixEffectWithPreview {
 
 export interface AtemMixEffectUpstreamKeyersTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.ATEM,
+    deviceType: DeviceType.ATEM
     type: AtemType.ME
     me: {
       upstreamKeyers: AtemUpstreamKeyer[]
@@ -35,8 +34,8 @@ export interface AtemMixEffectUpstreamKeyersTimelineObject extends TimelineObjec
 
 export interface AtemAuxTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.ATEM,
-    type: AtemType.AUX,
+    deviceType: DeviceType.ATEM
+    type: AtemType.AUX
     aux: {
       input: number
     }
@@ -45,17 +44,17 @@ export interface AtemAuxTimelineObject extends TimelineObject {
 
 export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.ATEM,
-    type: AtemType.DSK,
+    deviceType: DeviceType.ATEM
+    type: AtemType.DSK
     dsk: {
-      onAir: boolean,
+      onAir: boolean
       sources: {
-        fillSource: number,
+        fillSource: number
         cutSource: number
-      },
+      }
       properties: {
-        clip: number,
-        gain: number,
+        clip: number
+        gain: number
         mask: {
           enable: boolean
         }
@@ -65,23 +64,23 @@ export interface AtemDownstreamKeyerTimelineObject extends TimelineObject {
 }
 
 export interface AtemUpstreamKeyer {
-  upstreamKeyerId: number,
-  onAir: boolean,
-  mixEffectKeyType: number,
-  flyEnabled: boolean,
-  fillSource: number,
-  cutSource: number,
-  maskEnabled: boolean,
+  upstreamKeyerId: number
+  onAir: boolean
+  mixEffectKeyType: number
+  flyEnabled: boolean
+  fillSource: number
+  cutSource: number
+  maskEnabled: boolean
   lumaSettings: {
-    clip: number,
-    gain: number,
+    clip: number
+    gain: number
   }
 }
 
 export interface AtemSuperSourceTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.ATEM,
-    type: AtemType.SUPER_SOURCE,
+    deviceType: DeviceType.ATEM
+    type: AtemType.SUPER_SOURCE
     ssrc: {
       boxes: AtemSuperSourceBox[]
     }
@@ -89,32 +88,32 @@ export interface AtemSuperSourceTimelineObject extends TimelineObject {
 }
 
 export type AtemSuperSourceBox = {
-  enabled?: boolean;
-  source?: number;
+  enabled?: boolean
+  source?: number
   /** -4800 - 4800 */
-  x?: number;
+  x?: number
   /** -2700 - 2700 */
-  y?: number;
+  y?: number
   /** 70 - 1000 */
-  size?: number;
-  cropped?: boolean;
+  size?: number
+  cropped?: boolean
   /** 0 - 18000 */
-  cropTop?: number;
+  cropTop?: number
   /** 0 - 18000 */
-  cropBottom?: number;
+  cropBottom?: number
   /** 0 - 32000 */
-  cropLeft?: number;
+  cropLeft?: number
   /** 0 - 32000 */
-  cropRight?: number;
+  cropRight?: number
 }
 
 export interface AtemSuperSourcePropertiesTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.ATEM,
-    type: AtemType.SUPER_SOURCE_PROPERTIES,
+    deviceType: DeviceType.ATEM
+    type: AtemType.SUPER_SOURCE_PROPERTIES
     ssrcProps: {
-      artFillSource: number,
-      artCutSource: number,
+      artFillSource: number
+      artCutSource: number
       artOption: number
     } & SuperSourceProperties & SuperSourceBorder
   }
@@ -122,7 +121,7 @@ export interface AtemSuperSourcePropertiesTimelineObject extends TimelineObject 
 
 export type SuperSourceProperties = {
   /** Premultiply key for Art Source */
-  artPreMultiplied: true;
+  artPreMultiplied: true
 } | {
   /** Premultiply key for Art Source */
   artPreMultiplied: false
@@ -137,33 +136,33 @@ export type SuperSourceProperties = {
 export type SuperSourceBorder = {
   borderEnabled: false
 } | {
-  borderEnabled: true,
+  borderEnabled: true
   /** Border Bevel mode:
    *  0: no bevel, 1: in/out, 2: in, 3: out
    */
-  borderBevel: number;
+  borderBevel: number
   /** Width of the outer side of the bevel, 0-1600 */
-  borderOuterWidth: number;
+  borderOuterWidth: number
   /** Width of the inner side of the bevel, 0-1600 */
-  borderInnerWidth: number;
+  borderInnerWidth: number
   /** Softness of the outer side of the bevel, 0-100 */
-  borderOuterSoftness: number;
+  borderOuterSoftness: number
   /** Softness of the inner side of the bevel, 0-100 */
-  borderInnerSoftness: number;
+  borderInnerSoftness: number
   /** Softness of the bevel, 0-100 */
-  borderBevelSoftness: number;
+  borderBevelSoftness: number
   /** Position of the bevel, 0-100 */
-  borderBevelPosition: number;
+  borderBevelPosition: number
   /** Hue of the border color, 0-3599 */
-  borderHue: number;
+  borderHue: number
   /** Saturation of the border color, 0-1000 */
-  borderSaturation: number;
+  borderSaturation: number
   /** Luminance of the border color, 0-1000 */
-  borderLuma: number;
+  borderLuma: number
   /** Light source direction for rendering the bevel, 0-3590 */
-  borderLightSourceDirection: number;
+  borderLightSourceDirection: number
   /** Light source altitude for rendering the bevel, 10-100 */
-  borderLightSourceAltitude: number;
+  borderLightSourceAltitude: number
 }
 
 // Taken from TSR, so we must have the same values. // TODO: Find a better way to get the types from TSR
@@ -198,18 +197,18 @@ export interface AtemTransitionSettings {
     rate: number
   }
   dip?: {
-    rate: number,
+    rate: number
     input: number
-  },
+  }
   wipe?: {
     /** 1 - 250 frames */
-    rate?: number;
+    rate?: number
     /** 0 - 17 */
-    pattern?: AtemMeWipePattern;
+    pattern?: AtemMeWipePattern
     /** 0 - 10000 */
-    borderSoftness?: number;
-    reverseDirection?: boolean;
-    //...
+    borderSoftness?: number
+    reverseDirection?: boolean
+    // ...
   }
 }
 

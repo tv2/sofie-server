@@ -9,7 +9,6 @@ import { MongoId } from '../../../../rundown-execution/infrastructure/repositori
 const ACTION_TRIGGER_COLLECTION: string = 'triggers'
 
 export class MongoTriggerRepository extends BaseMongoRepository<Trigger & MongoId> implements TriggerRepository {
-
   constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
@@ -30,7 +29,7 @@ export class MongoTriggerRepository extends BaseMongoRepository<Trigger & MongoI
       id: this.uuidGenerator.generateUuid()
     } as Trigger
 
-    await this.getCollection().insertOne({...trigger, _id: trigger.id})
+    await this.getCollection().insertOne({ ...trigger, _id: trigger.id })
     return trigger
   }
 
@@ -44,7 +43,7 @@ export class MongoTriggerRepository extends BaseMongoRepository<Trigger & MongoI
   }
 
   private async doesTriggerExist(triggerId: string): Promise<boolean> {
-    return (await this.getCollection().countDocuments({ _id: triggerId })) === 1
+    return await this.getCollection().countDocuments({ _id: triggerId }) === 1
   }
 
   public async deleteTrigger(triggerId: string): Promise<void> {

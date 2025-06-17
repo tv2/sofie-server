@@ -12,7 +12,6 @@ import { RundownMode } from '../../../rundown-execution/domain/enums/rundown-mod
 import { TakeMode } from '../../../rundown-execution/domain/enums/take-mode'
 
 export class IngestedEntityToEntityMapper {
-
   public convertIngestedRundownToRundown(ingestedRundown: IngestedRundown): Rundown {
     return new Rundown({
       id: ingestedRundown.id,
@@ -121,7 +120,7 @@ export class IngestedEntityToEntityMapper {
     if (partToBeUpdated.isOnAir()) {
       return partToBeUpdated
     }
-    const updatedPieces: Piece[] = ingestedPart.ingestedPieces.map(ingestedPiece => {
+    const updatedPieces: Piece[] = ingestedPart.ingestedPieces.map((ingestedPiece) => {
       const existingPiece: Piece | undefined = partToBeUpdated.getPieces().find(piece => piece.id === ingestedPiece.id)
       return existingPiece
         ? this.updatePieceWithIngestedPiece(existingPiece, ingestedPiece)

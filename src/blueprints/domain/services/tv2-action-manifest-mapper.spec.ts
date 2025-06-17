@@ -13,7 +13,7 @@ import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-config
 import { Tv2BlueprintConfigurationTestFactory } from './tv2-blueprint-configuration-test-factory'
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
-import {Logger} from '../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2ActionManifestMapper.name, () => {
   describe(Tv2ActionManifestMapper.prototype.filterAndMapToSplitScreenManifestData.name, () => {

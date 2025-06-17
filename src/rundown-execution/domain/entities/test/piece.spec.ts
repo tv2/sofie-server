@@ -44,7 +44,7 @@ describe(Piece.name, () => {
     describe('Piece is unplanned', () => {
       it('updates the Part id', () => {
         const partId: string = 'partId'
-        const testee: Piece = new Piece({partId: '', isPlanned: false } as PieceInterface)
+        const testee: Piece = new Piece({ partId: '', isPlanned: false } as PieceInterface)
 
         expect(testee.getPartId()).not.toBe(partId)
         testee.setPartId(partId)
@@ -188,7 +188,6 @@ describe(Piece.name, () => {
         })
       })
     })
-
 
     describe('executedAt is more than zero', () => {
       const now: number = 500
@@ -355,7 +354,7 @@ describe(Piece.name, () => {
   describe(Piece.prototype.insertTimelineObjects.name, () => {
     describe('no TimelineObjects already have the same id as one of the TimelineObjects being inserted', () => {
       it('throws no exception', () => {
-        const testee: Piece = EntityTestFactory.createPiece({ timelineObjects: [EntityTestFactory.createTimelineObject({ id: 'originalId' })]})
+        const testee: Piece = EntityTestFactory.createPiece({ timelineObjects: [EntityTestFactory.createTimelineObject({ id: 'originalId' })] })
         expect(() => testee.insertTimelineObjects([EntityTestFactory.createTimelineObject({ id: 'insertedId' })])).not.toThrow(DuplicateIdException)
       })
     })
@@ -363,7 +362,7 @@ describe(Piece.name, () => {
     describe('an original TimelineObject already have the same id as one of the TimelineObjects being inserted', () => {
       it('throws a DuplicateIdException', () => {
         const duplicateTimelineObjectId: string = 'duplicateTimelineObjectID'
-        const testee: Piece = EntityTestFactory.createPiece({ timelineObjects: [EntityTestFactory.createTimelineObject({ id: duplicateTimelineObjectId })]})
+        const testee: Piece = EntityTestFactory.createPiece({ timelineObjects: [EntityTestFactory.createTimelineObject({ id: duplicateTimelineObjectId })] })
         expect(() => testee.insertTimelineObjects([EntityTestFactory.createTimelineObject({ id: duplicateTimelineObjectId })])).toThrow(DuplicateIdException)
       })
     })

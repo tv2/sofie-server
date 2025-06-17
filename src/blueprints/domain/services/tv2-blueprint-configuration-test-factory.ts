@@ -7,7 +7,6 @@ import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 
 export class Tv2BlueprintConfigurationTestFactory {
-
   public static createTv2BlueprintConfiguration(blueprintConfiguration: Partial<{ studio: Partial<Tv2StudioBlueprintConfiguration>, showStyle: Partial<Tv2ShowStyleBlueprintConfiguration> }> = {}): Tv2BlueprintConfiguration {
     return {
       studio: this.createTv2StudioBlueprintConfiguration(blueprintConfiguration.studio),

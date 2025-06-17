@@ -8,7 +8,6 @@ import { MongoEntityConverter, MongoStudio } from './mongo-entity-converter'
 const COLLECTION_NAME: string = 'studios'
 
 export class MongoStudioRepository extends BaseMongoRepository<MongoStudio> implements StudioRepository {
-
   constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)
   }
@@ -19,9 +18,9 @@ export class MongoStudioRepository extends BaseMongoRepository<MongoStudio> impl
 
   public async getStudio(studioId: string): Promise<Studio> {
     this.assertDatabaseConnection(this.getStudio.name)
-    const mongoStudio: MongoStudio | null = (await this.getCollection().findOne<MongoStudio>({
+    const mongoStudio: MongoStudio | null = await this.getCollection().findOne<MongoStudio>({
       _id: studioId,
-    }))
+    })
     if (!mongoStudio) {
       throw new NotFoundException(`No Studio found for studioId: ${studioId}`)
     }

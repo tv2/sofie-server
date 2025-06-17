@@ -9,7 +9,6 @@ import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/sho
 import { CoreShowStyleVariantBlueprintConfiguration } from './tv2-show-style-blueprint-configuration-mapper'
 
 export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConfiguration {
-
   constructor(private readonly configurationMapper: Tv2ConfigurationMapper) { }
 
   public validateConfiguration(configuration: Configuration): StatusMessage[] {
@@ -30,10 +29,10 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
   }
 
   private validateGraphicsSchemas(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
-    return showStyleConfiguration.graphicsSchemas.flatMap(schema => {
+    return showStyleConfiguration.graphicsSchemas.flatMap((schema) => {
       return schema.casparCgDesignValues
         .filter(designValues => designValues.name?.includes(' '))
-        .map(designValue => {
+        .map((designValue) => {
           return {
             id: `${schema.iNewsName}_${schema.iNewsSchemaColumn}`,
             title: `${schema.iNewsName} Schema Configuration`,
@@ -53,7 +52,6 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
         statusCode: StatusCode.BAD
       }]
     }
-
 
     if (!showStyleConfiguration.graphicsDefault.setupName?.value) {
       return [{
@@ -87,7 +85,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
   private validateShowStyleVariants(showStyleVariants: ShowStyleVariant[]): StatusMessage[] {
     return showStyleVariants
       .filter(variant => !Array.isArray((variant.blueprintConfiguration as CoreShowStyleVariantBlueprintConfiguration).GfxDefaults))
-      .map(variant => {
+      .map((variant) => {
         return {
           id: `${variant.id}_noGraphicsDefault`,
           title: `Misconfigured ShowStyleVariant ${variant.name}`,

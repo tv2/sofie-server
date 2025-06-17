@@ -5,7 +5,6 @@ const EXECUTE_CALLBACK_DURATION_THRESHOLD_IN_MS: number = 1
 const SCHEDULE_RESOLUTION: number = 2
 
 export class TimeoutCallbackScheduler implements CallbackScheduler {
-
   private readonly logger: Logger
   private timeoutIdentifier?: NodeJS.Timeout
 

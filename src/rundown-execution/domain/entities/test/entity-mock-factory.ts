@@ -145,7 +145,7 @@ export class EntityMockFactory {
     misc?: {
       partTimings?: Partial<PartTimings>
       executedAt?: number
-      piecesWithLifespanFilters?: Piece[],
+      piecesWithLifespanFilters?: Piece[]
       isPlanned?: boolean
     }
   ): Part {
@@ -158,7 +158,7 @@ export class EntityMockFactory {
     misc?: {
       partTimings?: Partial<PartTimings>
       executedAt?: number
-      piecesWithLifespanFilters?: Piece[],
+      piecesWithLifespanFilters?: Piece[]
       isPlanned?: boolean
     }
   ): Part {

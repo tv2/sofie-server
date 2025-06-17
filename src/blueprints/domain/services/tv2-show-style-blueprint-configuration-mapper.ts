@@ -33,9 +33,9 @@ interface Transition {
 }
 
 interface CoreGraphicsDefault {
-  DefaultSetupName: { value: string; label: string }
-  DefaultSchema: { value: string; label: string }
-  DefaultDesign: { value: string; label: string }
+  DefaultSetupName: { value: string, label: string }
+  DefaultSchema: { value: string, label: string }
+  DefaultDesign: { value: string, label: string }
 }
 
 interface CoreGraphicsSetup {
@@ -92,7 +92,6 @@ export interface CoreShowStyleVariantBlueprintConfiguration {
 }
 
 export class Tv2ShowStyleBlueprintConfigurationMapper {
-
   public mapShowStyleConfiguration(showStyle: ShowStyle, showStyleVariantId: string): Tv2ShowStyleBlueprintConfiguration {
     const coreConfiguration: CoreShowStyleBlueprintConfiguration = { ...(showStyle.blueprintConfiguration as CoreShowStyleBlueprintConfiguration) }
     const showStyleVariantBlueprintConfiguration: Tv2ShowStyleVariantBlueprintConfiguration | undefined = this.findShowStyleVariantBlueprintConfiguration(showStyleVariantId, showStyle)
@@ -112,7 +111,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     }
   }
 
-  private mapBreakerTransitionEffectConfigurations(showstyleTransition: string, coreTransitions?: Transition[]) : BreakerTransitionEffect[] {
+  private mapBreakerTransitionEffectConfigurations(showstyleTransition: string, coreTransitions?: Transition[]): BreakerTransitionEffect[] {
     if (!coreTransitions) {
       return []
     }
@@ -149,7 +148,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       return []
     }
 
-    return coreGraphicsSetups.map(setup => {
+    return coreGraphicsSetups.map((setup) => {
       return {
         id: setup._id,
         name: setup.Name,
@@ -160,13 +159,12 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
     })
   }
 
-
   private mapGraphicsTemplates(coreGraphicsTemplates?: CoreGraphicsTemplate[]): GraphicsTemplate[] {
-    if(!coreGraphicsTemplates) {
+    if (!coreGraphicsTemplates) {
       return []
     }
 
-    return coreGraphicsTemplates.map(template => {
+    return coreGraphicsTemplates.map((template) => {
       return {
         name: template.VizTemplate,
         lifespan: this.getLifespanFromTemplateOutType(template.OutType),
@@ -187,11 +185,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapGraphicsSchemas(coreGraphicsSchemas?: CoreGraphicsSchema[]): GraphicsSchema[] {
-    if(!coreGraphicsSchemas) {
+    if (!coreGraphicsSchemas) {
       return []
     }
 
-    return coreGraphicsSchemas.map(schema => {
+    return coreGraphicsSchemas.map((schema) => {
       return {
         iNewsName: schema.VizTemplate,
         iNewsSchemaColumn: schema.INewsSkemaColumn,
@@ -217,11 +215,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapSplitScreenConfigurations(coreSplitScreenConfigurations?: CoreSplitScreenConfiguration[]): SplitScreenConfiguration[] {
-    if(!coreSplitScreenConfigurations) {
+    if (!coreSplitScreenConfigurations) {
       return []
     }
 
-    return coreSplitScreenConfigurations.map(coreSplitScreenConfiguration => {
+    return coreSplitScreenConfigurations.map((coreSplitScreenConfiguration) => {
       return {
         id: coreSplitScreenConfiguration._id,
         name: coreSplitScreenConfiguration.DVEName,
@@ -246,11 +244,11 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
   }
 
   private mapBreakers(coreBreakers?: CoreBreaker[]): Breaker[] {
-    if(!coreBreakers) {
+    if (!coreBreakers) {
       return []
     }
 
-    return coreBreakers.map(coreBreaker => {
+    return coreBreakers.map((coreBreaker) => {
       return {
         id: coreBreaker._id,
         name: coreBreaker.BreakerName,

@@ -27,7 +27,7 @@ interface CoreStudioBlueprintConfiguration {
   SwitcherType: string
   SwitcherSource: CoreVideoMixer
 
-  DVEFolder?: string,
+  DVEFolder?: string
   DVEFileExtension: string
   DVEMediaFlowId: string
   DVEIgnoreStatus: boolean
@@ -84,7 +84,7 @@ interface CoreDownstreamKeyer {
   Fill: number
   DefaultOn: boolean
   Roles: CoreDownstreamKeyerRole[]
-  Clip: number,
+  Clip: number
   Gain: number
 }
 
@@ -107,7 +107,7 @@ interface CoreHtmlGraphics {
   KeepAliveDuration: number
   GraphicURL: string
   TransitionSettings: {
-    wipeRate: number,
+    wipeRate: number
     borderSoftness: number
   }
 }
@@ -119,7 +119,6 @@ interface CoreAudioBedSettings {
 }
 
 export class Tv2StudioBlueprintConfigurationMapper {
-
   public mapStudioConfiguration(studio: Studio): Tv2StudioBlueprintConfiguration {
     const coreConfiguration: CoreStudioBlueprintConfiguration = { ...(studio.blueprintConfiguration as CoreStudioBlueprintConfiguration) }
     return {
@@ -148,7 +147,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
     if (!sources) {
       return []
     }
-    return sources.map(source => {
+    return sources.map((source) => {
       return {
         id: source._id,
         name: source.SourceName,
@@ -162,7 +161,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
   }
 
   private mapSources(sources: CoreSourceMapping[]): Tv2SourceMapping[] {
-    return sources.map(source => {
+    return sources.map((source) => {
       return {
         id: source._id,
         name: source.SourceName,
@@ -172,7 +171,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
   }
 
   private mapToVideoMixerType(rawVideoMixerType: string): VideoMixerType {
-    switch(rawVideoMixerType) {
+    switch (rawVideoMixerType) {
       case 'TRICASTER': {
         return DeviceType.TRICASTER
       }
@@ -189,7 +188,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
       splitScreenArtFillSource: coreVideoMixer.SplitArtFill,
       splitScreenArtKeySource: coreVideoMixer.SplitArtKey,
       dipVideoMixerSource: coreVideoMixer.Dip,
-      downstreamKeyers: coreVideoMixer.DSK.map(dsk => {
+      downstreamKeyers: coreVideoMixer.DSK.map((dsk) => {
         return {
           id: dsk._id,
           index: dsk.Number,
@@ -260,12 +259,12 @@ export class Tv2StudioBlueprintConfigurationMapper {
   }
 
   private mapHtmlGraphics(coreGraphics: CoreHtmlGraphics): Tv2HtmlGraphics {
-    return  {
+    return {
       msKeepOldPartAliveBeforeTakingGraphics: coreGraphics.KeepAliveDuration,
       graphicsUrl: coreGraphics.GraphicURL,
       transitionSettings: {
         wipeRate: coreGraphics.TransitionSettings ? coreGraphics.TransitionSettings.wipeRate : 0,
-        borderSoftness: coreGraphics.TransitionSettings ? coreGraphics.TransitionSettings.borderSoftness: 0
+        borderSoftness: coreGraphics.TransitionSettings ? coreGraphics.TransitionSettings.borderSoftness : 0
       }
     }
   }

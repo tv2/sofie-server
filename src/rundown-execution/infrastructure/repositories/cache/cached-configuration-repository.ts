@@ -2,7 +2,6 @@ import { ConfigurationRepository } from '../../../domain/repositories/configurat
 import { Configuration } from '../../../domain/entities/configuration'
 
 export class CachedConfigurationRepository implements ConfigurationRepository {
-
   private cachedConfiguration: Configuration | undefined
 
   constructor(private readonly configurationRepository: ConfigurationRepository) {}

@@ -10,7 +10,6 @@ import { MongoAction, MongoEntityConverter } from '../../../../rundown-execution
 const COLLECTION_NAME: string = 'actions'
 
 export class MongoActionRepository extends BaseMongoRepository<MongoAction> implements ActionRepository {
-
   constructor(
     private readonly mongoEntityConverter: MongoEntityConverter,
     mongoDatabase: MongoDatabase,
@@ -39,7 +38,7 @@ export class MongoActionRepository extends BaseMongoRepository<MongoAction> impl
       .toArray()
   }
 
-  public async getActionsForRundown(rundownId:string): Promise<Action[]> {
+  public async getActionsForRundown(rundownId: string): Promise<Action[]> {
     this.assertDatabaseConnection(this.getActionsForRundown.name)
     const systemActions: Action[] = await this.getSystemActions()
     const rundownActions: Action[] = await this.getCollection()

@@ -6,7 +6,7 @@ import { ShelfConfiguration } from '../../domain/entities/shelf-configuration'
 
 describe(ConfigurationServiceImplementation.name, () => {
   describe(ConfigurationServiceImplementation.prototype.updateShelfConfiguration.name, () => {
-    it('saves the shelfConfiguration to the repository', async () => {
+    it('saves the shelfConfiguration to the repository', async() => {
       const shelfConfiguration: ShelfConfiguration = {
         id: 'someId',
         actionPanelConfigurations: [],
@@ -21,7 +21,7 @@ describe(ConfigurationServiceImplementation.name, () => {
       verify(shelfConfigurationRepository.updateShelfConfiguration(shelfConfiguration)).once()
     })
 
-    it('emits the updated shelfConfiguration from the repository', async () => {
+    it('emits the updated shelfConfiguration from the repository', async() => {
       const updateShelfConfiguration: ShelfConfiguration = {
         id: 'someId',
         actionPanelConfigurations: [],
@@ -46,7 +46,7 @@ describe(ConfigurationServiceImplementation.name, () => {
 })
 
 function createTestee(params?: {
-  configurationEventEmitter?: ConfigurationEventEmitter,
+  configurationEventEmitter?: ConfigurationEventEmitter
   shelfConfigurationRepository?: ShelfConfigurationRepository
 }): ConfigurationServiceImplementation {
   return new ConfigurationServiceImplementation(

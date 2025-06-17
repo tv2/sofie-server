@@ -24,7 +24,7 @@ export abstract class TriggerDto {
         return MacroTriggerDto.toEntity(triggerDto as MacroTriggerDto)
       }
       default:
-        throw new UnexpectedCaseException(triggerDto.type,'Unexpected Trigger type.')
+        throw new UnexpectedCaseException(triggerDto.type, 'Unexpected Trigger type.')
     }
   }
 }

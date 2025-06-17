@@ -18,7 +18,6 @@ import { IngestedPartRepository } from '../../../../sofie-ingest/domain/reposito
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest this should be renamed to "ingestedRundowns".
 
 export class MongoIngestedRundownRepository extends BaseMongoRepository<MongoIngestedRundown> implements IngestedRundownRepository {
-
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,

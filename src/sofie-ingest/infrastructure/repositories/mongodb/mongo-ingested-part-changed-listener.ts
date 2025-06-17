@@ -14,7 +14,6 @@ import { Logger } from '../../../../cross-cutting-concerns/application/interface
 const INGESTED_PART_COLLECTION_NAME: string = 'parts' // TODO: Once we control ingest changed this to "ingestedParts"
 
 export class MongoIngestedPartChangedListener extends BaseMongoRepository<MongoIngestedPart> implements DataChangedListener<IngestedPart> {
-
   private readonly logger: Logger
   private onCreatedCallback: (part: IngestedPart) => void
   private onUpdatedCallback: (part: IngestedPart) => void

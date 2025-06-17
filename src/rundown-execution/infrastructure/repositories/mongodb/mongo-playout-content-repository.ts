@@ -4,7 +4,6 @@ import { PlayoutContentRepository } from '../../../domain/repositories/playout-c
 import { MongoId } from './mongo-entity-converter'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 
-
 const PLAYOUT_CONTENT_COLLECTION_NAME: string = 'playoutContents'
 const PROGRAM_PLAYOUT_CONTENT_ID: string = 'PROGRAM'
 const PREVIEW_PLAYOUT_CONTENT_ID: string = 'PREVIEW'
@@ -14,7 +13,6 @@ interface MongoPlayoutContentWrapper extends MongoId {
 }
 
 export class MongoPlayoutContentRepository extends BaseMongoRepository<MongoPlayoutContentWrapper> implements PlayoutContentRepository {
-
   constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
   }

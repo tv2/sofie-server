@@ -17,7 +17,6 @@ import { MediaRepository } from '../../../domain/repositories/media-repository'
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 
 export class MongoMediaChangedListener extends BaseMongoRepository<MongoMedia> implements DataChangedListener<Media> {
-
   private readonly logger: Logger
   private onCreatedCallback: (media: Media) => void
   private onUpdateCallback: (media: Media) => void

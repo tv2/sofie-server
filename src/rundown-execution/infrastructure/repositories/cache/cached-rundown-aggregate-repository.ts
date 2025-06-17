@@ -7,7 +7,6 @@ import { Part } from '../../../domain/entities/part'
 import { Piece } from '../../../domain/entities/piece'
 
 export class CachedRundownAggregateRepository implements RundownAggregateRepository {
-
   private readonly logger: Logger
   private readonly cachedRundowns: Map<string, Rundown> = new Map()
 

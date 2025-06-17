@@ -14,7 +14,6 @@ import {
 } from '../interfaces/timeline-object-factories/tv2-video-mixer-timeline-object-factory'
 
 export class Tv2BlueprintBaselinePiecesGenerator implements BlueprintBaselinePieces {
-
   private videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory
 
   constructor(
@@ -35,7 +34,7 @@ export class Tv2BlueprintBaselinePiecesGenerator implements BlueprintBaselinePie
 
   private createBaselineDownstreamKeyerPieces(rundownId: string, studioConfiguration: Tv2StudioBlueprintConfiguration): Piece[] {
     return studioConfiguration.videoMixerBasicConfiguration.downstreamKeyers
-      .map(downstreamKeyer => {
+      .map((downstreamKeyer) => {
         const downstreamKeyerNumber: string = String(downstreamKeyer.index + 1)
         const pieceInterface: Tv2PieceInterface = {
           id: `${rundownId}_baseline_piece_${downstreamKeyerNumber}`,

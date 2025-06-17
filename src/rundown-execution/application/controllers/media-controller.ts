@@ -11,7 +11,6 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 
 @RestController('/media')
 export class MediaController extends BaseController {
-
   constructor(
     private readonly mediaRepository: MediaRepository,
     private readonly httpErrorHandler: HttpErrorHandler,

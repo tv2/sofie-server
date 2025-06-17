@@ -1,8 +1,7 @@
 import { MediaDto } from '../../../rundown-execution/application/dtos/media-dto'
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 
-import {MediaEventType} from '../enums/media-event-type'
-
+import { MediaEventType } from '../enums/media-event-type'
 
 export type MediaEvent = MediaCreatedEvent | MediaUpdatedEvent | MediaDeletedEvent
 

@@ -1,9 +1,9 @@
-import {TypedEvent} from '../../../cross-cutting-concerns/application/value-objects/typed-event'
-import {PartDto} from '../dtos/part-dto'
-import {PieceDto} from '../dtos/piece-dto'
-import {SegmentDto} from '../dtos/segment-dto'
-import {BasicRundownDto} from '../dtos/basic-rundown-dto'
-import {RundownDto} from '../dtos/rundown-dto'
+import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
+import { PartDto } from '../dtos/part-dto'
+import { PieceDto } from '../dtos/piece-dto'
+import { SegmentDto } from '../dtos/segment-dto'
+import { BasicRundownDto } from '../dtos/basic-rundown-dto'
+import { RundownDto } from '../dtos/rundown-dto'
 import { RundownEventType } from '../enums/rundown-event-type'
 
 export interface RundownEvent extends TypedEvent {

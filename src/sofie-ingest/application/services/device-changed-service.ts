@@ -14,7 +14,6 @@ const NOT_CONNECTED_MESSAGE: string = 'Not connected'
 const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 
 export class DeviceChangedService implements DataChangeService {
-
   private readonly logger: Logger
 
   constructor(
@@ -28,7 +27,7 @@ export class DeviceChangedService implements DataChangeService {
 
   public async initialize(): Promise<void> {
     await this.updateStatusMessageFromCurrentDeviceStatus()
-      .catch((error) => this.logger.data(error).error('Unable to update status messages from current devices'))
+      .catch(error => this.logger.data(error).error('Unable to update status messages from current devices'))
     this.listenForStatusMessageChanges(this.deviceChangedListener)
   }
 
@@ -41,13 +40,13 @@ export class DeviceChangedService implements DataChangeService {
   }
 
   private listenForStatusMessageChanges(deviceChangedListener: DataChangedListener<CoreDevice>): void {
-    deviceChangedListener.onCreated(device => {
+    deviceChangedListener.onCreated((device) => {
       this.onDeviceUpdated(device).catch(error => this.logger.data(error).error(`Failed processing device created event for device '${device.name}' with id '${device.id}'.`))
     })
-    deviceChangedListener.onUpdated(device => {
+    deviceChangedListener.onUpdated((device) => {
       this.onDeviceUpdated(device).catch(error => this.logger.data(error).error(`Failed processing device updated event for device '${device.name}' with id '${device.id}'.`))
     })
-    deviceChangedListener.onDeleted(deviceId => {
+    deviceChangedListener.onDeleted((deviceId) => {
       this.onDeviceDeleted(deviceId).catch(error => this.logger.data(error).error(`Failed processing device deleted event for device ${deviceId}`))
     })
   }

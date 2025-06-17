@@ -4,7 +4,6 @@ import { Configuration } from '../../../rundown-execution/domain/entities/config
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 
 export class Tv2ConfigurationMapper {
-
   constructor(
     private readonly studioMapper: Tv2StudioBlueprintConfigurationMapper,
     private readonly showStyleMapper: Tv2ShowStyleBlueprintConfigurationMapper

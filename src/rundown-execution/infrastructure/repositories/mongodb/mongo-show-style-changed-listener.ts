@@ -10,7 +10,6 @@ import { MongoShowStyle } from './mongo-entity-converter'
 const SHOW_STYLE_COLLECTION_NAME: string = 'showStyleBases'
 
 export class MongoShowStyleChangedListener extends BaseMongoRepository<MongoShowStyle> implements DataChangedListener<ShowStyle> {
-
   private readonly logger: Logger
 
   private onUpdatedCallback: (showStyle: ShowStyle) => void

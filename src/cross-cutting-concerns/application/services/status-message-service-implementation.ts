@@ -6,7 +6,6 @@ import { StatusCode } from '../../domain/enums/status-code'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 
 export class StatusMessageServiceImplementation implements StatusMessageService {
-
   constructor(
     private readonly statusMessageEventEmitter: StatusMessageEventEmitter,
     private readonly statusMessageRepository: StatusMessageRepository
@@ -69,7 +68,7 @@ export class StatusMessageServiceImplementation implements StatusMessageService 
     const statusMessages: StatusMessage[] = await this.statusMessageRepository.getStatusMessagesWithIdPrefix(idPrefix)
 
     await Promise.all(statusMessages.filter(statusMessage => !statusMessageIdsNotToBeDeleted.includes(statusMessage.id))
-      .map(async statusMessage => {
+      .map(async(statusMessage) => {
         statusMessage.statusCode = StatusCode.GOOD
         statusMessage.message = ''
         this.statusMessageEventEmitter.emitStatusMessageEvent(statusMessage)

@@ -17,7 +17,7 @@ export interface Tv2StudioBlueprintConfiguration {
   selectedGraphicsType: Tv2GraphicsType
   vizPilotGraphics: Tv2VizPilotGraphics
   htmlGraphics?: Tv2HtmlGraphics
-  shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: boolean,
+  shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: boolean
   audioBedSettings: AudioBedSettings
 }
 
@@ -49,7 +49,7 @@ export interface Tv2HtmlGraphics {
   msKeepOldPartAliveBeforeTakingGraphics: number
   graphicsUrl: string
   transitionSettings: {
-    wipeRate: number,
+    wipeRate: number
     borderSoftness: number
   }
 }
@@ -84,7 +84,7 @@ export interface Tv2DownstreamKeyer {
   videoMixerFillSource: number
   defaultOn: boolean
   roles: Tv2DownstreamKeyerRole[]
-  videoMixerClip: number,
+  videoMixerClip: number
   videoMixerGain: number
 }
 
@@ -100,5 +100,3 @@ export interface AudioBedSettings {
   fadeOutDurationInFrames: number
   volume: number
 }
-
-

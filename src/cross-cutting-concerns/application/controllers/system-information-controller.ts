@@ -13,7 +13,6 @@ import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/systemInformation')
 export class SystemInformationController extends BaseController {
-
   constructor(
     private readonly systemInformationRepository: SystemInformationRepository,
     private readonly statusMessageRepository: StatusMessageRepository,
@@ -38,7 +37,7 @@ export class SystemInformationController extends BaseController {
   @GetRequest('/statusMessages')
   public async getStatusMessages(_request: Request, response: Response): Promise<void> {
     try {
-      const statusMessages: StatusMessage[]  = await this.statusMessageRepository.getAllStatusMessages()
+      const statusMessages: StatusMessage[] = await this.statusMessageRepository.getAllStatusMessages()
       const statusMessageDtos: StatusMessageDto[] = statusMessages.map(statusMessage => new StatusMessageDto(statusMessage))
       response.send(this.httpResponseFormatter.formatSuccessResponse(statusMessageDtos))
     } catch (error) {

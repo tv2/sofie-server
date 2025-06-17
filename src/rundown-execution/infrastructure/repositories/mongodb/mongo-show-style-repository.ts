@@ -10,7 +10,6 @@ import { ShowStyleVariant } from '../../../domain/entities/show-style-variant'
 const COLLECTION_NAME: string = 'showStyleBases'
 
 export class MongoShowStyleRepository extends BaseMongoRepository<MongoShowStyle> implements ShowStyleRepository {
-
   constructor(
     mongoDatabase: MongoDatabase,
     private readonly showStyleVariantRepository: ShowStyleVariantRepository,
@@ -25,9 +24,9 @@ export class MongoShowStyleRepository extends BaseMongoRepository<MongoShowStyle
 
   public async getShowStyle(showStyleId: string): Promise<ShowStyle> {
     this.assertDatabaseConnection(this.getShowStyle.name)
-    const mongoShowStyle: MongoShowStyle | null = (await this.getCollection().findOne<MongoShowStyle>({
+    const mongoShowStyle: MongoShowStyle | null = await this.getCollection().findOne<MongoShowStyle>({
       _id: showStyleId,
-    }))
+    })
     if (!mongoShowStyle) {
       throw new NotFoundException(`No ShowStyle found for showStyleId: ${showStyleId}`)
     }

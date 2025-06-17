@@ -112,7 +112,6 @@ export interface MongoIngestedPiece extends MongoId {
 }
 
 export class MongoIngestedEntityConverter {
-
   public convertToIngestedRundown(mongoRundown: MongoIngestedRundown): IngestedRundown {
     return {
       id: mongoRundown._id,
@@ -140,7 +139,7 @@ export class MongoIngestedEntityConverter {
     const expectedDurationInMs: number | undefined = mongoUnscheduledRundownTiming.expectedDuration ?? undefined
     return {
       type: RundownTimingType.UNSCHEDULED,
-      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null)
+      ...expectedDurationInMs !== undefined ? { expectedDurationInMs } : null
     }
   }
 
@@ -150,8 +149,8 @@ export class MongoIngestedEntityConverter {
     return {
       type: RundownTimingType.FORWARD,
       expectedStartEpochTime: mongoForwardRundownTiming.expectedStart,
-      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null),
-      ...(expectedEndEpochTime !== undefined ? { expectedEndEpochTime } : null),
+      ...expectedDurationInMs !== undefined ? { expectedDurationInMs } : null,
+      ...expectedEndEpochTime !== undefined ? { expectedEndEpochTime } : null,
     }
   }
 
@@ -160,8 +159,8 @@ export class MongoIngestedEntityConverter {
     const expectedDurationInMs: number | undefined = mongoBackwardRundownTiming.expectedDuration ?? undefined
     return {
       type: RundownTimingType.BACKWARD,
-      ...(expectedStartEpochTime !== undefined ? { expectedStartEpochTime } : null),
-      ...(expectedDurationInMs !== undefined ? { expectedDurationInMs } : null),
+      ...expectedStartEpochTime !== undefined ? { expectedStartEpochTime } : null,
+      ...expectedDurationInMs !== undefined ? { expectedDurationInMs } : null,
       expectedEndEpochTime: mongoBackwardRundownTiming.expectedEnd
     }
   }
@@ -273,6 +272,6 @@ export class MongoIngestedEntityConverter {
   }
 
   public convertToIngestedPieces(mongoPieces: MongoIngestedPiece[]): IngestedPiece[] {
-    return mongoPieces.map((mongoPiece) => this.convertToIngestedPiece(mongoPiece))
+    return mongoPieces.map(mongoPiece => this.convertToIngestedPiece(mongoPiece))
   }
 }

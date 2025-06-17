@@ -25,7 +25,7 @@ import { PlayoutContentReadService } from '../../../rundown-execution/applicatio
 describe(ExecuteActionService.name, () => {
   describe(`${ExecuteActionService.prototype.executeAction.name}`, () => {
     describe('it receives an InsertPartAsOnAirAction', () => {
-      it('calls RundownService.insertPartAsOnAir', async () => {
+      it('calls RundownService.insertPartAsOnAir', async() => {
         const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_ON_AIR)
         const rundownService: RundownService = mock<RundownService>()
 
@@ -35,11 +35,11 @@ describe(ExecuteActionService.name, () => {
         verify(rundownService.insertPartAsOnAir(anyString(), anyOfClass(Part))).once()
       })
 
-      it('updates Part id to be unique', async () => {
+      it('updates Part id to be unique', async() => {
         const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, { action })
         // Executes the same Action twice. Verifies that the two generated Parts from the same Action does not have the same id.
         await testee.executeAction(action.id, 'rundownId')
         await testee.executeAction(action.id, 'rundownId')
@@ -50,7 +50,7 @@ describe(ExecuteActionService.name, () => {
         expect(firstExecutedPart.id).not.toBe(lastExecutedPart.id)
       })
 
-      it('adds the ActionId to the metadata of the Part', async () => {
+      it('adds the ActionId to the metadata of the Part', async() => {
         const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_ON_AIR)
         const rundownService: RundownService = mock<RundownService>()
 
@@ -63,21 +63,21 @@ describe(ExecuteActionService.name, () => {
     })
 
     describe('it receives an InsertPartAsNextAction', () => {
-      it('calls RundownService.insertPartAsNext', async () => {
+      it('calls RundownService.insertPartAsNext', async() => {
         const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_NEXT)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, { action })
         await testee.executeAction(action.id, 'rundownId')
 
         verify(rundownServiceMock.insertPartAsNext(anyString(), anyOfClass(Part))).once()
       })
 
-      it('updates Part id to be unique', async () => {
+      it('updates Part id to be unique', async() => {
         const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_NEXT)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, { action })
         // Executes the same Action twice. Verifies that the two generated Parts from the same Action does not have the same id.
         await testee.executeAction(action.id, 'rundownId')
         await testee.executeAction(action.id, 'rundownId')
@@ -88,7 +88,7 @@ describe(ExecuteActionService.name, () => {
         expect(firstExecutedPart.id).not.toBe(lastExecutedPart.id)
       })
 
-      it('adds the ActionId to the metadata of the Part', async () => {
+      it('adds the ActionId to the metadata of the Part', async() => {
         const action: PartAction = createPartAction(PartActionType.INSERT_PART_AS_NEXT)
         const rundownService: RundownService = mock<RundownService>()
 
@@ -103,21 +103,21 @@ describe(ExecuteActionService.name, () => {
     describe('it receives an InsertPieceAsOnAirAction', () => {
       beforeEach(() => jest.useFakeTimers())
       afterEach(() => jest.useRealTimers())
-      it('calls RundownService.insertPieceAsOnAir', async () => {
+      it('calls RundownService.insertPieceAsOnAir', async() => {
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, { action })
         await testee.executeAction(action.id, 'rundownId')
 
         verify(rundownServiceMock.insertPieceAsOnAir(anyString(), anyOfClass(Piece), anything())).once()
       })
 
-      it('updates Piece id to be unique', async () => {
+      it('updates Piece id to be unique', async() => {
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, { action })
         // Executes the same Action twice. Verifies that the two generated Pieces from the same Action does not have the same id.
         await testee.executeAction(action.id, 'rundownId')
         await testee.executeAction(action.id, 'rundownId')
@@ -128,12 +128,12 @@ describe(ExecuteActionService.name, () => {
         expect(firstExecutedPiece.id).not.toBe(lastExecutedPiece.id)
       })
 
-      it('updates Piece ExecutedAt to be set', async () => {
+      it('updates Piece ExecutedAt to be set', async() => {
         const now: number = Date.now()
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_ON_AIR)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, { action })
         await testee.executeAction(action.id, 'rundownId')
 
         const [, executedPiece] = capture(rundownServiceMock.insertPieceAsOnAir).first()
@@ -143,21 +143,21 @@ describe(ExecuteActionService.name, () => {
     })
 
     describe('it receives an InsertPieceAsNextAction', () => {
-      it('calls RundownService.insertPieceAsNext', async () => {
+      it('calls RundownService.insertPieceAsNext', async() => {
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_NEXT)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, { action })
         await testee.executeAction(action.id, 'rundownId')
 
         verify(rundownServiceMock.insertPieceAsNext(anyString(), anyOfClass(Piece), anything())).once()
       })
 
-      it('updates Piece id to be unique', async () => {
+      it('updates Piece id to be unique', async() => {
         const action: PieceAction = createPieceAction(PieceActionType.INSERT_PIECE_AS_NEXT)
         const rundownServiceMock: RundownService = mock<RundownService>()
 
-        const testee: ExecuteActionService = createTestee({rundownService: rundownServiceMock}, {action})
+        const testee: ExecuteActionService = createTestee({ rundownService: rundownServiceMock }, { action })
         // Executes the same Action twice. Verifies that the two generated Pieces from the same Action does not have the same id.
         await testee.executeAction(action.id, 'rundownId')
         await testee.executeAction(action.id, 'rundownId')
@@ -171,7 +171,7 @@ describe(ExecuteActionService.name, () => {
 
     describe('it receives an ReplacePieceAction', () => {
       describe('it finds a matching Piece in the Active Part', () => {
-        it('replaces the Piece in the Active Part', async () => {
+        it('replaces the Piece in the Active Part', async() => {
           const rundownService: RundownService = mock<RundownService>()
 
           const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
@@ -200,8 +200,8 @@ describe(ExecuteActionService.name, () => {
 
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
-            updateActionWithPiece: (action) => action,
-            piecePredicate: (piece) => piece.id === activePiece.id,
+            updateActionWithPiece: action => action,
+            piecePredicate: piece => piece.id === activePiece.id,
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
@@ -229,11 +229,11 @@ describe(ExecuteActionService.name, () => {
       })
 
       describe('it finds a matching Piece in the Next Part', () => {
-        it('replaces the Piece in the Next Part', async () => {
+        it('replaces the Piece in the Next Part', async() => {
           const rundownService: RundownService = mock<RundownService>()
 
-          const nextPiece: Piece = EntityTestFactory.createPiece({id: 'nextPiece'})
-          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart', pieces: [nextPiece]})
+          const nextPiece: Piece = EntityTestFactory.createPiece({ id: 'nextPiece' })
+          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [nextPiece] })
           const rundown: Rundown = EntityTestFactory.createRundown({
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -258,8 +258,8 @@ describe(ExecuteActionService.name, () => {
 
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
-            updateActionWithPiece: (action) => action,
-            piecePredicate: (piece) => piece.id === nextPiece.id,
+            updateActionWithPiece: action => action,
+            piecePredicate: piece => piece.id === nextPiece.id,
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
@@ -287,16 +287,16 @@ describe(ExecuteActionService.name, () => {
       })
 
       describe('it finds a matching Piece in both the Active and Next Part', () => {
-        it('only replaces the Piece in the Active Part', async () => {
+        it('only replaces the Piece in the Active Part', async() => {
           const rundownService: RundownService = mock<RundownService>()
 
           const name: string = 'nameToIdentifyMultiplePieces'
 
-          const activePiece: Piece = EntityTestFactory.createPiece({id: 'activePiece', name})
-          const activePart: Part = EntityTestFactory.createPart({id: 'activePart', pieces: [activePiece]})
+          const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece', name })
+          const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
 
-          const nextPiece: Piece = EntityTestFactory.createPiece({id: 'nextPiece', name})
-          const nextPart: Part = EntityTestFactory.createPart({id: 'nextPart', pieces: [nextPiece]})
+          const nextPiece: Piece = EntityTestFactory.createPiece({ id: 'nextPiece', name })
+          const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [nextPiece] })
 
           const rundown: Rundown = EntityTestFactory.createRundown({
             mode: RundownMode.ACTIVE,
@@ -322,8 +322,8 @@ describe(ExecuteActionService.name, () => {
 
           const mutateActionMethods: MutateActionWithPieceMethods = {
             type: MutateActionType.PIECE,
-            updateActionWithPiece: (action) => action,
-            piecePredicate: (piece) => piece.name === name,
+            updateActionWithPiece: action => action,
+            piecePredicate: piece => piece.name === name,
           }
 
           const blueprint: Blueprint = mock<Blueprint>()
@@ -382,15 +382,14 @@ function createPieceAction(actionType: PieceActionType): PieceAction {
   }
 }
 
-
 function createTestee(
   params?: {
-    actionRepository?: ActionRepository,
-    rundownRepository?: RundownRepository,
-    mediaRepository?: MediaRepository,
-    configurationRepository?: ConfigurationRepository,
-    rundownService?: RundownService,
-    blueprint?: Blueprint,
+    actionRepository?: ActionRepository
+    rundownRepository?: RundownRepository
+    mediaRepository?: MediaRepository
+    configurationRepository?: ConfigurationRepository
+    rundownService?: RundownService
+    blueprint?: Blueprint
     playoutContentService?: PlayoutContentReadService
   },
   misc?: {

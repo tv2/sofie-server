@@ -38,12 +38,12 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
 
   public async getSegments(rundownId: string, filters?: Partial<MongoSegment>): Promise<Segment[]> {
     this.assertDatabaseConnection(this.getSegments.name)
-    const mongoSegments: MongoSegment[] = (await this.getCollection()
+    const mongoSegments: MongoSegment[] = await this.getCollection()
       .find<MongoSegment>({ ...filters, rundownId: rundownId })
-      .toArray())
+      .toArray()
     const segments: Segment[] = this.mongoEntityConverter.convertToSegments(mongoSegments)
     return Promise.all(
-      segments.map(async (segment) => {
+      segments.map(async(segment) => {
         segment.setParts(await this.mongoPartRepository.getParts(segment.id))
         return segment
       })

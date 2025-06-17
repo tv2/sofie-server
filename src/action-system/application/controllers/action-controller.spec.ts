@@ -7,7 +7,7 @@ import { HttpResponseFormatter } from '../../../cross-cutting-concerns/applicati
 
 describe(ActionController.name, () => {
   describe(ActionController.prototype.executeAction.name, () => {
-    it('receives null as the value for ActionArguments, it converts it to undefined', async () => {
+    it('receives null as the value for ActionArguments, it converts it to undefined', async() => {
       const actionService: ActionService = mock<ActionService>()
       const request: Request = {
         params: {},
@@ -22,7 +22,7 @@ describe(ActionController.name, () => {
       verify(actionService.executeAction(anything(), anything(), undefined)).once()
     })
 
-    it('receives an object as ActionArguments, it doesnt modify the object', async () => {
+    it('receives an object as ActionArguments, it doesnt modify the object', async() => {
       const actionService: ActionService = mock<ActionService>()
       const actionArguments: { [key: string]: string } = {
         some: 'argument'
@@ -43,7 +43,7 @@ describe(ActionController.name, () => {
 })
 
 function createTestee(params?: {
-  actionService?: ActionService,
+  actionService?: ActionService
 }): ActionController {
   const actionServiceMock: ActionService = params?.actionService ?? mock<ActionService>()
   return new ActionController(instance(actionServiceMock), instance(mock<HttpErrorHandler>()), instance(mock<HttpResponseFormatter>()))

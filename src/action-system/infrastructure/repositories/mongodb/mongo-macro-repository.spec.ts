@@ -22,10 +22,9 @@ describe(MongoMacroRepository.name, () => {
       collection = mock(Collection<MongoId>)
     })
 
-
     describe('it receives Macro with no id', () => {
       describe('the id is undefined', () => {
-        it('saves the Macro with a new UUID', async () => {
+        it('saves the Macro with a new UUID', async() => {
           const macro: Macro = EntityTestFactory.createMacro({ id: undefined })
 
           const testee: MongoMacroRepository = createTestee({ collection: instance(collection), uuidGenerator: instance(uuidGenerator) })
@@ -39,7 +38,7 @@ describe(MongoMacroRepository.name, () => {
       })
 
       describe('the id is an empty string', () => {
-        it('saves the Macro with a new UUID', async () => {
+        it('saves the Macro with a new UUID', async() => {
           const macro: Macro = EntityTestFactory.createMacro({ id: '' })
 
           const testee: MongoMacroRepository = createTestee({ collection: instance(collection), uuidGenerator: instance(uuidGenerator) })
@@ -54,10 +53,8 @@ describe(MongoMacroRepository.name, () => {
     })
 
     describe('it receives Macro with pre-existing id', () => {
-
-
       describe('the id is not a valid UUID', () => {
-        it('throws an InvalidIdException', async () => {
+        it('throws an InvalidIdException', async() => {
           const nonValidUuid: string = 'non-valid-uuid'
           const macro: Macro = EntityTestFactory.createMacro({ id: nonValidUuid })
 
@@ -75,7 +72,7 @@ describe(MongoMacroRepository.name, () => {
           when(uuidGenerator.validateUuid(anyString())).thenReturn(true)
         })
 
-        it('saves the Macro with the pre-existing id', async () => {
+        it('saves the Macro with the pre-existing id', async() => {
           const preExistingValidUuid: string = 'pre-existing-valid-uuid'
           const macro: Macro = EntityTestFactory.createMacro({ id: preExistingValidUuid })
 
@@ -89,7 +86,7 @@ describe(MongoMacroRepository.name, () => {
         })
 
         describe('a Macro already exist with the UUID', () => {
-          it('throws an InvalidIdException', async () => {
+          it('throws an InvalidIdException', async() => {
             const duplicatedId: string = 'duplicatedId'
             const macro: Macro = EntityTestFactory.createMacro({ id: duplicatedId })
 
@@ -107,9 +104,9 @@ describe(MongoMacroRepository.name, () => {
 })
 
 function createTestee(params?: {
-  mongoDatabase?: MongoDatabase,
-  collection?: Collection<MongoId>,
-  uuidGenerator?: UuidGenerator,
+  mongoDatabase?: MongoDatabase
+  collection?: Collection<MongoId>
+  uuidGenerator?: UuidGenerator
 }): MongoMacroRepository {
   return new MongoMacroRepository(
     params?.mongoDatabase ?? getMockDatabase({ collection: params?.collection }),

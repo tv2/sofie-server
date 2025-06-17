@@ -10,7 +10,7 @@ export interface IngestedSegment {
   readonly referenceTag?: string
   readonly metadata?: unknown
   readonly budgetDuration?: number
-  readonly ingestedParts: Readonly<IngestedPart[]>
+  readonly ingestedParts: readonly IngestedPart[]
   readonly invalidity?: Invalidity
   readonly definesShowStyleVariant: boolean
 }

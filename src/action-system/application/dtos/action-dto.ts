@@ -2,7 +2,6 @@ import { Action, ActionArgument } from '../../domain/entities/action'
 import { ActionType } from '../../domain/enums/action-type'
 
 export class ActionDto {
-
   public readonly id: string
   public readonly name: string
   public readonly rank: number

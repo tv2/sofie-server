@@ -40,10 +40,10 @@ export interface Tv2ActionManifestSplitScreenData {
       template: string
       labels: string[]
       sources: {
-        [SplitScreenBoxInput.INPUT_1]?: Tv2ActionManifestSplitScreenSource,
-        [SplitScreenBoxInput.INPUT_2]?: Tv2ActionManifestSplitScreenSource,
-        [SplitScreenBoxInput.INPUT_3]?: Tv2ActionManifestSplitScreenSource,
-        [SplitScreenBoxInput.INPUT_4]?: Tv2ActionManifestSplitScreenSource,
+        [SplitScreenBoxInput.INPUT_1]?: Tv2ActionManifestSplitScreenSource
+        [SplitScreenBoxInput.INPUT_2]?: Tv2ActionManifestSplitScreenSource
+        [SplitScreenBoxInput.INPUT_3]?: Tv2ActionManifestSplitScreenSource
+        [SplitScreenBoxInput.INPUT_4]?: Tv2ActionManifestSplitScreenSource
       }
     }
   }
@@ -68,7 +68,7 @@ export interface Tv2ActionManifestFullscreenGraphicsData {
 export interface Tv2ActionManifestOverlayGraphicsData {
   rank: number
   pieceLayer: Tv2PieceLayer
-  name: string,
+  name: string
   expectedDuration?: number
   lifespan?: string
   content?: {
@@ -89,8 +89,8 @@ export enum SplitScreenBoxInput {
 }
 
 export interface Tv2ActionManifestSplitScreenSource {
-  sourceType: Tv2ActionManifestSplitScreenSourceType,
-  id: string,
+  sourceType: Tv2ActionManifestSplitScreenSourceType
+  id: string
   name: string
 }
 
@@ -137,4 +137,3 @@ export interface Tv2OverlayGraphicsManifestData {
   lifespan?: PieceLifespan
   vcpId: number
 }
-

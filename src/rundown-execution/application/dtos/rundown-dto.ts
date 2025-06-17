@@ -21,8 +21,8 @@ export class RundownDto {
     this.mode = rundown.getMode()
     this.takeMode = rundown.getTakeMode()
     this.modifiedAt = rundown.getLastTimeModified()
-    this.infinitePieces = rundown.getInfinitePieces().map((piece) => new PieceDto(piece))
-    this.segments = rundown.getSegments().map((segment) => new SegmentDto(segment))
+    this.infinitePieces = rundown.getInfinitePieces().map(piece => new PieceDto(piece))
+    this.segments = rundown.getSegments().map(segment => new SegmentDto(segment))
     this.timing = rundown.timing
   }
 }

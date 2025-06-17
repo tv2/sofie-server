@@ -17,11 +17,10 @@ import { ErrorCode } from '../../domain/enums/error-code'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 import { PlayoutContentReadService } from '../interfaces/playout-content-service'
 import { PlayoutContent } from '../../domain/value-objects/playout-content'
-import {Logger} from '../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 
 @RestController('/rundowns')
 export class RundownController extends BaseController {
-
   private readonly logger: Logger
 
   constructor(
@@ -90,7 +89,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.rundownService.deactivateRundown(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully deactivated` ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully deactivated`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -109,7 +108,7 @@ export class RundownController extends BaseController {
         return
       }
       await this.rundownService.setTakeMode(rundownId, takeMode)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully set Take Mode to ${takeMode}` ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" successfully set Take Mode to ${takeMode}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -160,7 +159,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.rundownService.resetRundown(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" has been reset` ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" has been reset`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -184,7 +183,7 @@ export class RundownController extends BaseController {
     try {
       const rundownId: string = request.params.rundownId
       await this.rundownService.deleteRundown(rundownId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" has been deleted` ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Rundown "${rundownId}" has been deleted`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -197,7 +196,7 @@ export class RundownController extends BaseController {
       const rundownId: string = request.params.rundownId
       const pieceId: string = request.params.pieceId
       await this.rundownService.stopPiece(rundownId, pieceId)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(`Piece "${pieceId}" was stopped` ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Piece "${pieceId}" was stopped`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }

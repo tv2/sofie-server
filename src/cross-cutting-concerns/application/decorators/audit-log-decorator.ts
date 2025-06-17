@@ -1,5 +1,5 @@
 import { Logger } from '../interfaces/logger'
-import {ConsoleLogger} from '../../infrastructure/services/console-logger'
+import { ConsoleLogger } from '../../infrastructure/services/console-logger'
 
 interface IncomingRequest {
   req?: {
@@ -14,7 +14,7 @@ export function AuditLog(): MethodDecorator {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (_target: unknown, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<any>): void => {
     const originalMethod: () => unknown = descriptor.value as () => unknown
-    descriptor.value = function (...args: unknown[]): void {
+    descriptor.value = function(...args: unknown[]): void {
       const argumentMessage: string = extractArgumentMessageFromIncomingRequest(args)
       logger.trace(`AuditLog - Method: "${JSON.stringify(propertyKey)}". ${argumentMessage}`)
       originalMethod.apply(this, args as []) // The "as []" is to comply with "yarn build".

@@ -4,7 +4,6 @@ import { EmptyTimelineObject } from '../../value-objects/timeline-state-resolver
 import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
 
 export class Tv2EmptyGraphicsCommandTimelineObjectFactory implements Tv2GraphicsCommandTimelineObjectFactory {
-
   public createAllOutGraphicsTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration): EmptyTimelineObject {
     return this.createNeverTimelineObject()
   }

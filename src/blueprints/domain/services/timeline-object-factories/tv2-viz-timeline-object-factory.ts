@@ -27,7 +27,6 @@ enum EngineName {
 const ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR: string = '\n - '
 
 export class Tv2VizTimelineObjectFactory implements Tv2GraphicsCommandTimelineObjectFactory, Tv2GraphicsElementTimelineObjectFactory {
-
   public createThemeOutTimelineObject(blueprintConfiguration: Tv2BlueprintConfiguration): VizMseElementInternalTimelineObject {
     return {
       id: '',

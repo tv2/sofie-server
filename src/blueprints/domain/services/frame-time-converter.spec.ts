@@ -27,7 +27,7 @@ describe(FrameTimeConverter.name, () => {
       describe(`when frame rate is ${frameRate}`, () =>
         testCases.forEach(testCase => describe(`when ${testCase.frames} frames are given`, () => {
           it(`returns ${testCase.milliseconds}`, () => {
-            const testee: FrameTimeConverter = createTestee({frameRate: frameRate})
+            const testee: FrameTimeConverter = createTestee({ frameRate: frameRate })
 
             const result: number = testee.convertFramesToMilliseconds(testCase.frames)
 

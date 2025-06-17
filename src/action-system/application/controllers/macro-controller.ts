@@ -10,7 +10,6 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 
 @RestController('/macros')
 export class MacroController extends BaseController {
-
   constructor(
     private readonly macroService: MacroService,
     private readonly httpErrorHandler: HttpErrorHandler,
@@ -53,12 +52,11 @@ export class MacroController extends BaseController {
         operations: macroDto.operations
       }
       await this.macroService.createMacro(macro)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created Macro ${macro.name}` ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created Macro ${macro.name}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
-
 
   @AuditLog()
   @PutRequest()
@@ -75,7 +73,6 @@ export class MacroController extends BaseController {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
   }
-
 
   @AuditLog()
   @DeleteRequest('/:macroId')
