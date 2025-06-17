@@ -10,7 +10,7 @@ import { StatusMessage } from '../../domain/entities/status-message'
 describe(StatusMessageServiceImplementation.name, () => {
   describe(StatusMessageServiceImplementation.prototype.updateStatusMessage.name, () => {
     describe('the StatusMessage does not already exist in the database', () => {
-      it('does nothing when the StatusMessage is GOOD', async() => {
+      it('does nothing when the StatusMessage is GOOD', async () => {
         const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
         const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
         const statusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ statusCode: StatusCode.GOOD })
@@ -23,7 +23,7 @@ describe(StatusMessageServiceImplementation.name, () => {
       })
 
       describe('the StatusMessage is BAD', () => {
-        it('emits a StatusMessageEvent with the StatusMessage', async() => {
+        it('emits a StatusMessageEvent with the StatusMessage', async () => {
           const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
           const statusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ statusCode: StatusCode.BAD })
 
@@ -33,7 +33,7 @@ describe(StatusMessageServiceImplementation.name, () => {
           verify(statusMessageEventEmitter.emitStatusMessageEvent(statusMessage)).once()
         })
 
-        it('saves the StatusMessage to the database', async() => {
+        it('saves the StatusMessage to the database', async () => {
           const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
           const statusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ statusCode: StatusCode.BAD })
 
@@ -46,7 +46,7 @@ describe(StatusMessageServiceImplementation.name, () => {
     })
 
     describe('the statusMessage exist in the database', () => {
-      it('does nothing when the StatusMessage has the same StatusCode and Message as the one in the database', async() => {
+      it('does nothing when the StatusMessage has the same StatusCode and Message as the one in the database', async () => {
         const statusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ statusCode: StatusCode.BAD, message: 'Some message' })
 
         const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
@@ -61,7 +61,7 @@ describe(StatusMessageServiceImplementation.name, () => {
       })
 
       describe('the StatusMessage is different from the one in the database', () => {
-        it('emits a StatusMessageEvent for the new StatusMessage', async() => {
+        it('emits a StatusMessageEvent for the new StatusMessage', async () => {
           const statusMessageFromDatabase: StatusMessage = EntityTestFactory.createStatusMessage({ message: 'Some message' })
           const newStatusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ message: 'Some other message' })
 
@@ -75,7 +75,7 @@ describe(StatusMessageServiceImplementation.name, () => {
           verify(statusMessageEventEmitter.emitStatusMessageEvent(newStatusMessage)).once()
         })
 
-        it('deletes the StatusMessage from the database when the Status is GOOD', async() => {
+        it('deletes the StatusMessage from the database when the Status is GOOD', async () => {
           const statusMessageFromDatabase: StatusMessage = EntityTestFactory.createStatusMessage({ message: 'Some message' })
           const newStatusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ statusCode: StatusCode.GOOD, message: 'Some other message' })
 
@@ -91,7 +91,7 @@ describe(StatusMessageServiceImplementation.name, () => {
         })
 
         it('updates the StatusMessage in the database when the Status is not GOOD',
-          async() => {
+          async () => {
             const statusMessageFromDatabase: StatusMessage = EntityTestFactory.createStatusMessage({ message: 'Some message' })
             const newStatusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ statusCode: StatusCode.BAD, message: 'Some other message' })
 

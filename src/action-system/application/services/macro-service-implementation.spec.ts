@@ -11,7 +11,7 @@ import { StatusMessageEventEmitter } from '../../../cross-cutting-concerns/appli
 
 describe(MacroServiceImplementation.name, () => {
   describe(MacroServiceImplementation.prototype.createMacro.name, () => {
-    it('should emit macro created event', async() => {
+    it('should emit macro created event', async () => {
       const macro: Macro = EntityTestFactory.createMacro()
 
       const mockedMacroEventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
@@ -26,7 +26,7 @@ describe(MacroServiceImplementation.name, () => {
     })
   })
 
-  it('should emit macro updated event', async() => {
+  it('should emit macro updated event', async () => {
     const macro: Macro = EntityTestFactory.createMacro()
 
     const mockedMacroEventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
@@ -42,7 +42,7 @@ describe(MacroServiceImplementation.name, () => {
 })
 
 describe(MacroServiceImplementation.prototype.deleteMacro.name, () => {
-  it('should emit macro deleted event', async() => {
+  it('should emit macro deleted event', async () => {
     const macroId: string = 'FakeMacroId'
 
     const mockedMacroEventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
@@ -58,7 +58,7 @@ describe(MacroServiceImplementation.prototype.deleteMacro.name, () => {
 })
 
 describe(MacroServiceImplementation.prototype.executeMacro.name, () => {
-  it('should emit macro operation failed event', async() => {
+  it('should emit macro operation failed event', async () => {
     const macro: Macro = EntityTestFactory.createMacro({ operations: [EntityTestFactory.createActionOperation({ delayNextOperationMs: 200 })] })
 
     const mockedStatusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
@@ -76,7 +76,7 @@ describe(MacroServiceImplementation.prototype.executeMacro.name, () => {
     verify(mockedStatusMessageEventEmitter.emitStatusMessageEvent(anything())).once()
   })
 
-  it('should call all 3 operations within timeframe of 401ms', async() => {
+  it('should call all 3 operations within timeframe of 401ms', async () => {
     jest.useFakeTimers()
     const operations: Operation[] = [
       EntityTestFactory.createActionOperation({ actionId: 'MyActionId', delayNextOperationMs: 200 }),

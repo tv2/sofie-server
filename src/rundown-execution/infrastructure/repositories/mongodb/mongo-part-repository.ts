@@ -43,7 +43,7 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
       .toArray()
     const parts: Part[] = this.mongoEntityConverter.convertToParts(mongoParts)
     return Promise.all(
-      parts.map(async(part) => {
+      parts.map(async (part) => {
         part.setPieces(await this.mongoPieceRepository.getPieces(part.id))
         return part
       })

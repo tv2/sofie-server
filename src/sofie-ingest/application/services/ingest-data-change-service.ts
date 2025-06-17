@@ -186,7 +186,7 @@ export class IngestDataChangeService implements DataChangeService {
   }
 
   private async synchronizeRundown(rundownId: string): Promise<void> {
-    await this.rundownLock.withLock(this.synchronizeRundown.name, async() => {
+    await this.rundownLock.withLock(this.synchronizeRundown.name, async () => {
       const rundown: Rundown | undefined = await this.rundownRepository.getRundown(rundownId).catch((error) => {
         if (error instanceof NotFoundException) {
           return undefined

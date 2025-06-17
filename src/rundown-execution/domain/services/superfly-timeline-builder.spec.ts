@@ -40,7 +40,7 @@ describe(SuperflyTimelineBuilder.name, () => {
   describe(SuperflyTimelineBuilder.prototype.buildTimeline.name, () => {
     describe('for baseline', () => {
       describe('it creates a group for the baseline', () => {
-        it('sets the correct baseline group id', async() => {
+        it('sets the correct baseline group id', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -52,7 +52,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(baselineGroup).not.toBeUndefined()
         })
 
-        it('sets the enable to while="1"', async() => {
+        it('sets the enable to while="1"', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -64,7 +64,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(baselineGroup.enable.while).toBe('1')
         })
 
-        it('sets an empty layer', async() => {
+        it('sets an empty layer', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -76,7 +76,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(baselineGroup.layer).toBe('')
         })
 
-        it('sets priority to "baseline" priority', async() => {
+        it('sets priority to "baseline" priority', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -88,7 +88,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(baselineGroup.priority).toBe(BASELINE_PRIORITY)
         })
 
-        it('sets the children to the baseline objects of the Rundown', async() => {
+        it('sets the children to the baseline objects of the Rundown', async () => {
           const baselineTimelineObjects: TimelineObject[] = [
             { id: 'object1' } as TimelineObject,
             { id: 'object2' } as TimelineObject,
@@ -116,7 +116,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
     describe('for active Part', () => {
       describe('it creates a group for active Part', () => {
-        it('sets correct active group id for the active Part', async() => {
+        it('sets correct active group id for the active Part', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -131,7 +131,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(result).not.toBeUndefined()
         })
 
-        it('sets TimelineEnable.start set to be when the active Part was "executed"', async() => {
+        it('sets TimelineEnable.start set to be when the active Part was "executed"', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -144,7 +144,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(result.enable.start).toBe(rundown.getActivePart().getExecutedAt())
         })
 
-        it('sets an empty layer', async() => {
+        it('sets an empty layer', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -157,7 +157,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(result.layer).toBe('')
         })
 
-        it('sets priority to high', async() => {
+        it('sets priority to high', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -172,7 +172,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('active Part doesn\'t have any Pieces', () => {
-        it('don\'t create any children for active Part group', async() => {
+        it('don\'t create any children for active Part group', async () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
@@ -188,7 +188,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
       describe('when the active part has one piece', () => {
         describe('creates a Piece control group on the active group', () => {
-          it('sets correct control group id for Piece on active group', async() => {
+          it('sets correct control group id for Piece on active group', async () => {
             const piece: Piece = EntityMockFactory.createPiece({
               transitionType: TransitionType.NO_TRANSITION,
             })
@@ -209,7 +209,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             expect(controlGroup).not.toBeUndefined()
           })
 
-          it('sets correct parentGroup id', async() => {
+          it('sets correct parentGroup id', async () => {
             const piece: Piece = EntityMockFactory.createPiece({
               transitionType: TransitionType.NO_TRANSITION,
             })
@@ -229,7 +229,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             expect(controlObject.inGroup).toBe(activeGroup.id)
           })
 
-          it('sets layer to Piece.layer', async() => {
+          it('sets layer to Piece.layer', async () => {
             const layer: string = 'someLayerForPiece'
             const piece: Piece = EntityMockFactory.createPiece({
               layer,
@@ -251,7 +251,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             expect(controlObject.layer).toBe(layer)
           })
 
-          it('sets priority to MEDIUM', async() => {
+          it('sets priority to MEDIUM', async () => {
             const piece: Piece = EntityMockFactory.createPiece({
               transitionType: TransitionType.NO_TRANSITION,
             })
@@ -273,7 +273,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
           describe('creates TimelineEnable for IN_TRANSITION Piece', () => {
             describe('active Part has an "inTransitionStart"', () => {
-              it('sets TimelineEnable.start to Part.timings.inTransitionStart + Piece.start', async() => {
+              it('sets TimelineEnable.start to Part.timings.inTransitionStart + Piece.start', async () => {
                 const inTransitionStart: number = 20
                 const piece: Piece = EntityMockFactory.createPiece({
                   start: 10,
@@ -299,7 +299,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(controlObject.enable.start).toBe(inTransitionStart + piece.getStart())
               })
 
-              it('sets TimelineEnable.duration to Piece.duration', async() => {
+              it('sets TimelineEnable.duration to Piece.duration', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   duration: 15,
                   transitionType: TransitionType.IN_TRANSITION,
@@ -325,7 +325,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('active Part does not have an "inTransitionStart"', () => {
-              it('does not create any groups for Piece', async() => {
+              it('does not create any groups for Piece', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   transitionType: TransitionType.IN_TRANSITION,
                 })
@@ -353,7 +353,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           describe('creates TimelineEnable for OUT_TRANSITION Piece', () => {
             describe('active Part has a "KeepAliveDuration"', () => {
               describe('active Part has a PostRollDuration', () => {
-                it('sets TimelineEnable.start to activeGroup.end - Part.keepAliveDuration - Part.postRollDuration', async() => {
+                it('sets TimelineEnable.start to activeGroup.end - Part.keepAliveDuration - Part.postRollDuration', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     transitionType: TransitionType.OUT_TRANSITION,
                   })
@@ -387,7 +387,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('active Part does not have a PostRollDuration', () => {
-                it('sets TimelineEnable.start to activeGroup.end - Part.keepAliveDuration', async() => {
+                it('sets TimelineEnable.start to activeGroup.end - Part.keepAliveDuration', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     transitionType: TransitionType.OUT_TRANSITION,
                   })
@@ -418,7 +418,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('active Part does not have a "KeepAliveDuration"', () => {
-              it('does not create any groups for Piece', async() => {
+              it('does not create any groups for Piece', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   transitionType: TransitionType.OUT_TRANSITION,
                 })
@@ -443,7 +443,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('creates TimelineEnable for NO_TRANSITION Piece', () => {
-            it('sets TimelineEnable.start to Piece.start', async() => {
+            it('sets TimelineEnable.start to Piece.start', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 start: 5,
                 transitionType: TransitionType.NO_TRANSITION,
@@ -465,7 +465,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('active Part has a delayStartOfPiecesDuration', () => {
-              it('sets the TimelineEnable.start for planned piece to Piece.start + delayStartOfPiecesDuration', async() => {
+              it('sets the TimelineEnable.start for planned piece to Piece.start + delayStartOfPiecesDuration', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   transitionType: TransitionType.NO_TRANSITION,
                   isPlanned: true,
@@ -494,7 +494,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
               describe('when piece is unplanned', () => {
                 describe('when piece is inserted on air', () => {
-                  it('ignores the piece start delay duration for TimelineEnable.start', async() => {
+                  it('ignores the piece start delay duration for TimelineEnable.start', async () => {
                     const piece: Piece = EntityTestFactory.createPiece({
                       transitionType: TransitionType.NO_TRANSITION,
                       isPlanned: false,
@@ -522,7 +522,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 describe('when piece is inserted off air', () => {
-                  it('adds the piece start delay duration for TimelineEnable.start', async() => {
+                  it('adds the piece start delay duration for TimelineEnable.start', async () => {
                     const piece: Piece = EntityMockFactory.createPiece({
                       transitionType: TransitionType.NO_TRANSITION,
                       isPlanned: false,
@@ -552,7 +552,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('Piece has a duration', () => {
-              it('sets TimelineEnable.duration to Piece.duration', async() => {
+              it('sets TimelineEnable.duration to Piece.duration', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   duration: 50,
                   transitionType: TransitionType.NO_TRANSITION,
@@ -578,7 +578,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
             describe('Piece does not have a duration', () => {
               describe('active Part has PostRoll', () => {
-                it('sets TimelineEnable.duration activeGroup.end - Part.timings.postRollDuration', async() => {
+                it('sets TimelineEnable.duration activeGroup.end - Part.timings.postRollDuration', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     transitionType: TransitionType.NO_TRANSITION,
                   })
@@ -608,7 +608,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('active Part does not have PostRoll', () => {
-                it('sets TimelineEnable.duration to be undefined', async() => {
+                it('sets TimelineEnable.duration to be undefined', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     transitionType: TransitionType.NO_TRANSITION,
                   })
@@ -635,7 +635,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
           describe('controlGroup has TimelineEnable.start === zero && Piece has PreRoll', () => {
             describe('creates PreRollControlGroup for Piece', () => {
-              it('sets id to correct id for PreRollControlGroup', async() => {
+              it('sets id to correct id for PreRollControlGroup', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   start: 0,
                   preRollDuration: 10,
@@ -663,7 +663,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(preRollObject).not.toBeUndefined()
               })
 
-              it('sets TimelineEnable.start to "activeGroup.id.start"', async() => {
+              it('sets TimelineEnable.start to "activeGroup.id.start"', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   start: 0,
                   preRollDuration: 10,
@@ -687,7 +687,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(preRollObject.enable.start).toBe(`#${activeGroup.id}.start`)
               })
 
-              it('sets an empty layer', async() => {
+              it('sets an empty layer', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   start: 0,
                   preRollDuration: 10,
@@ -711,7 +711,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(preRollObject.layer).toBe('')
               })
 
-              it('updates controlPiece to start at PreRollControlGroup + Piece.preRollDuration', async() => {
+              it('updates controlPiece to start at PreRollControlGroup + Piece.preRollDuration', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   start: 0,
                   preRollDuration: 10,
@@ -744,7 +744,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         })
 
         describe('create a Piece child group on the active group', () => {
-          it('sets correct Piece group id for Piece on active group', async() => {
+          it('sets correct Piece group id for Piece on active group', async () => {
             const piece: Piece = EntityMockFactory.createPiece({
               transitionType: TransitionType.NO_TRANSITION,
             })
@@ -765,7 +765,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             expect(childGroup).not.toBeUndefined()
           })
 
-          it('sets correct parentGroup id', async() => {
+          it('sets correct parentGroup id', async () => {
             const piece: Piece = EntityMockFactory.createPiece({
               transitionType: TransitionType.NO_TRANSITION,
             })
@@ -785,7 +785,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             expect(childGroup.inGroup).toBe(activeGroup.id)
           })
 
-          it('sets an empty layer', async() => {
+          it('sets an empty layer', async () => {
             const piece: Piece = EntityMockFactory.createPiece({
               transitionType: TransitionType.NO_TRANSITION,
             })
@@ -806,7 +806,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('Piece has PreRoll', () => {
-            it('sets TimelineEnable.start PieceControlGroup.start - Piece.preRollDuration', async() => {
+            it('sets TimelineEnable.start PieceControlGroup.start - Piece.preRollDuration', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 preRollDuration: 20,
                 transitionType: TransitionType.NO_TRANSITION,
@@ -834,7 +834,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('Piece does not have PreRoll', () => {
-            it('sets TimelineEnable.start to PieceControlGroup.start', async() => {
+            it('sets TimelineEnable.start to PieceControlGroup.start', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 transitionType: TransitionType.NO_TRANSITION,
               })
@@ -859,7 +859,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('Piece has PostRoll', () => {
-            it('sets TimelineEnable.end to PieceControlGroup.end - Piece.postRollDuration', async() => {
+            it('sets TimelineEnable.end to PieceControlGroup.end - Piece.postRollDuration', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 postRollDuration: 30,
                 transitionType: TransitionType.NO_TRANSITION,
@@ -885,7 +885,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('Piece does not have PostRoll', () => {
-            it('sets TimelineEnable.end to PieceControlGroup.end', async() => {
+            it('sets TimelineEnable.end to PieceControlGroup.end', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 transitionType: TransitionType.NO_TRANSITION,
               })
@@ -910,7 +910,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('Piece has a TimelineObject', () => {
-            it('sets the id of the TimelineObject to be pieceChildGroup.id_piece.id_timelineObject.id', async() => {
+            it('sets the id of the TimelineObject to be pieceChildGroup.id_piece.id_timelineObject.id', async () => {
               const timelineObject: TimelineObject = { id: 'timelineObjectId' } as TimelineObject
               const piece: Piece = EntityMockFactory.createPiece({
                 timelineObjects: [timelineObject],
@@ -933,7 +933,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               expect(result.id).toBe(`${childGroup.id}_${piece.id}_${timelineObject.id}`)
             })
 
-            it('sets the group of the TimelineObject to be the Piece child group', async() => {
+            it('sets the group of the TimelineObject to be the Piece child group', async () => {
               const timelineObject: TimelineObject = { id: 'timelineObjectId' } as TimelineObject
               const piece: Piece = EntityMockFactory.createPiece({
                 timelineObjects: [timelineObject],
@@ -956,7 +956,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               expect(result.inGroup).toBe(childGroup.id)
             })
 
-            it('has same content as the TimelineObject', async() => {
+            it('has same content as the TimelineObject', async () => {
               const content: unknown = { someContent: 'someContent' }
               const timelineObject: TimelineObject = { id: 'timelineObjectId', content } as TimelineObject
               const piece: Piece = EntityMockFactory.createPiece({
@@ -987,7 +987,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('Piece has five TimelineObjects', () => {
-            it('adds all five TimelineObjects to the children of the Piece child group', async() => {
+            it('adds all five TimelineObjects to the children of the Piece child group', async () => {
               const timelineObjects: TimelineObject[] = [
                 { id: '1' } as TimelineObject,
                 { id: '2' } as TimelineObject,
@@ -1033,7 +1033,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('active Part has five Pieces', () => {
-        it('creates five Piece control groups on the active group', async() => {
+        it('creates five Piece control groups on the active group', async () => {
           const pieces: Piece[] = [
             EntityMockFactory.createPiece({
               id: '1',
@@ -1074,7 +1074,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           )
         })
 
-        it('creates five Piece child groups on the active group', async() => {
+        it('creates five Piece child groups on the active group', async () => {
           const pieces: Piece[] = [
             EntityMockFactory.createPiece({
               id: '1',
@@ -1116,7 +1116,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         })
 
         describe('four of the Pieces are infinite Pieces', () => {
-          it('still creates groups for five Pieces', async() => {
+          it('still creates groups for five Pieces', async () => {
             const pieces: Piece[] = [
               EntityMockFactory.createPiece({
                 id: '1',
@@ -1167,7 +1167,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
     describe('Rundown has a previous Part', () => {
       describe('previous Part does not have an executedAt', () => {
-        it('throws an error', async() => {
+        it('throws an error', async () => {
           const previousPart: Part = EntityMockFactory.createPart({ id: 'previousId' })
           const activePart: Part = EntityMockFactory.createPart({ id: 'activeId' })
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
@@ -1179,7 +1179,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('it creates a group for previous Part', () => {
-        it('sets correct previous group id for the previous Part', async() => {
+        it('sets correct previous group id for the previous Part', async () => {
           const previousPart: Part = EntityMockFactory.createPart(
             { id: 'previousId' },
             {
@@ -1200,7 +1200,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(result).not.toBeUndefined()
         })
 
-        it('sets priority of the group to low', async() => {
+        it('sets priority of the group to low', async () => {
           const previousPart: Part = EntityMockFactory.createPart(
             { id: 'previousId' },
             {
@@ -1220,7 +1220,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(result.priority).toBe(LOW_PRIORITY)
         })
 
-        it('sets an empty layer', async() => {
+        it('sets an empty layer', async () => {
           const previousPart: Part = EntityMockFactory.createPart(
             { id: 'previousId' },
             {
@@ -1240,7 +1240,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           expect(result.layer).toBe('')
         })
 
-        it('sets the TimelineEnable.start to be when the previous Part was executed', async() => {
+        it('sets the TimelineEnable.start to be when the previous Part was executed', async () => {
           const previousPart: Part = EntityMockFactory.createPart(
             { id: 'previousId' },
             {
@@ -1261,7 +1261,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         })
 
         describe('active Part has a "previousPartContinueIntoPartDuration"', () => {
-          it('sets the TimelineEnable.end to activeGroup.start + active Part.previousPartContinueIntoPartDuration', async() => {
+          it('sets the TimelineEnable.end to activeGroup.start + active Part.previousPartContinueIntoPartDuration', async () => {
             const previousPartContinueIntoPartDuration: number = 50
 
             const previousPart: Part = EntityMockFactory.createPart(
@@ -1293,7 +1293,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         })
 
         describe('active Part does not have a "previousPartContinueIntoPartDuration"', () => {
-          it('sets the TimelineEnable.end to activeGroup.start + 0', async() => {
+          it('sets the TimelineEnable.end to activeGroup.start + 0', async () => {
             const previousPart: Part = EntityMockFactory.createPart(
               { id: 'previousId' },
               {
@@ -1317,7 +1317,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
         describe('previous Part has a Piece', () => {
           describe('creates a Piece control group on the previous group', () => {
-            it('sets correct control group id for Piece on previous group', async() => {
+            it('sets correct control group id for Piece on previous group', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 transitionType: TransitionType.NO_TRANSITION,
               })
@@ -1342,7 +1342,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               expect(controlGroup).not.toBeUndefined()
             })
 
-            it('sets correct parentGroup id', async() => {
+            it('sets correct parentGroup id', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 transitionType: TransitionType.NO_TRANSITION,
               })
@@ -1366,7 +1366,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               expect(controlGroup.inGroup).toBe(previousGroup.id)
             })
 
-            it('sets layer to Piece.layer', async() => {
+            it('sets layer to Piece.layer', async () => {
               const layer: string = 'someLayerForPiece'
               const piece: Piece = EntityMockFactory.createPiece({
                 layer,
@@ -1392,7 +1392,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               expect(controlGroup.layer).toBe(layer)
             })
 
-            it('sets priority to MEDIUM', async() => {
+            it('sets priority to MEDIUM', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 transitionType: TransitionType.NO_TRANSITION,
               })
@@ -1418,7 +1418,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
             describe('creates TimelineEnable for IN_TRANSITION Piece', () => {
               describe('previous Part has an "inTransitionStart"', () => {
-                it('sets TimelineEnable.start to Part.timings.inTransitionStart + Piece.start', async() => {
+                it('sets TimelineEnable.start to Part.timings.inTransitionStart + Piece.start', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     start: 10,
                     transitionType: TransitionType.IN_TRANSITION,
@@ -1453,7 +1453,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   expect(controlGroup.enable.start).toBe(inTransitionStart + piece.getStart())
                 })
 
-                it('sets TimelineEnable.duration to Piece.duration', async() => {
+                it('sets TimelineEnable.duration to Piece.duration', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     duration: 15,
                     transitionType: TransitionType.IN_TRANSITION,
@@ -1490,7 +1490,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('previous Part does not have an "inTransitionStart"', () => {
-                it('does not create any groups for Piece', async() => {
+                it('does not create any groups for Piece', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     transitionType: TransitionType.IN_TRANSITION,
                   })
@@ -1524,7 +1524,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             describe('creates TimelineEnable for OUT_TRANSITION Piece', () => {
               describe('previous Part has a "KeepAliveDuration"', () => {
                 describe('previous Part has a PostRollDuration', () => {
-                  it('sets TimelineEnable.start to previousGroup.end - Part.keepAliveDuration - previous Part.postRoll', async() => {
+                  it('sets TimelineEnable.start to previousGroup.end - Part.keepAliveDuration - previous Part.postRoll', async () => {
                     const postRollDuration: number = 20
                     const keepAliveDuration: number = 30
 
@@ -1571,7 +1571,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 describe('previous Part does not have a PostRollDuration', () => {
-                  it('sets TimelineEnable.start to previousGroup.end - previous Part.keepAliveDuration', async() => {
+                  it('sets TimelineEnable.start to previousGroup.end - previous Part.keepAliveDuration', async () => {
                     const keepAliveDuration: number = 30
 
                     const piece: Piece = EntityMockFactory.createPiece({
@@ -1614,7 +1614,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('previous Part does not have a "KeepAliveDuration"', () => {
-                it('does not create any groups for Piece', async() => {
+                it('does not create any groups for Piece', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     transitionType: TransitionType.OUT_TRANSITION,
                   })
@@ -1646,7 +1646,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('creates TimelineEnable for NO_TRANSITION Piece', () => {
-              it('sets TimelineEnable.start to Piece.start', async() => {
+              it('sets TimelineEnable.start to Piece.start', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   start: 10,
                   transitionType: TransitionType.NO_TRANSITION,
@@ -1677,7 +1677,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('Piece has a duration', () => {
-                it('sets TimelineEnable.duration to Piece.duration', async() => {
+                it('sets TimelineEnable.duration to Piece.duration', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     duration: 15,
                     transitionType: TransitionType.NO_TRANSITION,
@@ -1710,7 +1710,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
               describe('Piece does not have a duration', () => {
                 describe('previous Part has PostRoll', () => {
-                  it('sets TimelineEnable.duration to previousGroup - Part.timings.postRollDuration', async() => {
+                  it('sets TimelineEnable.duration to previousGroup - Part.timings.postRollDuration', async () => {
                     const postRollDuration: number = 30
 
                     const piece: Piece = EntityMockFactory.createPiece({
@@ -1752,7 +1752,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 describe('previous Part does not have PostRoll', () => {
-                  it('sets TimelineEnable.duration to undefined', async() => {
+                  it('sets TimelineEnable.duration to undefined', async () => {
                     const piece: Piece = EntityMockFactory.createPiece({
                       transitionType: TransitionType.NO_TRANSITION,
                     })
@@ -1789,7 +1789,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
             describe('controlGroup has TimelineEnable.start === zero && Piece has PreRoll', () => {
               describe('creates PreRollControlGroup for Piece', () => {
-                it('sets id to correct id for PreRollControlGroup', async() => {
+                it('sets id to correct id for PreRollControlGroup', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     start: 0,
                     preRollDuration: 10,
@@ -1824,7 +1824,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   expect(preRollObject).not.toBeUndefined()
                 })
 
-                it('sets TimelineEnable.start to "previousGroup.id.start"', async() => {
+                it('sets TimelineEnable.start to "previousGroup.id.start"', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     start: 0,
                     preRollDuration: 10,
@@ -1855,7 +1855,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   expect(preRollObject.enable.start).toBe(`#${previousGroup.id}.start`)
                 })
 
-                it('sets an empty layer', async() => {
+                it('sets an empty layer', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     start: 0,
                     preRollDuration: 10,
@@ -1886,7 +1886,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   expect(preRollObject.layer).toBe('')
                 })
 
-                it('updates controlPiece to start at PreRollControlGroup + Piece.preRollDuration', async() => {
+                it('updates controlPiece to start at PreRollControlGroup + Piece.preRollDuration', async () => {
                   const piece: Piece = EntityMockFactory.createPiece({
                     start: 0,
                     preRollDuration: 10,
@@ -1926,7 +1926,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('create a Piece child group on the previous group', () => {
-            it('sets correct Piece group id for Piece on previous group', async() => {
+            it('sets correct Piece group id for Piece on previous group', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 transitionType: TransitionType.NO_TRANSITION,
               })
@@ -1951,7 +1951,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               expect(childGroup).not.toBeUndefined()
             })
 
-            it('sets correct parentGroup id', async() => {
+            it('sets correct parentGroup id', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 transitionType: TransitionType.NO_TRANSITION,
               })
@@ -1975,7 +1975,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               expect(childGroup.inGroup).toBe(previousGroup.id)
             })
 
-            it('sets an empty layer', async() => {
+            it('sets an empty layer', async () => {
               const piece: Piece = EntityMockFactory.createPiece({
                 transitionType: TransitionType.NO_TRANSITION,
               })
@@ -2000,7 +2000,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('Piece has PreRoll', () => {
-              it('sets TimelineEnable.start PieceControlGroup.start - Piece.preRollDuration', async() => {
+              it('sets TimelineEnable.start PieceControlGroup.start - Piece.preRollDuration', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   preRollDuration: 10,
                   transitionType: TransitionType.NO_TRANSITION,
@@ -2037,7 +2037,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('Piece does not have PreRoll', () => {
-              it('sets TimelineEnable.start to PieceControlGroup.start - 0', async() => {
+              it('sets TimelineEnable.start to PieceControlGroup.start - 0', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   transitionType: TransitionType.NO_TRANSITION,
                 })
@@ -2071,7 +2071,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('Piece has PostRoll', () => {
-              it('sets TimelineEnable.end to PieceControlGroup.end - Piece.postRollDuration', async() => {
+              it('sets TimelineEnable.end to PieceControlGroup.end - Piece.postRollDuration', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   postRollDuration: 30,
                   transitionType: TransitionType.NO_TRANSITION,
@@ -2108,7 +2108,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('Piece does not have PostRoll', () => {
-              it('sets TimelineEnable.end to PieceControlGroup.end', async() => {
+              it('sets TimelineEnable.end to PieceControlGroup.end', async () => {
                 const piece: Piece = EntityMockFactory.createPiece({
                   transitionType: TransitionType.NO_TRANSITION,
                 })
@@ -2142,7 +2142,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('Piece has a TimelineObject', () => {
-              it('sets the id of the TimelineObject to be pieceChildGroup.id_piece.id_timelineObject.id', async() => {
+              it('sets the id of the TimelineObject to be pieceChildGroup.id_piece.id_timelineObject.id', async () => {
                 const timelineObject: TimelineObject = { id: 'timelineObjectId' } as TimelineObject
                 const piece: Piece = EntityMockFactory.createPiece({
                   timelineObjects: [timelineObject],
@@ -2174,7 +2174,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(result.id).toBe(`${childGroup.id}_${piece.id}_${timelineObject.id}`)
               })
 
-              it('sets the group of the TimelineObject to be the Piece child group', async() => {
+              it('sets the group of the TimelineObject to be the Piece child group', async () => {
                 const timelineObject: TimelineObject = { id: 'timelineObjectId' } as TimelineObject
                 const piece: Piece = EntityMockFactory.createPiece({
                   timelineObjects: [timelineObject],
@@ -2206,7 +2206,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(result.inGroup).toBe(childGroup.id)
               })
 
-              it('has same content as the TimelineObject', async() => {
+              it('has same content as the TimelineObject', async () => {
                 const content: unknown = { someContent: 'someContent' }
                 const timelineObject: TimelineObject = {
                   id: 'timelineObjectId',
@@ -2249,7 +2249,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('Piece has five TimelineObjects', () => {
-              it('adds all five TimelineObjects to the children of the Piece child group', async() => {
+              it('adds all five TimelineObjects to the children of the Piece child group', async () => {
                 const timelineObjects: TimelineObject[] = [
                   { id: '1' } as TimelineObject,
                   { id: '2' } as TimelineObject,
@@ -2305,7 +2305,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('previous Part does not have any Pieces', () => {
-        it('does not create any groups for the Pieces', async() => {
+        it('does not create any groups for the Pieces', async () => {
           const previousPart: Part = EntityMockFactory.createPart(
             { id: 'previousId' },
             {
@@ -2331,7 +2331,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
       describe('previous Part has Pieces', () => {
         describe('previous Part has five Pieces, but one of them is an infinite Piece', () => {
-          it('only creates groups for four Pieces', async() => {
+          it('only creates groups for four Pieces', async () => {
             const infinitePiece: Piece = EntityMockFactory.createPiece({
               pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
               transitionType: TransitionType.NO_TRANSITION,
@@ -2376,7 +2376,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         })
 
         describe('previous Part has five Pieces, but all of them are infinite Pieces', () => {
-          it('does not create any groups for the Pieces', async() => {
+          it('does not create any groups for the Pieces', async () => {
             const infinitePieces: Piece[] = [
               EntityMockFactory.createPiece({
                 pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
@@ -2423,7 +2423,7 @@ describe(SuperflyTimelineBuilder.name, () => {
     })
 
     describe('Rundown does not have a previous Part', () => {
-      it('does not create a group for previous Part', async() => {
+      it('does not create a group for previous Part', async () => {
         const activePart: Part = EntityMockFactory.createPart({ id: 'activeId' })
         const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart: undefined })
 
@@ -2441,7 +2441,7 @@ describe(SuperflyTimelineBuilder.name, () => {
     describe('active Part has autoNext', () => {
       describe('active Part has an expected duration longer than zero', () => {
         describe('active Part has "delayStartOfPiecesDuration', () => {
-          it('sets TimelineEnable.duration of the active group to active Part.expectedDuration + active Part.timings.delayStartOfPiecesDuration', async() => {
+          it('sets TimelineEnable.duration of the active group to active Part.expectedDuration + active Part.timings.delayStartOfPiecesDuration', async () => {
             const delayStartOfPiecesDuration: number = 5
 
             const nextPart: Part = EntityMockFactory.createPart({ id: 'nextId' })
@@ -2466,7 +2466,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         })
 
         describe('active Part does not have "delayStartOfPiecesDuration', () => {
-          it('sets TimelineEnable.duration of the active group to active Part.expectedDuration', async() => {
+          it('sets TimelineEnable.duration of the active group to active Part.expectedDuration', async () => {
             const nextPart: Part = EntityMockFactory.createPart({ id: 'nextId' })
             const activePart: Part = EntityMockFactory.createPart({
               id: 'activeId',
@@ -2486,7 +2486,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
         })
 
-        it('sets Timeline.autoNext.epochTimeToTakeNext to be active Part.executedAt + active Part.expected duration + active Part.delayStartOffPiecesDuration - next Part.previousPartContinueIntoPartDuration', async() => {
+        it('sets Timeline.autoNext.epochTimeToTakeNext to be active Part.executedAt + active Part.expected duration + active Part.delayStartOffPiecesDuration - next Part.previousPartContinueIntoPartDuration', async () => {
           const delayStartOfPiecesDuration: number = 30
           const continueIntoPartDuration: number = 50
 
@@ -2514,7 +2514,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('active Part does not have an expected duration longer than zero', () => {
-        it('does not set Timeline.autoNext', async() => {
+        it('does not set Timeline.autoNext', async () => {
           const nextPart: Part = EntityMockFactory.createPart({ id: 'nextId' })
           const activePart: Part = EntityMockFactory.createPart({
             id: 'activeId',
@@ -2531,7 +2531,7 @@ describe(SuperflyTimelineBuilder.name, () => {
     })
 
     describe('active Part does not have autoNext', () => {
-      it('does not set Timeline.autoNext', async() => {
+      it('does not set Timeline.autoNext', async () => {
         const nextPart: Part = EntityMockFactory.createPart({ id: 'nextId' })
         const activePart: Part = EntityMockFactory.createPart({ id: 'activeId' })
         const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, nextPart })
@@ -2545,7 +2545,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
     describe('Rundown has an infinite Piece', () => {
       describe('infinite Piece is an "inTransition" Pieces', () => {
-        it('does not create an infinite Piece group', async() => {
+        it('does not create an infinite Piece group', async () => {
           const infinitePiece: Piece = EntityMockFactory.createPiece({
             transitionType: TransitionType.IN_TRANSITION,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
@@ -2564,7 +2564,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('infinite Piece is an "outTransition" Pieces', () => {
-        it('does not create an infinite Piece group', async() => {
+        it('does not create an infinite Piece group', async () => {
           const infinitePiece: Piece = EntityMockFactory.createPiece({
             transitionType: TransitionType.OUT_TRANSITION,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
@@ -2584,7 +2584,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
       describe('infinite Piece is not a "transition" Piece"', () => {
         describe('infinite Piece belongs to the active Part', () => {
-          it('does not create infinite groups for Piece', async() => {
+          it('does not create infinite groups for Piece', async () => {
             const activePartId: string = 'activePartId'
             const infinitePiece: Piece = EntityMockFactory.createPiece({
               partId: activePartId,
@@ -2610,7 +2610,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
         describe('infinite Piece does not belong to the active Part', () => {
           describe('infinite Piece does not have an executedAt larger than zero', () => {
-            it('throws an error', async() => {
+            it('throws an error', async () => {
               const infinitePiece: Piece = EntityMockFactory.createPiece({
                 partId: 'randomPartId',
                 transitionType: TransitionType.NO_TRANSITION,
@@ -2630,7 +2630,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
           describe('infinite Piece has an executedAt larger than zero', () => {
             describe('creates an infinite group for Piece', () => {
-              it('sets correct infinite group id', async() => {
+              it('sets correct infinite group id', async () => {
                 const infinitePiece: Piece = EntityMockFactory.createPiece(
                   {
                     partId: 'randomPartId',
@@ -2658,7 +2658,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(infiniteGroup).not.toBeUndefined()
               })
 
-              it('sets priority to medium', async() => {
+              it('sets priority to medium', async () => {
                 const infinitePiece: Piece = EntityMockFactory.createPiece(
                   {
                     partId: 'randomPartId',
@@ -2685,7 +2685,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(infiniteGroup.priority).toBe(MEDIUM_PRIORITY)
               })
 
-              it('sets TimelineEnable.start to Piece.executedAt', async() => {
+              it('sets TimelineEnable.start to Piece.executedAt', async () => {
                 const executedAt: number = 200
                 const infinitePiece: Piece = EntityMockFactory.createPiece(
                   {
@@ -2713,7 +2713,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(infiniteGroup.enable.start).toBe(executedAt)
               })
 
-              it('sets the layer to Piece.layer', async() => {
+              it('sets the layer to Piece.layer', async () => {
                 const layer: string = 'someLayerForInfinitePiece'
                 const infinitePiece: Piece = EntityMockFactory.createPiece(
                   {
@@ -2743,7 +2743,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('infinite Piece has a TimelineObject', () => {
-                it('sets the id of the TimelineObject to be infinitePieceGroup.id_piece.id_timelineObject.id', async() => {
+                it('sets the id of the TimelineObject to be infinitePieceGroup.id_piece.id_timelineObject.id', async () => {
                   const timelineObject: TimelineObject = { id: 'timelineObject' } as TimelineObject
                   const infinitePiece: Piece = EntityMockFactory.createPiece(
                     {
@@ -2776,7 +2776,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   expect(result).not.toBeUndefined()
                 })
 
-                it('sets the group of the TimelineObject to be the infinite Piece group', async() => {
+                it('sets the group of the TimelineObject to be the infinite Piece group', async () => {
                   const timelineObject: TimelineObject = { id: 'timelineObject' } as TimelineObject
                   const infinitePiece: Piece = EntityMockFactory.createPiece(
                     {
@@ -2809,7 +2809,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   expect(result.inGroup).toBe(infiniteGroup.id)
                 })
 
-                it('has same content as the TimelineObject', async() => {
+                it('has same content as the TimelineObject', async () => {
                   const content: unknown = { someContent: 'someContent' }
                   const timelineObject: TimelineObject = {
                     id: 'timelineObjectId',
@@ -2853,7 +2853,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('Piece has five TimelineObjects', () => {
-                it('adds all five TimelineObjects to the children of the infinite Piece group', async() => {
+                it('adds all five TimelineObjects to the children of the infinite Piece group', async () => {
                   const timelineObjects: TimelineObject[] = [
                     { id: '1' } as TimelineObject,
                     { id: '2' } as TimelineObject,
@@ -2909,7 +2909,7 @@ describe(SuperflyTimelineBuilder.name, () => {
     })
 
     describe('Rundown has multiple valid infinite Pieces', () => {
-      it('creates infinite groups for all infinite Pieces', async() => {
+      it('creates infinite groups for all infinite Pieces', async () => {
         const infinitePieces: Piece[] = [
           EntityMockFactory.createPiece(
             {
@@ -2963,7 +2963,7 @@ describe(SuperflyTimelineBuilder.name, () => {
     })
 
     describe('Rundown does not have any infinite Pieces', () => {
-      it('does not create any infinite Piece groups', async() => {
+      it('does not create any infinite Piece groups', async () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
@@ -2978,7 +2978,7 @@ describe(SuperflyTimelineBuilder.name, () => {
     })
 
     describe('it builds lookahead group', () => {
-      it('sets the correct lookahead group id', async() => {
+      it('sets the correct lookahead group id', async () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
@@ -2990,7 +2990,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         expect(lookaheadGroup).not.toBeUndefined()
       })
 
-      it('sets the enable to while="1"', async() => {
+      it('sets the enable to while="1"', async () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
@@ -3002,7 +3002,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         expect(lookaheadGroup.enable.while).toBe('1')
       })
 
-      it('sets the layer to be empty', async() => {
+      it('sets the layer to be empty', async () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
@@ -3014,7 +3014,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         expect(lookaheadGroup.layer).toBe('')
       })
 
-      it('sets the priority to Lookahead priority', async() => {
+      it('sets the priority to Lookahead priority', async () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
@@ -3027,7 +3027,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('there are no layers with Lookahead', () => {
-        it('does not add any children to the lookahead group', async() => {
+        it('does not add any children to the lookahead group', async () => {
           const timelineObject: TimelineObject = {
             id: 'timelineObject',
             layer: 'someLayer',
@@ -3048,7 +3048,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         })
 
         describe('there are layers without lookahead', () => {
-          it('does not add any children to the lookahead group', async() => {
+          it('does not add any children to the lookahead group', async () => {
             const timelineObject: TimelineObject = {
               id: 'timelineObject',
               layer: 'someLayer',
@@ -3074,7 +3074,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       describe('there is one layer with Lookahead', () => {
         describe('it gets the Pieces of the active Part', () => {
           describe('active Part only have infinite Pieces', () => {
-            it('does not add any children to the lookahead group', async() => {
+            it('does not add any children to the lookahead group', async () => {
               const timelineObject: TimelineObject = {
                 id: 'timelineObject',
                 layer: 'someLayer',
@@ -3106,7 +3106,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('active Part does not have any Pieces with TimelineObjects on a Lookahead layer', () => {
-            it('does not add any children to the lookahead group', async() => {
+            it('does not add any children to the lookahead group', async () => {
               const timelineObject: TimelineObject = {
                 id: 'timelineObject',
                 layer: 'completelyRandomLayer',
@@ -3133,7 +3133,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
           describe('active Part has one TimelineObject for the lookahead layer', () => {
             describe('it adds the TimelineObject to the children of the lookahead group', () => {
-              it('sets the id to be "lookaheadGroupId_timelineObject.id"', async() => {
+              it('sets the id to be "lookaheadGroupId_timelineObject.id"', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -3167,7 +3167,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject).not.toBeUndefined()
               })
 
-              it('sets the priority to be the lookahead priority', async() => {
+              it('sets the priority to be the lookahead priority', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -3200,7 +3200,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject.priority).toBe(LOOKAHEAD_PRIORITY)
               })
 
-              it('sets lookahead to be true', async() => {
+              it('sets lookahead to be true', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -3233,7 +3233,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject.isLookahead).toBe(true)
               })
 
-              it('sets the start to be 0', async() => {
+              it('sets the start to be 0', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -3266,7 +3266,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject.enable.start).toBe(0)
               })
 
-              it('sets the end to be when the active group starts', async() => {
+              it('sets the end to be when the active group starts', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -3301,7 +3301,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 )
               })
 
-              it('sets the group id to be the Lookahead group id', async() => {
+              it('sets the group id to be the Lookahead group id', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -3334,7 +3334,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject.inGroup).toBe(LOOKAHEAD_GROUP_ID)
               })
 
-              it('sets the content to be the content of the TimelineObject', async() => {
+              it('sets the content to be the content of the TimelineObject', async () => {
                 const content: unknown = {
                   someContent: 'doesntMatterWhat',
                 }
@@ -3375,7 +3375,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('the layer is a WHEN_CLEAR lookahead layer', () => {
-                it('sets the layer to be the layer of the TimelineObject', async() => {
+                it('sets the layer to be the layer of the TimelineObject', async () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
                     layer: 'layerName',
@@ -3413,7 +3413,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('the layer is a PRELOAD lookahead layer', () => {
-                it('sets the "lookaheadForLayer" to be the same as the layer of the timelineObject', async() => {
+                it('sets the "lookaheadForLayer" to be the same as the layer of the timelineObject', async () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
                     layer: 'layerName',
@@ -3450,7 +3450,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   expect(lookaheadTimelineObject.layer).toBe(`${timelineObject.layer}_lookahead`)
                 })
 
-                it('sets the "layer" to be the layer of the TimelineObject post-fixed with "_lookahead"', async() => {
+                it('sets the "layer" to be the layer of the TimelineObject post-fixed with "_lookahead"', async () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
                     layer: 'layerName',
@@ -3491,7 +3491,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('active Part has two TimelineObjects for the lookahead layer', () => {
-            it('adds them both to the children of the lookahead group', async() => {
+            it('adds them both to the children of the lookahead group', async () => {
               const timelineObjectOne: TimelineObject = {
                 id: 'timelineObjectOne',
                 layer: 'layerName',
@@ -3535,7 +3535,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
         describe('it gets the Pieces from the next Part', () => {
           describe('next Part only have infinite Pieces', () => {
-            it('does not add any children to the lookahead group', async() => {
+            it('does not add any children to the lookahead group', async () => {
               const timelineObject: TimelineObject = {
                 id: 'timelineObject',
                 layer: 'someLayer',
@@ -3567,7 +3567,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('next Part does not have any Pieces with TimelineObjects on a Lookahead layer', () => {
-            it('does not add any children to the lookahead group', async() => {
+            it('does not add any children to the lookahead group', async () => {
               const timelineObject: TimelineObject = {
                 id: 'timelineObject',
                 layer: 'someLayerWithNoLookahead',
@@ -3594,7 +3594,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
           describe('next Part has one TimelineObject for the lookahead layer', () => {
             describe('it adds the TimelineObject to the children of the lookahead group', () => {
-              it('sets the id to be "lookaheadGroupId_timelineObject.id"', async() => {
+              it('sets the id to be "lookaheadGroupId_timelineObject.id"', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -3628,7 +3628,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject).not.toBeUndefined()
               })
 
-              it('sets the priority to be the lookahead priority', async() => {
+              it('sets the priority to be the lookahead priority', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -3661,7 +3661,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject.priority).toBe(LOOKAHEAD_PRIORITY)
               })
 
-              it('sets lookahead to be true', async() => {
+              it('sets lookahead to be true', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -3694,7 +3694,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject.isLookahead).toBe(true)
               })
 
-              it('sets the enable to be while active group is present', async() => {
+              it('sets the enable to be while active group is present', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -3731,7 +3731,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 )
               })
 
-              it('sets the group id to be the Lookahead group id', async() => {
+              it('sets the group id to be the Lookahead group id', async () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'someLayer',
@@ -3764,7 +3764,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject.inGroup).toBe(LOOKAHEAD_GROUP_ID)
               })
 
-              it('sets the content to be the content of the TimelineObject', async() => {
+              it('sets the content to be the content of the TimelineObject', async () => {
                 const content: unknown = {
                   someContent: 'couldBeAnything',
                 }
@@ -3805,7 +3805,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('the layer is a WHEN_CLEAR lookahead layer', () => {
-                it('sets the layer to be the layer of the TimelineObject', async() => {
+                it('sets the layer to be the layer of the TimelineObject', async () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
                     layer: 'someLayer',
@@ -3843,7 +3843,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
 
               describe('the layer is a PRELOAD lookahead layer', () => {
-                it('sets the "lookaheadForLayer" to be the same as the layer of the timelineObject', async() => {
+                it('sets the "lookaheadForLayer" to be the same as the layer of the timelineObject', async () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
                     layer: 'someLayer',
@@ -3880,7 +3880,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   expect(lookaheadTimelineObject.lookaheadForLayer).toBe(timelineObject.layer)
                 })
 
-                it('sets the "layer" to be the layer of the TimelineObject post-fixed with "_lookahead"', async() => {
+                it('sets the "layer" to be the layer of the TimelineObject post-fixed with "_lookahead"', async () => {
                   const timelineObject: TimelineObject = {
                     id: 'timelineObject',
                     layer: 'someLayer',
@@ -3921,7 +3921,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('next Part has two TimelineObjects with lookahead layer', () => {
-            it('adds them both to the children of the lookahead group', async() => {
+            it('adds them both to the children of the lookahead group', async () => {
               const timelineObjectOne: TimelineObject = {
                 id: 'timelineObjectOne',
                 layer: 'someLayer',
@@ -3967,7 +3967,7 @@ describe(SuperflyTimelineBuilder.name, () => {
 
           describe('layer has a minimumLookahead set to one', () => {
             describe('it has two TimelineObjects for layer', () => {
-              it('only adds the first TimelineObject to the children of the lookahead group', async() => {
+              it('only adds the first TimelineObject to the children of the lookahead group', async () => {
                 const firstTimelineObject: TimelineObject = {
                   id: 'firstTimelineObject',
                   layer: 'someLayer',
@@ -4019,7 +4019,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('it has the first TimelineObject for the layer on just before the maximumSearchDistance', () => {
-              it('adds the TimelineObject to the children of the lookahead group', async() => {
+              it('adds the TimelineObject to the children of the lookahead group', async () => {
                 const firstPiece: Piece = EntityMockFactory.createPiece()
                 const firstPart: Part = EntityMockFactory.createPart({ pieces: [firstPiece] })
                 const firstSegment: Segment = EntityMockFactory.createSegment({ parts: [firstPart] })
@@ -4077,7 +4077,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             })
 
             describe('it has no TimelineObject for layer within the maximumSearchDistance', () => {
-              it('does not add any children to the lookahead group', async() => {
+              it('does not add any children to the lookahead group', async () => {
                 const firstPiece: Piece = EntityMockFactory.createPiece()
                 const firstPart: Part = EntityMockFactory.createPart({ pieces: [firstPiece] })
 
@@ -4126,7 +4126,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               })
             })
 
-            it('does not count TimelineObjects from the active Part among minimumLookaheadObjects', async() => {
+            it('does not count TimelineObjects from the active Part among minimumLookaheadObjects', async () => {
               const activePartTimelineObject: TimelineObject = {
                 id: 'activePartTimelineObject',
                 layer: 'someLayer',
@@ -4180,7 +4180,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('layer has a minimumLookahead set to two', () => {
-            it('returns both TimelineObjects', async() => {
+            it('returns both TimelineObjects', async () => {
               const firstTimelineObject: TimelineObject = {
                 id: 'firstTimelineObject',
                 layer: 'someLayer',
@@ -4233,7 +4233,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
 
           describe('Rundown runs out of Parts before maximum search distance is reached', () => {
-            it('does not add any children to the lookahead group', async() => {
+            it('does not add any children to the lookahead group', async () => {
               const parts: Part[] = [
                 EntityMockFactory.createPart({ id: 'firstPartId' }),
                 EntityMockFactory.createPart({ id: 'secondPartId' }),
@@ -4271,7 +4271,7 @@ describe(SuperflyTimelineBuilder.name, () => {
       })
 
       describe('there is no next cursor', () => {
-        it('returns empty lookahead group', async() => {
+        it('returns empty lookahead group', async () => {
           const rundown: Rundown = EntityTestFactory.createRundown({
             segments: [],
             mode: RundownMode.ACTIVE,

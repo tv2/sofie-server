@@ -11,7 +11,7 @@ import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
 const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 
 describe(DeviceChangedService.name, () => {
-  it('calls the StatusMessageService with a StatusMessage that has the same id as the Device', async() => {
+  it('calls the StatusMessageService with a StatusMessage that has the same id as the Device', async () => {
     const device: CoreDevice = EntityTestFactory.createCoreDevice({ id: 'deviceId' })
     const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
@@ -24,7 +24,7 @@ describe(DeviceChangedService.name, () => {
     expect(statusMessage.id).toBe(`${DEVICE_STATUS_MESSAGE_PREFIX}${device.id}`)
   })
 
-  it('calls the StatusMessageService with a StatusMessage that has the Device name as title', async() => {
+  it('calls the StatusMessageService with a StatusMessage that has the Device name as title', async () => {
     const device: CoreDevice = EntityTestFactory.createCoreDevice({ statusMessage: 'some Message' })
     const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
@@ -38,7 +38,7 @@ describe(DeviceChangedService.name, () => {
   })
 
   describe('the Device is not connected', () => {
-    it('calls the StatusMessageService with a StatusCode BAD', async() => {
+    it('calls the StatusMessageService with a StatusCode BAD', async () => {
       const device: CoreDevice = EntityTestFactory.createCoreDevice({ isConnected: false, statusCode: StatusCode.UNKNOWN })
       const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
@@ -51,7 +51,7 @@ describe(DeviceChangedService.name, () => {
       expect(statusMessage.statusCode).toBe(StatusCode.BAD)
     })
 
-    it('calls the StatusMessageService with a NOT_CONNECTED message', async() => {
+    it('calls the StatusMessageService with a NOT_CONNECTED message', async () => {
       const device: CoreDevice = EntityTestFactory.createCoreDevice({ isConnected: false, statusMessage: 'some message' })
       const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
@@ -66,7 +66,7 @@ describe(DeviceChangedService.name, () => {
   })
 
   describe('the Device is connected', () => {
-    it('calls the StatusMessageService with a StatusMessage with a StatusCode matching the Device status', async() => {
+    it('calls the StatusMessageService with a StatusMessage with a StatusCode matching the Device status', async () => {
       const device: CoreDevice = EntityTestFactory.createCoreDevice({ isConnected: true, statusCode: StatusCode.WARNING })
       const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
@@ -79,7 +79,7 @@ describe(DeviceChangedService.name, () => {
       expect(statusMessage.statusCode).toBe(device.statusCode)
     })
 
-    it('calls the StatusMessageService with a StatusMessage with a message matching the Device status message', async() => {
+    it('calls the StatusMessageService with a StatusMessage with a message matching the Device status message', async () => {
       const device: CoreDevice = EntityTestFactory.createCoreDevice({ isConnected: true, statusMessage: 'Some message' })
       const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 

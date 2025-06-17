@@ -787,10 +787,10 @@
   resolved "https://registry.npmjs.org/@tsconfig/node16/-/node16-1.0.4.tgz"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
-"@tv2media/eslint-config@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@tv2media/eslint-config/-/eslint-config-1.0.1.tgz#074711b9f13e74ce0af2bfbef0cacb1502646be3"
-  integrity sha512-kdkMIQ/I4qLTTm1o+zns/ETGcHmQtX8G7g/u7TU55kDPo+1iUnDJdR5ZTJ8raJvnr529E3/peJqNEMM1fCYZ/w==
+"@tv2media/eslint-config@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@tv2media/eslint-config/-/eslint-config-1.0.3.tgz#0aaa556e7dfe0bb4617038b514fd9e3ad9608a92"
+  integrity sha512-RPP498GHKumH6bGqyQus8uVyDE98CGtFLECCKaaaCi35bWot5Rjr3ABW7SUssRCFgtHxbw3/oyKVuliNjShNlg==
   dependencies:
     "@stylistic/eslint-plugin" "^4.4.1"
     "@typescript-eslint/eslint-plugin" "^8.34.1"

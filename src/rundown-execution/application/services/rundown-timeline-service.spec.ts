@@ -32,7 +32,7 @@ import { PlayoutContentUpdateService } from '../interfaces/playout-content-servi
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
-    it('deletes a rundown, when it receives a valid RundownId', async() => {
+    it('deletes a rundown, when it receives a valid RundownId', async () => {
       const ingestedRundownRepository: IngestedRundownRepository = mock<IngestedRundownRepository>()
 
       const rundownRepository: RundownRepository = mock<RundownRepository>()
@@ -47,7 +47,7 @@ describe(RundownTimelineService.name, () => {
       verify(ingestedRundownRepository.deleteIngestedRundown(rundown.id)).once()
     })
 
-    it('emits a rundown deleted event, when it receives a valid RundownId', async() => {
+    it('emits a rundown deleted event, when it receives a valid RundownId', async () => {
       const rundown: Rundown = EntityMockFactory.createRundown({ mode: RundownMode.INACTIVE })
       const rundownRepository: RundownRepository = mock<RundownRepository>()
       when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
@@ -63,7 +63,7 @@ describe(RundownTimelineService.name, () => {
       verify(rundownEventEmitter.emitRundownDeleted(anything())).once()
     })
 
-    it('throws an exception, when it receives a RundownId of an active rundown', async() => {
+    it('throws an exception, when it receives a RundownId of an active rundown', async () => {
       const rundownRepository: RundownRepository = mock<RundownRepository>()
 
       const rundown: Rundown = EntityMockFactory.createRundown({ mode: RundownMode.ACTIVE })
@@ -77,7 +77,7 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.activateRundown.name}`, () => {
-    it('throws an exception, when trying to active a rundown when there is another already activated rundown', async() => {
+    it('throws an exception, when trying to active a rundown when there is another already activated rundown', async () => {
       const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE })]
       const rundownRepository: RundownRepository = mock<RundownRepository>()
       when(rundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
@@ -90,7 +90,7 @@ describe(RundownTimelineService.name, () => {
       await expect(result).rejects.toThrow(AlreadyActivatedException)
     })
 
-    it('throws an exception when trying to active a Rundown when there is another Rundown in rehearsal', async() => {
+    it('throws an exception when trying to active a Rundown when there is another Rundown in rehearsal', async () => {
       const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.REHEARSAL })]
       const rundownRepository: RundownRepository = mock<RundownRepository>()
       when(rundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
@@ -119,7 +119,7 @@ describe(RundownTimelineService.name, () => {
       expect(result).not.toThrow(AlreadyRehearsalException)
     })
 
-    it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async() => {
+    it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async () => {
       const aRundownMock: Rundown = EntityMockFactory.createRundownMock({ id: 'aRundown', mode: RundownMode.INACTIVE })
       const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
       const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
@@ -145,7 +145,7 @@ describe(RundownTimelineService.name, () => {
       verify(rundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
     })
 
-    it('emits infinitePiecesUpdatedEvent when pieces are changed', async() => {
+    it('emits infinitePiecesUpdatedEvent when pieces are changed', async () => {
       const aRundownMock: Rundown = EntityMockFactory.createRundownMock({ id: 'aRundown', mode: RundownMode.INACTIVE })
       const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'firstLayerPiece' })
       const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'secondLayerPiece' })
@@ -172,7 +172,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('Rundown is coming from inactive', () => {
-      it('calls playoutService.makeDevicesReady with okToDestroyStuff true', async() => {
+      it('calls playoutService.makeDevicesReady with okToDestroyStuff true', async () => {
         const playoutService: PlayoutService = createMockOfPlayoutService()
         const rundownMock: Rundown = EntityMockFactory.createRundownMock()
         when(rundownMock.getMode()).thenReturn(RundownMode.INACTIVE)
@@ -191,7 +191,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('Rundown is coming from rehearsal', () => {
-      it('calls playoutService.makeDevicesReady with okToDestroyStuff false', async() => {
+      it('calls playoutService.makeDevicesReady with okToDestroyStuff false', async () => {
         const playoutService: PlayoutService = createMockOfPlayoutService()
         const rundown: Rundown = EntityTestFactory.createRundown({ mode: RundownMode.REHEARSAL })
 
@@ -208,7 +208,7 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.enterRehearsal.name}`, () => {
-    it('throws an exception when trying to enter rehearsal on a Rundown when another Rundown is already active', async() => {
+    it('throws an exception when trying to enter rehearsal on a Rundown when another Rundown is already active', async () => {
       const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.ACTIVE })]
       const rundownRepository: RundownRepository = mock<RundownRepository>()
       when(rundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
@@ -221,7 +221,7 @@ describe(RundownTimelineService.name, () => {
       await expect(result).rejects.toThrow(AlreadyActivatedException)
     })
 
-    it('throws an exception when trying to enter rehearsal on a Rundown when another Rundown is already in rehearsal', async() => {
+    it('throws an exception when trying to enter rehearsal on a Rundown when another Rundown is already in rehearsal', async () => {
       const basicRundowns: Rundown[] = [EntityTestFactory.createRundown({ mode: RundownMode.REHEARSAL })]
       const rundownRepository: RundownRepository = mock<RundownRepository>()
       when(rundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
@@ -235,7 +235,7 @@ describe(RundownTimelineService.name, () => {
       await expect(result).rejects.toThrow(AlreadyRehearsalException)
     })
 
-    it('calls playoutService.makeDevicesReady with okToDestroyStuff is true', async() => {
+    it('calls playoutService.makeDevicesReady with okToDestroyStuff is true', async () => {
       const playoutService: PlayoutService = createMockOfPlayoutService()
       const rundownMock: Rundown = EntityMockFactory.createRundownMock()
       when(rundownMock.getInfinitePiecesMap()).thenReturn(new Map())
@@ -253,7 +253,7 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.deactivateRundown.name}`, () => {
-    it('calls the playoutService.makeDevicesStandDown', async() => {
+    it('calls the playoutService.makeDevicesStandDown', async () => {
       const playoutService: PlayoutService = createMockOfPlayoutService()
       const rundown: Rundown = EntityMockFactory.createRundown()
       const rundownRepository: RundownRepository = mock<RundownRepository>()
@@ -268,7 +268,7 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.setNextFromIds.name}`, () => {
     describe('has active segment with unplanned part as next', () => {
-      it('removes unplayed unplanned part when next cursor is moved away', async() => {
+      it('removes unplayed unplanned part when next cursor is moved away', async () => {
         const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
         const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
         const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
@@ -305,7 +305,7 @@ describe(RundownTimelineService.name, () => {
       })
     })
 
-    it('keeps unplanned part if it has already been played', async() => {
+    it('keeps unplanned part if it has already been played', async () => {
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
       const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
       const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
@@ -361,7 +361,7 @@ describe(RundownTimelineService.name, () => {
     const timelineBuilder: TimelineBuilder = mock<TimelineBuilder>()
     const ingestService: IngestService = createMockOfIngestService()
 
-    it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async() => {
+    it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async () => {
       const segments: Segment[] = [activeSegment, nextSegment]
       const rundown: Rundown = EntityTestFactory.createRundown({
         segments: segments,
@@ -394,7 +394,7 @@ describe(RundownTimelineService.name, () => {
       verify(rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)).never()
     })
 
-    it('calls for reingest of rundown data if segment put on air defines a show style variant', async() => {
+    it('calls for reingest of rundown data if segment put on air defines a show style variant', async () => {
       const segments: Segment[] = [activeSegment, nextShowStyleVariantSegment]
       const rundown: Rundown = EntityTestFactory.createRundown({
         segments: segments,
@@ -429,7 +429,7 @@ describe(RundownTimelineService.name, () => {
       verify(ingestService.reloadIngestData(rundown.id)).once()
     })
 
-    it('does not call for reingest of rundown data if segment put on air has not defined a show style variant', async() => {
+    it('does not call for reingest of rundown data if segment put on air has not defined a show style variant', async () => {
       const segments: Segment[] = [activeSegment, nextSegment]
       const rundown: Rundown = EntityTestFactory.createRundown({
         segments: segments,
@@ -465,7 +465,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('no Part has been Taken yet', () => {
-      it('does a Take', async() => {
+      it('does a Take', async () => {
         const rundownMock: Rundown = mock(Rundown)
         when(rundownMock.getActivePart()).thenThrow(new UnsupportedOperationException(''))
         const rundown: Rundown = instance(rundownMock)
@@ -487,7 +487,7 @@ describe(RundownTimelineService.name, () => {
 
     describe('active Part has an inTransition', () => {
       describe('enough time has not yet passed for the block duration', () => {
-        it('does not stop the callbackScheduler', async() => {
+        it('does not stop the callbackScheduler', async () => {
           const now: number = Date.now()
           jest.useFakeTimers({ now })
 
@@ -523,7 +523,7 @@ describe(RundownTimelineService.name, () => {
           verify(callbackScheduler.stop()).never()
         })
 
-        it('does not do a Take', async() => {
+        it('does not do a Take', async () => {
           const now: number = Date.now()
           jest.useFakeTimers({ now })
 
@@ -557,7 +557,7 @@ describe(RundownTimelineService.name, () => {
           verify(rundownMock.takeNext()).never()
         })
 
-        it('throws a TakeIsBlockedException', async() => {
+        it('throws a TakeIsBlockedException', async () => {
           const now: number = Date.now()
           jest.useFakeTimers({ now })
 
@@ -587,7 +587,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       describe('enough time has passed for the block duration', () => {
-        it('stops the callbackScheduler', async() => {
+        it('stops the callbackScheduler', async () => {
           const now: number = Date.now()
           jest.useFakeTimers({ now })
 
@@ -619,7 +619,7 @@ describe(RundownTimelineService.name, () => {
           verify(callbackScheduler.stop()).once()
         })
 
-        it('does a Take', async() => {
+        it('does a Take', async () => {
           const now: number = Date.now()
           jest.useFakeTimers({ now })
 
@@ -667,7 +667,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       describe('and the take mode is Standard', () => {
-        it('should not emit partInsertedAsNext event', async() => {
+        it('should not emit partInsertedAsNext event', async () => {
           const activeRundown: Rundown = instance(rundownMock)
           const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
           const rundownRepository: RundownRepository = mock<RundownRepository>()
@@ -682,7 +682,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       describe('and the take mode is Recall', () => {
-        it('should emit partInsertedAsNext event', async() => {
+        it('should emit partInsertedAsNext event', async () => {
           const activeRundown: Rundown = instance(rundownMock)
           const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
           const rundownRepository: RundownRepository = mock<RundownRepository>()
@@ -699,7 +699,7 @@ describe(RundownTimelineService.name, () => {
   })
 
   describe(`${RundownTimelineService.prototype.insertPartAsOnAir.name}`, () => {
-    it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async() => {
+    it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async () => {
       const aPiece: Piece = EntityTestFactory.createPiece({ id: 'aPieceId' })
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
@@ -733,7 +733,7 @@ describe(RundownTimelineService.name, () => {
       verify(rundownEventEmitter.emitInfinitePiecesUpdatedEvent(aRundown)).never()
     })
 
-    it('inserts the new Part as OnAir', async() => {
+    it('inserts the new Part as OnAir', async () => {
       const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
 
       const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPart' })
@@ -758,7 +758,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('there is already an unplanned Part queued as Next', () => {
-      it('keeps the unplanned Part as the Next Part', async() => {
+      it('keeps the unplanned Part as the Next Part', async () => {
         const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
 
         const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPart' })
@@ -787,7 +787,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('the Next Part is a planned Part', () => {
-      it('keeps the planned Part as the Next Part', async() => {
+      it('keeps the planned Part as the Next Part', async () => {
         const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
 
         const onAirPart: Part = EntityTestFactory.createPart({ id: 'onAirPart' })
@@ -816,7 +816,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('the Next Part is not immediately after the OnAir part', () => {
-      it('keeps the Part marked as Next as the Next Part', async() => {
+      it('keeps the Part marked as Next as the Next Part', async () => {
         const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
 
         const segmentId: string = 'segmentId'
@@ -847,7 +847,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('no Parts were pruned from the active Segment', () => {
-      it('emits a PartInsertedAsOnAirEvent with the inserted Part', async() => {
+      it('emits a PartInsertedAsOnAirEvent with the inserted Part', async () => {
         const rundownMock: Rundown = EntityMockFactory.createRundownMock()
         const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
         when(rundownMock.getActivePart()).thenReturn(partToBeInserted)
@@ -867,7 +867,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       describe('the active Part of the Rundown is not the same as the Part inserted', () => {
-        it('does not emit a PartInsertedAsOnAirEvent', async() => {
+        it('does not emit a PartInsertedAsOnAirEvent', async () => {
           const rundownMock: Rundown = EntityMockFactory.createRundownMock()
           const partOnAir: Part = EntityTestFactory.createPart({ id: 'partThatWasntInserted' })
           when(rundownMock.getActivePart()).thenReturn(partOnAir)
@@ -890,7 +890,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('Parts were pruned on the active Segment', () => {
-      it('does not emit a PartInsertedAsOnAirEvent', async() => {
+      it('does not emit a PartInsertedAsOnAirEvent', async () => {
         const rundownMock: Rundown = EntityMockFactory.createRundownMock()
         when(rundownMock.pruneOldUnplannedPartsOnActiveSegment()).thenReturn(['somePrunedPartIdOne', 'somePrunedPartIdTwo'])
         const partToBeInserted: Part = EntityTestFactory.createPart({ id: 'partToBeInserted', ingestedPart: undefined })
@@ -909,7 +909,7 @@ describe(RundownTimelineService.name, () => {
         verify(rundownEventEmitter.emitPartInsertedAsOnAirEvent(anything(), anything())).never()
       })
 
-      it('emits a SegmentUpdatedEvent for the active Segment', async() => {
+      it('emits a SegmentUpdatedEvent for the active Segment', async () => {
         const segment: Segment = EntityTestFactory.createSegment()
         const rundownMock: Rundown = EntityMockFactory.createRundownMock()
         when(rundownMock.getActiveSegment()).thenReturn(segment)
@@ -958,7 +958,7 @@ describe(RundownTimelineService.name, () => {
         when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
       })
 
-      it('saves no new Timeline', async() => {
+      it('saves no new Timeline', async () => {
         const timelineRepository: TimelineRepository = mock<TimelineRepository>()
 
         const testee: RundownTimelineService = createTestee({ rundownRepository, timelineRepository })
@@ -967,7 +967,7 @@ describe(RundownTimelineService.name, () => {
         verify(timelineRepository.saveTimeline(anything())).never()
       })
 
-      it('emits no PieceStoppedEvent', async() => {
+      it('emits no PieceStoppedEvent', async () => {
         const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
 
         const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
@@ -976,7 +976,7 @@ describe(RundownTimelineService.name, () => {
         verify(rundownEventEmitter.emitPieceStoppedEvent(anything(), anyString(), anything())).never()
       })
 
-      it('does not save the Rundown', async() => {
+      it('does not save the Rundown', async () => {
         const testee: RundownTimelineService = createTestee({ rundownRepository })
         await testee.stopPiece(rundown.id, nonExistingPieceId)
 
@@ -1012,7 +1012,7 @@ describe(RundownTimelineService.name, () => {
         when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
       })
 
-      it('build and saves a new Timeline', async() => {
+      it('build and saves a new Timeline', async () => {
         const timeline: Timeline = { // We just need a Timeline. We don't care what's in for this test.
           timelineGroups: []
         }
@@ -1029,7 +1029,7 @@ describe(RundownTimelineService.name, () => {
         verify(timelineRepository.saveTimeline(timeline)).once()
       })
 
-      it('emits a PieceStopped event for the Piece', async() => {
+      it('emits a PieceStopped event for the Piece', async () => {
         const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
 
         const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
@@ -1038,7 +1038,7 @@ describe(RundownTimelineService.name, () => {
         verify(rundownEventEmitter.emitPieceStoppedEvent(rundown, anyString(), piece)).once()
       })
 
-      it('saves the Rundown', async() => {
+      it('saves the Rundown', async () => {
         const testee: RundownTimelineService = createTestee({ rundownRepository })
         await testee.stopPiece(rundown.id, piece.id)
 
@@ -1049,7 +1049,7 @@ describe(RundownTimelineService.name, () => {
 
   describe(RundownTimelineService.prototype.resetRundown.name, () => {
     describe('when rundown is in rehearsal', () => {
-      it('is still in rehearsal after reset', async() => {
+      it('is still in rehearsal after reset', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-id',
           segments: [EntityTestFactory.createSegment({
@@ -1071,7 +1071,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('when rundown is active', () => {
-      it('is still active after reset', async() => {
+      it('is still active after reset', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-id',
           segments: [EntityTestFactory.createSegment({
@@ -1092,7 +1092,7 @@ describe(RundownTimelineService.name, () => {
       })
     })
 
-    it('emits set next event after reset event', async() => {
+    it('emits set next event after reset event', async () => {
       const rundown: Rundown = EntityTestFactory.createRundown({
         id: 'rundown-id',
         segments: [EntityTestFactory.createSegment({
@@ -1116,7 +1116,7 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.setTakeMode.name}`, () => {
     describe('when take mode has been changed in a rundown', () => {
-      it('will emit a rundown updated event', async() => {
+      it('will emit a rundown updated event', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-id',
           segments: [EntityTestFactory.createSegment({
@@ -1138,7 +1138,7 @@ describe(RundownTimelineService.name, () => {
     })
 
     describe('when take mode is set to the same take mode in a rundown', () => {
-      it('won\'t emit a rundown updated event since no changes occurred', async() => {
+      it('won\'t emit a rundown updated event since no changes occurred', async () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-id',
           segments: [EntityTestFactory.createSegment({

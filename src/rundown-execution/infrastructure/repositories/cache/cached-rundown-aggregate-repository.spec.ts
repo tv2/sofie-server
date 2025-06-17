@@ -6,7 +6,7 @@ import { Logger } from '../../../../cross-cutting-concerns/application/interface
 
 describe(CachedRundownAggregateRepository.name, () => {
   describe(CachedRundownAggregateRepository.prototype.getRundown.name, () => {
-    it('receives a RundownId returns a rundown', async() => {
+    it('receives a RundownId returns a rundown', async () => {
       const mockRepo: RundownAggregateRepository = mock<RundownAggregateRepository>()
 
       const randomRundownId: string = 'randomRundownId'
@@ -20,7 +20,7 @@ describe(CachedRundownAggregateRepository.name, () => {
       expect(result).toBe(randomRundown)
     })
 
-    it('receives two request to fetch the same Rundown, only call the database once', async() => {
+    it('receives two request to fetch the same Rundown, only call the database once', async () => {
       const mockRepo: RundownAggregateRepository = mock<RundownAggregateRepository>()
 
       const randomRundownId: string = 'randomRundownId'

@@ -43,7 +43,7 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
       .toArray()
     const segments: Segment[] = this.mongoEntityConverter.convertToSegments(mongoSegments)
     return Promise.all(
-      segments.map(async(segment) => {
+      segments.map(async (segment) => {
         segment.setParts(await this.mongoPartRepository.getParts(segment.id))
         return segment
       })

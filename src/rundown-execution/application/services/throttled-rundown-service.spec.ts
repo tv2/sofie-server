@@ -12,7 +12,7 @@ describe(ThrottledRundownService.name, () => {
 
   describe('when two operations are performed within the throttled interval', () => {
     describe('throws an error to second operation', () => {
-      it('throws error when two take nexts are performed with 0ms delay', async() => {
+      it('throws error when two take nexts are performed with 0ms delay', async () => {
         const rundownService: RundownService = mock<RundownService>()
 
         const rundownId: string = 'rundown-id'
@@ -26,7 +26,7 @@ describe(ThrottledRundownService.name, () => {
         expect(result).toThrow(ThrottledRundownException)
       })
 
-      it('does not throw an error when two different actions are performed with 0ms delay', async() => {
+      it('does not throw an error when two different actions are performed with 0ms delay', async () => {
         const rundownService: RundownService = mock<RundownService>()
 
         const rundownId: string = 'rundown-id'
@@ -40,7 +40,7 @@ describe(ThrottledRundownService.name, () => {
         expect(result).not.toThrow(ThrottledRundownException)
       })
 
-      it('throws error when two take nexts are performed with 499ms delay', async() => {
+      it('throws error when two take nexts are performed with 499ms delay', async () => {
         const rundownService: RundownService = mock<RundownService>()
 
         const rundownId: string = 'rundown-id'
@@ -62,7 +62,7 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe('when two operations are performed outside of a throttled interval', () => {
-    it('performed two take nexts with 500ms between', async() => {
+    it('performed two take nexts with 500ms between', async () => {
       const rundownService: RundownService = mock<RundownService>()
 
       const rundownId: string = 'rundown-id'
@@ -81,7 +81,7 @@ describe(ThrottledRundownService.name, () => {
       verify(rundownService.takeNext(rundownId)).times(2)
     })
 
-    it('performed two different operations with 500ms between', async() => {
+    it('performed two different operations with 500ms between', async () => {
       const rundownService: RundownService = mock<RundownService>()
 
       const rundownId: string = 'rundown-id'
@@ -102,7 +102,7 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe('when performed operations witch should not have throttled mechanism', () => {
-    it('performed two insert part as next operations without any time between', async() => {
+    it('performed two insert part as next operations without any time between', async () => {
       const rundownService: RundownService = mock<RundownService>()
 
       const rundownId: string = 'rundown-id'
@@ -118,7 +118,7 @@ describe(ThrottledRundownService.name, () => {
       verify(rundownService.insertPartAsNext(rundownId, secondPartToInsert)).calledAfter(rundownService.insertPartAsNext(rundownId, firstPartToInsert))
     })
 
-    it('performed two insert part as on air operations without any time between', async() => {
+    it('performed two insert part as on air operations without any time between', async () => {
       const rundownService: RundownService = mock<RundownService>()
 
       const rundownId: string = 'rundown-id'
@@ -133,7 +133,7 @@ describe(ThrottledRundownService.name, () => {
       verify(rundownService.insertPartAsOnAir(rundownId, partToInsert)).times(2)
     })
 
-    it('performed two replace piece on air on next part operations without any time between', async() => {
+    it('performed two replace piece on air on next part operations without any time between', async () => {
       const rundownService: RundownService = mock<RundownService>()
 
       const rundownId: string = 'rundown-id'
@@ -151,14 +151,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.takeNext.name, () => {
-    it('calls TakeNext on the RundownService', async() => {
+    it('calls TakeNext on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.takeNext('rundownId')
       verify(rundownService.takeNext(anything())).once()
     })
 
-    it('throws ThrottleRundownException if called twice in succession', async() => {
+    it('throws ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.takeNext('rundownId')
       jest.advanceTimersByTime(5)
@@ -167,14 +167,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.activateRundown.name, () => {
-    it('calls ActivateRundown on the RundownService', async() => {
+    it('calls ActivateRundown on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.activateRundown('rundownId')
       verify(rundownService.activateRundown(anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.activateRundown('rundownId')
       jest.advanceTimersByTime(5)
@@ -183,14 +183,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.deactivateRundown.name, () => {
-    it('calls DeactivateRundown on the RundownService', async() => {
+    it('calls DeactivateRundown on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.deactivateRundown('rundownId')
       verify(rundownService.deactivateRundown(anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.deactivateRundown('rundownId')
       jest.advanceTimersByTime(5)
@@ -199,14 +199,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.resetRundown.name, () => {
-    it('calls ResetRundown on the RundownService', async() => {
+    it('calls ResetRundown on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.resetRundown('rundownId')
       verify(rundownService.resetRundown(anything())).once()
     })
 
-    it('does not throw a ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw a ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.resetRundown('rundownId')
       jest.advanceTimersByTime(5)
@@ -215,14 +215,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.enterRehearsal.name, () => {
-    it('calls EnterRehearsal on the RundownService', async() => {
+    it('calls EnterRehearsal on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.enterRehearsal('rundownId')
       verify(rundownService.enterRehearsal(anything())).once()
     })
 
-    it('throws ThrottleRundownException if called twice in succession', async() => {
+    it('throws ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.enterRehearsal('rundownId')
       jest.advanceTimersByTime(5)
@@ -231,14 +231,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.deleteRundown.name, () => {
-    it('calls DeleteRundown on the RundownService', async() => {
+    it('calls DeleteRundown on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.deleteRundown('rundownId')
       verify(rundownService.deleteRundown(anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.deleteRundown('rundownId')
       jest.advanceTimersByTime(5)
@@ -247,14 +247,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.setNextFromIds.name, () => {
-    it('calls SetNext on the RundownService', async() => {
+    it('calls SetNext on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.setNextFromIds('rundownId', 'segmentId', 'partId')
       verify(rundownService.setNextFromIds(anything(), anything(), anything(), anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.setNextFromIds('rundownId', 'segmentId', 'partId')
       jest.advanceTimersByTime(5)
@@ -263,14 +263,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.insertPartAsOnAir.name, () => {
-    it('calls InsertPartAsOnAir on the RundownService', async() => {
+    it('calls InsertPartAsOnAir on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.insertPartAsNext('rundownId', EntityTestFactory.createPart())
       verify(rundownService.insertPartAsNext(anything(), anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.insertPartAsOnAir('rundownId', EntityTestFactory.createPart())
       jest.advanceTimersByTime(5)
@@ -279,14 +279,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.insertPartAsNext.name, () => {
-    it('calls InsertPartAsNext on the RundownService', async() => {
+    it('calls InsertPartAsNext on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.insertPartAsNext('rundownId', EntityTestFactory.createPart())
       verify(rundownService.insertPartAsNext(anything(), anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.insertPartAsNext('rundownId', EntityTestFactory.createPart())
       jest.advanceTimersByTime(5)
@@ -295,14 +295,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.insertPieceAsOnAir.name, () => {
-    it('calls InsertPieceAsOnAir on the RundownService', async() => {
+    it('calls InsertPieceAsOnAir on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.insertPieceAsOnAir('rundownId', EntityTestFactory.createPiece())
       verify(rundownService.insertPieceAsOnAir(anything(), anything(), anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.insertPieceAsOnAir('rundownId', EntityTestFactory.createPiece())
       jest.advanceTimersByTime(5)
@@ -311,14 +311,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.insertPieceAsNext.name, () => {
-    it('calls InsertPieceAsNext on the RundownService', async() => {
+    it('calls InsertPieceAsNext on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.insertPieceAsNext('rundownId', EntityTestFactory.createPiece())
       verify(rundownService.insertPieceAsNext(anything(), anything(), anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.insertPieceAsNext('rundownId', EntityTestFactory.createPiece())
       jest.advanceTimersByTime(5)
@@ -327,14 +327,14 @@ describe(ThrottledRundownService.name, () => {
   })
 
   describe(ThrottledRundownService.prototype.replacePieceOnAirOnNextPart.name, () => {
-    it('calls ReplacePieceOAirOnNextPart on the RundownService', async() => {
+    it('calls ReplacePieceOAirOnNextPart on the RundownService', async () => {
       const rundownService: RundownService = mock<RundownService>()
       const testee: ThrottledRundownService = createTestee({ rundownService })
       await testee.replacePieceOnAirOnNextPart('rundownId', EntityTestFactory.createPiece(), EntityTestFactory.createPiece())
       verify(rundownService.replacePieceOnAirOnNextPart(anything(), anything(), anything())).once()
     })
 
-    it('does not throw ThrottleRundownException if called twice in succession', async() => {
+    it('does not throw ThrottleRundownException if called twice in succession', async () => {
       const testee: ThrottledRundownService = createTestee()
       await testee.replacePieceOnAirOnNextPart('rundownId', EntityTestFactory.createPiece(), EntityTestFactory.createPiece())
       jest.advanceTimersByTime(5)
