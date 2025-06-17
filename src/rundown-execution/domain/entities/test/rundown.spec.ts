@@ -4383,7 +4383,7 @@ describe(Rundown.name, () => {
 
         try {
           testee.setNextFromIds(nextSegment.id, nextPart.id)
-        } catch (e) {
+        } catch {
           // Do nothing - the error is expected.
         }
 

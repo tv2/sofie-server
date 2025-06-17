@@ -219,7 +219,7 @@ export class RundownTimelineService implements RundownService {
 
     try {
       onAirPart = rundown.getActivePart()
-    } catch (error) {
+    } catch {
       // If 'getActivePart()' throws it means that we don't have any active Part yet which means the Take is not blocked - hence we can simply return.
       return
     }
