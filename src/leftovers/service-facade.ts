@@ -7,7 +7,6 @@ import { TimeoutCallbackScheduler } from '../cross-cutting-concerns/application/
 import { BlueprintsFacade } from '../blueprints/blueprints-facade'
 import { ActionService } from '../action-system/application/interfaces/action-service'
 import { ExecuteActionService } from '../action-system/application/services/execute-action-service'
-import { EventEmitterFacade } from './event-emitter-facade'
 import { DataChangeService } from '../rundown-execution/application/interfaces/data-change-service'
 import { BlueprintTimelineBuilder } from '../rundown-execution/domain/services/blueprint-timeline-builder'
 import { IngestService } from '../sofie-ingest/application/interfaces/ingest-service'
@@ -39,6 +38,14 @@ import { MacroService } from '../action-system/application/interfaces/macro-serv
 import { HelperFacade } from '../cross-cutting-concerns/application/helper-facade'
 import { PlayoutContentReadService, PlayoutContentUpdateService } from '../rundown-execution/application/interfaces/playout-content-service'
 import { PlayoutContentStateService } from '../rundown-execution/application/services/playout-content-state-service'
+import {
+  CrossCuttingConcernsEventEmitterFacade
+} from '../cross-cutting-concerns/application/facades/cross-cutting-concerns-event-emitter-facade'
+import {ActionSystemEventEmitterFacade} from '../action-system/application/facades/action-system-event-emitter-facade'
+import {
+  RundownExecutionEventEmitterFacade
+} from '../rundown-execution/application/facades/rundown-execution-event-emitter-facade'
+import {SofieIngestEventEmitterFacade} from '../sofie-ingest/application/facades/sofie-ingest-event-emitter-facade'
 
 export class ServiceFacade {
 
@@ -46,7 +53,7 @@ export class ServiceFacade {
 
   public static createRundownService(): RundownService {
     const rundownTimelineService: RundownTimelineService = new RundownTimelineService(
-      EventEmitterFacade.createRundownEventEmitter(),
+      RundownExecutionEventEmitterFacade.getRundownEventEmitter(),
       RepositoryFacade.createIngestedRundownRepository(),
       RepositoryFacade.createRundownRepository(),
       RepositoryFacade.createTimelineRepository(),
@@ -83,12 +90,17 @@ export class ServiceFacade {
   }
 
   public static createMacroService(): MacroService {
-    return new MacroServiceImplementation(EventEmitterFacade.createStatusMessageEventEmitter(), EventEmitterFacade.createMacroEventEmitter(), RepositoryFacade.createMacroRepository(), ServiceFacade.createActionService())
+    return new MacroServiceImplementation(
+      CrossCuttingConcernsEventEmitterFacade.getStatusMessageEventEmitter(),
+      ActionSystemEventEmitterFacade.getMacroEventEmitter(),
+      RepositoryFacade.createMacroRepository(),
+      ServiceFacade.createActionService()
+    )
   }
 
   public static createTriggerService(): TriggerService {
     return new TriggerServiceImplementation(
-      EventEmitterFacade.createTriggerEventEmitter(),
+      ActionSystemEventEmitterFacade.getTriggerEventEmitter(),
       RepositoryFacade.createTriggerRepository()
     )
   }
@@ -107,7 +119,7 @@ export class ServiceFacade {
       RepositoryFacade.createIngestedPieceChangedListener(),
       ServiceFacade.createIngestRundownSynchronizer(),
       new IngestedEntityToEntityMapper(),
-      EventEmitterFacade.createRundownEventEmitter(),
+      RundownExecutionEventEmitterFacade.getRundownEventEmitter(),
       ServiceFacade.createTimelineBuilder(),
       RepositoryFacade.createTimelineRepository(),
       ServiceFacade.createActionGenerationService(),
@@ -120,7 +132,7 @@ export class ServiceFacade {
       RepositoryFacade.createConfigurationRepository(),
       RepositoryFacade.createActionManifestRepository(),
       RepositoryFacade.createActionRepository(),
-      EventEmitterFacade.createActionEventEmitter(),
+      ActionSystemEventEmitterFacade.getActionEventEmitter(),
       BlueprintsFacade.createBlueprint(),
     )
   }
@@ -140,7 +152,7 @@ export class ServiceFacade {
 
   public static createMediaDataChangeService(): DataChangeService {
     return MediaDatabaseChangedService.getInstance(
-      EventEmitterFacade.createMediaEventEmitter(),
+      SofieIngestEventEmitterFacade.getMediaEventEmitter(),
       RepositoryFacade.createMediaChangedListener()
     )
   }
@@ -159,7 +171,7 @@ export class ServiceFacade {
 
   public static createConfigurationService(): ConfigurationService {
     return new ConfigurationServiceImplementation(
-      EventEmitterFacade.createConfigurationEventEmitter(),
+      RundownExecutionEventEmitterFacade.getConfigurationEventEmitter(),
       RepositoryFacade.createShelfConfigurationRepository()
     )
   }
@@ -186,21 +198,21 @@ export class ServiceFacade {
 
   public static createStatusMessageService(): StatusMessageService {
     return new StatusMessageServiceImplementation(
-      EventEmitterFacade.createStatusMessageEventEmitter(),
+      CrossCuttingConcernsEventEmitterFacade.getStatusMessageEventEmitter(),
       RepositoryFacade.createStatusMessageRepository()
     )
   }
 
   public static createPlayoutContentUpdateService(): PlayoutContentUpdateService {
     return PlayoutContentStateService.getInstance(
-      EventEmitterFacade.createPlayoutContentEventEmitter(),
+      RundownExecutionEventEmitterFacade.getPlayoutContentEventEmitter(),
       RepositoryFacade.createPlayoutContentRepository()
     )
   }
 
   public static createPlayoutContentReadService(): PlayoutContentReadService {
     return PlayoutContentStateService.getInstance(
-      EventEmitterFacade.createPlayoutContentEventEmitter(),
+      RundownExecutionEventEmitterFacade.getPlayoutContentEventEmitter(),
       RepositoryFacade.createPlayoutContentRepository()
     )
   }
