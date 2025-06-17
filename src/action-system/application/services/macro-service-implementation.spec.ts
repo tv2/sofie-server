@@ -27,7 +27,6 @@ describe(MacroServiceImplementation.name, () => {
   })
 
   it('should emit macro updated event', async() => {
-    EntityTestFactory
     const macro: Macro = EntityTestFactory.createMacro()
 
     const mockedMacroEventEmitter: MacroEventEmitter = mock<MacroEventEmitter>()
