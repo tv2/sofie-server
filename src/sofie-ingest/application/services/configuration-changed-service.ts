@@ -14,7 +14,7 @@ const CONFIGURATION_STATUS_MESSAGE_ID_PREFIX: string = 'INVALID_CONFIGURATION_'
 export class ConfigurationChangedService implements DataChangeService {
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly blueprint: Blueprint,
     private readonly statusMessageService: StatusMessageService,
     private readonly configurationRepository: ConfigurationRepository,

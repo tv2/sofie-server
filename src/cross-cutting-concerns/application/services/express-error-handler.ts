@@ -9,7 +9,7 @@ import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 export class ExpressErrorHandler implements HttpErrorHandler {
   private readonly logger: Logger
 
-  constructor(private readonly httpResponseFormatter: HttpResponseFormatter, logger: Logger) {
+  public constructor(private readonly httpResponseFormatter: HttpResponseFormatter, logger: Logger) {
     this.logger = logger.tag(ExpressErrorHandler.name)
   }
 

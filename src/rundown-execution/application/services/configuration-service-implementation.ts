@@ -4,7 +4,7 @@ import { ConfigurationEventEmitter } from '../interfaces/configuration-event-emi
 import { ShelfConfigurationRepository } from '../../domain/repositories/shelf-configuration-repository'
 
 export class ConfigurationServiceImplementation implements ConfigurationService {
-  constructor(
+  public constructor(
     private readonly configurationEventEmitter: ConfigurationEventEmitter,
     private readonly shelfConfigurationRepository: ShelfConfigurationRepository
   ) { }

@@ -39,7 +39,7 @@ const ATEM_PREFIX: string = 'atem_'
 export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   private readonly logger: Logger
 
-  constructor(logger: Logger) {
+  public constructor(logger: Logger) {
     this.logger = logger.tag(Tv2AtemVideoMixerTimelineObjectFactory.name)
   }
 

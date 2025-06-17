@@ -35,7 +35,7 @@ import { RundownEventObserver } from '../interfaces/rundown-event-observer'
 export class RundownEventService implements RundownEventEmitter, RundownEventObserver {
   private readonly callbacks: ((rundownEvent: RundownEvent) => void)[] = []
 
-  constructor(private readonly rundownEventBuilder: RundownEventBuilder) {}
+  public constructor(private readonly rundownEventBuilder: RundownEventBuilder) {}
 
   private emitRundownEvent(rundownEvent: RundownEvent): void {
     this.callbacks.forEach(callback => callback(rundownEvent))

@@ -9,7 +9,7 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 
 @RestController('/devices')
 export class DeviceController extends BaseController {
-  constructor(
+  public constructor(
     private readonly videoMixerDeviceRepository: VideoMixerDeviceRepository,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter,

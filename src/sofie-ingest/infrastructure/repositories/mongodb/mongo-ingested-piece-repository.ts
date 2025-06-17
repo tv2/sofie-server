@@ -7,7 +7,7 @@ import { MongoIngestedEntityConverter, MongoIngestedPiece } from '../../../../ru
 const INGESTED_PIECE_COLLECTION_NAME: string = 'pieces' // TODO: Once we control ingest renamed to "ingestedPieces".
 
 export class MongoIngestedPieceRepository extends BaseMongoRepository<MongoIngestedPiece> implements IngestedPieceRepository {
-  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoIngestedEntityConverter) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoIngestedEntityConverter) {
     super(mongoDatabase)
   }
 

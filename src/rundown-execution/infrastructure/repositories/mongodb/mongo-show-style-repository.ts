@@ -10,7 +10,7 @@ import { ShowStyleVariant } from '../../../domain/entities/show-style-variant'
 const COLLECTION_NAME: string = 'showStyleBases'
 
 export class MongoShowStyleRepository extends BaseMongoRepository<MongoShowStyle> implements ShowStyleRepository {
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly showStyleVariantRepository: ShowStyleVariantRepository,
     private readonly mongoEntityConverter: MongoEntityConverter

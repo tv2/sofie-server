@@ -15,7 +15,7 @@ import { StatusMessage } from '../../../cross-cutting-concerns/domain/entities/s
 import { Piece } from '../../../rundown-execution/domain/entities/piece'
 
 export class Tv2Blueprint implements Blueprint {
-  constructor(
+  public constructor(
     private readonly endStateForPartService: BlueprintGetEndStateForPart,
     private readonly onTimelineGenerateService: BlueprintOnTimelineGenerate,
     private readonly actionsService: BlueprintGenerateActions,

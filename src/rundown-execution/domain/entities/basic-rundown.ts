@@ -10,7 +10,7 @@ export class BasicRundown {
   protected takeMode: TakeMode
   protected modifiedAt: number
 
-  constructor(id: string, name: string, mode: RundownMode, takeMode: TakeMode, modifiedAt: number, timing: RundownTiming) {
+  public constructor(id: string, name: string, mode: RundownMode, takeMode: TakeMode, modifiedAt: number, timing: RundownTiming) {
     this.id = id
     this.name = name
     this.mode = mode

@@ -22,7 +22,7 @@ export class MongoMediaChangedListener extends BaseMongoRepository<MongoMedia> i
   private onUpdateCallback: (media: Media) => void
   private onDeletedCallback: (mediaId: string) => void
 
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     logger: Logger,
     private readonly mediaRepository: MediaRepository

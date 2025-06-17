@@ -46,7 +46,7 @@ export class Segment {
 
   private parts: Part[]
 
-  constructor(segment: SegmentInterface) {
+  public constructor(segment: SegmentInterface) {
     this.id = segment.id
     this.rundownId = segment.rundownId
     this.name = segment.name

@@ -22,7 +22,7 @@ export class PartDto {
   public readonly pieces: PieceDto[]
   public readonly replacedPlannedPieces: readonly PieceDto[]
 
-  constructor(part: Part) {
+  public constructor(part: Part) {
     this.id = part.id
     this.segmentId = part.getSegmentId()
     this.name = part.name

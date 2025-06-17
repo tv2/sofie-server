@@ -10,7 +10,7 @@ import { MongoPieceRepository } from './mongo-piece-repository'
 const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
 
 export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoPieceRepository: MongoPieceRepository,
     private readonly mongoEntityConverter: MongoEntityConverter,

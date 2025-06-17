@@ -10,7 +10,7 @@ import { MongoAction, MongoEntityConverter } from '../../../../rundown-execution
 const COLLECTION_NAME: string = 'actions'
 
 export class MongoActionRepository extends BaseMongoRepository<MongoAction> implements ActionRepository {
-  constructor(
+  public constructor(
     private readonly mongoEntityConverter: MongoEntityConverter,
     mongoDatabase: MongoDatabase,
   ) {

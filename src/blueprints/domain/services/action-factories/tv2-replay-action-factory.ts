@@ -26,7 +26,7 @@ import { OutputChannel } from '../../../../rundown-execution/domain/enums/output
 const EPSIO_REGEX: RegExp = /EPSIO/i
 
 export class Tv2ReplayActionFactory extends ActionFactory {
-  constructor(
+  public constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
   ) {

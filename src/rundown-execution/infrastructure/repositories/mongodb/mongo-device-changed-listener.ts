@@ -15,7 +15,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository<MongoCoreDev
   private onUpdatedCallback: (device: CoreDevice) => void
   private onDeletedCallback: (deviceId: string) => void
 
-  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter, logger: Logger) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter, logger: Logger) {
     super(mongoDatabase)
     this.logger = logger.tag(MongoDeviceChangedListener.name)
     mongoDatabase.onConnect(DEVICE_COLLECTION_NAME, () => this.listenForChanges())

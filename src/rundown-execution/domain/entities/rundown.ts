@@ -73,7 +73,7 @@ export class Rundown extends BasicRundown {
 
   private history: Part[]
 
-  constructor(rundown: RundownInterface) {
+  public constructor(rundown: RundownInterface) {
     super(rundown.id, rundown.name, rundown.mode, rundown.takeMode, rundown.modifiedAt, rundown.timing)
     this.segments = rundown.segments ? [...rundown.segments].sort(this.compareSegments) : []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []

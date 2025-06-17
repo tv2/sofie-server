@@ -20,7 +20,7 @@ export class MongoIngestedSegmentChangedListener extends BaseMongoRepository<Mon
   private onUpdatedCallback: (segment: IngestedSegment) => void
   private onDeletedCallback: (segmentId: string) => void
 
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     logger: Logger

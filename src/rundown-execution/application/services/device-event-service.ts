@@ -7,7 +7,7 @@ import { VideoMixerConfiguration } from '../../domain/value-objects/video-mixer-
 export class DeviceEventService implements DeviceEventEmitter, DeviceEventObserver {
   private readonly callbacks: ((deviceEvent: DeviceEvent) => void)[] = []
 
-  constructor(private readonly deviceEventBuilder: DeviceEventBuilder) {
+  public constructor(private readonly deviceEventBuilder: DeviceEventBuilder) {
   }
 
   private emitDeviceEvent(deviceEvent: DeviceEvent): void {

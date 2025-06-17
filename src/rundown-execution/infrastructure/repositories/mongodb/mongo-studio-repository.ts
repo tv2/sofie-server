@@ -8,7 +8,7 @@ import { MongoEntityConverter, MongoStudio } from './mongo-entity-converter'
 const COLLECTION_NAME: string = 'studios'
 
 export class MongoStudioRepository extends BaseMongoRepository<MongoStudio> implements StudioRepository {
-  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)
   }
 

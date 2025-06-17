@@ -34,7 +34,7 @@ const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 export class Tv2AudioActionFactory extends ActionFactory {
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly audioBedTimelineObjectFactory: Tv2AudioBedTimelineObjectFactory,
     private readonly frameTimeConverter: FrameTimeConverter,

@@ -37,7 +37,7 @@ const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
 
 export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate {
-  constructor(
+  public constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder
   ) {}

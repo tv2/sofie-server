@@ -4,7 +4,7 @@ import { TriggerRepository } from '../../domain/repositories/trigger-repository'
 import { TriggerEventEmitter } from '../interfaces/trigger-event-emitter'
 
 export class TriggerServiceImplementation implements TriggerService {
-  constructor(
+  public constructor(
     private readonly triggerEventEmitter: TriggerEventEmitter,
     private readonly triggerRepository: TriggerRepository
   ) { }

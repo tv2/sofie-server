@@ -13,7 +13,7 @@ export class PlayoutContentStateService implements PlayoutContentUpdateService, 
   private programPlayoutContents: PlayoutContent[] = []
   private previewPlayoutContents: PlayoutContent[] = []
 
-  constructor(
+  public constructor(
     private readonly playoutContentEventEmitter: PlayoutContentEventEmitter,
     private readonly playoutContentRepository: PlayoutContentRepository
   ) {

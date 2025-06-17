@@ -13,7 +13,7 @@ interface MongoPlayoutContentWrapper extends MongoId {
 }
 
 export class MongoPlayoutContentRepository extends BaseMongoRepository<MongoPlayoutContentWrapper> implements PlayoutContentRepository {
-  constructor(mongoDatabase: MongoDatabase) {
+  public constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
   }
 

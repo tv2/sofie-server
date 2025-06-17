@@ -66,7 +66,7 @@ const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
 const FULLSCREEN_GRAPHICS_SOURCE_NAME_PREFIX: string = 'PILOT_'
 
 export class Tv2GraphicsActionFactory extends ActionFactory {
-  constructor(
+  public constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,

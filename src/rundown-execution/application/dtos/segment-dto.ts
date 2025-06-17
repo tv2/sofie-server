@@ -19,7 +19,7 @@ export class SegmentDto {
   public readonly invalidity?: Invalidity
   public readonly parts: PartDto[]
 
-  constructor(segment: Segment) {
+  public constructor(segment: Segment) {
     this.id = segment.id
     this.rundownId = segment.rundownId
     this.name = segment.name

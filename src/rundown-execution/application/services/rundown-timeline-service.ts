@@ -29,7 +29,7 @@ import { PlayoutContentUpdateService } from '../interfaces/playout-content-servi
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
     private readonly rundownRepository: RundownRepository,

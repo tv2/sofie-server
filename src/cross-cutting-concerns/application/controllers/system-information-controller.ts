@@ -13,7 +13,7 @@ import { AuditLog } from '../decorators/audit-log-decorator'
 
 @RestController('/systemInformation')
 export class SystemInformationController extends BaseController {
-  constructor(
+  public constructor(
     private readonly systemInformationRepository: SystemInformationRepository,
     private readonly statusMessageRepository: StatusMessageRepository,
     private readonly httpErrorHandler: HttpErrorHandler,

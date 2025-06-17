@@ -10,7 +10,7 @@ export class CachedRundownAggregateRepository implements RundownAggregateReposit
   private readonly logger: Logger
   private readonly cachedRundowns: Map<string, Rundown> = new Map()
 
-  constructor(private readonly rundownAggregateRepository: RundownAggregateRepository, logger: Logger) {
+  public constructor(private readonly rundownAggregateRepository: RundownAggregateRepository, logger: Logger) {
     this.logger = logger.tag(CachedRundownAggregateRepository.name)
   }
 

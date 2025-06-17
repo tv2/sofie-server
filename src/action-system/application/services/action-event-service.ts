@@ -7,7 +7,7 @@ import { ActionEventObserver } from '../interfaces/action-event-observer'
 export class ActionEventService implements ActionEventEmitter, ActionEventObserver {
   private readonly callbacks: ((actionEvent: ActionEvent) => void)[] = []
 
-  constructor(private readonly actionEventBuilder: ActionEventBuilder) {
+  public constructor(private readonly actionEventBuilder: ActionEventBuilder) {
   }
 
   private emitActionEvents(actionEvent: ActionEvent): void {

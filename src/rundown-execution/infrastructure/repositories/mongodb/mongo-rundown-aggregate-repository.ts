@@ -17,7 +17,7 @@ import { MongoExpectedPlayoutItemRepository } from './mongo-expected-playout-ite
 const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
 export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRundown> implements RundownAggregateRepository {
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoSegmentRepository: MongoSegmentRepository,
     private readonly mongoPartRepository: MongoPartRepository,

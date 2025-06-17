@@ -9,7 +9,7 @@ const SHELF_CONFIGURATION_COLLECTION_NAME: string = 'shelfConfiguration'
 const SHELF_CONFIGURATION_ID: string = 'SHELF_CONFIGURATION_ID' // The system only support having a single Shelf.
 
 export class MongoShelfRepository extends BaseMongoRepository<ShelfConfiguration & MongoId> implements ShelfConfigurationRepository {
-  constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator
+  public constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator
   ) {
     super(mongoDatabase)
   }

@@ -30,7 +30,7 @@ export class WebSocketEventServer implements EventServer {
   private readonly logger: Logger
   private webSocketServer?: WebSocket.Server
 
-  constructor(
+  public constructor(
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionEventObserver: ActionEventObserver,
     private readonly triggerEventObserver: TriggerEventObserver,

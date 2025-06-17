@@ -4,7 +4,7 @@ import { Configuration } from '../../../domain/entities/configuration'
 export class CachedConfigurationRepository implements ConfigurationRepository {
   private cachedConfiguration: Configuration | undefined
 
-  constructor(private readonly configurationRepository: ConfigurationRepository) {}
+  public constructor(private readonly configurationRepository: ConfigurationRepository) {}
 
   public async getConfiguration(): Promise<Configuration> {
     this.cachedConfiguration ??= await this.configurationRepository.getConfiguration()

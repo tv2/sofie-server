@@ -9,7 +9,7 @@ import { InvalidIdException } from '../../../../rundown-execution/domain/excepti
 
 const COLLECTION_NAME: string = 'macros'
 export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> implements MacroRepository {
-  constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
 

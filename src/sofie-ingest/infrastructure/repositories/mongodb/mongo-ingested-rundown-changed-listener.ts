@@ -20,7 +20,7 @@ export class MongoIngestedRundownChangedListener extends BaseMongoRepository<Mon
   private onUpdatedCallback: (rundown: IngestedRundown) => void
   private onDeletedCallback: (rundownId: string) => void
 
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     logger: Logger

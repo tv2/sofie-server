@@ -19,7 +19,7 @@ export class MongoIngestedPartChangedListener extends BaseMongoRepository<MongoI
   private onUpdatedCallback: (part: IngestedPart) => void
   private onDeletedCallback: (partId: string) => void
 
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     logger: Logger

@@ -16,7 +16,7 @@ interface MongoAdLibAction {
 }
 
 export class MongoAdLibActionsRepository extends BaseMongoRepository<MongoAdLibAction> implements ActionManifestRepository {
-  constructor(mongoDatabase: MongoDatabase) {
+  public constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
   }
 

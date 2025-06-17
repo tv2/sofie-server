@@ -8,7 +8,7 @@ export class ExpressRestServer {
   private readonly server: Express
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly controllers: readonly BaseController[],
     logger: Logger
   ) {

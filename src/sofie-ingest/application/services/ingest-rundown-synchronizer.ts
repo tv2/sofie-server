@@ -22,7 +22,7 @@ export interface RundownSynchronizeResult {
 }
 
 export class IngestRundownSynchronizer {
-  constructor(
+  public constructor(
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     private readonly ingestEntityDiffer: EntityChangeDetector,
     private readonly blueprint: Blueprint,

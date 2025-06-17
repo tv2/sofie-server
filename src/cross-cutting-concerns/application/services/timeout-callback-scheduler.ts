@@ -8,7 +8,7 @@ export class TimeoutCallbackScheduler implements CallbackScheduler {
   private readonly logger: Logger
   private timeoutIdentifier?: NodeJS.Timeout
 
-  constructor(logger: Logger) {
+  public constructor(logger: Logger) {
     this.logger = logger.tag(TimeoutCallbackScheduler.name)
   }
 

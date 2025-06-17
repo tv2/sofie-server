@@ -4,7 +4,7 @@ import { DataChangedListener } from '../../../cross-cutting-concerns/application
 import { Media } from '../../../rundown-execution/domain/entities/media'
 
 export class MediaDatabaseChangedService implements DataChangeService {
-  constructor(private readonly mediaEventEmitter: MediaEventEmitter, mediaChangedListener: DataChangedListener<Media>) {
+  public constructor(private readonly mediaEventEmitter: MediaEventEmitter, mediaChangedListener: DataChangedListener<Media>) {
     this.listenForMediaChanges(mediaChangedListener)
   }
 

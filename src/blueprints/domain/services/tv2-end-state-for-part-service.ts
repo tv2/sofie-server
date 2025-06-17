@@ -14,7 +14,7 @@ import { SisyfosPersistenceMetadata } from '../../../rundown-execution/domain/va
  Minimal effort has been put into refactoring it - only to the extent that it works with the new data model of AlbaServer.
  */
 export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
-  constructor(private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder) {}
+  public constructor(private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder) {}
 
   public getEndStateForPart(
     part: Part,

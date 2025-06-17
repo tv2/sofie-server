@@ -20,7 +20,7 @@ export class MongoDatabase implements Database {
 
   private readonly onConnectCallbacks: Map<string, () => void> = new Map()
 
-  constructor(logger: Logger) {
+  public constructor(logger: Logger) {
     this.logger = logger.tag(MongoDatabase.name)
   }
 

@@ -46,7 +46,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   private robotActionFactory: Tv2RobotActionFactory
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly actionFactoryProvider: Tv2ActionFactoryProvider,
     logger: Logger,

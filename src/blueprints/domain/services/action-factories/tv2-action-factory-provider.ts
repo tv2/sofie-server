@@ -38,7 +38,7 @@ export class Tv2ActionFactoryProvider {
 
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly timelineObjectFactoryProvider: TimelineObjectFactoryProvider,
     private readonly objectCloner: ObjectCloner,

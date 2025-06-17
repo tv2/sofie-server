@@ -48,7 +48,7 @@ export class IngestDataChangeService implements DataChangeService {
   private readonly affectedRundownIds: Set<string> = new Set()
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly ingestedRundownRepository: IngestedRundownRepository,
     private readonly rundownRepository: RundownRepository,
     private readonly rundownLock: AsyncLock,

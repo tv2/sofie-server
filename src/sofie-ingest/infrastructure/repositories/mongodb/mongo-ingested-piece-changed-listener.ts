@@ -19,7 +19,7 @@ export class MongoIngestedPieceChangedListener extends BaseMongoRepository<Mongo
   private onUpdatedCallback: (piece: IngestedPiece) => void
   private onDeletedCallback: (pieceId: string) => void
 
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     logger: Logger

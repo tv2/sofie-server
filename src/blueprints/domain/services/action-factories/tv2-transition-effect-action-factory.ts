@@ -58,7 +58,7 @@ enum SpecialEffectName {
 export class Tv2TransitionEffectActionFactory extends ActionFactory {
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,

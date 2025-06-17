@@ -15,7 +15,7 @@ export class RundownDto {
   public readonly segments: SegmentDto[]
   public readonly timing: RundownTiming
 
-  constructor(rundown: Rundown) {
+  public constructor(rundown: Rundown) {
     this.id = rundown.id
     this.name = rundown.name
     this.mode = rundown.getMode()

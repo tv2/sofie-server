@@ -180,7 +180,7 @@ const SYSTEM_ACTIONS: SystemAction[] = [
 ]
 
 export class ExecuteActionService implements ActionService {
-  constructor(
+  public constructor(
     private readonly actionRepository: ActionRepository,
     private readonly rundownRepository: RundownRepository,
     private readonly mediaRepository: MediaRepository,

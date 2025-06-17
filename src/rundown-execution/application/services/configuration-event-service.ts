@@ -7,7 +7,7 @@ import { ConfigurationEventBuilder } from '../interfaces/configuration-event-bui
 export class ConfigurationEventService implements ConfigurationEventEmitter, ConfigurationEventObserver {
   private readonly callbacks: ((configurationEvent: ConfigurationEvent) => void)[] = []
 
-  constructor(private readonly configurationEventBuilder: ConfigurationEventBuilder) { }
+  public constructor(private readonly configurationEventBuilder: ConfigurationEventBuilder) { }
 
   public emitShelfConfigurationUpdated(shelfConfiguration: ShelfConfiguration): void {
     const shelfConfigurationUpdatedEvent: ShelfConfigurationUpdatedEvent = this.configurationEventBuilder.buildShelfConfigurationUpdatedEvent(shelfConfiguration)

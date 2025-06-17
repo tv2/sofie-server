@@ -6,7 +6,7 @@ import { StatusCode } from '../../domain/enums/status-code'
 import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
 
 export class StatusMessageServiceImplementation implements StatusMessageService {
-  constructor(
+  public constructor(
     private readonly statusMessageEventEmitter: StatusMessageEventEmitter,
     private readonly statusMessageRepository: StatusMessageRepository
   ) { }

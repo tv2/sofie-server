@@ -7,7 +7,7 @@ const PLAYOUT_GATEWAY_HOST: string = process.env.PLAYOUT_GATEWAY_HOST ?? 'localh
 export class PlayoutGatewayService implements PlayoutService {
   private readonly logger: Logger
 
-  constructor(private readonly httpService: HttpService, logger: Logger) {
+  public constructor(private readonly httpService: HttpService, logger: Logger) {
     this.logger = logger.tag(PlayoutGatewayService.name)
   }
 

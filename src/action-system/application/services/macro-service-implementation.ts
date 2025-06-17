@@ -9,7 +9,7 @@ import { StatusMessageEventEmitter } from '../../../cross-cutting-concerns/appli
 import { StatusCode } from '../../../cross-cutting-concerns/domain/enums/status-code'
 
 export class MacroServiceImplementation implements MacroService {
-  constructor(
+  public constructor(
     private readonly statusMessageEventEmitter: StatusMessageEventEmitter,
     private readonly macroEventEmitter: MacroEventEmitter,
     private readonly macroRepository: MacroRepository,

@@ -10,7 +10,7 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 
 @RestController('/triggers')
 export class TriggerController extends BaseController {
-  constructor(
+  public constructor(
     private readonly triggerService: TriggerService,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter

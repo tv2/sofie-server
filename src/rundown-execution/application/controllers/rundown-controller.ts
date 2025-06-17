@@ -23,7 +23,7 @@ import { Logger } from '../../../cross-cutting-concerns/application/interfaces/l
 export class RundownController extends BaseController {
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly rundownService: RundownService,
     private readonly rundownRepository: RundownRepository,
     private readonly ingestService: IngestService,

@@ -214,7 +214,7 @@ const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 export class MongoEntityConverter {
   private readonly logger: Logger
 
-  constructor(logger: Logger) {
+  public constructor(logger: Logger) {
     this.logger = logger.tag(MongoEntityConverter.name)
   }
 

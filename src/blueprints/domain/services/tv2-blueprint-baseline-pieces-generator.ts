@@ -16,7 +16,7 @@ import {
 export class Tv2BlueprintBaselinePiecesGenerator implements BlueprintBaselinePieces {
   private videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory
 
-  constructor(
+  public constructor(
     private readonly studioMapper: Tv2StudioBlueprintConfigurationMapper,
     private readonly timelineObjectFactoryProvider: TimelineObjectFactoryProvider
   ) {

@@ -58,7 +58,7 @@ export class Piece {
   private originalTimelineObjects: TimelineObject[]
   private readonly insertedTimelineObjects: TimelineObject[] = []
 
-  constructor(piece: PieceInterface) {
+  public constructor(piece: PieceInterface) {
     this.id = piece.id
     this.partId = piece.partId
     this.rundownId = piece.rundownId

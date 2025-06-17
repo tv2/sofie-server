@@ -25,7 +25,7 @@ const FRAME_RATE: number = 25
 export class TimelineObjectFactoryProvider {
   private readonly logger: Logger
 
-  constructor(logger: Logger) {
+  public constructor(logger: Logger) {
     this.logger = logger.tag(this.constructor.name)
   }
 

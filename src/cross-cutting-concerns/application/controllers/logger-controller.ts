@@ -11,7 +11,7 @@ import { AuditLog } from '../decorators/audit-log-decorator'
 export class LoggerController extends BaseController {
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly httpResponseFormatter: HttpResponseFormatter,
     private readonly httpErrorHandler: HttpErrorHandler,
     logger: Logger

@@ -29,7 +29,7 @@ const OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS: string[] = ['studio0_graphicsLower',
 export class Tv2ActionManifestMapper {
   private readonly logger: Logger
 
-  constructor(logger: Logger) {
+  public constructor(logger: Logger) {
     this.logger = logger.tag(this.constructor.name)
   }
 

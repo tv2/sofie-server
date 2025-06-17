@@ -12,7 +12,7 @@ const STUDIO_ID: string = 'studio0'
 const SHOW_STYLE_ID: string = 'show0'
 
 export class MongoConfigurationRepository implements ConfigurationRepository {
-  constructor(
+  public constructor(
     private readonly studioRepository: StudioRepository,
     private readonly showStyleRepository: ShowStyleRepository
   ) {

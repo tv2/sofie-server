@@ -10,7 +10,7 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 
 @RestController('/macros')
 export class MacroController extends BaseController {
-  constructor(
+  public constructor(
     private readonly macroService: MacroService,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter

@@ -9,7 +9,7 @@ import { MongoId } from '../../../../rundown-execution/infrastructure/repositori
 const ACTION_TRIGGER_COLLECTION: string = 'triggers'
 
 export class MongoTriggerRepository extends BaseMongoRepository<Trigger & MongoId> implements TriggerRepository {
-  constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator) {
     super(mongoDatabase)
   }
 

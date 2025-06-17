@@ -9,7 +9,7 @@ import { ActionEventEmitter } from '../interfaces/action-event-emitter'
 
 // TODO: This should have a interface that other modules can depend on.
 export class ActionGenerationService {
-  constructor(
+  public constructor(
     private readonly configurationRepository: ConfigurationRepository,
     private readonly actionManifestRepository: ActionManifestRepository,
     private readonly actionRepository: ActionRepository,

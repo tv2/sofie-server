@@ -89,7 +89,7 @@ export class Part {
 
   public readonly ingestedPart?: IngestedPart
 
-  constructor(part: PartInterface) {
+  public constructor(part: PartInterface) {
     this.id = part.id
     this.rundownId = part.rundownId
     this.segmentId = part.segmentId

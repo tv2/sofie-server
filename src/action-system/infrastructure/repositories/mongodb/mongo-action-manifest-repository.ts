@@ -2,7 +2,7 @@ import { ActionManifestRepository } from '../../../domain/repositories/action-ma
 import { ActionManifest } from '../../../domain/entities/action'
 
 export class MongoActionManifestRepository implements ActionManifestRepository {
-  constructor(private readonly actionManifestRepositories: ActionManifestRepository[]) {
+  public constructor(private readonly actionManifestRepositories: ActionManifestRepository[]) {
   }
 
   public async getActionManifests(rundownId: string): Promise<ActionManifest[]> {

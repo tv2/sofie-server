@@ -12,7 +12,7 @@ interface TimelineObjectsString {
 }
 
 export class MongoRundownBaselineRepository extends BaseMongoRepository<MongoTimeline> implements RundownBaselineRepository {
-  constructor(mongoDatabase: MongoDatabase) {
+  public constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
   }
 

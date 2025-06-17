@@ -11,7 +11,7 @@ export class ActionDto {
   public readonly argument?: ActionArgument
   public readonly rundownId?: string
 
-  constructor(action: Action) {
+  public constructor(action: Action) {
     this.id = action.id
     this.name = action.name
     this.rank = action.rank

@@ -9,7 +9,7 @@ import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/sho
 import { CoreShowStyleVariantBlueprintConfiguration } from './tv2-show-style-blueprint-configuration-mapper'
 
 export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConfiguration {
-  constructor(private readonly configurationMapper: Tv2ConfigurationMapper) { }
+  public constructor(private readonly configurationMapper: Tv2ConfigurationMapper) { }
 
   public validateConfiguration(configuration: Configuration): StatusMessage[] {
     const tv2BlueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, '')

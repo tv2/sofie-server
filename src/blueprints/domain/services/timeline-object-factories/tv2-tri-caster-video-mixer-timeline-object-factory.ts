@@ -43,7 +43,7 @@ const TRI_CASTER_PREFIX: string = 'triCaster_'
 export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   private readonly logger: Logger
 
-  constructor(private readonly atemToTriCasterSplitScreenConverter: AtemToTriCasterSplitScreenConverter, logger: Logger) {
+  public constructor(private readonly atemToTriCasterSplitScreenConverter: AtemToTriCasterSplitScreenConverter, logger: Logger) {
     this.logger = logger.tag(Tv2TriCasterVideoMixerTimelineObjectFactory.name)
   }
 

@@ -8,7 +8,7 @@ export class StatusMessageDto {
   public readonly statusCode: StatusCode
   public readonly lastUpdatedTimestamp?: number
 
-  constructor(statusMessage: StatusMessage) {
+  public constructor(statusMessage: StatusMessage) {
     this.id = statusMessage.id
     this.title = statusMessage.title
     this.message = statusMessage.message

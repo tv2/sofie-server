@@ -16,7 +16,7 @@ const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 export class DeviceChangedService implements DataChangeService {
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly statusMessageService: StatusMessageService,
     private readonly deviceRepository: DeviceRepository,
     private readonly deviceChangedListener: DataChangedListener<CoreDevice>,

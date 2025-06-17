@@ -22,7 +22,7 @@ import { DownstreamKeyerPlayoutContent, PlayoutContent } from '../../../../rundo
 import { Action, MutateActionMethods, MutateActionType } from '../../../../action-system/domain/entities/action'
 
 export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
-  constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
+  public constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
     super()
   }
 

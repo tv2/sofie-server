@@ -7,7 +7,7 @@ import { MongoEntityConverter, MongoMedia } from './mongo-entity-converter'
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 
 export class MongoMediaRepository extends BaseMongoRepository<MongoMedia> implements MediaRepository {
-  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)
   }
 

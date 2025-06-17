@@ -13,7 +13,7 @@ const RUNDOWN_THROTTLED_ERROR_TEXT: string = `Unable to do action. An action was
 export class ThrottledRundownService implements RundownService {
   private lastOperationTakenEpochTimestamp: number
 
-  constructor(private readonly rundownService: RundownService) {
+  public constructor(private readonly rundownService: RundownService) {
   }
 
   public setTakeMode(rundownId: string, takeMode: TakeMode): Promise<void> {

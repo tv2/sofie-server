@@ -10,7 +10,7 @@ import { MongoEntityConverter, MongoShowStyleVariant } from './mongo-entity-conv
 const COLLECTION_NAME: string = 'showStyleVariants'
 
 export class MongoShowStyleVariantRepository extends BaseMongoRepository<MongoShowStyleVariant> implements ShowStyleVariantRepository {
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoEntityConverter: MongoEntityConverter,
     private readonly rundownRepository: RundownRepository

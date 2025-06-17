@@ -29,7 +29,7 @@ const VIDEO_MIXER_NAME: string = 'atem'
  * Once proper device settings are introduced in Alba this SHOULD be deleted!
  */
 export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDevice> implements VideoMixerDeviceRepository {
-  constructor(mongoDatabase: MongoDatabase, private readonly deviceEventEmitter: DeviceEventEmitter) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly deviceEventEmitter: DeviceEventEmitter) {
     super(mongoDatabase)
     mongoDatabase.onConnect(COLLECTION_NAME, () => this.listenForVideoMixerChanges())
   }

@@ -16,7 +16,7 @@ export class PieceDto {
   public readonly lifespan: PieceLifespan
   public readonly metadata?: unknown
 
-  constructor(piece: Piece) {
+  public constructor(piece: Piece) {
     this.id = piece.id
     this.partId = piece.getPartId()
     this.rundownId = piece.rundownId
