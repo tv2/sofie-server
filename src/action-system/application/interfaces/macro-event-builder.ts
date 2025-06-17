@@ -3,7 +3,7 @@ import {
   MacroCreatedEvent,
   MacroDeletedEvent,
   MacroUpdatedEvent
-} from '../../domain/value-objects/macro-event'
+} from '../value-objects/macro-event'
 
 export interface MacroEventBuilder {
   buildMacroCreatedEvent(macro: Macro): MacroCreatedEvent

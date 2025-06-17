@@ -5,7 +5,7 @@ import {
   MacroCreatedEvent, MacroDeletedEvent,
   MacroEvent,
   MacroUpdatedEvent
-} from '../../domain/value-objects/macro-event'
+} from '../value-objects/macro-event'
 import { Macro } from '../../domain/entities/macro'
 
 export class MacroEventService implements MacroEventEmitter, MacroEventObserver {

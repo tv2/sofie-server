@@ -3,7 +3,7 @@ import {
   TriggerCreatedEvent,
   TriggerDeletedEvent,
   TriggerUpdatedEvent
-} from '../../domain/value-objects/trigger-event'
+} from '../value-objects/trigger-event'
 
 export interface TriggerEventBuilder {
   buildTriggerCreatedEvent(trigger: Trigger): TriggerCreatedEvent

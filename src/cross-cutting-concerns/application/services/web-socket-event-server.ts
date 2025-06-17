@@ -10,9 +10,9 @@ import { ConfigurationEventObserver } from '../../../rundown-execution/applicati
 import { MediaEventObserver } from '../../../sofie-ingest/application/interfaces/media-event-observer'
 import { RundownEventObserver } from '../../../rundown-execution/application/interfaces/rundown-event-observer'
 import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
-import { ActionEvent } from '../../../action-system/domain/value-objects/action-event'
-import { TriggerEvent } from '../../../action-system/domain/value-objects/trigger-event'
-import { MacroEvent } from '../../../action-system/domain/value-objects/macro-event'
+import { ActionEvent } from '../../../action-system/application/value-objects/action-event'
+import { TriggerEvent } from '../../../action-system/application/value-objects/trigger-event'
+import { MacroEvent } from '../../../action-system/application/value-objects/macro-event'
 import { ConfigurationEvent } from '../../../rundown-execution/application/value-objects/configuration-event'
 import { MediaEvent } from '../../../sofie-ingest/application/value-objects/media-event'
 import { RundownEvent } from '../../../rundown-execution/application/value-objects/rundown-event'
@@ -22,9 +22,9 @@ import { DeviceEventObserver } from '../../../rundown-execution/application/inte
 import { DeviceEvent } from '../../../rundown-execution/application/value-objects/device-event'
 import { TypedEvent } from '../value-objects/typed-event'
 import { NtpEvent } from '../value-objects/ntp-event'
-import { NtpEventType } from '../../../leftovers/event-type'
 import { PlayoutContentEventObserver } from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
 import { PlayoutContentEvent } from '../../../rundown-execution/application/value-objects/playout-content-event'
+import {NtpEventType} from '../enums/ntp-event-type'
 
 export class WebSocketEventServer implements EventServer {
   private static instance: EventServer

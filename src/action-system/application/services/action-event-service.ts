@@ -1,6 +1,6 @@
 import { ActionEventEmitter } from '../interfaces/action-event-emitter'
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
-import { ActionEvent, ActionsUpdatedEvent } from '../../domain/value-objects/action-event'
+import { ActionEvent, ActionsUpdatedEvent } from '../value-objects/action-event'
 import { Action } from '../../domain/entities/action'
 import { ActionEventObserver } from '../interfaces/action-event-observer'
 
