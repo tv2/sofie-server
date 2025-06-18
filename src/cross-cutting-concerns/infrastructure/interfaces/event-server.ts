@@ -1,4 +1,4 @@
 export interface EventServer {
-  startServer(port: number): void
+  startServer(port: number): Promise<void>
   stopServer(): void
 }

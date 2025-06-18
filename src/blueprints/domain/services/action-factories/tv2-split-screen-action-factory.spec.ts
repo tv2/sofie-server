@@ -25,9 +25,9 @@ import {
 } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2Action } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../action-system/domain/enums/action-type'
-import { Tv2Logger } from '../../interfaces/tv2-logger'
 import { ObjectCloner } from '../../../../cross-cutting-concerns/domain/services/object-cloner'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   describe(Tv2SplitScreenActionFactory.prototype.createSplitScreenActions.name, () => {
@@ -226,10 +226,10 @@ function createTestee(params?: {
   stringHashConverter?: Tv2StringHashConverter,
   assetPathHelper?: Tv2AssetPathHelper,
   objectCloner?: ObjectCloner,
-  logger?: Tv2Logger,
+  logger?: Logger,
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
-    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfTv2Logger())),
+    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfLogger())),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.graphicsSplitScreenTimelineObjectFactory ?? instance(mock<Tv2GraphicsSplitScreenTimelineObjectFactory>()),
@@ -237,12 +237,12 @@ function createTestee(params?: {
     params?.stringHashConverter ?? new Tv2StringHashConverter(),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
     params?.objectCloner ?? instance(mock<ObjectCloner>()),
-    params?.logger ?? instance(createMockOfTv2Logger()),
+    params?.logger ?? instance(createMockOfLogger()),
   )
 }
 
-function createMockOfTv2Logger(): Tv2Logger {
-  const mockedLogger: Tv2Logger = mock<Tv2Logger>()
+function createMockOfLogger(): Logger {
+  const mockedLogger: Logger = mock<Logger>()
   when(mockedLogger.tag(anyString())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.data(anything())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.metadata(anything())).thenCall(() => instance(mockedLogger))

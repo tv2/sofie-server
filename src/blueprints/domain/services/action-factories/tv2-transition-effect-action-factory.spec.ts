@@ -8,7 +8,6 @@ import {
 } from '../../interfaces/timeline-object-factories/tv2-audio-mixer-timeline-object-factory'
 import {anything, instance, mock, when} from '@typestrong/ts-mockito'
 import {Tv2AssetPathHelper} from '../tv2-asset-path-helper'
-import {Tv2Logger} from '../../interfaces/tv2-logger'
 import {FrameTimeConverter} from '../frame-time-converter'
 import {EntityTestFactory} from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import {
@@ -30,6 +29,7 @@ import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-con
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
 import { PieceActionType } from '../../../../action-system/domain/enums/action-type'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   describe(Tv2TransitionEffectActionFactory.prototype.getMutateActionMethods.name, () => {
@@ -148,7 +148,7 @@ function createTestee(params?: {
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
   assetPathHelper?: Tv2AssetPathHelper,
   frameTimeConverter?: FrameTimeConverter,
-  logger?: Tv2Logger
+  logger?: Logger
 }): Tv2TransitionEffectActionFactory {
   return new Tv2TransitionEffectActionFactory(
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
@@ -156,5 +156,5 @@ function createTestee(params?: {
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
     params?.frameTimeConverter ?? instance(mock(FrameTimeConverter)),
-    params?.logger ?? instance(mock<Tv2Logger>()))
+    params?.logger ?? instance(mock<Logger>()))
 }

@@ -18,8 +18,8 @@ import { Tv2SourceMappingWithAudio } from '../value-objects/tv2-studio-blueprint
 import { Tv2MisconfigurationException } from '../exceptions/tv2-misconfiguration-exception'
 import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
 import { ExhaustiveCaseChecker } from '../../../cross-cutting-concerns/domain/services/exhaustive-case-checker'
-import { Tv2Logger } from '../interfaces/tv2-logger'
 import { AudioMode } from '../../../rundown-execution/domain/enums/audio-mode'
+import {Logger} from '../../../cross-cutting-concerns/application/interfaces/logger'
 
 const SPLIT_SCREEN_ACTION_MANIFEST_ID: string = 'select_dve'
 const VIDEO_CLIP_ACTION_MANIFEST_ID: string = 'select_server_clip'
@@ -28,9 +28,9 @@ const OVERLAY_GRAPHICS_ACTION_MANIFEST_IDS: string[] = ['studio0_graphicsLower',
 
 export class Tv2ActionManifestMapper {
 
-  private readonly logger: Tv2Logger
+  private readonly logger: Logger
 
-  constructor(logger: Tv2Logger) {
+  constructor(logger: Logger) {
     this.logger = logger.tag(this.constructor.name)
   }
 

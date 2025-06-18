@@ -11,18 +11,6 @@ const INFINITE_PIECES_PLAYOUT_CONTENT_TYPES: PlayoutContentType[] = [PlayoutCont
 // TODO: Determine if this should be moved to Alba TV 2 server.
 export class PlayoutContentStateService implements PlayoutContentUpdateService, PlayoutContentReadService {
 
-  private static instance: PlayoutContentUpdateService & PlayoutContentReadService
-
-  public static getInstance(
-    playoutContentEventEmitter: PlayoutContentEventEmitter,
-    playoutContentRepository: PlayoutContentRepository
-  ): PlayoutContentUpdateService & PlayoutContentReadService {
-    if (!this.instance) {
-      this.instance = new PlayoutContentStateService(playoutContentEventEmitter, playoutContentRepository)
-    }
-    return this.instance
-  }
-
   private programPlayoutContents: PlayoutContent[] = []
   private previewPlayoutContents: PlayoutContent[] = []
 

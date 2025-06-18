@@ -29,8 +29,8 @@ import { DeviceType } from '../../../../rundown-execution/domain/enums/device-ty
 import { AtemSourceIndex } from '../../value-objects/timeline-state-resolver-types/atem-types'
 import { AtemToTriCasterSplitScreenConverter } from '../atem-to-tricaster-split-screen-converter'
 import { TimelineObject } from '../../../../rundown-execution/domain/entities/timeline-object'
-import { Tv2Logger } from '../../interfaces/tv2-logger'
 import { TimelineObjectMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 interface TriCasterTransitionEffectProperties {
   input: number
@@ -42,9 +42,9 @@ const TRI_CASTER_PREFIX: string = 'triCaster_'
 
 export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
 
-  private readonly logger: Tv2Logger
+  private readonly logger: Logger
 
-  constructor(private readonly atemToTriCasterSplitScreenConverter: AtemToTriCasterSplitScreenConverter, logger: Tv2Logger) {
+  constructor(private readonly atemToTriCasterSplitScreenConverter: AtemToTriCasterSplitScreenConverter, logger: Logger) {
     this.logger = logger.tag(Tv2TriCasterVideoMixerTimelineObjectFactory.name)
   }
 

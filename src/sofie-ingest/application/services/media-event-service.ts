@@ -5,14 +5,6 @@ import { MediaCreatedEvent, MediaDeletedEvent, MediaEvent, MediaUpdatedEvent } f
 import { Media } from '../../../rundown-execution/domain/entities/media'
 
 export class MediaEventService implements MediaEventEmitter, MediaEventObserver {
-  private static instance: MediaEventService
-
-  public static getInstance(mediaEventBuilder: MediaEventBuilder): MediaEventService {
-    if (!this.instance) {
-      this.instance = new MediaEventService(mediaEventBuilder)
-    }
-    return this.instance
-  }
 
   private readonly callbacks: ((mediaEvent: MediaEvent) => void)[] = []
 

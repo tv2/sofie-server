@@ -1,6 +1,5 @@
 import { Tv2VideoMixerTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-video-mixer-timeline-object-factory'
 import { Tv2AtemVideoMixerTimelineObjectFactory } from './tv2-atem-video-mixer-timeline-object-factory'
-import { Tv2LoggerFacade } from '../../../infrastructure/tv2-logger-facade'
 import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
 import { Tv2TriCasterVideoMixerTimelineObjectFactory } from './tv2-tri-caster-video-mixer-timeline-object-factory'
 import { AtemToTriCasterSplitScreenConverter } from '../atem-to-tricaster-split-screen-converter'
@@ -19,25 +18,29 @@ import {
 } from '../../interfaces/timeline-object-factories/tv2-graphics-split-screen-timeline-object-factory'
 import { Tv2RobotTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-robot-timeline-object-factory'
 import { Tv2TelemetricsTimelineObjectFactory } from './tv2-telemetrics-timeline-object-factory'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const FRAME_RATE: number = 25
 
 export class TimelineObjectFactoryProvider {
 
-  constructor() {
+  private readonly logger: Logger
+
+  constructor(logger: Logger) {
+    this.logger = logger.tag(this.constructor.name)
   }
 
   public createVideoMixerTimelineObjectFactory(configuration?: Tv2StudioBlueprintConfiguration): Tv2VideoMixerTimelineObjectFactory {
     if (!configuration) {
-      return new Tv2AtemVideoMixerTimelineObjectFactory(Tv2LoggerFacade.createLogger())
+      return new Tv2AtemVideoMixerTimelineObjectFactory(this.logger)
     }
 
     switch (configuration.videoMixerType) {
       case DeviceType.ATEM: {
-        return new Tv2AtemVideoMixerTimelineObjectFactory(Tv2LoggerFacade.createLogger())
+        return new Tv2AtemVideoMixerTimelineObjectFactory(this.logger)
       }
       case DeviceType.TRICASTER: {
-        return new Tv2TriCasterVideoMixerTimelineObjectFactory(new AtemToTriCasterSplitScreenConverter(), Tv2LoggerFacade.createLogger())
+        return new Tv2TriCasterVideoMixerTimelineObjectFactory(new AtemToTriCasterSplitScreenConverter(), this.logger)
       }
       default: {
         throw new Tv2MisconfigurationException(`Invalid VideoMixerType: ${configuration.videoMixerType}`)

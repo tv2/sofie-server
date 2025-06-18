@@ -1,6 +1,5 @@
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2ActionService } from './tv2-action-service'
-import { Tv2Logger } from '../interfaces/tv2-logger'
 import { Tv2ConfigurationMapper } from './tv2-configuration-mapper'
 import { Tv2ActionFactoryProvider } from './action-factories/tv2-action-factory-provider'
 import { ConfigurationTestFactory } from '../../../rundown-execution/domain/entities/test/configuration-test-factory'
@@ -23,6 +22,7 @@ import { Tv2ActionSubtype } from '../value-objects/tv2-action'
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
+import {Logger} from '../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2ActionService.name, () => {
   describe(Tv2ActionService.prototype.generateActions.name, () => {
@@ -112,16 +112,16 @@ describe(Tv2ActionService.name, () => {
   })
 })
 
-function createTestee(mocks: { configurationMapper?: Tv2ConfigurationMapper, actionFactoryProvider?: Tv2ActionFactoryProvider, logger?: Tv2Logger } = {}): Tv2ActionService {
+function createTestee(mocks: { configurationMapper?: Tv2ConfigurationMapper, actionFactoryProvider?: Tv2ActionFactoryProvider, logger?: Logger } = {}): Tv2ActionService {
   return new Tv2ActionService(
     mocks.configurationMapper ?? instance(mock<Tv2ConfigurationMapper>()),
     mocks.actionFactoryProvider ?? instance(createMockOfTv2ActionFactoryProvider()),
-    mocks.logger ?? instance(createMockOfTv2Logger()),
+    mocks.logger ?? instance(createMockOfLogger()),
   )
 }
 
-function createMockOfTv2Logger(): Tv2Logger {
-  const mockedLogger: Tv2Logger = mock<Tv2Logger>()
+function createMockOfLogger(): Logger {
+  const mockedLogger: Logger = mock<Logger>()
   when(mockedLogger.tag(anyString())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.data(anything())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.metadata(anything())).thenCall(() => instance(mockedLogger))
