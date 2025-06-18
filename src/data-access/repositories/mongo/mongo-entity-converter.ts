@@ -268,12 +268,8 @@ export class MongoEntityConverter {
   private mapToInfinitePieceMap(infinitePieces: Piece[]): Map<string, Piece[]> {
     const map: Map<string, Piece[]> = new Map()
     infinitePieces.forEach(piece => {
-      const piecesForLayer: Piece[] | undefined = map.get(piece.layer)
-      if (!piecesForLayer) {
-        map.set(piece.layer, [piece])
-        return
-      }
-      piecesForLayer.push(piece)
+      const piecesForLayer: Piece[] = map.get(piece.layer) ?? []
+      map.set(piece.layer, [...piecesForLayer, piece])
     })
     return map
   }

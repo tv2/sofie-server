@@ -412,17 +412,17 @@ export class Rundown extends BasicRundown {
     this.assertNotUndefined(this.activeCursor, 'active Part')
 
     const now: number = Date.now()
-    const layersWithPieces: Map<string, Piece[]> = new Map(
+    let layersWithPieces: Map<string, Piece[]> = new Map(
       this.getActivePart().getPieces()
         .filter(piece => !piece.hasEnded(now))
         .map(piece => [piece.layer, [piece]])
     )
 
     const piecesThatAreNotOutlived: Piece[] = this.findOldNotOutlivedInfinitePieces()
-    this.addPiecesToLayers(piecesThatAreNotOutlived, layersWithPieces)
+    layersWithPieces = this.addPiecesToLayers(piecesThatAreNotOutlived, layersWithPieces)
 
-    this.addSpanningPiecesNotOnLayersFromActiveSegment(layersWithPieces)
-    this.addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces)
+    layersWithPieces = this.addSpanningPiecesNotOnLayersFromActiveSegment(layersWithPieces)
+    layersWithPieces = this.addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces)
 
     this.addBaselinePiecesNotOnLayers(layersWithPieces)
     this.resetOldInfinitePieces(layersWithPieces)
@@ -430,7 +430,7 @@ export class Rundown extends BasicRundown {
   }
 
   private findOldNotOutlivedInfinitePieces(): Piece[] {
-    return Array.from(this.infinitePieces.values()).flatMap((oldList: Piece[]) => oldList).filter(oldPiece => !this.isPieceOutlived(oldPiece))
+    return Array.from(this.infinitePieces.values()).flat().filter(piece => !this.isPieceOutlived(piece))
   }
 
   private isPieceOutlived(piece: Piece): boolean {
@@ -465,14 +465,10 @@ export class Rundown extends BasicRundown {
   }
 
   private resetOldInfinitePieces(newInfinitePieces: Map<string, Piece[]>): void {
-    this.infinitePieces.forEach((oldList: Piece[], layer: string) => {
-      const newList: Piece[] | undefined = newInfinitePieces.get(layer)
-      if (!newList) {
-        oldList.forEach(piece => piece.resetExecution())
-        return
-      }
+    this.infinitePieces.forEach((currentInfinitePieces: Piece[], layer: string) => {
+      const newInfinitePiecesList: Piece[] = newInfinitePieces.get(layer) ?? []
 
-      oldList.filter(piece => newList.every(p => p.id !== piece.id))
+      currentInfinitePieces.filter(piece => newInfinitePiecesList.every(p => p.id !== piece.id))
         .forEach(piece => piece.resetExecution())
     })
   }
@@ -493,7 +489,7 @@ export class Rundown extends BasicRundown {
         return
       }
       piece.takeOffAir(newList[0].getExecutedAt() + this.getActivePart().getTimings().delayStartOfPiecesDuration)
-      layersWithPieces.set(piece.layer, [...newList, piece])
+      layersWithPieces.set(piece.layer, [piece, ...newList])
     })
     return layersWithPieces
   }
