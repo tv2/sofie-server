@@ -25,6 +25,8 @@ import { NtpEvent } from '../value-objects/ntp-event'
 import { PlayoutContentEventObserver } from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
 import { PlayoutContentEvent } from '../../../rundown-execution/application/value-objects/playout-content-event'
 import {NtpEventType} from '../enums/ntp-event-type'
+import { HealthStatusEventObserver } from '../interfaces/health-status-event-observer'
+import { HealthStatusEvent } from '../value-objects/health-status-event'
 
 export class WebSocketEventServer implements EventServer {
 
@@ -41,6 +43,7 @@ export class WebSocketEventServer implements EventServer {
     private readonly statusMessageEventObserver: StatusMessageEventObserver,
     private readonly deviceEventObserver: DeviceEventObserver,
     private readonly playoutContentEventObserver: PlayoutContentEventObserver,
+    private readonly healthStatusEventObserver: HealthStatusEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -112,6 +115,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.playoutContentEventObserver.subscribeToPlayoutContentEvents((playoutContentEvent: PlayoutContentEvent) => {
       webSocket.send(JSON.stringify(playoutContentEvent))
+    })
+    this.healthStatusEventObserver.subscribeToHealthStatusMessageEvents((healthStatusEvent: HealthStatusEvent) => {
+      webSocket.send(JSON.stringify(healthStatusEvent))
     })
 
     webSocket.onmessage = (message: WebSocket.MessageEvent): void => {

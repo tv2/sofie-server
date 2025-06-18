@@ -1,31 +1,33 @@
-import {Logger} from './cross-cutting-concerns/application/interfaces/logger'
-import {ConsoleLogger} from './cross-cutting-concerns/infrastructure/services/console-logger'
-import {MongoDatabase} from './cross-cutting-concerns/infrastructure/mongodb/mongo-database'
+import { Logger } from './cross-cutting-concerns/application/interfaces/logger'
+import { ConsoleLogger } from './cross-cutting-concerns/infrastructure/services/console-logger'
+import { MongoDatabase } from './cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import {
   MongoRundownAggregateRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-rundown-aggregate-repository'
-import {MongoSegmentRepository} from './rundown-execution/infrastructure/repositories/mongodb/mongo-segment-repository'
-import {MongoPieceRepository} from './rundown-execution/infrastructure/repositories/mongodb/mongo-piece-repository'
-import {MongoEntityConverter} from './rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
-import {MongoPartRepository} from './rundown-execution/infrastructure/repositories/mongodb/mongo-part-repository'
+import {
+  MongoSegmentRepository
+} from './rundown-execution/infrastructure/repositories/mongodb/mongo-segment-repository'
+import { MongoPieceRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-piece-repository'
+import { MongoEntityConverter } from './rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
+import { MongoPartRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-part-repository'
 import {
   MongoExpectedPlayoutItemRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-expected-playout-item-repository'
-import {RundownAggregateRepository} from './rundown-execution/domain/repositories/rundown-aggregate-repository'
-import {RundownTimelineService} from './rundown-execution/application/services/rundown-timeline-service'
-import {ThrottledRundownService} from './rundown-execution/application/services/throttled-rundown-service'
-import {SynchronizedRundownService} from './rundown-execution/application/services/synchronized-rundown-service'
-import {AsyncLock} from './cross-cutting-concerns/application/services/async-lock'
+import { RundownAggregateRepository } from './rundown-execution/domain/repositories/rundown-aggregate-repository'
+import { RundownTimelineService } from './rundown-execution/application/services/rundown-timeline-service'
+import { ThrottledRundownService } from './rundown-execution/application/services/throttled-rundown-service'
+import { SynchronizedRundownService } from './rundown-execution/application/services/synchronized-rundown-service'
+import { AsyncLock } from './cross-cutting-concerns/application/services/async-lock'
 import {
   MongoIngestedRundownRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-rundown-repository'
-import {IngestedRundownRepository} from './sofie-ingest/domain/repositories/ingested-rundown-repository'
-import {IngestedSegmentRepository} from './sofie-ingest/domain/repositories/ingested-segment-repository'
-import {IngestedPartRepository} from './sofie-ingest/domain/repositories/ingested-part-repository'
+import { IngestedRundownRepository } from './sofie-ingest/domain/repositories/ingested-rundown-repository'
+import { IngestedSegmentRepository } from './sofie-ingest/domain/repositories/ingested-segment-repository'
+import { IngestedPartRepository } from './sofie-ingest/domain/repositories/ingested-part-repository'
 import {
   MongoIngestedPartRepository
 } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-ingested-part-repository'
-import {IngestedPieceRepository} from './sofie-ingest/domain/repositories/ingested-piece-repository'
+import { IngestedPieceRepository } from './sofie-ingest/domain/repositories/ingested-piece-repository'
 import {
   MongoIngestedEntityConverter
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-ingested-entity-converter'
@@ -35,134 +37,136 @@ import {
 import {
   MongoIngestedSegmentRepository
 } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-ingested-segment-repository'
-import {RundownBaselineRepository} from './rundown-execution/domain/repositories/rundown-baseline-repository'
+import { RundownBaselineRepository } from './rundown-execution/domain/repositories/rundown-baseline-repository'
 import {
   MongoRundownBaselineRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-rundown-baseline-repository'
-import {TimelineRepository} from './rundown-execution/domain/repositories/timeline-repository'
+import { TimelineRepository } from './rundown-execution/domain/repositories/timeline-repository'
 import {
   MongoTimelineRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-timeline-repository'
-import {TimelineBuilder} from './rundown-execution/domain/interfaces/timeline-builder'
-import {ObjectCloner} from './cross-cutting-concerns/domain/services/object-cloner'
-import {DeepPropertyObjectCloner} from './cross-cutting-concerns/infrastructure/services/deep-property-object-cloner'
-import {Blueprint} from './rundown-execution/domain/value-objects/blueprint'
-import {Tv2ConfigurationMapper} from './blueprints/domain/services/tv2-configuration-mapper'
+import { TimelineBuilder } from './rundown-execution/domain/interfaces/timeline-builder'
+import { ObjectCloner } from './cross-cutting-concerns/domain/services/object-cloner'
+import { DeepPropertyObjectCloner } from './cross-cutting-concerns/infrastructure/services/deep-property-object-cloner'
+import { Blueprint } from './rundown-execution/domain/value-objects/blueprint'
+import { Tv2ConfigurationMapper } from './blueprints/domain/services/tv2-configuration-mapper'
 import {
   Tv2StudioBlueprintConfigurationMapper
 } from './blueprints/domain/services/tv2-studio-blueprint-configuration-mapper'
 import {
   Tv2ShowStyleBlueprintConfigurationMapper
 } from './blueprints/domain/services/tv2-show-style-blueprint-configuration-mapper'
-import {Tv2SisyfosPersistentLayerFinder} from './blueprints/domain/services/tv2-sisyfos-persistent-layer-finder'
-import {Tv2Blueprint} from './blueprints/domain/services/tv2-blueprint'
-import {Tv2EndStateForPartService} from './blueprints/domain/services/tv2-end-state-for-part-service'
-import {Tv2OnTimelineGenerateService} from './blueprints/domain/services/tv2-on-timeline-generate-service'
-import {Tv2BlueprintConfigurationValidator} from './blueprints/domain/services/tv2-blueprint-configuration-validator'
-import {Tv2BlueprintBaselinePiecesGenerator} from './blueprints/domain/services/tv2-blueprint-baseline-pieces-generator'
+import { Tv2SisyfosPersistentLayerFinder } from './blueprints/domain/services/tv2-sisyfos-persistent-layer-finder'
+import { Tv2Blueprint } from './blueprints/domain/services/tv2-blueprint'
+import { Tv2EndStateForPartService } from './blueprints/domain/services/tv2-end-state-for-part-service'
+import { Tv2OnTimelineGenerateService } from './blueprints/domain/services/tv2-on-timeline-generate-service'
+import { Tv2BlueprintConfigurationValidator } from './blueprints/domain/services/tv2-blueprint-configuration-validator'
+import {
+  Tv2BlueprintBaselinePiecesGenerator
+} from './blueprints/domain/services/tv2-blueprint-baseline-pieces-generator'
 import {
   TimelineObjectFactoryProvider
 } from './blueprints/domain/services/timeline-object-factories/timeline-object-factory-provider'
-import {Tv2ActionService} from './blueprints/domain/services/tv2-action-service'
-import {Tv2ActionFactoryProvider} from './blueprints/domain/services/action-factories/tv2-action-factory-provider'
-import {ConfigurationRepository} from './rundown-execution/domain/repositories/configuration-repository'
+import { Tv2ActionService } from './blueprints/domain/services/tv2-action-service'
+import { Tv2ActionFactoryProvider } from './blueprints/domain/services/action-factories/tv2-action-factory-provider'
+import { ConfigurationRepository } from './rundown-execution/domain/repositories/configuration-repository'
 import {
   MongoConfigurationRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-configuration-repository'
-import {StudioRepository} from './rundown-execution/domain/repositories/studio-repository'
-import {MongoStudioRepository} from './rundown-execution/infrastructure/repositories/mongodb/mongo-studio-repository'
-import {ShowStyleRepository} from './rundown-execution/domain/repositories/show-style-repository'
+import { StudioRepository } from './rundown-execution/domain/repositories/studio-repository'
+import { MongoStudioRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-studio-repository'
+import { ShowStyleRepository } from './rundown-execution/domain/repositories/show-style-repository'
 import {
   MongoShowStyleRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-show-style-repository'
-import {ShowStyleVariantRepository} from './rundown-execution/domain/repositories/show-style-variant-repository'
+import { ShowStyleVariantRepository } from './rundown-execution/domain/repositories/show-style-variant-repository'
 import {
   MongoShowStyleVariantRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-show-style-variant-repository'
-import {BlueprintTimelineBuilder} from './rundown-execution/domain/services/blueprint-timeline-builder'
-import {SuperflyTimelineBuilder} from './rundown-execution/domain/services/superfly-timeline-builder'
-import {RundownService} from './rundown-execution/application/interfaces/rundown-service'
-import {IngestService} from './sofie-ingest/application/interfaces/ingest-service'
-import {Tv2INewsIngestService} from './sofie-ingest/application/services/tv2-inews-ingest-service'
-import {HttpService} from './cross-cutting-concerns/application/interfaces/http-service'
-import {GotHttpService} from './cross-cutting-concerns/infrastructure/services/got-http-service'
-import {PlayoutService} from './rundown-execution/application/interfaces/playout-service'
-import {PlayoutGatewayService} from './rundown-execution/application/services/playout-gateway-service'
-import {TimeoutCallbackScheduler} from './cross-cutting-concerns/application/services/timeout-callback-scheduler'
-import {PlayoutContentStateService} from './rundown-execution/application/services/playout-content-state-service'
+import { BlueprintTimelineBuilder } from './rundown-execution/domain/services/blueprint-timeline-builder'
+import { SuperflyTimelineBuilder } from './rundown-execution/domain/services/superfly-timeline-builder'
+import { RundownService } from './rundown-execution/application/interfaces/rundown-service'
+import { IngestService } from './sofie-ingest/application/interfaces/ingest-service'
+import { Tv2INewsIngestService } from './sofie-ingest/application/services/tv2-inews-ingest-service'
+import { HttpService } from './cross-cutting-concerns/application/interfaces/http-service'
+import { GotHttpService } from './cross-cutting-concerns/infrastructure/services/got-http-service'
+import { PlayoutService } from './rundown-execution/application/interfaces/playout-service'
+import { PlayoutGatewayService } from './rundown-execution/application/services/playout-gateway-service'
+import { TimeoutCallbackScheduler } from './cross-cutting-concerns/application/services/timeout-callback-scheduler'
+import { PlayoutContentStateService } from './rundown-execution/application/services/playout-content-state-service'
 import {
   MongoPlayoutContentRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-playout-content-repository'
-import {PlayoutContentRepository} from './rundown-execution/domain/repositories/playout-content-repository'
-import {CallbackScheduler} from './cross-cutting-concerns/application/interfaces/callback-scheduler'
-import {PlayoutContentEventEmitter} from './rundown-execution/application/interfaces/playout-content-event-emitter'
-import {PlayoutContentEventService} from './rundown-execution/application/services/playout-content-event-service'
-import {RundownExecutionEventBuilder} from './rundown-execution/application/services/rundown-execution-event-builder'
-import {RundownEventService} from './rundown-execution/application/services/rundown-event-service'
-import {RundownController} from './rundown-execution/application/controllers/rundown-controller'
-import {HttpErrorHandler} from './cross-cutting-concerns/application/interfaces/http-error-handler'
-import {ExpressErrorHandler} from './cross-cutting-concerns/application/services/express-error-handler'
-import {JsendResponseFormatter} from './cross-cutting-concerns/application/services/jsend-response-formatter'
-import {ExpressRestServer} from './cross-cutting-concerns/infrastructure/services/express-rest-server'
-import {LoggerController} from './cross-cutting-concerns/application/controllers/logger-controller'
-import {TimelineController} from './rundown-execution/application/controllers/timeline-controller'
-import {ActionController} from './action-system/application/controllers/action-controller'
-import {ActionService} from './action-system/application/interfaces/action-service'
-import {ExecuteActionService} from './action-system/application/services/execute-action-service'
-import {ActionRepository} from './action-system/domain/repositories/action-repository'
-import {MongoActionRepository} from './action-system/infrastructure/repositories/mongodb/mongo-action-repository'
-import {MediaRepository} from './rundown-execution/domain/repositories/media-repository'
-import {MongoMediaRepository} from './rundown-execution/infrastructure/repositories/mongodb/mongo-media-repository'
-import {TriggerController} from './action-system/application/controllers/trigger-controller'
-import {TriggerService} from './action-system/application/interfaces/trigger-service'
-import {TriggerServiceImplementation} from './action-system/application/services/trigger-service-implementation'
-import {ActionSystemEventBuilder} from './action-system/application/services/action-system-event-builder'
-import {TriggerEventService} from './action-system/application/services/trigger-event-service'
-import {TriggerRepository} from './action-system/domain/repositories/trigger-repository'
-import {MongoTriggerRepository} from './action-system/infrastructure/repositories/mongodb/mongo-trigger-repository'
-import {UuidGenerator} from './cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
-import {CryptoUuidGenerator} from './cross-cutting-concerns/infrastructure/services/crypto-uuid-generator'
-import {ConfigurationController} from './rundown-execution/application/controllers/configuration-controller'
-import {ConfigurationService} from './rundown-execution/application/interfaces/configuration-service'
+import { PlayoutContentRepository } from './rundown-execution/domain/repositories/playout-content-repository'
+import { CallbackScheduler } from './cross-cutting-concerns/application/interfaces/callback-scheduler'
+import { PlayoutContentEventEmitter } from './rundown-execution/application/interfaces/playout-content-event-emitter'
+import { PlayoutContentEventService } from './rundown-execution/application/services/playout-content-event-service'
+import { RundownExecutionEventBuilder } from './rundown-execution/application/services/rundown-execution-event-builder'
+import { RundownEventService } from './rundown-execution/application/services/rundown-event-service'
+import { RundownController } from './rundown-execution/application/controllers/rundown-controller'
+import { HttpErrorHandler } from './cross-cutting-concerns/application/interfaces/http-error-handler'
+import { ExpressErrorHandler } from './cross-cutting-concerns/application/services/express-error-handler'
+import { JsendResponseFormatter } from './cross-cutting-concerns/application/services/jsend-response-formatter'
+import { ExpressRestServer } from './cross-cutting-concerns/infrastructure/services/express-rest-server'
+import { LoggerController } from './cross-cutting-concerns/application/controllers/logger-controller'
+import { TimelineController } from './rundown-execution/application/controllers/timeline-controller'
+import { ActionController } from './action-system/application/controllers/action-controller'
+import { ActionService } from './action-system/application/interfaces/action-service'
+import { ExecuteActionService } from './action-system/application/services/execute-action-service'
+import { ActionRepository } from './action-system/domain/repositories/action-repository'
+import { MongoActionRepository } from './action-system/infrastructure/repositories/mongodb/mongo-action-repository'
+import { MediaRepository } from './rundown-execution/domain/repositories/media-repository'
+import { MongoMediaRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-media-repository'
+import { TriggerController } from './action-system/application/controllers/trigger-controller'
+import { TriggerService } from './action-system/application/interfaces/trigger-service'
+import { TriggerServiceImplementation } from './action-system/application/services/trigger-service-implementation'
+import { ActionSystemEventBuilder } from './action-system/application/services/action-system-event-builder'
+import { TriggerEventService } from './action-system/application/services/trigger-event-service'
+import { TriggerRepository } from './action-system/domain/repositories/trigger-repository'
+import { MongoTriggerRepository } from './action-system/infrastructure/repositories/mongodb/mongo-trigger-repository'
+import { UuidGenerator } from './cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
+import { CryptoUuidGenerator } from './cross-cutting-concerns/infrastructure/services/crypto-uuid-generator'
+import { ConfigurationController } from './rundown-execution/application/controllers/configuration-controller'
+import { ConfigurationService } from './rundown-execution/application/interfaces/configuration-service'
 import {
   ConfigurationServiceImplementation
 } from './rundown-execution/application/services/configuration-service-implementation'
-import {ConfigurationEventService} from './rundown-execution/application/services/configuration-event-service'
-import {ShelfConfigurationRepository} from './rundown-execution/domain/repositories/shelf-configuration-repository'
-import {MongoShelfRepository} from './rundown-execution/infrastructure/repositories/mongodb/mongo-shelf-repository'
-import {MediaController} from './rundown-execution/application/controllers/media-controller'
+import { ConfigurationEventService } from './rundown-execution/application/services/configuration-event-service'
+import { ShelfConfigurationRepository } from './rundown-execution/domain/repositories/shelf-configuration-repository'
+import { MongoShelfRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-shelf-repository'
+import { MediaController } from './rundown-execution/application/controllers/media-controller'
 import {
   SystemInformationController
 } from './cross-cutting-concerns/application/controllers/system-information-controller'
-import {SystemInformationRepository} from './cross-cutting-concerns/domain/repositories/system-information-repository'
+import { SystemInformationRepository } from './cross-cutting-concerns/domain/repositories/system-information-repository'
 import {
   MongoSystemInformationRepository
 } from './cross-cutting-concerns/infrastructure/mongodb/mongo-system-information-repository'
-import {StatusMessageRepository} from './cross-cutting-concerns/domain/repositories/status-message-repository'
+import { StatusMessageRepository } from './cross-cutting-concerns/domain/repositories/status-message-repository'
 import {
   MongoStatusMessageRepository
 } from './cross-cutting-concerns/infrastructure/mongodb/mongo-status-message-repository'
-import {DeviceController} from './rundown-execution/application/controllers/device-controller'
-import {VideoMixerDeviceRepository} from './rundown-execution/domain/repositories/video-mixer-device-repository'
+import { DeviceController } from './rundown-execution/application/controllers/device-controller'
+import { VideoMixerDeviceRepository } from './rundown-execution/domain/repositories/video-mixer-device-repository'
 import {
   MongoVideoMixerDeviceRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-video-mixer-device-repository'
-import {DeviceEventService} from './rundown-execution/application/services/device-event-service'
-import {MacroController} from './action-system/application/controllers/macro-controller'
-import {MacroService} from './action-system/application/interfaces/macro-service'
-import {MacroServiceImplementation} from './action-system/application/services/macro-service-implementation'
-import {StatusMessageEventService} from './cross-cutting-concerns/application/services/status-message-event-service'
+import { DeviceEventService } from './rundown-execution/application/services/device-event-service'
+import { MacroController } from './action-system/application/controllers/macro-controller'
+import { MacroService } from './action-system/application/interfaces/macro-service'
+import { MacroServiceImplementation } from './action-system/application/services/macro-service-implementation'
+import { StatusMessageEventService } from './cross-cutting-concerns/application/services/status-message-event-service'
 import {
   CrossCuttingConcernsEventBuilder
 } from './cross-cutting-concerns/application/services/cross-cutting-concerns-event-builder'
-import {MacroEventService} from './action-system/application/services/macro-event-service'
-import {MacroRepository} from './action-system/domain/repositories/macro-repository'
-import {MongoMacroRepository} from './action-system/infrastructure/repositories/mongodb/mongo-macro-repository'
-import {EventServer} from './cross-cutting-concerns/infrastructure/interfaces/event-server'
-import {WebSocketEventServer} from './cross-cutting-concerns/application/services/web-socket-event-server'
-import {ActionEventService} from './action-system/application/services/action-event-service'
-import {MediaEventService} from './sofie-ingest/application/services/media-event-service'
-import {SofieIngestEventBuilder} from './sofie-ingest/application/services/sofie-ingest-event-builder'
+import { MacroEventService } from './action-system/application/services/macro-event-service'
+import { MacroRepository } from './action-system/domain/repositories/macro-repository'
+import { MongoMacroRepository } from './action-system/infrastructure/repositories/mongodb/mongo-macro-repository'
+import { EventServer } from './cross-cutting-concerns/infrastructure/interfaces/event-server'
+import { WebSocketEventServer } from './cross-cutting-concerns/application/services/web-socket-event-server'
+import { ActionEventService } from './action-system/application/services/action-event-service'
+import { MediaEventService } from './sofie-ingest/application/services/media-event-service'
+import { SofieIngestEventBuilder } from './sofie-ingest/application/services/sofie-ingest-event-builder'
 import {
   MongoIngestedRundownChangedListener
 } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-ingested-rundown-changed-listener'
@@ -175,13 +179,13 @@ import {
 import {
   MongoIngestedPieceChangedListener
 } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-ingested-piece-changed-listener'
-import {IngestDataChangeService} from './sofie-ingest/application/services/ingest-data-change-service'
-import {IngestRundownSynchronizer} from './sofie-ingest/application/services/ingest-rundown-synchronizer'
-import {EntityChangeDetector} from './sofie-ingest/domain/services/entity-change-detector'
-import {IngestedEntityToEntityMapper} from './sofie-ingest/domain/services/ingested-entity-to-entity-mapper'
-import {RundownEventEmitter} from './rundown-execution/application/interfaces/rundown-event-emitter'
-import {ActionGenerationService} from './action-system/application/services/action-generation-service'
-import {ActionManifestRepository} from './action-system/domain/repositories/action-manifest-repository'
+import { IngestDataChangeService } from './sofie-ingest/application/services/ingest-data-change-service'
+import { IngestRundownSynchronizer } from './sofie-ingest/application/services/ingest-rundown-synchronizer'
+import { EntityChangeDetector } from './sofie-ingest/domain/services/entity-change-detector'
+import { IngestedEntityToEntityMapper } from './sofie-ingest/domain/services/ingested-entity-to-entity-mapper'
+import { RundownEventEmitter } from './rundown-execution/application/interfaces/rundown-event-emitter'
+import { ActionGenerationService } from './action-system/application/services/action-generation-service'
+import { ActionManifestRepository } from './action-system/domain/repositories/action-manifest-repository'
 import {
   MongoActionManifestRepository
 } from './action-system/infrastructure/repositories/mongodb/mongo-action-manifest-repository'
@@ -191,22 +195,22 @@ import {
 import {
   MongoAdLibPieceRepository
 } from './action-system/infrastructure/repositories/mongodb/mongo-ad-lib-piece-repository'
-import {MediaDatabaseChangedService} from './sofie-ingest/application/services/media-database-changed-service'
+import { MediaDatabaseChangedService } from './sofie-ingest/application/services/media-database-changed-service'
 import {
   MongoDeviceChangedListener
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-device-changed-listener'
 import {
   MongoMediaChangedListener
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-media-changed-listener'
-import {MediaEventEmitter} from './rundown-execution/application/interfaces/media-event-emitter'
-import {DeviceChangedService} from './sofie-ingest/application/services/device-changed-service'
-import {DeviceRepository} from './rundown-execution/domain/repositories/device-repository'
-import {StatusMessageService} from './cross-cutting-concerns/application/interfaces/status-message-service'
+import { MediaEventEmitter } from './rundown-execution/application/interfaces/media-event-emitter'
+import { DeviceChangedService } from './sofie-ingest/application/services/device-changed-service'
+import { DeviceRepository } from './rundown-execution/domain/repositories/device-repository'
+import { StatusMessageService } from './cross-cutting-concerns/application/interfaces/status-message-service'
 import {
   StatusMessageServiceImplementation
 } from './cross-cutting-concerns/application/services/status-message-service-implementation'
-import {MongoDeviceRepository} from './rundown-execution/infrastructure/repositories/mongodb/mongo-device-repository'
-import {ConfigurationChangedService} from './sofie-ingest/application/services/configuration-changed-service'
+import { MongoDeviceRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-device-repository'
+import { ConfigurationChangedService } from './sofie-ingest/application/services/configuration-changed-service'
 import {
   MongoShowStyleChangedListener
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-show-style-changed-listener'
@@ -219,6 +223,10 @@ import {
 import {
   CachedConfigurationRepository
 } from './rundown-execution/infrastructure/repositories/cache/cached-configuration-repository'
+import { GatewayConnector } from './tv2-inews-ingest/application/interfaces/gatewayConnector'
+import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
+import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
+import { HealthStatusEventService } from './cross-cutting-concerns/application/services/health-status-event-service'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -258,6 +266,7 @@ async function main(logger: Logger): Promise<void> {
 
   const crossCuttingConcernsEventBuilder: CrossCuttingConcernsEventBuilder = new CrossCuttingConcernsEventBuilder()
   const statusMessageEventService: StatusMessageEventService = new StatusMessageEventService(crossCuttingConcernsEventBuilder)
+  const healthStatusEventService: HealthStatusEventService = new HealthStatusEventService(crossCuttingConcernsEventBuilder)
 
   const actionSystemEventBuilder: ActionSystemEventBuilder = new ActionSystemEventBuilder()
   const actionEventService: ActionEventService = new ActionEventService(actionSystemEventBuilder)
@@ -310,7 +319,7 @@ async function main(logger: Logger): Promise<void> {
 
   // System setup
   const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController], logger)
-  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, logger)
+  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, healthStatusEventService, logger)
 
   // System startup
   await mongoDatabase.connect()
@@ -322,6 +331,11 @@ async function main(logger: Logger): Promise<void> {
   await restServer.start(3005)
   await eventServer.startServer(3006)
   logger.info('Alba server is configured.')
+
+
+  // TODO: Place correctly in the structure.
+  const gateway: GatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(healthStatusEventService))
+  gateway.connect()
 }
 
 function createRundownAggregateRepository(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter, logger: Logger): RundownAggregateRepository {
