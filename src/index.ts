@@ -159,7 +159,7 @@ import { MacroEventService } from './action-system/application/services/macro-ev
 import { MacroRepository } from './action-system/domain/repositories/macro-repository'
 import { MongoMacroRepository } from './action-system/infrastructure/repositories/mongodb/mongo-macro-repository'
 import { EventServer } from './cross-cutting-concerns/infrastructure/interfaces/event-server'
-import { WebSocketEventServer } from './cross-cutting-concerns/application/services/web-socket-event-server'
+import { WebSocketEventServer } from './cross-cutting-concerns/infrastructure/services/web-socket-event-server'
 import { ActionEventService } from './action-system/application/services/action-event-service'
 import { MediaEventService } from './sofie-ingest/application/services/media-event-service'
 import { SofieIngestEventBuilder } from './sofie-ingest/application/services/sofie-ingest-event-builder'
