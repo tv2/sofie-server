@@ -43,10 +43,3 @@ export interface PieceMetadata {
   mediaPlayerSessions?: string[]
   sourceName?: string
 }
-
-export interface TimelineObjectMetadata {
-  context?: string
-  mediaPlayerSession?: string
-  templateData?: unknown
-  fileName?: string
-}

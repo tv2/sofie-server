@@ -28,8 +28,7 @@ import {
 import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
 import { AtemSourceIndex } from '../../value-objects/timeline-state-resolver-types/atem-types'
 import { AtemToTriCasterSplitScreenConverter } from '../atem-to-tricaster-split-screen-converter'
-import { TimelineObject } from '../../../../rundown-execution/domain/entities/timeline-object'
-import { TimelineObjectMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
+import { TimelineObject, TimelineObjectMetadata } from '../../../../rundown-execution/domain/entities/timeline-object'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 interface TriCasterTransitionEffectProperties {

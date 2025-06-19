@@ -29,9 +29,8 @@ import {
 } from '../../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Piece } from '../../../../rundown-execution/domain/entities/piece'
-import { TimelineObject } from '../../../../rundown-execution/domain/entities/timeline-object'
+import { TimelineObject, TimelineObjectMetadata } from '../../../../rundown-execution/domain/entities/timeline-object'
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
-import { TimelineObjectMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const ATEM_PREFIX: string = 'atem_'

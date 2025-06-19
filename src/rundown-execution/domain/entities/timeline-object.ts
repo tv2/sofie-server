@@ -1,6 +1,5 @@
 import { TimelineObject as SuperFlyTimelineObject } from 'superfly-timeline'
 import { TimelineEnable } from './timeline-enable'
-import { TimelineObjectMetadata } from '../value-objects/metadata'
 import { DeviceType } from '../enums/device-type'
 
 export type TimelineObject = SuperFlyTimelineObject & {
@@ -13,6 +12,13 @@ export type TimelineObject = SuperFlyTimelineObject & {
     deviceType: DeviceType
     type: unknown
   }
+}
+
+export interface TimelineObjectMetadata {
+  context?: string
+  mediaPlayerSession?: string
+  templateData?: unknown
+  fileName?: string
 }
 
 export interface LookaheadTimelineObject extends TimelineObject {

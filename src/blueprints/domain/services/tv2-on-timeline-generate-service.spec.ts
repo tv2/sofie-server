@@ -7,13 +7,16 @@ import { Part } from '../../../rundown-execution/domain/entities/part'
 import { OnTimelineGenerateResult } from '../../../rundown-execution/domain/value-objects/on-timeline-generate-result'
 import { Tv2MediaPlayerSession, Tv2RundownPersistentState } from '../value-objects/tv2-rundown-persistent-state'
 import { Timeline } from '../../../rundown-execution/domain/entities/timeline'
-import { TimelineObject, TimelineObjectGroup } from '../../../rundown-execution/domain/entities/timeline-object'
+import {
+  TimelineObject,
+  TimelineObjectGroup,
+  TimelineObjectMetadata
+} from '../../../rundown-execution/domain/entities/timeline-object'
 import { Tv2MediaPlayer, Tv2StudioBlueprintConfiguration } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2ShowStyleBlueprintConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2ConfigurationMapper } from './tv2-configuration-mapper'
-import { TimelineObjectMetadata } from '../../../rundown-execution/domain/value-objects/metadata'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
