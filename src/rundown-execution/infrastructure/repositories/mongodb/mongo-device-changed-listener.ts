@@ -10,13 +10,12 @@ import { CoreDevice } from '../../../domain/entities/device'
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
 export class MongoDeviceChangedListener extends BaseMongoRepository<MongoCoreDevice> implements DataChangedListener<CoreDevice> {
-
   private readonly logger: Logger
   private onCreatedCallback: (device: CoreDevice) => void
   private onUpdatedCallback: (device: CoreDevice) => void
   private onDeletedCallback: (deviceId: string) => void
 
-  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter, logger: Logger) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter, logger: Logger) {
     super(mongoDatabase)
     this.logger = logger.tag(MongoDeviceChangedListener.name)
     mongoDatabase.onConnect(DEVICE_COLLECTION_NAME, () => this.listenForChanges())

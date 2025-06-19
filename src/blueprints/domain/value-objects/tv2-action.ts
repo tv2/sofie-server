@@ -78,11 +78,11 @@ export interface Tv2RemoteAction extends Tv2PartAction {
 }
 
 export interface Tv2RecallLastPlannedRemoteAsNextAction extends Tv2PartAction {
-  type: PartActionType.INSERT_PART_AS_NEXT,
+  type: PartActionType.INSERT_PART_AS_NEXT
   metadata: {
     playoutContent: RecalledPlayoutContent<PlayoutContentType.REMOTE>
     outputChannel: OutputChannel
-    actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE,
+    actionSubtype: Tv2ActionSubtype.RECALL_LAST_PLANNED_REMOTE
   }
 }
 
@@ -109,7 +109,7 @@ export interface Tv2DipTransitionEffectActionMetadata {
   playoutContent: TransitionPlayoutContent
   outputChannel: OutputChannel
   transitionEffectType: TransitionEffectType.DIP
-  durationInFrames: number,
+  durationInFrames: number
   dipInput: number
 }
 
@@ -132,9 +132,9 @@ export interface Tv2AudioAction extends Tv2PieceAction {
 
 export interface Tv2FadeAudioBedAction extends Tv2PieceAction {
   metadata: {
-    playoutContent:AudioPlayoutContent
+    playoutContent: AudioPlayoutContent
     outputChannel: OutputChannel
-    actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED,
+    actionSubtype: Tv2ActionSubtype.FADE_AUDIO_BED
     defaultFadeDurationInFrames: number
   }
 }
@@ -152,7 +152,7 @@ export interface Tv2RecallSplitScreenAction extends Tv2PartAction {
   metadata: {
     playoutContent: RecalledPlayoutContent<PlayoutContentType.SPLIT_SCREEN>
     outputChannel: OutputChannel
-    actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN,
+    actionSubtype: Tv2ActionSubtype.RECALL_SPLIT_SCREEN
   }
 }
 
@@ -161,7 +161,7 @@ export interface Tv2SplitScreenLayoutAction extends Tv2PartAction {
   metadata: {
     playoutContent: SplitScreenPlayoutContent
     outputChannel: OutputChannel
-    actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT,
+    actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_LAYOUT
   }
 }
 
@@ -176,7 +176,7 @@ export interface Tv2SplitScreenInsertSourceInputAction extends Tv2PieceAction {
 
 export type Tv2SplitScreenInsertSourceInputMetadata = {
   playoutContent: SplitScreenInputPlayoutContent
-  videoMixerSource: number,
+  videoMixerSource: number
   audioTimelineObjects: Tv2BlueprintTimelineObject[]
   videoClip?: {
     timelineObjects: Tv2BlueprintTimelineObject[]
@@ -226,8 +226,8 @@ export interface Tv2FullscreenGraphicsAction extends Tv2PartAction {
 
 export interface Tv2ToggleDownstreamKeyerAction extends Tv2PieceAction {
   metadata: {
-    playoutContent: DownstreamKeyerPlayoutContent,
-    outputChannel: OutputChannel,
+    playoutContent: DownstreamKeyerPlayoutContent
+    outputChannel: OutputChannel
     actionSubtype: Tv2ActionSubtype.TOGGLE_DOWNSTREAM_KEYER
     downstreamKeyerConfiguration: Tv2DownstreamKeyer
   }

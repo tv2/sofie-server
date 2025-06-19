@@ -5,7 +5,7 @@ export class MediaDto {
   public readonly sourceName: string
   public readonly duration?: number
 
-  constructor(media: Media) {
+  public constructor(media: Media) {
     this.id = media.id
     this.sourceName = media.sourceName
     this.duration = media.duration

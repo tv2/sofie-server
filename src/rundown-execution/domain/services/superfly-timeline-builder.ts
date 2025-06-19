@@ -44,7 +44,7 @@ const BASELINE_PRIORITY: number = 0
 const LOW_PRIORITY: number = -1
 
 export class SuperflyTimelineBuilder implements TimelineBuilder {
-  constructor(private readonly objectCloner: ObjectCloner) {}
+  public constructor(private readonly objectCloner: ObjectCloner) {}
 
   public getBaseTimeline(): Timeline {
     return { timelineGroups: [] }
@@ -102,8 +102,8 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
 
     let autoNextEpochTime: number = 0
     if (activePart.autoNext && !!activePart.expectedDuration) {
-      currentPartEnable.duration =
-          activePart.expectedDuration + activePart.getTimings().delayStartOfPiecesDuration
+      currentPartEnable.duration
+          = activePart.expectedDuration + activePart.getTimings().delayStartOfPiecesDuration
       autoNextEpochTime = activePart.getExecutedAt() + currentPartEnable.duration
     }
 
@@ -123,7 +123,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
 
     activeGroup.children = activePart
       .getPieces()
-      .flatMap((piece) => this.generateGroupsAndTimelineObjectsForPiece(piece, activePart, activeGroup))
+      .flatMap(piece => this.generateGroupsAndTimelineObjectsForPiece(piece, activePart, activeGroup))
     return activeGroup
   }
 
@@ -165,7 +165,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       controlForPiece.enable.start = `#${preRollControlForPiece.id} + ${piece.preRollDuration}`
     }
 
-    childGroupForPiece.children = piece.getTimelineObjects().map((timelineObject) =>
+    childGroupForPiece.children = piece.getTimelineObjects().map(timelineObject =>
       this.mapToTimelineObjectForPieceGroup(timelineObject, childGroupForPiece, piece)
     )
 
@@ -231,8 +231,8 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     piece: Piece,
     parentGroup: TimelineObjectGroup
   ): TimelineEnable | undefined {
-    const duration: string | number | undefined =
-        partCalculatedTimings.postRollDuration && !piece.getDuration()
+    const duration: string | number | undefined
+        = partCalculatedTimings.postRollDuration && !piece.getDuration()
           ? `#${parentGroup.id} - ${partCalculatedTimings.postRollDuration}`
           : piece.getDuration()
 
@@ -322,7 +322,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     timeline: Timeline
   ): Timeline {
     const lookaheadLayers: StudioLayer[] = studio.layers.filter(
-      (layer) => layer.lookaheadMode !== LookaheadMode.NONE
+      layer => layer.lookaheadMode !== LookaheadMode.NONE
     )
 
     const lookaheadObjects: TimelineObject[] = this.findLookaheadTimelineObjectsForLayers(lookaheadLayers, rundown, activeGroup)
@@ -357,8 +357,8 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         activeGroup
       )
 
-      const activePartLookaheadObjects: LookaheadTimelineObject[] =
-        this.findLookaheadTimelineObjectsForActivePart(rundown, layer, activeGroup)
+      const activePartLookaheadObjects: LookaheadTimelineObject[]
+        = this.findLookaheadTimelineObjectsForActivePart(rundown, layer, activeGroup)
       lookaheadObjects.push(...activePartLookaheadObjects)
 
       return this.postFixRandomIdToDuplicateObjects(lookaheadObjects)
@@ -367,7 +367,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
 
   private postFixRandomIdToDuplicateObjects(timelineObjects: LookaheadTimelineObject[]): LookaheadTimelineObject[] {
     const existingIds: Set<string> = new Set<string>()
-    return timelineObjects.map(timelineObject => {
+    return timelineObjects.map((timelineObject) => {
       if (existingIds.has(timelineObject.id)) {
         return {
           ...timelineObject,
@@ -418,10 +418,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   ): LookaheadTimelineObject[] {
     return part
       .getPieces()
-      .filter((piece) => piece.pieceLifespan === PieceLifespan.WITHIN_PART)
-      .flatMap((piece) => piece.getTimelineObjects())
-      .filter((timelineObject) => timelineObject.layer === layer.name)
-      .map((timelineObject) => this.mapTimelineObjectToLookAheadTimelineObject(timelineObject, enable, layer, idPostFix))
+      .filter(piece => piece.pieceLifespan === PieceLifespan.WITHIN_PART)
+      .flatMap(piece => piece.getTimelineObjects())
+      .filter(timelineObject => timelineObject.layer === layer.name)
+      .map(timelineObject => this.mapTimelineObjectToLookAheadTimelineObject(timelineObject, enable, layer, idPostFix))
   }
 
   /*
@@ -520,7 +520,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       .getInfinitePieces()
       .filter(piece => piece.transitionType === TransitionType.NO_TRANSITION)
       .filter(piece => piece.getPartId() !== activePart.id)
-      .forEach(piece => {
+      .forEach((piece) => {
         if (!piece.getExecutedAt()) {
           throw new UnsupportedOperationException(
             `Found infinite Piece: ${piece.id} without an "executedAt". Infinite Pieces must have an "executedAt"! ${piece.pieceLifespan}`

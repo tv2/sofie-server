@@ -17,8 +17,7 @@ import { MongoExpectedPlayoutItemRepository } from './mongo-expected-playout-ite
 const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
 export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRundown> implements RundownAggregateRepository {
-
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoSegmentRepository: MongoSegmentRepository,
     private readonly mongoPartRepository: MongoPartRepository,
@@ -96,7 +95,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
   }
 
   private async doesRundownExist(rundownId: string): Promise<boolean> {
-    return (await this.getCollection().countDocuments({ _id: rundownId })) === 1
+    return await this.getCollection().countDocuments({ _id: rundownId }) === 1
   }
 
   public getSegment(segmentId: string): Promise<Segment> {

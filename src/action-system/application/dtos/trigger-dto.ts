@@ -24,7 +24,7 @@ export abstract class TriggerDto {
         return MacroTriggerDto.toEntity(triggerDto as MacroTriggerDto)
       }
       default:
-        throw new UnexpectedCaseException(triggerDto.type,'Unexpected Trigger type.')
+        throw new UnexpectedCaseException(triggerDto.type, 'Unexpected Trigger type.')
     }
   }
 }
@@ -33,7 +33,7 @@ export class ActionTriggerDto extends TriggerDto {
   public readonly actionId: string
   public readonly actionArguments?: string | number
 
-  constructor(trigger: ActionTrigger) {
+  public constructor(trigger: ActionTrigger) {
     super()
     this.id = trigger.id
     this.type = trigger.type
@@ -60,7 +60,7 @@ export class ActionTriggerDto extends TriggerDto {
 export class MacroTriggerDto extends TriggerDto {
   public readonly macroId: string
 
-  constructor(trigger: MacroTrigger) {
+  public constructor(trigger: MacroTrigger) {
     super()
     this.id = trigger.id
     this.type = trigger.type

@@ -27,7 +27,7 @@ import { Tv2Action } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../action-system/domain/enums/action-type'
 import { ObjectCloner } from '../../../../cross-cutting-concerns/domain/services/object-cloner'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   describe(Tv2SplitScreenActionFactory.prototype.createSplitScreenActions.name, () => {
@@ -207,7 +207,6 @@ describe(Tv2SplitScreenActionFactory.name, () => {
         })
       ]
 
-
       const result: Tv2Action[] = testee.createSplitScreenActions(blueprintConfiguration, actionManifests)
       const splitScreenActions: Tv2Action[] = result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.playoutContent.type === PlayoutContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)
 
@@ -218,15 +217,15 @@ describe(Tv2SplitScreenActionFactory.name, () => {
 })
 
 function createTestee(params?: {
-  actionManifestMapper?: Tv2ActionManifestMapper,
-  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
-  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
-  graphicsSplitScreenTimelineObjectFactory?: Tv2GraphicsSplitScreenTimelineObjectFactory,
-  videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory,
-  stringHashConverter?: Tv2StringHashConverter,
-  assetPathHelper?: Tv2AssetPathHelper,
-  objectCloner?: ObjectCloner,
-  logger?: Logger,
+  actionManifestMapper?: Tv2ActionManifestMapper
+  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
+  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
+  graphicsSplitScreenTimelineObjectFactory?: Tv2GraphicsSplitScreenTimelineObjectFactory
+  videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory
+  stringHashConverter?: Tv2StringHashConverter
+  assetPathHelper?: Tv2AssetPathHelper
+  objectCloner?: ObjectCloner
+  logger?: Logger
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
     params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfLogger())),

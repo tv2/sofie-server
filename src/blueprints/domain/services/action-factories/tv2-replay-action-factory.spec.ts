@@ -14,7 +14,7 @@ describe(Tv2ReplayActionFactory.name, () => {
 })
 
 function createTestee(params?: {
-  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
+  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
 }): Tv2ReplayActionFactory {
   return new Tv2ReplayActionFactory(

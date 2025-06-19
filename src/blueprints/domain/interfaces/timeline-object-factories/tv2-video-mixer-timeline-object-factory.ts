@@ -15,7 +15,7 @@ export interface Tv2VideoMixerTimelineObjectFactory {
   createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): Tv2BlueprintTimelineObject
   createProgramTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject
   createCleanFeedTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject
-  createLookaheadTimelineObject( sourceInput: number, enable: TimelineEnable): Tv2BlueprintTimelineObject
+  createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): Tv2BlueprintTimelineObject
   createAuxTimelineObject(sourceInput: number, layer: Tv2VideoMixerLayer): Tv2BlueprintTimelineObject
   createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): Tv2BlueprintTimelineObject
   createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): Tv2BlueprintTimelineObject

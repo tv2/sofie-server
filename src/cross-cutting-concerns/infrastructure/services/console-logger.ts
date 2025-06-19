@@ -3,7 +3,7 @@ import { ConsoleVault, NodeEnvironmentLogger } from '@tv2media/logger/node'
 import { PlainTextFormat } from '@tv2media/logger'
 
 export class ConsoleLogger extends NodeEnvironmentLogger implements Logger {
-  constructor() {
+  public constructor() {
     super([
       new ConsoleVault({
         level: LogLevel.TRACE,

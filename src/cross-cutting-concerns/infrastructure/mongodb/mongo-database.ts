@@ -14,14 +14,13 @@ function getMongoDatabaseName(): string {
 }
 
 export class MongoDatabase implements Database {
-
   private readonly logger: Logger
   private client: mongodb.MongoClient
   private db: mongodb.Db
 
   private readonly onConnectCallbacks: Map<string, () => void> = new Map()
 
-  constructor(logger: Logger) {
+  public constructor(logger: Logger) {
     this.logger = logger.tag(MongoDatabase.name)
   }
 

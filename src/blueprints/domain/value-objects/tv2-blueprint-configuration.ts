@@ -2,6 +2,6 @@ import { Tv2StudioBlueprintConfiguration } from './tv2-studio-blueprint-configur
 import { Tv2ShowStyleBlueprintConfiguration } from './tv2-show-style-blueprint-configuration'
 
 export interface Tv2BlueprintConfiguration {
-  studio: Tv2StudioBlueprintConfiguration,
+  studio: Tv2StudioBlueprintConfiguration
   showStyle: Tv2ShowStyleBlueprintConfiguration
 }

@@ -112,7 +112,6 @@ describe(RundownTimelineService.name, () => {
       when(rundownRepository.getBasicRundowns()).thenResolve(basicRundowns)
       when(rundownRepository.getRundown(rundownToActivate.id)).thenResolve(rundownToActivate)
 
-
       const testee: RundownTimelineService = createTestee({ rundownRepository })
 
       const result: () => Promise<void> = () => testee.activateRundown(rundownToActivate.id)
@@ -125,8 +124,8 @@ describe(RundownTimelineService.name, () => {
       const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
       const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
 
-      const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',firstLayerPiece]])
-      const secondMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',secondLayerPiece]])
+      const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer', firstLayerPiece]])
+      const secondMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer', secondLayerPiece]])
       const aRundown: Rundown = instance(aRundownMock)
       when(aRundownMock.getInfinitePiecesMap()).thenReturn(firstMap).thenReturn(secondMap)
 
@@ -151,8 +150,8 @@ describe(RundownTimelineService.name, () => {
       const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'firstLayerPiece' })
       const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'secondLayerPiece' })
 
-      const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',firstLayerPiece]])
-      const secondMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer',secondLayerPiece]])
+      const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer', firstLayerPiece]])
+      const secondMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer', secondLayerPiece]])
       const aRundown: Rundown = instance(aRundownMock)
       when(aRundownMock.getInfinitePiecesMap()).thenReturn(firstMap).thenReturn(secondMap)
 
@@ -200,7 +199,7 @@ describe(RundownTimelineService.name, () => {
         when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
         when(rundownRepository.getBasicRundowns()).thenReturn(Promise.resolve([]))
 
-        const testee: RundownTimelineService = createTestee({playoutService, rundownRepository})
+        const testee: RundownTimelineService = createTestee({ playoutService, rundownRepository })
         await testee.activateRundown(rundown.id)
 
         verify(playoutService.makeDevicesReady(false, rundown.id)).once()
@@ -274,7 +273,7 @@ describe(RundownTimelineService.name, () => {
         const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
         const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
         const unplayedUnplannedPart: Part = EntityTestFactory.createPart({ id: 'unplannedNextPart', isNext: true, executedAt: 0, ingestedPart: undefined })
-        const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart, unplayedUnplannedPart]})
+        const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart, unplayedUnplannedPart] })
         const segments: Segment[] = [activeSegment, nextSegment]
         const rundown: Rundown = EntityTestFactory.createRundown({
           segments: segments,
@@ -311,7 +310,7 @@ describe(RundownTimelineService.name, () => {
       const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
       const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
       const playedUnplannedPart: Part = EntityTestFactory.createPart({ id: 'unplannedNextPart', isNext: true, executedAt: 100, ingestedPart: undefined })
-      const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart, playedUnplannedPart]})
+      const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart, playedUnplannedPart] })
       const segments: Segment[] = [activeSegment, nextSegment]
       const rundown: Rundown = EntityTestFactory.createRundown({
         segments: segments,
@@ -349,13 +348,13 @@ describe(RundownTimelineService.name, () => {
     const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [activePiece] })
     const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart], definesShowStyleVariant: false })
     const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart], definesShowStyleVariant: false })
-    const nextShowStyleVariantSegment: Segment = EntityTestFactory.createSegment( { parts: [nextPart], definesShowStyleVariant: true })
+    const nextShowStyleVariantSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart], definesShowStyleVariant: true })
 
     const rundownRepository: RundownRepository = mock<RundownRepository>()
     const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
     const mockTimeLineObject: TimelineObject = mock<TimelineObject>()
     const mockTimeLineObjects: TimelineObject[] = [mockTimeLineObject]
-    const mockTimelineObjectGroup: TimelineObjectGroup = mock<TimelineObjectGroup>({isGroup: true, children:mockTimeLineObjects})
+    const mockTimelineObjectGroup: TimelineObjectGroup = mock<TimelineObjectGroup>({ isGroup: true, children: mockTimeLineObjects })
     const mockTimeline: Timeline = mock<Timeline>({
       mockTimelineObjectGroup: instance(mockTimelineObjectGroup)
     })
@@ -418,7 +417,7 @@ describe(RundownTimelineService.name, () => {
       when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
       when(timelineBuilder.buildTimeline(rundown)).thenResolve(mockTimeline)
 
-      const testee: RundownTimelineService = createTestee( {
+      const testee: RundownTimelineService = createTestee({
         rundownEventEmitter,
         rundownRepository,
         timelineBuilder,
@@ -453,7 +452,7 @@ describe(RundownTimelineService.name, () => {
       when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
       when(timelineBuilder.buildTimeline(rundown)).thenResolve(mockTimeline)
 
-      const testee: RundownTimelineService = createTestee( {
+      const testee: RundownTimelineService = createTestee({
         rundownEventEmitter,
         rundownRepository,
         timelineBuilder,
@@ -474,7 +473,7 @@ describe(RundownTimelineService.name, () => {
         const rundownRepository: RundownRepository = mock<RundownRepository>()
         when(rundownRepository.getRundown(rundown.id)).thenReturn(Promise.resolve(rundown))
 
-        const testee: RundownTimelineService = createTestee({rundownRepository})
+        const testee: RundownTimelineService = createTestee({ rundownRepository })
 
         try {
           await testee.takeNext(rundown.id)
@@ -655,9 +654,9 @@ describe(RundownTimelineService.name, () => {
     describe('when a take mode is selected', () => {
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
-      const activeSegment: Segment = EntityTestFactory.createSegment({parts: [activePart]})
+      const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart] })
       const activePartInfinitePiecesMap: Map<string, Piece> = new Map<string, Piece>([['activeLayerId', activePiece]])
-      const previousPiece: Piece = EntityTestFactory.createPiece({id: 'previousPieceId'})
+      const previousPiece: Piece = EntityTestFactory.createPiece({ id: 'previousPieceId' })
       const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPart', pieces: [previousPiece] })
       const rundownMock: Rundown = EntityMockFactory.createActiveRundownMock({
         activePart: activePart,
@@ -676,7 +675,7 @@ describe(RundownTimelineService.name, () => {
           when(rundownMock.getTakeMode()).thenReturn(TakeMode.STANDARD)
           when(rundownRepository.getRundown(activeRundown.id)).thenReturn(Promise.resolve(activeRundown))
 
-          const testee: RundownTimelineService = createTestee({rundownRepository, rundownEventEmitter})
+          const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
           await testee.takeNext(activeRundown.id)
           verify(rundownEventEmitter.emitPartInsertedAsNextEvent(activeRundown, anything())).never()
         })
@@ -691,7 +690,7 @@ describe(RundownTimelineService.name, () => {
           when(rundownMock.getTakeMode()).thenReturn(TakeMode.RECALL)
           when(rundownRepository.getRundown(activeRundown.id)).thenReturn(Promise.resolve(activeRundown))
 
-          const testee: RundownTimelineService = createTestee({rundownRepository, rundownEventEmitter})
+          const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
           await testee.takeNext(activeRundown.id)
           verify(rundownEventEmitter.emitPartInsertedAsNextEvent(activeRundown, anything())).once()
         })
@@ -701,15 +700,15 @@ describe(RundownTimelineService.name, () => {
 
   describe(`${RundownTimelineService.prototype.insertPartAsOnAir.name}`, () => {
     it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async () => {
-      const aPiece: Piece = EntityTestFactory.createPiece({id: 'aPieceId'})
+      const aPiece: Piece = EntityTestFactory.createPiece({ id: 'aPieceId' })
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
-      const activeSegment: Segment = EntityTestFactory.createSegment({parts: [activePart]})
+      const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart] })
       const activePartInfinitePiecesMap: Map<string, Piece> = new Map<string, Piece>([['activeLayerId', activePiece]])
-      const previousPiece: Piece = EntityTestFactory.createPiece({id: 'previousPieceId'})
+      const previousPiece: Piece = EntityTestFactory.createPiece({ id: 'previousPieceId' })
       const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPart', pieces: [previousPiece] })
       const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [aPiece] })
-      const nextSegment: Segment = EntityTestFactory.createSegment({parts: [nextPart]})
+      const nextSegment: Segment = EntityTestFactory.createSegment({ parts: [nextPart] })
       const aRundown: Rundown = EntityMockFactory.createActiveRundown({
         activePart: activePart,
         nextPart: nextPart,
@@ -1130,7 +1129,7 @@ describe(RundownTimelineService.name, () => {
 
         const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
 
-        const testee: RundownTimelineService = createTestee({rundownRepository, rundownEventEmitter})
+        const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
 
         await testee.setTakeMode(rundown.id, TakeMode.RECALL)
 
@@ -1152,7 +1151,7 @@ describe(RundownTimelineService.name, () => {
 
         const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
 
-        const testee: RundownTimelineService = createTestee({rundownRepository, rundownEventEmitter})
+        const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
 
         await testee.setTakeMode(rundown.id, TakeMode.STANDARD)
 
@@ -1168,11 +1167,11 @@ function createTestee(params?: {
   rundownRepository?: RundownRepository
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
-  ingestService?: IngestService,
-  playoutService?: PlayoutService,
+  ingestService?: IngestService
+  playoutService?: PlayoutService
   callbackScheduler?: CallbackScheduler
-  blueprint?: Blueprint,
-  playoutContentService?: PlayoutContentUpdateService,
+  blueprint?: Blueprint
+  playoutContentService?: PlayoutContentUpdateService
   logger?: Logger
 }): RundownTimelineService {
   const timelineBuilderMock: TimelineBuilder = mock<TimelineBuilder>()
@@ -1185,7 +1184,7 @@ function createTestee(params?: {
     instance(params?.timelineRepository ?? mock<TimelineRepository>()),
     instance(params?.timelineBuilder ?? timelineBuilderMock),
     instance(params?.ingestService ?? createMockOfIngestService()),
-    instance(params?.playoutService ?? createMockOfPlayoutService()) ,
+    instance(params?.playoutService ?? createMockOfPlayoutService()),
     instance(params?.callbackScheduler ?? mock<CallbackScheduler>()),
     instance(params?.blueprint ?? mock<Blueprint>()),
     instance(params?.playoutContentService ?? mock<PlayoutContentUpdateService>()),

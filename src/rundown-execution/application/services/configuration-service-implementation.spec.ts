@@ -46,7 +46,7 @@ describe(ConfigurationServiceImplementation.name, () => {
 })
 
 function createTestee(params?: {
-  configurationEventEmitter?: ConfigurationEventEmitter,
+  configurationEventEmitter?: ConfigurationEventEmitter
   shelfConfigurationRepository?: ShelfConfigurationRepository
 }): ConfigurationServiceImplementation {
   return new ConfigurationServiceImplementation(

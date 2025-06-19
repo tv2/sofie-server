@@ -10,8 +10,7 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 
 @RestController('/triggers')
 export class TriggerController extends BaseController {
-
-  constructor(
+  public constructor(
     private readonly triggerService: TriggerService,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter
@@ -36,7 +35,7 @@ export class TriggerController extends BaseController {
     try {
       const trigger: Trigger = TriggerDto.toEntity(request.body as TriggerDto)
       await this.triggerService.createTrigger(trigger)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created Trigger for type of ${trigger.type}` ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully created Trigger for type of ${trigger.type}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }
@@ -48,7 +47,7 @@ export class TriggerController extends BaseController {
     try {
       const trigger: Trigger = TriggerDto.toEntity(request.body as TriggerDto)
       await this.triggerService.updateTrigger(trigger)
-      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully updated Trigger type of ${trigger.type}, id: ${trigger.id}` ))
+      response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully updated Trigger type of ${trigger.type}, id: ${trigger.id}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)
     }

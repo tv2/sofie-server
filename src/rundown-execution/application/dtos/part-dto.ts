@@ -22,7 +22,7 @@ export class PartDto {
   public readonly pieces: PieceDto[]
   public readonly replacedPlannedPieces: readonly PieceDto[]
 
-  constructor(part: Part) {
+  public constructor(part: Part) {
     this.id = part.id
     this.segmentId = part.getSegmentId()
     this.name = part.name
@@ -38,7 +38,7 @@ export class PartDto {
     this.autoNext = part.autoNext
     this.isPlanned = part.isPlanned
     this.metadata = part.metadata
-    this.pieces = part.getPieces().map((piece) => new PieceDto(piece))
-    this.replacedPlannedPieces = part.getReplacedPlannedPieces().map((piece) => new PieceDto(piece))
+    this.pieces = part.getPieces().map(piece => new PieceDto(piece))
+    this.replacedPlannedPieces = part.getReplacedPlannedPieces().map(piece => new PieceDto(piece))
   }
 }

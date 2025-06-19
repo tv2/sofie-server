@@ -99,7 +99,7 @@ describe(PlayoutContentStateService.name, () => {
 
       describe('the programPlayoutContents is not empty', () => {
         it('emits an empty ProgramPlayoutEvent', async () => {
-          const rundownWithProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [{ type: PlayoutContentType.COMMAND }]})
+          const rundownWithProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [{ type: PlayoutContentType.COMMAND }] })
           const rundownWithNoActivePart: Rundown = EntityTestFactory.createRundown({
             mode: RundownMode.ACTIVE,
             alreadyActiveProperties: {
@@ -160,7 +160,7 @@ describe(PlayoutContentStateService.name, () => {
 
       beforeEach(async () => {
         // We need to set up some data, so there is actually going to be a change when called again.
-        const rundownWithSetupProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [{ type: PlayoutContentType.CAMERA, source: 'setupCameraSource' }]})
+        const rundownWithSetupProgramPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ program: [{ type: PlayoutContentType.CAMERA, source: 'setupCameraSource' }] })
         testee = createTestee({ playoutContentEventEmitter: instance(playoutContentEventEmitter) })
         await testee.updatePlayoutContentState(rundownWithSetupProgramPlayoutContent)
         // We need to reset the mock so each test has a clean slate.
@@ -218,7 +218,7 @@ describe(PlayoutContentStateService.name, () => {
               { type: PlayoutContentType.CAMERA, source: 'someSource' },
               { type: PlayoutContentType.GRAPHICS },
               { type: PlayoutContentType.AUDIO },
-              { type: PlayoutContentType.REMOTE, source: 'someRemoteSource'},
+              { type: PlayoutContentType.REMOTE, source: 'someRemoteSource' },
               { type: PlayoutContentType.COMMAND }
             ]
 
@@ -238,7 +238,7 @@ describe(PlayoutContentStateService.name, () => {
 
       beforeEach(async () => {
         // We need to set up some data, so there is actually going to be a change when called again.
-        const rundownWithSetupPreviewPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ preview: [{ type: PlayoutContentType.CAMERA, source: 'setupCameraSource' }]})
+        const rundownWithSetupPreviewPlayoutContent: Rundown = createActiveRundownWithPlayoutContents({ preview: [{ type: PlayoutContentType.CAMERA, source: 'setupCameraSource' }] })
         testee = createTestee({ playoutContentEventEmitter: instance(playoutContentEventEmitter) })
         await testee.updatePlayoutContentState(rundownWithSetupPreviewPlayoutContent)
         // We need to reset the mock so each test has a clean slate.
@@ -310,7 +310,7 @@ describe(PlayoutContentStateService.name, () => {
 })
 
 function createTestee(params?: {
-  playoutContentEventEmitter?: PlayoutContentEventEmitter,
+  playoutContentEventEmitter?: PlayoutContentEventEmitter
   playoutContentRepository?: PlayoutContentRepository
 }): PlayoutContentUpdateService {
   return new PlayoutContentStateService(
@@ -320,8 +320,8 @@ function createTestee(params?: {
 }
 
 function createActiveRundownWithPlayoutContents(playoutContents?: { program?: PlayoutContent[], preview?: PlayoutContent[] }): Rundown {
-  const programPieces: Piece[] = playoutContents?.program?.map(playoutContent => EntityTestFactory.createPiece({ metadata: { playoutContent }})) ?? []
-  const previewPieces: Piece[] = playoutContents?.preview?.map(playoutContent => EntityTestFactory.createPiece({ metadata: { playoutContent }})) ?? []
+  const programPieces: Piece[] = playoutContents?.program?.map(playoutContent => EntityTestFactory.createPiece({ metadata: { playoutContent } })) ?? []
+  const previewPieces: Piece[] = playoutContents?.preview?.map(playoutContent => EntityTestFactory.createPiece({ metadata: { playoutContent } })) ?? []
 
   const activePart: Part = EntityTestFactory.createPart({
     pieces: programPieces

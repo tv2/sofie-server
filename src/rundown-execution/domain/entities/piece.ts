@@ -58,7 +58,7 @@ export class Piece {
   private originalTimelineObjects: TimelineObject[]
   private readonly insertedTimelineObjects: TimelineObject[] = []
 
-  constructor(piece: PieceInterface) {
+  public constructor(piece: PieceInterface) {
     this.id = piece.id
     this.partId = piece.partId
     this.rundownId = piece.rundownId
@@ -183,7 +183,7 @@ export class Piece {
 
   public getUnsyncedCopy(): Piece {
     const unsyncedId: string = this.id.endsWith(UNSYNCED_ID_POSTFIX) ? this.id : `${this.id}${UNSYNCED_ID_POSTFIX}`
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: unsyncedId})
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: unsyncedId })
   }
 
   public copy(newPartId?: string): Piece {
@@ -197,7 +197,7 @@ export class Piece {
   }
 
   public insertTimelineObjects(timelineObjects: TimelineObject[]): void {
-    timelineObjects.forEach(timelineObjectToBeInserted => {
+    timelineObjects.forEach((timelineObjectToBeInserted) => {
       const containsDuplicateId: boolean = this.getTimelineObjects().some(timelineObject => timelineObject.id === timelineObjectToBeInserted.id)
       if (containsDuplicateId) {
         throw new DuplicateIdException(`A TimelineObject with id '${timelineObjectToBeInserted.id}' already exist on Piece ${this.id}`)

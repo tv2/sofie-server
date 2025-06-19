@@ -6,21 +6,21 @@ export type SisyfosTimelineObject = SisyfosChannelTimelineObject | SisyfosChanne
 
 export interface SisyfosChannelTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.SISYFOS;
-    type: SisyfosType.CHANNEL;
+    deviceType: DeviceType.SISYFOS
+    type: SisyfosType.CHANNEL
     resync?: boolean
-  } & SisyfosChannelOptions;
+  } & SisyfosChannelOptions
 }
 
 export interface SisyfosChannelsTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.SISYFOS;
-    type: SisyfosType.CHANNELS;
+    deviceType: DeviceType.SISYFOS
+    type: SisyfosType.CHANNELS
     channels: ({
       /** The mapping layer to look up the channel from */
-      mappedLayer: string;
-    } & SisyfosChannelOptions)[];
-    overridePriority?: number;
+      mappedLayer: string
+    } & SisyfosChannelOptions)[]
+    overridePriority?: number
   }
 }
 
@@ -31,11 +31,11 @@ export enum SisyfosType {
 }
 
 export interface SisyfosChannelOptions {
-  isPgm?: SisyfosFaderState;
-  faderLevel?: number;
-  label?: string;
-  visible?: boolean;
-  fadeTime?: number;
+  isPgm?: SisyfosFaderState
+  faderLevel?: number
+  label?: string
+  visible?: boolean
+  fadeTime?: number
 }
 
 export enum SisyfosFaderState {

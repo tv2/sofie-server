@@ -9,8 +9,7 @@ const SHELF_CONFIGURATION_COLLECTION_NAME: string = 'shelfConfiguration'
 const SHELF_CONFIGURATION_ID: string = 'SHELF_CONFIGURATION_ID' // The system only support having a single Shelf.
 
 export class MongoShelfRepository extends BaseMongoRepository<ShelfConfiguration & MongoId> implements ShelfConfigurationRepository {
-
-  constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator
+  public constructor(mongoDatabase: MongoDatabase, private readonly uuidGenerator: UuidGenerator
   ) {
     super(mongoDatabase)
   }
@@ -36,7 +35,7 @@ export class MongoShelfRepository extends BaseMongoRepository<ShelfConfiguration
       staticActionIds: [],
       shouldShowShelf: false
     }
-    await this.getCollection().insertOne({...shelfConfiguration, _id: shelfConfiguration.id })
+    await this.getCollection().insertOne({ ...shelfConfiguration, _id: shelfConfiguration.id })
     return shelfConfiguration
   }
 
@@ -48,7 +47,7 @@ export class MongoShelfRepository extends BaseMongoRepository<ShelfConfiguration
   }
 
   private applyMissingActionPanelIds(shelfConfiguration: ShelfConfiguration): ShelfConfiguration {
-    shelfConfiguration.actionPanelConfigurations = shelfConfiguration.actionPanelConfigurations.map(actionPanel => {
+    shelfConfiguration.actionPanelConfigurations = shelfConfiguration.actionPanelConfigurations.map((actionPanel) => {
       if (!actionPanel.id) {
         actionPanel.id = this.uuidGenerator.generateUuid()
       }

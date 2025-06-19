@@ -5,10 +5,9 @@ import { StatusMessageEvent } from '../value-objects/status-message-event'
 import { StatusMessageEventBuilder } from '../interfaces/status-message-event-builder'
 
 export class StatusMessageEventService implements StatusMessageEventEmitter, StatusMessageEventObserver {
-
   private readonly callbacks: ((statusMessageEvent: StatusMessageEvent) => void)[] = []
 
-  constructor(private readonly statusMessageEventBuilder: StatusMessageEventBuilder) {
+  public constructor(private readonly statusMessageEventBuilder: StatusMessageEventBuilder) {
   }
 
   public emitStatusMessageEvent(statusMessage: StatusMessage): void {

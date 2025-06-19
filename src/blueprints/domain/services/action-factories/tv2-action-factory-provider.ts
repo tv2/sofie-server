@@ -15,18 +15,16 @@ import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
 import { FrameTimeConverter } from '../frame-time-converter'
 import { Tv2ConfigurationMapper } from '../tv2-configuration-mapper'
 import { TimelineObjectFactoryProvider } from '../timeline-object-factories/timeline-object-factory-provider'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
-import {ObjectCloner} from '../../../../cross-cutting-concerns/domain/services/object-cloner'
-
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { ObjectCloner } from '../../../../cross-cutting-concerns/domain/services/object-cloner'
 
 interface ActionFactoryInstance<T> {
-  factory: T,
+  factory: T
   shouldFactoryBeRecreated: (configuration?: Tv2BlueprintConfiguration) => boolean
 }
 const FRAME_RATE: number = 25
 
 export class Tv2ActionFactoryProvider {
-
   private cameraActionFactoryInstance: ActionFactoryInstance<Tv2CameraActionFactory>
   private remoteActionFactoryInstance: ActionFactoryInstance<Tv2RemoteActionFactory>
   private transitionEffectActionFactoryInstance: ActionFactoryInstance<Tv2TransitionEffectActionFactory>
@@ -40,7 +38,7 @@ export class Tv2ActionFactoryProvider {
 
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly timelineObjectFactoryProvider: TimelineObjectFactoryProvider,
     private readonly objectCloner: ObjectCloner,
@@ -282,4 +280,3 @@ export class Tv2ActionFactoryProvider {
     return this.robotActionFactoryInstance.factory
   }
 }
-

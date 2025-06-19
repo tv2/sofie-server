@@ -66,8 +66,7 @@ const TV2_GRAPHICS_LAYERS: Tv2PieceLayer[] = [
 const FULLSCREEN_GRAPHICS_SOURCE_NAME_PREFIX: string = 'PILOT_'
 
 export class Tv2GraphicsActionFactory extends ActionFactory {
-
-  constructor(
+  public constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
@@ -321,7 +320,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   }
 
   private createFullscreenGraphicsActions(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, fullscreenGraphicsData: Tv2FullscreenGraphicsManifestData[]): Tv2PartAction[] {
-    return this.removeDuplicateActions(fullscreenGraphicsData.map((graphicsData) => this.createFullscreenGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, graphicsData)))
+    return this.removeDuplicateActions(fullscreenGraphicsData.map(graphicsData => this.createFullscreenGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, graphicsData)))
   }
 
   private createFullscreenGraphicsAction(blueprintConfiguration: Tv2BlueprintConfiguration, elementTimelineObjectFactory: Tv2GraphicsElementTimelineObjectFactory, graphicsData: Tv2FullscreenGraphicsManifestData): Tv2FullscreenGraphicsAction {
@@ -490,7 +489,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
 
     const lowerThirdActions: Tv2PieceAction[] = graphicsData
       .filter(data => data.pieceLayer === Tv2PieceLayer.GRAPHICS_LOWER_THIRD)
-      .map((data) => this.createLowerThirdGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
+      .map(data => this.createLowerThirdGraphicsAction(blueprintConfiguration, elementTimelineObjectFactory, data))
 
     const pilotOverlayActions: Tv2PieceAction[] = graphicsData
       .filter(data => data.pieceLayer === Tv2PieceLayer.GRAPHICS_PILOT_OVERLAY)

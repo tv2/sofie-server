@@ -10,7 +10,7 @@ import { MongoPieceRepository } from './mongo-piece-repository'
 const PART_COLLECTION_NAME: string = 'executedParts' // TODO: Once we control ingest rename to "parts".
 
 export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoPieceRepository: MongoPieceRepository,
     private readonly mongoEntityConverter: MongoEntityConverter,
@@ -38,9 +38,9 @@ export class MongoPartRepository extends BaseMongoRepository<MongoPart> {
 
   public async getParts(segmentId: string, filters?: Partial<MongoPart>): Promise<Part[]> {
     this.assertDatabaseConnection(this.getParts.name)
-    const mongoParts: MongoPart[] = (await this.getCollection()
+    const mongoParts: MongoPart[] = await this.getCollection()
       .find<MongoPart>({ ...filters, segmentId: segmentId })
-      .toArray())
+      .toArray()
     const parts: Part[] = this.mongoEntityConverter.convertToParts(mongoParts)
     return Promise.all(
       parts.map(async (part) => {

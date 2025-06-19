@@ -24,14 +24,13 @@ import { TypedEvent } from '../value-objects/typed-event'
 import { NtpEvent } from '../value-objects/ntp-event'
 import { PlayoutContentEventObserver } from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
 import { PlayoutContentEvent } from '../../../rundown-execution/application/value-objects/playout-content-event'
-import {NtpEventType} from '../enums/ntp-event-type'
+import { NtpEventType } from '../enums/ntp-event-type'
 
 export class WebSocketEventServer implements EventServer {
-
   private readonly logger: Logger
   private webSocketServer?: WebSocket.Server
 
-  constructor(
+  public constructor(
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionEventObserver: ActionEventObserver,
     private readonly triggerEventObserver: TriggerEventObserver,

@@ -7,8 +7,7 @@ import { CoreDevice } from '../../../domain/entities/device'
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
 export class MongoCoreDeviceRepository extends BaseMongoRepository<MongoId> implements DeviceRepository {
-
-  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)
   }
 

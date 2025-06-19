@@ -148,8 +148,6 @@ describe(Tv2AssetPathHelper.name, () => {
   })
 })
 
-
-
 function createTestee(): Tv2AssetPathHelper {
   return new Tv2AssetPathHelper()
 }

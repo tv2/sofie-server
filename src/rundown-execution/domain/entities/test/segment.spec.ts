@@ -750,7 +750,7 @@ describe(Segment.name, () => {
         const partThree: Part = EntityTestFactory.createPart({ id: '3', isUnsynced: false } as PartInterface)
         const parts: Part[] = [partOne, partTwo, partThree]
 
-        const testee: Segment = new Segment({ parts} as SegmentInterface)
+        const testee: Segment = new Segment({ parts } as SegmentInterface)
         testee.removeUnsyncedParts()
 
         expect(testee.getParts()).toHaveLength(parts.length)
@@ -765,7 +765,7 @@ describe(Segment.name, () => {
         const partThree: Part = EntityTestFactory.createPart({ id: '3', isUnsynced: true } as PartInterface)
         const parts: Part[] = [partOne, partTwo, partThree]
 
-        const testee: Segment = new Segment({ parts} as SegmentInterface)
+        const testee: Segment = new Segment({ parts } as SegmentInterface)
         testee.removeUnsyncedParts()
 
         expect(testee.getParts()).toHaveLength(1)
@@ -882,7 +882,6 @@ describe(Segment.name, () => {
         expect(testee.getParts()[0]).toBe(partTwo)
         expect(testee.getParts()[1]).toBe(partThree)
         expect(testee.getParts()[2]).toBe(newPart)
-
       })
     })
   })
@@ -891,9 +890,9 @@ describe(Segment.name, () => {
     describe('Part does not exist on Segment', () => {
       it('does not remove any Parts', () => {
         const nonExistingPartId: string = 'nonExistingPartId'
-        const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId'})
+        const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId' })
 
-        const testee: Segment = new Segment({ parts: [somePart]} as SegmentInterface)
+        const testee: Segment = new Segment({ parts: [somePart] } as SegmentInterface)
 
         expect(testee.getParts()).toHaveLength(1)
         testee.removePart(nonExistingPartId)
@@ -905,16 +904,16 @@ describe(Segment.name, () => {
       describe('Part is on Air', () => {
         it('mark the Part as unsynced', () => {
           const partId: string = 'somePartId'
-          const somePart: Part = EntityMockFactory.createPartMock({ id: partId, isOnAir: true})
-          const testee: Segment = new Segment({ parts: [instance(somePart)]} as SegmentInterface)
+          const somePart: Part = EntityMockFactory.createPartMock({ id: partId, isOnAir: true })
+          const testee: Segment = new Segment({ parts: [instance(somePart)] } as SegmentInterface)
 
           testee.removePart(partId)
           verify(somePart.markAsUnsynced()).once()
         })
 
         it('does not remove the Part', () => {
-          const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId', isOnAir: true})
-          const testee: Segment = new Segment({ parts: [somePart]} as SegmentInterface)
+          const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId', isOnAir: true })
+          const testee: Segment = new Segment({ parts: [somePart] } as SegmentInterface)
 
           expect(testee.getParts()).toHaveLength(1)
           testee.removePart(somePart.id)
@@ -924,8 +923,8 @@ describe(Segment.name, () => {
 
       describe('Part is not on Air', () => {
         it('removes the Part', () => {
-          const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId', isOnAir: false})
-          const testee: Segment = new Segment({ parts: [somePart]} as SegmentInterface)
+          const somePart: Part = EntityTestFactory.createPart({ id: 'somePartId', isOnAir: false })
+          const testee: Segment = new Segment({ parts: [somePart] } as SegmentInterface)
 
           expect(testee.getParts()).toHaveLength(1)
           testee.removePart(somePart.id)
@@ -950,7 +949,7 @@ describe(Segment.name, () => {
     describe('when part is last valid part in segment', () => {
       it('throws a last part in segment exception', () => {
         const fromPart: Part = EntityTestFactory.createPart({ id: 'from-part' })
-        const invalidPart: Part = EntityTestFactory.createPart({ invalidity: { reason: 'some reason' }})
+        const invalidPart: Part = EntityTestFactory.createPart({ invalidity: { reason: 'some reason' } })
         const testee: Segment = EntityTestFactory.createSegment({ parts: [fromPart, invalidPart] })
 
         const result: () => Part = () => testee.findNextPartNotOnAir(fromPart)
@@ -962,7 +961,7 @@ describe(Segment.name, () => {
     describe('when part is followed by an invalid part', () => {
       it('skips the invalid part', () => {
         const fromPart: Part = EntityTestFactory.createPart({ id: 'from-part' })
-        const invalidPart: Part = EntityTestFactory.createPart({ invalidity: { reason: 'some reason' }})
+        const invalidPart: Part = EntityTestFactory.createPart({ invalidity: { reason: 'some reason' } })
         const nextValidPart: Part = EntityTestFactory.createPart({ id: 'next-valid-part' })
         const testee: Segment = EntityTestFactory.createSegment({ parts: [fromPart, invalidPart, nextValidPart] })
 
@@ -974,11 +973,11 @@ describe(Segment.name, () => {
   })
 
   describe(Segment.prototype.findPreviousValidPartNotOnAir.name, () => {
-    it ('returns the Part before the fromPart', () => {
+    it('returns the Part before the fromPart', () => {
       const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPartId', rank: 1 })
       const fromPart: Part = EntityTestFactory.createPart({ id: 'fromPartId', rank: 2 })
 
-      const testee: Segment = EntityTestFactory.createSegment({ parts: [previousPart, fromPart]})
+      const testee: Segment = EntityTestFactory.createSegment({ parts: [previousPart, fromPart] })
       const result: Part = testee.findPreviousValidPartNotOnAir(fromPart)
 
       expect(result).toBe(previousPart)
@@ -990,7 +989,7 @@ describe(Segment.name, () => {
         const secondPart: Part = EntityTestFactory.createPart({ id: 'secondPartId', rank: 2 })
         const thirdPart: Part = EntityTestFactory.createPart({ id: 'thirdPartId', rank: 3 })
 
-        const testee: Segment = EntityTestFactory.createSegment({ parts: [firstPart, secondPart, thirdPart]})
+        const testee: Segment = EntityTestFactory.createSegment({ parts: [firstPart, secondPart, thirdPart] })
         const result: Part = testee.findPreviousValidPartNotOnAir(thirdPart)
 
         expect(result).toBe(secondPart)
@@ -1014,7 +1013,7 @@ describe(Segment.name, () => {
     })
 
     describe('fromPart is the first valid Part in the Segment', () => {
-      it ('throws a first Part in Segment exception', () => {
+      it('throws a first Part in Segment exception', () => {
         const invalidPart: Part = EntityTestFactory.createPart({ id: 'invalidPart', rank: 1, invalidity: { reason: 'invalid' } })
         const firstValidPart: Part = EntityTestFactory.createPart({ id: 'validPart', rank: 2 })
         const testee: Segment = EntityTestFactory.createSegment({ parts: [invalidPart, firstValidPart] })

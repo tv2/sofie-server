@@ -14,8 +14,7 @@ interface ExecuteActionRequestBody {
 
 @RestController('/actions')
 export class ActionController extends BaseController {
-
-  constructor(
+  public constructor(
     private readonly actionService: ActionService,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter

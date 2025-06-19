@@ -18,7 +18,7 @@ import {
 import { Tv2SplitScreenActionFactory } from './action-factories/tv2-split-screen-action-factory'
 import { Tv2ReplayActionFactory } from './action-factories/tv2-replay-action-factory'
 import { Tv2RobotActionFactory } from './action-factories/tv2-robot-action-factory'
-import {Logger} from '../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 
 enum ActionTypeName {
   CAMERA = 'camera',
@@ -34,7 +34,6 @@ enum ActionTypeName {
 }
 
 export class Tv2ActionService implements BlueprintGenerateActions {
-
   private cameraActionFactory: Tv2CameraActionFactory
   private remoteActionFactory: Tv2RemoteActionFactory
   private audioActionFactory: Tv2AudioActionFactory
@@ -47,7 +46,7 @@ export class Tv2ActionService implements BlueprintGenerateActions {
   private robotActionFactory: Tv2RobotActionFactory
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly actionFactoryProvider: Tv2ActionFactoryProvider,
     logger: Logger,

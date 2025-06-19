@@ -14,13 +14,12 @@ import { Logger } from '../../../../cross-cutting-concerns/application/interface
 const INGESTED_PIECE_COLLECTION_NAME: string = 'pieces' // TODO: Once we control ingest changed this to "ingestedPieces"
 
 export class MongoIngestedPieceChangedListener extends BaseMongoRepository<MongoIngestedPiece> implements DataChangedListener<IngestedPiece> {
-
   private readonly logger: Logger
   private onCreatedCallback: (piece: IngestedPiece) => void
   private onUpdatedCallback: (piece: IngestedPiece) => void
   private onDeletedCallback: (pieceId: string) => void
 
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     logger: Logger

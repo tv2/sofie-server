@@ -1,21 +1,20 @@
-import {ActionEventBuilder} from '../interfaces/action-event-builder'
-import {MacroEventBuilder} from '../interfaces/macro-event-builder'
-import {TriggerEventBuilder} from '../interfaces/trigger-event-builder'
-import {Action} from '../../domain/entities/action'
-import {ActionsUpdatedEvent} from '../value-objects/action-event'
-import {ActionEventType} from '../enums/action-event-type'
-import {ActionDto} from '../dtos/action-dto'
-import {Macro} from '../../domain/entities/macro'
-import {MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent} from '../value-objects/macro-event'
-import {MacroEventType} from '../enums/macro-event-type'
-import {MacroDto} from '../dtos/macro-dto'
-import {Trigger} from '../../domain/entities/trigger'
-import {TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent} from '../value-objects/trigger-event'
-import {TriggerEventType} from '../enums/trigger-event-type'
-import {TriggerDto} from '../dtos/trigger-dto'
+import { ActionEventBuilder } from '../interfaces/action-event-builder'
+import { MacroEventBuilder } from '../interfaces/macro-event-builder'
+import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
+import { Action } from '../../domain/entities/action'
+import { ActionsUpdatedEvent } from '../value-objects/action-event'
+import { ActionEventType } from '../enums/action-event-type'
+import { ActionDto } from '../dtos/action-dto'
+import { Macro } from '../../domain/entities/macro'
+import { MacroCreatedEvent, MacroDeletedEvent, MacroUpdatedEvent } from '../value-objects/macro-event'
+import { MacroEventType } from '../enums/macro-event-type'
+import { MacroDto } from '../dtos/macro-dto'
+import { Trigger } from '../../domain/entities/trigger'
+import { TriggerCreatedEvent, TriggerDeletedEvent, TriggerUpdatedEvent } from '../value-objects/trigger-event'
+import { TriggerEventType } from '../enums/trigger-event-type'
+import { TriggerDto } from '../dtos/trigger-dto'
 
 export class ActionSystemEventBuilder implements ActionEventBuilder, MacroEventBuilder, TriggerEventBuilder {
-
   public buildActionsUpdatedEvent(actions: Action[], rundownId?: string): ActionsUpdatedEvent {
     return {
       type: ActionEventType.ACTIONS_UPDATED,

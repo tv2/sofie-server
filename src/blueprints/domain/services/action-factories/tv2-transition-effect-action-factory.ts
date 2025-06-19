@@ -45,7 +45,7 @@ import { FrameTimeConverter } from '../frame-time-converter'
 import { OutputLayer } from '../../../../rundown-execution/domain/enums/output-layer'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const POST_TRANSITION_DELAY_IN_FRAMES: number = 7 // The VideoMixer needs a slight delay after a transition before updating the preview. If no delay, we risk the VideoMixer putting the new Preview in Program.
 const MAX_FRAME_DURATION_LIMIT: number = 250 // The maximum allowed transition duration in frames.
@@ -56,10 +56,9 @@ enum SpecialEffectName {
 }
 
 export class Tv2TransitionEffectActionFactory extends ActionFactory {
-
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
@@ -83,7 +82,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         PieceActionType.INSERT_PIECE_AS_NEXT_AND_TAKE,
         blueprintConfiguration.studio.videoMixerBasicConfiguration.dipVideoMixerSource,
       ),
-      ...blueprintConfiguration.showStyle.breakerTransitionEffectConfigurations.flatMap(transitionEffect => {
+      ...blueprintConfiguration.showStyle.breakerTransitionEffectConfigurations.flatMap((transitionEffect) => {
         try {
           return [
             this.createBreakerTransitionEffectAction(PieceActionType.INSERT_PIECE_AS_NEXT, transitionEffect, blueprintConfiguration),
@@ -124,7 +123,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
               throw new Tv2MisconfigurationException(`DipTransitionAction expects 'actionArguments' to be an integer. ${actionArguments} is not an integer.`)
             }
             const transitionEffectAction: Tv2TransitionEffectAction = action as Tv2TransitionEffectAction
-            const metadata: Tv2DipTransitionEffectActionMetadata =  transitionEffectAction.metadata as Tv2DipTransitionEffectActionMetadata
+            const metadata: Tv2DipTransitionEffectActionMetadata = transitionEffectAction.metadata as Tv2DipTransitionEffectActionMetadata
             return this.createDipTransitionEffectAction(transitionEffectAction.type, this.getBoundedTransitionFrameDuration(actionArguments), metadata.dipInput)
           }
         })
@@ -341,7 +340,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
     const effectName: string = `Effect ${breaker.name}`
     const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, {
-      metadata:{
+      metadata: {
         playoutContent: {
           type: PlayoutContentType.TRANSITION
         },

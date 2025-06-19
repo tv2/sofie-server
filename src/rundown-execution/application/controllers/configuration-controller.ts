@@ -15,7 +15,7 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 
 @RestController('/configurations')
 export class ConfigurationController extends BaseController {
-  constructor(
+  public constructor(
     private readonly configurationService: ConfigurationService,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly showStyleVariantRepository: ShowStyleVariantRepository,

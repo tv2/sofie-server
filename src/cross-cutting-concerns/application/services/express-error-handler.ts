@@ -1,16 +1,15 @@
-import {Response} from 'express'
-import {Exception} from '../../../rundown-execution/domain/exceptions/exception'
-import {ErrorCode} from '../../../rundown-execution/domain/enums/error-code'
-import {HttpStatusCode} from '../enums/http-status-code'
-import {HttpErrorHandler} from '../interfaces/http-error-handler'
-import {Logger} from '../interfaces/logger'
-import {HttpResponseFormatter} from '../interfaces/http-response-formatter'
+import { Response } from 'express'
+import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
+import { ErrorCode } from '../../../rundown-execution/domain/enums/error-code'
+import { HttpStatusCode } from '../enums/http-status-code'
+import { HttpErrorHandler } from '../interfaces/http-error-handler'
+import { Logger } from '../interfaces/logger'
+import { HttpResponseFormatter } from '../interfaces/http-response-formatter'
 
 export class ExpressErrorHandler implements HttpErrorHandler {
-
   private readonly logger: Logger
 
-  constructor(private readonly httpResponseFormatter: HttpResponseFormatter, logger: Logger) {
+  public constructor(private readonly httpResponseFormatter: HttpResponseFormatter, logger: Logger) {
     this.logger = logger.tag(ExpressErrorHandler.name)
   }
 

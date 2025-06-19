@@ -37,7 +37,6 @@ import { TakeMode } from '../../../domain/enums/take-mode'
 import { PieceMetadata } from '../../../domain/value-objects/metadata'
 import { CoreDevice } from '../../../domain/entities/device'
 
-
 export interface MongoId {
   _id: string
 }
@@ -204,7 +203,7 @@ export interface MongoCoreDevice extends MongoId {
   name: string
   type: DeviceType
   status: {
-    statusCode: number,
+    statusCode: number
     messages: string[]
   }
   connected: boolean
@@ -215,7 +214,7 @@ const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
 export class MongoEntityConverter {
   private readonly logger: Logger
 
-  constructor(logger: Logger) {
+  public constructor(logger: Logger) {
     this.logger = logger.tag(MongoEntityConverter.name)
   }
 
@@ -389,7 +388,7 @@ export class MongoEntityConverter {
 
   private getPartTimings(part: Part): PartTimings | undefined {
     try {
-      return  part.getTimings()
+      return part.getTimings()
     } catch (error) {
       if ((error as Exception).errorCode !== ErrorCode.UNSUPPORTED_OPERATION) {
         throw error

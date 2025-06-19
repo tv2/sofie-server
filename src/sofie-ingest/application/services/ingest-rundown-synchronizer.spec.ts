@@ -56,7 +56,6 @@ describe(IngestRundownSynchronizer.name, () => {
 
         expect(result.updatedRundown?.getMode()).toBe(RundownMode.ACTIVE)
       })
-
     })
 
     describe('when an initial rundown is created', () => {
@@ -77,7 +76,6 @@ describe(IngestRundownSynchronizer.name, () => {
         expect(result.updatedRundown?.getTakeMode()).toBe(TakeMode.RECALL)
       })
     })
-
 
     describe('when one or more segments are deleted', () => {
       it('returns a list of the deleted segments', async () => {
@@ -334,7 +332,7 @@ describe(IngestRundownSynchronizer.name, () => {
         const rundown: Rundown = EntityTestFactory.createRundown({
           id: 'rundown-a',
           segments: [
-            EntityTestFactory.createSegment({ id: 'segment-a', parts: [EntityTestFactory.createPart({ id: 'part-a', segmentId: 'segment-a' }),EntityTestFactory.createPart({ id: 'part-b', segmentId: 'segment-a' })] }),
+            EntityTestFactory.createSegment({ id: 'segment-a', parts: [EntityTestFactory.createPart({ id: 'part-a', segmentId: 'segment-a' }), EntityTestFactory.createPart({ id: 'part-b', segmentId: 'segment-a' })] }),
           ],
         })
         const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({
@@ -383,7 +381,7 @@ describe(IngestRundownSynchronizer.name, () => {
             segments: [
               EntityTestFactory.createSegment({ id: 'segment-a', parts: [
                 EntityTestFactory.createPart({ id: 'part-a', segmentId: 'segment-a', name: 'A1', isOnAir: true, ingestedPart: EntityTestFactory.createIngestedPart({ id: 'part-a', segmentId: 'segment-a', name: 'A1' }) }),
-                EntityTestFactory.createPart({ id: 'part-b', segmentId: 'segment-a', name: 'B1', ingestedPart: EntityTestFactory.createIngestedPart({  id: 'part-b', segmentId: 'segment-a', name: 'B1' }) })] }),
+                EntityTestFactory.createPart({ id: 'part-b', segmentId: 'segment-a', name: 'B1', ingestedPart: EntityTestFactory.createIngestedPart({ id: 'part-b', segmentId: 'segment-a', name: 'B1' }) })] }),
             ],
           })
           const ingestedRundown: IngestedRundown = EntityTestFactory.createIngestedRundown({
@@ -431,9 +429,9 @@ describe(IngestRundownSynchronizer.name, () => {
 
 function createTestee(
   params: {
-    ingestedEntityToEntityMapper?: IngestedEntityToEntityMapper,
-    entityChangeDetector?: EntityChangeDetector,
-    blueprint?: Blueprint,
+    ingestedEntityToEntityMapper?: IngestedEntityToEntityMapper
+    entityChangeDetector?: EntityChangeDetector
+    blueprint?: Blueprint
     configurationRepository?: ConfigurationRepository
   } = {}
 ): IngestRundownSynchronizer {
@@ -445,7 +443,6 @@ function createTestee(
   } else {
     blueprint = params.blueprint
   }
-
 
   return new IngestRundownSynchronizer(
     params.ingestedEntityToEntityMapper ?? new IngestedEntityToEntityMapper(),

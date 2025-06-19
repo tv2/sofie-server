@@ -5,7 +5,7 @@ export class MacroDto {
   public readonly name: string
   public readonly operations: Operation[]
 
-  constructor(macro: Macro) {
+  public constructor(macro: Macro) {
     this.id = macro.id
     this.name = macro.name
     this.operations = macro.operations

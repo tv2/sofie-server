@@ -43,7 +43,7 @@ describe(ActionController.name, () => {
 })
 
 function createTestee(params?: {
-  actionService?: ActionService,
+  actionService?: ActionService
 }): ActionController {
   const actionServiceMock: ActionService = params?.actionService ?? mock<ActionService>()
   return new ActionController(instance(actionServiceMock), instance(mock<HttpErrorHandler>()), instance(mock<HttpResponseFormatter>()))
