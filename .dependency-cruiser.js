@@ -207,6 +207,23 @@ module.exports = {
         pathNot: '^src/[^/]+/domain/|^node_modules|/logger.ts$' // TODO: Domain should not depend on node_modules nor Logger.
       },
     },
+    {
+      name: 'applications-depends-on-domains-and-applications',
+      comment: 'Application modules may only depend on them selves, their domain module, other application modules or other domain modules.' +
+          'Keep inter-context dependencies as few as possible.',
+      severity: 'error',
+      from: {
+        path: '^src/[^/]+/application/'
+      },
+      to: {
+        dependencyTypesNot: ['core'],
+        pathNot: [
+          '^src/[^/]+/application/',
+          '^src/[^/]+/domain/',
+          '^node_modules'
+        ]
+      }
+    }
   ],
   options: {
 
