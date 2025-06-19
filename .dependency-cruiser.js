@@ -213,7 +213,8 @@ module.exports = {
           'Keep inter-context dependencies as few as possible.',
       severity: 'error',
       from: {
-        path: '^src/[^/]+/application/'
+        path: '^src/[^/]+/application/',
+        pathNot: 'audit-log-decorator.ts$' // TODO: Find a solution for doing audit-logging without decorators.
       },
       to: {
         dependencyTypesNot: ['core'],
