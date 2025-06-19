@@ -219,6 +219,8 @@ import {
 import {
   CachedConfigurationRepository
 } from './rundown-execution/infrastructure/repositories/cache/cached-configuration-repository'
+import { StringHashGenerator } from './blueprints/domain/interfaces/string-hash-generator'
+import { CryptoStringHashGenerator } from './blueprints/infrastructure/services/crypto-string-hash-generator'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -349,9 +351,10 @@ function createBlueprint(objectCloner: ObjectCloner, logger: Logger): Blueprint 
   const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
   const timelineObjectFactoryProvider: TimelineObjectFactoryProvider = new TimelineObjectFactoryProvider(logger)
 
+  const stringHashGenerator: StringHashGenerator = new CryptoStringHashGenerator()
   const tv2ActionService: Tv2ActionService = new Tv2ActionService(
     configurationMapper,
-    new Tv2ActionFactoryProvider(configurationMapper, timelineObjectFactoryProvider, objectCloner, logger),
+    new Tv2ActionFactoryProvider(configurationMapper, timelineObjectFactoryProvider, stringHashGenerator, objectCloner, logger),
     logger
   )
 

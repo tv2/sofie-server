@@ -6,7 +6,7 @@ import {
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-mixer-timeline-object-factory'
-import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
+import { StringHashGenerator } from '../../interfaces/string-hash-generator'
 import {
   Tv2GraphicsTimelineObjectFactoryFactory
 } from '../timeline-object-factories/tv2-graphics-timeline-object-factory-factory'
@@ -179,7 +179,7 @@ function createTestee(params?: {
   graphicsTimelineObjectFactoryFactory?: Tv2GraphicsTimelineObjectFactoryFactory
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
-  stringHashConverter?: Tv2StringHashConverter
+  stringHashConverter?: StringHashGenerator
   configurationMapper?: Tv2ConfigurationMapper
 }): Tv2GraphicsActionFactory {
   return new Tv2GraphicsActionFactory(
@@ -187,7 +187,7 @@ function createTestee(params?: {
     params?.graphicsTimelineObjectFactoryFactory ?? instance(createMockedTv2GraphicsTimelineObjectFactoryFactory()),
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
-    params?.stringHashConverter ?? new Tv2StringHashConverter(),
+    params?.stringHashConverter ?? instance(createMockOfStringHashGenerator()),
     params?.configurationMapper ?? instance(mock<Tv2ConfigurationMapper>())
   )
 }
@@ -253,4 +253,9 @@ function createConfiguredBlueprintConfiguration(): Tv2BlueprintConfiguration {
       }
     }
   })
+}
+function createMockOfStringHashGenerator(): StringHashGenerator {
+  const mockedStringHashGenerator: StringHashGenerator = mock()
+  when(mockedStringHashGenerator.getHashedValue(anything())).thenCall(text => text)
+  return mockedStringHashGenerator
 }

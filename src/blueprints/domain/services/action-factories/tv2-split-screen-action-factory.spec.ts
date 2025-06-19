@@ -14,7 +14,7 @@ import {
   Tv2VideoClipTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-clip-timeline-object-factory'
 import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
-import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
+import { StringHashGenerator } from '../../interfaces/string-hash-generator'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../tv2-blueprint-configuration-test-factory'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
@@ -222,7 +222,7 @@ function createTestee(params?: {
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
   graphicsSplitScreenTimelineObjectFactory?: Tv2GraphicsSplitScreenTimelineObjectFactory
   videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory
-  stringHashConverter?: Tv2StringHashConverter
+  stringHashConverter?: StringHashGenerator
   assetPathHelper?: Tv2AssetPathHelper
   objectCloner?: ObjectCloner
   logger?: Logger
@@ -233,7 +233,7 @@ function createTestee(params?: {
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.graphicsSplitScreenTimelineObjectFactory ?? instance(mock<Tv2GraphicsSplitScreenTimelineObjectFactory>()),
     params?.videoClipTimelineObjectFactory ?? instance(mock<Tv2VideoClipTimelineObjectFactory>()),
-    params?.stringHashConverter ?? new Tv2StringHashConverter(),
+    params?.stringHashConverter ?? instance(createMockOfStringHashGenerator()),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
     params?.objectCloner ?? instance(mock<ObjectCloner>()),
     params?.logger ?? instance(createMockOfLogger()),
@@ -303,4 +303,10 @@ function createConfiguredBlueprintConfiguration(): Tv2BlueprintConfiguration {
       ]
     }
   })
+}
+
+function createMockOfStringHashGenerator(): StringHashGenerator {
+  const mockedStringHashGenerator: StringHashGenerator = mock()
+  when(mockedStringHashGenerator.getHashedValue(anything())).thenCall(text => text)
+  return mockedStringHashGenerator
 }

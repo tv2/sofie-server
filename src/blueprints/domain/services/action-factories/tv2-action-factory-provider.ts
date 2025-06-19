@@ -11,7 +11,7 @@ import { Tv2ReplayActionFactory } from './tv2-replay-action-factory'
 import { Tv2RobotActionFactory } from './tv2-robot-action-factory'
 import { Tv2AssetPathHelper } from '../tv2-asset-path-helper'
 import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
-import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
+import { StringHashGenerator } from '../../interfaces/string-hash-generator'
 import { FrameTimeConverter } from '../frame-time-converter'
 import { Tv2ConfigurationMapper } from '../tv2-configuration-mapper'
 import { TimelineObjectFactoryProvider } from '../timeline-object-factories/timeline-object-factory-provider'
@@ -41,6 +41,7 @@ export class Tv2ActionFactoryProvider {
   public constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly timelineObjectFactoryProvider: TimelineObjectFactoryProvider,
+    private readonly stringHashGenerator: StringHashGenerator,
     private readonly objectCloner: ObjectCloner,
     logger: Logger
   ) {
@@ -162,7 +163,7 @@ export class Tv2ActionFactoryProvider {
           this.timelineObjectFactoryProvider.createGraphicsTimelineObjectFactoryFactory(),
           this.timelineObjectFactoryProvider.createAudioMixerTimelineObjectFactory(),
           this.timelineObjectFactoryProvider.createVideoMixerTimelineObjectFactory(configuration?.studio),
-          this.createStringHashConverter(),
+          this.stringHashGenerator,
           this.configurationMapper
         )
       },
@@ -177,10 +178,6 @@ export class Tv2ActionFactoryProvider {
 
   private createActionManifestMapper(): Tv2ActionManifestMapper {
     return new Tv2ActionManifestMapper(this.logger)
-  }
-
-  private createStringHashConverter(): Tv2StringHashConverter {
-    return new Tv2StringHashConverter()
   }
 
   public createVideoClipActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2VideoClipActionFactory {
@@ -230,7 +227,7 @@ export class Tv2ActionFactoryProvider {
           this.timelineObjectFactoryProvider.createAudioMixerTimelineObjectFactory(),
           this.timelineObjectFactoryProvider.createGraphicsSplitScreenTimelineObjectFactory(),
           this.timelineObjectFactoryProvider.createVideoClipTimelineObjectFactory(),
-          this.createStringHashConverter(),
+          this.stringHashGenerator,
           this.createAssetPathHelper(),
           this.objectCloner,
           this.logger,
