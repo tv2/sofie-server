@@ -4,7 +4,6 @@ import { StatusMessage } from '../../../cross-cutting-concerns/domain/entities/s
 import { StatusCode } from '../../../cross-cutting-concerns/domain/enums/status-code'
 import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 import { StatusMessageService } from '../../../cross-cutting-concerns/application/interfaces/status-message-service'
-import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 import { DeviceRepository } from '../../../rundown-execution/domain/repositories/device-repository'
 import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
 import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
@@ -15,41 +14,22 @@ const NOT_CONNECTED_MESSAGE: string = 'Not connected'
 const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 
 export class DeviceChangedService implements DataChangeService {
-  private static instance: DataChangeService
-
-  public static getInstance(
-    statusMessageService: StatusMessageService,
-    deviceRepository: DeviceRepository,
-    deviceChangedListener: DataChangedListener<CoreDevice>,
-    logger: Logger
-  ): DataChangeService {
-    if (!this.instance) {
-      this.instance = new DeviceChangedService(
-        statusMessageService,
-        deviceRepository,
-        deviceChangedListener,
-        logger
-      )
-    }
-    return this.instance
-  }
 
   private readonly logger: Logger
 
   constructor(
     private readonly statusMessageService: StatusMessageService,
     private readonly deviceRepository: DeviceRepository,
-    deviceChangedListener: DataChangedListener<CoreDevice>,
+    private readonly deviceChangedListener: DataChangedListener<CoreDevice>,
     logger: Logger
   ) {
     this.logger = logger.tag(DeviceChangedService.name)
-    this.updateStatusMessageFromCurrentDeviceStatus()
-      .catch((error) => this.logger.data(error).error('Unable to update status messages from current devices'))
-    this.listenForStatusMessageChanges(deviceChangedListener)
   }
 
-  public initialize(): Promise<void> {
-    throw new UnsupportedOperationException('Not implemented')
+  public async initialize(): Promise<void> {
+    await this.updateStatusMessageFromCurrentDeviceStatus()
+      .catch((error) => this.logger.data(error).error('Unable to update status messages from current devices'))
+    this.listenForStatusMessageChanges(this.deviceChangedListener)
   }
 
   private async updateStatusMessageFromCurrentDeviceStatus(): Promise<void> {

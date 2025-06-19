@@ -11,9 +11,9 @@ import {
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from './tv2-blueprint-configuration-test-factory'
-import { Tv2Logger } from '../interfaces/tv2-logger'
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2PieceLayer } from '../value-objects/tv2-layers'
+import {Logger} from '../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2ActionManifestMapper.name, () => {
   describe(Tv2ActionManifestMapper.prototype.filterAndMapToSplitScreenManifestData.name, () => {
@@ -184,12 +184,12 @@ describe(Tv2ActionManifestMapper.name, () => {
   })
 })
 
-function createTestee(params: { logger?: Tv2Logger } = {}): Tv2ActionManifestMapper {
-  return new Tv2ActionManifestMapper(params?.logger ?? instance(createMockOfTv2Logger()))
+function createTestee(params: { logger?: Logger } = {}): Tv2ActionManifestMapper {
+  return new Tv2ActionManifestMapper(params?.logger ?? instance(createMockOfLogger()))
 }
 
-function createMockOfTv2Logger(): Tv2Logger {
-  const mockedLogger: Tv2Logger = mock<Tv2Logger>()
+function createMockOfLogger(): Logger {
+  const mockedLogger: Logger = mock<Logger>()
   when(mockedLogger.tag(anyString())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.data(anything())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.metadata(anything())).thenCall(() => instance(mockedLogger))

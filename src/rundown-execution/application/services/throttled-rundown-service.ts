@@ -12,13 +12,6 @@ const RUNDOWN_THROTTLED_ERROR_TEXT: string = `Unable to do action. An action was
 
 export class ThrottledRundownService implements RundownService {
 
-  private static instance?: ThrottledRundownService
-
-  public static getInstance(rundownService: RundownService): ThrottledRundownService {
-    this.instance ??= new ThrottledRundownService(rundownService)
-    return this.instance
-  }
-
   private lastOperationTakenEpochTimestamp: number
 
   constructor(private readonly rundownService: RundownService) {

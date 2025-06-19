@@ -6,15 +6,6 @@ import { ConfigurationEventBuilder } from '../interfaces/configuration-event-bui
 
 export class ConfigurationEventService implements ConfigurationEventEmitter, ConfigurationEventObserver {
 
-  private static instance: ConfigurationEventService
-
-  public static getInstance(configurationEventBuilder: ConfigurationEventBuilder): ConfigurationEventService {
-    if (!this.instance) {
-      this.instance = new ConfigurationEventService(configurationEventBuilder)
-    }
-    return this.instance
-  }
-
   private readonly callbacks: ((configurationEvent: ConfigurationEvent) => void)[] = []
 
   constructor(private readonly configurationEventBuilder: ConfigurationEventBuilder) { }

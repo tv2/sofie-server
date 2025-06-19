@@ -2,18 +2,10 @@ import { ConfigurationRepository } from '../../../domain/repositories/configurat
 import { Configuration } from '../../../domain/entities/configuration'
 
 export class CachedConfigurationRepository implements ConfigurationRepository {
-  private static instance: ConfigurationRepository
-
-  public static getInstance(configurationRepository: ConfigurationRepository): ConfigurationRepository {
-    if (!this.instance) {
-      this.instance = new CachedConfigurationRepository(configurationRepository)
-    }
-    return this.instance
-  }
 
   private cachedConfiguration: Configuration | undefined
 
-  private constructor(private readonly configurationRepository: ConfigurationRepository) {}
+  constructor(private readonly configurationRepository: ConfigurationRepository) {}
 
   public async getConfiguration(): Promise<Configuration> {
     this.cachedConfiguration ??= await this.configurationRepository.getConfiguration()

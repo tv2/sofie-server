@@ -2,31 +2,15 @@ import { DataChangeService } from '../../../rundown-execution/application/interf
 import { MediaEventEmitter } from '../../../rundown-execution/application/interfaces/media-event-emitter'
 import { DataChangedListener } from '../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import { Media } from '../../../rundown-execution/domain/entities/media'
-import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
 
 export class MediaDatabaseChangedService implements DataChangeService {
 
-  private static instance: DataChangeService
-
-  public static getInstance(
-    mediaEventEmitter: MediaEventEmitter,
-    mediaChangedListener: DataChangedListener<Media>
-  ): DataChangeService {
-    if (!this.instance) {
-      this.instance = new MediaDatabaseChangedService(
-        mediaEventEmitter,
-        mediaChangedListener
-      )
-    }
-    return this.instance
-  }
-
-  private constructor(private readonly mediaEventEmitter: MediaEventEmitter, mediaChangedListener: DataChangedListener<Media>) {
+  constructor(private readonly mediaEventEmitter: MediaEventEmitter, mediaChangedListener: DataChangedListener<Media>) {
     this.listenForMediaChanges(mediaChangedListener)
   }
 
   public initialize(): Promise<void> {
-    throw new UnsupportedOperationException('Not implemented')
+    return Promise.resolve()
   }
 
   private listenForMediaChanges(mediaChangedListener: DataChangedListener<Media>): void {

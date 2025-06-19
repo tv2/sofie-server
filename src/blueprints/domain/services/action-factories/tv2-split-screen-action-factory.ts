@@ -50,7 +50,6 @@ import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
 import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
-import { Tv2Logger } from '../../interfaces/tv2-logger'
 import { Tv2UnexpectedActionException } from '../../exceptions/tv2-unexpected-action-exception'
 import { PieceMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
 import { OutputLayer } from '../../../../rundown-execution/domain/enums/output-layer'
@@ -63,6 +62,7 @@ import {
   SplitScreenPlayoutContent
 } from '../../../../rundown-execution/domain/value-objects/playout-content'
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 const NUMBER_OF_SPLIT_SCREEN_BOXES: number = 4
 
@@ -78,7 +78,7 @@ const DEFAULT_DVE_INPUT_MAPPINGS: string = '1:INP1;2:INP2;3:INP3;4:INP4'
 
 export class Tv2SplitScreenActionFactory extends ActionFactory {
 
-  private readonly logger: Tv2Logger
+  private readonly logger: Logger
 
   constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
@@ -89,7 +89,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     private readonly stringHashConverter: Tv2StringHashConverter,
     private readonly assetPathHelper: Tv2AssetPathHelper,
     private readonly objectCloner: ObjectCloner,
-    logger: Tv2Logger,
+    logger: Logger,
   ) {
     super()
     this.logger = logger.tag(this.constructor.name)

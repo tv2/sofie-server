@@ -9,15 +9,14 @@ import { Tv2VideoMixerConfigurationActionFactory } from './tv2-video-mixer-confi
 import { Tv2SplitScreenActionFactory } from './tv2-split-screen-action-factory'
 import { Tv2ReplayActionFactory } from './tv2-replay-action-factory'
 import { Tv2RobotActionFactory } from './tv2-robot-action-factory'
-import { Tv2LoggerFacade } from '../../../infrastructure/tv2-logger-facade'
 import { Tv2AssetPathHelper } from '../tv2-asset-path-helper'
 import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
 import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
 import { FrameTimeConverter } from '../frame-time-converter'
 import { Tv2ConfigurationMapper } from '../tv2-configuration-mapper'
-import { LoggerFacade } from '../../../../cross-cutting-concerns/application/logger-facade'
-import { HelperFacade } from '../../../../cross-cutting-concerns/application/helper-facade'
 import { TimelineObjectFactoryProvider } from '../timeline-object-factories/timeline-object-factory-provider'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import {ObjectCloner} from '../../../../cross-cutting-concerns/domain/services/object-cloner'
 
 
 interface ActionFactoryInstance<T> {
@@ -39,10 +38,16 @@ export class Tv2ActionFactoryProvider {
   private replayActionFactoryInstance: ActionFactoryInstance<Tv2ReplayActionFactory>
   private robotActionFactoryInstance: ActionFactoryInstance<Tv2RobotActionFactory>
 
+  private readonly logger: Logger
+
   constructor(
     private readonly configurationMapper: Tv2ConfigurationMapper,
-    private readonly timelineObjectFactoryProvider: TimelineObjectFactoryProvider
-  ) { }
+    private readonly timelineObjectFactoryProvider: TimelineObjectFactoryProvider,
+    private readonly objectCloner: ObjectCloner,
+    logger: Logger
+  ) {
+    this.logger = logger.tag(this.constructor.name)
+  }
 
   public createCameraActionFactory(configuration?: Tv2BlueprintConfiguration): Tv2CameraActionFactory {
     this.cameraActionFactoryInstance = this.getUpdatedActionFactoryInstance(
@@ -110,7 +115,7 @@ export class Tv2ActionFactoryProvider {
           this.timelineObjectFactoryProvider.createAudioMixerTimelineObjectFactory(),
           this.createAssetPathHelper(),
           this.createFrameTimeConverter(),
-          Tv2LoggerFacade.createLogger()
+          this.logger
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {
@@ -138,7 +143,7 @@ export class Tv2ActionFactoryProvider {
           this.timelineObjectFactoryProvider.createAudioMixerTimelineObjectFactory(),
           this.timelineObjectFactoryProvider.createAudioBedTimelineObjectFactory(),
           this.createFrameTimeConverter(),
-          LoggerFacade.createLogger(),
+          this.logger
         )
       },
       (): boolean => {
@@ -173,7 +178,7 @@ export class Tv2ActionFactoryProvider {
   }
 
   private createActionManifestMapper(): Tv2ActionManifestMapper {
-    return new Tv2ActionManifestMapper(Tv2LoggerFacade.createLogger())
+    return new Tv2ActionManifestMapper(this.logger)
   }
 
   private createStringHashConverter(): Tv2StringHashConverter {
@@ -229,8 +234,8 @@ export class Tv2ActionFactoryProvider {
           this.timelineObjectFactoryProvider.createVideoClipTimelineObjectFactory(),
           this.createStringHashConverter(),
           this.createAssetPathHelper(),
-          HelperFacade.createObjectCloner(),
-          Tv2LoggerFacade.createLogger(),
+          this.objectCloner,
+          this.logger,
         )
       },
       (c?: Tv2BlueprintConfiguration): boolean => {

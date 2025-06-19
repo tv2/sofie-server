@@ -8,7 +8,6 @@ import {
 import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
-import { Tv2Logger } from '../../interfaces/tv2-logger'
 import { Tv2VideoClipAction } from '../../value-objects/tv2-action'
 import { Tv2BlueprintConfigurationTestFactory } from '../tv2-blueprint-configuration-test-factory'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
@@ -17,6 +16,7 @@ import { EntityTestFactory } from '../../../../rundown-execution/domain/entities
 import {
   Tv2VideoClipTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-clip-timeline-object-factory'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2VideoClipActionFactory.name, () => {
   describe(Tv2VideoClipActionFactory.prototype.createVideoClipActions.name, () => {
@@ -72,21 +72,21 @@ describe(Tv2VideoClipActionFactory.name, () => {
 
 function createTestee(params?: {
   actionManifestMapper?: Tv2ActionManifestMapper,
-  logger?: Tv2Logger,
+  logger?: Logger,
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
   videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory
 }): Tv2VideoClipActionFactory {
   return new Tv2VideoClipActionFactory(
-    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfTv2Logger())),
+    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfLogger())),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.audioMixerTimelineObjectFactory ?? instance(createMockedTv2AudioMixerTimelineObjectFactory()),
     params?.videoClipTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory)),
   )
 }
 
-function createMockOfTv2Logger(): Tv2Logger {
-  const mockedLogger: Tv2Logger = mock<Tv2Logger>()
+function createMockOfLogger(): Logger {
+  const mockedLogger: Logger = mock<Logger>()
   when(mockedLogger.tag(anyString())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.data(anything())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.metadata(anything())).thenCall(() => instance(mockedLogger))

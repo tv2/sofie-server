@@ -11,54 +11,54 @@ import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
 const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 
 describe(DeviceChangedService.name, () => {
-  it('calls the StatusMessageService with a StatusMessage that has the same id as the Device', () => {
+  it('calls the StatusMessageService with a StatusMessage that has the same id as the Device', async () => {
     const device: CoreDevice = EntityTestFactory.createCoreDevice({id: 'deviceId'})
     const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
     const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
-    // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-    createTestee({statusMessageService, deviceDataChangedListener})
+    const testee: DeviceChangedService = createTestee({statusMessageService, deviceDataChangedListener})
+    await testee.initialize()
 
     const [statusMessage] = capture(statusMessageService.updateStatusMessage).last()
     expect(statusMessage.id).toBe(`${DEVICE_STATUS_MESSAGE_PREFIX}${device.id}`)
   })
 
-  it('calls the StatusMessageService with a StatusMessage that has the Device name as title', () => {
+  it('calls the StatusMessageService with a StatusMessage that has the Device name as title', async () => {
     const device: CoreDevice = EntityTestFactory.createCoreDevice({statusMessage: 'some Message'})
     const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
     const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
-    // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-    createTestee({statusMessageService, deviceDataChangedListener})
+    const testee: DeviceChangedService = createTestee({statusMessageService, deviceDataChangedListener})
+    await testee.initialize()
 
     const [statusMessage] = capture(statusMessageService.updateStatusMessage).last()
     expect(statusMessage.message).toBe(device.statusMessage)
   })
 
   describe('the Device is not connected', () => {
-    it('calls the StatusMessageService with a StatusCode BAD', () => {
+    it('calls the StatusMessageService with a StatusCode BAD', async () => {
       const device: CoreDevice = EntityTestFactory.createCoreDevice({isConnected: false, statusCode: StatusCode.UNKNOWN})
       const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
       const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
-      // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-      createTestee({statusMessageService, deviceDataChangedListener})
+      const testee: DeviceChangedService = createTestee({statusMessageService, deviceDataChangedListener})
+      await testee.initialize()
 
       const [statusMessage] = capture(statusMessageService.updateStatusMessage).last()
       expect(statusMessage.statusCode).toBe(StatusCode.BAD)
     })
 
-    it('calls the StatusMessageService with a NOT_CONNECTED message', () => {
+    it('calls the StatusMessageService with a NOT_CONNECTED message', async () => {
       const device: CoreDevice = EntityTestFactory.createCoreDevice({isConnected: false, statusMessage: 'some message'})
       const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
       const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
-      // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-      createTestee({statusMessageService, deviceDataChangedListener})
+      const testee: DeviceChangedService = createTestee({statusMessageService, deviceDataChangedListener})
+      await testee.initialize()
 
       const [statusMessage] = capture(statusMessageService.updateStatusMessage).last()
       expect(statusMessage.message).toBe('Not connected')
@@ -66,27 +66,27 @@ describe(DeviceChangedService.name, () => {
   })
 
   describe('the Device is connected', () => {
-    it('calls the StatusMessageService with a StatusMessage with a StatusCode matching the Device status', () => {
+    it('calls the StatusMessageService with a StatusMessage with a StatusCode matching the Device status', async () => {
       const device: CoreDevice = EntityTestFactory.createCoreDevice({isConnected: true, statusCode: StatusCode.WARNING})
       const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
       const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
-      // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-      createTestee({statusMessageService, deviceDataChangedListener})
+      const testee: DeviceChangedService = createTestee({statusMessageService, deviceDataChangedListener})
+      await testee.initialize()
 
       const [statusMessage] = capture(statusMessageService.updateStatusMessage).last()
       expect(statusMessage.statusCode).toBe(device.statusCode)
     })
 
-    it('calls the StatusMessageService with a StatusMessage with a message matching the Device status message', () => {
+    it('calls the StatusMessageService with a StatusMessage with a message matching the Device status message', async () => {
       const device: CoreDevice = EntityTestFactory.createCoreDevice({isConnected: true, statusMessage: 'Some message'})
       const deviceDataChangedListener: DataChangedListener<CoreDevice> = createDeviceChangedListenerMock(device)
 
       const statusMessageService: StatusMessageService = mock<StatusMessageService>()
 
-      // This is our testee. The flow starts in the constructor, so we just need to instantiate it.
-      createTestee({statusMessageService, deviceDataChangedListener})
+      const testee: DeviceChangedService = createTestee({statusMessageService, deviceDataChangedListener})
+      await testee.initialize()
 
       const [statusMessage] = capture(statusMessageService.updateStatusMessage).last()
       expect(statusMessage.message).toBe(device.statusMessage)

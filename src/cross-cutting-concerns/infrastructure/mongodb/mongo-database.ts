@@ -14,14 +14,6 @@ function getMongoDatabaseName(): string {
 }
 
 export class MongoDatabase implements Database {
-  private static instance: MongoDatabase
-
-  public static getInstance(logger: Logger): MongoDatabase {
-    if (!this.instance) {
-      this.instance = new MongoDatabase(logger)
-    }
-    return this.instance
-  }
 
   private readonly logger: Logger
   private client: mongodb.MongoClient
@@ -29,7 +21,7 @@ export class MongoDatabase implements Database {
 
   private readonly onConnectCallbacks: Map<string, () => void> = new Map()
 
-  private constructor(logger: Logger) {
+  constructor(logger: Logger) {
     this.logger = logger.tag(MongoDatabase.name)
   }
 

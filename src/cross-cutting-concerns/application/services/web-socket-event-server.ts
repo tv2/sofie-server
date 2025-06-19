@@ -27,41 +27,11 @@ import { PlayoutContentEvent } from '../../../rundown-execution/application/valu
 import {NtpEventType} from '../enums/ntp-event-type'
 
 export class WebSocketEventServer implements EventServer {
-  private static instance: EventServer
-
-  public static getInstance(
-    rundownEventObserver: RundownEventObserver,
-    actionEventObserver: ActionEventObserver,
-    triggerEventObserver: TriggerEventObserver,
-    macroEventObserver: MacroEventObserver,
-    mediaEventObserver: MediaEventObserver,
-    configurationEventObserver: ConfigurationEventObserver,
-    statusMessageEventObserver: StatusMessageEventObserver,
-    deviceEventObserver: DeviceEventObserver,
-    playoutContentEventObserver: PlayoutContentEventObserver,
-    logger: Logger
-  ): EventServer {
-    if (!this.instance) {
-      this.instance = new WebSocketEventServer(
-        rundownEventObserver,
-        actionEventObserver,
-        triggerEventObserver,
-        macroEventObserver,
-        mediaEventObserver,
-        configurationEventObserver,
-        statusMessageEventObserver,
-        deviceEventObserver,
-        playoutContentEventObserver,
-        logger
-      )
-    }
-    return this.instance
-  }
 
   private readonly logger: Logger
   private webSocketServer?: WebSocket.Server
 
-  private constructor(
+  constructor(
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionEventObserver: ActionEventObserver,
     private readonly triggerEventObserver: TriggerEventObserver,
@@ -76,42 +46,43 @@ export class WebSocketEventServer implements EventServer {
     this.logger = logger.tag(WebSocketEventServer.name)
   }
 
-  public startServer(port: number): void {
+  public async startServer(port: number): Promise<void> {
     if (this.webSocketServer) {
-      this.logger.info('Server is already started')
+      this.logger.info('WebSocket server is already started.')
       return
     }
-    this.setupWebSocketServer(port)
+    await this.setupWebSocketServer(port)
   }
 
-  private setupWebSocketServer(port: number): void {
+  private async setupWebSocketServer(port: number): Promise<void> {
     if (this.webSocketServer) {
       return
     }
 
-    this.webSocketServer = this.createWebSocketServer(port)
+    this.webSocketServer = await this.createWebSocketServer(port)
 
     this.webSocketServer.on('connection', (webSocket: WebSocket) => {
-      this.logger.info('WebSocket successfully registered to server')
+      this.logger.info('WebSocket connection successfully registered to server.')
       this.addObserversForWebSocket(webSocket)
     })
 
     this.webSocketServer.on('close', () => {
-      this.logger.info('WebSocket server has closed')
+      this.logger.info('WebSocket server has closed.')
       this.webSocketServer = undefined
     })
   }
 
-  private createWebSocketServer(port: number): WebSocketServer {
-    const app: Express = express()
-    const server: Server = http.createServer(app)
-    const webSocketServer: WsServer = new WebSocketServer({ server })
+  private createWebSocketServer(port: number): Promise<WebSocketServer> {
+    return new Promise<WebSocketServer>((resolve) => {
+      const app: Express = express()
+      const server: Server = http.createServer(app)
+      const webSocketServer: WsServer = new WebSocketServer({ server })
 
-    server.listen(port, () => {
-      this.logger.info(`WebSocket server started on port: ${port}`)
+      server.listen(port, () => {
+        this.logger.info(`WebSocket server started on port ${port}.`)
+        resolve(webSocketServer)
+      })
     })
-
-    return webSocketServer
   }
 
   private addObserversForWebSocket(webSocket: WebSocket): void {

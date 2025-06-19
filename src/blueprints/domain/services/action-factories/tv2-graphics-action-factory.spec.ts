@@ -30,7 +30,7 @@ import {
 } from '../../interfaces/timeline-object-factories/tv2-graphics-element-timeline-object-factory'
 import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
-import { Tv2Logger } from '../../interfaces/tv2-logger'
+import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2GraphicsActionFactory.name, () => {
   describe(Tv2GraphicsActionFactory.prototype.createGraphicsActions.name, () => {
@@ -183,7 +183,7 @@ function createTestee(params?: {
   configurationMapper?: Tv2ConfigurationMapper
 }): Tv2GraphicsActionFactory {
   return new Tv2GraphicsActionFactory(
-    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfTv2Logger())),
+    params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfLogger())),
     params?.graphicsTimelineObjectFactoryFactory ?? instance(createMockedTv2GraphicsTimelineObjectFactoryFactory()),
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
@@ -192,8 +192,8 @@ function createTestee(params?: {
   )
 }
 
-function createMockOfTv2Logger(): Tv2Logger {
-  const mockedLogger: Tv2Logger = mock<Tv2Logger>()
+function createMockOfLogger(): Logger {
+  const mockedLogger: Logger = mock<Logger>()
   when(mockedLogger.tag(anyString())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.data(anything())).thenCall(() => instance(mockedLogger))
   when(mockedLogger.metadata(anything())).thenCall(() => instance(mockedLogger))
