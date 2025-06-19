@@ -36,6 +36,7 @@
     "**/*.spec.ts",
     "**/*mock*.ts",
     "jest.config.ts",
-    "database/manager/*.ts"
+    "database/manager/*.ts",
+    "migrations"
   ]
 }
