@@ -195,6 +195,18 @@ module.exports = {
         ]
       }
     },
+    {
+      name: 'domain-only-depends-on-domain',
+      comment: 'Domain modules may only depend on them selves and on other domain modules.',
+      severity: 'error',
+      from: {
+        path: '^src/[^/]+/domain/',
+        pathNot: '[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$'
+      },
+      to: {
+        pathNot: '^src/[^/]+/domain/|^node_modules|/logger.ts$' // TODO: Domain should not depend on node_modules nor Logger.
+      },
+    },
   ],
   options: {
 
