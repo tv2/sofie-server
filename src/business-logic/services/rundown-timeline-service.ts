@@ -61,7 +61,7 @@ export class RundownTimelineService implements RundownService {
     await this.assertNoRundownIsInRehearsal(rundownId)
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const infinitePiecesBeforeActivation: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    const infinitePiecesBeforeActivation: Map<string, Piece[]> = rundown.getInfinitePiecesMap()
     const rundownModeBeforeActivation: RundownMode = rundown.getMode()
 
     rundown.activate()
@@ -82,7 +82,7 @@ export class RundownTimelineService implements RundownService {
     await this.assertNoRundownIsInRehearsal()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const infinitePiecesBeforeRehearsal: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    const infinitePiecesBeforeRehearsal: Map<string, Piece[]> = rundown.getInfinitePiecesMap()
     rundown.enterRehearsal()
 
     await this.buildAndPersistTimeline(rundown)
@@ -126,17 +126,19 @@ export class RundownTimelineService implements RundownService {
     return timeline
   }
 
-  private emitIfInfinitePiecesHasChanged(rundown: Rundown, infinitePiecesBefore: Map<string, Piece>): void {
+  private emitIfInfinitePiecesHasChanged(rundown: Rundown, infinitePiecesBefore: Map<string, Piece[]>): void {
     if (this.doInfinitePieceMapsDiffer(infinitePiecesBefore, rundown.getInfinitePiecesMap())) {
       this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
     }
   }
 
-  private doInfinitePieceMapsDiffer(firstInfinitePieceMap: Map<string, Piece>, secondInfinitePieceMap: Map<string, Piece>): boolean {
+  private doInfinitePieceMapsDiffer(firstInfinitePieceMap: Map<string, Piece[]>, secondInfinitePieceMap: Map<string, Piece[]>): boolean {
     if (firstInfinitePieceMap.size !== secondInfinitePieceMap.size) {
       return true
     }
-    return [...firstInfinitePieceMap.entries()].some(([layer, piece]) => secondInfinitePieceMap.get(layer)?.id !== piece.id)
+    const firstInfinitePieces: Piece[] = Array.from(firstInfinitePieceMap.values()).flatMap(list => list)
+    const secondInfinitePieces: Piece[] = Array.from(secondInfinitePieceMap.values()).flatMap(list => list)
+    return !firstInfinitePieces.every(piece => secondInfinitePieces.some(secondPiece => piece.id === secondPiece.id))
   }
 
   public async deactivateRundown(rundownId: string): Promise<void> {
@@ -170,7 +172,7 @@ export class RundownTimelineService implements RundownService {
 
     this.stopAutoNext()
 
-    const infinitePiecesBeforeTakeNext: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    const infinitePiecesBeforeTakeNext: Map<string, Piece[]> = rundown.getInfinitePiecesMap()
     rundown.takeNext()
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))
 
@@ -366,7 +368,7 @@ export class RundownTimelineService implements RundownService {
 
   public async insertPieceAsOnAir(rundownId: string, piece: Piece, layersToStopPiecesOn: string[] = []): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
-    const infinitePiecesBeforeInsertPieceAsOnAir: Map<string, Piece> = rundown.getInfinitePiecesMap()
+    const infinitePiecesBeforeInsertPieceAsOnAir: Map<string, Piece[]> = rundown.getInfinitePiecesMap()
     rundown.stopActivePiecesOnLayers(layersToStopPiecesOn)
     rundown.insertPieceIntoActivePart(piece)
     rundown.getActivePart().setEndState(this.getEndStateForActivePart(rundown))

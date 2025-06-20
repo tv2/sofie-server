@@ -2,7 +2,7 @@ import { RundownService } from '../services/interfaces/rundown-service'
 import { RundownTimelineService } from '../services/rundown-timeline-service'
 import { RepositoryFacade } from '../../data-access/facades/repository-facade'
 import { TimelineBuilder } from '../services/interfaces/timeline-builder'
-import { SuperflyTimelineBuilder } from '../services/superfly-timeline-builder'
+import { SuperTimelineBuilder } from '../services/super-timeline-builder'
 import { TimeoutCallbackScheduler } from '../services/timeout-callback-scheduler'
 import { BlueprintsFacade } from '../../blueprints/blueprints-facade'
 import { ActionService } from '../services/interfaces/action-service'
@@ -64,9 +64,9 @@ export class ServiceFacade {
   }
 
   public static createTimelineBuilder(): TimelineBuilder {
-    const superflyTimelineBuilder: TimelineBuilder = new SuperflyTimelineBuilder(HelperFacade.createObjectCloner())
+    const superTimelineBuilder: TimelineBuilder = new SuperTimelineBuilder(HelperFacade.createObjectCloner())
     return new BlueprintTimelineBuilder(
-      superflyTimelineBuilder,
+      superTimelineBuilder,
       RepositoryFacade.createConfigurationRepository(),
       BlueprintsFacade.createBlueprint()
     )

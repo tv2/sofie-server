@@ -43,7 +43,7 @@ const LOOKAHEAD_PRIORITY: number = 0.1
 const BASELINE_PRIORITY: number = 0
 const LOW_PRIORITY: number = -1
 
-export class SuperflyTimelineBuilder implements TimelineBuilder {
+export class SuperTimelineBuilder implements TimelineBuilder {
   constructor(private readonly objectCloner: ObjectCloner) {}
 
   public getBaseTimeline(): Timeline {
@@ -52,7 +52,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
 
   public async buildTimeline(rundown: Rundown, studio?: Studio): Promise<Timeline> {
     if (!studio) {
-      throw new MisconfigurationException(`No Studio provided when calling ${SuperflyTimelineBuilder.name}.${SuperflyTimelineBuilder.prototype.buildTimeline.name}`)
+      throw new MisconfigurationException(`No Studio provided when calling ${SuperTimelineBuilder.name}.${SuperTimelineBuilder.prototype.buildTimeline.name}`)
     }
 
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)
@@ -540,6 +540,10 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
             deviceType: DeviceType.ABSTRACT,
             type: undefined
           }
+        }
+
+        if (piece.getTakenOffAirTimestamp() > 0) {
+          infiniteGroup.enable.end = piece.getTakenOffAirTimestamp()
         }
 
         infiniteGroup.children = piece.getTimelineObjects().flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))
