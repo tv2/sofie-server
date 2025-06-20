@@ -2,7 +2,7 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { StudioRepository } from '../../../domain/repositories/studio-repository'
 import { Studio } from '../../../domain/entities/studio'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { MongoEntityConverter, MongoStudio } from './mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'studios'

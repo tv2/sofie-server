@@ -1,7 +1,7 @@
 import { TimelineObject } from './timeline-object'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { TransitionType } from '../enums/transition-type'
-import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { IngestedPiece } from './ingested-piece'
 import { UNSYNCED_ID_POSTFIX } from '../value-objects/unsynced_constants'
 import { PieceMetadata } from '../value-objects/metadata'

@@ -2,7 +2,7 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { ShowStyleRepository } from '../../../domain/repositories/show-style-repository'
 import { ShowStyle } from '../../../domain/entities/show-style'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { MongoEntityConverter, MongoShowStyle } from './mongo-entity-converter'
 import { ShowStyleVariantRepository } from '../../../domain/repositories/show-style-variant-repository'
 import { ShowStyleVariant } from '../../../domain/entities/show-style-variant'

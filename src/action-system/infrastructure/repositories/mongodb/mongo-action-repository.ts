@@ -3,8 +3,8 @@ import { ActionRepository } from '../../../domain/repositories/action-repository
 import { Action } from '../../../domain/entities/action'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { DeleteResult, UnorderedBulkOperation } from 'mongodb'
-import { DeletionFailedException } from '../../../../rundown-execution/domain/exceptions/deletion-failed-exception'
-import { NotFoundException } from '../../../../rundown-execution/domain/exceptions/not-found-exception'
+import { DeletionFailedException } from '../../../../cross-cutting-concerns/infrastructure/exceptions/deletion-failed-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { MongoAction, MongoEntityConverter } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'actions'

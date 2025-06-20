@@ -6,7 +6,7 @@ import { Tv2MediaPlayerSession, Tv2RundownPersistentState } from '../value-objec
 import { TimelineObject, TimelineObjectGroup } from '../../../rundown-execution/domain/entities/timeline-object'
 import { Tv2PartEndState } from '../value-objects/tv2-part-end-state'
 import { Tv2SisyfosPersistentLayerFinder } from './tv2-sisyfos-persistent-layer-finder'
-import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2MediaPlayer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../../rundown-execution/domain/entities/timeline'

@@ -1,7 +1,7 @@
 import { BaseController, DeleteRequest, GetRequest, PostRequest, PutRequest, RestController } from '../../../cross-cutting-concerns/application/controllers/base-controller'
 import { Request, Response } from 'express'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
-import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
+import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
 import { MacroDto } from '../dtos/macro-dto'
 import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { MacroService } from '../interfaces/macro-service'

@@ -3,7 +3,7 @@ import { Piece } from '../../../domain/entities/piece'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { AnyBulkWriteOperation, } from 'mongodb'
 import { MongoEntityConverter, MongoPiece } from './mongo-entity-converter'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 
 const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 

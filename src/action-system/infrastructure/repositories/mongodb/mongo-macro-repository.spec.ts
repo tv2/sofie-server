@@ -6,7 +6,7 @@ import { Collection } from 'mongodb'
 import { MongoId } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { Macro } from '../../../domain/entities/macro'
-import { InvalidIdException } from '../../../../rundown-execution/domain/exceptions/invalid-id-exception'
+import { InvalidIdException } from '../../exceptions/invalid-id-exception'
 
 const UUID: string = 'random-uuid'
 

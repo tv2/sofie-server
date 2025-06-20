@@ -3,7 +3,7 @@ import { TimelineRepository } from '../../domain/repositories/timeline-repositor
 import { Request, Response } from 'express'
 import { Timeline } from '../../domain/entities/timeline'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
-import { Exception } from '../../domain/exceptions/exception'
+import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
 import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 

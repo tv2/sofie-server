@@ -4,7 +4,7 @@ import { ShowStyleVariant } from '../../../domain/entities/show-style-variant'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
-import { UnsupportedOperationException } from '../../../domain/exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { MongoShowStyleVariant } from './mongo-entity-converter'
 
 const SHOW_STYLE_VARIANT_CONFIGURATION_COLLECTION_NAME: string = 'showStyleVariants'

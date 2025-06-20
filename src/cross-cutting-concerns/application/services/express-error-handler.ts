@@ -1,6 +1,6 @@
 import { Response } from 'express'
-import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
-import { ErrorCode } from '../../../rundown-execution/domain/enums/error-code'
+import { Exception } from '../../domain/exceptions/exception'
+import { ErrorCode } from '../../domain/enums/error-code'
 import { HttpStatusCode } from '../enums/http-status-code'
 import { HttpErrorHandler } from '../interfaces/http-error-handler'
 import { Logger } from '../interfaces/logger'

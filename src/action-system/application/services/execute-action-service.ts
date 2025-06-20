@@ -17,7 +17,7 @@ import {
 import { Blueprint } from '../../../rundown-execution/domain/value-objects/blueprint'
 import { ActionRepository } from '../../domain/repositories/action-repository'
 import { PartActionType, PieceActionType, SystemActionType } from '../../domain/enums/action-type'
-import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { RundownService } from '../../../rundown-execution/application/interfaces/rundown-service'
 import { Part, PartInterface } from '../../../rundown-execution/domain/entities/part'
 import { Piece, PieceInterface } from '../../../rundown-execution/domain/entities/piece'

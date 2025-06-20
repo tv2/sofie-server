@@ -1,7 +1,7 @@
 import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { PartTimings } from '../value-objects/part-timings'
-import { UnsupportedOperationException } from '../exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { InTransition } from '../value-objects/in-transition'
 import { OutTransition } from '../value-objects/out-transition'
 import { AutoNext } from '../value-objects/auto-next'

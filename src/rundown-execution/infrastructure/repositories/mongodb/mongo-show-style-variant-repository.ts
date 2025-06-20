@@ -3,7 +3,7 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { RundownRepository } from '../../../domain/repositories/rundown-repository'
 import { ShowStyleVariant } from '../../../domain/entities/show-style-variant'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { Rundown } from '../../../domain/entities/rundown'
 import { MongoEntityConverter, MongoShowStyleVariant } from './mongo-entity-converter'
 

@@ -2,7 +2,7 @@ import { TimelineRepository } from '../../../domain/repositories/timeline-reposi
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { Timeline } from '../../../domain/entities/timeline'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { MongoEntityConverter, MongoTimeline } from './mongo-entity-converter'
 
 const TIMELINE_COLLECTION_NAME: string = 'timeline'

@@ -1,6 +1,6 @@
 import * as mongodb from 'mongodb'
 import { Collection } from 'mongodb'
-import { DatabaseNotConnectedException } from '../../../rundown-execution/domain/exceptions/database-not-connected-exception'
+import { DatabaseNotConnectedException } from '../exceptions/database-not-connected-exception'
 import { MongoId } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { Logger } from '../../application/interfaces/logger'
 import { Database } from '../interfaces/database'

@@ -2,7 +2,7 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { Part } from '../../../domain/entities/part'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { AnyBulkWriteOperation, } from 'mongodb'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { Piece } from '../../../domain/entities/piece'
 import { MongoEntityConverter, MongoPart } from './mongo-entity-converter'
 import { MongoPieceRepository } from './mongo-piece-repository'

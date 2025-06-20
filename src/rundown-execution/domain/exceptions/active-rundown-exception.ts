@@ -1,5 +1,5 @@
-import { ErrorCode } from '../enums/error-code'
-import { Exception } from './exception'
+import { ErrorCode } from '../../../cross-cutting-concerns/domain/enums/error-code'
+import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
 
 export class ActiveRundownException extends Exception {
   public constructor(message: string) {

@@ -5,7 +5,7 @@ import {
 } from './mongo-ingested-entity-converter'
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { IngestedRundownRepository } from '../../../../sofie-ingest/domain/repositories/ingested-rundown-repository'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { RundownBaselineRepository } from '../../../domain/repositories/rundown-baseline-repository'
 import { IngestedSegmentRepository } from '../../../../sofie-ingest/domain/repositories/ingested-segment-repository'
 import { IngestedRundown } from '../../../domain/entities/ingested-rundown'

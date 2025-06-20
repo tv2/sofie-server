@@ -1,6 +1,6 @@
 import { ThrottledRundownService } from './throttled-rundown-service'
 import { anything, instance, mock, verify } from '@typestrong/ts-mockito'
-import { ThrottledRundownException } from '../../domain/exceptions/throttled-rundown-exception'
+import { ThrottledRundownException } from '../exceptions/throttled-rundown-exception'
 import { RundownService } from '../interfaces/rundown-service'
 import { Part } from '../../domain/entities/part'
 import { EntityTestFactory } from '../../domain/entities/test/entity-test-factory'
