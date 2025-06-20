@@ -224,6 +224,18 @@ module.exports = {
           '^node_modules'
         ]
       }
+    },
+    {
+      name: 'cross-cutting-concerns-only-depends-on-itself',
+      comment: 'The cross-cutting concerns module should not depend on any other modules. Libraries and packages are allowed.',
+      severity: 'error',
+      from: {
+        path: '/cross-cutting-concerns/',
+      },
+      to: {
+        dependencyTypesNot: ['core'],
+        pathNot: '/cross-cutting-concerns/|^node_modules',
+      }
     }
   ],
   options: {
