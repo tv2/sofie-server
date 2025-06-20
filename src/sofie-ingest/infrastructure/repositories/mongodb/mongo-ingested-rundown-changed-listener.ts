@@ -15,13 +15,12 @@ import { Logger } from '../../../../cross-cutting-concerns/application/interface
 const INGESTED_RUNDOWN_COLLECTION_NAME: string = 'rundowns' // TODO: Once we control ingest changed this to "ingestedRundowns"
 
 export class MongoIngestedRundownChangedListener extends BaseMongoRepository<MongoIngestedRundown> implements DataChangedListener<IngestedRundown> {
-
   private readonly logger: Logger
   private onCreatedCallback: (rundown: IngestedRundown) => void
   private onUpdatedCallback: (rundown: IngestedRundown) => void
   private onDeletedCallback: (rundownId: string) => void
 
-  constructor(
+  public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoIngestedEntityConverter: MongoIngestedEntityConverter,
     logger: Logger

@@ -3,9 +3,8 @@ import got from 'got'
 import { HttpError, HttpErrorCode } from '../../application/exceptions/http-error'
 
 export class GotHttpService implements HttpService {
-
   public post(url: string, body?: string): unknown {
-    return got.post(url, { body }).catch(error => {
+    return got.post(url, { body }).catch((error) => {
       const bodyText: string = error.response?.body
       if (bodyText) {
         throw new HttpError(HttpErrorCode.BAD_REQUEST, bodyText)

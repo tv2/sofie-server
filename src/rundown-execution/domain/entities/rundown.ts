@@ -73,7 +73,7 @@ export class Rundown extends BasicRundown {
 
   private history: Part[]
 
-  constructor(rundown: RundownInterface) {
+  public constructor(rundown: RundownInterface) {
     super(rundown.id, rundown.name, rundown.mode, rundown.takeMode, rundown.modifiedAt, rundown.timing)
     this.segments = rundown.segments ? [...rundown.segments].sort(this.compareSegments) : []
     this.baselineTimelineObjects = rundown.baselineTimelineObjects ?? []
@@ -147,7 +147,7 @@ export class Rundown extends BasicRundown {
     if (!cursor) {
       return
     }
-    return {...cursor, ...cursorPatch}
+    return { ...cursor, ...cursorPatch }
   }
 
   private removeUnsyncedSegments(): void {
@@ -246,7 +246,7 @@ export class Rundown extends BasicRundown {
   }
 
   private findNextValidSegment(): Segment {
-    const activeSegmentIndex: number = this.segments.findIndex((segment) => segment.id === this.activeCursor?.segment?.id)
+    const activeSegmentIndex: number = this.segments.findIndex(segment => segment.id === this.activeCursor?.segment?.id)
     if (activeSegmentIndex === -1) {
       throw new NotFoundException('Active Segment does not exist in Rundown')
     }
@@ -336,7 +336,7 @@ export class Rundown extends BasicRundown {
   }
 
   private getSegmentIndexForPart(part: Part): number {
-    const segmentIndexForPart: number = this.segments.findIndex((segment) => segment.id === part.getSegmentId())
+    const segmentIndexForPart: number = this.segments.findIndex(segment => segment.id === part.getSegmentId())
     if (segmentIndexForPart < 0) {
       throw new NotFoundException(
         `Part: "${part.id}" does not belong to any Segments on Rundown: "${this.id}"`
@@ -416,14 +416,14 @@ export class Rundown extends BasicRundown {
       this.activeCursor.part
         .getPieces()
         .filter(piece => !piece.hasEnded(now))
-        .map((piece) => [piece.layer, piece])
+        .map(piece => [piece.layer, piece])
     )
 
     const piecesToCheckIfTheyHaveBeenOutlived: Piece[] = this.findOldInfinitePiecesNotOnLayers(
       new Set(layersWithPieces.keys())
     )
     const piecesThatAreNotOutlived: Piece[] = piecesToCheckIfTheyHaveBeenOutlived.filter(
-      (piece) => !this.isPieceOutlived(piece)
+      piece => !this.isPieceOutlived(piece)
     )
     layersWithPieces = this.addPiecesToLayers(piecesThatAreNotOutlived, layersWithPieces)
 
@@ -436,7 +436,7 @@ export class Rundown extends BasicRundown {
   }
 
   private findOldInfinitePiecesNotOnLayers(layers: Set<string>): Piece[] {
-    return Array.from(this.infinitePieces.values()).filter((oldPiece) => !layers.has(oldPiece.layer))
+    return Array.from(this.infinitePieces.values()).filter(oldPiece => !layers.has(oldPiece.layer))
   }
 
   private isPieceOutlived(piece: Piece): boolean {
@@ -471,10 +471,10 @@ export class Rundown extends BasicRundown {
   }
 
   private resetOutlivedInfinitePieces(piecesThatHasNotBeenOutlived: Piece[]): void {
-    const pieceIdsThatHasNotBeenOutlived: string[] = piecesThatHasNotBeenOutlived.map((piece) => piece.id)
+    const pieceIdsThatHasNotBeenOutlived: string[] = piecesThatHasNotBeenOutlived.map(piece => piece.id)
     Array.from(this.infinitePieces.values())
-      .filter((piece) => !pieceIdsThatHasNotBeenOutlived.includes(piece.id))
-      .forEach((piece) => piece.resetExecution())
+      .filter(piece => !pieceIdsThatHasNotBeenOutlived.includes(piece.id))
+      .forEach(piece => piece.resetExecution())
   }
 
   private addPiecesToLayers(pieces: Piece[], layersWithPieces: Map<string, Piece>): Map<string, Piece> {
@@ -506,7 +506,7 @@ export class Rundown extends BasicRundown {
   }
 
   private addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces: Map<string, Piece>): Map<string, Piece> {
-    const indexOfActiveSegment: number = this.segments.findIndex((segment) => segment.id === this.activeCursor?.segment?.id)
+    const indexOfActiveSegment: number = this.segments.findIndex(segment => segment.id === this.activeCursor?.segment?.id)
     for (let i: number = indexOfActiveSegment - 1; i >= 0; i--) {
       const piecesSpanningSegment: Piece[] = this.segments[i]
         .getFirstSpanningRundownPieceForEachLayerForAllParts(new Set(layersWithPieces.keys()))
@@ -518,7 +518,7 @@ export class Rundown extends BasicRundown {
 
   private addBaselinePiecesNotOnLayers(layersWithPieces: Map<string, Piece>): void {
     this.baselinePieces.filter(baselinePiece => !layersWithPieces.has(baselinePiece.layer))
-      .forEach(baselinePiece => {
+      .forEach((baselinePiece) => {
         if (!baselinePiece.getExecutedAt()) {
           baselinePiece.putOnAir(Date.now())
         }
@@ -723,7 +723,7 @@ export class Rundown extends BasicRundown {
   }
 
   private findSegment(segmentId: string): Segment {
-    const segment: Segment | undefined = this.segments.find((segment) => segment.id === segmentId)
+    const segment: Segment | undefined = this.segments.find(segment => segment.id === segmentId)
     if (!segment) {
       throw new NotFoundException(`Segment "${segmentId}" does not exist in Rundown "${this.id}"`)
     }
@@ -835,7 +835,7 @@ export class Rundown extends BasicRundown {
     if (!unsyncedPart) {
       throw new NotFoundException(`Unsynced onAir Part not found in unsynced Segment ${unsyncedSegment.id}`)
     }
-    this.activeCursor = this.createCursor(this.activeCursor, { segment: unsyncedSegment, part:  unsyncedPart })
+    this.activeCursor = this.createCursor(this.activeCursor, { segment: unsyncedSegment, part: unsyncedPart })
     this.segments.push(unsyncedSegment)
     this.segments.sort(this.compareSegments)
     return unsyncedSegment
@@ -889,7 +889,7 @@ export class Rundown extends BasicRundown {
 
   private markInfinitePiecesFromPartUnsynced(partId: string): void {
     const infinitePiecesFromPart: Piece[] = [...this.infinitePieces.values()].filter(piece => piece.getPartId() === partId)
-    infinitePiecesFromPart.map(piece => {
+    infinitePiecesFromPart.map((piece) => {
       piece.markAsUnsynced()
       return piece.getUnsyncedCopy()
     }).forEach(unsyncedPiece => this.infinitePieces.set(unsyncedPiece.layer, unsyncedPiece))

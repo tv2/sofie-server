@@ -7,11 +7,10 @@ import { Part } from '../../../domain/entities/part'
 import { Piece } from '../../../domain/entities/piece'
 
 export class CachedRundownAggregateRepository implements RundownAggregateRepository {
-
   private readonly logger: Logger
   private readonly cachedRundowns: Map<string, Rundown> = new Map()
 
-  constructor(private readonly rundownAggregateRepository: RundownAggregateRepository, logger: Logger) {
+  public constructor(private readonly rundownAggregateRepository: RundownAggregateRepository, logger: Logger) {
     this.logger = logger.tag(CachedRundownAggregateRepository.name)
   }
 

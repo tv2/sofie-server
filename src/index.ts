@@ -163,7 +163,7 @@ import { MacroEventService } from './action-system/application/services/macro-ev
 import { MacroRepository } from './action-system/domain/repositories/macro-repository'
 import { MongoMacroRepository } from './action-system/infrastructure/repositories/mongodb/mongo-macro-repository'
 import { EventServer } from './cross-cutting-concerns/infrastructure/interfaces/event-server'
-import { WebSocketEventServer } from './cross-cutting-concerns/application/services/web-socket-event-server'
+import { WebSocketEventServer } from './cross-cutting-concerns/infrastructure/services/web-socket-event-server'
 import { ActionEventService } from './action-system/application/services/action-event-service'
 import { MediaEventService } from './sofie-ingest/application/services/media-event-service'
 import { SofieIngestEventBuilder } from './sofie-ingest/application/services/sofie-ingest-event-builder'
@@ -223,6 +223,8 @@ import {
 import {
   CachedConfigurationRepository
 } from './rundown-execution/infrastructure/repositories/cache/cached-configuration-repository'
+import { StringHashGenerator } from './blueprints/domain/interfaces/string-hash-generator'
+import { CryptoStringHashGenerator } from './blueprints/infrastructure/services/crypto-string-hash-generator'
 import { GatewayConnector } from './tv2-inews-ingest/application/interfaces/gatewayConnector'
 import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
 import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
@@ -255,7 +257,6 @@ async function main(logger: Logger): Promise<void> {
   const triggerRepository: TriggerRepository = new MongoTriggerRepository(mongoDatabase, uuidGenerator)
   const macroRepository: MacroRepository = new MongoMacroRepository(mongoDatabase, uuidGenerator)
   const actionManifestRepository: ActionManifestRepository = createActionManifestRepository(mongoDatabase)
-
 
   // Event builders and event services
   const rundownExecutionEventBuilder: RundownExecutionEventBuilder = new RundownExecutionEventBuilder()
@@ -364,9 +365,10 @@ function createBlueprint(objectCloner: ObjectCloner, logger: Logger): Blueprint 
   const sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder = new Tv2SisyfosPersistentLayerFinder()
   const timelineObjectFactoryProvider: TimelineObjectFactoryProvider = new TimelineObjectFactoryProvider(logger)
 
+  const stringHashGenerator: StringHashGenerator = new CryptoStringHashGenerator()
   const tv2ActionService: Tv2ActionService = new Tv2ActionService(
     configurationMapper,
-    new Tv2ActionFactoryProvider(configurationMapper, timelineObjectFactoryProvider, objectCloner, logger),
+    new Tv2ActionFactoryProvider(configurationMapper, timelineObjectFactoryProvider, stringHashGenerator, objectCloner, logger),
     logger
   )
 

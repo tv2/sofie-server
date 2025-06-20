@@ -3,7 +3,7 @@ import { TimelineObject } from '../../../../rundown-execution/domain/entities/ti
 
 export interface EmptyTimelineObject extends TimelineObject {
   content: {
-    deviceType: DeviceType.ABSTRACT,
+    deviceType: DeviceType.ABSTRACT
     type: 'empty'
   }
 }

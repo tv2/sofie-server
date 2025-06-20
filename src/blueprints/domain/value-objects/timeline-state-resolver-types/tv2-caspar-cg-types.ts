@@ -6,12 +6,12 @@ export interface Tv2CasparCgTemplateData {
       display: Tv2CasparCgTemplateDisplayMode
       payload: {
         type: 'still'
-        url: string,
+        url: string
         noAnimation: boolean
       }
     }
     [Tv2CasparCgTemplateSlotType.PILOT_OVERLAY]?: {
-      display: Tv2CasparCgTemplateDisplayMode,
+      display: Tv2CasparCgTemplateDisplayMode
       payload: {
         type: string
         url: string

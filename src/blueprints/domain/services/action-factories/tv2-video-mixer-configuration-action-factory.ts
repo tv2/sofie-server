@@ -22,8 +22,7 @@ import { DownstreamKeyerPlayoutContent, PlayoutContent } from '../../../../rundo
 import { Action, MutateActionMethods, MutateActionType } from '../../../../action-system/domain/entities/action'
 
 export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
-
-  constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
+  public constructor(private readonly videoSwitcherTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory) {
     super()
   }
 
@@ -97,7 +96,6 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
     }
   }
 
-
   private createVideoSwitcherPieceInterface(pieceInterfaceWithRequiredValues: Pick<Tv2PieceInterface, 'id' | 'name'> & Partial<Tv2PieceInterface>, playoutContent: DownstreamKeyerPlayoutContent): Tv2PieceInterface {
     return {
       partId: '',
@@ -127,7 +125,7 @@ export class Tv2VideoMixerConfigurationActionFactory extends ActionFactory {
   }
 
   private createEmptyDownstreamKeyerToggleActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2ToggleDownstreamKeyerAction[] {
-    return blueprintConfiguration.studio.videoMixerBasicConfiguration.downstreamKeyers.map(downstreamKeyer => {
+    return blueprintConfiguration.studio.videoMixerBasicConfiguration.downstreamKeyers.map((downstreamKeyer) => {
       const downstreamKeyerNumber: string = String(downstreamKeyer.index + 1)
       return {
         id: this.sanitizeStringForId(`downstreamKeyer${downstreamKeyerNumber}_toggle_action`),

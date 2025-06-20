@@ -2,38 +2,42 @@ import express, { Express } from 'express'
 import * as http from 'http'
 import { Server } from 'http'
 import WebSocket, { Server as WsServer, WebSocketServer } from 'ws'
-import { Logger } from '../interfaces/logger'
+import { Logger } from '../../application/interfaces/logger'
 import { ActionEventObserver } from '../../../action-system/application/interfaces/action-event-observer'
 import { TriggerEventObserver } from '../../../action-system/application/interfaces/trigger-event-observer'
 import { MacroEventObserver } from '../../../action-system/application/interfaces/macro-event-observer'
-import { ConfigurationEventObserver } from '../../../rundown-execution/application/interfaces/configuration-event-observer'
+import {
+  ConfigurationEventObserver
+} from '../../../rundown-execution/application/interfaces/configuration-event-observer'
 import { MediaEventObserver } from '../../../sofie-ingest/application/interfaces/media-event-observer'
 import { RundownEventObserver } from '../../../rundown-execution/application/interfaces/rundown-event-observer'
-import { StatusMessageEventObserver } from '../interfaces/status-message-event-observer'
+import { StatusMessageEventObserver } from '../../application/interfaces/status-message-event-observer'
 import { ActionEvent } from '../../../action-system/application/value-objects/action-event'
 import { TriggerEvent } from '../../../action-system/application/value-objects/trigger-event'
 import { MacroEvent } from '../../../action-system/application/value-objects/macro-event'
 import { ConfigurationEvent } from '../../../rundown-execution/application/value-objects/configuration-event'
 import { MediaEvent } from '../../../sofie-ingest/application/value-objects/media-event'
 import { RundownEvent } from '../../../rundown-execution/application/value-objects/rundown-event'
-import { StatusMessageEvent } from '../value-objects/status-message-event'
-import { EventServer } from '../../infrastructure/interfaces/event-server'
+import { StatusMessageEvent } from '../../application/value-objects/status-message-event'
+import { EventServer } from '../interfaces/event-server'
 import { DeviceEventObserver } from '../../../rundown-execution/application/interfaces/device-event-observer'
 import { DeviceEvent } from '../../../rundown-execution/application/value-objects/device-event'
-import { TypedEvent } from '../value-objects/typed-event'
-import { NtpEvent } from '../value-objects/ntp-event'
-import { PlayoutContentEventObserver } from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
+import { TypedEvent } from '../../application/value-objects/typed-event'
+import { NtpEvent } from '../../application/value-objects/ntp-event'
+import {
+  PlayoutContentEventObserver
+} from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
 import { PlayoutContentEvent } from '../../../rundown-execution/application/value-objects/playout-content-event'
-import {NtpEventType} from '../enums/ntp-event-type'
+import { NtpEventType } from '../../application/enums/ntp-event-type'
 import { HealthStatusEventObserver } from '../interfaces/health-status-event-observer'
 import { HealthStatusEvent } from '../value-objects/health-status-event'
 
+// TODO: This class could be split up in the transport mechanism and the application use case for propagating events.
 export class WebSocketEventServer implements EventServer {
-
   private readonly logger: Logger
   private webSocketServer?: WebSocket.Server
 
-  constructor(
+  public constructor(
     private readonly rundownEventObserver: RundownEventObserver,
     private readonly actionEventObserver: ActionEventObserver,
     private readonly triggerEventObserver: TriggerEventObserver,

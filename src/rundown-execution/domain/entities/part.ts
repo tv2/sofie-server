@@ -89,7 +89,7 @@ export class Part {
 
   public readonly ingestedPart?: IngestedPart
 
-  constructor(part: PartInterface) {
+  public constructor(part: PartInterface) {
     this.id = part.id
     this.rundownId = part.rundownId
     this.segmentId = part.segmentId
@@ -130,7 +130,7 @@ export class Part {
     const now: number = Date.now()
     this.executedAt = now
     this.playedDuration = 0
-    this.pieces.forEach((piece) => piece.putOnAir(now + piece.getStart()))
+    this.pieces.forEach(piece => piece.putOnAir(now + piece.getStart()))
   }
 
   private assertValidity(operationName: string): void {
@@ -246,7 +246,7 @@ export class Part {
   }
 
   public getPiecesWithLifespan(lifespanFilters: PieceLifespan[]): Piece[] {
-    return this.pieces.filter((piece) => lifespanFilters.includes(piece.pieceLifespan))
+    return this.pieces.filter(piece => lifespanFilters.includes(piece.pieceLifespan))
   }
 
   public getExecutedAt(): number {
@@ -283,7 +283,7 @@ export class Part {
       .reduce((preRollDuration: number, piece: Piece) => Math.max(preRollDuration, piece.preRollDuration ?? 0), 0)
 
     const maxPostRollDurationForPieces: number = this.pieces
-      .filter((piece) => !!piece.postRollDuration && !piece.getDuration())
+      .filter(piece => !!piece.postRollDuration && !piece.getDuration())
       .reduce((postRollDuration: number, piece: Piece) => Math.max(postRollDuration, piece.postRollDuration), 0)
     let inTransition: InTransition | undefined
     let allowTransition: boolean = false
@@ -340,9 +340,9 @@ export class Part {
       delayStartOfPiecesDuration: delayStartOfPiecesDuration + inTransition.delayPiecesDuration,
       postRollDuration: maxPostRollDurationForPieces,
       previousPartContinueIntoPartDuration:
-          delayStartOfPiecesDuration +
-          inTransition.keepPreviousPartAliveDuration +
-          previousPart.getTimings().postRollDuration,
+          delayStartOfPiecesDuration
+          + inTransition.keepPreviousPartAliveDuration
+          + previousPart.getTimings().postRollDuration,
     }
   }
 
@@ -380,11 +380,11 @@ export class Part {
   }
 
   private resetPieces(): void {
-    this.pieces =  [
+    this.pieces = [
       ...this.pieces.filter(piece => piece.isPlanned),
       ...this.replacedPlannedPieces
     ].filter(piece => this.ingestedPart!.ingestedPieces.some(ingestPiece => ingestPiece.id === piece.id))
-      .map(piece => {
+      .map((piece) => {
         const ingestedPiece: IngestedPiece = this.ingestedPart!.ingestedPieces.find(ingestPiece => ingestPiece.id === piece.id)!
         piece.resetFromIngestedPiece(ingestedPiece)
         return piece
@@ -397,7 +397,7 @@ export class Part {
   }
 
   public getUnsyncedCopy(): Part {
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}` })
   }
 
   public updateInTransition(inTransition: InTransition): void {
@@ -442,5 +442,4 @@ export class Part {
     }
     return new Part(partInterface)
   }
-
 }

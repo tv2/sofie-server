@@ -29,7 +29,7 @@ import { PlayoutContentUpdateService } from '../interfaces/playout-content-servi
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly ingestedRundownRepository: IngestedRundownRepository,
     private readonly rundownRepository: RundownRepository,
@@ -102,7 +102,7 @@ export class RundownTimelineService implements RundownService {
   }
 
   private async assertNoRundownIsActive(): Promise<void> {
-    (await this.rundownRepository.getBasicRundowns()).forEach(rundown => {
+    (await this.rundownRepository.getBasicRundowns()).forEach((rundown) => {
       if (rundown.getMode() === RundownMode.ACTIVE) {
         throw new AlreadyActivatedException(`Unable to do action. Rundown ${rundown.name} is already active.`)
       }
@@ -110,7 +110,7 @@ export class RundownTimelineService implements RundownService {
   }
 
   private async assertNoRundownIsInRehearsal(rundownIdExemptFromRehearsalCheck?: string): Promise<void> {
-    (await this.rundownRepository.getBasicRundowns()).forEach(rundown => {
+    (await this.rundownRepository.getBasicRundowns()).forEach((rundown) => {
       if (rundown.id === rundownIdExemptFromRehearsalCheck) {
         return
       }
@@ -184,7 +184,7 @@ export class RundownTimelineService implements RundownService {
     this.emitIfInfinitePiecesHasChanged(rundown, infinitePiecesBeforeTakeNext)
     this.rundownEventEmitter.emitTakeEvent(rundown)
 
-    if (recallPart){
+    if (recallPart) {
       this.rundownEventEmitter.emitPartInsertedAsNextEvent(rundown, recallPart)
     }
 
@@ -219,7 +219,7 @@ export class RundownTimelineService implements RundownService {
 
     try {
       onAirPart = rundown.getActivePart()
-    } catch (error) {
+    } catch {
       // If 'getActivePart()' throws it means that we don't have any active Part yet which means the Take is not blocked - hence we can simply return.
       return
     }
@@ -238,7 +238,7 @@ export class RundownTimelineService implements RundownService {
   private deleteUnsyncedSegments(rundown: Rundown): void {
     rundown.getSegments()
       .filter(segment => segment.isUnsynced() && !segment.isOnAir())
-      .forEach(segment => {
+      .forEach((segment) => {
         rundown.removeUnsyncedSegment(segment)
         this.rundownEventEmitter.emitSegmentDeleted(rundown, segment.id)
       })
@@ -290,7 +290,7 @@ export class RundownTimelineService implements RundownService {
     if (!rundown.isActivePartSet()) {
       return
     }
-    rundown.getActiveSegment().getParts().forEach(part => {
+    rundown.getActiveSegment().getParts().forEach((part) => {
       if (!part.isPlanned && !part.isNext() && part.getExecutedAt() === 0) {
         rundown.removePartFromSegment(part.id)
         this.rundownEventEmitter.emitPartDeleted(rundown, part.getSegmentId(), part.id)

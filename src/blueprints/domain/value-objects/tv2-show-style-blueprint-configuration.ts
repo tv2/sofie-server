@@ -13,9 +13,9 @@ export interface Tv2ShowStyleBlueprintConfiguration {
 }
 
 export interface GraphicsDefault {
-  setupName: { value: string; label: string }
-  schema: { value: string; label: string }
-  design: { value: string; label: string }
+  setupName: { value: string, label: string }
+  schema: { value: string, label: string }
+  design: { value: string, label: string }
 }
 
 export interface GraphicsSetup {
@@ -112,12 +112,12 @@ export enum TransitionEffectType {
 
 export interface Breaker {
   id: string
-  name: string,
+  name: string
   fileName: string
   durationInFrames: number
   startAlpha: number
   endAlpha: number
-  autoNext: boolean,
+  autoNext: boolean
   shouldLoadFirstFrame: boolean
 }
 

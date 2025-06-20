@@ -8,8 +8,7 @@ import { NotFoundException } from '../../../domain/exceptions/not-found-exceptio
 const PIECE_COLLECTION_NAME: string = 'executedPieces' // TODO: Once we control ingest rename to "pieces".
 
 export class MongoPieceRepository extends BaseMongoRepository<MongoPiece> {
-
-  constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
     super(mongoDatabase)
   }
 

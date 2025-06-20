@@ -46,7 +46,7 @@ export class Segment {
 
   private parts: Part[]
 
-  constructor(segment: SegmentInterface) {
+  public constructor(segment: SegmentInterface) {
     this.id = segment.id
     this.rundownId = segment.rundownId
     this.name = segment.name
@@ -148,7 +148,7 @@ export class Segment {
   }
 
   public findNextPartNotOnAir(fromPart: Part): Part {
-    const fromPartIndex: number = this.parts.findIndex((part) => part.id === fromPart.id)
+    const fromPartIndex: number = this.parts.findIndex(part => part.id === fromPart.id)
     if (fromPartIndex === -1) {
       throw new NotFoundException('Part does not exist in Segment')
     }
@@ -178,7 +178,7 @@ export class Segment {
   }
 
   public findPart(partId: string): Part {
-    const part: Part | undefined = this.parts.find((part) => part.id === partId)
+    const part: Part | undefined = this.parts.find(part => part.id === partId)
     if (!part) {
       throw new NotFoundException(`Part "${partId}" does not exist in Segment "${this.id}"`)
     }
@@ -244,7 +244,7 @@ export class Segment {
   }
 
   public getFirstSpanningPieceForEachLayerBeforePart(part: Part, layersToIgnore: Set<string>): Piece[] {
-    const indexOfPart: number = this.parts.findIndex((p) => p.id === part.id)
+    const indexOfPart: number = this.parts.findIndex(p => p.id === part.id)
     return this.getPiecesOnUnusedLayersFromIndexToStart(indexOfPart - 1, layersToIgnore, [
       PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
       PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
@@ -260,7 +260,7 @@ export class Segment {
     const now: number = Date.now()
     return this.parts
       .slice(0, startIndex + 1)
-      .flatMap((part) => part.getPiecesWithLifespan(lifespans))
+      .flatMap(part => part.getPiecesWithLifespan(lifespans))
       .filter(piece => !piece.hasEnded(now))
       .reduceRight(this.createGetPiecesOnUnusedLayersReducer(usedLayers), [])
   }
@@ -285,7 +285,7 @@ export class Segment {
   }
 
   public doesPieceBelongToSegment(piece: Piece): boolean {
-    return this.parts.some((part) => part.id === piece.getPartId())
+    return this.parts.some(part => part.id === piece.getPartId())
   }
 
   public reset(): void {
@@ -323,7 +323,7 @@ export class Segment {
   }
 
   public getUnsyncedCopy(): Segment {
-    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}`})
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this, { id: `${this.id}${UNSYNCED_ID_POSTFIX}` })
   }
 
   public isSegmentUntimed(): boolean {

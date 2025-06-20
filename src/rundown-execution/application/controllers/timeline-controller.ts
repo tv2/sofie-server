@@ -9,7 +9,7 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 
 @RestController('/timelines')
 export class TimelineController extends BaseController {
-  constructor(
+  public constructor(
     private readonly timelineRepository: TimelineRepository,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter

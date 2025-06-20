@@ -22,8 +22,7 @@ import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/p
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
 
 export class Tv2CameraActionFactory extends ActionFactory {
-
-  constructor(
+  public constructor(
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory
   ) {

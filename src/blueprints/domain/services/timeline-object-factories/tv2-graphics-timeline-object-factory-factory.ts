@@ -11,8 +11,7 @@ import {
 import { FrameTimeConverter } from '../frame-time-converter'
 
 export class Tv2GraphicsTimelineObjectFactoryFactory {
-
-  constructor(private readonly assetPathHelper: Tv2AssetPathHelper, private readonly frameTimeConverter: FrameTimeConverter) {}
+  public constructor(private readonly assetPathHelper: Tv2AssetPathHelper, private readonly frameTimeConverter: FrameTimeConverter) {}
 
   public createGraphicsCommandTimelineObjectFactory(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2GraphicsCommandTimelineObjectFactory {
     return this.isUsingHtmlGraphics(blueprintConfiguration)

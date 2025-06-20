@@ -11,7 +11,7 @@ export class BasicRundownDto {
   public readonly modifiedAt: number
   public readonly timing: RundownTiming
 
-  constructor(basicRundown: BasicRundown) {
+  public constructor(basicRundown: BasicRundown) {
     this.id = basicRundown.id
     this.name = basicRundown.name
     this.mode = basicRundown.getMode()

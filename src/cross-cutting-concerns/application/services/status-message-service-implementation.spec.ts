@@ -46,7 +46,7 @@ describe(StatusMessageServiceImplementation.name, () => {
     })
 
     describe('the statusMessage exist in the database', () => {
-      it ('does nothing when the StatusMessage has the same StatusCode and Message as the one in the database', async () => {
+      it('does nothing when the StatusMessage has the same StatusCode and Message as the one in the database', async () => {
         const statusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ statusCode: StatusCode.BAD, message: 'Some message' })
 
         const statusMessageEventEmitter: StatusMessageEventEmitter = mock<StatusMessageEventEmitter>()
@@ -92,13 +92,13 @@ describe(StatusMessageServiceImplementation.name, () => {
 
         it('updates the StatusMessage in the database when the Status is not GOOD',
           async () => {
-            const statusMessageFromDatabase: StatusMessage = EntityTestFactory.createStatusMessage({message: 'Some message'})
+            const statusMessageFromDatabase: StatusMessage = EntityTestFactory.createStatusMessage({ message: 'Some message' })
             const newStatusMessage: StatusMessage = EntityTestFactory.createStatusMessage({ statusCode: StatusCode.BAD, message: 'Some other message' })
 
             const statusMessageRepository: StatusMessageRepository = mock<StatusMessageRepository>()
             when(statusMessageRepository.getStatusMessage(statusMessageFromDatabase.id)).thenReturn(Promise.resolve(statusMessageFromDatabase))
 
-            const testee: StatusMessageService = createTestee({statusMessageRepository})
+            const testee: StatusMessageService = createTestee({ statusMessageRepository })
             await testee.updateStatusMessage(newStatusMessage)
 
             verify(statusMessageRepository.updateStatusMessage(newStatusMessage)).once()
@@ -111,7 +111,7 @@ describe(StatusMessageServiceImplementation.name, () => {
 })
 
 function createTestee(params?: {
-  statusMessageEventEmitter?: StatusMessageEventEmitter,
+  statusMessageEventEmitter?: StatusMessageEventEmitter
   statusMessageRepository?: StatusMessageRepository
 }): StatusMessageService {
   return new StatusMessageServiceImplementation(

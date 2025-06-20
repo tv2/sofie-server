@@ -48,7 +48,7 @@ export enum SystemActionId {
 }
 
 export interface SystemAction extends Action {
-  id: SystemActionId,
+  id: SystemActionId
   type: SystemActionType
   data: unknown
 }
@@ -56,7 +56,7 @@ export interface SystemAction extends Action {
 export interface PartAction extends Action {
   type: PartActionType
   data: {
-    partInterface: PartInterface,
+    partInterface: PartInterface
     pieceInterfaces: PieceInterface[]
   }
 }
@@ -81,7 +81,7 @@ export type MutateActionMethods =
 export enum MutateActionType {
   PIECE = 'PIECE',
   MEDIA = 'MEDIA',
-  HISTORIC_PART= 'HISTORIC_PART',
+  HISTORIC_PART = 'HISTORIC_PART',
   APPLY_ARGUMENTS = 'APPLY_ARGUMENTS',
   CONFIGURATION = 'CONFIGURATION',
   PLAYOUT_CONTENT = 'PLAYOUT_CONTENT'
@@ -100,24 +100,24 @@ export interface MutateActionWithMedia {
 }
 
 export interface MutateActionWithHistoricPartMethods {
-  type: MutateActionType.HISTORIC_PART,
+  type: MutateActionType.HISTORIC_PART
   updateActionWithPartData: (action: Action, historicPart: Part, presentPart: Part | undefined) => Action
   partPredicate: (part: Part) => boolean
 }
 
 export interface MutateActionWithArgumentsMethods {
-  type: MutateActionType.APPLY_ARGUMENTS,
+  type: MutateActionType.APPLY_ARGUMENTS
   updateActionWithArguments: (action: Action, actionArguments: unknown) => Action
 }
 
 export interface MutateActionWithConfiguration {
-  type: MutateActionType.CONFIGURATION,
+  type: MutateActionType.CONFIGURATION
   updateWithConfiguration: (action: Action, configuration: Configuration, showStyleVariantId: string) => Action
 }
 
 export interface MutateActionWithPlayoutContent {
-  type: MutateActionType.PLAYOUT_CONTENT,
-  updateActionWithPlayoutContent: (action: Action, playoutContent: PlayoutContent) => Action,
+  type: MutateActionType.PLAYOUT_CONTENT
+  updateActionWithPlayoutContent: (action: Action, playoutContent: PlayoutContent) => Action
   playoutContentPredicate: (playoutContent: PlayoutContent) => boolean
 }
 

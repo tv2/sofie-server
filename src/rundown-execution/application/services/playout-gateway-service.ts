@@ -5,10 +5,9 @@ import { Logger } from '../../../cross-cutting-concerns/application/interfaces/l
 const PLAYOUT_GATEWAY_HOST: string = process.env.PLAYOUT_GATEWAY_HOST ?? 'localhost:3009'
 
 export class PlayoutGatewayService implements PlayoutService {
-
   private readonly logger: Logger
 
-  constructor(private readonly httpService: HttpService, logger: Logger) {
+  public constructor(private readonly httpService: HttpService, logger: Logger) {
     this.logger = logger.tag(PlayoutGatewayService.name)
   }
 

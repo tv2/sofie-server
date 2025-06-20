@@ -7,8 +7,7 @@ import { TimelineBuilder } from '../interfaces/timeline-builder'
 import { Blueprint } from '../value-objects/blueprint'
 
 export class BlueprintTimelineBuilder implements TimelineBuilder {
-
-  constructor(
+  public constructor(
     private readonly timelineBuilder: TimelineBuilder,
     private readonly configurationRepository: ConfigurationRepository,
     private readonly blueprint: Blueprint

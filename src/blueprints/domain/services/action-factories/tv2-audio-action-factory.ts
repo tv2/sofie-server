@@ -32,10 +32,9 @@ import { OutputChannel } from '../../../../rundown-execution/domain/enums/output
 const AUDIO_BED_ACTION_ID: string = Tv2PieceLayer.AUDIO_BED
 
 export class Tv2AudioActionFactory extends ActionFactory {
-
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly audioBedTimelineObjectFactory: Tv2AudioBedTimelineObjectFactory,
     private readonly frameTimeConverter: FrameTimeConverter,
@@ -187,20 +186,19 @@ export class Tv2AudioActionFactory extends ActionFactory {
     }
   }
 
-
   private createAudioBedActionsFromActionManifests(blueprintConfiguration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2AudioAction[] {
     const audioBedActions: Tv2AudioAction[] = actionManifests
       .filter(this.isAudioBedActionManifest.bind(this))
       .reduce<Tv2AudioAction[]>(
-      (audioBedActions, audioBedActionManifest) => {
-        try {
-          return [...audioBedActions, this.createAudioBedActionFromActionManifest(blueprintConfiguration, audioBedActionManifest)]
-        } catch (error) {
-          this.logger.data(error).warn(`Failed creating audio bed action for action manifest '${audioBedActionManifest.data.name}'.`)
-          return audioBedActions
-        }
-      }, []
-    )
+        (audioBedActions, audioBedActionManifest) => {
+          try {
+            return [...audioBedActions, this.createAudioBedActionFromActionManifest(blueprintConfiguration, audioBedActionManifest)]
+          } catch (error) {
+            this.logger.data(error).warn(`Failed creating audio bed action for action manifest '${audioBedActionManifest.data.name}'.`)
+            return audioBedActions
+          }
+        }, []
+      )
 
     return this.removeDuplicateActions(audioBedActions)
   }
@@ -325,7 +323,7 @@ export class Tv2AudioActionFactory extends ActionFactory {
   private applyFadeArgumentToFadeAction(action: Action, fadeDurationInFrames: unknown): Action {
     const audioAction: Tv2FadeAudioBedAction = action as Tv2FadeAudioBedAction
 
-    const fadeDurationInMilliseconds: number =  this.frameTimeConverter.convertFramesToMilliseconds(this.isInteger(fadeDurationInFrames) ? fadeDurationInFrames : audioAction.metadata.defaultFadeDurationInFrames)
+    const fadeDurationInMilliseconds: number = this.frameTimeConverter.convertFramesToMilliseconds(this.isInteger(fadeDurationInFrames) ? fadeDurationInFrames : audioAction.metadata.defaultFadeDurationInFrames)
     const fadeAudioBedTimelineObjects: Tv2BlueprintTimelineObject[] = [
       this.audioBedTimelineObjectFactory.createFadeAudioBedTimelineObject(fadeDurationInMilliseconds),
       this.audioMixerTimelineObjectFactory.createAudioBedAudioTimelineObject(),

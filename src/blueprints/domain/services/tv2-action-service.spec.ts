@@ -22,7 +22,7 @@ import { Tv2ActionSubtype } from '../value-objects/tv2-action'
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../../rundown-execution/domain/enums/output-channel'
-import {Logger} from '../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2ActionService.name, () => {
   describe(Tv2ActionService.prototype.generateActions.name, () => {
@@ -50,10 +50,14 @@ describe(Tv2ActionService.name, () => {
       describe('when split screen and camera actions fail to be generated', () => {
         it('ignores the failed action types', () => {
           const mockedTv2CameraActionFactory: Tv2CameraActionFactory = mock()
-          when(mockedTv2CameraActionFactory.createCameraActions(anything())).thenCall(() => { throw new Error('Some camera action error.') })
+          when(mockedTv2CameraActionFactory.createCameraActions(anything())).thenCall(() => {
+            throw new Error('Some camera action error.')
+          })
 
           const mockedTv2SplitScreenActionFactory: Tv2SplitScreenActionFactory = mock()
-          when(mockedTv2SplitScreenActionFactory.createSplitScreenActions(anything(), anything())).thenCall(() => { throw new Error('Some split screen action error.') })
+          when(mockedTv2SplitScreenActionFactory.createSplitScreenActions(anything(), anything())).thenCall(() => {
+            throw new Error('Some split screen action error.')
+          })
 
           const testee: Tv2ActionService = createTestee({
             actionFactoryProvider: instance(createMockOfTv2ActionFactoryProvider({
@@ -81,10 +85,14 @@ describe(Tv2ActionService.name, () => {
       describe('when graphics and remote actions fail to be generated', () => {
         it('ignores the failed action types', () => {
           const mockedTv2RemoteActionFactory: Tv2RemoteActionFactory = mock()
-          when(mockedTv2RemoteActionFactory.createRemoteActions(anything())).thenCall(() => { throw new Error('Some remote action error.') })
+          when(mockedTv2RemoteActionFactory.createRemoteActions(anything())).thenCall(() => {
+            throw new Error('Some remote action error.')
+          })
 
           const mockedTv2GraphicsActionFactory: Tv2GraphicsActionFactory = mock()
-          when(mockedTv2GraphicsActionFactory.createGraphicsActions(anything(), anything())).thenCall(() => { throw new Error('Some graphics action error.') })
+          when(mockedTv2GraphicsActionFactory.createGraphicsActions(anything(), anything())).thenCall(() => {
+            throw new Error('Some graphics action error.')
+          })
 
           const testee: Tv2ActionService = createTestee({
             actionFactoryProvider: instance(createMockOfTv2ActionFactoryProvider({
@@ -128,19 +136,18 @@ function createMockOfLogger(): Logger {
   return mockedLogger
 }
 
-
 function createMockOfTv2ActionFactoryProvider(
   mocks: {
-    audioActionFactory?: Tv2AudioActionFactory,
-    cameraActionFactory?: Tv2CameraActionFactory,
-    remoteActionFactory?: Tv2RemoteActionFactory,
-    transitionEffectActionFactory?: Tv2TransitionEffectActionFactory,
-    graphicsActionFactory?: Tv2GraphicsActionFactory,
-    videoClipActionFactory?: Tv2VideoClipActionFactory,
-    videoMixerActionFactory?: Tv2VideoMixerConfigurationActionFactory,
-    splitScreenActionFactory?: Tv2SplitScreenActionFactory,
-    replayActionFactory?: Tv2ReplayActionFactory,
-    robotActionFactory?: Tv2RobotActionFactory,
+    audioActionFactory?: Tv2AudioActionFactory
+    cameraActionFactory?: Tv2CameraActionFactory
+    remoteActionFactory?: Tv2RemoteActionFactory
+    transitionEffectActionFactory?: Tv2TransitionEffectActionFactory
+    graphicsActionFactory?: Tv2GraphicsActionFactory
+    videoClipActionFactory?: Tv2VideoClipActionFactory
+    videoMixerActionFactory?: Tv2VideoMixerConfigurationActionFactory
+    splitScreenActionFactory?: Tv2SplitScreenActionFactory
+    replayActionFactory?: Tv2ReplayActionFactory
+    robotActionFactory?: Tv2RobotActionFactory
   } = {}
 ): Tv2ActionFactoryProvider {
   const mockedActionFactoryProvider: Tv2ActionFactoryProvider = mock<Tv2ActionFactoryProvider>()
@@ -150,10 +157,10 @@ function createMockOfTv2ActionFactoryProvider(
   when(mockedActionFactoryProvider.createTransitionEffectActionFactory(anything())).thenReturn(mocks.transitionEffectActionFactory ?? instance(createMockOfTv2TransitionEffectActionFactory()))
   when(mockedActionFactoryProvider.createGraphicsActionFactory(anything())).thenReturn(mocks.graphicsActionFactory ?? instance(createMockOfTv2GraphicsActionFactory()))
   when(mockedActionFactoryProvider.createVideoClipActionFactory(anything())).thenReturn(mocks.videoClipActionFactory ?? instance(createMockOfTv2VideoClipActionFactory()))
-  when(mockedActionFactoryProvider.createVideoMixerActionFactory(anything())).thenReturn(mocks.videoMixerActionFactory?? instance(createMockOfTv2VideoMixerConfigurationActionFactory()))
-  when(mockedActionFactoryProvider.createSplitScreenActionFactory(anything())).thenReturn(mocks.splitScreenActionFactory?? instance(createMockOfTv2SplitScreenActionFactory()))
-  when(mockedActionFactoryProvider.createReplayActionFactory(anything())).thenReturn(mocks.replayActionFactory?? instance(createMockOfTv2ReplayActionFactory()))
-  when(mockedActionFactoryProvider.createRobotActionFactory(anything())).thenReturn(mocks.robotActionFactory?? instance(createMockOfTv2RobotActionFactory()))
+  when(mockedActionFactoryProvider.createVideoMixerActionFactory(anything())).thenReturn(mocks.videoMixerActionFactory ?? instance(createMockOfTv2VideoMixerConfigurationActionFactory()))
+  when(mockedActionFactoryProvider.createSplitScreenActionFactory(anything())).thenReturn(mocks.splitScreenActionFactory ?? instance(createMockOfTv2SplitScreenActionFactory()))
+  when(mockedActionFactoryProvider.createReplayActionFactory(anything())).thenReturn(mocks.replayActionFactory ?? instance(createMockOfTv2ReplayActionFactory()))
+  when(mockedActionFactoryProvider.createRobotActionFactory(anything())).thenReturn(mocks.robotActionFactory ?? instance(createMockOfTv2RobotActionFactory()))
   return mockedActionFactoryProvider
 }
 

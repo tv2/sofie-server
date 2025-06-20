@@ -12,8 +12,7 @@ interface TimelineObjectsString {
 }
 
 export class MongoRundownBaselineRepository extends BaseMongoRepository<MongoTimeline> implements RundownBaselineRepository {
-
-  constructor(mongoDatabase: MongoDatabase) {
+  public constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
   }
 
@@ -23,9 +22,9 @@ export class MongoRundownBaselineRepository extends BaseMongoRepository<MongoTim
 
   public async getRundownBaseline(rundownId: string): Promise<TimelineObject[]> {
     this.assertDatabaseConnection(this.getRundownBaseline.name)
-    const rundownBaseline: TimelineObjectsString | null = (await this.getCollection().findOne<TimelineObjectsString>({
+    const rundownBaseline: TimelineObjectsString | null = await this.getCollection().findOne<TimelineObjectsString>({
       rundownId,
-    }))
+    })
     if (!rundownBaseline) {
       throw new NotFoundException(`No baseline found for Rundown with id: ${rundownId}`)
     }

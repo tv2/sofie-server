@@ -8,8 +8,7 @@ import { MongoId } from '../../../rundown-execution/infrastructure/repositories/
 const STATUS_MESSAGE_COLLECTION_NAME: string = 'statusMessages'
 
 export class MongoStatusMessageRepository extends BaseMongoRepository<StatusMessage & MongoId> implements StatusMessageRepository {
-
-  constructor(mongoDatabase: MongoDatabase) {
+  public constructor(mongoDatabase: MongoDatabase) {
     super(mongoDatabase)
   }
 

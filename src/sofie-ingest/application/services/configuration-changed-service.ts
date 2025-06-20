@@ -12,10 +12,9 @@ import { ShowStyleVariant } from '../../../rundown-execution/domain/entities/sho
 const CONFIGURATION_STATUS_MESSAGE_ID_PREFIX: string = 'INVALID_CONFIGURATION_'
 
 export class ConfigurationChangedService implements DataChangeService {
-
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly blueprint: Blueprint,
     private readonly statusMessageService: StatusMessageService,
     private readonly configurationRepository: ConfigurationRepository,
@@ -41,7 +40,7 @@ export class ConfigurationChangedService implements DataChangeService {
   private async validateConfiguration(): Promise<void> {
     this.configurationRepository.clearConfigurationCache()
     const configuration: Configuration = await this.configurationRepository.getConfiguration()
-    const statusMessages: StatusMessage[] = this.blueprint.validateConfiguration(configuration).map(statusMessage => {
+    const statusMessages: StatusMessage[] = this.blueprint.validateConfiguration(configuration).map((statusMessage) => {
       return {
         ...statusMessage,
         id: `${CONFIGURATION_STATUS_MESSAGE_ID_PREFIX}${statusMessage.id}` // We need to prefix the id, so we can differentiate the configuration status messages from other status messages.

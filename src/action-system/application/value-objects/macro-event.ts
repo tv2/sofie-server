@@ -1,6 +1,6 @@
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 import { MacroDto } from '../dtos/macro-dto'
-import {MacroEventType} from '../enums/macro-event-type'
+import { MacroEventType } from '../enums/macro-event-type'
 
 export type MacroEvent = MacroCreatedEvent | MacroUpdatedEvent | MacroDeletedEvent
 

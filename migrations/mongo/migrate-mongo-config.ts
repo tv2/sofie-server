@@ -8,7 +8,6 @@ function getMongoDatabaseName(): string {
   return mongoUrlPattern.exec(MONGO_CONNECTION_STRING)?.groups?.databaseName ?? 'meteor'
 }
 
-// eslint-disable-next-line @typescript-eslint/typedef
 const config = {
   mongodb: {
     url: MONGO_CONNECTION_STRING,

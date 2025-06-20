@@ -9,8 +9,7 @@ import { HttpError, HttpErrorCode } from '../../../cross-cutting-concerns/applic
 const INEWS_HOST: string = process.env.INEWS_HOST ?? 'localhost:3007'
 
 export class Tv2INewsIngestService implements IngestService {
-
-  constructor(private readonly httpService: HttpService, private readonly rundownRepository: RundownRepository) {}
+  public constructor(private readonly httpService: HttpService, private readonly rundownRepository: RundownRepository) {}
 
   public async reloadIngestData(rundownId: string): Promise<void> {
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)

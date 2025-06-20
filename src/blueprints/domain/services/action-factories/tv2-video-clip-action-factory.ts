@@ -33,8 +33,7 @@ import { OutputChannel } from '../../../../rundown-execution/domain/enums/output
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
 
 export class Tv2VideoClipActionFactory extends ActionFactory {
-
-  constructor(
+  public constructor(
     private readonly actionManifestMapper: Tv2ActionManifestMapper,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
@@ -65,14 +64,14 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
     }
 
     videoClipAction.data.partInterface.expectedDuration = media?.duration
-      ? Math.max((media.duration * 1000) - videoClipAction.metadata.configuredVideoClipPostRollDuration, 0)
+      ? Math.max(media.duration * 1000 - videoClipAction.metadata.configuredVideoClipPostRollDuration, 0)
       : videoClipAction.data.partInterface.expectedDuration
 
     const mediaPlayerSession: string = `${action.id}_${Date.now()}`
-    videoClipAction.data.pieceInterfaces.map(pieceInterface => {
+    videoClipAction.data.pieceInterfaces.map((pieceInterface) => {
       pieceInterface.metadata.mediaPlayerSessions = [mediaPlayerSession]
 
-      pieceInterface.timelineObjects.map(timelineObject => {
+      pieceInterface.timelineObjects.map((timelineObject) => {
         const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
         blueprintTimelineObject.metaData = {
           ...blueprintTimelineObject.metaData,
@@ -125,7 +124,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       outputLayer: OutputLayer.PROGRAM,
       sisyfosPersistMetaData: {
         sisyfosLayers: [],
-        acceptsPersistedAudio: videoClipData.adLibPix &&  videoClipData.audioMode === AudioMode.VOICE_OVER
+        acceptsPersistedAudio: videoClipData.adLibPix && videoClipData.audioMode === AudioMode.VOICE_OVER
       },
       sourceName: videoClipData.fileName
     }

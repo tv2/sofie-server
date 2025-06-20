@@ -22,7 +22,6 @@ describe(MongoMacroRepository.name, () => {
       collection = mock(Collection<MongoId>)
     })
 
-
     describe('it receives Macro with no id', () => {
       describe('the id is undefined', () => {
         it('saves the Macro with a new UUID', async () => {
@@ -54,8 +53,6 @@ describe(MongoMacroRepository.name, () => {
     })
 
     describe('it receives Macro with pre-existing id', () => {
-
-
       describe('the id is not a valid UUID', () => {
         it('throws an InvalidIdException', async () => {
           const nonValidUuid: string = 'non-valid-uuid'
@@ -107,9 +104,9 @@ describe(MongoMacroRepository.name, () => {
 })
 
 function createTestee(params?: {
-  mongoDatabase?: MongoDatabase,
-  collection?: Collection<MongoId>,
-  uuidGenerator?: UuidGenerator,
+  mongoDatabase?: MongoDatabase
+  collection?: Collection<MongoId>
+  uuidGenerator?: UuidGenerator
 }): MongoMacroRepository {
   return new MongoMacroRepository(
     params?.mongoDatabase ?? getMockDatabase({ collection: params?.collection }),

@@ -14,7 +14,7 @@ import {
   Tv2VideoClipTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-clip-timeline-object-factory'
 import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
-import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
+import { StringHashGenerator } from '../../interfaces/string-hash-generator'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../tv2-blueprint-configuration-test-factory'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
@@ -27,7 +27,7 @@ import { Tv2Action } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../action-system/domain/enums/action-type'
 import { ObjectCloner } from '../../../../cross-cutting-concerns/domain/services/object-cloner'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
-import {Logger} from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 describe(Tv2SplitScreenActionFactory.name, () => {
   describe(Tv2SplitScreenActionFactory.prototype.createSplitScreenActions.name, () => {
@@ -207,7 +207,6 @@ describe(Tv2SplitScreenActionFactory.name, () => {
         })
       ]
 
-
       const result: Tv2Action[] = testee.createSplitScreenActions(blueprintConfiguration, actionManifests)
       const splitScreenActions: Tv2Action[] = result.filter(action => action.type === PartActionType.INSERT_PART_AS_NEXT && action.metadata.playoutContent.type === PlayoutContentType.SPLIT_SCREEN && !action.metadata.actionSubtype)
 
@@ -218,15 +217,15 @@ describe(Tv2SplitScreenActionFactory.name, () => {
 })
 
 function createTestee(params?: {
-  actionManifestMapper?: Tv2ActionManifestMapper,
-  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory,
-  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory,
-  graphicsSplitScreenTimelineObjectFactory?: Tv2GraphicsSplitScreenTimelineObjectFactory,
-  videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory,
-  stringHashConverter?: Tv2StringHashConverter,
-  assetPathHelper?: Tv2AssetPathHelper,
-  objectCloner?: ObjectCloner,
-  logger?: Logger,
+  actionManifestMapper?: Tv2ActionManifestMapper
+  videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
+  audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
+  graphicsSplitScreenTimelineObjectFactory?: Tv2GraphicsSplitScreenTimelineObjectFactory
+  videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory
+  stringHashConverter?: StringHashGenerator
+  assetPathHelper?: Tv2AssetPathHelper
+  objectCloner?: ObjectCloner
+  logger?: Logger
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
     params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfLogger())),
@@ -234,7 +233,7 @@ function createTestee(params?: {
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.graphicsSplitScreenTimelineObjectFactory ?? instance(mock<Tv2GraphicsSplitScreenTimelineObjectFactory>()),
     params?.videoClipTimelineObjectFactory ?? instance(mock<Tv2VideoClipTimelineObjectFactory>()),
-    params?.stringHashConverter ?? new Tv2StringHashConverter(),
+    params?.stringHashConverter ?? instance(createMockOfStringHashGenerator()),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
     params?.objectCloner ?? instance(mock<ObjectCloner>()),
     params?.logger ?? instance(createMockOfLogger()),
@@ -304,4 +303,10 @@ function createConfiguredBlueprintConfiguration(): Tv2BlueprintConfiguration {
       ]
     }
   })
+}
+
+function createMockOfStringHashGenerator(): StringHashGenerator {
+  const mockedStringHashGenerator: StringHashGenerator = mock()
+  when(mockedStringHashGenerator.getHashedValue(anything())).thenCall(text => text)
+  return mockedStringHashGenerator
 }

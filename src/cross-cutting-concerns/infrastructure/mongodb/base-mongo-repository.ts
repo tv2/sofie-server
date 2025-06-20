@@ -4,7 +4,6 @@ import { DatabaseNotConnectedException } from '../../../rundown-execution/domain
 import { MongoId } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 
 export abstract class BaseMongoRepository<Model extends MongoId> {
-
   protected constructor(protected mongoDatabase: MongoDatabase) {}
 
   protected abstract getCollectionName(): string

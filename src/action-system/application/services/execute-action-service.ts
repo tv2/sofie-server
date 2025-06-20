@@ -180,7 +180,7 @@ const SYSTEM_ACTIONS: SystemAction[] = [
 ]
 
 export class ExecuteActionService implements ActionService {
-  constructor(
+  public constructor(
     private readonly actionRepository: ActionRepository,
     private readonly rundownRepository: RundownRepository,
     private readonly mediaRepository: MediaRepository,
@@ -190,7 +190,7 @@ export class ExecuteActionService implements ActionService {
     private readonly playoutContentService: PlayoutContentReadService
   ) {}
 
-  public async getActionsForRundown(rundownId :string): Promise<Action[]> {
+  public async getActionsForRundown(rundownId: string): Promise<Action[]> {
     return [
       ...rundownId === SYSTEM_ACTIONS_ID ? SYSTEM_ACTIONS : [],
       ...await this.actionRepository.getActionsForRundown(rundownId)
@@ -372,7 +372,7 @@ export class ExecuteActionService implements ActionService {
 
   private mutateActionWithPlayoutContent(mutateActionMethods: MutateActionWithPlayoutContent, action: Action): Action {
     const playoutContent: PlayoutContent | undefined = this.playoutContentService.getProgramPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
-    ?? this.playoutContentService.getPreviewPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
+      ?? this.playoutContentService.getPreviewPlayoutContentState().find(playoutContent => mutateActionMethods.playoutContentPredicate(playoutContent))
 
     if (!playoutContent) {
       return action

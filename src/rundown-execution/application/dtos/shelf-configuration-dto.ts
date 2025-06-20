@@ -6,7 +6,7 @@ export class ShelfConfigurationDto {
   public readonly staticActionIds: string[]
   public readonly shouldShowShelf: boolean
 
-  constructor(shelfConfiguration: ShelfConfiguration) {
+  public constructor(shelfConfiguration: ShelfConfiguration) {
     this.id = shelfConfiguration.id
     this.actionPanelConfigurations = shelfConfiguration.actionPanelConfigurations.map(actionPanelConfiguration => new ShelfActionPanelConfigurationDto(actionPanelConfiguration))
     this.staticActionIds = shelfConfiguration.staticActionIds
@@ -20,7 +20,7 @@ export class ShelfActionPanelConfigurationDto {
   public readonly rank: number
   public readonly actionFilter: unknown
 
-  constructor(shelfActionPanelConfiguration: ShelfActionPanelConfiguration) {
+  public constructor(shelfActionPanelConfiguration: ShelfActionPanelConfiguration) {
     this.id = shelfActionPanelConfiguration.id
     this.name = shelfActionPanelConfiguration.name
     this.rank = shelfActionPanelConfiguration.rank

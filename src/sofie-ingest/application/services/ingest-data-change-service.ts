@@ -43,13 +43,12 @@ interface DeletedSegmentInfo {
 const SYNCHRONIZE_DEBOUNCE_DELAY_IN_MS: number = 600
 
 export class IngestDataChangeService implements DataChangeService {
-
   private isSynchronizing: boolean = false
   private dataChangeEventDebounceTimerId?: NodeJS.Timeout
   private readonly affectedRundownIds: Set<string> = new Set()
   private readonly logger: Logger
 
-  constructor(
+  public constructor(
     private readonly ingestedRundownRepository: IngestedRundownRepository,
     private readonly rundownRepository: RundownRepository,
     private readonly rundownLock: AsyncLock,
@@ -76,10 +75,10 @@ export class IngestDataChangeService implements DataChangeService {
 
     this.segmentChangedListener.onCreated(segment => this.registerChangeForRundown(segment.rundownId))
     this.segmentChangedListener.onUpdated(segment => this.registerChangeForRundown(segment.rundownId))
-    this.segmentChangedListener.onDeleted(segmentId => {
+    this.segmentChangedListener.onDeleted((segmentId) => {
       this.segmentRepository.getSegment(segmentId)
         .then(segment => this.registerChangeForRundown(segment.rundownId))
-        .catch(error => {
+        .catch((error) => {
           this.logger.data(error).error(`Failed getting segment with id '${segmentId}' for delete segment event.`)
           this.markAllRundownsAsAffected().catch(error => this.logger.data(error).error(`Failed marking all rundowns as affected when deletion of the segment with id '${segmentId}' failed.`))
         })
@@ -87,10 +86,10 @@ export class IngestDataChangeService implements DataChangeService {
 
     this.partChangedListener.onCreated(part => this.registerChangeForRundown(part.rundownId))
     this.partChangedListener.onUpdated(part => this.registerChangeForRundown(part.rundownId))
-    this.partChangedListener.onDeleted(partId => {
+    this.partChangedListener.onDeleted((partId) => {
       this.partRepository.getPart(partId)
         .then(part => this.registerChangeForRundown(part.rundownId))
-        .catch(error => {
+        .catch((error) => {
           this.logger.data(error).warn(`Failed getting part with id '${partId}' for deleted part event. Marking all rundowns as affected.`)
           this.markAllRundownsAsAffected().catch(error => this.logger.data(error).error(`Failed marking all rundowns as affected when deletion of the part with id '${partId}' failed.`))
         })
@@ -98,10 +97,10 @@ export class IngestDataChangeService implements DataChangeService {
 
     this.pieceChangedListener.onCreated(piece => this.registerChangeForRundown(piece.rundownId))
     this.pieceChangedListener.onUpdated(piece => this.registerChangeForRundown(piece.rundownId))
-    this.pieceChangedListener.onDeleted(pieceId => {
+    this.pieceChangedListener.onDeleted((pieceId) => {
       this.pieceRepository.getPiece(pieceId)
         .then(piece => this.registerChangeForRundown(piece.rundownId))
-        .catch(error => {
+        .catch((error) => {
           this.logger.data(error).error(`Failed getting piece with id '${pieceId}' for deleted piece event.`)
           this.markAllRundownsAsAffected().catch(error => this.logger.data(error).error(`Failed marking all rundowns as affected when deletion of the piece with id '${pieceId}' failed.`))
         })
@@ -119,7 +118,6 @@ export class IngestDataChangeService implements DataChangeService {
       this.dataChangeEventDebounceTimerId = undefined
       this.synchronizeAffectedRundowns().catch(error => this.logger.data(error).error('Failed synchronizing one or more affected rundowns.'))
     }, SYNCHRONIZE_DEBOUNCE_DELAY_IN_MS)
-
   }
 
   private async synchronizeAffectedRundowns(): Promise<void> {
@@ -142,7 +140,7 @@ export class IngestDataChangeService implements DataChangeService {
       this.logger.debug(`Starting to synchronize rundown with id '${rundownId}'.`)
       await this.synchronizeRundown(rundownId)
       const timeSpentInMs: number = Number(process.hrtime.bigint() - startTime) / 1_000_000
-      this.logger.trace(`Synchronizing changes for rundown with id '${ rundownId }' took ${ timeSpentInMs }ms.`)
+      this.logger.trace(`Synchronizing changes for rundown with id '${rundownId}' took ${timeSpentInMs}ms.`)
     } catch (error) {
       this.logger.data(error).error(`Failed synchronizing changes for rundown with id '${rundownId}'.`)
     }
@@ -189,13 +187,13 @@ export class IngestDataChangeService implements DataChangeService {
 
   private async synchronizeRundown(rundownId: string): Promise<void> {
     await this.rundownLock.withLock(this.synchronizeRundown.name, async () => {
-      const rundown: Rundown | undefined = await this.rundownRepository.getRundown(rundownId).catch(error => {
+      const rundown: Rundown | undefined = await this.rundownRepository.getRundown(rundownId).catch((error) => {
         if (error instanceof NotFoundException) {
           return undefined
         }
         throw error
       })
-      const ingestedRundown: IngestedRundown | undefined = await this.ingestedRundownRepository.getIngestedRundown(rundownId).catch(error => {
+      const ingestedRundown: IngestedRundown | undefined = await this.ingestedRundownRepository.getIngestedRundown(rundownId).catch((error) => {
         if (error instanceof NotFoundException) {
           return undefined
         }
@@ -270,7 +268,7 @@ export class IngestDataChangeService implements DataChangeService {
   }
 
   private applyRundownSynchronizeResult(rundown: Rundown, rundownSynchronizeResult: RundownSynchronizeResult): DeletedInfo {
-    const deletedSegmentsInfo: DeletedSegmentInfo[] = rundownSynchronizeResult.deletedSegments.map(segment => {
+    const deletedSegmentsInfo: DeletedSegmentInfo[] = rundownSynchronizeResult.deletedSegments.map((segment) => {
       const originalSegmentId: string = segment.id
       const deletedSegment: Segment | undefined = rundown.removeSegment(segment.id)
       return {
@@ -281,7 +279,7 @@ export class IngestDataChangeService implements DataChangeService {
     rundownSynchronizeResult.createdSegments.forEach(segment => rundown.addSegment(segment))
     rundownSynchronizeResult.updatedSegments.forEach(segment => rundown.updateSegment(segment))
 
-    const deletedPartsInfo: DeletedPartInfo[] = rundownSynchronizeResult.deletedParts.map(part => {
+    const deletedPartsInfo: DeletedPartInfo[] = rundownSynchronizeResult.deletedParts.map((part) => {
       const originalPartId: string = part.id
       const originalSegmentId: string = part.getSegmentId()
       const deletedPart: Part | undefined = rundown.removePartFromSegment(part.id)
@@ -302,18 +300,18 @@ export class IngestDataChangeService implements DataChangeService {
       this.rundownEventEmitter.emitRundownUpdated(rundownSynchronizeResult.updatedRundown)
     }
     deletedInfo.deletedSegmentsInfo.filter((deletedSegmentInfo): deletedSegmentInfo is Required<DeletedSegmentInfo> => deletedSegmentInfo.segment !== undefined)
-      .forEach(({ segment, originalSegmentId }) => {
+      .forEach(({ segment, originalSegmentId }) =>
         segment.isUnsynced() ? this.rundownEventEmitter.emitSegmentUnsynced(rundown, segment, originalSegmentId) : this.rundownEventEmitter.emitSegmentDeleted(rundown, originalSegmentId)
-      })
+      )
     rundownSynchronizeResult.createdSegments.forEach(segment => this.rundownEventEmitter.emitSegmentCreated(rundown, segment))
     rundownSynchronizeResult.updatedSegments.forEach(segment => this.rundownEventEmitter.emitSegmentUpdated(rundown, segment))
 
     const updatedSegmentIds: ReadonlySet<string> = new Set(rundownSynchronizeResult.updatedSegments.map(segment => segment.id))
     deletedInfo.deletedPartsInfo
       .filter((deletedPartInfo): deletedPartInfo is Required<DeletedPartInfo> => deletedPartInfo.part !== undefined && !updatedSegmentIds.has(deletedPartInfo.part.getSegmentId()))
-      .forEach(({ part, originalSegmentId, originalPartId }) => {
+      .forEach(({ part, originalSegmentId, originalPartId }) =>
         part.isUnsynced() ? this.rundownEventEmitter.emitPartUnsynced(rundown, part, originalPartId) : this.rundownEventEmitter.emitPartDeleted(rundown, originalSegmentId, originalPartId)
-      })
+      )
     rundownSynchronizeResult.createdParts.filter(part => !updatedSegmentIds.has(part.getSegmentId())).forEach(part => this.rundownEventEmitter.emitPartCreated(rundown, part))
     rundownSynchronizeResult.updatedParts.filter(part => !updatedSegmentIds.has(part.getSegmentId())).forEach(part => this.rundownEventEmitter.emitPartUpdated(rundown, part))
   }

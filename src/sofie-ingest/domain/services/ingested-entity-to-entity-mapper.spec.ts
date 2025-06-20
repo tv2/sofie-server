@@ -20,7 +20,6 @@ describe(IngestedEntityToEntityMapper.name, () => {
 
         const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
 
-
         const result: Segment = testee.updateSegmentWithIngestedSegment(segment, ingestedSegment)
 
         expect(segment.getParts()).toEqual([
@@ -59,10 +58,10 @@ describe(IngestedEntityToEntityMapper.name, () => {
 
         expect(segment.getParts()).toEqual(parts.map(part => expect.objectContaining({ id: part.id })))
 
-        result.getParts().forEach(((part, partIndex, newParts) => {
-          const previousRank: number = partIndex > 0 ? newParts[partIndex-1].getRank() : 0
+        result.getParts().forEach((part, partIndex, newParts) => {
+          const previousRank: number = partIndex > 0 ? newParts[partIndex - 1].getRank() : 0
           expect(part.getRank()).toBeGreaterThanOrEqual(previousRank)
-        }))
+        })
       })
     })
   })
@@ -89,7 +88,7 @@ describe(IngestedEntityToEntityMapper.name, () => {
         const pieceId: string = 'somePieceId'
         const oldPieceName: string = 'oldPieceName'
         const partToBeUpdated: Part = EntityTestFactory.createPart({
-          pieces: [EntityTestFactory.createPiece({ id: pieceId, name: oldPieceName})]
+          pieces: [EntityTestFactory.createPiece({ id: pieceId, name: oldPieceName })]
         })
 
         const newPieceName: string = 'newPieceName'
@@ -98,7 +97,7 @@ describe(IngestedEntityToEntityMapper.name, () => {
           name: newPieceName
         } as IngestedPiece
         const ingestedPart: IngestedPart = {
-          ingestedPieces: [updatedPiece] as Readonly<IngestedPiece[]>
+          ingestedPieces: [updatedPiece] as readonly IngestedPiece[]
         } as IngestedPart
 
         const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
@@ -115,7 +114,7 @@ describe(IngestedEntityToEntityMapper.name, () => {
           pieces: [EntityTestFactory.createPiece()]
         })
         const ingestedPart: IngestedPart = {
-          ingestedPieces: [] as Readonly<IngestedPiece[]>
+          ingestedPieces: [] as readonly IngestedPiece[]
         } as IngestedPart
 
         const testee: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
