@@ -305,6 +305,7 @@ async function main(logger: Logger): Promise<void> {
   const statusMessageService: StatusMessageService = new StatusMessageServiceImplementation(statusMessageEventService, statusMessageRepository)
   const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, mongoEntityConverter, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
+  const gateway: GatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
 
   // Controller setup
   const httpResponseFormatter: JsendResponseFormatter = new JsendResponseFormatter()
@@ -334,11 +335,8 @@ async function main(logger: Logger): Promise<void> {
   await configurationDataChangeService.initialize()
   await restServer.start(3005)
   await eventServer.startServer(3006)
-  logger.info('Alba server is configured.')
-
-  // TODO: Place correctly in the structure.
-  const gateway: GatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
   gateway.connect()
+  logger.info('Alba server is configured.')
 }
 
 function createRundownAggregateRepository(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter, logger: Logger): RundownAggregateRepository {
