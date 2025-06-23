@@ -4,7 +4,6 @@ import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { StatusCode } from '../../../../cross-cutting-concerns/domain/enums/status-code'
-import { StatusMessage } from '../../../../cross-cutting-concerns/domain/entities/status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
 import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
@@ -212,16 +211,6 @@ export class EntityTestFactory {
       isConnected: false,
       type: DeviceType.ABSTRACT,
       ...device
-    }
-  }
-
-  public static createStatusMessage(statusMessage: Partial<StatusMessage> = {}): StatusMessage {
-    return {
-      id: 'statusMessageId',
-      title: 'statusMessageTitle',
-      message: 'someMessage',
-      statusCode: StatusCode.UNKNOWN,
-      ...statusMessage
     }
   }
 
