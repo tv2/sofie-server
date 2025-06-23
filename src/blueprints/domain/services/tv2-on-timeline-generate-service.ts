@@ -10,7 +10,7 @@ import { UnsupportedOperationException } from '../../../cross-cutting-concerns/d
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2MediaPlayer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../../rundown-execution/domain/entities/timeline'
-import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../sofie-ingest/domain/enums/device-type'
 import {
   AtemAuxTimelineObject,
   AtemMixEffectTimelineObject,

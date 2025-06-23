@@ -1,8 +1,8 @@
 import { Media } from '../../../domain/entities/media'
-import { CoreDevice } from '../../../../rundown-execution/domain/entities/device'
+import { CoreDevice } from '../../../domain/entities/device'
 import { StatusCode } from '../../../../cross-cutting-concerns/domain/enums/status-code'
 import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../domain/enums/device-type'
 
 export interface MongoMedia extends MongoId {
   mediaId: string

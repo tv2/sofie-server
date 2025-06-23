@@ -12,7 +12,7 @@ import {
   Tv2VizPilotGraphics,
   VideoMixerType
 } from '../value-objects/tv2-studio-blueprint-configuration'
-import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../sofie-ingest/domain/enums/device-type'
 
 interface CoreStudioBlueprintConfiguration {
   SourcesCam: CoreSourceMappingWithSound[] // Cameras

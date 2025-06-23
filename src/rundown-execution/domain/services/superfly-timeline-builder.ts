@@ -22,7 +22,7 @@ import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exc
 import { ErrorCode } from '../../../cross-cutting-concerns/domain/enums/error-code'
 import { Timeline } from '../entities/timeline'
 import { MisconfigurationException } from '../../../cross-cutting-concerns/domain/exceptions/misconfiguration-exception'
-import { DeviceType } from '../enums/device-type'
+import { DeviceType } from '../../../sofie-ingest/domain/enums/device-type'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'

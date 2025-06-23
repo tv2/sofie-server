@@ -141,12 +141,12 @@ import { StatusMessageRepository } from './cross-cutting-concerns/domain/reposit
 import {
   MongoStatusMessageRepository
 } from './cross-cutting-concerns/infrastructure/mongodb/mongo-status-message-repository'
-import { DeviceController } from './rundown-execution/application/controllers/device-controller'
-import { VideoMixerDeviceRepository } from './rundown-execution/domain/repositories/video-mixer-device-repository'
+import { DeviceController } from './sofie-ingest/application/controllers/device-controller'
+import { VideoMixerDeviceRepository } from './sofie-ingest/domain/repositories/video-mixer-device-repository'
 import {
   MongoVideoMixerDeviceRepository
-} from './rundown-execution/infrastructure/repositories/mongodb/mongo-video-mixer-device-repository'
-import { DeviceEventService } from './rundown-execution/application/services/device-event-service'
+} from './sofie-ingest/infrastructure/repositories/mongodb/mongo-video-mixer-device-repository'
+import { DeviceEventService } from './sofie-ingest/application/services/device-event-service'
 import { MacroController } from './action-system/application/controllers/macro-controller'
 import { MacroService } from './action-system/application/interfaces/macro-service'
 import { MacroServiceImplementation } from './action-system/application/services/macro-service-implementation'
@@ -193,18 +193,18 @@ import {
 import { MediaDatabaseChangedService } from './sofie-ingest/application/services/media-database-changed-service'
 import {
   MongoDeviceChangedListener
-} from './rundown-execution/infrastructure/repositories/mongodb/mongo-device-changed-listener'
+} from './sofie-ingest/infrastructure/repositories/mongodb/mongo-device-changed-listener'
 import {
   MongoMediaChangedListener
 } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-media-changed-listener'
 import { MediaEventEmitter } from './sofie-ingest/application/interfaces/media-event-emitter'
 import { DeviceChangedService } from './sofie-ingest/application/services/device-changed-service'
-import { DeviceRepository } from './rundown-execution/domain/repositories/device-repository'
+import { DeviceRepository } from './sofie-ingest/domain/repositories/device-repository'
 import { StatusMessageService } from './cross-cutting-concerns/application/interfaces/status-message-service'
 import {
   StatusMessageServiceImplementation
 } from './cross-cutting-concerns/application/services/status-message-service-implementation'
-import { MongoDeviceRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-device-repository'
+import { MongoDeviceRepository } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-device-repository'
 import { ConfigurationChangedService } from './sofie-ingest/application/services/configuration-changed-service'
 import {
   MongoShowStyleChangedListener
@@ -269,7 +269,6 @@ async function main(logger: Logger): Promise<void> {
   const rundownExecutionEventBuilder: RundownExecutionEventBuilder = new RundownExecutionEventBuilder()
   const rundownEventService: RundownEventService = new RundownEventService(rundownExecutionEventBuilder)
   const configurationEventService: ConfigurationEventService = new ConfigurationEventService(rundownExecutionEventBuilder)
-  const deviceEventService: DeviceEventService = new DeviceEventService(rundownExecutionEventBuilder)
   const playoutContentEventService: PlayoutContentEventService = new PlayoutContentEventService(rundownExecutionEventBuilder)
 
   const crossCuttingConcernsEventBuilder: CrossCuttingConcernsEventBuilder = new CrossCuttingConcernsEventBuilder()
@@ -282,6 +281,7 @@ async function main(logger: Logger): Promise<void> {
 
   const sofieIngestEventBuilder: SofieIngestEventBuilder = new SofieIngestEventBuilder()
   const mediaEventService: MediaEventService = new MediaEventService(sofieIngestEventBuilder)
+  const deviceEventService: DeviceEventService = new DeviceEventService(sofieIngestEventBuilder)
 
   // Data change listeners
   const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService)

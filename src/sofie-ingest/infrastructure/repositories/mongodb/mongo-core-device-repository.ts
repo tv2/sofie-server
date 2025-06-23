@@ -4,7 +4,7 @@ import { DeviceRepository } from '../../../domain/repositories/device-repository
 import { CoreDevice } from '../../../domain/entities/device'
 import {
   MongoCoreDevice, SofieIngestMongoEntityConverter
-} from '../../../../sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
+} from './sofie-ingest-mongo-entity-converter'
 import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'

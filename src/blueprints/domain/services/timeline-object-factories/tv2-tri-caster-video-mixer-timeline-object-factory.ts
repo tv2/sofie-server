@@ -25,7 +25,7 @@ import {
   TriCasterTransition,
   TriCasterType
 } from '../../value-objects/timeline-state-resolver-types/tri-caster-type'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import { AtemSourceIndex } from '../../value-objects/timeline-state-resolver-types/atem-types'
 import { AtemToTriCasterSplitScreenConverter } from '../atem-to-tricaster-split-screen-converter'
 import { TimelineObject, TimelineObjectMetadata } from '../../../../rundown-execution/domain/entities/timeline-object'

@@ -6,7 +6,7 @@ import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exc
 import { CoreDevice } from '../../../domain/entities/device'
 import {
   MongoCoreDevice
-} from '../../../../sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
+} from './sofie-ingest-mongo-entity-converter'
 
 const DEVICE_COLLECTION_NAME: string = 'externalDevices'
 

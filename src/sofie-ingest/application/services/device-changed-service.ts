@@ -4,9 +4,9 @@ import { StatusMessage } from '../../../cross-cutting-concerns/domain/entities/s
 import { StatusCode } from '../../../cross-cutting-concerns/domain/enums/status-code'
 import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 import { StatusMessageService } from '../../../cross-cutting-concerns/application/interfaces/status-message-service'
-import { DeviceRepository } from '../../../rundown-execution/domain/repositories/device-repository'
-import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
-import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
+import { DeviceRepository } from '../../domain/repositories/device-repository'
+import { DeviceType } from '../../domain/enums/device-type'
+import { CoreDevice } from '../../domain/entities/device'
 
 // TODO: Find a way to translate
 const NOT_CONNECTED_MESSAGE: string = 'Not connected'

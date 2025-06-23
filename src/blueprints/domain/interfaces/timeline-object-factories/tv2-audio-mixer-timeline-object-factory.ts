@@ -1,7 +1,7 @@
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2VideoClipManifestData } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2SourceMappingWithAudio } from '../../value-objects/tv2-studio-blueprint-configuration'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
 import { AudioMode } from '../../../../rundown-execution/domain/enums/audio-mode'
 

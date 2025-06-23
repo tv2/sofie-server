@@ -11,7 +11,7 @@ import {
   VizType
 } from '../../value-objects/timeline-state-resolver-types/viz-types'
 import { Tv2GraphicsLayer } from '../../value-objects/tv2-layers'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import {
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData

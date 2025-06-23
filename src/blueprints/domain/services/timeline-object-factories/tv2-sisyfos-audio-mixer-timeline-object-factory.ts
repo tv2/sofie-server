@@ -7,7 +7,7 @@ import {
   SisyfosType
 } from '../../value-objects/timeline-state-resolver-types/sisyfos-types'
 import { Tv2SisyfosLayer } from '../../value-objects/tv2-layers'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../value-objects/timeline-state-resolver-types/abstract-types'
 import { Tv2VideoClipManifestData } from '../../value-objects/tv2-action-manifest-data'

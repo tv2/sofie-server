@@ -7,7 +7,7 @@ import { Logger } from '../../../../cross-cutting-concerns/application/interface
 import { CoreDevice } from '../../../domain/entities/device'
 import {
   MongoCoreDevice, SofieIngestMongoEntityConverter
-} from '../../../../sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
+} from './sofie-ingest-mongo-entity-converter'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 

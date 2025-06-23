@@ -1,6 +1,6 @@
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2GraphicsElementTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-graphics-element-timeline-object-factory'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import {
   CasparCgMediaTimelineObject,
   CasparCgTemplateTimelineObject,
