@@ -1,4 +1,4 @@
-import { DataChangeService } from '../../../rundown-execution/application/interfaces/data-change-service'
+import { DataChangeService } from '../interfaces/data-change-service'
 import { IngestRundownSynchronizer, RundownSynchronizeResult } from './ingest-rundown-synchronizer'
 import { DataChangedListener } from '../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
