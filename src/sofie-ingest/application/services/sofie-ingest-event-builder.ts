@@ -1,5 +1,5 @@
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
-import { Media } from '../../../rundown-execution/domain/entities/media'
+import { Media } from '../../domain/entities/media'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
 import { MediaEventType } from '../enums/media-event-type'
 import { MediaDto } from '../../../rundown-execution/application/dtos/media-dto'

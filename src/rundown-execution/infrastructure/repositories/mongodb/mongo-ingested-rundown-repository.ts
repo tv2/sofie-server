@@ -1,8 +1,5 @@
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import {
-  MongoIngestedEntityConverter,
-  MongoIngestedRundown,
-} from './mongo-ingested-entity-converter'
+import { MongoIngestedEntityConverter, MongoIngestedRundown, } from './mongo-ingested-entity-converter'
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { IngestedRundownRepository } from '../../../../sofie-ingest/domain/repositories/ingested-rundown-repository'
 import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'

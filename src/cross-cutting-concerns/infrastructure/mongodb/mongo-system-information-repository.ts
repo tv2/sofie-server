@@ -2,13 +2,16 @@ import { SystemInformation } from '../../domain/value-objects/system-information
 import { SystemInformationRepository } from '../../domain/repositories/system-information-repository'
 import { BaseMongoRepository } from './base-mongo-repository'
 import { MongoDatabase } from './mongo-database'
-import { MongoEntityConverter, MongoSystemInformation } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { NotFoundException } from '../../domain/exceptions/not-found-exception'
+import {
+  CrossCuttingConcernsMongoEntityConverter,
+  MongoSystemInformation
+} from './cross-cutting-concerns-mongo-entity-converter'
 
 const SYSTEM_INFORMATION_COLLECTION_NAME: string = 'coreSystem'
 
 export class MongoSystemInformationRepository extends BaseMongoRepository<MongoSystemInformation> implements SystemInformationRepository {
-  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly crossCuttingConcernsMongoEntityConverter: CrossCuttingConcernsMongoEntityConverter) {
     super(mongoDatabase)
   }
 
@@ -21,6 +24,6 @@ export class MongoSystemInformationRepository extends BaseMongoRepository<MongoS
     if (!mongoSystemInformation) {
       throw new NotFoundException('No SystemInformation found. Has Alba been set up correctly?')
     }
-    return this.mongoEntityConverter.convertSystemInformation(mongoSystemInformation)
+    return this.crossCuttingConcernsMongoEntityConverter.convertSystemInformation(mongoSystemInformation)
   }
 }

@@ -5,7 +5,7 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 import { UnsupportedOperationException } from '../../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
-import { MongoShowStyle } from './mongo-entity-converter'
+import { MongoShowStyle } from './rundown-execution-mongo-entity-converter'
 
 const SHOW_STYLE_COLLECTION_NAME: string = 'showStyleBases'
 

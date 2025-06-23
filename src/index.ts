@@ -6,7 +6,6 @@ import {
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-rundown-aggregate-repository'
 import { MongoSegmentRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-segment-repository'
 import { MongoPieceRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-piece-repository'
-import { MongoEntityConverter } from './rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { MongoPartRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-part-repository'
 import {
   MongoExpectedPlayoutItemRepository
@@ -221,6 +220,18 @@ import {
 } from './rundown-execution/infrastructure/repositories/cache/cached-configuration-repository'
 import { StringHashGenerator } from './blueprints/domain/interfaces/string-hash-generator'
 import { CryptoStringHashGenerator } from './blueprints/infrastructure/services/crypto-string-hash-generator'
+import {
+  RundownExecutionMongoEntityConverter
+} from './rundown-execution/infrastructure/repositories/mongodb/rundown-execution-mongo-entity-converter'
+import {
+  CrossCuttingConcernsMongoEntityConverter
+} from './cross-cutting-concerns/infrastructure/mongodb/cross-cutting-concerns-mongo-entity-converter'
+import {
+  ActionSystemMongoEntityConverter
+} from './action-system/infrastructure/repositories/mongodb/action-system-mongo-entity-converter'
+import {
+  SofieIngestMongoEntityConverter
+} from './sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -230,22 +241,26 @@ async function main(logger: Logger): Promise<void> {
 
   // Repository setup
   const mongoDatabase: MongoDatabase = new MongoDatabase(logger)
-  const mongoEntityConverter: MongoEntityConverter = new MongoEntityConverter(logger)
 
-  const systemInformationRepository: SystemInformationRepository = new MongoSystemInformationRepository(mongoDatabase, mongoEntityConverter)
+  const mongoCrossCuttingConcernsEntityConverter: CrossCuttingConcernsMongoEntityConverter = new CrossCuttingConcernsMongoEntityConverter()
+  const systemInformationRepository: SystemInformationRepository = new MongoSystemInformationRepository(mongoDatabase, mongoCrossCuttingConcernsEntityConverter)
   const statusMessageRepository: StatusMessageRepository = new MongoStatusMessageRepository(mongoDatabase)
 
-  const rundownAggregateRepository: RundownAggregateRepository = createRundownAggregateRepository(mongoDatabase, mongoEntityConverter, logger)
+  const mongoRundownExecutionEntityConverter: RundownExecutionMongoEntityConverter = new RundownExecutionMongoEntityConverter(logger)
+  const rundownAggregateRepository: RundownAggregateRepository = createRundownAggregateRepository(mongoDatabase, mongoRundownExecutionEntityConverter, logger)
   const rundownBaselineRepository: RundownBaselineRepository = new MongoRundownBaselineRepository(mongoDatabase)
-  const deviceRepository: DeviceRepository = new MongoDeviceRepository(mongoDatabase, uuidGenerator)
-  const ingestedRundownRepository: IngestedRundownRepository = createIngestedRundownRepository(mongoDatabase, rundownBaselineRepository)
-  const timelineRepository: TimelineRepository = new MongoTimelineRepository(mongoDatabase, mongoEntityConverter)
-  const showStyleVariantRepository: ShowStyleVariantRepository = new MongoShowStyleVariantRepository(mongoDatabase, mongoEntityConverter, rundownAggregateRepository)
-  const configurationRepository: ConfigurationRepository = createConfigurationRepository(mongoDatabase, mongoEntityConverter, showStyleVariantRepository)
+  const timelineRepository: TimelineRepository = new MongoTimelineRepository(mongoDatabase, mongoRundownExecutionEntityConverter)
+  const showStyleVariantRepository: ShowStyleVariantRepository = new MongoShowStyleVariantRepository(mongoDatabase, mongoRundownExecutionEntityConverter, rundownAggregateRepository)
+  const configurationRepository: ConfigurationRepository = createConfigurationRepository(mongoDatabase, showStyleVariantRepository, logger)
   const shelfConfigurationRepository: ShelfConfigurationRepository = new MongoShelfRepository(mongoDatabase, uuidGenerator)
-  const mediaRepository: MediaRepository = new MongoMediaRepository(mongoDatabase, mongoEntityConverter)
 
-  const actionRepository: ActionRepository = new MongoActionRepository(mongoEntityConverter, mongoDatabase)
+  const sofieIngestMongoEntityConverter: SofieIngestMongoEntityConverter = new SofieIngestMongoEntityConverter()
+  const mediaRepository: MediaRepository = new MongoMediaRepository(mongoDatabase, sofieIngestMongoEntityConverter)
+  const ingestedRundownRepository: IngestedRundownRepository = createIngestedRundownRepository(mongoDatabase, rundownBaselineRepository)
+  const deviceRepository: DeviceRepository = new MongoDeviceRepository(mongoDatabase, uuidGenerator)
+
+  const mongoActionSystemEntityConverter: ActionSystemMongoEntityConverter = new ActionSystemMongoEntityConverter()
+  const actionRepository: ActionRepository = new MongoActionRepository(mongoActionSystemEntityConverter, mongoDatabase)
   const triggerRepository: TriggerRepository = new MongoTriggerRepository(mongoDatabase, uuidGenerator)
   const macroRepository: MacroRepository = new MongoMacroRepository(mongoDatabase, uuidGenerator)
   const actionManifestRepository: ActionManifestRepository = createActionManifestRepository(mongoDatabase)
@@ -291,7 +306,7 @@ async function main(logger: Logger): Promise<void> {
   const ingestDataChangeService: IngestDataChangeService = createIngestChangeService(mongoDatabase, ingestedRundownRepository, rundownAggregateRepository, rundownAsyncLock, blueprint, configurationRepository, rundownEventService, timelineBuilder, timelineRepository, actionGenerationService, logger)
   const mediaDataChangeService: MediaDatabaseChangedService = createMediaDataChangeService(mongoDatabase, mediaRepository, mediaEventService, logger)
   const statusMessageService: StatusMessageService = new StatusMessageServiceImplementation(statusMessageEventService, statusMessageRepository)
-  const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, mongoEntityConverter, statusMessageService, deviceRepository, logger)
+  const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
 
   // Controller setup
@@ -325,13 +340,13 @@ async function main(logger: Logger): Promise<void> {
   logger.info('Alba server is configured.')
 }
 
-function createRundownAggregateRepository(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter, logger: Logger): RundownAggregateRepository {
+function createRundownAggregateRepository(mongoDatabase: MongoDatabase, rundownExecutionMongoEntityConverter: RundownExecutionMongoEntityConverter, logger: Logger): RundownAggregateRepository {
   const mongoExpectedPlayoutItemRepository: MongoExpectedPlayoutItemRepository = new MongoExpectedPlayoutItemRepository(mongoDatabase)
 
-  const mongoPieceRepository: MongoPieceRepository = new MongoPieceRepository(mongoDatabase, mongoEntityConverter)
-  const mongoPartRepository: MongoPartRepository = new MongoPartRepository(mongoDatabase, mongoPieceRepository, mongoEntityConverter)
-  const mongoSegmentRepository: MongoSegmentRepository = new MongoSegmentRepository(mongoDatabase, mongoPartRepository, mongoEntityConverter)
-  const mongoRundownAggregateRepository: MongoRundownAggregateRepository = new MongoRundownAggregateRepository(mongoDatabase, mongoSegmentRepository, mongoPartRepository, mongoPieceRepository, mongoExpectedPlayoutItemRepository, mongoEntityConverter)
+  const mongoPieceRepository: MongoPieceRepository = new MongoPieceRepository(mongoDatabase, rundownExecutionMongoEntityConverter)
+  const mongoPartRepository: MongoPartRepository = new MongoPartRepository(mongoDatabase, mongoPieceRepository, rundownExecutionMongoEntityConverter)
+  const mongoSegmentRepository: MongoSegmentRepository = new MongoSegmentRepository(mongoDatabase, mongoPartRepository, rundownExecutionMongoEntityConverter)
+  const mongoRundownAggregateRepository: MongoRundownAggregateRepository = new MongoRundownAggregateRepository(mongoDatabase, mongoSegmentRepository, mongoPartRepository, mongoPieceRepository, mongoExpectedPlayoutItemRepository, rundownExecutionMongoEntityConverter)
   return new CachedRundownAggregateRepository(mongoRundownAggregateRepository, logger)
 }
 
@@ -367,9 +382,10 @@ function createBlueprint(objectCloner: ObjectCloner, logger: Logger): Blueprint 
   )
 }
 
-function createConfigurationRepository(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter, showStyleVariantRepository: ShowStyleVariantRepository): ConfigurationRepository {
-  const studioRepository: StudioRepository = new MongoStudioRepository(mongoDatabase, mongoEntityConverter)
-  const showStyleRepository: ShowStyleRepository = new MongoShowStyleRepository(mongoDatabase, showStyleVariantRepository, mongoEntityConverter)
+function createConfigurationRepository(mongoDatabase: MongoDatabase, showStyleVariantRepository: ShowStyleVariantRepository, logger: Logger): ConfigurationRepository {
+  const rundownExecutionMongoEntityConverter: RundownExecutionMongoEntityConverter = new RundownExecutionMongoEntityConverter(logger)
+  const studioRepository: StudioRepository = new MongoStudioRepository(mongoDatabase, rundownExecutionMongoEntityConverter)
+  const showStyleRepository: ShowStyleRepository = new MongoShowStyleRepository(mongoDatabase, showStyleVariantRepository, rundownExecutionMongoEntityConverter)
   const mongoConfigurationRepository: MongoConfigurationRepository = new MongoConfigurationRepository(studioRepository, showStyleRepository)
   return new CachedConfigurationRepository(mongoConfigurationRepository)
 }
@@ -425,8 +441,9 @@ function createMediaDataChangeService(mongoDatabase: MongoDatabase, mediaReposit
   return new MediaDatabaseChangedService(mediaEventEmitter, mediaDataChangeListener)
 }
 
-function createDeviceDataChangeService(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter, statusMessageService: StatusMessageService, deviceRepository: DeviceRepository, logger: Logger): DeviceChangedService {
-  const deviceChangeListener: MongoDeviceChangedListener = new MongoDeviceChangedListener(mongoDatabase, mongoEntityConverter, logger)
+function createDeviceDataChangeService(mongoDatabase: MongoDatabase, statusMessageService: StatusMessageService, deviceRepository: DeviceRepository, logger: Logger): DeviceChangedService {
+  const sofieIngestMongoEntityConverter: SofieIngestMongoEntityConverter = new SofieIngestMongoEntityConverter()
+  const deviceChangeListener: MongoDeviceChangedListener = new MongoDeviceChangedListener(mongoDatabase, sofieIngestMongoEntityConverter, logger)
   return new DeviceChangedService(statusMessageService, deviceRepository, deviceChangeListener, logger)
 }
 

@@ -4,8 +4,8 @@ import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure
 import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { MacroRepository } from '../../../domain/repositories/macro-repository'
 import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
-import { MongoId } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { InvalidIdException } from '../../exceptions/invalid-id-exception'
+import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
 
 const COLLECTION_NAME: string = 'macros'
 export class MongoMacroRepository extends BaseMongoRepository<Macro & MongoId> implements MacroRepository {

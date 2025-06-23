@@ -3,10 +3,10 @@ import { anyString, anything, capture, instance, mock, when } from '@typestrong/
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
 import { Collection } from 'mongodb'
-import { MongoId } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { EntityTestFactory } from '../../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { Macro } from '../../../domain/entities/macro'
 import { InvalidIdException } from '../../exceptions/invalid-id-exception'
+import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
 
 const UUID: string = 'random-uuid'
 

@@ -5,7 +5,7 @@ import { Logger } from '../../../../cross-cutting-concerns/application/interface
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { UnsupportedOperationException } from '../../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
-import { MongoShowStyleVariant } from './mongo-entity-converter'
+import { MongoShowStyleVariant } from './rundown-execution-mongo-entity-converter'
 
 const SHOW_STYLE_VARIANT_CONFIGURATION_COLLECTION_NAME: string = 'showStyleVariants'
 

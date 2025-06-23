@@ -6,13 +6,18 @@ import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exc
 import { AnyBulkWriteOperation, ClientSession } from 'mongodb'
 import { Piece } from '../../../domain/entities/piece'
 import { Segment } from '../../../domain/entities/segment'
-import { MongoEntityConverter, MongoPart, MongoPiece, MongoRundown, MongoSegment } from './mongo-entity-converter'
 import { MongoSegmentRepository } from './mongo-segment-repository'
 import { MongoPartRepository } from './mongo-part-repository'
 import { MongoPieceRepository } from './mongo-piece-repository'
 import { Part } from '../../../domain/entities/part'
 import { RundownAggregateRepository } from '../../../domain/repositories/rundown-aggregate-repository'
 import { MongoExpectedPlayoutItemRepository } from './mongo-expected-playout-item-repository'
+import {
+  MongoPart, MongoPiece,
+  MongoRundown,
+  MongoSegment,
+  RundownExecutionMongoEntityConverter
+} from './rundown-execution-mongo-entity-converter'
 
 const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
 
@@ -23,7 +28,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     private readonly mongoPartRepository: MongoPartRepository,
     private readonly mongoPieceRepository: MongoPieceRepository,
     private readonly mongoExpectedPlayoutItemRepository: MongoExpectedPlayoutItemRepository,
-    private readonly mongoEntityConverter: MongoEntityConverter
+    private readonly rundownExecutionMongoEntityConverter: RundownExecutionMongoEntityConverter
   ) {
     super(mongoDatabase)
   }
@@ -37,7 +42,7 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     return this.getCollection()
       .find({})
       .project<MongoRundown>({ _id: 1, name: 1, modifiedAt: 1, mode: 1, timing: 1 })
-      .map(basicMongoRundown => this.mongoEntityConverter.convertToBasicRundown(basicMongoRundown))
+      .map(basicMongoRundown => this.rundownExecutionMongoEntityConverter.convertToBasicRundown(basicMongoRundown))
       .toArray()
   }
 
@@ -53,13 +58,13 @@ export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRu
     const baselinePieces: Piece[] = await this.mongoPieceRepository.getPiecesFromIds(mongoRundown.baselinePieceIds)
     const infinitePieces: Piece[] = await this.mongoPieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
     const segments: Segment[] = await this.mongoSegmentRepository.getSegments(mongoRundown._id)
-    return this.mongoEntityConverter.convertToRundown(mongoRundown, segments, baselinePieces, infinitePieces)
+    return this.rundownExecutionMongoEntityConverter.convertToRundown(mongoRundown, segments, baselinePieces, infinitePieces)
   }
 
   public async saveRundown(rundown: Rundown): Promise<void> {
     this.assertDatabaseConnection(this.saveRundown.name)
 
-    const mongoRundown: MongoRundown = this.mongoEntityConverter.convertToMongoRundown(rundown)
+    const mongoRundown: MongoRundown = this.rundownExecutionMongoEntityConverter.convertToMongoRundown(rundown)
     const segments: readonly Segment[] = rundown.getSegments()
     const saveSegmentQueries: readonly AnyBulkWriteOperation<MongoSegment>[] = this.mongoSegmentRepository.buildSaveSegmentQueries(rundown.getSegments())
     const deleteOrphanedSegmentsQuery: AnyBulkWriteOperation<MongoSegment> = this.mongoSegmentRepository.buildDeleteOrphanedSegmentsForRundownQuery(rundown.id, segments)

@@ -24,7 +24,7 @@ import { Piece, PieceInterface } from '../../../rundown-execution/domain/entitie
 import { RundownRepository } from '../../../rundown-execution/domain/repositories/rundown-repository'
 import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
 import { MediaRepository } from '../../../rundown-execution/domain/repositories/media-repository'
-import { Media } from '../../../rundown-execution/domain/entities/media'
+import { Media } from '../../../sofie-ingest/domain/entities/media'
 import { ConfigurationRepository } from '../../../rundown-execution/domain/repositories/configuration-repository'
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { SetNextDirection } from '../../../rundown-execution/domain/enums/set-next-direction'

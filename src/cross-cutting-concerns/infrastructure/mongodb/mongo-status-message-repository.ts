@@ -3,7 +3,7 @@ import { StatusMessageRepository } from '../../domain/repositories/status-messag
 import { StatusMessage } from '../../domain/entities/status-message'
 import { MongoDatabase } from './mongo-database'
 import { NotFoundException } from '../../domain/exceptions/not-found-exception'
-import { MongoId } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
+import { MongoId } from '../value-objects/mongo-id'
 
 const STATUS_MESSAGE_COLLECTION_NAME: string = 'statusMessages'
 

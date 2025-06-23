@@ -1,7 +1,7 @@
 import { MongoDatabase } from './mongo-database'
 import { AnyBulkWriteOperation, ClientSession, Collection } from 'mongodb'
 import { DatabaseNotConnectedException } from '../exceptions/database-not-connected-exception'
-import { MongoId } from '../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
+import { MongoId } from '../value-objects/mongo-id'
 
 export abstract class BaseMongoRepository<Model extends MongoId> {
   protected constructor(protected mongoDatabase: MongoDatabase) {}

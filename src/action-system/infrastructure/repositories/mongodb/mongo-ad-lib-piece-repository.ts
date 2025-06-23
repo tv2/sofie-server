@@ -3,7 +3,7 @@ import { ActionManifestRepository } from '../../../domain/repositories/action-ma
 import { ActionManifest } from '../../../domain/entities/action'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { Filter } from 'mongodb'
-import { MongoId } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
+import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
 
 const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
 

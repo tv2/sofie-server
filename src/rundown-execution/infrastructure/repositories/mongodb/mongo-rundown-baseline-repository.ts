@@ -3,7 +3,7 @@ import { RundownBaselineRepository } from '../../../domain/repositories/rundown-
 import { TimelineObject } from '../../../domain/entities/timeline-object'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
-import { MongoTimeline } from './mongo-entity-converter'
+import { MongoTimeline } from './rundown-execution-mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'rundownBaselineObjs'
 

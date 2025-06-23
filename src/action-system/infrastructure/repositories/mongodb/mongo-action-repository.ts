@@ -5,13 +5,14 @@ import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure
 import { DeleteResult, UnorderedBulkOperation } from 'mongodb'
 import { DeletionFailedException } from '../../../../cross-cutting-concerns/infrastructure/exceptions/deletion-failed-exception'
 import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
-import { MongoAction, MongoEntityConverter } from '../../../../rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
+
+import { MongoAction, ActionSystemMongoEntityConverter } from './action-system-mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'actions'
 
 export class MongoActionRepository extends BaseMongoRepository<MongoAction> implements ActionRepository {
   public constructor(
-    private readonly mongoEntityConverter: MongoEntityConverter,
+    private readonly actionSystemMongoEntityConverter: ActionSystemMongoEntityConverter,
     mongoDatabase: MongoDatabase,
   ) {
     super(mongoDatabase)
@@ -27,14 +28,14 @@ export class MongoActionRepository extends BaseMongoRepository<MongoAction> impl
     if (action === null) {
       throw new NotFoundException(`No Action found for ActionId ${actionId}`)
     }
-    return this.mongoEntityConverter.convertToAction(action)
+    return this.actionSystemMongoEntityConverter.convertToAction(action)
   }
 
   public async getSystemActions(): Promise<Action[]> {
     this.assertDatabaseConnection(this.getSystemActions.name)
     return this.getCollection()
       .find<MongoAction>({ rundownId: { $exists: false } })
-      .map(mongoAction => this.mongoEntityConverter.convertToAction(mongoAction))
+      .map(mongoAction => this.actionSystemMongoEntityConverter.convertToAction(mongoAction))
       .toArray()
   }
 
@@ -43,7 +44,7 @@ export class MongoActionRepository extends BaseMongoRepository<MongoAction> impl
     const systemActions: Action[] = await this.getSystemActions()
     const rundownActions: Action[] = await this.getCollection()
       .find<MongoAction>({ rundownId: rundownId })
-      .map(mongoAction => this.mongoEntityConverter.convertToAction(mongoAction))
+      .map(mongoAction => this.actionSystemMongoEntityConverter.convertToAction(mongoAction))
       .toArray()
     return systemActions.concat(rundownActions)
   }
@@ -51,7 +52,7 @@ export class MongoActionRepository extends BaseMongoRepository<MongoAction> impl
   public async saveActions(actions: Action[]): Promise<void> {
     this.assertDatabaseConnection(this.saveActions.name)
     const bulkOperation: UnorderedBulkOperation = this.getCollection().initializeUnorderedBulkOp({ ignoreUndefined: true })
-    actions.forEach(action => bulkOperation.find({ _id: action.id }).upsert().replaceOne(this.mongoEntityConverter.convertToMongoAction(action)))
+    actions.forEach(action => bulkOperation.find({ _id: action.id }).upsert().replaceOne(this.actionSystemMongoEntityConverter.convertToMongoAction(action)))
     await bulkOperation.execute()
   }
 

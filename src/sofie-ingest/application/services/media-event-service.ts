@@ -2,7 +2,7 @@ import { MediaEventEmitter } from '../../../rundown-execution/application/interf
 import { MediaEventObserver } from '../interfaces/media-event-observer'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaEvent, MediaUpdatedEvent } from '../value-objects/media-event'
-import { Media } from '../../../rundown-execution/domain/entities/media'
+import { Media } from '../../domain/entities/media'
 
 export class MediaEventService implements MediaEventEmitter, MediaEventObserver {
   private readonly callbacks: ((mediaEvent: MediaEvent) => void)[] = []

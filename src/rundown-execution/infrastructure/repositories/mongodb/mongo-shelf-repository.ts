@@ -3,7 +3,7 @@ import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure
 import { ShelfConfigurationRepository } from '../../../domain/repositories/shelf-configuration-repository'
 import { ShelfConfiguration } from '../../../domain/entities/shelf-configuration'
 import { UuidGenerator } from '../../../../cross-cutting-concerns/infrastructure/interfaces/uuid-generator'
-import { MongoId } from './mongo-entity-converter'
+import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
 
 const SHELF_CONFIGURATION_COLLECTION_NAME: string = 'shelfConfiguration'
 const SHELF_CONFIGURATION_ID: string = 'SHELF_CONFIGURATION_ID' // The system only support having a single Shelf.

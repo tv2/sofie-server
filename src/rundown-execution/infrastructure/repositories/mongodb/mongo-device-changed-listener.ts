@@ -1,11 +1,13 @@
 import { DataChangedListener } from '../../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
-import { MongoCoreDevice, MongoEntityConverter } from './mongo-entity-converter'
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { ChangeStream, ChangeStreamDeleteDocument, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 import { CoreDevice } from '../../../domain/entities/device'
+import {
+  MongoCoreDevice, SofieIngestMongoEntityConverter
+} from '../../../../sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
 
 const DEVICE_COLLECTION_NAME: string = 'peripheralDevices'
 
@@ -15,7 +17,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository<MongoCoreDev
   private onUpdatedCallback: (device: CoreDevice) => void
   private onDeletedCallback: (deviceId: string) => void
 
-  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter, logger: Logger) {
+  public constructor(mongoDatabase: MongoDatabase, private readonly sofieIngestMongoEntityConverter: SofieIngestMongoEntityConverter, logger: Logger) {
     super(mongoDatabase)
     this.logger = logger.tag(MongoDeviceChangedListener.name)
     mongoDatabase.onConnect(DEVICE_COLLECTION_NAME, () => this.listenForChanges())
@@ -32,7 +34,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository<MongoCoreDev
     switch (change.operationType) {
       case MongoChangeEvent.INSERT: {
         const mongoDevice: MongoCoreDevice = change.fullDocument
-        this.onCreatedCallback(this.mongoEntityConverter.convertToCoreDeviceInterface(mongoDevice))
+        this.onCreatedCallback(this.sofieIngestMongoEntityConverter.convertToCoreDeviceInterface(mongoDevice))
         return
       }
       case MongoChangeEvent.UPDATE: {
@@ -40,7 +42,7 @@ export class MongoDeviceChangedListener extends BaseMongoRepository<MongoCoreDev
         if (!mongoDevice) {
           return
         }
-        this.onUpdatedCallback(this.mongoEntityConverter.convertToCoreDeviceInterface(mongoDevice))
+        this.onUpdatedCallback(this.sofieIngestMongoEntityConverter.convertToCoreDeviceInterface(mongoDevice))
         return
       }
       case MongoChangeEvent.DELETE: {
