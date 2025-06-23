@@ -1,5 +1,5 @@
 import { DataChangeService } from '../../../rundown-execution/application/interfaces/data-change-service'
-import { MediaEventEmitter } from '../../../rundown-execution/application/interfaces/media-event-emitter'
+import { MediaEventEmitter } from '../interfaces/media-event-emitter'
 import { DataChangedListener } from '../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import { Media } from '../../domain/entities/media'
 

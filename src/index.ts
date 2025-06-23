@@ -110,8 +110,8 @@ import { ActionService } from './action-system/application/interfaces/action-ser
 import { ExecuteActionService } from './action-system/application/services/execute-action-service'
 import { ActionRepository } from './action-system/domain/repositories/action-repository'
 import { MongoActionRepository } from './action-system/infrastructure/repositories/mongodb/mongo-action-repository'
-import { MediaRepository } from './rundown-execution/domain/repositories/media-repository'
-import { MongoMediaRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-media-repository'
+import { MediaRepository } from './sofie-ingest/domain/repositories/media-repository'
+import { MongoMediaRepository } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-media-repository'
 import { TriggerController } from './action-system/application/controllers/trigger-controller'
 import { TriggerService } from './action-system/application/interfaces/trigger-service'
 import { TriggerServiceImplementation } from './action-system/application/services/trigger-service-implementation'
@@ -129,7 +129,7 @@ import {
 import { ConfigurationEventService } from './rundown-execution/application/services/configuration-event-service'
 import { ShelfConfigurationRepository } from './rundown-execution/domain/repositories/shelf-configuration-repository'
 import { MongoShelfRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-shelf-repository'
-import { MediaController } from './rundown-execution/application/controllers/media-controller'
+import { MediaController } from './sofie-ingest/application/controllers/media-controller'
 import {
   SystemInformationController
 } from './cross-cutting-concerns/application/controllers/system-information-controller'
@@ -196,8 +196,8 @@ import {
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-device-changed-listener'
 import {
   MongoMediaChangedListener
-} from './rundown-execution/infrastructure/repositories/mongodb/mongo-media-changed-listener'
-import { MediaEventEmitter } from './rundown-execution/application/interfaces/media-event-emitter'
+} from './sofie-ingest/infrastructure/repositories/mongodb/mongo-media-changed-listener'
+import { MediaEventEmitter } from './sofie-ingest/application/interfaces/media-event-emitter'
 import { DeviceChangedService } from './sofie-ingest/application/services/device-changed-service'
 import { DeviceRepository } from './rundown-execution/domain/repositories/device-repository'
 import { StatusMessageService } from './cross-cutting-concerns/application/interfaces/status-message-service'

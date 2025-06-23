@@ -1,4 +1,4 @@
-import { Media } from '../../../sofie-ingest/domain/entities/media'
+import { Media } from '../entities/media'
 
 export interface MediaRepository {
   getMedia(): Promise<Media[]>

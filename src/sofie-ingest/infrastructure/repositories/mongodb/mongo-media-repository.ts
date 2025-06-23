@@ -1,10 +1,10 @@
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { MediaRepository } from '../../../domain/repositories/media-repository'
-import { Media } from '../../../../sofie-ingest/domain/entities/media'
+import { Media } from '../../../domain/entities/media'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import {
   MongoMedia, SofieIngestMongoEntityConverter
-} from '../../../../sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
+} from './sofie-ingest-mongo-entity-converter'
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 

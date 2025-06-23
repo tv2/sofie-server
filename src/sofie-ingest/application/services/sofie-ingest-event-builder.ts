@@ -2,7 +2,7 @@ import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { Media } from '../../domain/entities/media'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaUpdatedEvent } from '../value-objects/media-event'
 import { MediaEventType } from '../enums/media-event-type'
-import { MediaDto } from '../../../rundown-execution/application/dtos/media-dto'
+import { MediaDto } from '../dtos/media-dto'
 
 export class SofieIngestEventBuilder implements MediaEventBuilder {
   public buildMediaCreatedEvent(media: Media): MediaCreatedEvent {

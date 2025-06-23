@@ -1,4 +1,4 @@
-import { MediaEventEmitter } from '../../../rundown-execution/application/interfaces/media-event-emitter'
+import { MediaEventEmitter } from '../interfaces/media-event-emitter'
 import { MediaEventObserver } from '../interfaces/media-event-observer'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaEvent, MediaUpdatedEvent } from '../value-objects/media-event'

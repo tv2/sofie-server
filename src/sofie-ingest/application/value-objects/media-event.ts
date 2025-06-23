@@ -1,4 +1,4 @@
-import { MediaDto } from '../../../rundown-execution/application/dtos/media-dto'
+import { MediaDto } from '../dtos/media-dto'
 import { TypedEvent } from '../../../cross-cutting-concerns/application/value-objects/typed-event'
 
 import { MediaEventType } from '../enums/media-event-type'

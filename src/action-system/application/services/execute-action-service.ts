@@ -23,7 +23,7 @@ import { Part, PartInterface } from '../../../rundown-execution/domain/entities/
 import { Piece, PieceInterface } from '../../../rundown-execution/domain/entities/piece'
 import { RundownRepository } from '../../../rundown-execution/domain/repositories/rundown-repository'
 import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
-import { MediaRepository } from '../../../rundown-execution/domain/repositories/media-repository'
+import { MediaRepository } from '../../../sofie-ingest/domain/repositories/media-repository'
 import { Media } from '../../../sofie-ingest/domain/entities/media'
 import { ConfigurationRepository } from '../../../rundown-execution/domain/repositories/configuration-repository'
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
