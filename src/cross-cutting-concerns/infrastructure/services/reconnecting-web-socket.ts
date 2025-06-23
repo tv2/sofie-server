@@ -1,76 +1,77 @@
 import { Socket } from '../interfaces/socket'
 import WebSocket, { CloseEvent, ErrorEvent, Event, MessageEvent } from 'ws'
-import { HealthStatus } from '../../application/enums/health-status'
-import { HealthStatusEventEmitter } from '../../application/interfaces/health-status-event-emitter'
-import {
-  UnsupportedOperationException
-} from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception' // TODO: This is an illegal import. Are our Exceptions placed correctly in the new structure?
+import { Logger } from '../../application/interfaces/logger'
 
 const WEB_SOCKET_NORMAL_CLOSURE_CODE: number = 1000
 
 export class ReconnectingWebSocket implements Socket {
 
   private webSocket: WebSocket
-  private healthStatus: HealthStatus = HealthStatus.UNKNOWN
-  private healthStatusIdentifier: string
 
   private timeoutIdentifier?: NodeJS.Timeout
   private keepAlive: boolean = true
 
-  constructor(private readonly healthStatusEventEmitter: HealthStatusEventEmitter) {
+  private connectionString: string
+
+  private onConnected: () => void
+  private onData: (data: unknown) => void
+  private onError: () => void
+  private onClose: (isClosedByError: boolean) => void
+
+  private logger: Logger
+
+  constructor(logger: Logger) {
+    this.logger = logger.tag("ReconnectingWebSocket")
   }
 
-  public setHealthStatusIdentifier(healthStatusIdentifier: string): void {
-    this.healthStatusIdentifier = healthStatusIdentifier
-  }
-
-  public connect<T>(
+  public connect(
     connectionString: string,
-    onData: (data: T) => void,
+    onConnected: () => void,
+    onData: (data: unknown) => void,
+    onError: () => void,
+    onClose: (isClosedByError: boolean) => void
   ): void {
-    if (!this.healthStatusIdentifier) {
-      throw new UnsupportedOperationException('It is not allowed to connect to a Socket without providing an identifier for the health status.')
-    }
+    this.connectionString = connectionString
+    this.onConnected = onConnected
+    this.onData = onData
+    this.onError = onError
+    this.onClose = onClose
 
-    this.webSocket = new WebSocket(connectionString)
+    this.connectToNewSocket()
+  }
+
+  private connectToNewSocket(): void {
+    this.webSocket = new WebSocket(this.connectionString)
 
     this.webSocket.addEventListener('open', (_event: Event) => {
-      this.updateHealthStatus(HealthStatus.GOOD)
+      this.logger.debug(`Connected to WebSocket on ${this.connectionString}`)
+      this.onConnected()
     })
 
     this.webSocket.addEventListener('message', (event: MessageEvent) => {
-      onData(JSON.parse(JSON.stringify(event.data)))
+      this.onData(event.data)
     })
 
-    this.webSocket.addEventListener('error', (_event: ErrorEvent) => {
-      this.updateHealthStatus(HealthStatus.BAD)
+    this.webSocket.addEventListener('error', (event: ErrorEvent) => {
+      this.logger.data(event).error(`Error from WebSocket listening on: ${this.connectionString}`)
+      this.onError()
     })
 
     this.webSocket.addEventListener('close', (event: CloseEvent) => {
-      this.updateHealthStatus(event.code === WEB_SOCKET_NORMAL_CLOSURE_CODE ? HealthStatus.UNKNOWN : HealthStatus.BAD)
-      this.reconnect<T>(connectionString, onData)
+      this.logger.debug(`WebSocket listening on ${this.connectionString} was closed`)
+      this.onClose(event.code !== WEB_SOCKET_NORMAL_CLOSURE_CODE)
+      this.reconnect()
     })
   }
 
-  private reconnect<T>(
-    connectionString: string,
-    onData: (data: T) => void,
-  ): void {
+  private reconnect(): void {
     clearTimeout(this.timeoutIdentifier)
 
     if (!this.keepAlive) {
       return
     }
 
-    this.timeoutIdentifier = setTimeout(() => this.connect(connectionString, onData), 5000)
-  }
-
-  private updateHealthStatus(newHealthStatus: HealthStatus): void {
-    if (this.healthStatus === newHealthStatus) {
-      return
-    }
-    this.healthStatus = newHealthStatus
-    this.healthStatusEventEmitter.emitHealthStatusEvent(this.healthStatusIdentifier, this.healthStatus)
+    this.timeoutIdentifier = setTimeout(() => this.connectToNewSocket(), 5000)
   }
 
   public disconnect(): void {

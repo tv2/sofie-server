@@ -228,7 +228,8 @@ import { CryptoStringHashGenerator } from './blueprints/infrastructure/services/
 import { GatewayConnector } from './tv2-inews-ingest/application/interfaces/gatewayConnector'
 import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
 import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
-import { HealthStatusEventService } from './cross-cutting-concerns/application/services/health-status-event-service'
+import { IngestHealthStatusEventService } from './rundown-ingest/application/interfaces/ingest-health-status-event-service'
+import { RundownIngestEventBuilder } from './rundown-ingest/application/services/rundown-ingest-event-builder'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -267,7 +268,6 @@ async function main(logger: Logger): Promise<void> {
 
   const crossCuttingConcernsEventBuilder: CrossCuttingConcernsEventBuilder = new CrossCuttingConcernsEventBuilder()
   const statusMessageEventService: StatusMessageEventService = new StatusMessageEventService(crossCuttingConcernsEventBuilder)
-  const healthStatusEventService: HealthStatusEventService = new HealthStatusEventService(crossCuttingConcernsEventBuilder)
 
   const actionSystemEventBuilder: ActionSystemEventBuilder = new ActionSystemEventBuilder()
   const actionEventService: ActionEventService = new ActionEventService(actionSystemEventBuilder)
@@ -276,6 +276,9 @@ async function main(logger: Logger): Promise<void> {
 
   const sofieIngestEventBuilder: SofieIngestEventBuilder = new SofieIngestEventBuilder()
   const mediaEventService: MediaEventService = new MediaEventService(sofieIngestEventBuilder)
+
+  const rundownIngestEventBuilder: RundownIngestEventBuilder = new RundownIngestEventBuilder()
+  const healthStatusEventService: IngestHealthStatusEventService = new IngestHealthStatusEventService(rundownIngestEventBuilder)
 
   // Data change listeners
   const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService)
@@ -335,7 +338,7 @@ async function main(logger: Logger): Promise<void> {
 
 
   // TODO: Place correctly in the structure.
-  const gateway: GatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(healthStatusEventService))
+  const gateway: GatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
   gateway.connect()
 }
 

@@ -1,8 +1,10 @@
 export interface Socket {
-  setHealthStatusIdentifier(healthStatusIdentifier: string): void
-  connect<T>(
+  connect(
     connectionString: string,
-    onData: (data: T) => void
+    onConnected: () => void,
+    onData: (data: unknown) => void,
+    onError: () => void,
+    onClose: (isClosedByError: boolean) => void
   ): void
   disconnect(): void
 }
