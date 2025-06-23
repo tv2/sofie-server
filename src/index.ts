@@ -336,7 +336,6 @@ async function main(logger: Logger): Promise<void> {
   await eventServer.startServer(3006)
   logger.info('Alba server is configured.')
 
-
   // TODO: Place correctly in the structure.
   const gateway: GatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
   gateway.connect()

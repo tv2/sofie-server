@@ -9,10 +9,9 @@ const HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'ws://localhost:3008'
 const FEATURE_FLAG: boolean = process.env.DISABLE_INEWS_GATEWAY === 'true'
 
 export class INewsGatewayConnector implements GatewayConnector {
-
   private healthStatus: IngestHealthStatus = IngestHealthStatus.UNKNOWN
 
-  constructor(private readonly socket: Socket, private readonly ingestHealthStatusEventEmitter: IngestHealthStatusEventEmitter) {
+  public constructor(private readonly socket: Socket, private readonly ingestHealthStatusEventEmitter: IngestHealthStatusEventEmitter) {
   }
 
   public connect(): void {
@@ -25,7 +24,7 @@ export class INewsGatewayConnector implements GatewayConnector {
       () => {
         this.updateHealthStatus(IngestHealthStatus.GOOD)
       },
-      (data) => this.onData(data),
+      data => this.onData(data),
       () => {
         this.updateHealthStatus(IngestHealthStatus.BAD)
       },
@@ -53,6 +52,5 @@ export class INewsGatewayConnector implements GatewayConnector {
 
   private onData(_data: unknown): void {
     // TODO: Implement in later task - Update type as well.
-    console.log(_data)
   }
 }

@@ -5,10 +5,9 @@ import { IngestHealthStatus } from '../enum/ingest-health-status'
 import { IngestHealthStatusEvent } from '../value-objects/ingest-health-status-event'
 
 export class IngestHealthStatusEventService implements IngestHealthStatusEventEmitter, IngestHealthStatusEventObserver {
-
   private readonly callbacks: ((healthStatusEvent: IngestHealthStatusEvent) => void)[] = []
 
-  constructor(private readonly healthStatusMessageBuilder: IngestHealthStatusEventBuilder) { }
+  public constructor(private readonly healthStatusMessageBuilder: IngestHealthStatusEventBuilder) { }
 
   public emitHealthStatusEvent(healthStatusCode: IngestHealthStatus): void {
     const healthStatusEvent: IngestHealthStatusEvent = this.healthStatusMessageBuilder.buildIngestHealthStatusEvent(healthStatusCode)

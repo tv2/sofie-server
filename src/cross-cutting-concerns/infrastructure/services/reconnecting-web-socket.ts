@@ -5,7 +5,6 @@ import { Logger } from '../../application/interfaces/logger'
 const WEB_SOCKET_NORMAL_CLOSURE_CODE: number = 1000
 
 export class ReconnectingWebSocket implements Socket {
-
   private webSocket: WebSocket
 
   private timeoutIdentifier?: NodeJS.Timeout
@@ -18,10 +17,10 @@ export class ReconnectingWebSocket implements Socket {
   private onError: () => void
   private onClose: (isClosedByError: boolean) => void
 
-  private logger: Logger
+  private readonly logger: Logger
 
-  constructor(logger: Logger) {
-    this.logger = logger.tag("ReconnectingWebSocket")
+  public constructor(logger: Logger) {
+    this.logger = logger.tag('ReconnectingWebSocket')
   }
 
   public connect(
