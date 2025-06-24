@@ -31,6 +31,12 @@ import { PlayoutContentEvent } from '../../../rundown-execution/application/valu
 import { NtpEventType } from '../../application/enums/ntp-event-type'
 import { IngestHealthStatusEventObserver } from '../../../rundown-ingest/application/interfaces/ingest-health-status-event-observer'
 import { IngestHealthStatusEvent } from '../../../rundown-ingest/application/value-objects/ingest-health-status-event'
+import {
+  INewsIngestConfigurationEventObserver
+} from '../../../tv2-inews-ingest/application/interfaces/i-news-ingest-configuration-event-observer'
+import {
+  INewsIngestConfigurationEvent
+} from '../../../tv2-inews-ingest/application/value-objects/i-news-ingest-configuration-event'
 
 // TODO: This class could be split up in the transport mechanism and the application use case for propagating events.
 export class WebSocketEventServer implements EventServer {
@@ -48,6 +54,7 @@ export class WebSocketEventServer implements EventServer {
     private readonly deviceEventObserver: DeviceEventObserver,
     private readonly playoutContentEventObserver: PlayoutContentEventObserver,
     private readonly healthStatusEventObserver: IngestHealthStatusEventObserver,
+    private readonly iNewsIngestConfigurationEventObserver: INewsIngestConfigurationEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -122,6 +129,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.healthStatusEventObserver.subscribeToHealthStatusMessageEvents((healthStatusEvent: IngestHealthStatusEvent) => {
       webSocket.send(JSON.stringify(healthStatusEvent))
+    })
+    this.iNewsIngestConfigurationEventObserver.subscribeToINewsIngestConfigurationEvents((iNewsIngestConfigurationEvent: INewsIngestConfigurationEvent) => {
+      webSocket.send(JSON.stringify(iNewsIngestConfigurationEvent))
     })
 
     webSocket.onmessage = (message: WebSocket.MessageEvent): void => {

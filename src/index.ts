@@ -228,7 +228,7 @@ import { CryptoStringHashGenerator } from './blueprints/infrastructure/services/
 import { IngestGatewayConnector } from './rundown-ingest/application/interfaces/ingest-gateway-connector'
 import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
 import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
-import { IngestHealthStatusEventService } from './rundown-ingest/application/interfaces/ingest-health-status-event-service'
+import { IngestHealthStatusEventService } from './rundown-ingest/application/services/ingest-health-status-event-service'
 import { RundownIngestEventBuilder } from './rundown-ingest/application/services/rundown-ingest-event-builder'
 import { IngestController } from './rundown-ingest/application/controllers/ingest-controller'
 import {
@@ -239,6 +239,13 @@ import {
 } from './tv2-inews-ingest/infrastructure/repositories/mongo/mongo-i-news-ingest-configuration-repository'
 import { Tv2INewsIngestController } from './tv2-inews-ingest/application/controllers/tv2-i-news-ingest-controller'
 import { INewsIngestService } from './tv2-inews-ingest/application/services/i-news-ingest-service'
+import {
+  INewsIngestConfigurationEventBuilder
+} from './tv2-inews-ingest/application/interfaces/i-news-ingest-configuration-event-builder'
+import { Tv2INewsIngestEventBuilder } from './tv2-inews-ingest/application/services/tv2-i-news-ingest-event-builder'
+import {
+  INewsIngestConfigurationEventService
+} from './tv2-inews-ingest/application/services/i-news-ingest-configuration-event-service'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -291,6 +298,9 @@ async function main(logger: Logger): Promise<void> {
   const rundownIngestEventBuilder: RundownIngestEventBuilder = new RundownIngestEventBuilder()
   const healthStatusEventService: IngestHealthStatusEventService = new IngestHealthStatusEventService(rundownIngestEventBuilder)
 
+  const iNewsIngestConfigurationEventBuilder: INewsIngestConfigurationEventBuilder = new Tv2INewsIngestEventBuilder()
+  const iNewsIngestConfigurationEventService: INewsIngestConfigurationEventService = new INewsIngestConfigurationEventService(iNewsIngestConfigurationEventBuilder)
+
   // Data change listeners
   const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService)
 
@@ -317,7 +327,7 @@ async function main(logger: Logger): Promise<void> {
   const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, mongoEntityConverter, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
   const ingestGatewayConnector: IngestGatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
-  const iNewsIngestService: INewsIngestService = new INewsIngestService(iNewsIngestConfigurationRepository)
+  const iNewsIngestService: INewsIngestService = new INewsIngestService(iNewsIngestConfigurationRepository, iNewsIngestConfigurationEventService)
 
   // Controller setup
   const httpResponseFormatter: JsendResponseFormatter = new JsendResponseFormatter()
@@ -338,7 +348,7 @@ async function main(logger: Logger): Promise<void> {
 
   // System setup
   const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController, ingestController, tv2INewsIngestController], logger)
-  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, healthStatusEventService, logger)
+  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, healthStatusEventService, iNewsIngestConfigurationEventService, logger)
 
   // System startup
   await mongoDatabase.connect()

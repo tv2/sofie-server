@@ -1,0 +1,3 @@
+export enum INewsIngestConfigurationEventType {
+  I_NEWS_INGEST_CONFIGURATION_UPDATED = 'I_NEWS_INGEST_CONFIGURATION_UPDATED'
+}
