@@ -3,28 +3,11 @@ import * as http from 'http'
 import { Server } from 'http'
 import WebSocket, { Server as WsServer, WebSocketServer } from 'ws'
 import { Logger } from '../../application/interfaces/logger'
-import { ActionEventObserver } from '../../../action-system/application/interfaces/action-event-observer'
-import { TriggerEventObserver } from '../../../action-system/application/interfaces/trigger-event-observer'
-import { MacroEventObserver } from '../../../action-system/application/interfaces/macro-event-observer'
-import { ConfigurationEventObserver } from '../../../rundown-execution/application/interfaces/configuration-event-observer'
-import { MediaEventObserver } from '../../../sofie-ingest/application/interfaces/media-event-observer'
-import { RundownEventObserver } from '../../../rundown-execution/application/interfaces/rundown-event-observer'
-import { StatusMessageEventObserver } from '../../application/interfaces/status-message-event-observer'
-import { ActionEvent } from '../../../action-system/application/value-objects/action-event'
-import { TriggerEvent } from '../../../action-system/application/value-objects/trigger-event'
-import { MacroEvent } from '../../../action-system/application/value-objects/macro-event'
-import { ConfigurationEvent } from '../../../rundown-execution/application/value-objects/configuration-event'
-import { MediaEvent } from '../../../sofie-ingest/application/value-objects/media-event'
-import { RundownEvent } from '../../../rundown-execution/application/value-objects/rundown-event'
-import { StatusMessageEvent } from '../../application/value-objects/status-message-event'
 import { EventServer } from '../interfaces/event-server'
-import { DeviceEventObserver } from '../../../sofie-ingest/application/interfaces/device-event-observer'
-import { DeviceEvent } from '../../../sofie-ingest/application/value-objects/device-event'
 import { TypedEvent } from '../../application/value-objects/typed-event'
 import { NtpEvent } from '../../application/value-objects/ntp-event'
-import { PlayoutContentEventObserver } from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
-import { PlayoutContentEvent } from '../../../rundown-execution/application/value-objects/playout-content-event'
 import { NtpEventType } from '../../application/enums/ntp-event-type'
+import { TypedEventObserver } from '../../application/interfaces/typed-event-observer'
 
 // TODO: This class could be split up in the transport mechanism and the application use case for propagating events.
 export class WebSocketEventServer implements EventServer {
@@ -32,15 +15,7 @@ export class WebSocketEventServer implements EventServer {
   private webSocketServer?: WebSocket.Server
 
   public constructor(
-    private readonly rundownEventObserver: RundownEventObserver,
-    private readonly actionEventObserver: ActionEventObserver,
-    private readonly triggerEventObserver: TriggerEventObserver,
-    private readonly macroEventObserver: MacroEventObserver,
-    private readonly mediaEventObserver: MediaEventObserver,
-    private readonly configurationEventObserver: ConfigurationEventObserver,
-    private readonly statusMessageEventObserver: StatusMessageEventObserver,
-    private readonly deviceEventObserver: DeviceEventObserver,
-    private readonly playoutContentEventObserver: PlayoutContentEventObserver,
+    private readonly typedEventObserver: TypedEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -86,33 +61,7 @@ export class WebSocketEventServer implements EventServer {
   }
 
   private addObserversForWebSocket(webSocket: WebSocket): void {
-    this.rundownEventObserver.subscribeToRundownEvents((rundownEvent: RundownEvent) => {
-      webSocket.send(JSON.stringify(rundownEvent))
-    })
-    this.actionEventObserver.subscribeToActionEvents((actionEvent: ActionEvent) => {
-      webSocket.send(JSON.stringify(actionEvent))
-    })
-    this.triggerEventObserver.subscribeToTriggerEvents((triggerEvent: TriggerEvent) => {
-      webSocket.send(JSON.stringify(triggerEvent))
-    })
-    this.macroEventObserver.subscribeToMacroEvents((macro: MacroEvent) => {
-      webSocket.send(JSON.stringify(macro))
-    })
-    this.mediaEventObserver.subscribeToMediaEvents((mediaEvent: MediaEvent) => {
-      webSocket.send(JSON.stringify(mediaEvent))
-    })
-    this.configurationEventObserver.subscribeToConfigurationEvents((configurationEvent: ConfigurationEvent) => {
-      webSocket.send(JSON.stringify(configurationEvent))
-    })
-    this.statusMessageEventObserver.subscribeToStatusMessageEvents((statusMessageEvent: StatusMessageEvent) => {
-      webSocket.send(JSON.stringify(statusMessageEvent))
-    })
-    this.deviceEventObserver.subscribeToDeviceEvents((deviceEvent: DeviceEvent) => {
-      webSocket.send(JSON.stringify(deviceEvent))
-    })
-    this.playoutContentEventObserver.subscribeToPlayoutContentEvents((playoutContentEvent: PlayoutContentEvent) => {
-      webSocket.send(JSON.stringify(playoutContentEvent))
-    })
+    this.typedEventObserver.subscribeToTypedEvents((typedEvent: TypedEvent) => webSocket.send(JSON.stringify(typedEvent)))
 
     webSocket.onmessage = (message: WebSocket.MessageEvent): void => {
       const messageText: string = message.data.toString()

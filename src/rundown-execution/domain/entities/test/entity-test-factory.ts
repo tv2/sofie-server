@@ -20,6 +20,7 @@ import { TimelineObject } from '../timeline-object'
 import { PlayoutContentType } from '../../enums/playout-content-type'
 import { CoreDevice } from '../../../../sofie-ingest/domain/entities/device'
 
+// TODO: Split up into
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
     return new Rundown(this.createRundownInterface(rundownInterface))

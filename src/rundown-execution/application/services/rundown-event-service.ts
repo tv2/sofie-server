@@ -30,15 +30,13 @@ import { Rundown } from '../../domain/entities/rundown'
 import { Piece } from '../../domain/entities/piece'
 import { Part } from '../../domain/entities/part'
 import { Segment } from '../../domain/entities/segment'
-import { RundownEventObserver } from '../interfaces/rundown-event-observer'
+import { TypedEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/typed-event-emitter'
 
-export class RundownEventService implements RundownEventEmitter, RundownEventObserver {
-  private readonly callbacks: ((rundownEvent: RundownEvent) => void)[] = []
-
-  public constructor(private readonly rundownEventBuilder: RundownEventBuilder) {}
+export class RundownEventService implements RundownEventEmitter {
+  public constructor(private readonly typedEventEmitter: TypedEventEmitter, private readonly rundownEventBuilder: RundownEventBuilder) {}
 
   private emitRundownEvent(rundownEvent: RundownEvent): void {
-    this.callbacks.forEach(callback => callback(rundownEvent))
+    this.typedEventEmitter.emitTypedEvent(rundownEvent)
   }
 
   public emitActivateEvent(rundown: Rundown): void {
@@ -154,9 +152,5 @@ export class RundownEventService implements RundownEventEmitter, RundownEventObs
   public emitPartUnsynced(rundown: Rundown, unsyncedPart: Part, originalPartId: string): void {
     const event: PartUnsyncedEvent = this.rundownEventBuilder.buildPartUnsyncedEvent(rundown, unsyncedPart, originalPartId)
     this.emitRundownEvent(event)
-  }
-
-  public subscribeToRundownEvents(onRundownEventCallback: (rundownEvent: RundownEvent) => void): void {
-    this.callbacks.push(onRundownEventCallback)
   }
 }

@@ -232,6 +232,7 @@ import {
 import {
   SofieIngestMongoEntityConverter
 } from './sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
+import { TypedEventBus } from './cross-cutting-concerns/application/services/typed-event-bus'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -266,22 +267,23 @@ async function main(logger: Logger): Promise<void> {
   const actionManifestRepository: ActionManifestRepository = createActionManifestRepository(mongoDatabase)
 
   // Event builders and event services
+  const typedEventBus: TypedEventBus = new TypedEventBus()
   const rundownExecutionEventBuilder: RundownExecutionEventBuilder = new RundownExecutionEventBuilder()
-  const rundownEventService: RundownEventService = new RundownEventService(rundownExecutionEventBuilder)
-  const configurationEventService: ConfigurationEventService = new ConfigurationEventService(rundownExecutionEventBuilder)
-  const playoutContentEventService: PlayoutContentEventService = new PlayoutContentEventService(rundownExecutionEventBuilder)
+  const rundownEventService: RundownEventService = new RundownEventService(typedEventBus, rundownExecutionEventBuilder)
+  const configurationEventService: ConfigurationEventService = new ConfigurationEventService(typedEventBus, rundownExecutionEventBuilder)
+  const playoutContentEventService: PlayoutContentEventService = new PlayoutContentEventService(typedEventBus, rundownExecutionEventBuilder)
 
   const crossCuttingConcernsEventBuilder: CrossCuttingConcernsEventBuilder = new CrossCuttingConcernsEventBuilder()
-  const statusMessageEventService: StatusMessageEventService = new StatusMessageEventService(crossCuttingConcernsEventBuilder)
+  const statusMessageEventService: StatusMessageEventService = new StatusMessageEventService(typedEventBus, crossCuttingConcernsEventBuilder)
 
   const actionSystemEventBuilder: ActionSystemEventBuilder = new ActionSystemEventBuilder()
   const actionEventService: ActionEventService = new ActionEventService(actionSystemEventBuilder)
-  const triggerEventService: TriggerEventService = new TriggerEventService(actionSystemEventBuilder)
-  const macroEventService: MacroEventService = new MacroEventService(actionSystemEventBuilder)
+  const triggerEventService: TriggerEventService = new TriggerEventService(typedEventBus, actionSystemEventBuilder)
+  const macroEventService: MacroEventService = new MacroEventService(typedEventBus, actionSystemEventBuilder)
 
   const sofieIngestEventBuilder: SofieIngestEventBuilder = new SofieIngestEventBuilder()
-  const mediaEventService: MediaEventService = new MediaEventService(sofieIngestEventBuilder)
-  const deviceEventService: DeviceEventService = new DeviceEventService(sofieIngestEventBuilder)
+  const mediaEventService: MediaEventService = new MediaEventService(typedEventBus, sofieIngestEventBuilder)
+  const deviceEventService: DeviceEventService = new DeviceEventService(typedEventBus, sofieIngestEventBuilder)
 
   // Data change listeners
   const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService)
@@ -326,7 +328,7 @@ async function main(logger: Logger): Promise<void> {
 
   // System setup
   const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController], logger)
-  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, logger)
+  const eventServer: EventServer = new WebSocketEventServer(typedEventBus, logger)
 
   // System startup
   await mongoDatabase.connect()

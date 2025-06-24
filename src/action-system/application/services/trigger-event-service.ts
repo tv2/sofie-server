@@ -1,5 +1,4 @@
 import { TriggerEventEmitter } from '../interfaces/trigger-event-emitter'
-import { TriggerEventObserver } from '../interfaces/trigger-event-observer'
 import { Trigger } from '../../domain/entities/trigger'
 import {
   TriggerCreatedEvent, TriggerDeletedEvent,
@@ -7,14 +6,13 @@ import {
   TriggerUpdatedEvent
 } from '../value-objects/trigger-event'
 import { TriggerEventBuilder } from '../interfaces/trigger-event-builder'
+import { TypedEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/typed-event-emitter'
 
-export class TriggerEventService implements TriggerEventEmitter, TriggerEventObserver {
-  private readonly callbacks: ((triggerEvent: TriggerEvent) => void)[] = []
-
-  public constructor(private readonly triggerEventBuilder: TriggerEventBuilder) { }
+export class TriggerEventService implements TriggerEventEmitter {
+  public constructor(private readonly typedEventEmitter: TypedEventEmitter, private readonly triggerEventBuilder: TriggerEventBuilder) { }
 
   private emitTriggerEvent(triggerEvent: TriggerEvent): void {
-    this.callbacks.forEach(callback => callback(triggerEvent))
+    this.typedEventEmitter.emitTypedEvent(triggerEvent)
   }
 
   public emitTriggerCreatedEvent(trigger: Trigger): void {
@@ -30,9 +28,5 @@ export class TriggerEventService implements TriggerEventEmitter, TriggerEventObs
   public emitTriggerDeletedEvent(triggerId: string): void {
     const event: TriggerDeletedEvent = this.triggerEventBuilder.buildTriggerDeletedEvent(triggerId)
     this.emitTriggerEvent(event)
-  }
-
-  public subscribeToTriggerEvents(onTriggerEventCallback: (triggerEvent: TriggerEvent) => void): void {
-    this.callbacks.push(onTriggerEventCallback)
   }
 }
