@@ -1,4 +1,4 @@
-import { GatewayConnector } from '../../application/interfaces/gatewayConnector'
+import { IngestGatewayConnector } from '../../../rundown-ingest/application/interfaces/ingest-gateway-connector'
 import { Socket } from '../../../cross-cutting-concerns/infrastructure/interfaces/socket'
 import {
   IngestHealthStatusEventEmitter
@@ -8,7 +8,7 @@ import { IngestHealthStatus } from '../../../rundown-ingest/application/enum/ing
 const HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'ws://localhost:3008'
 const FEATURE_FLAG: boolean = process.env.DISABLE_INEWS_GATEWAY === 'true'
 
-export class INewsGatewayConnector implements GatewayConnector {
+export class INewsGatewayConnector implements IngestGatewayConnector {
   private healthStatus: IngestHealthStatus = IngestHealthStatus.UNKNOWN
 
   public constructor(private readonly socket: Socket, private readonly ingestHealthStatusEventEmitter: IngestHealthStatusEventEmitter) {
@@ -52,5 +52,9 @@ export class INewsGatewayConnector implements GatewayConnector {
 
   private onData(_data: unknown): void {
     // TODO: Implement in later task - Update type as well.
+  }
+
+  public getStatus(): IngestHealthStatus {
+    return this.healthStatus
   }
 }
