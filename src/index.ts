@@ -231,6 +231,14 @@ import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/s
 import { IngestHealthStatusEventService } from './rundown-ingest/application/interfaces/ingest-health-status-event-service'
 import { RundownIngestEventBuilder } from './rundown-ingest/application/services/rundown-ingest-event-builder'
 import { IngestController } from './rundown-ingest/application/controllers/ingest-controller'
+import {
+  INewsIngestConfigurationRepository
+} from './tv2-inews-ingest/domain/repositories/i-news-ingest-configuration-repository'
+import {
+  MongoINewsIngestConfigurationRepository
+} from './tv2-inews-ingest/infrastructure/repositories/mongo/mongo-i-news-ingest-configuration-repository'
+import { Tv2INewsIngestController } from './tv2-inews-ingest/application/controllers/tv2-i-news-ingest-controller'
+import { INewsIngestService } from './tv2-inews-ingest/application/services/i-news-ingest-service'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -259,6 +267,8 @@ async function main(logger: Logger): Promise<void> {
   const triggerRepository: TriggerRepository = new MongoTriggerRepository(mongoDatabase, uuidGenerator)
   const macroRepository: MacroRepository = new MongoMacroRepository(mongoDatabase, uuidGenerator)
   const actionManifestRepository: ActionManifestRepository = createActionManifestRepository(mongoDatabase)
+
+  const iNewsIngestConfigurationRepository: INewsIngestConfigurationRepository = new MongoINewsIngestConfigurationRepository(mongoDatabase)
 
   // Event builders and event services
   const rundownExecutionEventBuilder: RundownExecutionEventBuilder = new RundownExecutionEventBuilder()
@@ -307,6 +317,7 @@ async function main(logger: Logger): Promise<void> {
   const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, mongoEntityConverter, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
   const ingestGatewayConnector: IngestGatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
+  const iNewsIngestService: INewsIngestService = new INewsIngestService(iNewsIngestConfigurationRepository)
 
   // Controller setup
   const httpResponseFormatter: JsendResponseFormatter = new JsendResponseFormatter()
@@ -323,9 +334,10 @@ async function main(logger: Logger): Promise<void> {
   const loggerController: LoggerController = new LoggerController(httpResponseFormatter, httpErrorHandler, logger)
   const deviceController: DeviceController = new DeviceController(videoMixerDeviceRepository, httpErrorHandler, httpResponseFormatter)
   const ingestController: IngestController = new IngestController(ingestGatewayConnector, httpErrorHandler, httpResponseFormatter)
+  const tv2INewsIngestController: Tv2INewsIngestController = new Tv2INewsIngestController(iNewsIngestService, httpResponseFormatter, httpErrorHandler)
 
   // System setup
-  const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController, ingestController], logger)
+  const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController, ingestController, tv2INewsIngestController], logger)
   const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, healthStatusEventService, logger)
 
   // System startup
