@@ -25,6 +25,8 @@ import { RundownCursor } from '../../domain/value-objects/rundown-cursor'
 import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'
 import { PlayoutContentUpdateService } from '../interfaces/playout-content-service'
+import { Configuration } from '../../domain/entities/configuration'
+import { ConfigurationRepository } from '../../domain/repositories/configuration-repository'
 
 export class RundownTimelineService implements RundownService {
   private readonly logger: Logger
@@ -35,6 +37,7 @@ export class RundownTimelineService implements RundownService {
     private readonly rundownRepository: RundownRepository,
     private readonly timelineRepository: TimelineRepository,
     private readonly timelineBuilder: TimelineBuilder,
+    private readonly configurationRepository: ConfigurationRepository,
     private readonly ingestService: IngestService,
     private readonly playoutService: PlayoutService,
     private readonly callbackScheduler: CallbackScheduler,
@@ -121,7 +124,8 @@ export class RundownTimelineService implements RundownService {
   }
 
   private async buildAndPersistTimeline(rundown: Rundown): Promise<Timeline> {
-    const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration)
     await this.timelineRepository.saveTimeline(timeline)
     return timeline
   }

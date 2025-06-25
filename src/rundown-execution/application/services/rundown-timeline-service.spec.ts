@@ -29,6 +29,7 @@ import { TakeIsBlockedException } from '../exceptions/take-is-blocked-exception'
 import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { TakeMode } from '../../domain/enums/take-mode'
 import { PlayoutContentUpdateService } from '../interfaces/playout-content-service'
+import { ConfigurationRepository } from '../../domain/repositories/configuration-repository'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -382,7 +383,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
-      when(timelineBuilder.buildTimeline(rundown)).thenResolve(mockTimeline)
+      when(timelineBuilder.buildTimeline(rundown, anything())).thenReturn(mockTimeline)
 
       const testee: RundownTimelineService = createTestee({
         rundownEventEmitter,
@@ -415,7 +416,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
-      when(timelineBuilder.buildTimeline(rundown)).thenResolve(mockTimeline)
+      when(timelineBuilder.buildTimeline(rundown, anything())).thenReturn(mockTimeline)
 
       const testee: RundownTimelineService = createTestee({
         rundownEventEmitter,
@@ -450,7 +451,7 @@ describe(RundownTimelineService.name, () => {
       })
 
       when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
-      when(timelineBuilder.buildTimeline(rundown)).thenResolve(mockTimeline)
+      when(timelineBuilder.buildTimeline(rundown, anything())).thenReturn(mockTimeline)
 
       const testee: RundownTimelineService = createTestee({
         rundownEventEmitter,
@@ -1018,14 +1019,14 @@ describe(RundownTimelineService.name, () => {
         }
 
         const timelineBuilder: TimelineBuilder = mock<TimelineBuilder>()
-        when(timelineBuilder.buildTimeline(rundown)).thenResolve(timeline)
+        when(timelineBuilder.buildTimeline(rundown, anything())).thenReturn(timeline)
 
         const timelineRepository: TimelineRepository = mock<TimelineRepository>()
 
         const testee: RundownTimelineService = createTestee({ rundownRepository, timelineBuilder, timelineRepository })
         await testee.stopPiece(rundown.id, piece.id)
 
-        verify(timelineBuilder.buildTimeline(rundown)).once()
+        verify(timelineBuilder.buildTimeline(rundown, anything())).once()
         verify(timelineRepository.saveTimeline(timeline)).once()
       })
 
@@ -1167,6 +1168,7 @@ function createTestee(params?: {
   rundownRepository?: RundownRepository
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
+  configurationRepository?: ConfigurationRepository
   ingestService?: IngestService
   playoutService?: PlayoutService
   callbackScheduler?: CallbackScheduler
@@ -1175,7 +1177,7 @@ function createTestee(params?: {
   logger?: Logger
 }): RundownTimelineService {
   const timelineBuilderMock: TimelineBuilder = mock<TimelineBuilder>()
-  when(timelineBuilderMock.buildTimeline(anything())).thenReturn(Promise.resolve({ timelineGroups: [] }))
+  when(timelineBuilderMock.buildTimeline(anything(), anything())).thenReturn({ timelineGroups: [] })
 
   return new RundownTimelineService(
     instance(params?.rundownEventEmitter ?? mock<RundownEventEmitter>()),
@@ -1183,6 +1185,7 @@ function createTestee(params?: {
     instance(params?.rundownRepository ?? mock<RundownRepository>()),
     instance(params?.timelineRepository ?? mock<TimelineRepository>()),
     instance(params?.timelineBuilder ?? timelineBuilderMock),
+    instance(params?.configurationRepository ?? mock<ConfigurationRepository>()),
     instance(params?.ingestService ?? createMockOfIngestService()),
     instance(params?.playoutService ?? createMockOfPlayoutService()),
     instance(params?.callbackScheduler ?? mock<CallbackScheduler>()),

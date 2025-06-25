@@ -293,11 +293,11 @@ async function main(logger: Logger): Promise<void> {
 
   // Services
   const blueprint: Blueprint = createBlueprint(objectCloner, logger)
-  const timelineBuilder: TimelineBuilder = createTimelineBuilder(objectCloner, configurationRepository, blueprint)
+  const timelineBuilder: TimelineBuilder = createTimelineBuilder(objectCloner, blueprint)
   const ingestService: IngestService = new Tv2INewsIngestService(httpService, rundownAggregateRepository)
   const playoutService: PlayoutService = new PlayoutGatewayService(httpService, logger)
   const playoutContentStateService: PlayoutContentStateService = createPlayoutContentStateService(mongoDatabase, playoutContentEventService)
-  const rundownTimelineService: RundownTimelineService = new RundownTimelineService(rundownEventService, ingestedRundownRepository, rundownAggregateRepository, timelineRepository, timelineBuilder, ingestService, playoutService, timeoutCallbackScheduler, blueprint, playoutContentStateService, logger)
+  const rundownTimelineService: RundownTimelineService = new RundownTimelineService(rundownEventService, ingestedRundownRepository, rundownAggregateRepository, timelineRepository, timelineBuilder, configurationRepository, ingestService, playoutService, timeoutCallbackScheduler, blueprint, playoutContentStateService, logger)
   const synchronizedRundownService: SynchronizedRundownService = new SynchronizedRundownService(rundownTimelineService, rundownAsyncLock)
   const rundownService: RundownService = new ThrottledRundownService(synchronizedRundownService)
   const actionService: ActionService = new ExecuteActionService(actionRepository, rundownAggregateRepository, mediaRepository, configurationRepository, rundownService, blueprint, playoutContentStateService)
@@ -399,9 +399,9 @@ function createActionManifestRepository(mongoDatabase: MongoDatabase): ActionMan
   return new MongoActionManifestRepository([adLibActionManifestRepository, adLibPieceManifestRepository])
 }
 
-function createTimelineBuilder(objectCloner: ObjectCloner, configurationRepository: ConfigurationRepository, blueprint: Blueprint): TimelineBuilder {
+function createTimelineBuilder(objectCloner: ObjectCloner, blueprint: Blueprint): TimelineBuilder {
   const superflyTimelineBuilder: SuperflyTimelineBuilder = new SuperflyTimelineBuilder(objectCloner)
-  return new BlueprintTimelineBuilder(superflyTimelineBuilder, configurationRepository, blueprint)
+  return new BlueprintTimelineBuilder(superflyTimelineBuilder, blueprint)
 }
 
 function createPlayoutContentStateService(mongoDatabase: MongoDatabase, playoutContentEventEmitter: PlayoutContentEventEmitter): PlayoutContentStateService {
@@ -434,6 +434,7 @@ function createIngestChangeService(mongoDatabase: MongoDatabase, ingestedRundown
     rundownEventEmitter,
     timelineBuilder,
     timelineRepository,
+    configurationRepository,
     actionGenerationService,
     logger
   )

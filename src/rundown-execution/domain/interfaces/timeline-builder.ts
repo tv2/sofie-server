@@ -1,8 +1,8 @@
 import { Rundown } from '../entities/rundown'
 import { Timeline } from '../entities/timeline'
-import { Studio } from '../entities/studio'
+import { Configuration } from '../entities/configuration'
 
 export interface TimelineBuilder {
   getBaseTimeline(): Timeline
-  buildTimeline(rundown: Rundown, studio?: Studio): Promise<Timeline>
+  buildTimeline(rundown: Rundown, configuration: Configuration): Timeline
 }
