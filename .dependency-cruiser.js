@@ -238,6 +238,194 @@ module.exports = {
       }
     }
   ],
+  allowedSeverity: 'error',
+  allowed: [
+    {
+      comment: 'Domain modules can unrestricted depend on themself.',
+      from: {
+        path: '^src/([^/]+)/domain/',
+      },
+      to: {
+        path: '^src/$1/domain/',
+      }
+    },
+    {
+      comment: 'Rundown execution can depend on superfly-timeline',
+      from: {
+        path: '^src/rundown-execution/',
+      },
+      to: {
+        path: '/superfly-timeline/',
+      }
+    },
+    {
+      comment: 'Domain modules can depend on domain modules in other context modules.',
+      from: {
+        path: '^src/([^/]+)/domain/',
+      },
+      to: {
+        pathNot: '^src/$1/domain/',
+        path: '^src/[^/]+/domain/',
+      }
+    },
+    {
+      // TODO: This rule should be removed.
+      comment: 'Blueprints domain module can depend logger interface - temporarily.',
+      from: {
+        path: '^src/blueprints/domain/',
+      },
+      to: {
+        path: '^src/cross-cutting-concerns/application/interfaces/logger.ts',
+      }
+    },
+    {
+      comment: 'Application modules can unrestricted depend on themself and their domain module.',
+      from: {
+        path: '^src/([^/]+)/application/',
+      },
+      to: {
+        path: [
+          '^src/$1/application/',
+          '^src/$1/domain/'
+        ],
+      }
+    },
+    {
+      comment: 'Application modules can depend on other application modules.',
+      from: {
+        path: '^src/([^/]+)/application/',
+      },
+      to: {
+        pathNot: '^src/$1/application/',
+        path: '^src/[^/]+/application/',
+      }
+    },
+    {
+      comment: 'Application modules can depend on domain modules in other context modules.',
+      from: {
+        path: '^src/([^/]+)/application/',
+      },
+      to: {
+        pathNot: '^src/$1/domain/',
+        path: '^src/[^/]+/domain/',
+      }
+    },
+    {
+      comment: 'Any module may depend on the cross-cutting-concerns domain module or same submodule.',
+      from: {
+        path: '^src/[^/]+/([^/]+)/'
+      },
+      to: {
+        path: [
+          '^src/cross-cutting-concerns/domain/',
+          '^src/cross-cutting-concerns/$1/'
+        ],
+      }
+    },
+    {
+      comment: 'Controllers may depend on the base controller in the cross-cutting-concerns module.',
+      from: {
+        path: 'controller.ts$',
+      },
+      to: {
+        path: [
+          '^src/cross-cutting-concerns/application/controllers/base-controller.ts$'
+        ],
+      }
+    },
+    {
+      // TODO: Remove this rule when controllers and related application classes no longer are dependent on express.
+      comment: 'Controllers and related application classes may depend on express from cross-cutting-concerns',
+      from: {
+        path: [
+          'controller.ts$',
+          '/express-error-handler.ts$',
+          '/http-error-handler.ts$',
+        ],
+      },
+      to: {
+        path: [
+          '/express/',
+        ],
+      }
+    },
+    {
+      comment: 'Any module may depend on cross-cutting-concerns domain exceptions',
+      from: {
+        path: '^src/',
+      },
+      to: {
+        path: [
+          '^src/cross-cutting-concerns/domain/exceptions/[.]+-exception.ts',
+        ],
+      }
+    },
+    {
+      comment: 'Infrastructure modules may depend on other infrastructure, domain and application modules.',
+      from: {
+        path: '^src/([^/]+)/infrastructure/',
+      },
+      to: {
+        path: [
+          '^src/[^/]+/infrastructure/',
+          '^src/[^/]+/application/',
+          '^src/[^/]+/domain/'
+        ],
+      }
+    },
+    {
+      comment: 'Infrastructure and application modules may depend on node_modules.',
+      from: {
+        path: [
+          '^src/[^/]+/infrastructure/',
+          '^src/[^/]+/application/',
+        ],
+      },
+      to: {
+        path: '^node_modules/',
+      }
+    },
+    {
+      comment: 'Infrastructure modules may depend on Node core packages.',
+      from: {
+        path: '^src/([^/]+)/infrastructure/',
+      },
+      to: {
+        dependencyTypes: ['core']
+      }
+    },
+    {
+      comment: 'Test files may depend on node_modules.',
+      from: {
+        path: [
+            '[.]spec[.]ts',
+            '/test/'
+        ],
+      },
+      to: {
+        path: '^node_modules/'
+      }
+    },
+    {
+      comment: 'Composition root in index.ts may depend on everything.',
+      from: {
+        path: '^src/index.ts$'
+      },
+      to: {
+        path: '^src/'
+      }
+    },
+    {
+      // TODO: Remove when AuditLog decorator uses dependency inversion.
+      comment: 'AuditLog decorator may depend on ConsoleLogger.',
+      from: {
+        path: '^src/cross-cutting-concerns/application/decorators/audit-log-decorator.ts$',
+      },
+      to: {
+        path: '^src/cross-cutting-concerns/infrastructure/services/console-logger.ts$',
+      }
+    }
+  ],
   options: {
 
     /* Which modules not to follow further when encountered */
