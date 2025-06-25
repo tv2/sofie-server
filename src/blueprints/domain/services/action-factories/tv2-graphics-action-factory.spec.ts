@@ -254,6 +254,7 @@ function createConfiguredBlueprintConfiguration(): Tv2BlueprintConfiguration {
     }
   })
 }
+
 function createMockOfStringHashGenerator(): StringHashGenerator {
   const mockedStringHashGenerator: StringHashGenerator = mock()
   when(mockedStringHashGenerator.getHashedValue(anything())).thenCall(text => text)
