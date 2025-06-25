@@ -196,6 +196,21 @@ module.exports = {
       }
     },
     {
+      name: 'domain-may-not-use-repositories',
+      comment: 'Domain modules may not use repositories as they represent life-cycle management which lies beyond domain.',
+      severity: 'error',
+      from: {
+        path:'^src/[^/]+/domain',
+        pathNot: '^src/[^/]+/domain/repositories'
+      },
+      to: {
+        path: [
+          '-repository.ts$',
+          'repositories',
+        ]
+      }
+    },
+    {
       name: 'cross-cutting-concerns-only-depends-on-itself',
       comment: 'The cross-cutting concerns module should not depend on any other modules. Libraries and packages are allowed.',
       severity: 'error',
@@ -220,15 +235,6 @@ module.exports = {
       }
     },
     {
-      comment: 'Rundown execution can depend on superfly-timeline',
-      from: {
-        path: '^src/rundown-execution/',
-      },
-      to: {
-        path: '/superfly-timeline/',
-      }
-    },
-    {
       comment: 'Domain modules can depend on domain modules in other context modules.',
       from: {
         path: '^src/([^/]+)/domain/',
@@ -236,6 +242,15 @@ module.exports = {
       to: {
         pathNot: '^src/$1/domain/',
         path: '^src/[^/]+/domain/',
+      }
+    },
+    {
+      comment: 'Rundown execution can depend on superfly-timeline',
+      from: {
+        path: '^src/rundown-execution/',
+      },
+      to: {
+        path: '/superfly-timeline/',
       }
     },
     {
