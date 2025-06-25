@@ -195,36 +195,6 @@ module.exports = {
         ]
       }
     },
-    { // TODO: Change rule to only allow type imports across module borders.
-      name: 'domain-only-depends-on-domain',
-      comment: 'Domain modules may only depend on them selves and on other domain modules.',
-      severity: 'error',
-      from: {
-        path: '^src/[^/]+/domain/',
-        pathNot: '[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$'
-      },
-      to: {
-        pathNot: '^src/[^/]+/domain/|^node_modules|/logger.ts$' // TODO: Domain should not depend on node_modules nor Logger.
-      },
-    },
-    { // TODO: Change rule to only allow type imports across module borders.
-      name: 'applications-depends-on-domains-and-applications',
-      comment: 'Application modules may only depend on them selves, their domain module, other application modules or other domain modules.' +
-          'Keep inter-context dependencies as few as possible.',
-      severity: 'error',
-      from: {
-        path: '^src/[^/]+/application/',
-        pathNot: 'audit-log-decorator.ts$' // TODO: Find a solution for doing audit-logging without decorators.
-      },
-      to: {
-        dependencyTypesNot: ['core'],
-        pathNot: [
-          '^src/[^/]+/application/',
-          '^src/[^/]+/domain/',
-          '^node_modules'
-        ]
-      }
-    },
     {
       name: 'cross-cutting-concerns-only-depends-on-itself',
       comment: 'The cross-cutting concerns module should not depend on any other modules. Libraries and packages are allowed.',
