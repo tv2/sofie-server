@@ -195,7 +195,7 @@ module.exports = {
         ]
       }
     },
-    {
+    { // TODO: Change rule to only allow type imports across module borders.
       name: 'domain-only-depends-on-domain',
       comment: 'Domain modules may only depend on them selves and on other domain modules.',
       severity: 'error',
@@ -207,7 +207,7 @@ module.exports = {
         pathNot: '^src/[^/]+/domain/|^node_modules|/logger.ts$' // TODO: Domain should not depend on node_modules nor Logger.
       },
     },
-    {
+    { // TODO: Change rule to only allow type imports across module borders.
       name: 'applications-depends-on-domains-and-applications',
       comment: 'Application modules may only depend on them selves, their domain module, other application modules or other domain modules.' +
           'Keep inter-context dependencies as few as possible.',
