@@ -35,7 +35,7 @@ import {
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData
 } from '../../value-objects/tv2-action-manifest-data'
-import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
+import { StringHashGenerator } from '../../interfaces/string-hash-generator'
 import { Tv2MisconfigurationException } from '../../exceptions/tv2-misconfiguration-exception'
 import {
   Tv2GraphicsCommandTimelineObjectFactory
@@ -71,7 +71,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     private readonly graphicsTimelineObjectFactoryFactory: Tv2GraphicsTimelineObjectFactoryFactory,
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory,
-    private readonly stringHashConverter: Tv2StringHashConverter,
+    private readonly stringHashConverter: StringHashGenerator,
     private readonly configurationMapper: Tv2ConfigurationMapper
   ) {
     super()

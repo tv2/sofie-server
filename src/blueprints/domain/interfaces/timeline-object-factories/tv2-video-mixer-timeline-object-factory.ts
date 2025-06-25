@@ -8,7 +8,8 @@ import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-con
 import { Tv2BlueprintTimelineObject, } from '../../value-objects/tv2-blueprint-timeline-object'
 import { Piece } from '../../../../rundown-execution/domain/entities/piece'
 import { Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
-import { TimelineObjectMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
+
+import { TimelineObjectMetadata } from '../../../../rundown-execution/domain/entities/timeline-object'
 
 export interface Tv2VideoMixerTimelineObjectFactory {
   createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): Tv2BlueprintTimelineObject

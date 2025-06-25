@@ -18,7 +18,7 @@ export async function up(db: Db): Promise<void> {
 
 export async function down(db: Db): Promise<void> {
   await db.collection('actionTriggers').updateMany(
-    { 'actionArguments': { $exists: true } },
+    { actionArguments: { $exists: true } },
     [
       {
         $set: { 'data.actionArguments': '$actionArguments' }

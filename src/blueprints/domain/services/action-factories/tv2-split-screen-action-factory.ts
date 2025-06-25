@@ -49,7 +49,7 @@ import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
 import { Tv2ActionManifest } from '../../value-objects/tv2-action-manifest'
 import { Tv2PieceInterface } from '../../entities/tv2-piece-interface'
 import { ActionFactory } from './action-factory'
-import { Tv2StringHashConverter } from '../tv2-string-hash-converter'
+import { StringHashGenerator } from '../../interfaces/string-hash-generator'
 import { Tv2UnexpectedActionException } from '../../exceptions/tv2-unexpected-action-exception'
 import { PieceMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
 import { OutputLayer } from '../../../../rundown-execution/domain/enums/output-layer'
@@ -85,7 +85,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     private readonly audioMixerTimelineObjectFactory: Tv2AudioMixerTimelineObjectFactory,
     private readonly graphicsSplitScreenTimelineObjectFactory: Tv2GraphicsSplitScreenTimelineObjectFactory,
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
-    private readonly stringHashConverter: Tv2StringHashConverter,
+    private readonly stringHashConverter: StringHashGenerator,
     private readonly assetPathHelper: Tv2AssetPathHelper,
     private readonly objectCloner: ObjectCloner,
     logger: Logger,
