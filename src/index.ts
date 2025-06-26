@@ -417,7 +417,7 @@ function createIngestChangeService(mongoDatabase: MongoDatabase, ingestedRundown
   const ingestedPieceChangeListener: MongoIngestedPieceChangedListener = new MongoIngestedPieceChangedListener(mongoDatabase, ingestedMongoEntityConverter, logger)
   const entityChangeDetector: EntityChangeDetector = new EntityChangeDetector()
   const ingestedEntityToEntityMapper: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
-  const ingestRundownSynchronizer: IngestRundownSynchronizer = new IngestRundownSynchronizer(ingestedEntityToEntityMapper, entityChangeDetector, blueprint, configurationRepository)
+  const ingestRundownSynchronizer: IngestRundownSynchronizer = new IngestRundownSynchronizer(ingestedEntityToEntityMapper, entityChangeDetector, blueprint)
   return new IngestDataChangeService(
     ingestedRundownRepository,
     rundownAggregateRepository,
