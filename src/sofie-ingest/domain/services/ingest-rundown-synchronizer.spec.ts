@@ -1,6 +1,6 @@
 import { IngestRundownSynchronizer, RundownSynchronizeResult } from './ingest-rundown-synchronizer'
-import { IngestedEntityToEntityMapper } from '../../domain/services/ingested-entity-to-entity-mapper'
-import { EntityChangeDetector } from '../../domain/services/entity-change-detector'
+import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper'
+import { EntityChangeDetector } from './entity-change-detector'
 import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
