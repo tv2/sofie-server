@@ -2,6 +2,7 @@ import { Socket } from '../interfaces/socket'
 import WebSocket, { CloseEvent, ErrorEvent, Event, MessageEvent } from 'ws'
 import { Logger } from '../../application/interfaces/logger'
 
+const WEB_SOCKET_CONNECTION_PREFIX: string = 'ws://'
 const WEB_SOCKET_NORMAL_CLOSURE_CODE: number = 1000
 
 export class ReconnectingWebSocket implements Socket {
@@ -10,12 +11,12 @@ export class ReconnectingWebSocket implements Socket {
   private timeoutIdentifier?: NodeJS.Timeout
   private keepAlive: boolean = true
 
-  private connectionString: string
+  private ipAddress: string
 
-  private onConnected: () => void
-  private onData: (data: unknown) => void
-  private onError: () => void
-  private onClose: (isClosedByError: boolean) => void
+  private onConnected?: () => void
+  private onClose?: (isClosedByError: boolean) => void
+  private onData?: (data: unknown) => void
+  private onError?: () => void
 
   private readonly logger: Logger
 
@@ -23,42 +24,32 @@ export class ReconnectingWebSocket implements Socket {
     this.logger = logger.tag('ReconnectingWebSocket')
   }
 
-  public connect(
-    connectionString: string,
-    onConnected: () => void,
-    onData: (data: unknown) => void,
-    onError: () => void,
-    onClose: (isClosedByError: boolean) => void
-  ): void {
-    this.connectionString = connectionString
-    this.onConnected = onConnected
-    this.onData = onData
-    this.onError = onError
-    this.onClose = onClose
-
+  public connect(ipAddress: string): void {
+    this.ipAddress = ipAddress
     this.connectToNewSocket()
   }
 
   private connectToNewSocket(): void {
-    this.webSocket = new WebSocket(this.connectionString)
+    this.webSocket?.close()
+    this.webSocket = new WebSocket(`${WEB_SOCKET_CONNECTION_PREFIX}${this.ipAddress}`)
 
     this.webSocket.addEventListener('open', (_event: Event) => {
-      this.logger.debug(`Connected to WebSocket on ${this.connectionString}`)
-      this.onConnected()
+      this.logger.debug(`Connected to WebSocket on ${this.ipAddress}`)
+      this.onConnected?.()
     })
 
     this.webSocket.addEventListener('message', (event: MessageEvent) => {
-      this.onData(event.data)
+      this.onData?.(event.data)
     })
 
     this.webSocket.addEventListener('error', (event: ErrorEvent) => {
-      this.logger.data(event).error(`Error from WebSocket listening on: ${this.connectionString}`)
-      this.onError()
+      this.logger.data(event).error(`Error from WebSocket listening on: ${this.ipAddress}`)
+      this.onError?.()
     })
 
     this.webSocket.addEventListener('close', (event: CloseEvent) => {
-      this.logger.debug(`WebSocket listening on ${this.connectionString} was closed`)
-      this.onClose(event.code !== WEB_SOCKET_NORMAL_CLOSURE_CODE)
+      this.logger.debug(`WebSocket listening on ${this.ipAddress} was closed`)
+      this.onClose?.(event.code !== WEB_SOCKET_NORMAL_CLOSURE_CODE)
       this.reconnect()
     })
   }
@@ -77,5 +68,21 @@ export class ReconnectingWebSocket implements Socket {
     this.keepAlive = false
     clearTimeout(this.timeoutIdentifier)
     this.webSocket.close(WEB_SOCKET_NORMAL_CLOSURE_CODE)
+  }
+
+  public subscribeToOnConnected(onConnected: () => void): void {
+    this.onConnected = onConnected
+  }
+
+  public subscribeToOnClosed(onClosed: (isClosedByError: boolean) => void): void {
+    this.onClose = onClosed
+  }
+
+  public subscribeToData(onData: (data: unknown) => void): void {
+    this.onData = onData
+  }
+
+  public subscribeToError(onError: () => void): void {
+    this.onError = onError
   }
 }

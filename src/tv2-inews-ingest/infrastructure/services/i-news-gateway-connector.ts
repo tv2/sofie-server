@@ -5,8 +5,8 @@ import {
 } from '../../../rundown-ingest/application/interfaces/ingest-health-status-event-emitter'
 import { IngestHealthStatus } from '../../../rundown-ingest/application/enum/ingest-health-status'
 
-const HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'ws://localhost:3008'
-const FEATURE_FLAG: boolean = process.env.DISABLE_INEWS_GATEWAY === 'true'
+const HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'localhost:3008'
+const FEATURE_FLAG_DISABLED: boolean = process.env.DISABLE_INEWS_GATEWAY === 'true'
 
 export class INewsGatewayConnector implements IngestGatewayConnector {
   private healthStatus: IngestHealthStatus = IngestHealthStatus.UNKNOWN
@@ -15,26 +15,17 @@ export class INewsGatewayConnector implements IngestGatewayConnector {
   }
 
   public connect(): void {
-    if (FEATURE_FLAG) {
+    if (FEATURE_FLAG_DISABLED) {
       // TODO: This is temporary until we can release the new Ingest flow.
       return
     }
-    this.socket.connect(
-      this.getConnectionString(),
-      () => {
-        this.updateHealthStatus(IngestHealthStatus.GOOD)
-      },
-      data => this.onData(data),
-      () => {
-        this.updateHealthStatus(IngestHealthStatus.BAD)
-      },
-      (isClosedByError: boolean) => {
-        if (isClosedByError) {
-          return
-        }
-        this.updateHealthStatus(IngestHealthStatus.UNKNOWN)
-      }
-    )
+
+    this.socket.subscribeToOnConnected(() => this.updateHealthStatus(IngestHealthStatus.GOOD))
+    this.socket.subscribeToOnClosed((isClosedByError: boolean) => this.updateHealthStatus(isClosedByError ? IngestHealthStatus.BAD : IngestHealthStatus.UNKNOWN))
+    this.socket.subscribeToData(this.onData)
+    this.socket.subscribeToError(() => this.updateHealthStatus(IngestHealthStatus.BAD))
+
+    this.socket.connect(this.getConnectionString())
   }
 
   private getConnectionString(): string {
