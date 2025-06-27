@@ -1,36 +1,35 @@
 import { IngestGatewayConnector } from '../../../rundown-ingest/application/interfaces/ingest-gateway-connector'
-import { Socket } from '../../../cross-cutting-concerns/infrastructure/interfaces/socket'
+import { WebSocket } from '../../../cross-cutting-concerns/infrastructure/interfaces/web-socket'
 import {
   IngestHealthStatusEventEmitter
 } from '../../../rundown-ingest/application/interfaces/ingest-health-status-event-emitter'
 import { IngestHealthStatus } from '../../../rundown-ingest/application/enum/ingest-health-status'
 
-const HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'localhost:3008'
+const HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'ws://localhost:3008'
 const FEATURE_FLAG_DISABLED: boolean = process.env.DISABLE_INEWS_GATEWAY === 'true'
 
 export class INewsGatewayConnector implements IngestGatewayConnector {
   private healthStatus: IngestHealthStatus = IngestHealthStatus.UNKNOWN
 
-  public constructor(private readonly socket: Socket, private readonly ingestHealthStatusEventEmitter: IngestHealthStatusEventEmitter) {
+  public constructor(private readonly webSocket: WebSocket, private readonly ingestHealthStatusEventEmitter: IngestHealthStatusEventEmitter) {
   }
 
-  public connect(): void {
+  public connect(queueIds: string[]): void {
     if (FEATURE_FLAG_DISABLED) {
       // TODO: This is temporary until we can release the new Ingest flow.
       return
     }
 
-    this.socket.subscribeToOnConnected(() => this.updateHealthStatus(IngestHealthStatus.GOOD))
-    this.socket.subscribeToOnClosed((isClosedByError: boolean) => this.updateHealthStatus(isClosedByError ? IngestHealthStatus.BAD : IngestHealthStatus.UNKNOWN))
-    this.socket.subscribeToData(this.onData)
-    this.socket.subscribeToError(() => this.updateHealthStatus(IngestHealthStatus.BAD))
+    this.webSocket.subscribeToOnConnected(() => this.updateHealthStatus(IngestHealthStatus.GOOD))
+    this.webSocket.subscribeToOnClosed((isClosedByError: boolean) => this.updateHealthStatus(isClosedByError ? IngestHealthStatus.BAD : IngestHealthStatus.UNKNOWN))
+    this.webSocket.subscribeToData(this.onData)
+    this.webSocket.subscribeToError(() => this.updateHealthStatus(IngestHealthStatus.BAD))
 
-    this.socket.connect(this.getConnectionString())
+    this.webSocket.connect(this.getConnectionString(queueIds))
   }
 
-  private getConnectionString(): string {
-    const queues: string = ''
-    return `${HOST}/?queues=${queues}`
+  private getConnectionString(queueIds: readonly string[]): string {
+    return `${HOST}/?queues=${queueIds.join(',')}`
   }
 
   private updateHealthStatus(healthStatus: IngestHealthStatus): void {
