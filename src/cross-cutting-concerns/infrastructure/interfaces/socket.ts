@@ -1,10 +1,9 @@
 export interface Socket {
-  connect(
-    connectionString: string,
-    onConnected: () => void,
-    onData: (data: unknown) => void,
-    onError: () => void,
-    onClose: (isClosedByError: boolean) => void
-  ): void
+  connect(ipAddress: string): void
   disconnect(): void
+
+  subscribeToOnConnected(onConnected: () => void): void
+  subscribeToOnClosed(onClosed: (isClosedByError: boolean) => void): void
+  subscribeToData(onData: (data: unknown) => void): void
+  subscribeToError(onError: () => void): void
 }
