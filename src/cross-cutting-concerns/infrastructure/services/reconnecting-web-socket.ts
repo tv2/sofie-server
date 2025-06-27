@@ -40,6 +40,7 @@ export class ReconnectingWebSocket implements Socket {
   }
 
   private connectToNewSocket(): void {
+    this.webSocket?.close()
     this.webSocket = new WebSocket(this.connectionString)
 
     this.webSocket.addEventListener('open', (_event: Event) => {
