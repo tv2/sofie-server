@@ -1,6 +1,6 @@
-import { INewsIngestConfiguration } from '../../domain/entities/i-news-ingest-configuration'
+import { InewsIngestConfiguration } from '../../domain/entities/inews-ingest-configuration'
 
 export interface IngestService {
-  getIngestConfiguration(): Promise<INewsIngestConfiguration>
-  saveIngestConfiguration(iNewsIngestConfiguration: INewsIngestConfiguration): Promise<void>
+  getIngestConfiguration(): Promise<InewsIngestConfiguration>
+  saveIngestConfiguration(inewsIngestConfiguration: InewsIngestConfiguration): Promise<void>
 }
