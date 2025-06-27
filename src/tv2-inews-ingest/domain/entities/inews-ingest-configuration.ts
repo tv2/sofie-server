@@ -1,8 +1,5 @@
+import { InewsQueueSubscription } from '../value-objects/ines-queue-subscription'
+
 export interface InewsIngestConfiguration {
   queueSubscriptions: InewsQueueSubscription[]
-}
-
-export interface InewsQueueSubscription {
-  queueId: string
-  isDisabled: boolean
 }
