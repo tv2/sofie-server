@@ -21,21 +21,17 @@ export class MongoInewsIngestConfigurationRepository extends BaseMongoRepository
   public async get(): Promise<InewsIngestConfiguration> {
     this.assertDatabaseConnection(this.get.name)
     const inewsIngestConfiguration: InewsIngestConfiguration | null = await this.getCollection().findOne()
-    if (!inewsIngestConfiguration) {
-      return {
-        queueSubscriptions: []
-      }
+    return inewsIngestConfiguration ?? this.createEmptyInewsIngestConfiguration()
+  }
+
+  private createEmptyInewsIngestConfiguration(): InewsIngestConfiguration {
+    return {
+      queueSubscriptions: []
     }
-    return inewsIngestConfiguration
   }
 
   public async save(inewsIngestConfiguration: InewsIngestConfiguration): Promise<void> {
     this.assertDatabaseConnection(this.save.name)
-    const count: number = await this.getCollection().estimatedDocumentCount()
-    if (count === 1) {
-      await this.getCollection().replaceOne({}, inewsIngestConfiguration)
-    } else {
-      await this.getCollection().updateOne({}, { $set: inewsIngestConfiguration }, { upsert: true })
-    }
+    await this.getCollection().replaceOne({}, inewsIngestConfiguration, { upsert: true })
   }
 }
