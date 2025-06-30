@@ -1,8 +1,8 @@
-import { InewsQueueSubscription } from '../../domain/value-objects/ines-queue-subscription'
+import { InewsQueueSubscription } from '../../domain/value-objects/inews-queue-subscription'
 
 export class InewsQueueSubscriptionDto {
-  public queueId: string
-  public isDisabled: boolean
+  public readonly queueId: string
+  public readonly isDisabled: boolean
 
   public constructor(inewsQueueSubscription: InewsQueueSubscription) {
     this.queueId = inewsQueueSubscription.queueId
