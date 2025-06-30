@@ -8,7 +8,7 @@ import { HttpError, HttpErrorCode } from '../../../cross-cutting-concerns/applic
 
 const INEWS_HOST: string = process.env.INEWS_HOST ?? 'localhost:3007'
 
-export class Tv2INewsIngestService implements IngestService {
+export class Tv2InewsIngestService implements IngestService {
   public constructor(private readonly httpService: HttpService, private readonly rundownRepository: RundownRepository) {}
 
   public async reloadIngestData(rundownId: string): Promise<void> {
@@ -19,7 +19,7 @@ export class Tv2INewsIngestService implements IngestService {
     } catch (error) {
       if (error instanceof HttpError) {
         if (error.code === HttpErrorCode.CONNECTION_REFUSED) {
-          throw new ServiceUnavailableException('Unable to reingest data from iNews. Check your iNews connection.')
+          throw new ServiceUnavailableException('Unable to reingest data from inews. Check your inews connection.')
         }
         if (/does not exist in playlist/i.test(error.message)) {
           throw new NotFoundException('Unable to reingest data, since the rundown is not configured for ingest.')
