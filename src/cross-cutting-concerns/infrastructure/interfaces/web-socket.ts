@@ -1,5 +1,5 @@
-export interface Socket {
-  connect(ipAddress: string): void
+export interface WebSocket {
+  connect(connectionUrl: string): void
   disconnect(): void
 
   subscribeToOnConnected(onConnected: () => void): void

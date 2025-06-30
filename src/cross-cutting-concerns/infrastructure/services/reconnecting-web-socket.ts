@@ -1,17 +1,17 @@
-import { Socket } from '../interfaces/socket'
+import { WebSocket as AlbaWebSocket } from '../interfaces/web-socket'
 import WebSocket, { CloseEvent, ErrorEvent, Event, MessageEvent } from 'ws'
 import { Logger } from '../../application/interfaces/logger'
 
-const WEB_SOCKET_CONNECTION_PREFIX: string = 'ws://'
 const WEB_SOCKET_NORMAL_CLOSURE_CODE: number = 1000
+const WEB_SOCKET_DO_NOT_RECONNECT_CLOSURE_CODE: number = 3000
 
-export class ReconnectingWebSocket implements Socket {
+export class ReconnectingWebSocket implements AlbaWebSocket {
   private webSocket: WebSocket
 
   private timeoutIdentifier?: NodeJS.Timeout
   private keepAlive: boolean = true
 
-  private ipAddress: string
+  private connectionUrl: string
 
   private onConnected?: () => void
   private onClose?: (isClosedByError: boolean) => void
@@ -24,17 +24,17 @@ export class ReconnectingWebSocket implements Socket {
     this.logger = logger.tag('ReconnectingWebSocket')
   }
 
-  public connect(ipAddress: string): void {
-    this.ipAddress = ipAddress
+  public connect(connectionUrl: string): void {
+    this.connectionUrl = connectionUrl
     this.connectToNewSocket()
   }
 
   private connectToNewSocket(): void {
-    this.webSocket?.close()
-    this.webSocket = new WebSocket(`${WEB_SOCKET_CONNECTION_PREFIX}${this.ipAddress}`)
+    this.webSocket?.close(WEB_SOCKET_DO_NOT_RECONNECT_CLOSURE_CODE)
+    this.webSocket = new WebSocket(this.connectionUrl)
 
     this.webSocket.addEventListener('open', (_event: Event) => {
-      this.logger.debug(`Connected to WebSocket on ${this.ipAddress}`)
+      this.logger.debug(`Connected to WebSocket on ${this.connectionUrl}`)
       this.onConnected?.()
     })
 
@@ -43,14 +43,16 @@ export class ReconnectingWebSocket implements Socket {
     })
 
     this.webSocket.addEventListener('error', (event: ErrorEvent) => {
-      this.logger.data(event).error(`Error from WebSocket listening on: ${this.ipAddress}`)
+      this.logger.data(event).error(`Error from WebSocket listening on: ${this.connectionUrl}`)
       this.onError?.()
     })
 
     this.webSocket.addEventListener('close', (event: CloseEvent) => {
-      this.logger.debug(`WebSocket listening on ${this.ipAddress} was closed`)
+      this.logger.debug(`WebSocket listening on ${this.connectionUrl} was closed`)
       this.onClose?.(event.code !== WEB_SOCKET_NORMAL_CLOSURE_CODE)
-      this.reconnect()
+      if (event.code !== WEB_SOCKET_DO_NOT_RECONNECT_CLOSURE_CODE) {
+        this.reconnect()
+      }
     })
   }
 

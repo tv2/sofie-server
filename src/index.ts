@@ -327,7 +327,7 @@ async function main(logger: Logger): Promise<void> {
   const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, mongoEntityConverter, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
   const ingestGatewayConnector: IngestGatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
-  const inewsIngestService: InewsIngestService = new InewsIngestService(inewsIngestConfigurationRepository, inewsIngestConfigurationEventService)
+  const inewsIngestService: InewsIngestService = new InewsIngestService(inewsIngestConfigurationRepository, inewsIngestConfigurationEventService, ingestGatewayConnector)
 
   // Controller setup
   const httpResponseFormatter: JsendResponseFormatter = new JsendResponseFormatter()
@@ -357,9 +357,9 @@ async function main(logger: Logger): Promise<void> {
   await mediaDataChangeService.initialize()
   await deviceDataChangeService.initialize()
   await configurationDataChangeService.initialize()
+  await inewsIngestService.initialize()
   await restServer.start(3005)
   await eventServer.startServer(3006)
-  ingestGatewayConnector.connect()
   logger.info('Alba server is configured.')
 }
 
