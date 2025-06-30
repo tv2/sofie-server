@@ -225,11 +225,12 @@ import {
 } from './rundown-execution/infrastructure/repositories/cache/cached-configuration-repository'
 import { StringHashGenerator } from './blueprints/domain/interfaces/string-hash-generator'
 import { CryptoStringHashGenerator } from './blueprints/infrastructure/services/crypto-string-hash-generator'
-import { GatewayConnector } from './tv2-inews-ingest/application/interfaces/gatewayConnector'
+import { IngestGatewayConnector } from './rundown-ingest/application/interfaces/ingest-gateway-connector'
 import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
 import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
 import { IngestHealthStatusEventService } from './rundown-ingest/application/interfaces/ingest-health-status-event-service'
 import { RundownIngestEventBuilder } from './rundown-ingest/application/services/rundown-ingest-event-builder'
+import { IngestController } from './rundown-ingest/application/controllers/ingest-controller'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -305,7 +306,7 @@ async function main(logger: Logger): Promise<void> {
   const statusMessageService: StatusMessageService = new StatusMessageServiceImplementation(statusMessageEventService, statusMessageRepository)
   const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, mongoEntityConverter, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
-  const gateway: GatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
+  const ingestGatewayConnector: IngestGatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
 
   // Controller setup
   const httpResponseFormatter: JsendResponseFormatter = new JsendResponseFormatter()
@@ -321,9 +322,10 @@ async function main(logger: Logger): Promise<void> {
   const systemInformationController: SystemInformationController = new SystemInformationController(systemInformationRepository, statusMessageRepository, httpErrorHandler, httpResponseFormatter)
   const loggerController: LoggerController = new LoggerController(httpResponseFormatter, httpErrorHandler, logger)
   const deviceController: DeviceController = new DeviceController(videoMixerDeviceRepository, httpErrorHandler, httpResponseFormatter)
+  const ingestController: IngestController = new IngestController(ingestGatewayConnector, httpErrorHandler, httpResponseFormatter)
 
   // System setup
-  const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController], logger)
+  const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController, ingestController], logger)
   const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, healthStatusEventService, logger)
 
   // System startup
@@ -335,7 +337,7 @@ async function main(logger: Logger): Promise<void> {
   await configurationDataChangeService.initialize()
   await restServer.start(3005)
   await eventServer.startServer(3006)
-  gateway.connect()
+  ingestGatewayConnector.connect()
   logger.info('Alba server is configured.')
 }
 
