@@ -4,7 +4,9 @@ import { MongoDatabase } from './cross-cutting-concerns/infrastructure/mongodb/m
 import {
   MongoRundownAggregateRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-rundown-aggregate-repository'
-import { MongoSegmentRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-segment-repository'
+import {
+  MongoSegmentRepository
+} from './rundown-execution/infrastructure/repositories/mongodb/mongo-segment-repository'
 import { MongoPieceRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-piece-repository'
 import { MongoEntityConverter } from './rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { MongoPartRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-part-repository'
@@ -59,7 +61,9 @@ import { Tv2Blueprint } from './blueprints/domain/services/tv2-blueprint'
 import { Tv2EndStateForPartService } from './blueprints/domain/services/tv2-end-state-for-part-service'
 import { Tv2OnTimelineGenerateService } from './blueprints/domain/services/tv2-on-timeline-generate-service'
 import { Tv2BlueprintConfigurationValidator } from './blueprints/domain/services/tv2-blueprint-configuration-validator'
-import { Tv2BlueprintBaselinePiecesGenerator } from './blueprints/domain/services/tv2-blueprint-baseline-pieces-generator'
+import {
+  Tv2BlueprintBaselinePiecesGenerator
+} from './blueprints/domain/services/tv2-blueprint-baseline-pieces-generator'
 import {
   TimelineObjectFactoryProvider
 } from './blueprints/domain/services/timeline-object-factories/timeline-object-factory-provider'
@@ -221,6 +225,11 @@ import {
 } from './rundown-execution/infrastructure/repositories/cache/cached-configuration-repository'
 import { StringHashGenerator } from './blueprints/domain/interfaces/string-hash-generator'
 import { CryptoStringHashGenerator } from './blueprints/infrastructure/services/crypto-string-hash-generator'
+import { GatewayConnector } from './tv2-inews-ingest/application/interfaces/gatewayConnector'
+import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
+import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
+import { IngestHealthStatusEventService } from './rundown-ingest/application/interfaces/ingest-health-status-event-service'
+import { RundownIngestEventBuilder } from './rundown-ingest/application/services/rundown-ingest-event-builder'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -268,6 +277,9 @@ async function main(logger: Logger): Promise<void> {
   const sofieIngestEventBuilder: SofieIngestEventBuilder = new SofieIngestEventBuilder()
   const mediaEventService: MediaEventService = new MediaEventService(sofieIngestEventBuilder)
 
+  const rundownIngestEventBuilder: RundownIngestEventBuilder = new RundownIngestEventBuilder()
+  const healthStatusEventService: IngestHealthStatusEventService = new IngestHealthStatusEventService(rundownIngestEventBuilder)
+
   // Data change listeners
   const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService)
 
@@ -293,6 +305,7 @@ async function main(logger: Logger): Promise<void> {
   const statusMessageService: StatusMessageService = new StatusMessageServiceImplementation(statusMessageEventService, statusMessageRepository)
   const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, mongoEntityConverter, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
+  const gateway: GatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
 
   // Controller setup
   const httpResponseFormatter: JsendResponseFormatter = new JsendResponseFormatter()
@@ -311,7 +324,7 @@ async function main(logger: Logger): Promise<void> {
 
   // System setup
   const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController], logger)
-  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, logger)
+  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, healthStatusEventService, logger)
 
   // System startup
   await mongoDatabase.connect()
@@ -322,6 +335,7 @@ async function main(logger: Logger): Promise<void> {
   await configurationDataChangeService.initialize()
   await restServer.start(3005)
   await eventServer.startServer(3006)
+  gateway.connect()
   logger.info('Alba server is configured.')
 }
 

@@ -6,7 +6,9 @@ import { Logger } from '../../application/interfaces/logger'
 import { ActionEventObserver } from '../../../action-system/application/interfaces/action-event-observer'
 import { TriggerEventObserver } from '../../../action-system/application/interfaces/trigger-event-observer'
 import { MacroEventObserver } from '../../../action-system/application/interfaces/macro-event-observer'
-import { ConfigurationEventObserver } from '../../../rundown-execution/application/interfaces/configuration-event-observer'
+import {
+  ConfigurationEventObserver
+} from '../../../rundown-execution/application/interfaces/configuration-event-observer'
 import { MediaEventObserver } from '../../../sofie-ingest/application/interfaces/media-event-observer'
 import { RundownEventObserver } from '../../../rundown-execution/application/interfaces/rundown-event-observer'
 import { StatusMessageEventObserver } from '../../application/interfaces/status-message-event-observer'
@@ -22,9 +24,13 @@ import { DeviceEventObserver } from '../../../rundown-execution/application/inte
 import { DeviceEvent } from '../../../rundown-execution/application/value-objects/device-event'
 import { TypedEvent } from '../../application/value-objects/typed-event'
 import { NtpEvent } from '../../application/value-objects/ntp-event'
-import { PlayoutContentEventObserver } from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
+import {
+  PlayoutContentEventObserver
+} from '../../../rundown-execution/application/interfaces/playout-content-event-observer'
 import { PlayoutContentEvent } from '../../../rundown-execution/application/value-objects/playout-content-event'
 import { NtpEventType } from '../../application/enums/ntp-event-type'
+import { IngestHealthStatusEventObserver } from '../../../rundown-ingest/application/interfaces/ingest-health-status-event-observer'
+import { IngestHealthStatusEvent } from '../../../rundown-ingest/application/value-objects/ingest-health-status-event'
 
 // TODO: This class could be split up in the transport mechanism and the application use case for propagating events.
 export class WebSocketEventServer implements EventServer {
@@ -41,6 +47,7 @@ export class WebSocketEventServer implements EventServer {
     private readonly statusMessageEventObserver: StatusMessageEventObserver,
     private readonly deviceEventObserver: DeviceEventObserver,
     private readonly playoutContentEventObserver: PlayoutContentEventObserver,
+    private readonly healthStatusEventObserver: IngestHealthStatusEventObserver,
     logger: Logger
   ) {
     this.logger = logger.tag(WebSocketEventServer.name)
@@ -112,6 +119,9 @@ export class WebSocketEventServer implements EventServer {
     })
     this.playoutContentEventObserver.subscribeToPlayoutContentEvents((playoutContentEvent: PlayoutContentEvent) => {
       webSocket.send(JSON.stringify(playoutContentEvent))
+    })
+    this.healthStatusEventObserver.subscribeToHealthStatusMessageEvents((healthStatusEvent: IngestHealthStatusEvent) => {
+      webSocket.send(JSON.stringify(healthStatusEvent))
     })
 
     webSocket.onmessage = (message: WebSocket.MessageEvent): void => {
