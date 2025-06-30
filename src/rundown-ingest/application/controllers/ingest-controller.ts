@@ -6,10 +6,10 @@ import {
 } from '../../../cross-cutting-concerns/application/controllers/base-controller'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
-import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { IngestGatewayConnector } from '../interfaces/ingest-gateway-connector'
 import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { IngestHealthStatus } from '../enum/ingest-health-status'
+import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
 
 @RestController('/ingest')
 export class IngestController extends BaseController {
