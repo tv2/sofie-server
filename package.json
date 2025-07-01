@@ -36,7 +36,7 @@
     "migrate-down-production": "ts-node node_modules/migrate-mongo/bin/migrate-mongo down -f data-access/migrations/mongo/migrate-mongo-config.js"
   },
   "engines": {
-    "node": ">=14 <=22.6"
+    "node": ">=16.20"
   },
   "devDependencies": {
     "@tv2media/eslint-config": "1.0.3",
