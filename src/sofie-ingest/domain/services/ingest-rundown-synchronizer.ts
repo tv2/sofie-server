@@ -2,12 +2,11 @@ import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
 import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
 import { Segment } from '../../../rundown-execution/domain/entities/segment'
 import { Part } from '../../../rundown-execution/domain/entities/part'
-import { IngestedEntityToEntityMapper } from '../../domain/services/ingested-entity-to-entity-mapper'
+import { IngestedEntityToEntityMapper } from './ingested-entity-to-entity-mapper'
 import { IngestedPart } from '../../../rundown-execution/domain/entities/ingested-part'
-import { EntityChangeDetector } from '../../domain/services/entity-change-detector'
+import { EntityChangeDetector } from './entity-change-detector'
 import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
 import { Blueprint } from '../../../rundown-execution/domain/value-objects/blueprint'
-import { ConfigurationRepository } from '../../../rundown-execution/domain/repositories/configuration-repository'
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { Piece } from '../../../rundown-execution/domain/entities/piece'
 
@@ -26,13 +25,11 @@ export class IngestRundownSynchronizer {
     private readonly ingestedEntityToEntityMapper: IngestedEntityToEntityMapper,
     private readonly ingestEntityDiffer: EntityChangeDetector,
     private readonly blueprint: Blueprint,
-    private readonly configurationRepository: ConfigurationRepository
   ) {}
 
-  // TODO: Add configuration as a parameter to avoid async-ness and move this to the domain module.
-  public async synchronizeRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<RundownSynchronizeResult> {
+  public synchronizeRundown(rundown: Rundown, ingestedRundown: IngestedRundown, configuration: Configuration): RundownSynchronizeResult {
     const partlessIngestedSegmentIds: ReadonlySet<string> = this.getPartlessSegmentIds(ingestedRundown.ingestedSegments)
-    const updatedRundown: Rundown | undefined = await this.getUpdatedRundown(rundown, ingestedRundown)
+    const updatedRundown: Rundown | undefined = this.getUpdatedRundown(rundown, ingestedRundown, configuration)
 
     const createdSegments: readonly Segment[] = this.getCreatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments)
     const updatedSegments: readonly Segment[] = this.getUpdatedSegments(rundown.getSegments(), ingestedRundown.ingestedSegments, partlessIngestedSegmentIds)
@@ -62,8 +59,7 @@ export class IngestRundownSynchronizer {
     }
   }
 
-  private async getUpdatedRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<Rundown | undefined> {
-    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+  private getUpdatedRundown(rundown: Rundown, ingestedRundown: IngestedRundown, configuration: Configuration): Rundown | undefined {
     const baselinePiecesForRundown: Piece[] = this.blueprint.generateBaselinePieces(rundown.id, configuration)
     rundown.updateBaselinePieces(baselinePiecesForRundown)
 

@@ -178,7 +178,7 @@ import {
   MongoIngestedPieceChangedListener
 } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-ingested-piece-changed-listener'
 import { IngestDataChangeService } from './sofie-ingest/application/services/ingest-data-change-service'
-import { IngestRundownSynchronizer } from './sofie-ingest/application/services/ingest-rundown-synchronizer'
+import { IngestRundownSynchronizer } from './sofie-ingest/domain/services/ingest-rundown-synchronizer'
 import { EntityChangeDetector } from './sofie-ingest/domain/services/entity-change-detector'
 import { IngestedEntityToEntityMapper } from './sofie-ingest/domain/services/ingested-entity-to-entity-mapper'
 import { RundownEventEmitter } from './rundown-execution/application/interfaces/rundown-event-emitter'
@@ -455,7 +455,7 @@ function createIngestChangeService(mongoDatabase: MongoDatabase, ingestedRundown
   const ingestedPieceChangeListener: MongoIngestedPieceChangedListener = new MongoIngestedPieceChangedListener(mongoDatabase, ingestedMongoEntityConverter, logger)
   const entityChangeDetector: EntityChangeDetector = new EntityChangeDetector()
   const ingestedEntityToEntityMapper: IngestedEntityToEntityMapper = new IngestedEntityToEntityMapper()
-  const ingestRundownSynchronizer: IngestRundownSynchronizer = new IngestRundownSynchronizer(ingestedEntityToEntityMapper, entityChangeDetector, blueprint, configurationRepository)
+  const ingestRundownSynchronizer: IngestRundownSynchronizer = new IngestRundownSynchronizer(ingestedEntityToEntityMapper, entityChangeDetector, blueprint)
   return new IngestDataChangeService(
     ingestedRundownRepository,
     rundownAggregateRepository,

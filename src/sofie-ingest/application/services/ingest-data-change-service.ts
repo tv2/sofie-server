@@ -1,5 +1,5 @@
 import { DataChangeService } from '../interfaces/data-change-service'
-import { IngestRundownSynchronizer, RundownSynchronizeResult } from './ingest-rundown-synchronizer'
+import { IngestRundownSynchronizer, RundownSynchronizeResult } from '../../domain/services/ingest-rundown-synchronizer'
 import { DataChangedListener } from '../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
 import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
 import { IngestedSegment } from '../../../rundown-execution/domain/entities/ingested-segment'
@@ -225,7 +225,8 @@ export class IngestDataChangeService implements DataChangeService {
     const startTime: bigint = process.hrtime.bigint()
     const emptyRundown: Rundown = this.ingestedEntityToEntityMapper.convertIngestedRundownToRundown(ingestedRundown)
 
-    const rundownSynchronizeResult: RundownSynchronizeResult = await this.ingestRundownSynchronizer.synchronizeRundown(emptyRundown, ingestedRundown)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const rundownSynchronizeResult: RundownSynchronizeResult = this.ingestRundownSynchronizer.synchronizeRundown(emptyRundown, ingestedRundown, configuration)
     const createdRundown: Rundown = rundownSynchronizeResult.updatedRundown ?? emptyRundown
     this.logRundownSynchronizeResult(rundownSynchronizeResult, `Creating the rundown '${createdRundown.name}' with id '${createdRundown.id}' has the following effects:`)
     this.applyRundownSynchronizeResult(createdRundown, rundownSynchronizeResult)
@@ -240,7 +241,8 @@ export class IngestDataChangeService implements DataChangeService {
 
   private async updateEmitAndPersistRundown(rundown: Rundown, ingestedRundown: IngestedRundown): Promise<void> {
     const startTime: bigint = process.hrtime.bigint()
-    const rundownSynchronizeResult: RundownSynchronizeResult = await this.ingestRundownSynchronizer.synchronizeRundown(rundown, ingestedRundown)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
+    const rundownSynchronizeResult: RundownSynchronizeResult = this.ingestRundownSynchronizer.synchronizeRundown(rundown, ingestedRundown, configuration)
     const updatedRundown: Rundown = rundownSynchronizeResult.updatedRundown ?? rundown
     this.logRundownSynchronizeResult(rundownSynchronizeResult, `Synchronizing rundown '${updatedRundown.name}' with id '${updatedRundown.id}' had following effects:`)
     const { deletedPartsInfo, deletedSegmentsInfo }: DeletedInfo = this.applyRundownSynchronizeResult(updatedRundown, rundownSynchronizeResult)
