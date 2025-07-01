@@ -10,7 +10,7 @@ import { IngestedPart } from '../../../rundown-execution/domain/entities/ingeste
 import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
 import { PieceLifespan } from '../../../rundown-execution/domain/enums/piece-lifespan'
 import { TransitionType } from '../../../rundown-execution/domain/enums/transition-type'
-import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../enums/device-type'
 import { PlayoutContentType } from '../../../rundown-execution/domain/enums/playout-content-type'
 
 describe(EntityChangeDetector.name, () => {

@@ -2,7 +2,7 @@ import { BaseController, GetRequest, PostRequest, PutRequest, RestController } f
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { Request, Response } from 'express'
 import { ConfigurationRepository } from '../../domain/repositories/configuration-repository'
-import { Exception } from '../../domain/exceptions/exception'
+import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
 import { Configuration } from '../../domain/entities/configuration'
 import { ShowStyleVariantRepository } from '../../domain/repositories/show-style-variant-repository'
 import { ShowStyleVariant } from '../../domain/entities/show-style-variant'

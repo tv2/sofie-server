@@ -1,5 +1,4 @@
 import { MacroEventEmitter } from '../interfaces/macro-event-emitter'
-import { MacroEventObserver } from '../interfaces/macro-event-observer'
 import { MacroEventBuilder } from '../interfaces/macro-event-builder'
 import {
   MacroCreatedEvent, MacroDeletedEvent,
@@ -7,14 +6,13 @@ import {
   MacroUpdatedEvent
 } from '../value-objects/macro-event'
 import { Macro } from '../../domain/entities/macro'
+import { TypedEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/typed-event-emitter'
 
-export class MacroEventService implements MacroEventEmitter, MacroEventObserver {
-  private readonly callbacks: ((macroEvent: MacroEvent) => void)[] = []
-
-  public constructor(private readonly macroEventBuilder: MacroEventBuilder) { }
+export class MacroEventService implements MacroEventEmitter {
+  public constructor(private readonly typedEventEmitter: TypedEventEmitter, private readonly macroEventBuilder: MacroEventBuilder) { }
 
   private emitMacroEvent(macroEvent: MacroEvent): void {
-    this.callbacks.forEach(callback => callback(macroEvent))
+    this.typedEventEmitter.emitTypedEvent(macroEvent)
   }
 
   public emitMacroCreatedEvent(macro: Macro): void {
@@ -30,9 +28,5 @@ export class MacroEventService implements MacroEventEmitter, MacroEventObserver 
   public emitMacroDeletedEvent(macroId: string): void {
     const event: MacroDeletedEvent = this.macroEventBuilder.buildMacroDeletedEvent(macroId)
     this.emitMacroEvent(event)
-  }
-
-  public subscribeToMacroEvents(onMacroEventCallback: (macroEvent: MacroEvent) => void): void {
-    this.callbacks.push(onMacroEventCallback)
   }
 }

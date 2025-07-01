@@ -1,13 +1,11 @@
 import { ConfigurationEventEmitter } from '../interfaces/configuration-event-emitter'
 import { ShelfConfiguration } from '../../domain/entities/shelf-configuration'
-import { ConfigurationEventObserver } from '../interfaces/configuration-event-observer'
 import { ConfigurationEvent, ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
 import { ConfigurationEventBuilder } from '../interfaces/configuration-event-builder'
+import { TypedEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/typed-event-emitter'
 
-export class ConfigurationEventService implements ConfigurationEventEmitter, ConfigurationEventObserver {
-  private readonly callbacks: ((configurationEvent: ConfigurationEvent) => void)[] = []
-
-  public constructor(private readonly configurationEventBuilder: ConfigurationEventBuilder) { }
+export class ConfigurationEventService implements ConfigurationEventEmitter {
+  public constructor(private readonly typedEventEmitter: TypedEventEmitter, private readonly configurationEventBuilder: ConfigurationEventBuilder) { }
 
   public emitShelfConfigurationUpdated(shelfConfiguration: ShelfConfiguration): void {
     const shelfConfigurationUpdatedEvent: ShelfConfigurationUpdatedEvent = this.configurationEventBuilder.buildShelfConfigurationUpdatedEvent(shelfConfiguration)
@@ -15,10 +13,6 @@ export class ConfigurationEventService implements ConfigurationEventEmitter, Con
   }
 
   private emitConfigurationEvents(configurationEvent: ConfigurationEvent): void {
-    this.callbacks.forEach(callback => callback(configurationEvent))
-  }
-
-  public subscribeToConfigurationEvents(onConfigurationEventCallback: (configurationEvent: ShelfConfigurationUpdatedEvent) => void): void {
-    this.callbacks.push(onConfigurationEventCallback)
+    this.typedEventEmitter.emitTypedEvent(configurationEvent)
   }
 }

@@ -4,9 +4,9 @@ import { DataChangedListener } from '../../../cross-cutting-concerns/application
 import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 import { StatusMessageService } from '../../../cross-cutting-concerns/application/interfaces/status-message-service'
 import { StatusCode } from '../../../cross-cutting-concerns/domain/enums/status-code'
-import { DeviceRepository } from '../../../rundown-execution/domain/repositories/device-repository'
+import { DeviceRepository } from '../../domain/repositories/device-repository'
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
-import { CoreDevice } from '../../../rundown-execution/domain/entities/device'
+import { CoreDevice } from '../../domain/entities/device'
 
 const DEVICE_STATUS_MESSAGE_PREFIX: string = 'DEVICE_'
 

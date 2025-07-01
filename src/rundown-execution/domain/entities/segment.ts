@@ -1,6 +1,6 @@
 import { Part } from './part'
 import { LastPartInSegmentException } from '../exceptions/last-part-in-segment-exception'
-import { NotFoundException } from '../exceptions/not-found-exception'
+import { NotFoundException } from '../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { Piece } from './piece'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { AlreadyExistException } from '../exceptions/already-exist-exception'

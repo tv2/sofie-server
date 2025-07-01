@@ -1,5 +1,5 @@
 import { TimelineObject, TimelineObjectMetadata } from '../../../rundown-execution/domain/entities/timeline-object'
-import { DeviceType } from '../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../sofie-ingest/domain/enums/device-type'
 
 export interface Tv2BlueprintTimelineObject extends TimelineObject {
   content: {

@@ -14,7 +14,7 @@ import { RundownRepository } from '../../../rundown-execution/domain/repositorie
 import { Blueprint } from '../../../rundown-execution/domain/value-objects/blueprint'
 import { anyOfClass, anyString, anything, capture, instance, mock, verify, when } from '@typestrong/ts-mockito'
 import { Piece, PieceInterface } from '../../../rundown-execution/domain/entities/piece'
-import { MediaRepository } from '../../../rundown-execution/domain/repositories/media-repository'
+import { MediaRepository } from '../../../sofie-ingest/domain/repositories/media-repository'
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
 import { Owner } from '../../../rundown-execution/domain/enums/owner'

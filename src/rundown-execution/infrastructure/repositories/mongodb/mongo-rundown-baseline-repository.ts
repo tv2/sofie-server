@@ -2,8 +2,8 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { RundownBaselineRepository } from '../../../domain/repositories/rundown-baseline-repository'
 import { TimelineObject } from '../../../domain/entities/timeline-object'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
-import { MongoTimeline } from './mongo-entity-converter'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
+import { MongoTimeline } from './rundown-execution-mongo-entity-converter'
 
 const COLLECTION_NAME: string = 'rundownBaselineObjs'
 

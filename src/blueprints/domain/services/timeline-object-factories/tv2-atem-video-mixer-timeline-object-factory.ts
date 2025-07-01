@@ -21,7 +21,7 @@ import {
   SuperSourceProperties
 } from '../../value-objects/timeline-state-resolver-types/atem-types'
 import { Tv2AtemLayer, Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import { TimelineEnable } from '../../../../rundown-execution/domain/entities/timeline-enable'
 import {
   SplitScreenBoxProperties,

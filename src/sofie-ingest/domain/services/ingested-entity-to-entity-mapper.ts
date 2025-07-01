@@ -7,7 +7,7 @@ import { IngestedSegment } from '../../../rundown-execution/domain/entities/inge
 import { Segment } from '../../../rundown-execution/domain/entities/segment'
 import { IngestedRundown } from '../../../rundown-execution/domain/entities/ingested-rundown'
 import { Rundown, RundownAlreadyActiveProperties } from '../../../rundown-execution/domain/entities/rundown'
-import { UnsupportedOperationException } from '../../../rundown-execution/domain/exceptions/unsupported-operation-exception'
+import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { RundownMode } from '../../../rundown-execution/domain/enums/rundown-mode'
 import { TakeMode } from '../../../rundown-execution/domain/enums/take-mode'
 

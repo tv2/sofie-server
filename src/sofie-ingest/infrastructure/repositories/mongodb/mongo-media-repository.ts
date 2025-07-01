@@ -2,12 +2,17 @@ import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastr
 import { MediaRepository } from '../../../domain/repositories/media-repository'
 import { Media } from '../../../domain/entities/media'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
-import { MongoEntityConverter, MongoMedia } from './mongo-entity-converter'
+import {
+  MongoMedia, SofieIngestMongoEntityConverter
+} from './sofie-ingest-mongo-entity-converter'
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 
 export class MongoMediaRepository extends BaseMongoRepository<MongoMedia> implements MediaRepository {
-  public constructor(mongoDatabase: MongoDatabase, private readonly mongoEntityConverter: MongoEntityConverter) {
+  public constructor(
+    mongoDatabase: MongoDatabase,
+    private readonly sofieIngestMongoEntityConverter: SofieIngestMongoEntityConverter
+  ) {
     super(mongoDatabase)
   }
 
@@ -18,7 +23,7 @@ export class MongoMediaRepository extends BaseMongoRepository<MongoMedia> implem
   public async getMedia(): Promise<Media[]> {
     this.assertDatabaseConnection(this.getMedia.name)
     const mongoMedia: MongoMedia[] = await this.getCollection().find<MongoMedia>({}).toArray()
-    return mongoMedia.map(media => this.mongoEntityConverter.convertMedia(media))
+    return mongoMedia.map(media => this.sofieIngestMongoEntityConverter.convertMedia(media))
   }
 
   public async getMediaBySourceName(sourceName: string): Promise<Media | undefined> {
@@ -28,6 +33,6 @@ export class MongoMediaRepository extends BaseMongoRepository<MongoMedia> implem
       // There might not be Media available yet.
       return undefined
     }
-    return this.mongoEntityConverter.convertMedia(mongoMedia)
+    return this.sofieIngestMongoEntityConverter.convertMedia(mongoMedia)
   }
 }

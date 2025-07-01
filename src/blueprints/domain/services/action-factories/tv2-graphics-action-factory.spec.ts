@@ -28,7 +28,7 @@ import { Tv2DownstreamKeyerRole } from '../../value-objects/tv2-studio-blueprint
 import {
   Tv2GraphicsElementTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-graphics-element-timeline-object-factory'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 

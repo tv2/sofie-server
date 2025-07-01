@@ -2,10 +2,10 @@ import { Segment } from '../../../domain/entities/segment'
 import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
 import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
 import { AnyBulkWriteOperation, } from 'mongodb'
-import { NotFoundException } from '../../../domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { Part } from '../../../domain/entities/part'
-import { MongoEntityConverter, MongoSegment } from './mongo-entity-converter'
 import { MongoPartRepository } from './mongo-part-repository'
+import { MongoSegment, RundownExecutionMongoEntityConverter } from './rundown-execution-mongo-entity-converter'
 
 const SEGMENT_COLLECTION_NAME: string = 'executedSegments' // TODO: Once we control ingest rename to "segments".
 
@@ -13,7 +13,7 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
   public constructor(
     mongoDatabase: MongoDatabase,
     private readonly mongoPartRepository: MongoPartRepository,
-    private readonly mongoEntityConverter: MongoEntityConverter,
+    private readonly rundownExecutionMongoEntityConverter: RundownExecutionMongoEntityConverter,
   ) {
     super(mongoDatabase)
   }
@@ -30,7 +30,7 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
     if (!mongoSegment) {
       throw new NotFoundException(`No Segment found for SegmentId ${segmentId}`)
     }
-    const segment: Segment = this.mongoEntityConverter.convertToSegment(mongoSegment)
+    const segment: Segment = this.rundownExecutionMongoEntityConverter.convertToSegment(mongoSegment)
     const parts: Part[] = await this.mongoPartRepository.getParts(segment.id)
     segment.setParts(parts)
     return segment
@@ -41,7 +41,7 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
     const mongoSegments: MongoSegment[] = await this.getCollection()
       .find<MongoSegment>({ ...filters, rundownId: rundownId })
       .toArray()
-    const segments: Segment[] = this.mongoEntityConverter.convertToSegments(mongoSegments)
+    const segments: Segment[] = this.rundownExecutionMongoEntityConverter.convertToSegments(mongoSegments)
     return Promise.all(
       segments.map(async (segment) => {
         segment.setParts(await this.mongoPartRepository.getParts(segment.id))
@@ -63,7 +63,7 @@ export class MongoSegmentRepository extends BaseMongoRepository<MongoSegment> {
   }
 
   private buildSaveSegmentQuery(segment: Segment): AnyBulkWriteOperation<MongoSegment> {
-    const mongoSegment: MongoSegment = this.mongoEntityConverter.convertToMongoSegment(segment)
+    const mongoSegment: MongoSegment = this.rundownExecutionMongoEntityConverter.convertToMongoSegment(segment)
     return {
       updateOne: {
         filter: { _id: mongoSegment._id },

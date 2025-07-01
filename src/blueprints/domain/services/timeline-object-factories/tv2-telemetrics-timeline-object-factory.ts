@@ -4,7 +4,7 @@ import {
   TelemetricsType
 } from '../../value-objects/timeline-state-resolver-types/telemetrics-type'
 import { Tv2TelemetricsLayer } from '../../value-objects/tv2-layers'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 
 export class Tv2TelemetricsTimelineObjectFactory implements Tv2RobotTimelineObjectFactory {
   public createCallPresetTimelineObject(preset: number): TelemetricsCallPresetTimelineObject {

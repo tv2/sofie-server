@@ -4,8 +4,8 @@ import { MediaRepository } from '../../domain/repositories/media-repository'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
 import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { Media } from '../../domain/entities/media'
-import { Exception } from '../../domain/exceptions/exception'
-import { NotFoundException } from '../../domain/exceptions/not-found-exception'
+import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
+import { NotFoundException } from '../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { MediaDto } from '../dtos/media-dto'
 import { AuditLog } from '../../../cross-cutting-concerns/application/decorators/audit-log-decorator'
 
@@ -37,7 +37,7 @@ export class MediaController extends BaseController {
       const sourceName: string = request.params.sourceName
       const media: Media | undefined = await this.mediaRepository.getMediaBySourceName(sourceName)
       if (!media) {
-        throw new NotFoundException(`No Media for found for Media with source name ${sourceName}`)
+        throw new NotFoundException(`No Media found with source name ${sourceName}.`)
       }
       response.send(this.httpResponseFormatter.formatSuccessResponse(new MediaDto(media)))
     } catch (error) {

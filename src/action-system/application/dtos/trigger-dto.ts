@@ -1,5 +1,5 @@
 import { ActionTrigger, MacroTrigger, Trigger, TriggerType } from '../../domain/entities/trigger'
-import { UnexpectedCaseException } from '../../../rundown-execution/domain/exceptions/unexpected-case-exception'
+import { UnexpectedCaseException } from '../../../cross-cutting-concerns/domain/exceptions/unexpected-case-exception'
 
 export abstract class TriggerDto {
   public id: string

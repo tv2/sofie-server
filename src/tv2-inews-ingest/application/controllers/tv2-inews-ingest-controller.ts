@@ -8,10 +8,10 @@ import { AuditLog } from '../../../cross-cutting-concerns/application/decorators
 import { Request, Response } from 'express'
 import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/interfaces/http-error-handler'
-import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
 import { InewsIngestConfiguration } from '../../domain/entities/inews-ingest-configuration'
 import { InewsIngestConfigurationDto } from '../dtos/inews-ingest-configuration-dto'
 import { IngestService } from '../interfaces/ingest-service'
+import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
 
 @RestController('tv2-inews-ingest')
 export class Tv2InewsIngestController extends BaseController {

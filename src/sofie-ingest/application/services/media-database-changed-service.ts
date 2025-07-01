@@ -1,7 +1,7 @@
-import { DataChangeService } from '../../../rundown-execution/application/interfaces/data-change-service'
-import { MediaEventEmitter } from '../../../rundown-execution/application/interfaces/media-event-emitter'
+import { DataChangeService } from '../interfaces/data-change-service'
+import { MediaEventEmitter } from '../interfaces/media-event-emitter'
 import { DataChangedListener } from '../../../cross-cutting-concerns/application/interfaces/data-changed-listener'
-import { Media } from '../../../rundown-execution/domain/entities/media'
+import { Media } from '../../domain/entities/media'
 
 export class MediaDatabaseChangedService implements DataChangeService {
   public constructor(private readonly mediaEventEmitter: MediaEventEmitter, mediaChangedListener: DataChangedListener<Media>) {

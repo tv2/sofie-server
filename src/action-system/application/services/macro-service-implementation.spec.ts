@@ -5,8 +5,8 @@ import { MacroEventEmitter } from '../interfaces/macro-event-emitter'
 import { Macro, Operation } from '../../domain/entities/macro'
 import { EntityTestFactory } from '../../../rundown-execution/domain/entities/test/entity-test-factory'
 import { ActionService } from '../interfaces/action-service'
-import { Exception } from '../../../rundown-execution/domain/exceptions/exception'
-import { ErrorCode } from '../../../rundown-execution/domain/enums/error-code'
+import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
+import { ErrorCode } from '../../../cross-cutting-concerns/domain/enums/error-code'
 import { StatusMessageEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/status-message-event-emitter'
 
 describe(MacroServiceImplementation.name, () => {

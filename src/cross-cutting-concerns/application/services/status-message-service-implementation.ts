@@ -3,7 +3,7 @@ import { StatusMessageService } from '../interfaces/status-message-service'
 import { StatusMessageEventEmitter } from '../interfaces/status-message-event-emitter'
 import { StatusMessageRepository } from '../../domain/repositories/status-message-repository'
 import { StatusCode } from '../../domain/enums/status-code'
-import { NotFoundException } from '../../../rundown-execution/domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../domain/exceptions/not-found-exception'
 
 export class StatusMessageServiceImplementation implements StatusMessageService {
   public constructor(

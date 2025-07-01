@@ -9,6 +9,7 @@ import { PartTimings } from '../../value-objects/part-timings'
 import { RundownMode } from '../../enums/rundown-mode'
 import { PlayoutContentType } from '../../enums/playout-content-type'
 
+// TODO: Get rid of it.
 export class EntityMockFactory {
   public static createRundown(rundownInterface?: Partial<RundownInterface>): Rundown {
     const mockedRundown: Rundown = this.createRundownMock(rundownInterface)

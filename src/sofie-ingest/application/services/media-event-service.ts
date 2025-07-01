@@ -1,16 +1,14 @@
-import { MediaEventEmitter } from '../../../rundown-execution/application/interfaces/media-event-emitter'
-import { MediaEventObserver } from '../interfaces/media-event-observer'
+import { MediaEventEmitter } from '../interfaces/media-event-emitter'
 import { MediaEventBuilder } from '../interfaces/media-event-builder'
 import { MediaCreatedEvent, MediaDeletedEvent, MediaEvent, MediaUpdatedEvent } from '../value-objects/media-event'
-import { Media } from '../../../rundown-execution/domain/entities/media'
+import { Media } from '../../domain/entities/media'
+import { TypedEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/typed-event-emitter'
 
-export class MediaEventService implements MediaEventEmitter, MediaEventObserver {
-  private readonly callbacks: ((mediaEvent: MediaEvent) => void)[] = []
-
-  public constructor(private readonly mediaEventBuilder: MediaEventBuilder) { }
+export class MediaEventService implements MediaEventEmitter {
+  public constructor(private readonly typedEventEmitter: TypedEventEmitter, private readonly mediaEventBuilder: MediaEventBuilder) { }
 
   private emitMediaEvent(mediaEvent: MediaEvent): void {
-    this.callbacks.forEach(callback => callback(mediaEvent))
+    this.typedEventEmitter.emitTypedEvent(mediaEvent)
   }
 
   public emitMediaCreated(media: Media): void {
@@ -26,9 +24,5 @@ export class MediaEventService implements MediaEventEmitter, MediaEventObserver 
   public emitMediaDeleted(mediaId: string): void {
     const event: MediaDeletedEvent = this.mediaEventBuilder.buildMediaDeletedEvent(mediaId)
     this.emitMediaEvent(event)
-  }
-
-  public subscribeToMediaEvents(onMediaEventCallback: (mediaEvent: MediaEvent) => void): void {
-    this.callbacks.push(onMediaEventCallback)
   }
 }

@@ -8,7 +8,6 @@ import {
   MongoSegmentRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-segment-repository'
 import { MongoPieceRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-piece-repository'
-import { MongoEntityConverter } from './rundown-execution/infrastructure/repositories/mongodb/mongo-entity-converter'
 import { MongoPartRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-part-repository'
 import {
   MongoExpectedPlayoutItemRepository
@@ -115,8 +114,8 @@ import { ActionService } from './action-system/application/interfaces/action-ser
 import { ExecuteActionService } from './action-system/application/services/execute-action-service'
 import { ActionRepository } from './action-system/domain/repositories/action-repository'
 import { MongoActionRepository } from './action-system/infrastructure/repositories/mongodb/mongo-action-repository'
-import { MediaRepository } from './rundown-execution/domain/repositories/media-repository'
-import { MongoMediaRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-media-repository'
+import { MediaRepository } from './sofie-ingest/domain/repositories/media-repository'
+import { MongoMediaRepository } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-media-repository'
 import { TriggerController } from './action-system/application/controllers/trigger-controller'
 import { TriggerService } from './action-system/application/interfaces/trigger-service'
 import { TriggerServiceImplementation } from './action-system/application/services/trigger-service-implementation'
@@ -134,7 +133,7 @@ import {
 import { ConfigurationEventService } from './rundown-execution/application/services/configuration-event-service'
 import { ShelfConfigurationRepository } from './rundown-execution/domain/repositories/shelf-configuration-repository'
 import { MongoShelfRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-shelf-repository'
-import { MediaController } from './rundown-execution/application/controllers/media-controller'
+import { MediaController } from './sofie-ingest/application/controllers/media-controller'
 import {
   SystemInformationController
 } from './cross-cutting-concerns/application/controllers/system-information-controller'
@@ -146,12 +145,12 @@ import { StatusMessageRepository } from './cross-cutting-concerns/domain/reposit
 import {
   MongoStatusMessageRepository
 } from './cross-cutting-concerns/infrastructure/mongodb/mongo-status-message-repository'
-import { DeviceController } from './rundown-execution/application/controllers/device-controller'
-import { VideoMixerDeviceRepository } from './rundown-execution/domain/repositories/video-mixer-device-repository'
+import { DeviceController } from './sofie-ingest/application/controllers/device-controller'
+import { VideoMixerDeviceRepository } from './sofie-ingest/domain/repositories/video-mixer-device-repository'
 import {
   MongoVideoMixerDeviceRepository
-} from './rundown-execution/infrastructure/repositories/mongodb/mongo-video-mixer-device-repository'
-import { DeviceEventService } from './rundown-execution/application/services/device-event-service'
+} from './sofie-ingest/infrastructure/repositories/mongodb/mongo-video-mixer-device-repository'
+import { DeviceEventService } from './sofie-ingest/application/services/device-event-service'
 import { MacroController } from './action-system/application/controllers/macro-controller'
 import { MacroService } from './action-system/application/interfaces/macro-service'
 import { MacroServiceImplementation } from './action-system/application/services/macro-service-implementation'
@@ -198,18 +197,18 @@ import {
 import { MediaDatabaseChangedService } from './sofie-ingest/application/services/media-database-changed-service'
 import {
   MongoDeviceChangedListener
-} from './rundown-execution/infrastructure/repositories/mongodb/mongo-device-changed-listener'
+} from './sofie-ingest/infrastructure/repositories/mongodb/mongo-device-changed-listener'
 import {
   MongoMediaChangedListener
-} from './rundown-execution/infrastructure/repositories/mongodb/mongo-media-changed-listener'
-import { MediaEventEmitter } from './rundown-execution/application/interfaces/media-event-emitter'
+} from './sofie-ingest/infrastructure/repositories/mongodb/mongo-media-changed-listener'
+import { MediaEventEmitter } from './sofie-ingest/application/interfaces/media-event-emitter'
 import { DeviceChangedService } from './sofie-ingest/application/services/device-changed-service'
-import { DeviceRepository } from './rundown-execution/domain/repositories/device-repository'
+import { DeviceRepository } from './sofie-ingest/domain/repositories/device-repository'
 import { StatusMessageService } from './cross-cutting-concerns/application/interfaces/status-message-service'
 import {
   StatusMessageServiceImplementation
 } from './cross-cutting-concerns/application/services/status-message-service-implementation'
-import { MongoDeviceRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-device-repository'
+import { MongoDeviceRepository } from './sofie-ingest/infrastructure/repositories/mongodb/mongo-device-repository'
 import { ConfigurationChangedService } from './sofie-ingest/application/services/configuration-changed-service'
 import {
   MongoShowStyleChangedListener
@@ -225,6 +224,19 @@ import {
 } from './rundown-execution/infrastructure/repositories/cache/cached-configuration-repository'
 import { StringHashGenerator } from './blueprints/domain/interfaces/string-hash-generator'
 import { CryptoStringHashGenerator } from './blueprints/infrastructure/services/crypto-string-hash-generator'
+import {
+  RundownExecutionMongoEntityConverter
+} from './rundown-execution/infrastructure/repositories/mongodb/rundown-execution-mongo-entity-converter'
+import {
+  CrossCuttingConcernsMongoEntityConverter
+} from './cross-cutting-concerns/infrastructure/mongodb/cross-cutting-concerns-mongo-entity-converter'
+import {
+  ActionSystemMongoEntityConverter
+} from './action-system/infrastructure/repositories/mongodb/action-system-mongo-entity-converter'
+import {
+  SofieIngestMongoEntityConverter
+} from './sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
+import { TypedEventBus } from './cross-cutting-concerns/application/services/typed-event-bus'
 import { IngestGatewayConnector } from './rundown-ingest/application/interfaces/ingest-gateway-connector'
 import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
 import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
@@ -255,22 +267,26 @@ async function main(logger: Logger): Promise<void> {
 
   // Repository setup
   const mongoDatabase: MongoDatabase = new MongoDatabase(logger)
-  const mongoEntityConverter: MongoEntityConverter = new MongoEntityConverter(logger)
 
-  const systemInformationRepository: SystemInformationRepository = new MongoSystemInformationRepository(mongoDatabase, mongoEntityConverter)
+  const mongoCrossCuttingConcernsEntityConverter: CrossCuttingConcernsMongoEntityConverter = new CrossCuttingConcernsMongoEntityConverter()
+  const systemInformationRepository: SystemInformationRepository = new MongoSystemInformationRepository(mongoDatabase, mongoCrossCuttingConcernsEntityConverter)
   const statusMessageRepository: StatusMessageRepository = new MongoStatusMessageRepository(mongoDatabase)
 
-  const rundownAggregateRepository: RundownAggregateRepository = createRundownAggregateRepository(mongoDatabase, mongoEntityConverter, logger)
+  const mongoRundownExecutionEntityConverter: RundownExecutionMongoEntityConverter = new RundownExecutionMongoEntityConverter(logger)
+  const rundownAggregateRepository: RundownAggregateRepository = createRundownAggregateRepository(mongoDatabase, mongoRundownExecutionEntityConverter, logger)
   const rundownBaselineRepository: RundownBaselineRepository = new MongoRundownBaselineRepository(mongoDatabase)
-  const deviceRepository: DeviceRepository = new MongoDeviceRepository(mongoDatabase, uuidGenerator)
-  const ingestedRundownRepository: IngestedRundownRepository = createIngestedRundownRepository(mongoDatabase, rundownBaselineRepository)
-  const timelineRepository: TimelineRepository = new MongoTimelineRepository(mongoDatabase, mongoEntityConverter)
-  const showStyleVariantRepository: ShowStyleVariantRepository = new MongoShowStyleVariantRepository(mongoDatabase, mongoEntityConverter, rundownAggregateRepository)
-  const configurationRepository: ConfigurationRepository = createConfigurationRepository(mongoDatabase, mongoEntityConverter, showStyleVariantRepository)
+  const timelineRepository: TimelineRepository = new MongoTimelineRepository(mongoDatabase, mongoRundownExecutionEntityConverter)
+  const showStyleVariantRepository: ShowStyleVariantRepository = new MongoShowStyleVariantRepository(mongoDatabase, mongoRundownExecutionEntityConverter, rundownAggregateRepository)
+  const configurationRepository: ConfigurationRepository = createConfigurationRepository(mongoDatabase, showStyleVariantRepository, logger)
   const shelfConfigurationRepository: ShelfConfigurationRepository = new MongoShelfRepository(mongoDatabase, uuidGenerator)
-  const mediaRepository: MediaRepository = new MongoMediaRepository(mongoDatabase, mongoEntityConverter)
 
-  const actionRepository: ActionRepository = new MongoActionRepository(mongoEntityConverter, mongoDatabase)
+  const sofieIngestMongoEntityConverter: SofieIngestMongoEntityConverter = new SofieIngestMongoEntityConverter()
+  const mediaRepository: MediaRepository = new MongoMediaRepository(mongoDatabase, sofieIngestMongoEntityConverter)
+  const ingestedRundownRepository: IngestedRundownRepository = createIngestedRundownRepository(mongoDatabase, rundownBaselineRepository)
+  const deviceRepository: DeviceRepository = new MongoDeviceRepository(mongoDatabase, uuidGenerator)
+
+  const mongoActionSystemEntityConverter: ActionSystemMongoEntityConverter = new ActionSystemMongoEntityConverter()
+  const actionRepository: ActionRepository = new MongoActionRepository(mongoActionSystemEntityConverter, mongoDatabase)
   const triggerRepository: TriggerRepository = new MongoTriggerRepository(mongoDatabase, uuidGenerator)
   const macroRepository: MacroRepository = new MongoMacroRepository(mongoDatabase, uuidGenerator)
   const actionManifestRepository: ActionManifestRepository = createActionManifestRepository(mongoDatabase)
@@ -278,22 +294,23 @@ async function main(logger: Logger): Promise<void> {
   const inewsIngestConfigurationRepository: InewsIngestConfigurationRepository = new MongoInewsIngestConfigurationRepository(mongoDatabase)
 
   // Event builders and event services
+  const typedEventBus: TypedEventBus = new TypedEventBus()
   const rundownExecutionEventBuilder: RundownExecutionEventBuilder = new RundownExecutionEventBuilder()
-  const rundownEventService: RundownEventService = new RundownEventService(rundownExecutionEventBuilder)
-  const configurationEventService: ConfigurationEventService = new ConfigurationEventService(rundownExecutionEventBuilder)
-  const deviceEventService: DeviceEventService = new DeviceEventService(rundownExecutionEventBuilder)
-  const playoutContentEventService: PlayoutContentEventService = new PlayoutContentEventService(rundownExecutionEventBuilder)
+  const rundownEventService: RundownEventService = new RundownEventService(typedEventBus, rundownExecutionEventBuilder)
+  const configurationEventService: ConfigurationEventService = new ConfigurationEventService(typedEventBus, rundownExecutionEventBuilder)
+  const playoutContentEventService: PlayoutContentEventService = new PlayoutContentEventService(typedEventBus, rundownExecutionEventBuilder)
 
   const crossCuttingConcernsEventBuilder: CrossCuttingConcernsEventBuilder = new CrossCuttingConcernsEventBuilder()
-  const statusMessageEventService: StatusMessageEventService = new StatusMessageEventService(crossCuttingConcernsEventBuilder)
+  const statusMessageEventService: StatusMessageEventService = new StatusMessageEventService(typedEventBus, crossCuttingConcernsEventBuilder)
 
   const actionSystemEventBuilder: ActionSystemEventBuilder = new ActionSystemEventBuilder()
   const actionEventService: ActionEventService = new ActionEventService(actionSystemEventBuilder)
-  const triggerEventService: TriggerEventService = new TriggerEventService(actionSystemEventBuilder)
-  const macroEventService: MacroEventService = new MacroEventService(actionSystemEventBuilder)
+  const triggerEventService: TriggerEventService = new TriggerEventService(typedEventBus, actionSystemEventBuilder)
+  const macroEventService: MacroEventService = new MacroEventService(typedEventBus, actionSystemEventBuilder)
 
   const sofieIngestEventBuilder: SofieIngestEventBuilder = new SofieIngestEventBuilder()
-  const mediaEventService: MediaEventService = new MediaEventService(sofieIngestEventBuilder)
+  const mediaEventService: MediaEventService = new MediaEventService(typedEventBus, sofieIngestEventBuilder)
+  const deviceEventService: DeviceEventService = new DeviceEventService(typedEventBus, sofieIngestEventBuilder)
 
   const rundownIngestEventBuilder: RundownIngestEventBuilder = new RundownIngestEventBuilder()
   const healthStatusEventService: IngestHealthStatusEventService = new IngestHealthStatusEventService(rundownIngestEventBuilder)
@@ -324,7 +341,7 @@ async function main(logger: Logger): Promise<void> {
   const ingestDataChangeService: IngestDataChangeService = createIngestChangeService(mongoDatabase, ingestedRundownRepository, rundownAggregateRepository, rundownAsyncLock, blueprint, configurationRepository, rundownEventService, timelineBuilder, timelineRepository, actionGenerationService, logger)
   const mediaDataChangeService: MediaDatabaseChangedService = createMediaDataChangeService(mongoDatabase, mediaRepository, mediaEventService, logger)
   const statusMessageService: StatusMessageService = new StatusMessageServiceImplementation(statusMessageEventService, statusMessageRepository)
-  const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, mongoEntityConverter, statusMessageService, deviceRepository, logger)
+  const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
   const ingestGatewayConnector: IngestGatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
   const inewsIngestService: InewsIngestService = new InewsIngestService(inewsIngestConfigurationRepository, inewsIngestConfigurationEventService, ingestGatewayConnector)
@@ -348,7 +365,7 @@ async function main(logger: Logger): Promise<void> {
 
   // System setup
   const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController, ingestController, tv2InewsIngestController], logger)
-  const eventServer: EventServer = new WebSocketEventServer(rundownEventService, actionEventService, triggerEventService, macroEventService, mediaEventService, configurationEventService, statusMessageEventService, deviceEventService, playoutContentEventService, healthStatusEventService, inewsIngestConfigurationEventService, logger)
+  const eventServer: EventServer = new WebSocketEventServer(typedEventBus, logger)
 
   // System startup
   await mongoDatabase.connect()
@@ -363,13 +380,13 @@ async function main(logger: Logger): Promise<void> {
   logger.info('Alba server is configured.')
 }
 
-function createRundownAggregateRepository(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter, logger: Logger): RundownAggregateRepository {
+function createRundownAggregateRepository(mongoDatabase: MongoDatabase, rundownExecutionMongoEntityConverter: RundownExecutionMongoEntityConverter, logger: Logger): RundownAggregateRepository {
   const mongoExpectedPlayoutItemRepository: MongoExpectedPlayoutItemRepository = new MongoExpectedPlayoutItemRepository(mongoDatabase)
 
-  const mongoPieceRepository: MongoPieceRepository = new MongoPieceRepository(mongoDatabase, mongoEntityConverter)
-  const mongoPartRepository: MongoPartRepository = new MongoPartRepository(mongoDatabase, mongoPieceRepository, mongoEntityConverter)
-  const mongoSegmentRepository: MongoSegmentRepository = new MongoSegmentRepository(mongoDatabase, mongoPartRepository, mongoEntityConverter)
-  const mongoRundownAggregateRepository: MongoRundownAggregateRepository = new MongoRundownAggregateRepository(mongoDatabase, mongoSegmentRepository, mongoPartRepository, mongoPieceRepository, mongoExpectedPlayoutItemRepository, mongoEntityConverter)
+  const mongoPieceRepository: MongoPieceRepository = new MongoPieceRepository(mongoDatabase, rundownExecutionMongoEntityConverter)
+  const mongoPartRepository: MongoPartRepository = new MongoPartRepository(mongoDatabase, mongoPieceRepository, rundownExecutionMongoEntityConverter)
+  const mongoSegmentRepository: MongoSegmentRepository = new MongoSegmentRepository(mongoDatabase, mongoPartRepository, rundownExecutionMongoEntityConverter)
+  const mongoRundownAggregateRepository: MongoRundownAggregateRepository = new MongoRundownAggregateRepository(mongoDatabase, mongoSegmentRepository, mongoPartRepository, mongoPieceRepository, mongoExpectedPlayoutItemRepository, rundownExecutionMongoEntityConverter)
   return new CachedRundownAggregateRepository(mongoRundownAggregateRepository, logger)
 }
 
@@ -405,9 +422,10 @@ function createBlueprint(objectCloner: ObjectCloner, logger: Logger): Blueprint 
   )
 }
 
-function createConfigurationRepository(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter, showStyleVariantRepository: ShowStyleVariantRepository): ConfigurationRepository {
-  const studioRepository: StudioRepository = new MongoStudioRepository(mongoDatabase, mongoEntityConverter)
-  const showStyleRepository: ShowStyleRepository = new MongoShowStyleRepository(mongoDatabase, showStyleVariantRepository, mongoEntityConverter)
+function createConfigurationRepository(mongoDatabase: MongoDatabase, showStyleVariantRepository: ShowStyleVariantRepository, logger: Logger): ConfigurationRepository {
+  const rundownExecutionMongoEntityConverter: RundownExecutionMongoEntityConverter = new RundownExecutionMongoEntityConverter(logger)
+  const studioRepository: StudioRepository = new MongoStudioRepository(mongoDatabase, rundownExecutionMongoEntityConverter)
+  const showStyleRepository: ShowStyleRepository = new MongoShowStyleRepository(mongoDatabase, showStyleVariantRepository, rundownExecutionMongoEntityConverter)
   const mongoConfigurationRepository: MongoConfigurationRepository = new MongoConfigurationRepository(studioRepository, showStyleRepository)
   return new CachedConfigurationRepository(mongoConfigurationRepository)
 }
@@ -463,8 +481,9 @@ function createMediaDataChangeService(mongoDatabase: MongoDatabase, mediaReposit
   return new MediaDatabaseChangedService(mediaEventEmitter, mediaDataChangeListener)
 }
 
-function createDeviceDataChangeService(mongoDatabase: MongoDatabase, mongoEntityConverter: MongoEntityConverter, statusMessageService: StatusMessageService, deviceRepository: DeviceRepository, logger: Logger): DeviceChangedService {
-  const deviceChangeListener: MongoDeviceChangedListener = new MongoDeviceChangedListener(mongoDatabase, mongoEntityConverter, logger)
+function createDeviceDataChangeService(mongoDatabase: MongoDatabase, statusMessageService: StatusMessageService, deviceRepository: DeviceRepository, logger: Logger): DeviceChangedService {
+  const sofieIngestMongoEntityConverter: SofieIngestMongoEntityConverter = new SofieIngestMongoEntityConverter()
+  const deviceChangeListener: MongoDeviceChangedListener = new MongoDeviceChangedListener(mongoDatabase, sofieIngestMongoEntityConverter, logger)
   return new DeviceChangedService(statusMessageService, deviceRepository, deviceChangeListener, logger)
 }
 

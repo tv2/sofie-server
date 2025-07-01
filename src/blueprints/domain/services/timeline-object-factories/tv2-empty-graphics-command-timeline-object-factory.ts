@@ -1,7 +1,7 @@
 import { Tv2GraphicsCommandTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-graphics-command-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { EmptyTimelineObject } from '../../value-objects/timeline-state-resolver-types/abstract-types'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 
 export class Tv2EmptyGraphicsCommandTimelineObjectFactory implements Tv2GraphicsCommandTimelineObjectFactory {
   public createAllOutGraphicsTimelineObject(_blueprintConfiguration: Tv2BlueprintConfiguration): EmptyTimelineObject {

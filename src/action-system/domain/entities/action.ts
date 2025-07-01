@@ -1,7 +1,7 @@
 import { ActionType, PartActionType, PieceActionType, SystemActionType } from '../enums/action-type'
 import { Part, PartInterface } from '../../../rundown-execution/domain/entities/part'
 import { Piece, PieceInterface } from '../../../rundown-execution/domain/entities/piece'
-import { Media } from '../../../rundown-execution/domain/entities/media'
+import { Media } from '../../../sofie-ingest/domain/entities/media'
 import { InTransition } from '../../../rundown-execution/domain/value-objects/in-transition'
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { PlayoutContent } from '../../../rundown-execution/domain/value-objects/playout-content'

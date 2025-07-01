@@ -4,10 +4,9 @@ import { Part, PartInterface } from '../part'
 import { Piece, PieceInterface } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { StatusCode } from '../../../../cross-cutting-concerns/domain/enums/status-code'
-import { StatusMessage } from '../../../../cross-cutting-concerns/domain/entities/status-message'
 import { RundownMode } from '../../enums/rundown-mode'
 import { RundownTimingType } from '../../enums/rundown-timing-type'
-import { DeviceType } from '../../enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import { TransitionType } from '../../enums/transition-type'
 import { ActionManifest, PieceAction } from '../../../../action-system/domain/entities/action'
 import { IngestedPart } from '../ingested-part'
@@ -19,8 +18,9 @@ import { TakeMode } from '../../enums/take-mode'
 import { ActionOperation, Macro, Operation, OperationType } from '../../../../action-system/domain/entities/macro'
 import { TimelineObject } from '../timeline-object'
 import { PlayoutContentType } from '../../enums/playout-content-type'
-import { CoreDevice } from '../device'
+import { CoreDevice } from '../../../../sofie-ingest/domain/entities/device'
 
+// TODO: Split up into
 export class EntityTestFactory {
   public static createRundown(rundownInterface: Partial<RundownInterface> = {}): Rundown {
     return new Rundown(this.createRundownInterface(rundownInterface))
@@ -212,16 +212,6 @@ export class EntityTestFactory {
       isConnected: false,
       type: DeviceType.ABSTRACT,
       ...device
-    }
-  }
-
-  public static createStatusMessage(statusMessage: Partial<StatusMessage> = {}): StatusMessage {
-    return {
-      id: 'statusMessageId',
-      title: 'statusMessageTitle',
-      message: 'someMessage',
-      statusCode: StatusCode.UNKNOWN,
-      ...statusMessage
     }
   }
 

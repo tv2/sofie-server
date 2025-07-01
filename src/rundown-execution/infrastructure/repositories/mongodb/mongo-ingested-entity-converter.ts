@@ -12,9 +12,9 @@ import {
   UnscheduledRundownTiming
 } from '../../../domain/value-objects/rundown-timing'
 import { RundownTimingType } from '../../../domain/enums/rundown-timing-type'
-import { MongoId } from './mongo-entity-converter'
 import { Invalidity } from '../../../domain/value-objects/invalidity'
 import { PieceMetadata } from '../../../domain/value-objects/metadata'
+import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
 
 export interface MongoIngestedRundown extends MongoId {
   name: string

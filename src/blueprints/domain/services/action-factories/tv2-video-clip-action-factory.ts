@@ -14,7 +14,7 @@ import {
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-mixer-timeline-object-factory'
-import { Media } from '../../../../rundown-execution/domain/entities/media'
+import { Media } from '../../../../sofie-ingest/domain/entities/media'
 import { Tv2Action, Tv2VideoClipAction } from '../../value-objects/tv2-action'
 import {
   Tv2VideoClipTimelineObjectFactory

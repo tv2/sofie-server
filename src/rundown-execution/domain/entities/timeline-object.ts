@@ -1,6 +1,6 @@
 import { TimelineObject as SuperFlyTimelineObject } from 'superfly-timeline'
 import { TimelineEnable } from './timeline-enable'
-import { DeviceType } from '../enums/device-type'
+import { DeviceType } from '../../../sofie-ingest/domain/enums/device-type'
 
 export type TimelineObject = SuperFlyTimelineObject & {
   enable: TimelineEnable

@@ -1,45 +1,35 @@
-import { Owner } from '../../../domain/enums/owner'
-import { PieceLifespan } from '../../../domain/enums/piece-lifespan'
-import { TransitionType } from '../../../domain/enums/transition-type'
-import { TimelineObject } from '../../../domain/entities/timeline-object'
-import { InTransition } from '../../../domain/value-objects/in-transition'
-import { OutTransition } from '../../../domain/value-objects/out-transition'
-import { AutoNext } from '../../../domain/value-objects/auto-next'
-import { PartTimings } from '../../../domain/value-objects/part-timings'
-import { PartEndState } from '../../../domain/value-objects/part-end-state'
-import { RundownPersistentState } from '../../../domain/value-objects/rundown-persistent-state'
-import { RundownCursor } from '../../../domain/value-objects/rundown-cursor'
-import { Piece } from '../../../domain/entities/piece'
-import { Part } from '../../../domain/entities/part'
 import { Segment } from '../../../domain/entities/segment'
+import { Piece } from '../../../domain/entities/piece'
 import { Rundown, RundownAlreadyActiveProperties } from '../../../domain/entities/rundown'
+import { RundownMode } from '../../../domain/enums/rundown-mode'
+import { TakeMode } from '../../../domain/enums/take-mode'
+import { RundownCursor } from '../../../domain/value-objects/rundown-cursor'
+import { Part } from '../../../domain/entities/part'
 import { BasicRundown } from '../../../domain/entities/basic-rundown'
-import { Exception } from '../../../domain/exceptions/exception'
-import { ErrorCode } from '../../../domain/enums/error-code'
+import { PartTimings } from '../../../domain/value-objects/part-timings'
+import { Exception } from '../../../../cross-cutting-concerns/domain/exceptions/exception'
+import { ErrorCode } from '../../../../cross-cutting-concerns/domain/enums/error-code'
 import { Timeline } from '../../../domain/entities/timeline'
 import { Studio } from '../../../domain/entities/studio'
 import { StudioLayer } from '../../../domain/value-objects/studio-layer'
 import { LookaheadMode } from '../../../domain/enums/lookahead-mode'
-import { ShowStyle } from '../../../domain/entities/show-style'
 import { ShowStyleVariant } from '../../../domain/entities/show-style-variant'
-import { Media } from '../../../domain/entities/media'
-import { RundownTiming } from '../../../domain/value-objects/rundown-timing'
-import { IngestedPart } from '../../../domain/entities/ingested-part'
-import { SystemInformation } from '../../../../cross-cutting-concerns/domain/value-objects/system-information'
-import { StatusCode } from '../../../../cross-cutting-concerns/domain/enums/status-code'
-import { RundownMode } from '../../../domain/enums/rundown-mode'
-import { Invalidity } from '../../../domain/value-objects/invalidity'
+import { ShowStyle } from '../../../domain/entities/show-style'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
-import { Action, ActionArgument } from '../../../../action-system/domain/entities/action'
-import { ActionType } from '../../../../action-system/domain/enums/action-type'
-import { DeviceType } from '../../../domain/enums/device-type'
-import { TakeMode } from '../../../domain/enums/take-mode'
+import { TimelineObject } from '../../../domain/entities/timeline-object'
+import { RundownPersistentState } from '../../../domain/value-objects/rundown-persistent-state'
+import { RundownTiming } from '../../../domain/value-objects/rundown-timing'
+import { Owner } from '../../../domain/enums/owner'
+import { Invalidity } from '../../../domain/value-objects/invalidity'
+import { InTransition } from '../../../domain/value-objects/in-transition'
+import { OutTransition } from '../../../domain/value-objects/out-transition'
+import { AutoNext } from '../../../domain/value-objects/auto-next'
+import { PartEndState } from '../../../domain/value-objects/part-end-state'
+import { IngestedPart } from '../../../domain/entities/ingested-part'
+import { PieceLifespan } from '../../../domain/enums/piece-lifespan'
+import { TransitionType } from '../../../domain/enums/transition-type'
 import { PieceMetadata } from '../../../domain/value-objects/metadata'
-import { CoreDevice } from '../../../domain/entities/device'
-
-export interface MongoId {
-  _id: string
-}
+import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
 
 export interface MongoRundown extends MongoId {
   name: string
@@ -174,48 +164,11 @@ interface MongoLayerMapping {
   lookaheadMaxSearchDistance: number
 }
 
-export interface MongoMedia extends MongoId {
-  mediaId: string
-  mediainfo?: {
-    format?: {
-      duration?: string
-    }
-  }
-}
-
-export interface MongoSystemInformation extends MongoId {
-  name: string
-}
-
-export interface MongoAction extends MongoId {
-  id: string
-  name: string
-  rank: number
-  description?: string
-  type: ActionType
-  data: unknown
-  metadata?: unknown
-  rundownId?: string
-  argument?: ActionArgument
-}
-
-export interface MongoCoreDevice extends MongoId {
-  name: string
-  type: DeviceType
-  status: {
-    statusCode: number
-    messages: string[]
-  }
-  connected: boolean
-}
-
-const MILLISECONDS_TO_SECONDS_RATIO: number = 1000
-
-export class MongoEntityConverter {
+export class RundownExecutionMongoEntityConverter {
   private readonly logger: Logger
 
   public constructor(logger: Logger) {
-    this.logger = logger.tag(MongoEntityConverter.name)
+    this.logger = logger
   }
 
   public convertToRundown(mongoRundown: MongoRundown, segments: Segment[], baselinePieces: Piece[], infinitePieces?: Piece[]): Rundown {
@@ -510,79 +463,6 @@ export class MongoEntityConverter {
       name: mongoShowStyleVariant.name,
       showStyleBaseId: mongoShowStyleVariant.showStyleBaseId,
       blueprintConfiguration: mongoShowStyleVariant.blueprintConfig
-    }
-  }
-
-  public convertMedia(mongoMedia: MongoMedia): Media {
-    return {
-      id: mongoMedia._id,
-      sourceName: mongoMedia.mediaId,
-      duration: mongoMedia.mediainfo?.format?.duration ? Number.parseFloat(mongoMedia.mediainfo?.format?.duration) * MILLISECONDS_TO_SECONDS_RATIO : 0
-    }
-  }
-
-  public convertSystemInformation(mongoSystemInformation: MongoSystemInformation): SystemInformation {
-    return {
-      name: mongoSystemInformation.name
-    }
-  }
-
-  public convertToCoreDeviceInterface(mongoDevice: MongoCoreDevice): CoreDevice {
-    const statusMessage: string = mongoDevice.status.messages && mongoDevice.status.messages.length > 0
-      ? mongoDevice.status.messages.reduce((previousValue, currentValue) => `${previousValue}; ${currentValue}`)
-      : ''
-
-    return {
-      id: mongoDevice._id,
-      name: mongoDevice.name,
-      isConnected: mongoDevice.connected,
-      statusCode: this.getStatusCode(mongoDevice.status.statusCode),
-      statusMessage,
-      type: mongoDevice.type
-    }
-  }
-
-  private getStatusCode(value: number): StatusCode {
-    switch (value) {
-      case 1: {
-        return StatusCode.GOOD
-      }
-      case 2:
-      case 3: {
-        return StatusCode.WARNING
-      }
-      case 4:
-      case 5: {
-        return StatusCode.BAD
-      }
-      default: {
-        return StatusCode.UNKNOWN
-      }
-    }
-  }
-
-  public convertToCoreDeviceInterfaces(mongoDevices: MongoCoreDevice[]): CoreDevice[] {
-    return mongoDevices.map(mongoDevice => this.convertToCoreDeviceInterface(mongoDevice))
-  }
-
-  public convertToAction(mongoAction: MongoAction): Action {
-    return {
-      id: mongoAction.id,
-      type: mongoAction.type,
-      rundownId: mongoAction.rundownId ?? undefined,
-      argument: mongoAction.argument,
-      data: mongoAction.data,
-      description: mongoAction.description,
-      metadata: mongoAction.metadata,
-      name: mongoAction.name,
-      rank: mongoAction.rank,
-    }
-  }
-
-  public convertToMongoAction(action: Action): MongoAction {
-    return {
-      ...action,
-      _id: action.id
     }
   }
 }

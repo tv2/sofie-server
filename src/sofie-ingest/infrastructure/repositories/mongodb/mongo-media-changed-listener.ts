@@ -10,9 +10,11 @@ import {
   ChangeStreamOptions, ChangeStreamReplaceDocument, ChangeStreamUpdateDocument
 } from 'mongodb'
 import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
-import { MongoMedia } from './mongo-entity-converter'
 import { Media } from '../../../domain/entities/media'
 import { MediaRepository } from '../../../domain/repositories/media-repository'
+import {
+  MongoMedia
+} from './sofie-ingest-mongo-entity-converter'
 
 const MEDIA_COLLECTION_NAME: string = 'mediaObjects'
 

@@ -1,6 +1,6 @@
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2GraphicsElementTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-graphics-element-timeline-object-factory'
-import { DeviceType } from '../../../../rundown-execution/domain/enums/device-type'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import {
   CasparCgMediaTimelineObject,
   CasparCgTemplateTimelineObject,
@@ -12,7 +12,7 @@ import {
 } from '../../value-objects/timeline-state-resolver-types/caspar-cg-types'
 import { Tv2CasparCgLayer, Tv2GraphicsLayer } from '../../value-objects/tv2-layers'
 import { Tv2AssetPathHelper } from '../tv2-asset-path-helper'
-import { MisconfigurationException } from '../../../../rundown-execution/domain/exceptions/misconfiguration-exception'
+import { MisconfigurationException } from '../../../../cross-cutting-concerns/domain/exceptions/misconfiguration-exception'
 import {
   Tv2FullscreenGraphicsManifestData,
   Tv2OverlayGraphicsManifestData,
@@ -33,7 +33,7 @@ import {
   Tv2CasparCgTemplateSlotType
 } from '../../value-objects/timeline-state-resolver-types/tv2-caspar-cg-types'
 import { Tv2AudioBedTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-audio-bed-timeline-object-factory'
-import { NotFoundException } from '../../../../rundown-execution/domain/exceptions/not-found-exception'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { AudioBedSettings } from '../../value-objects/tv2-studio-blueprint-configuration'
 import { FrameTimeConverter } from '../frame-time-converter'
 

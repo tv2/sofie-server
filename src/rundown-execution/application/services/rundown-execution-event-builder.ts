@@ -1,5 +1,4 @@
 import { RundownEventBuilder } from '../interfaces/rundown-event-builder'
-import { DeviceEventBuilder } from '../interfaces/device-event-builder'
 import { Rundown } from '../../domain/entities/rundown'
 import {
   PartCreatedEvent,
@@ -33,9 +32,6 @@ import { RundownDto } from '../dtos/rundown-dto'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { Segment } from '../../domain/entities/segment'
 import { SegmentDto } from '../dtos/segment-dto'
-import { VideoMixerConfiguration } from '../../domain/value-objects/video-mixer-configuration'
-import { VideoMixerConfigurationUpdatedEvent } from '../value-objects/device-event'
-import { DeviceEventType } from '../enums/device-event-type'
 import { ShelfConfiguration } from '../../domain/entities/shelf-configuration'
 import { ShelfConfigurationUpdatedEvent } from '../value-objects/configuration-event'
 import { ConfigurationEventType } from '../enums/configuration-event-type'
@@ -45,7 +41,7 @@ import { PlayoutContent } from '../../domain/value-objects/playout-content'
 import { PreviewPlayoutContentEvent, ProgramPlayoutContentEvent } from '../value-objects/playout-content-event'
 import { PlayoutContentEventType } from '../enums/playout-content-event-type'
 
-export class RundownExecutionEventBuilder implements RundownEventBuilder, DeviceEventBuilder, ConfigurationEventBuilder, PlayoutContentEventBuilder {
+export class RundownExecutionEventBuilder implements RundownEventBuilder, ConfigurationEventBuilder, PlayoutContentEventBuilder {
   public buildActivateEvent(rundown: Rundown): RundownActivatedEvent {
     return {
       type: RundownEventType.ACTIVATED,
@@ -257,14 +253,6 @@ export class RundownExecutionEventBuilder implements RundownEventBuilder, Device
       rundownId: rundown.id,
       part: new PartDto(unsyncedPart),
       originalPartId,
-    }
-  }
-
-  public buildVideoMixerConfigurationUpdatedEvent(videoMixerConfiguration: VideoMixerConfiguration): VideoMixerConfigurationUpdatedEvent {
-    return {
-      type: DeviceEventType.VIDEO_MIXER_CONFIGURATION_UPDATED,
-      videoMixer: videoMixerConfiguration,
-      timestamp: Date.now()
     }
   }
 

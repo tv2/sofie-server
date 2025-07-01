@@ -20,7 +20,7 @@ import { AlreadyRehearsalException } from '../../domain/exceptions/already-rehea
 import { IngestService } from '../../../sofie-ingest/application/interfaces/ingest-service'
 import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 import { PlayoutService } from '../interfaces/playout-service'
-import { TakeIsBlockedException } from '../../domain/exceptions/take-is-blocked-exception'
+import { TakeIsBlockedException } from '../exceptions/take-is-blocked-exception'
 import { RundownCursor } from '../../domain/value-objects/rundown-cursor'
 import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'
