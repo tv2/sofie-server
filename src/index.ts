@@ -161,7 +161,6 @@ import {
 import { MacroEventService } from './action-system/application/services/macro-event-service'
 import { MacroRepository } from './action-system/domain/repositories/macro-repository'
 import { MongoMacroRepository } from './action-system/infrastructure/repositories/mongodb/mongo-macro-repository'
-import { EventServer } from './cross-cutting-concerns/infrastructure/interfaces/event-server'
 import { WebSocketEventServer } from './cross-cutting-concerns/infrastructure/services/web-socket-event-server'
 import { ActionEventService } from './action-system/application/services/action-event-service'
 import { MediaEventService } from './sofie-ingest/application/services/media-event-service'
@@ -237,6 +236,7 @@ import {
   SofieIngestMongoEntityConverter
 } from './sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
 import { TypedEventBus } from './cross-cutting-concerns/application/services/typed-event-bus'
+import { TypedEventServer } from './cross-cutting-concerns/application/services/typed-event-server'
 import { IngestGatewayConnector } from './rundown-ingest/application/interfaces/ingest-gateway-connector'
 import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
 import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
@@ -365,7 +365,8 @@ async function main(logger: Logger): Promise<void> {
 
   // System setup
   const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController, ingestController, tv2InewsIngestController], logger)
-  const eventServer: EventServer = new WebSocketEventServer(typedEventBus, logger)
+  const webSocketEventServer = new WebSocketEventServer(uuidGenerator, logger)
+  const typedEventServer: TypedEventServer = new TypedEventServer(webSocketEventServer, typedEventBus, logger)
 
   // System startup
   await mongoDatabase.connect()
@@ -376,7 +377,7 @@ async function main(logger: Logger): Promise<void> {
   await configurationDataChangeService.initialize()
   await inewsIngestService.initialize()
   await restServer.start(3005)
-  await eventServer.startServer(3006)
+  await typedEventServer.startServer(3006)
   logger.info('Alba server is configured.')
 }
 
