@@ -21,8 +21,8 @@ import { LookaheadMode } from '../enums/lookahead-mode'
 import { Exception } from '../../../cross-cutting-concerns/domain/exceptions/exception'
 import { ErrorCode } from '../../../cross-cutting-concerns/domain/enums/error-code'
 import { Timeline } from '../entities/timeline'
-import { MisconfigurationException } from '../../../cross-cutting-concerns/domain/exceptions/misconfiguration-exception'
 import { DeviceType } from '../../../sofie-ingest/domain/enums/device-type'
+import { Configuration } from '../entities/configuration'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -50,15 +50,13 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     return { timelineGroups: [] }
   }
 
-  public async buildTimeline(rundown: Rundown, studio?: Studio): Promise<Timeline> {
-    if (!studio) {
-      throw new MisconfigurationException(`No Studio provided when calling ${SuperflyTimelineBuilder.name}.${SuperflyTimelineBuilder.prototype.buildTimeline.name}`)
-    }
+  public buildTimeline(rundown: Rundown, configuration: Configuration): Timeline {
+    const studio: Studio = configuration.studio
 
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)
 
     if (!rundown.isActivePartSet()) {
-      return Promise.resolve(this.createTimelineWithLookaheadGroup(rundown, studio, undefined, timeline))
+      return this.createTimelineWithLookaheadGroup(rundown, studio, undefined, timeline)
     }
 
     const activePartTimelineGroup: ActivePartTimelineObjectGroup = this.createActivePartGroup(rundown)
@@ -69,7 +67,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     timeline = this.createTimelineWithInfiniteGroups(rundown, timeline)
     timeline = this.updateTimelineAutoNextEpochTimestampFromNextPart(rundown, activePartTimelineGroup, timeline)
 
-    return Promise.resolve(timeline)
+    return timeline
   }
 
   private createTimelineWithBaseline(rundown: Rundown): Timeline {

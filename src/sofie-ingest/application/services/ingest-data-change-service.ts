@@ -23,6 +23,8 @@ import { Timeline } from '../../../rundown-execution/domain/entities/timeline'
 import { AsyncLock } from '../../../cross-cutting-concerns/application/services/async-lock'
 import { PieceRepository } from '../../../rundown-execution/domain/repositories/piece-repository'
 import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
+import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
+import { ConfigurationRepository } from '../../../rundown-execution/domain/repositories/configuration-repository'
 
 interface DeletedInfo {
   readonly deletedPartsInfo: readonly DeletedPartInfo[]
@@ -64,6 +66,7 @@ export class IngestDataChangeService implements DataChangeService {
     private readonly rundownEventEmitter: RundownEventEmitter,
     private readonly timelineBuilder: TimelineBuilder,
     private readonly timelineRepository: TimelineRepository,
+    private readonly configurationRepository: ConfigurationRepository,
     private readonly actionGenerationService: ActionGenerationService,
     logger: Logger,
   ) {
@@ -324,7 +327,8 @@ export class IngestDataChangeService implements DataChangeService {
   private async persistRundown(rundown: Rundown): Promise<void> {
     await this.rundownRepository.saveRundown(rundown)
     if (rundown.isActive()) {
-      const timeline: Timeline = await this.timelineBuilder.buildTimeline(rundown)
+      const configuration: Configuration = await this.configurationRepository.getConfiguration()
+      const timeline: Timeline = this.timelineBuilder.buildTimeline(rundown, configuration)
       await this.timelineRepository.saveTimeline(timeline)
       if (rundown.getSegments().length > 0) {
         this.rundownEventEmitter.emitSetNextEvent(rundown)
