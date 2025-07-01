@@ -8,7 +8,7 @@ import { Piece } from '../entities/piece'
 import { LookaheadTimelineObject, TimelineObject, TimelineObjectGroup } from '../entities/timeline-object'
 import { TransitionType } from '../enums/transition-type'
 import { PieceLifespan } from '../enums/piece-lifespan'
-import { ObjectCloner } from '../../../cross-cutting-concerns/domain/services/object-cloner'
+import { DeepObjectCloner } from '../../../cross-cutting-concerns/domain/services/deep-object-cloner'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { StudioLayer } from '../value-objects/studio-layer'
 import { LookaheadMode } from '../enums/lookahead-mode'
@@ -1006,8 +1006,8 @@ describe(SuperflyTimelineBuilder.name, () => {
               const activePart: Part = EntityMockFactory.createPart({ pieces: [piece] })
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
-              const objectCloner: ObjectCloner = mock<ObjectCloner>()
-              when(objectCloner.clone(timelineObject)).thenReturn(
+              const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+              when(objectCloner.deepClone(timelineObject)).thenReturn(
                 JSON.parse(JSON.stringify(timelineObject))
               )
 
@@ -1043,9 +1043,9 @@ describe(SuperflyTimelineBuilder.name, () => {
               const activePart: Part = EntityMockFactory.createPart({ pieces: [piece] })
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
-              const objectCloner: ObjectCloner = mock<ObjectCloner>()
+              const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
               timelineObjects.forEach(timelineObject =>
-                when(objectCloner.clone(timelineObject)).thenReturn(
+                when(objectCloner.deepClone(timelineObject)).thenReturn(
                   JSON.parse(JSON.stringify(timelineObject))
                 )
               )
@@ -2306,8 +2306,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   previousPart,
                 })
 
-                const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                when(objectCloner.clone(timelineObject)).thenReturn(
+                const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                when(objectCloner.deepClone(timelineObject)).thenReturn(
                   JSON.parse(JSON.stringify(timelineObject))
                 )
 
@@ -2352,9 +2352,9 @@ describe(SuperflyTimelineBuilder.name, () => {
                   previousPart,
                 })
 
-                const objectCloner: ObjectCloner = mock<ObjectCloner>()
+                const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
                 timelineObjects.forEach(timelineObject =>
-                  when(objectCloner.clone(timelineObject)).thenReturn(
+                  when(objectCloner.deepClone(timelineObject)).thenReturn(
                     JSON.parse(JSON.stringify(timelineObject))
                   )
                 )
@@ -2930,8 +2930,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     infinitePieces: [infinitePiece],
                   })
 
-                  const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                  when(objectCloner.clone(timelineObject)).thenReturn(
+                  const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                  when(objectCloner.deepClone(timelineObject)).thenReturn(
                     JSON.parse(JSON.stringify(timelineObject))
                   )
 
@@ -2977,9 +2977,9 @@ describe(SuperflyTimelineBuilder.name, () => {
                     infinitePieces: [infinitePiece],
                   })
 
-                  const objectCloner: ObjectCloner = mock<ObjectCloner>()
+                  const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
                   timelineObjects.forEach(timelineObject =>
-                    when(objectCloner.clone(timelineObject)).thenReturn(
+                    when(objectCloner.deepClone(timelineObject)).thenReturn(
                       JSON.parse(JSON.stringify(timelineObject))
                     )
                   )
@@ -3472,8 +3472,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   }),
                 ]
 
-                const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                when(objectCloner.clone(timelineObject)).thenReturn(timelineObject)
+                const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                when(objectCloner.deepClone(timelineObject)).thenReturn(timelineObject)
 
                 const testee: TimelineBuilder = createTestee(instance(objectCloner))
                 const timeline: Timeline
@@ -3510,8 +3510,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     }),
                   ]
 
-                  const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                  when(objectCloner.clone(timelineObject)).thenReturn(timelineObject)
+                  const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                  when(objectCloner.deepClone(timelineObject)).thenReturn(timelineObject)
 
                   const testee: TimelineBuilder = createTestee(instance(objectCloner))
                   const timeline: Timeline
@@ -3549,8 +3549,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     }),
                   ]
 
-                  const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                  when(objectCloner.clone(timelineObject)).thenReturn(timelineObject)
+                  const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                  when(objectCloner.deepClone(timelineObject)).thenReturn(timelineObject)
 
                   const testee: TimelineBuilder = createTestee(instance(objectCloner))
                   const timeline: Timeline
@@ -3587,8 +3587,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     }),
                   ]
 
-                  const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                  when(objectCloner.clone(timelineObject)).thenReturn(timelineObject)
+                  const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                  when(objectCloner.deepClone(timelineObject)).thenReturn(timelineObject)
 
                   const testee: TimelineBuilder = createTestee(instance(objectCloner))
                   const timeline: Timeline
@@ -3914,8 +3914,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                   }),
                 ]
 
-                const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                when(objectCloner.clone(timelineObject)).thenReturn(timelineObject)
+                const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                when(objectCloner.deepClone(timelineObject)).thenReturn(timelineObject)
 
                 const testee: TimelineBuilder = createTestee(instance(objectCloner))
                 const timeline: Timeline
@@ -3952,8 +3952,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     }),
                   ]
 
-                  const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                  when(objectCloner.clone(timelineObject)).thenReturn(timelineObject)
+                  const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                  when(objectCloner.deepClone(timelineObject)).thenReturn(timelineObject)
 
                   const testee: TimelineBuilder = createTestee(instance(objectCloner))
                   const timeline: Timeline
@@ -3991,8 +3991,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     }),
                   ]
 
-                  const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                  when(objectCloner.clone(timelineObject)).thenReturn(timelineObject)
+                  const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                  when(objectCloner.deepClone(timelineObject)).thenReturn(timelineObject)
 
                   const testee: TimelineBuilder = createTestee(instance(objectCloner))
                   const timeline: Timeline
@@ -4029,8 +4029,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                     }),
                   ]
 
-                  const objectCloner: ObjectCloner = mock<ObjectCloner>()
-                  when(objectCloner.clone(timelineObject)).thenReturn(timelineObject)
+                  const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+                  when(objectCloner.deepClone(timelineObject)).thenReturn(timelineObject)
 
                   const testee: TimelineBuilder = createTestee(instance(objectCloner))
                   const timeline: Timeline
@@ -4079,8 +4079,8 @@ describe(SuperflyTimelineBuilder.name, () => {
                 }),
               ]
 
-              const objectCloner: ObjectCloner = mock<ObjectCloner>()
-              when(objectCloner.clone(timelineObjectOne)).thenReturn(timelineObjectOne)
+              const objectCloner: DeepObjectCloner = mock<DeepObjectCloner>()
+              when(objectCloner.deepClone(timelineObjectOne)).thenReturn(timelineObjectOne)
 
               const testee: TimelineBuilder = createTestee(instance(objectCloner))
               const timeline: Timeline
@@ -4446,10 +4446,10 @@ describe(SuperflyTimelineBuilder.name, () => {
   })
 })
 
-function createTestee(objectCloner?: ObjectCloner): SuperflyTimelineBuilder {
+function createTestee(objectCloner?: DeepObjectCloner): SuperflyTimelineBuilder {
   if (!objectCloner) {
-    const objectClonerMock: ObjectCloner = mock<ObjectCloner>()
-    when(objectClonerMock.clone(anything())).thenReturn({})
+    const objectClonerMock: DeepObjectCloner = mock<DeepObjectCloner>()
+    when(objectClonerMock.deepClone(anything())).thenReturn({})
     objectCloner = instance(objectClonerMock)
   }
 

@@ -45,7 +45,7 @@ import {
   MongoTimelineRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-timeline-repository'
 import { TimelineBuilder } from './rundown-execution/domain/interfaces/timeline-builder'
-import { ObjectCloner } from './cross-cutting-concerns/domain/services/object-cloner'
+import { DeepObjectCloner } from './cross-cutting-concerns/domain/services/deep-object-cloner'
 import { DeepPropertyObjectCloner } from './cross-cutting-concerns/infrastructure/services/deep-property-object-cloner'
 import { Blueprint } from './rundown-execution/domain/value-objects/blueprint'
 import { Tv2ConfigurationMapper } from './blueprints/domain/services/tv2-configuration-mapper'
@@ -261,7 +261,7 @@ import {
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
-  const objectCloner: ObjectCloner = new DeepPropertyObjectCloner()
+  const objectCloner: DeepObjectCloner = new DeepPropertyObjectCloner()
   const httpService: HttpService = new GotHttpService()
   const timeoutCallbackScheduler: CallbackScheduler = new TimeoutCallbackScheduler(logger)
 
@@ -399,7 +399,7 @@ function createIngestedRundownRepository(mongoDatabase: MongoDatabase, rundownBa
   return new MongoIngestedRundownRepository(mongoDatabase, ingestedEntityConverter, rundownBaselineRepository, ingestedSegmentRepository, ingestedPartRepository, ingestedPieceRepository)
 }
 
-function createBlueprint(objectCloner: ObjectCloner, logger: Logger): Blueprint {
+function createBlueprint(objectCloner: DeepObjectCloner, logger: Logger): Blueprint {
   const configurationMapper: Tv2ConfigurationMapper = new Tv2ConfigurationMapper(
     new Tv2StudioBlueprintConfigurationMapper(),
     new Tv2ShowStyleBlueprintConfigurationMapper()
@@ -437,7 +437,7 @@ function createActionManifestRepository(mongoDatabase: MongoDatabase): ActionMan
   return new MongoActionManifestRepository([adLibActionManifestRepository, adLibPieceManifestRepository])
 }
 
-function createTimelineBuilder(objectCloner: ObjectCloner, blueprint: Blueprint): TimelineBuilder {
+function createTimelineBuilder(objectCloner: DeepObjectCloner, blueprint: Blueprint): TimelineBuilder {
   const superflyTimelineBuilder: SuperflyTimelineBuilder = new SuperflyTimelineBuilder(objectCloner)
   return new BlueprintTimelineBuilder(superflyTimelineBuilder, blueprint)
 }
