@@ -4,7 +4,9 @@ import { MongoDatabase } from './cross-cutting-concerns/infrastructure/mongodb/m
 import {
   MongoRundownAggregateRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-rundown-aggregate-repository'
-import { MongoSegmentRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-segment-repository'
+import {
+  MongoSegmentRepository
+} from './rundown-execution/infrastructure/repositories/mongodb/mongo-segment-repository'
 import { MongoPieceRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-piece-repository'
 import { MongoPartRepository } from './rundown-execution/infrastructure/repositories/mongodb/mongo-part-repository'
 import {
@@ -58,7 +60,9 @@ import { Tv2Blueprint } from './blueprints/domain/services/tv2-blueprint'
 import { Tv2EndStateForPartService } from './blueprints/domain/services/tv2-end-state-for-part-service'
 import { Tv2OnTimelineGenerateService } from './blueprints/domain/services/tv2-on-timeline-generate-service'
 import { Tv2BlueprintConfigurationValidator } from './blueprints/domain/services/tv2-blueprint-configuration-validator'
-import { Tv2BlueprintBaselinePiecesGenerator } from './blueprints/domain/services/tv2-blueprint-baseline-pieces-generator'
+import {
+  Tv2BlueprintBaselinePiecesGenerator
+} from './blueprints/domain/services/tv2-blueprint-baseline-pieces-generator'
 import {
   TimelineObjectFactoryProvider
 } from './blueprints/domain/services/timeline-object-factories/timeline-object-factory-provider'
@@ -82,7 +86,7 @@ import { BlueprintTimelineBuilder } from './rundown-execution/domain/services/bl
 import { SuperflyTimelineBuilder } from './rundown-execution/domain/services/superfly-timeline-builder'
 import { RundownService } from './rundown-execution/application/interfaces/rundown-service'
 import { IngestService } from './sofie-ingest/application/interfaces/ingest-service'
-import { Tv2INewsIngestService } from './sofie-ingest/application/services/tv2-inews-ingest-service'
+import { Tv2InewsIngestService } from './sofie-ingest/application/services/tv2-inews-ingest-service'
 import { HttpService } from './cross-cutting-concerns/application/interfaces/http-service'
 import { GotHttpService } from './cross-cutting-concerns/infrastructure/services/got-http-service'
 import { PlayoutService } from './rundown-execution/application/interfaces/playout-service'
@@ -233,6 +237,27 @@ import {
 } from './sofie-ingest/infrastructure/repositories/mongodb/sofie-ingest-mongo-entity-converter'
 import { TypedEventBus } from './cross-cutting-concerns/application/services/typed-event-bus'
 import { TypedEventServer } from './cross-cutting-concerns/application/services/typed-event-server'
+import { IngestGatewayConnector } from './rundown-ingest/application/interfaces/ingest-gateway-connector'
+import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
+import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
+import { IngestHealthStatusEventService } from './rundown-ingest/application/services/ingest-health-status-event-service'
+import { RundownIngestEventBuilder } from './rundown-ingest/application/services/rundown-ingest-event-builder'
+import { IngestController } from './rundown-ingest/application/controllers/ingest-controller'
+import {
+  InewsIngestConfigurationRepository
+} from './tv2-inews-ingest/domain/repositories/inews-ingest-configuration-repository'
+import {
+  MongoInewsIngestConfigurationRepository
+} from './tv2-inews-ingest/infrastructure/repositories/mongo/mongo-inews-ingest-configuration-repository'
+import { Tv2InewsIngestController } from './tv2-inews-ingest/application/controllers/tv2-inews-ingest-controller'
+import { InewsIngestService } from './tv2-inews-ingest/application/services/inews-ingest-service'
+import {
+  InewsIngestConfigurationEventBuilder
+} from './tv2-inews-ingest/application/interfaces/inews-ingest-configuration-event-builder'
+import { Tv2InewsIngestEventBuilder } from './tv2-inews-ingest/application/services/tv2-inews-ingest-event-builder'
+import {
+  InewsIngestConfigurationEventService
+} from './tv2-inews-ingest/application/services/inews-ingest-configuration-event-service'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -266,6 +291,8 @@ async function main(logger: Logger): Promise<void> {
   const macroRepository: MacroRepository = new MongoMacroRepository(mongoDatabase, uuidGenerator)
   const actionManifestRepository: ActionManifestRepository = createActionManifestRepository(mongoDatabase)
 
+  const inewsIngestConfigurationRepository: InewsIngestConfigurationRepository = new MongoInewsIngestConfigurationRepository(mongoDatabase)
+
   // Event builders and event services
   const typedEventBus: TypedEventBus = new TypedEventBus()
   const rundownExecutionEventBuilder: RundownExecutionEventBuilder = new RundownExecutionEventBuilder()
@@ -285,6 +312,12 @@ async function main(logger: Logger): Promise<void> {
   const mediaEventService: MediaEventService = new MediaEventService(typedEventBus, sofieIngestEventBuilder)
   const deviceEventService: DeviceEventService = new DeviceEventService(typedEventBus, sofieIngestEventBuilder)
 
+  const rundownIngestEventBuilder: RundownIngestEventBuilder = new RundownIngestEventBuilder()
+  const healthStatusEventService: IngestHealthStatusEventService = new IngestHealthStatusEventService(rundownIngestEventBuilder)
+
+  const inewsIngestConfigurationEventBuilder: InewsIngestConfigurationEventBuilder = new Tv2InewsIngestEventBuilder()
+  const inewsIngestConfigurationEventService: InewsIngestConfigurationEventService = new InewsIngestConfigurationEventService(inewsIngestConfigurationEventBuilder)
+
   // Data change listeners
   const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService)
 
@@ -294,7 +327,7 @@ async function main(logger: Logger): Promise<void> {
   // Services
   const blueprint: Blueprint = createBlueprint(objectCloner, logger)
   const timelineBuilder: TimelineBuilder = createTimelineBuilder(objectCloner, blueprint)
-  const ingestService: IngestService = new Tv2INewsIngestService(httpService, rundownAggregateRepository)
+  const ingestService: IngestService = new Tv2InewsIngestService(httpService, rundownAggregateRepository)
   const playoutService: PlayoutService = new PlayoutGatewayService(httpService, logger)
   const playoutContentStateService: PlayoutContentStateService = createPlayoutContentStateService(mongoDatabase, playoutContentEventService)
   const rundownTimelineService: RundownTimelineService = new RundownTimelineService(rundownEventService, ingestedRundownRepository, rundownAggregateRepository, timelineRepository, timelineBuilder, configurationRepository, ingestService, playoutService, timeoutCallbackScheduler, blueprint, playoutContentStateService, logger)
@@ -310,6 +343,8 @@ async function main(logger: Logger): Promise<void> {
   const statusMessageService: StatusMessageService = new StatusMessageServiceImplementation(statusMessageEventService, statusMessageRepository)
   const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
+  const ingestGatewayConnector: IngestGatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
+  const inewsIngestService: InewsIngestService = new InewsIngestService(inewsIngestConfigurationRepository, inewsIngestConfigurationEventService, ingestGatewayConnector)
 
   // Controller setup
   const httpResponseFormatter: JsendResponseFormatter = new JsendResponseFormatter()
@@ -325,9 +360,11 @@ async function main(logger: Logger): Promise<void> {
   const systemInformationController: SystemInformationController = new SystemInformationController(systemInformationRepository, statusMessageRepository, httpErrorHandler, httpResponseFormatter)
   const loggerController: LoggerController = new LoggerController(httpResponseFormatter, httpErrorHandler, logger)
   const deviceController: DeviceController = new DeviceController(videoMixerDeviceRepository, httpErrorHandler, httpResponseFormatter)
+  const ingestController: IngestController = new IngestController(ingestGatewayConnector, httpErrorHandler, httpResponseFormatter)
+  const tv2InewsIngestController: Tv2InewsIngestController = new Tv2InewsIngestController(inewsIngestService, httpResponseFormatter, httpErrorHandler)
 
   // System setup
-  const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController], logger)
+  const restServer: ExpressRestServer = new ExpressRestServer([rundownController, timelineController, actionController, triggerController, macroController, configurationController, mediaController, deviceController, systemInformationController, loggerController, ingestController, tv2InewsIngestController], logger)
   const webSocketEventServer = new WebSocketEventServer(uuidGenerator, logger)
   const typedEventServer: TypedEventServer = new TypedEventServer(webSocketEventServer, typedEventBus, logger)
 
@@ -338,6 +375,7 @@ async function main(logger: Logger): Promise<void> {
   await mediaDataChangeService.initialize()
   await deviceDataChangeService.initialize()
   await configurationDataChangeService.initialize()
+  await inewsIngestService.initialize()
   await restServer.start(3005)
   await typedEventServer.startServer(3006)
   logger.info('Alba server is configured.')
