@@ -54,7 +54,7 @@ import { Tv2UnexpectedActionException } from '../../exceptions/tv2-unexpected-ac
 import { PieceMetadata } from '../../../../rundown-execution/domain/value-objects/metadata'
 import { OutputLayer } from '../../../../rundown-execution/domain/enums/output-layer'
 import { AudioMode } from '../../../../rundown-execution/domain/enums/audio-mode'
-import { ObjectCloner } from '../../../../cross-cutting-concerns/domain/services/object-cloner'
+import { DeepObjectCloner } from '../../../../cross-cutting-concerns/domain/services/deep-object-cloner'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
 import {
   SourcePlayoutContent,
@@ -87,7 +87,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     private readonly videoClipTimelineObjectFactory: Tv2VideoClipTimelineObjectFactory,
     private readonly stringHashConverter: StringHashGenerator,
     private readonly assetPathHelper: Tv2AssetPathHelper,
-    private readonly objectCloner: ObjectCloner,
+    private readonly objectCloner: DeepObjectCloner,
     logger: Logger,
   ) {
     super()
@@ -374,7 +374,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   }
 
   private updateInsertToInputAction(action: Action, splitScreenPieceFromRundown: Piece): Action {
-    const pieceMetadata: PieceMetadata = this.objectCloner.clone(splitScreenPieceFromRundown.metadata)
+    const pieceMetadata: PieceMetadata = this.objectCloner.deepClone(splitScreenPieceFromRundown.metadata)
     if (!pieceMetadata.splitScreen || !pieceMetadata.config) {
       throw new Tv2UnexpectedActionException(`Unable to find split screen configuration for the piece '${splitScreenPieceFromRundown.name}'.`)
     }

@@ -14,7 +14,7 @@ import { PartTimings } from '../value-objects/part-timings'
 import { PieceLifespan } from '../enums/piece-lifespan'
 import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { ExhaustiveCaseChecker } from '../../../cross-cutting-concerns/domain/services/exhaustive-case-checker'
-import { ObjectCloner } from '../../../cross-cutting-concerns/domain/services/object-cloner'
+import { DeepObjectCloner } from '../../../cross-cutting-concerns/domain/services/deep-object-cloner'
 import { Studio } from '../entities/studio'
 import { StudioLayer } from '../value-objects/studio-layer'
 import { LookaheadMode } from '../enums/lookahead-mode'
@@ -44,7 +44,7 @@ const BASELINE_PRIORITY: number = 0
 const LOW_PRIORITY: number = -1
 
 export class SuperflyTimelineBuilder implements TimelineBuilder {
-  public constructor(private readonly objectCloner: ObjectCloner) {}
+  public constructor(private readonly objectCloner: DeepObjectCloner) {}
 
   public getBaseTimeline(): Timeline {
     return { timelineGroups: [] }
@@ -307,7 +307,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     childGroupForPiece: TimelineObjectGroup,
     piece: Piece
   ): TimelineObject {
-    const timelineObjectCopy: TimelineObject = this.objectCloner.clone(timelineObject)
+    const timelineObjectCopy: TimelineObject = this.objectCloner.deepClone(timelineObject)
     timelineObjectCopy.id = `${childGroupForPiece.id}_${piece.id}_${timelineObject.id}`
     timelineObjectCopy.inGroup = childGroupForPiece.id
     return timelineObjectCopy
@@ -455,7 +455,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     idPostFix: string = ''
   ): LookaheadTimelineObject {
     const lookAheadTimelineObject: LookaheadTimelineObject = {
-      ...this.objectCloner.clone(timelineObject),
+      ...this.objectCloner.deepClone(timelineObject),
       id: `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${idPostFix}`,
       priority: LOOKAHEAD_PRIORITY,
       isLookahead: true,

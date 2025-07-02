@@ -25,7 +25,7 @@ import {
 } from '../../value-objects/tv2-action-manifest-data'
 import { Tv2Action } from '../../value-objects/tv2-action'
 import { PartActionType } from '../../../../action-system/domain/enums/action-type'
-import { ObjectCloner } from '../../../../cross-cutting-concerns/domain/services/object-cloner'
+import { DeepObjectCloner } from '../../../../cross-cutting-concerns/domain/services/deep-object-cloner'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
@@ -224,7 +224,7 @@ function createTestee(params?: {
   videoClipTimelineObjectFactory?: Tv2VideoClipTimelineObjectFactory
   stringHashConverter?: StringHashGenerator
   assetPathHelper?: Tv2AssetPathHelper
-  objectCloner?: ObjectCloner
+  objectCloner?: DeepObjectCloner
   logger?: Logger
 }): Tv2SplitScreenActionFactory {
   return new Tv2SplitScreenActionFactory(
@@ -235,7 +235,7 @@ function createTestee(params?: {
     params?.videoClipTimelineObjectFactory ?? instance(mock<Tv2VideoClipTimelineObjectFactory>()),
     params?.stringHashConverter ?? instance(createMockOfStringHashGenerator()),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
-    params?.objectCloner ?? instance(mock<ObjectCloner>()),
+    params?.objectCloner ?? instance(mock<DeepObjectCloner>()),
     params?.logger ?? instance(createMockOfLogger()),
   )
 }

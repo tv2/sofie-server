@@ -16,7 +16,7 @@ import { FrameTimeConverter } from '../frame-time-converter'
 import { Tv2ConfigurationMapper } from '../tv2-configuration-mapper'
 import { TimelineObjectFactoryProvider } from '../timeline-object-factories/timeline-object-factory-provider'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
-import { ObjectCloner } from '../../../../cross-cutting-concerns/domain/services/object-cloner'
+import { DeepObjectCloner } from '../../../../cross-cutting-concerns/domain/services/deep-object-cloner'
 
 interface ActionFactoryInstance<T> {
   factory: T
@@ -42,7 +42,7 @@ export class Tv2ActionFactoryProvider {
     private readonly configurationMapper: Tv2ConfigurationMapper,
     private readonly timelineObjectFactoryProvider: TimelineObjectFactoryProvider,
     private readonly stringHashGenerator: StringHashGenerator,
-    private readonly objectCloner: ObjectCloner,
+    private readonly objectCloner: DeepObjectCloner,
     logger: Logger
   ) {
     this.logger = logger.tag(this.constructor.name)
