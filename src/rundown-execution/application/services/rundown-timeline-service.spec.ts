@@ -20,7 +20,7 @@ import { Timeline } from '../../domain/entities/timeline'
 import { TimelineObject, TimelineObjectGroup } from '../../domain/entities/timeline-object'
 import { RundownMode } from '../../domain/enums/rundown-mode'
 import { AlreadyRehearsalException } from '../../domain/exceptions/already-rehearsal-exception'
-import { IngestService } from '../../../sofie-ingest/application/interfaces/ingest-service'
+import { SofieIngestService } from '../../../sofie-ingest/application/interfaces/sofie-ingest-service'
 import { RundownService } from '../interfaces/rundown-service'
 import { Logger } from '../../../cross-cutting-concerns/application/interfaces/logger'
 import { PlayoutService } from '../interfaces/playout-service'
@@ -360,7 +360,7 @@ describe(RundownTimelineService.name, () => {
       mockTimelineObjectGroup: instance(mockTimelineObjectGroup)
     })
     const timelineBuilder: TimelineBuilder = mock<TimelineBuilder>()
-    const ingestService: IngestService = createMockOfIngestService()
+    const ingestService: SofieIngestService = createMockOfIngestService()
 
     it('does not emit infinitePiecesUpdatedEvent unless pieces are changed', async () => {
       const segments: Segment[] = [activeSegment, nextSegment]
@@ -1169,7 +1169,7 @@ function createTestee(params?: {
   timelineRepository?: TimelineRepository
   timelineBuilder?: TimelineBuilder
   configurationRepository?: ConfigurationRepository
-  ingestService?: IngestService
+  ingestService?: SofieIngestService
   playoutService?: PlayoutService
   callbackScheduler?: CallbackScheduler
   blueprint?: Blueprint
@@ -1195,8 +1195,8 @@ function createTestee(params?: {
   )
 }
 
-function createMockOfIngestService(): IngestService {
-  const mockedIngestService: IngestService = mock()
+function createMockOfIngestService(): SofieIngestService {
+  const mockedIngestService: SofieIngestService = mock()
   when(mockedIngestService.reloadIngestData(anyString())).thenResolve()
   return mockedIngestService
 }

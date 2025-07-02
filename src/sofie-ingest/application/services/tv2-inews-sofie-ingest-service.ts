@@ -1,4 +1,4 @@
-import { IngestService } from '../interfaces/ingest-service'
+import { SofieIngestService } from '../interfaces/sofie-ingest-service'
 import { HttpService } from '../../../cross-cutting-concerns/application/interfaces/http-service'
 import { RundownRepository } from '../../../rundown-execution/domain/repositories/rundown-repository'
 import { Rundown } from '../../../rundown-execution/domain/entities/rundown'
@@ -8,7 +8,7 @@ import { HttpError, HttpErrorCode } from '../../../cross-cutting-concerns/applic
 
 const INEWS_HOST: string = process.env.INEWS_HOST ?? 'localhost:3007'
 
-export class Tv2InewsIngestService implements IngestService {
+export class Tv2InewsSofieIngestService implements SofieIngestService {
   public constructor(private readonly httpService: HttpService, private readonly rundownRepository: RundownRepository) {}
 
   public async reloadIngestData(rundownId: string): Promise<void> {
