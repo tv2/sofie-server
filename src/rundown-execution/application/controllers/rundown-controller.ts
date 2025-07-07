@@ -9,7 +9,7 @@ import { HttpErrorHandler } from '../../../cross-cutting-concerns/application/in
 import { BasicRundown } from '../../domain/entities/basic-rundown'
 import { BasicRundownDto } from '../dtos/basic-rundown-dto'
 import { Owner } from '../../domain/enums/owner'
-import { IngestService } from '../../../sofie-ingest/application/interfaces/ingest-service'
+import { SofieIngestService } from '../../../sofie-ingest/application/interfaces/sofie-ingest-service'
 import { HttpResponseFormatter } from '../../../cross-cutting-concerns/application/interfaces/http-response-formatter'
 import { SetNextDirection } from '../../domain/enums/set-next-direction'
 import { TakeMode } from '../../domain/enums/take-mode'
@@ -26,7 +26,7 @@ export class RundownController extends BaseController {
   public constructor(
     private readonly rundownService: RundownService,
     private readonly rundownRepository: RundownRepository,
-    private readonly ingestService: IngestService,
+    private readonly ingestService: SofieIngestService,
     private readonly playoutContentService: PlayoutContentReadService,
     private readonly httpErrorHandler: HttpErrorHandler,
     private readonly httpResponseFormatter: HttpResponseFormatter,

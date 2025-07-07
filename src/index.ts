@@ -85,8 +85,8 @@ import {
 import { BlueprintTimelineBuilder } from './rundown-execution/domain/services/blueprint-timeline-builder'
 import { SuperflyTimelineBuilder } from './rundown-execution/domain/services/superfly-timeline-builder'
 import { RundownService } from './rundown-execution/application/interfaces/rundown-service'
-import { IngestService } from './sofie-ingest/application/interfaces/ingest-service'
-import { Tv2InewsIngestService } from './sofie-ingest/application/services/tv2-inews-ingest-service'
+import { SofieIngestService } from './sofie-ingest/application/interfaces/sofie-ingest-service'
+import { Tv2InewsSofieIngestService } from './sofie-ingest/application/services/tv2-inews-sofie-ingest-service'
 import { HttpService } from './cross-cutting-concerns/application/interfaces/http-service'
 import { GotHttpService } from './cross-cutting-concerns/infrastructure/services/got-http-service'
 import { PlayoutService } from './rundown-execution/application/interfaces/playout-service'
@@ -327,7 +327,7 @@ async function main(logger: Logger): Promise<void> {
   // Services
   const blueprint: Blueprint = createBlueprint(objectCloner, logger)
   const timelineBuilder: TimelineBuilder = createTimelineBuilder(objectCloner, blueprint)
-  const ingestService: IngestService = new Tv2InewsIngestService(httpService, rundownAggregateRepository)
+  const ingestService: SofieIngestService = new Tv2InewsSofieIngestService(httpService, rundownAggregateRepository)
   const playoutService: PlayoutService = new PlayoutGatewayService(httpService, logger)
   const playoutContentStateService: PlayoutContentStateService = createPlayoutContentStateService(mongoDatabase, playoutContentEventService)
   const rundownTimelineService: RundownTimelineService = new RundownTimelineService(rundownEventService, ingestedRundownRepository, rundownAggregateRepository, timelineRepository, timelineBuilder, configurationRepository, ingestService, playoutService, timeoutCallbackScheduler, blueprint, playoutContentStateService, logger)
