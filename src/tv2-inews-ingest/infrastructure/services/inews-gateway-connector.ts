@@ -8,7 +8,7 @@ import { IngestHealthStatus } from '../../../rundown-ingest/application/enum/ing
 const HOST: string = process.env.INEWS_GATEWAY_HOST ?? ''
 const DISABLE_INEWS_GATEWAY_CONNECTION: boolean = HOST.trim() === ''
 
-export class INewsGatewayConnector implements IngestGatewayConnector {
+export class InewsGatewayConnector implements IngestGatewayConnector {
   private healthStatus: IngestHealthStatus = IngestHealthStatus.UNKNOWN
 
   public constructor(private readonly webSocket: WebSocket, private readonly ingestHealthStatusEventEmitter: IngestHealthStatusEventEmitter) {
