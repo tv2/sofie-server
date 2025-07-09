@@ -10,7 +10,7 @@ Welcome to the Alba ecosystem. This is the central server for rundown execution 
 ## Usage
 
 ### Building
-The server can be build to JavaScript by:
+The server can be built to JavaScript by:
 1. Install dependencies with `yarn install`.
 2. Build to the folder `/dist` with `yarn build`.
 
@@ -18,7 +18,7 @@ The server can be build to JavaScript by:
 As Alba is being rewritten, based on Sofie, in chunks, it co-exists with Sofie and relies on Sofie for functionalities like rundown ingest and playout control. With time this will gradually be moved over to Alba.
 
 The repository has a Docker compose setup for Sofie, which you need Docker and Docker compose in order to use.
-For now it is possible to start a Sofie instance by:
+For now, it is possible to start a Sofie instance by:
 
 1. Starting a mongo database:
    1. Run `yarn start-database`.
