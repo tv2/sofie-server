@@ -355,7 +355,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
     return {
       id: `fullscreenGraphicsPart_${this.stringHashConverter.getHashedValue(graphicsData.name)}`,
       rundownId: '',
-      name: `Full ${graphicsData.name}`,
+      name: graphicsData.name,
       segmentId: '',
       inTransition: {
         blockTakeDuration: 0,

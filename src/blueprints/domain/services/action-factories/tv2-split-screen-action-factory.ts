@@ -221,7 +221,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     return {
       id: partId,
       rundownId: '',
-      name: splitScreenConfiguration.name,
+      name: `DVE: ${splitScreenConfiguration.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,

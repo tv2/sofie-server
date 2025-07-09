@@ -114,7 +114,7 @@ export class Tv2CameraActionFactory extends ActionFactory {
     return {
       id: partId,
       rundownId: '',
-      name: `Camera Part ${source.name}`,
+      name: `KAM ${source.name}`,
       segmentId: '',
       pieces: [],
       rank: -1,

@@ -145,7 +145,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     return {
       id: partId,
       rundownId: '',
-      name: `Part ${source.name}`,
+      name: source.name,
       segmentId: '',
       pieces: [],
       rank: -1,
