@@ -33,6 +33,7 @@ import {
 } from '../value-objects/timeline-state-resolver-types/tri-caster-type'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
+const INFINITE_GROUP_PREFIX: string = 'infinite_group_'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
 
@@ -136,15 +137,17 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     }
 
     const activeGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(ACTIVE_GROUP_PREFIX))
+    const infiniteGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(INFINITE_GROUP_PREFIX))
     const lookaheadGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(LOOKAHEAD_GROUP_ID))
-    if (!activeGroup || !lookaheadGroup) {
-      throw new UnsupportedOperationException('No Active or Lookahead Group found. This shouldn\'t be possible!')
+    if (!activeGroup || !infiniteGroup || !lookaheadGroup) {
+      throw new UnsupportedOperationException('Missing the Active, Infinite and/or Lookahead Group. This shouldn\'t be possible!')
     }
 
     const mediaPlayerSessionsInUse: Tv2MediaPlayerSession[] = this.findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions, activeGroup)
     const availableMediaPlayers: Tv2MediaPlayer[] = configuration.studio.mediaPlayers.filter(mediaPlayer => !mediaPlayerSessionsInUse.some(session => session.mediaPlayer.id === mediaPlayer.id))
 
     this.assignMediaPlayersForGroup(activeGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
+    this.assignMediaPlayersForGroup(infiniteGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
     this.assignMediaPlayersForGroup(lookaheadGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
 
     return mediaPlayerSessionsInUse
