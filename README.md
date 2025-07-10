@@ -6,6 +6,7 @@ Welcome to the Alba ecosystem. This is the central server for rundown execution 
 ## Requirements
 - NodeJS >= 16.20
 - Yarn
+- A running MongoDB instance with an initialized replica set.
 - Optional: Docker and Docker Compose
 
 ## Usage
@@ -18,6 +19,16 @@ The server can be built to JavaScript by:
 
 > [!note]
 > The project is intended to be run as a Docker container and is currently published to the [tv2media](https://hub.docker.com/repository/docker/tv2media/alba-server/general) space.
+
+### Configuration
+Configuration is done through environment variables:
+
+| Variable               | Description                                                      | Example                                  |
+|------------------------|------------------------------------------------------------------|------------------------------------------|
+| `MONGO_URL`            | The connection URL to the MongoDB instance.                      | `MONGO_URL=mongodb://localhost:3001`     |
+| `INEWS_HOST`           | The host and port for the REST API of the Sofie iNews Gateway.   | `INEWS_HOST=localhost:3007`              |
+| `PLAYOUT_GATEWAY_HOST` | The host and port for the REST API of the Sofie Playout Gateway. | `PLAYOUT_GATEWAY_HOST=localhost:3009`    |
+| `INEWS_GATEWAY_HOST`   | The websocket URL used to connect to the Alba iNews Gateway.     | `INEWS_GATEWAY_HOST=ws://localhost:3008` |
 
 ### Running with development server
 You can start a development server with `yarn watch`.
