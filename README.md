@@ -1,4 +1,5 @@
 # Alba Server
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
 Welcome to the Alba ecosystem. This is the central server for rundown execution and management.
 
@@ -13,8 +14,15 @@ Welcome to the Alba ecosystem. This is the central server for rundown execution 
 The server can be built to JavaScript by:
 1. Install dependencies with `yarn install`.
 2. Build to the folder `/dist` with `yarn build`.
+3. To start the built application, run `yarn start`.
 
-### Running with Sofie
+> [!note]
+> The project is intended to be run as a Docker container and is currently published to the [tv2media](https://hub.docker.com/repository/docker/tv2media/alba-server/general) space.
+
+### Running with development server
+You can start a development server with `yarn watch`.
+
+### Running alongside Sofie
 As Alba is being rewritten, based on Sofie, in chunks, it co-exists with Sofie and relies on Sofie for functionalities like rundown ingest and playout control. With time this will gradually be moved over to Alba.
 
 The repository has a Docker compose setup for Sofie, which you need Docker and Docker compose in order to use.
@@ -29,4 +37,4 @@ For now, it is possible to start a Sofie instance by:
 ## Related projects
 
 At TV 2 the Alba server is used in conjunction with the [Alba TV 2 server](https://github.com/tv2/alba-tv2-server) and the [Angular web client](https://github.com/tv2/alba-web-client).
-All 3 services are needed to run Alba at TV 2.
+All 3 applications are needed to run Alba at TV 2.
