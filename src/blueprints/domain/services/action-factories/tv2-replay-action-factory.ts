@@ -54,7 +54,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
   private createReplayActionWithVoiceOverAsNext(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio): Tv2ReplayAction {
     const sanitizedId: string = this.sanitizeStringForId(source.name)
     const partId: string = `${sanitizedId}_VO_as_next_part_action`
-    const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name} VO`)
+    const partInterface: PartInterface = this.createPartInterface(partId, `${source.name} VO`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, AudioMode.VOICE_OVER)
 
     return {
@@ -82,7 +82,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
   private createReplayActionWithVoiceOverAsOnAir(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio): Tv2ReplayAction {
     const sanitizedId: string = this.sanitizeStringForId(source.name)
     const partId: string = `${sanitizedId}_VO_on_air_part_action`
-    const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name} VO`)
+    const partInterface: PartInterface = this.createPartInterface(partId, `${source.name} VO`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, AudioMode.VOICE_OVER)
 
     return {
@@ -110,7 +110,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
   private createReplayActionWithoutVoiceOverAsNext(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio): Tv2ReplayAction {
     const sanitizedId: string = this.sanitizeStringForId(source.name)
     const partId: string = `${sanitizedId}_part_action`
-    const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name}`)
+    const partInterface: PartInterface = this.createPartInterface(partId, `${source.name}`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, AudioMode.FULL)
 
     return {
@@ -138,7 +138,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
   private createReplayActionWithoutVoiceOverAsOnAir(configuration: Tv2BlueprintConfiguration, source: Tv2SourceMappingWithAudio): Tv2ReplayAction {
     const sanitizedId: string = this.sanitizeStringForId(source.name)
     const partId: string = `${sanitizedId}_on_air_part_action`
-    const partInterface: PartInterface = this.createPartInterface(partId, `Replay Part ${source.name}`)
+    const partInterface: PartInterface = this.createPartInterface(partId, `${source.name}`)
     const pieceInterface: Tv2PieceInterface = this.createReplayForSourcePieceInterface(configuration, partId, source, AudioMode.FULL)
 
     return {
