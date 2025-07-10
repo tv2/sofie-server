@@ -5,17 +5,17 @@ import {
 } from '../../../rundown-ingest/application/interfaces/ingest-health-status-event-emitter'
 import { IngestHealthStatus } from '../../../rundown-ingest/application/enum/ingest-health-status'
 
-const HOST: string = process.env.INEWS_GATEWAY_HOST ?? 'ws://localhost:3008'
-const FEATURE_FLAG_DISABLED: boolean = process.env.DISABLE_INEWS_GATEWAY === 'true'
+const HOST: string = process.env.INEWS_GATEWAY_HOST ?? ''
+const DISABLE_INEWS_GATEWAY_CONNECTION: boolean = HOST.trim() === ''
 
-export class INewsGatewayConnector implements IngestGatewayConnector {
+export class InewsGatewayConnector implements IngestGatewayConnector {
   private healthStatus: IngestHealthStatus = IngestHealthStatus.UNKNOWN
 
   public constructor(private readonly webSocket: WebSocket, private readonly ingestHealthStatusEventEmitter: IngestHealthStatusEventEmitter) {
   }
 
   public connect(queueIds: string[]): void {
-    if (FEATURE_FLAG_DISABLED) {
+    if (DISABLE_INEWS_GATEWAY_CONNECTION) {
       // TODO: This is temporary until we can release the new Ingest flow.
       return
     }
