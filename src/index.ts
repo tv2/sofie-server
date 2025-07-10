@@ -238,7 +238,7 @@ import {
 import { TypedEventBus } from './cross-cutting-concerns/application/services/typed-event-bus'
 import { TypedEventServer } from './cross-cutting-concerns/application/services/typed-event-server'
 import { IngestGatewayConnector } from './rundown-ingest/application/interfaces/ingest-gateway-connector'
-import { INewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/i-news-gateway-connector'
+import { InewsGatewayConnector } from './tv2-inews-ingest/infrastructure/services/inews-gateway-connector'
 import { ReconnectingWebSocket } from './cross-cutting-concerns/infrastructure/services/reconnecting-web-socket'
 import { IngestHealthStatusEventService } from './rundown-ingest/application/services/ingest-health-status-event-service'
 import { RundownIngestEventBuilder } from './rundown-ingest/application/services/rundown-ingest-event-builder'
@@ -343,7 +343,7 @@ async function main(logger: Logger): Promise<void> {
   const statusMessageService: StatusMessageService = new StatusMessageServiceImplementation(statusMessageEventService, statusMessageRepository)
   const deviceDataChangeService: DeviceChangedService = createDeviceDataChangeService(mongoDatabase, statusMessageService, deviceRepository, logger)
   const configurationDataChangeService: ConfigurationChangedService = createConfigurationDataChangeService(mongoDatabase, blueprint, statusMessageService, configurationRepository, logger)
-  const ingestGatewayConnector: IngestGatewayConnector = new INewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
+  const ingestGatewayConnector: IngestGatewayConnector = new InewsGatewayConnector(new ReconnectingWebSocket(logger), healthStatusEventService)
   const inewsIngestService: InewsIngestService = new InewsIngestService(inewsIngestConfigurationRepository, inewsIngestConfigurationEventService, ingestGatewayConnector)
 
   // Controller setup
