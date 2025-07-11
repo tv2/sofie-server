@@ -81,7 +81,7 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     const sisyfosPersistedLevelsTimelineObject: TimelineObject
       = this.createSisyfosPersistedLevelsTimelineObject(activePart, previousPart, rundownPersistentState)
     const activeTimelineObjectGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
-      timelineObject => timelineObject.id.includes('active_group_')
+      timelineObject => timelineObject.id.includes(ACTIVE_GROUP_PREFIX)
     )
     if (!activeTimelineObjectGroup) {
       throw new UnsupportedOperationException('No active group found. This should not be possible')
@@ -137,17 +137,17 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     }
 
     const activeGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(ACTIVE_GROUP_PREFIX))
-    const infiniteGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(INFINITE_GROUP_PREFIX))
+    const infiniteGroups: TimelineObjectGroup[] = timeline.timelineGroups.filter(group => group.id.includes(INFINITE_GROUP_PREFIX))
     const lookaheadGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group => group.id.includes(LOOKAHEAD_GROUP_ID))
-    if (!activeGroup || !infiniteGroup || !lookaheadGroup) {
-      throw new UnsupportedOperationException('Missing the Active, Infinite and/or Lookahead Group. This shouldn\'t be possible!')
+    if (!activeGroup || !lookaheadGroup) {
+      throw new UnsupportedOperationException('Missing the Active and/or Lookahead Groups. This shouldn\'t be possible!')
     }
 
     const mediaPlayerSessionsInUse: Tv2MediaPlayerSession[] = this.findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions, activeGroup)
     const availableMediaPlayers: Tv2MediaPlayer[] = configuration.studio.mediaPlayers.filter(mediaPlayer => !mediaPlayerSessionsInUse.some(session => session.mediaPlayer.id === mediaPlayer.id))
 
     this.assignMediaPlayersForGroup(activeGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
-    this.assignMediaPlayersForGroup(infiniteGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
+    infiniteGroups.forEach(infiniteGroup => this.assignMediaPlayersForGroup(infiniteGroup, mediaPlayerSessionsInUse, availableMediaPlayers))
     this.assignMediaPlayersForGroup(lookaheadGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
 
     return mediaPlayerSessionsInUse
