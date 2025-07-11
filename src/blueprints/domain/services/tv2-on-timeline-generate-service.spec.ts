@@ -17,8 +17,10 @@ import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timel
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
 import { Tv2ShowStyleBlueprintConfiguration } from '../value-objects/tv2-show-style-blueprint-configuration'
 import { Tv2ConfigurationMapper } from './tv2-configuration-mapper'
+import { DeviceType } from '../../../sofie-ingest/domain/enums/device-type'
 
 const ACTIVE_GROUP_PREFIX: string = 'active_group_'
+const INFINITE_GROUP_PREFIX: string = 'infinite_group_'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
 const SHOW_STYLE_VARIANT_ID: string = 'showStyleVariantId'
 
@@ -72,6 +74,56 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(0)
+        })
+      })
+
+      describe('when a timeline object in the infinite group wants a media player', () => {
+        describe('when no other timeline objects wants a media player', () => {
+          it('assigns a media player session to that timeline object', () => {
+            const mediaPlayerIds: string[] = ['1', '2']
+            const configuration: Configuration = {} as Configuration
+            const sessionId: string = 'sessionId'
+            const timeline: Timeline = createTimeline({
+              infiniteGroupTimelineObjects: [createTimelineObject('some-infinite-id', { mediaPlayerSession: sessionId })]
+            })
+
+            const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = []
+            const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
+            const part: Part = EntityMockFactory.createPart()
+
+            const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+
+            const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
+            expect(result.activeMediaPlayerSessions).toHaveLength(1)
+            expect(result.activeMediaPlayerSessions[0].sessionId).toBe(sessionId)
+          })
+        })
+
+        describe('when one media player is available', () => {
+          describe('when a timeline object in the lookahead group wants a media player', () => {
+            it('assigns the media player to the infinite timeline object does not assign one to the lookahead timeline object', () => {
+              const mediaPlayerIds: string[] = ['1']
+              const configuration: Configuration = {} as Configuration
+              const infiniteSessionId: string = 'infinite-session-id'
+              const lookaheadSessionId: string = 'lookahead-session-id'
+              const timeline: Timeline = createTimeline({
+                infiniteGroupTimelineObjects: [createTimelineObject('some-infinite-id', { mediaPlayerSession: infiniteSessionId })],
+                lookaheadGroupTimelineObjects: [createTimelineObject('some-lookahead-id', { mediaPlayerSession: lookaheadSessionId })],
+              })
+
+              const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = []
+              const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
+              const part: Part = EntityMockFactory.createPart()
+
+              const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
+              const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+
+              const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
+              expect(result.activeMediaPlayerSessions).toHaveLength(1)
+              expect(result.activeMediaPlayerSessions[0].sessionId).toBe(infiniteSessionId)
+            })
+          })
         })
       })
 
@@ -608,18 +660,38 @@ function createConfiguration(abMediaPlayerIds?: string[]): Tv2BlueprintConfigura
   }
 }
 
-function createTimeline(params?: { activeGroupTimelineObjects?: TimelineObject[], lookaheadGroupTimelineObjects?: TimelineObject[] }): Timeline {
+function createTimeline(params?: { activeGroupTimelineObjects?: TimelineObject[], lookaheadGroupTimelineObjects?: TimelineObject[], infiniteGroupTimelineObjects?: TimelineObject[] }): Timeline {
   return {
     timelineGroups: [
-      {
+      createTimelineObjectGroup({
         id: ACTIVE_GROUP_PREFIX,
         children: params?.activeGroupTimelineObjects ?? [] as TimelineObject[]
-      } as TimelineObjectGroup,
-      {
+      }),
+      createTimelineObjectGroup({
+        id: INFINITE_GROUP_PREFIX,
+        children: params?.infiniteGroupTimelineObjects ?? [] as TimelineObject[]
+      }),
+      createTimelineObjectGroup({
         id: LOOKAHEAD_GROUP_ID,
         children: params?.lookaheadGroupTimelineObjects ?? [] as TimelineObject[]
-      } as TimelineObjectGroup
+      })
     ]
+  }
+}
+
+function createTimelineObjectGroup(timelineObjectGroup: Partial<TimelineObjectGroup>): TimelineObjectGroup {
+  return {
+    id: '',
+    children: [],
+    isGroup: true,
+    content: {
+      deviceType: DeviceType.ABSTRACT,
+      type: undefined
+    },
+    enable: { start: 0 },
+    keyframes: [],
+    layer: '',
+    ...timelineObjectGroup
   }
 }
 
