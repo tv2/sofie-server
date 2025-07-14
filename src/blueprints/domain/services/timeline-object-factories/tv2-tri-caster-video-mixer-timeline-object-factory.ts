@@ -37,7 +37,7 @@ interface TriCasterTransitionEffectProperties {
   durationInFrames?: number
 }
 
-const TRI_CASTER_PREFIX: string = 'triCaster_'
+const TRI_CASTER_PREFIX: string = 'tricaster_'
 
 export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
   private readonly logger: Logger
