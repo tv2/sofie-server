@@ -21,6 +21,7 @@ export enum Tv2PieceLayer {
   REPLAY = 'studio0_local',
   REPLAY_STUDIO_AUXILIARY = 'studio0_aux_studio_screen',
   REPLAY_VIZ_AUXILIARY = 'studio0_aux_viz_full1',
+  WALL_AUXILIARY = 'studio0_aux_wall',
   VIDEO_CLIP = 'studio0_selected_clip',
   ROBOT_CAMERA = 'studio0_robot_camera'
 }

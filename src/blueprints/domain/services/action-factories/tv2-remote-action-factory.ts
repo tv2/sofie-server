@@ -147,7 +147,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       name: `${remoteSourceMapping.name} \u2192 AUX ${auxiliarySourceMapping.auxiliaryId}`,
       rundownId: '',
       partId: '',
-      layer: Tv2PieceLayer.REMOTE,
+      layer: Tv2PieceLayer.WALL_AUXILIARY,
       pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
