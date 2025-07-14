@@ -4,6 +4,7 @@ export interface Tv2StudioBlueprintConfiguration {
   cameraSources: Tv2SourceMappingWithAudio[]
   remoteSources: Tv2SourceMappingWithAudio[]
   feedSources: Tv2SourceMappingWithAudio[]
+  auxiliarySources: Tv2SourceAuxiliaryMapping[]
   replaySources: Tv2SourceMappingWithAudio[]
   studioMicrophones: string[]
   mediaPlayers: Tv2MediaPlayer[]
@@ -58,6 +59,11 @@ export interface Tv2SourceMapping {
   id: string
   name: string
   videoMixerSource: number
+}
+
+export interface Tv2SourceAuxiliaryMapping {
+  auxiliaryId: string
+  layerId: string
 }
 
 export interface Tv2MediaPlayer extends Tv2SourceMapping { }

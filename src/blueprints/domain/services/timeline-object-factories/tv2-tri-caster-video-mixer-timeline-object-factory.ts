@@ -2,7 +2,7 @@ import {
   Tv2VideoMixerTimelineObjectFactory,
   VideoMixerWipeTransitionSettings
 } from '../../interfaces/timeline-object-factories/tv2-video-mixer-timeline-object-factory'
-import { Tv2TriCasterLayer, Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
+import { Tv2TriCasterLayer } from '../../value-objects/tv2-layers'
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
 import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
 import {
@@ -176,7 +176,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createAuxTimelineObject(sourceInput: number, layer: Tv2VideoMixerLayer): TriCasterMixOutputTimelineObject {
+  public createAuxTimelineObject(sourceInput: number, layer: string): TriCasterMixOutputTimelineObject {
     return {
       id: `${TRI_CASTER_PREFIX}${layer}_input_${sourceInput}_timelineObject`,
       enable: {
