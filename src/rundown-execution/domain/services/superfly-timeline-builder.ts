@@ -416,7 +416,6 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
   ): LookaheadTimelineObject[] {
     return part
       .getPieces()
-      .filter(piece => piece.pieceLifespan === PieceLifespan.WITHIN_PART)
       .flatMap(piece => piece.getTimelineObjects())
       .filter(timelineObject => timelineObject.layer === layer.name)
       .map(timelineObject => this.mapTimelineObjectToLookAheadTimelineObject(timelineObject, enable, layer, idPostFix))
