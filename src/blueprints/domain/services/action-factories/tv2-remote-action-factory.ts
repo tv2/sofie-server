@@ -90,11 +90,10 @@ export class Tv2RemoteActionFactory extends ActionFactory {
   private createRouteToAuxiliaryActions(
     configuration: Tv2BlueprintConfiguration
   ): Tv2RemoteAction[] {
-    return configuration.studio.feedSources
-      .concat(configuration.studio.cameraSources)
-      .flatMap(source =>
-        this.createRouteToAuxiliaryActionForSourceMapping(source, configuration)
-      )
+    return [
+      ...configuration.studio.remoteSources,
+      ...configuration.studio.feedSources,
+    ].flatMap(source => this.createRouteToAuxiliaryActionForSourceMapping(source, configuration))
   }
 
   private createRouteToAuxiliaryActionForSourceMapping(
@@ -102,10 +101,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     configuration: Tv2BlueprintConfiguration
   ): Tv2RemoteAction[] {
     return configuration.studio.auxiliarySources.map(auxiliarySourceMapping =>
-      this.createRouteToAuxiliaryAction(
-        remoteSourceMapping,
-        auxiliarySourceMapping,
-      )
+      this.createRouteToAuxiliaryAction(remoteSourceMapping, auxiliarySourceMapping)
     )
   }
 
@@ -113,24 +109,18 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     remoteSourceMapping: Tv2SourceMappingWithAudio,
     auxiliarySourceMapping: Tv2SourceAuxiliaryMapping,
   ): Tv2RemoteAction {
-    const sanitizedRemoteId: string = this.sanitizeStringForId(
-      remoteSourceMapping.name
+    const sanitizedRemoteId: string = this.sanitizeStringForId(remoteSourceMapping.name)
+    const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
+    const remotePieceInterface: Tv2PieceInterface = this.createRemoteAuxiliaryPieceInterface(
+      remoteSourceMapping,
+      auxiliarySourceMapping,
     )
-
-    const sanitizedAuxiliaryId: string = this.sanitizeStringForId(
-      auxiliarySourceMapping.auxiliaryId
-    )
-    const remotePieceInterface: Tv2PieceInterface
-      = this.createRemoteAuxiliaryPieceInterface(
-        remoteSourceMapping,
-        auxiliarySourceMapping,
-      )
 
     return {
-      id: `routeSourceToAction_${sanitizedRemoteId}_aux${sanitizedAuxiliaryId}`,
-      name: `${remoteSourceMapping.name} to AUX${auxiliarySourceMapping.auxiliaryId}`,
+      id: `routeRemoteSource_${sanitizedRemoteId}_to_aux${sanitizedAuxiliaryId}`,
+      name: `${remoteSourceMapping.name} to AUX ${auxiliarySourceMapping.auxiliaryId}`,
       rank: 0,
-      description: `Routes ${remoteSourceMapping.name} to AUX${auxiliarySourceMapping.auxiliaryId}.`,
+      description: `Routes ${remoteSourceMapping.name} to AUX ${auxiliarySourceMapping.auxiliaryId}.`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface: remotePieceInterface,
@@ -140,7 +130,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
           type: PlayoutContentType.REMOTE,
           source: remoteSourceMapping.name,
         },
-        outputChannel: OutputChannel.PROGRAM,
+        outputChannel: OutputChannel.UNKNOWN,
       },
     }
   }
@@ -149,16 +139,12 @@ export class Tv2RemoteActionFactory extends ActionFactory {
     remoteSourceMapping: Tv2SourceMappingWithAudio,
     auxiliarySourceMapping: Tv2SourceAuxiliaryMapping,
   ): Tv2PieceInterface {
-    const sanitizedRemoteId: string = this.sanitizeStringForId(
-      remoteSourceMapping.name
-    )
-    const sanitizedAuxiliaryId: string = this.sanitizeStringForId(
-      auxiliarySourceMapping.auxiliaryId
-    )
+    const sanitizedRemoteId: string = this.sanitizeStringForId(remoteSourceMapping.name)
+    const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
 
     return {
       id: `routeRemoteSourcePiece_${sanitizedRemoteId}_aux${sanitizedAuxiliaryId}`,
-      name: `${remoteSourceMapping.name} \u2192 AUX${auxiliarySourceMapping.auxiliaryId}`,
+      name: `${remoteSourceMapping.name} \u2192 AUX ${auxiliarySourceMapping.auxiliaryId}`,
       rundownId: '',
       partId: '',
       layer: Tv2PieceLayer.REMOTE,
