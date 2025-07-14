@@ -57,6 +57,7 @@ export class Tv2BlueprintConfigurationTestFactory {
       mediaPlayers: [],
       remoteSources: [],
       replaySources: [],
+      auxiliarySources: [],
       selectedGraphicsType: Tv2GraphicsType.HTML,
       serverPostRollDuration: 0,
       shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: false,
