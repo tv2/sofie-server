@@ -6,6 +6,7 @@ import {
   MutateActionWithArgumentsMethods,
   MutateActionWithConfiguration,
   MutateActionWithHistoricPartMethods,
+  MutateActionWithInfinitePieces,
   MutateActionWithMedia,
   MutateActionWithPieceMethods,
   MutateActionWithPlayoutContent,
@@ -325,6 +326,9 @@ export class ExecuteActionService implements ActionService {
       case MutateActionType.PLAYOUT_CONTENT: {
         return this.mutateActionWithPlayoutContent(mutateActionMethods, action)
       }
+      case MutateActionType.WITH_INFINITE_PIECES: {
+        return this.mutateActionWithInfinitePieces(mutateActionMethods, action, rundownId)
+      }
       default: {
         return action
       }
@@ -379,6 +383,11 @@ export class ExecuteActionService implements ActionService {
     }
 
     return mutateActionMethods.updateActionWithPlayoutContent(action, playoutContent)
+  }
+
+  private async mutateActionWithInfinitePieces(mutateActionMethods: MutateActionWithInfinitePieces, action: Action, rundownId: string): Promise<Action> {
+    const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    return mutateActionMethods.updateActionWithInfinitePieces(action, rundown.getInfinitePieces())
   }
 
   private async insertPartAsOnAir(partAction: PartAction, rundownId: string): Promise<void> {

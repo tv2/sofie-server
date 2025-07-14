@@ -29,8 +29,11 @@ import { OutputLayer } from '../../../../rundown-execution/domain/enums/output-l
 import { AudioMode } from '../../../../rundown-execution/domain/enums/audio-mode'
 import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/playout-content-type'
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
+import { Piece, PieceInterface } from '../../../../rundown-execution/domain/entities/piece'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 
 const A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE: number = -1
+const VOSS_TO_PROGRAM_ACTION_ID: string = 'vossToProgramAction'
 
 export class Tv2VideoClipActionFactory extends ActionFactory {
   public constructor(
@@ -52,6 +55,9 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
         type: MutateActionType.MEDIA,
         getMediaSourceName: () => action.name,
         updateActionWithMedia: (action: Action, media: Media | undefined) => this.updateVideoClipAction(action, media)
+      }, {
+        type: MutateActionType.WITH_INFINITE_PIECES,
+        updateActionWithInfinitePieces: (action: Action, infinitePieces: readonly Piece[]) => this.updateVossToProgramFromInfinitePieces(action, infinitePieces)
       }]
     }
     return []
@@ -83,11 +89,106 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
     return videoClipAction
   }
 
+  private updateVossToProgramFromInfinitePieces(action: Action, infinitePieces: readonly Piece[]): Action {
+    if (!this.isVossToProgramAction(action)) {
+      return action
+    }
+
+    const vossVideoClipPiece: Piece | undefined = infinitePieces.find(piece => this.isVossVideoClipPiece(piece))
+    const mediaPlayerSession: string | undefined = vossVideoClipPiece ? this.getVossVideoClipPlayerSessionId(vossVideoClipPiece) : undefined
+
+    if (!vossVideoClipPiece || !mediaPlayerSession) {
+      throw new NotFoundException('Unable to find a VOSS session.')
+    }
+
+    const sourceName: string = vossVideoClipPiece.metadata.sourceName ?? ''
+    const partInterface: PartInterface = this.createPartInterface('vossToProgramPart', {
+      name: sourceName,
+      rank: 0,
+      fileName: sourceName,
+      durationFromIngest: vossVideoClipPiece.getDuration() ?? 0,
+      adLibPix: false,
+      audioMode: AudioMode.VOICE_OVER
+    })
+    const pieceInterface: PieceInterface = {
+      id: '',
+      partId: partInterface.id,
+      rundownId: '',
+      pieceLifespan: PieceLifespan.WITHIN_PART,
+      name: sourceName,
+      start: 0,
+      duration: 0,
+      executedAt: 0,
+      takenOffAirTimestamp: 0,
+      postRollDuration: 0,
+      preRollDuration: 0,
+      transitionType: TransitionType.NO_TRANSITION,
+      isInsertedOnAir: false,
+      isPlanned: false,
+      isUnsynced: false,
+      layer: Tv2PieceLayer.VIDEO_CLIP, // TODO: This should be changed.
+      metadata: {
+        playoutContent: {
+          type: PlayoutContentType.VIDEO_CLIP,
+        },
+        outputLayer: OutputLayer.PROGRAM,
+        audioMode: AudioMode.VOICE_OVER,
+        sourceName,
+      },
+      tags: [],
+      timelineObjects: [
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, { start: 0 }, { mediaPlayerSession })
+      ],
+    }
+
+    return {
+      ...action,
+      data: {
+        partInterface,
+        pieceInterfaces: [pieceInterface],
+      }
+    }
+  }
+
+  private isVossToProgramAction(action: Action): action is Tv2VideoClipAction {
+    return action.id === VOSS_TO_PROGRAM_ACTION_ID
+  }
+
+  private isVossVideoClipPiece(piece: Piece): boolean {
+    return piece.pieceLifespan === PieceLifespan.SPANNING_UNTIL_SEGMENT_END
+      && piece.metadata.outputLayer === OutputLayer.AUXILIARY
+      && piece.metadata.playoutContent.type === PlayoutContentType.VIDEO_CLIP
+  }
+
+  private getVossVideoClipPlayerSessionId(piece: Piece): string | undefined {
+    return piece.getTimelineObjects().find(timelineObject => !!timelineObject.metaData?.mediaPlayerSession)?.metaData?.mediaPlayerSession
+  }
+
   public createVideoClipActions(configuration: Tv2BlueprintConfiguration, actionManifests: Tv2ActionManifest[]): Tv2VideoClipAction[] {
     const videoClipManifestData: Tv2VideoClipManifestData[] = this.actionManifestMapper.filterAndMapToVideoClipManifestData(actionManifests)
-    return this.removeDuplicateActions(
-      videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip))
-    )
+    return this.removeDuplicateActions([
+      ...videoClipManifestData.map(videoClip => this.createInsertVideoClipAsNextAction(configuration, videoClip)),
+      this.createVossToProgramAsNextAction(configuration),
+    ])
+  }
+
+  private createVossToProgramAsNextAction(blueprintsConfiguration: Tv2BlueprintConfiguration): Tv2VideoClipAction {
+    return {
+      id: VOSS_TO_PROGRAM_ACTION_ID,
+      type: PartActionType.INSERT_PART_AS_NEXT,
+      name: 'VOSS to PGM',
+      description: 'Cues the voice over clip from a VOSS session to program.',
+      rank: 0,
+      data: { partInterface: {} as PartInterface, pieceInterfaces: [] },
+      metadata: {
+        fileName: '',
+        playoutContent: {
+          type: PlayoutContentType.VIDEO_CLIP
+        },
+        outputChannel: OutputChannel.UNKNOWN,
+        configuredVideoClipPostRollDuration: blueprintsConfiguration.studio.serverPostRollDuration,
+      },
+    }
   }
 
   private createInsertVideoClipAsNextAction(configuration: Tv2BlueprintConfiguration, videoClipData: Tv2VideoClipManifestData): Tv2VideoClipAction {
