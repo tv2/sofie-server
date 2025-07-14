@@ -15,7 +15,7 @@ import {
   Tv2SourceMappingWithAudio,
 } from '../../value-objects/tv2-studio-blueprint-configuration'
 import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
-import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
+import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../../rundown-execution/domain/enums/piece-lifespan'
 import { TransitionType } from '../../../../rundown-execution/domain/enums/transition-type'
 import {
@@ -147,8 +147,8 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       name: `${remoteSourceMapping.name} \u2192 AUX ${auxiliarySourceMapping.auxiliaryId}`,
       rundownId: '',
       partId: '',
-      layer: Tv2PieceLayer.WALL_AUXILIARY,
-      pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
+      layer: Tv2VideoMixerLayer.WALL_AUXILIARY,
+      pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
       isUnsynced: false,
