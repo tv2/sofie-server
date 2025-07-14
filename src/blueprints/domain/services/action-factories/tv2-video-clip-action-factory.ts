@@ -126,7 +126,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       isInsertedOnAir: false,
       isPlanned: false,
       isUnsynced: false,
-      layer: Tv2PieceLayer.VIDEO_CLIP, // TODO: This should be changed.
+      layer: Tv2PieceLayer.VIDEO_CLIP,
       metadata: {
         playoutContent: {
           type: PlayoutContentType.VIDEO_CLIP,
