@@ -20,7 +20,7 @@ import {
   SuperSourceBorder,
   SuperSourceProperties
 } from '../../value-objects/timeline-state-resolver-types/atem-types'
-import { Tv2AtemLayer, Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
+import { Tv2AtemLayer } from '../../value-objects/tv2-layers'
 import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import { TimelineEnable } from '../../../../rundown-execution/domain/entities/timeline-enable'
 import {
@@ -365,7 +365,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     ]
   }
 
-  public createAuxTimelineObject(sourceInput: number, layer: Tv2VideoMixerLayer): AtemAuxTimelineObject {
+  public createAuxTimelineObject(sourceInput: number, layer: string): AtemAuxTimelineObject {
     return {
       id: `${ATEM_PREFIX}${layer}_input_${sourceInput}_timelineObject`,
       enable: {

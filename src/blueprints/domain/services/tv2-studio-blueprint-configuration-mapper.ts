@@ -5,6 +5,7 @@ import {
   Tv2FolderConfiguration,
   Tv2GraphicsType,
   Tv2HtmlGraphics,
+  Tv2SourceAuxiliaryMapping,
   Tv2SourceMapping,
   Tv2SourceMappingWithAudio,
   Tv2StudioBlueprintConfiguration,
@@ -18,6 +19,7 @@ interface CoreStudioBlueprintConfiguration {
   SourcesCam: CoreSourceMappingWithSound[] // Cameras
   SourcesRM: CoreSourceMappingWithSound[] // Lives
   SourcesFeed: CoreSourceMappingWithSound[] // Feeds
+  SourcesAuxiliary: CoreSourceAuxiliaryMapping[] // Auxiliaries
   SourcesReplay: CoreSourceMappingWithSound[] // Replays
   StudioMics: string[]
   ABMediaPlayers: CoreMediaPlayer[]
@@ -67,6 +69,12 @@ interface CoreSourceMappingWithSound extends CoreSourceMapping {
   StudioMics: boolean
   WantsToPersistAudio?: boolean
   AcceptPersistAudio?: boolean
+}
+
+interface CoreSourceAuxiliaryMapping {
+  _id: string
+  AuxiliaryId: string
+  LayerId: string
 }
 
 interface CoreVideoMixer {
@@ -125,6 +133,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
       cameraSources: this.mapSourcesWithSound(coreConfiguration.SourcesCam),
       remoteSources: this.mapSourcesWithSound(coreConfiguration.SourcesRM),
       feedSources: this.mapSourcesWithSound(coreConfiguration.SourcesFeed),
+      auxiliarySources: this.mapAuxiliarySources(coreConfiguration.SourcesAuxiliary),
       replaySources: this.mapSourcesWithSound(coreConfiguration.SourcesReplay),
       studioMicrophones: coreConfiguration.StudioMics,
       mediaPlayers: this.mapSources(coreConfiguration.ABMediaPlayers),
@@ -141,6 +150,18 @@ export class Tv2StudioBlueprintConfigurationMapper {
       shouldPreventOverlayWhileFullscreenGraphicsIsOnAir: coreConfiguration.PreventOverlayWithFull,
       audioBedSettings: this.mapAudioBedSettings(coreConfiguration.AudioBedSettings, coreConfiguration.AudioBedFolder)
     }
+  }
+
+  private mapAuxiliarySources(sources: CoreSourceAuxiliaryMapping[] | undefined): Tv2SourceAuxiliaryMapping[] {
+    if (!sources) {
+      return []
+    }
+    return sources.map((source) => {
+      return {
+        auxiliaryId: source.AuxiliaryId,
+        layerId: source.LayerId,
+      }
+    })
   }
 
   private mapSourcesWithSound(sources: CoreSourceMappingWithSound[] | undefined): Tv2SourceMappingWithAudio[] {
