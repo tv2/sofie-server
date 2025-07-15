@@ -77,6 +77,7 @@ export type MutateActionMethods =
   | MutateActionWithArgumentsMethods
   | MutateActionWithConfiguration
   | MutateActionWithPlayoutContent
+  | MutateActionWithInfinitePieces
 
 export enum MutateActionType {
   PIECE = 'PIECE',
@@ -84,7 +85,8 @@ export enum MutateActionType {
   HISTORIC_PART = 'HISTORIC_PART',
   APPLY_ARGUMENTS = 'APPLY_ARGUMENTS',
   CONFIGURATION = 'CONFIGURATION',
-  PLAYOUT_CONTENT = 'PLAYOUT_CONTENT'
+  PLAYOUT_CONTENT = 'PLAYOUT_CONTENT',
+  WITH_INFINITE_PIECES = 'WITH_INFINITE_PIECES', // Mutate-action that is given read-access to the infinite pieces of the rundown.
 }
 
 export interface MutateActionWithPieceMethods {
@@ -119,6 +121,11 @@ export interface MutateActionWithPlayoutContent {
   type: MutateActionType.PLAYOUT_CONTENT
   updateActionWithPlayoutContent: (action: Action, playoutContent: PlayoutContent) => Action
   playoutContentPredicate: (playoutContent: PlayoutContent) => boolean
+}
+
+export interface MutateActionWithInfinitePieces {
+  type: MutateActionType.WITH_INFINITE_PIECES
+  updateActionWithInfinitePieces: (action: Action, infinitePieces: readonly Piece[]) => Action
 }
 
 // TODO: This should

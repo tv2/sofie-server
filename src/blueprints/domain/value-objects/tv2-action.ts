@@ -70,7 +70,16 @@ export interface Tv2CameraAction extends Tv2PartAction {
   }
 }
 
-export interface Tv2RemoteAction extends Tv2PartAction {
+export type Tv2RemoteAction = Tv2RemotePartAction | Tv2RemotePieceAction
+
+export interface Tv2RemotePartAction extends Tv2PartAction {
+  metadata: {
+    playoutContent: RemotePlayoutContent
+    outputChannel: OutputChannel
+  }
+}
+
+export interface Tv2RemotePieceAction extends Tv2PieceAction {
   metadata: {
     playoutContent: RemotePlayoutContent
     outputChannel: OutputChannel

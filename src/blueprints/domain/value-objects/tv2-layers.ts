@@ -56,6 +56,7 @@ export enum Tv2TriCasterLayer {
 
 export enum Tv2VideoMixerLayer {
   AR = 'aux_ar',
+  WALL_AUXILIARY = 'aux_wall',
   VIZ_OVERLAY_AUXILIARY = 'aux_viz_ovl_in_1'
 }
 
