@@ -98,7 +98,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
     const mediaPlayerSession: string | undefined = vossVideoClipPiece ? this.getVossVideoClipPlayerSessionId(vossVideoClipPiece) : undefined
 
     if (!vossVideoClipPiece || !mediaPlayerSession) {
-      throw new NotFoundException('Unable to find a VOSS session.')
+      throw new NotFoundException('Failed putting VOSS video clip in program: Unable to find a VOSS session.')
     }
 
     const sourceName: string = vossVideoClipPiece.metadata.sourceName ?? ''
@@ -176,7 +176,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
     return {
       id: VOSS_TO_PROGRAM_ACTION_ID,
       type: PartActionType.INSERT_PART_AS_NEXT,
-      name: 'VOSS to PGM',
+      name: 'VOSS to Program',
       description: 'Cues the voice over clip from a VOSS session to program.',
       rank: 0,
       data: { partInterface: {} as PartInterface, pieceInterfaces: [] },
