@@ -162,7 +162,7 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     )
   }
 
-  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): TriCasterMixOutputTimelineObject {
+  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): TriCasterMixOutputTimelineObject {
     return {
       id: `${TRI_CASTER_PREFIX}lookahead`,
       enable,
@@ -172,7 +172,8 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
         deviceType: DeviceType.TRICASTER,
         type: TriCasterType.MIX_OUTPUT,
         source: this.mapInputToTriCasterInput(sourceInput)
-      }
+      },
+      ...metadata ? { metaData: metadata } : undefined
     }
   }
 
