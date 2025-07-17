@@ -16,6 +16,7 @@ export class ConfigurationTestFactory {
       layers: [],
       settings: {
         mediaPreviewUrl: '',
+        hostUrl: '',
       },
       ...studio,
     }
