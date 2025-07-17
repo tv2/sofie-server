@@ -135,6 +135,7 @@ export interface MongoStudio {
   _id: string
   settings: {
     mediaPreviewsUrl: string
+    sofieUrl: string
   }
   mappings: MongoLayerMappings
   blueprintConfig: unknown
@@ -412,7 +413,8 @@ export class RundownExecutionMongoEntityConverter {
     }
     return {
       settings: {
-        mediaPreviewUrl: mongoStudio.settings.mediaPreviewsUrl
+        mediaPreviewUrl: mongoStudio.settings.mediaPreviewsUrl,
+        hostUrl: mongoStudio.settings.sofieUrl,
       },
       layers,
       blueprintConfiguration: mongoStudio.blueprintConfig

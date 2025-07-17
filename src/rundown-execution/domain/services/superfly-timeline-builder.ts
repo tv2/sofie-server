@@ -46,7 +46,7 @@ const LOW_PRIORITY: number = -1
 export class SuperflyTimelineBuilder implements TimelineBuilder {
   public constructor(private readonly objectCloner: DeepObjectCloner) {}
 
-  public getBaseTimeline(): Timeline {
+  public getBaseTimeline(_configuration: Configuration): Timeline {
     return { timelineGroups: [] }
   }
 

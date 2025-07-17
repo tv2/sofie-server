@@ -147,9 +147,10 @@ export class RundownTimelineService implements RundownService {
     this.stopAutoNext()
 
     const rundown: Rundown = await this.rundownRepository.getRundown(rundownId)
+    const configuration: Configuration = await this.configurationRepository.getConfiguration()
 
     rundown.deactivate()
-    const timeline: Timeline = this.timelineBuilder.getBaseTimeline()
+    const timeline: Timeline = this.timelineBuilder.getBaseTimeline(configuration)
 
     await this.timelineRepository.saveTimeline(timeline)
 
