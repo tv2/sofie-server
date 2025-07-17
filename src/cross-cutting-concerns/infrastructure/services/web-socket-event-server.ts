@@ -69,7 +69,10 @@ export class WebSocketEventServer implements EventServer {
     this.activeConnections.get(connectionId)?.close(WEBSOCKET_INTERNAL_ERROR_CLOSED_CODE)
     this.activeConnections.set(connectionId, webSocket)
     webSocket.onmessage = (message: WebSocket.MessageEvent): void => {
-      this.eventListener?.(message.data.toString())
+      const response: string | undefined = this.eventListener?.(message.data.toString())
+      if (response) {
+        webSocket.send(response)
+      }
     }
     webSocket.onclose = (): void => {
       this.activeConnections.delete(connectionId)
