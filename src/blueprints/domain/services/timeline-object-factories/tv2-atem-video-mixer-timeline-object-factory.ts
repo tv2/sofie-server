@@ -188,7 +188,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       })
   }
 
-  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable): AtemAuxTimelineObject {
+  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): AtemAuxTimelineObject {
     return {
       id: `${ATEM_PREFIX}lookahead`,
       enable,
@@ -200,7 +200,8 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
         aux: {
           input: sourceInput
         }
-      }
+      },
+      ...metadata ? { metaData: metadata } : undefined
     }
   }
 

@@ -137,7 +137,8 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       },
       tags: [],
       timelineObjects: [
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, { start: 0 }, { mediaPlayerSession })
+        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, { start: 0 }, { mediaPlayerSession }),
+        this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(A_B_VIDEO_CLIP_PLACEHOLDER_SOURCE, { start: 0 }, { mediaPlayerSession }),
       ],
     }
 
