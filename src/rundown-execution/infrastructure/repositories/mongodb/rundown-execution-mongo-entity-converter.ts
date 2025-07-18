@@ -218,8 +218,13 @@ export class RundownExecutionMongoEntityConverter {
     }
   }
 
-  private mapToInfinitePieceMap(infinitePieces: Piece[]): Map<string, Piece> {
-    return new Map(infinitePieces.map(piece => [piece.layer, piece]))
+  private mapToInfinitePieceMap(infinitePieces: Piece[]): Map<string, Piece[]> {
+    const infinitePiecesOnLayers: Map<string, Piece[]> = new Map()
+    infinitePieces.forEach((piece: Piece) => {
+      const piecesForLayer: Piece[] = infinitePiecesOnLayers.get(piece.layer) ?? []
+      infinitePiecesOnLayers.set(piece.layer, [...piecesForLayer, piece])
+    })
+    return infinitePiecesOnLayers
   }
 
   public convertToMongoRundown(rundown: Rundown): MongoRundown {
