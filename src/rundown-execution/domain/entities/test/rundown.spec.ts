@@ -80,7 +80,7 @@ describe(Rundown.name, () => {
                   segment: nextSegment,
                   owner: Owner.SYSTEM
                 },
-                infinitePieces: new Map([[piece.layer, piece]]),
+                infinitePieces: new Map([[piece.layer, [piece]]]),
               },
             } as RundownInterface
 
@@ -119,7 +119,7 @@ describe(Rundown.name, () => {
                   segment: nextSegment,
                   owner: Owner.SYSTEM
                 },
-                infinitePieces: new Map([[piece.layer, piece]]),
+                infinitePieces: new Map([[piece.layer, [piece]]]),
               },
             } as RundownInterface
 
@@ -766,7 +766,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[layer, firstPiece]]),
+              infinitePieces: new Map([[layer, [firstPiece]]]),
             },
           } as RundownInterface)
 
@@ -811,7 +811,7 @@ describe(Rundown.name, () => {
                 segment: nextSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -862,7 +862,7 @@ describe(Rundown.name, () => {
                 segment: nextSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1005,6 +1005,167 @@ describe(Rundown.name, () => {
     })
 
     describe('Rundown has a "sticky Rundown" infinite Piece', () => {
+      describe('it takes a Part which wants to delay the start of its Pieces', () => {
+        it('contains both the new and old infinite Piece for the same layer', () => {
+          const layer: string = 'someLayer'
+          const delayOfPartPieces: number = 2000
+          const oldPiece: Piece = EntityTestFactory.createPiece({
+            id: 'oldPiece',
+            layer,
+            pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+            executedAt: 1000
+          })
+          const oldPart: Part = EntityTestFactory.createPart({
+            id: 'oldPart',
+            pieces: [oldPiece]
+          })
+          const newPiece: Piece = EntityTestFactory.createPiece({
+            id: 'newPiece',
+            layer,
+            pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+            preRollDuration: delayOfPartPieces
+          })
+          const newPart: Part = EntityTestFactory.createPart({
+            id: 'newPart',
+            segmentId: 'segment',
+            pieces: [newPiece],
+          })
+          const segment: Segment = EntityTestFactory.createSegment({
+            id: 'segment',
+            parts: [oldPart, newPart],
+          })
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: oldPart,
+                segment: segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: newPart,
+                segment: segment,
+                owner: Owner.SYSTEM
+              },
+              infinitePieces: new Map([[oldPiece.layer, [oldPiece]]]),
+            },
+          }))
+          testee.takeNext()
+
+          const result: Piece[] = testee.getInfinitePieces()
+          expect(result).toHaveLength(2)
+        })
+
+        it('sets the end end of the old infinite Piece to the start of the new infinite Piece + the delay of the Part', () => {
+          const layer: string = 'someLayer'
+          const delayOfPartPieces: number = 2000
+          const oldPiece: Piece = EntityTestFactory.createPiece({
+            id: 'oldPiece',
+            layer,
+            pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+            executedAt: 1000
+          })
+          const oldPart: Part = EntityTestFactory.createPart({
+            id: 'oldPart',
+            pieces: [oldPiece]
+          })
+          const newPiece: Piece = EntityTestFactory.createPiece({
+            id: 'newPiece',
+            layer,
+            pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+            preRollDuration: delayOfPartPieces
+          })
+          const newPart: Part = EntityTestFactory.createPart({
+            id: 'newPart',
+            segmentId: 'segment',
+            pieces: [newPiece],
+          })
+          const segment: Segment = EntityTestFactory.createSegment({
+            id: 'segment',
+            parts: [oldPart, newPart],
+          })
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: oldPart,
+                segment: segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: newPart,
+                segment: segment,
+                owner: Owner.SYSTEM
+              },
+              infinitePieces: new Map([[oldPiece.layer, [oldPiece]]]),
+            },
+          }))
+          testee.takeNext()
+
+          const oldPieceResult: Piece = testee.getInfinitePieces().find(piece => piece.id === oldPiece.id)!
+          const newPieceResult: Piece = testee.getInfinitePieces().find(piece => piece.id === newPiece.id)!
+
+          expect(oldPieceResult.getTakenOffAirTimestamp()).toBe(newPieceResult.getExecutedAt() + delayOfPartPieces)
+        })
+      })
+
+      describe('it takes a Part which does not want to delay the start of its Pieces', () => {
+        it('only have the new infinite Piece for the layer', () => {
+          const layer: string = 'someLayer'
+          const oldPiece: Piece = EntityTestFactory.createPiece({
+            id: 'oldPiece',
+            layer,
+            pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+            executedAt: 1000
+          })
+          const oldPart: Part = EntityTestFactory.createPart({
+            id: 'oldPart',
+            pieces: [oldPiece]
+          })
+          const newPiece: Piece = EntityTestFactory.createPiece({
+            id: 'newPiece',
+            layer,
+            pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+          })
+          const newPart: Part = EntityTestFactory.createPart({
+            id: 'newPart',
+            segmentId: 'segment',
+            pieces: [newPiece],
+          })
+          const segment: Segment = EntityTestFactory.createSegment({
+            id: 'segment',
+            parts: [oldPart, newPart],
+          })
+
+          const testee: Rundown = new Rundown(EntityTestFactory.createRundownInterface({
+            segments: [segment],
+            mode: RundownMode.ACTIVE,
+            alreadyActiveProperties: {
+              activeCursor: {
+                part: oldPart,
+                segment: segment,
+                owner: Owner.SYSTEM
+              },
+              nextCursor: {
+                part: newPart,
+                segment: segment,
+                owner: Owner.SYSTEM
+              },
+              infinitePieces: new Map([[oldPiece.layer, [oldPiece]]]),
+            },
+          }))
+          testee.takeNext()
+
+          const result: Piece[] = testee.getInfinitePieces()
+          expect(result).toHaveLength(1)
+          expect(result).toContain(newPiece)
+        })
+      })
+
       describe('Rundown "skips" a Segment that also has a "sticky" infinite Piece', () => {
         it('does not change the "sticky" infinite Piece', () => {
           const layer: string = 'someLayer'
@@ -1056,7 +1217,7 @@ describe(Rundown.name, () => {
                 segment: lastSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1119,7 +1280,7 @@ describe(Rundown.name, () => {
                 segment: firstSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
+              infinitePieces: new Map([[lastPiece.layer, [lastPiece]]]),
             },
           }))
 
@@ -1176,7 +1337,7 @@ describe(Rundown.name, () => {
                 segment: lastSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1233,7 +1394,7 @@ describe(Rundown.name, () => {
                 segment: lastSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1543,7 +1704,7 @@ describe(Rundown.name, () => {
                 segment: lastSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1594,7 +1755,7 @@ describe(Rundown.name, () => {
                 segment: lastSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1653,7 +1814,7 @@ describe(Rundown.name, () => {
                 segment: nextSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1708,7 +1869,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1771,7 +1932,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1834,7 +1995,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
+              infinitePieces: new Map([[lastPiece.layer, [lastPiece]]]),
             },
           }))
 
@@ -1888,7 +2049,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -1949,7 +2110,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -2015,7 +2176,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -2064,7 +2225,7 @@ describe(Rundown.name, () => {
                 segment: nextSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -2118,7 +2279,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -2179,7 +2340,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             }
           }))
 
@@ -2242,7 +2403,7 @@ describe(Rundown.name, () => {
                   segment,
                   owner: Owner.SYSTEM
                 },
-                infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
+                infinitePieces: new Map([[lastPiece.layer, [lastPiece]]]),
               }
             }))
 
@@ -2294,7 +2455,7 @@ describe(Rundown.name, () => {
                   segment,
                   owner: Owner.SYSTEM
                 },
-                infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
+                infinitePieces: new Map([[lastPiece.layer, [lastPiece]]]),
               }
             }))
 
@@ -2348,7 +2509,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -2400,7 +2561,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -2449,7 +2610,7 @@ describe(Rundown.name, () => {
                 segment: nextSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             },
           }))
 
@@ -2498,7 +2659,7 @@ describe(Rundown.name, () => {
                 segment: nextSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             }
           }))
 
@@ -2541,7 +2702,7 @@ describe(Rundown.name, () => {
                 segment: lastSegment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[firstPiece.layer, firstPiece]]),
+              infinitePieces: new Map([[firstPiece.layer, [firstPiece]]]),
             }
           }))
 
@@ -2594,7 +2755,7 @@ describe(Rundown.name, () => {
                   segment: middleSegment,
                   owner: Owner.SYSTEM
                 },
-                infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
+                infinitePieces: new Map([[lastPiece.layer, [lastPiece]]]),
               }
             }))
 
@@ -2651,7 +2812,7 @@ describe(Rundown.name, () => {
                   segment: middleSegment,
                   owner: Owner.SYSTEM
                 },
-                infinitePieces: new Map([[lastPiece.layer, lastPiece]]),
+                infinitePieces: new Map([[lastPiece.layer, [lastPiece]]]),
               }
             }))
 
@@ -2799,7 +2960,7 @@ describe(Rundown.name, () => {
                 segment,
                 owner: Owner.SYSTEM
               },
-              infinitePieces: new Map([[pieceLayer, infinitePiece]])
+              infinitePieces: new Map([[pieceLayer, [infinitePiece]]])
             }
           }))
           testee.updateBaselinePieces([baselinePiece])
@@ -2834,7 +2995,7 @@ describe(Rundown.name, () => {
                   segment,
                   owner: Owner.SYSTEM
                 },
-                infinitePieces: new Map([[pieceLayer, baselinePiece]])
+                infinitePieces: new Map([[pieceLayer, [baselinePiece]]])
               }
             }))
             testee.updateBaselinePieces([baselinePiece])
@@ -2870,7 +3031,7 @@ describe(Rundown.name, () => {
                   segment,
                   owner: Owner.SYSTEM
                 },
-                infinitePieces: new Map([[pieceLayer, baselinePiece]])
+                infinitePieces: new Map([[pieceLayer, [baselinePiece]]])
               }
             }))
             testee.updateBaselinePieces([baselinePiece])
@@ -3044,9 +3205,9 @@ describe(Rundown.name, () => {
         const thirdPart: Part = EntityTestFactory.createPart({ id: 'thirdPart', pieces: [infinitePiece] })
         const thirdSegment: Segment = EntityTestFactory.createSegment({ id: 'thirdSegment', parts: [thirdPart] })
 
-        const infinitePieces: Map<string, Piece> = new Map([
-          ['layerOne', EntityTestFactory.createPiece({ id: 'infinitePieceOne' })],
-          ['layerTwo', EntityTestFactory.createPiece({ id: 'infinitePieceTwo' })]
+        const infinitePieces: Map<string, Piece[]> = new Map([
+          ['layerOne', [EntityTestFactory.createPiece({ id: 'infinitePieceOne' })]],
+          ['layerTwo', [EntityTestFactory.createPiece({ id: 'infinitePieceTwo' })]]
         ])
         const testee: Rundown = new Rundown({
           mode: RundownMode.REHEARSAL,
@@ -4197,8 +4358,8 @@ describe(Rundown.name, () => {
         })
         when(infinitePiece.getUnsyncedCopy()).thenReturn(infinitePiece)
 
-        const infinitePieceMap: Map<string, Piece> = new Map()
-        infinitePieceMap.set(infinitePiece.layer, instance(infinitePiece))
+        const infinitePieceMap: Map<string, Piece[]> = new Map()
+        infinitePieceMap.set(infinitePiece.layer, [instance(infinitePiece)])
 
         const part: Part = EntityTestFactory.createPart({ id: partId })
         const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
@@ -4225,8 +4386,8 @@ describe(Rundown.name, () => {
           layer: 'someLayer'
         })
 
-        const infinitePieceMap: Map<string, Piece> = new Map()
-        infinitePieceMap.set(infinitePiece.layer, infinitePiece)
+        const infinitePieceMap: Map<string, Piece[]> = new Map()
+        infinitePieceMap.set(infinitePiece.layer, [infinitePiece])
 
         const part: Part = EntityTestFactory.createPart({ id: partId })
         const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
@@ -5202,8 +5363,8 @@ describe(Rundown.name, () => {
       describe('when piece is an infinite piece', () => {
         it('stops the Piece', () => {
           const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'pieceId', layer: 'infinitePieceLayer', executedAt: 12345678, duration: undefined })
-          const infinitePieces: Map<string, Piece> = new Map()
-          infinitePieces.set(infinitePiece.layer, infinitePiece)
+          const infinitePieces: Map<string, Piece[]> = new Map()
+          infinitePieces.set(infinitePiece.layer, [infinitePiece])
 
           const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
           const segment: Segment = EntityTestFactory.createSegment({ id: 'segment', parts: [activePart] })

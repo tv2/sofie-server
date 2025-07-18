@@ -539,6 +539,9 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
           }
         }
 
+        if (piece.getTakenOffAirTimestamp() > 0) {
+          infiniteGroup.enable.end = piece.getTakenOffAirTimestamp()
+        }
         infiniteGroup.children = piece.getTimelineObjects().flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))
         infinitePieceTimelineObjectGroups.push(infiniteGroup)
       })

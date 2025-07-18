@@ -19,6 +19,14 @@ describe(Piece.name, () => {
       const result: number = testee.getExecutedAt()
       expect(result).toEqual(now)
     })
+
+    it('resets takenOffAirTimestamp', () => {
+      const testee: Piece = new Piece({ takenOffAirTimestamp: 1000 } as PieceInterface)
+
+      expect(testee.getTakenOffAirTimestamp()).not.toBe(0)
+      testee.putOnAir(Date.now())
+      expect(testee.getTakenOffAirTimestamp()).toBe(0)
+    })
   })
 
   describe(Piece.prototype.resetExecution.name, () => {

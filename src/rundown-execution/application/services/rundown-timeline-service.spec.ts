@@ -125,8 +125,8 @@ describe(RundownTimelineService.name, () => {
       const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
       const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'samePieceId' })
 
-      const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer', firstLayerPiece]])
-      const secondMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer', secondLayerPiece]])
+      const firstMap: Map<string, Piece[]> = new Map<string, Piece[]>([['firstLayer', [firstLayerPiece]]])
+      const secondMap: Map<string, Piece[]> = new Map<string, Piece[]>([['firstLayer', [secondLayerPiece]]])
       const aRundown: Rundown = instance(aRundownMock)
       when(aRundownMock.getInfinitePiecesMap()).thenReturn(firstMap).thenReturn(secondMap)
 
@@ -151,8 +151,8 @@ describe(RundownTimelineService.name, () => {
       const firstLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'firstLayerPiece' })
       const secondLayerPiece: Piece = EntityTestFactory.createPiece({ id: 'secondLayerPiece' })
 
-      const firstMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer', firstLayerPiece]])
-      const secondMap: Map<string, Piece> = new Map<string, Piece>([['firstLayer', secondLayerPiece]])
+      const firstMap: Map<string, Piece[]> = new Map<string, Piece[]>([['firstLayer', [firstLayerPiece]]])
+      const secondMap: Map<string, Piece[]> = new Map<string, Piece[]>([['firstLayer', [secondLayerPiece]]])
       const aRundown: Rundown = instance(aRundownMock)
       when(aRundownMock.getInfinitePiecesMap()).thenReturn(firstMap).thenReturn(secondMap)
 
@@ -656,7 +656,7 @@ describe(RundownTimelineService.name, () => {
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
       const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart] })
-      const activePartInfinitePiecesMap: Map<string, Piece> = new Map<string, Piece>([['activeLayerId', activePiece]])
+      const activePartInfinitePiecesMap: Map<string, Piece[]> = new Map<string, Piece[]>([['activeLayerId', [activePiece]]])
       const previousPiece: Piece = EntityTestFactory.createPiece({ id: 'previousPieceId' })
       const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPart', pieces: [previousPiece] })
       const rundownMock: Rundown = EntityMockFactory.createActiveRundownMock({
@@ -705,7 +705,7 @@ describe(RundownTimelineService.name, () => {
       const activePiece: Piece = EntityTestFactory.createPiece({ id: 'activePiece' })
       const activePart: Part = EntityTestFactory.createPart({ id: 'activePart', pieces: [activePiece] })
       const activeSegment: Segment = EntityTestFactory.createSegment({ parts: [activePart] })
-      const activePartInfinitePiecesMap: Map<string, Piece> = new Map<string, Piece>([['activeLayerId', activePiece]])
+      const activePartInfinitePiecesMap: Map<string, Piece[]> = new Map<string, Piece[]>([['activeLayerId', [activePiece]]])
       const previousPiece: Piece = EntityTestFactory.createPiece({ id: 'previousPieceId' })
       const previousPart: Part = EntityTestFactory.createPart({ id: 'previousPart', pieces: [previousPiece] })
       const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [aPiece] })
