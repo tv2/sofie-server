@@ -1,6 +1,18 @@
-# MongoDB migrations
+# Alba server migrations
 
-Sofie server uses the library [migrate-mongo](https://www.npmjs.com/package/migrate-mongo) for running the migrations.
+The package is for running database migrations for Alba server.
+
+## Usage
+
+Running `docker run tv2media/alba-server-migrations:latest -e MONGO_URL=mongodb://<mongo-host>` will perform pending migrations.
+
+Running `docker run tv2media/alba-server-migrations:latest -e MONGO_URL=mongodb://<mongo-host> migrate-down` will undo the latest migration.
+
+Both commands will output the status of the migrations.
+
+## Development with migrations
+
+Alba server uses the library [migrate-mongo](https://www.npmjs.com/package/migrate-mongo) for running the migrations.
 A migration consists of `up` and `down` methods, where `up` applies the migration and `down` rolls back the changes from `up`.
 
 Below is a migration-template that contains the `up`' and `down` methods.

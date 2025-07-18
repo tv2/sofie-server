@@ -1,0 +1,20 @@
+{
+  "name": "alba-server-migrations",
+  "version": "1.0.0",
+  "repository": "https://github.com/tv2/alba-server",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "create-migration": "ts-node ./node_modules/.bin/migrate-mongo create -f migrate-mongo-config.ts",
+    "migrate": "sh -c 'ts-node ./node_modules/.bin/migrate-mongo up -f migrate-mongo-config.ts; yarn migration-status'",
+    "migrate-down": "sh -c 'ts-node ./node_modules/.bin/migrate-mongo down -f migrate-mongo-config.ts; yarn migration-status'",
+    "migration-status": "ts-node ./node_modules/.bin/migrate-mongo status -f migrate-mongo-config.ts"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.2.2",
+    "@types/node": "^20.5.9",
+    "migrate-mongo": "^12.1.3",
+    "mongodb": "^6.1.0"
+  }
+}
