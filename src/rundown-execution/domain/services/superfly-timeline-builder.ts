@@ -23,6 +23,7 @@ import { ErrorCode } from '../../../cross-cutting-concerns/domain/enums/error-co
 import { Timeline } from '../entities/timeline'
 import { DeviceType } from '../../../sofie-ingest/domain/enums/device-type'
 import { Configuration } from '../entities/configuration'
+import { MisconfigurationException } from '../../../cross-cutting-concerns/domain/exceptions/misconfiguration-exception'
 
 const BASELINE_GROUP_ID: string = 'baseline_group'
 const LOOKAHEAD_GROUP_ID: string = 'lookahead_group'
@@ -52,6 +53,9 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
 
   public buildTimeline(rundown: Rundown, configuration: Configuration): Timeline {
     const studio: Studio = configuration.studio
+    if (!studio) {
+      throw new MisconfigurationException(`No Studio provided when calling ${SuperflyTimelineBuilder.name}.${SuperflyTimelineBuilder.prototype.buildTimeline.name}`)
+    }
 
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)
 
@@ -542,6 +546,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
         if (piece.getTakenOffAirTimestamp() > 0) {
           infiniteGroup.enable.end = piece.getTakenOffAirTimestamp()
         }
+
         infiniteGroup.children = piece.getTimelineObjects().flatMap(timelineObject => this.mapToTimelineObjectForPieceGroup(timelineObject, infiniteGroup, piece))
         infinitePieceTimelineObjectGroups.push(infiniteGroup)
       })
