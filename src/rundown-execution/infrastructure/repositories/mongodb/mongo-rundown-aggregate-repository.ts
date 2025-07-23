@@ -1,0 +1,121 @@
+import { Rundown } from '../../../domain/entities/rundown'
+import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
+import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
+import { BasicRundown } from '../../../domain/entities/basic-rundown'
+import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
+import { AnyBulkWriteOperation, ClientSession } from 'mongodb'
+import { Piece } from '../../../domain/entities/piece'
+import { Segment } from '../../../domain/entities/segment'
+import { MongoSegmentRepository } from './mongo-segment-repository'
+import { MongoPartRepository } from './mongo-part-repository'
+import { MongoPieceRepository } from './mongo-piece-repository'
+import { Part } from '../../../domain/entities/part'
+import { RundownAggregateRepository } from '../../../domain/repositories/rundown-aggregate-repository'
+import { MongoExpectedPlayoutItemRepository } from './mongo-expected-playout-item-repository'
+import {
+  MongoPart, MongoPiece,
+  MongoRundown,
+  MongoSegment,
+  RundownExecutionMongoEntityConverter
+} from './rundown-execution-mongo-entity-converter'
+
+const RUNDOWN_COLLECTION_NAME: string = 'executedRundowns' // TODO: Once we control ingest renamed this to "rundowns".
+
+export class MongoRundownAggregateRepository extends BaseMongoRepository<MongoRundown> implements RundownAggregateRepository {
+  public constructor(
+    mongoDatabase: MongoDatabase,
+    private readonly mongoSegmentRepository: MongoSegmentRepository,
+    private readonly mongoPartRepository: MongoPartRepository,
+    private readonly mongoPieceRepository: MongoPieceRepository,
+    private readonly mongoExpectedPlayoutItemRepository: MongoExpectedPlayoutItemRepository,
+    private readonly rundownExecutionMongoEntityConverter: RundownExecutionMongoEntityConverter
+  ) {
+    super(mongoDatabase)
+  }
+
+  protected getCollectionName(): string {
+    return RUNDOWN_COLLECTION_NAME
+  }
+
+  public getBasicRundowns(): Promise<BasicRundown[]> {
+    this.assertDatabaseConnection(this.getBasicRundowns.name)
+    return this.getCollection()
+      .find({})
+      .project<MongoRundown>({ _id: 1, name: 1, modifiedAt: 1, mode: 1, timing: 1 })
+      .map(basicMongoRundown => this.rundownExecutionMongoEntityConverter.convertToBasicRundown(basicMongoRundown))
+      .toArray()
+  }
+
+  public async getRundown(rundownId: string): Promise<Rundown> {
+    this.assertDatabaseConnection(this.getRundown.name)
+    const mongoRundown: MongoRundown | null = await this.getCollection().findOne<MongoRundown>({
+      _id: rundownId
+    })
+    if (!mongoRundown) {
+      throw new NotFoundException(`No Rundown found in database for RundownId ${rundownId}`)
+    }
+
+    const baselinePieces: Piece[] = await this.mongoPieceRepository.getPiecesFromIds(mongoRundown.baselinePieceIds)
+    const infinitePieces: Piece[] = await this.mongoPieceRepository.getPiecesFromIds(mongoRundown.infinitePieceIds)
+    const segments: Segment[] = await this.mongoSegmentRepository.getSegments(mongoRundown._id)
+    return this.rundownExecutionMongoEntityConverter.convertToRundown(mongoRundown, segments, baselinePieces, infinitePieces)
+  }
+
+  public async saveRundown(rundown: Rundown): Promise<void> {
+    this.assertDatabaseConnection(this.saveRundown.name)
+
+    const mongoRundown: MongoRundown = this.rundownExecutionMongoEntityConverter.convertToMongoRundown(rundown)
+    const segments: readonly Segment[] = rundown.getSegments()
+    const saveSegmentQueries: readonly AnyBulkWriteOperation<MongoSegment>[] = this.mongoSegmentRepository.buildSaveSegmentQueries(rundown.getSegments())
+    const deleteOrphanedSegmentsQuery: AnyBulkWriteOperation<MongoSegment> = this.mongoSegmentRepository.buildDeleteOrphanedSegmentsForRundownQuery(rundown.id, segments)
+    const parts: readonly Part[] = segments.flatMap(segment => segment.getParts())
+    const savePartQueries: readonly AnyBulkWriteOperation<MongoPart>[] = this.mongoPartRepository.buildSavePartQueries(parts)
+    const deleteOrphanedPartsQuery: AnyBulkWriteOperation<MongoPart> = this.mongoPartRepository.buildDeleteOrphanedPartsForRundownQuery(rundown.id, parts)
+    const pieces: readonly Piece[] = rundown.getBaselinePieces().concat(parts.flatMap(part => part.getPieces()))
+    const savePieceQueries: readonly AnyBulkWriteOperation<MongoPiece>[] = this.mongoPieceRepository.buildSavePieceQueries(pieces)
+    const deleteOrphanedPiecesQuery: AnyBulkWriteOperation<MongoPiece> = this.mongoPieceRepository.buildDeleteOrphanedPiecesForRundownQuery(rundown.id, pieces.concat(rundown.getInfinitePieces()))
+
+    await this.withTransaction(async (session) => {
+      await this.getCollection().updateOne({ _id: mongoRundown._id }, { $set: mongoRundown }, { upsert: true, ignoreUndefined: true })
+      await this.mongoSegmentRepository.executeQueries(saveSegmentQueries.concat(deleteOrphanedSegmentsQuery), session)
+      await this.mongoPartRepository.executeQueries(savePartQueries.concat(deleteOrphanedPartsQuery), session)
+      await this.mongoPieceRepository.executeQueries(savePieceQueries.concat(deleteOrphanedPiecesQuery), session)
+    })
+  }
+
+  public async deleteRundown(rundownId: string): Promise<void> {
+    this.assertDatabaseConnection(this.deleteRundown.name)
+    const doesRundownExist: boolean = await this.doesRundownExist(rundownId)
+    if (!doesRundownExist) {
+      return
+    }
+
+    await this.withTransaction(async (session) => {
+      await this.mongoPieceRepository.executeQueries([this.mongoPieceRepository.buildDeletePiecesForRundownQuery(rundownId)], session)
+      await this.mongoPartRepository.executeQueries([this.mongoPartRepository.buildDeletePartsForRundownQuery(rundownId)], session)
+      await this.mongoSegmentRepository.executeQueries([this.mongoSegmentRepository.buildDeleteSegmentsForRundownQuery(rundownId)], session)
+      await this.mongoExpectedPlayoutItemRepository.executeQueries([this.mongoExpectedPlayoutItemRepository.buildDeleteExpectedPlayoutItemsForRundownQuery(rundownId)], session)
+      await this.getCollection().deleteOne({ _id: rundownId })
+    })
+  }
+
+  private async doesRundownExist(rundownId: string): Promise<boolean> {
+    return await this.getCollection().countDocuments({ _id: rundownId }) === 1
+  }
+
+  public getSegment(segmentId: string): Promise<Segment> {
+    return this.mongoSegmentRepository.getSegment(segmentId)
+  }
+
+  public getPart(partId: string): Promise<Part> {
+    return this.mongoPartRepository.getPart(partId)
+  }
+
+  private withTransaction(callback: (session: ClientSession) => Promise<void>): Promise<void> {
+    return this.mongoDatabase.getClient().withSession(session => session.withTransaction(session => callback(session)))
+  }
+
+  public getPiece(pieceId: string): Promise<Piece> {
+    return this.mongoPieceRepository.getPiece(pieceId)
+  }
+}
