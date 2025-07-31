@@ -333,11 +333,11 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     ]
   }
 
-  private createTransitionEffectTimelineObject(layer: Tv2TriCasterLayer, transitionEffectProperties: TriCasterTransitionEffectProperties, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject {
+  private createTransitionEffectTimelineObject(layer: Tv2TriCasterLayer, transitionEffectProperties: TriCasterTransitionEffectProperties, metadata?: TimelineObjectMetadata, start?: number): TriCasterMixEffectTimelineObject {
     return {
       id: `${layer}_${transitionEffectProperties.transitionEffect}`,
       enable: {
-        start: 0
+        start: start ?? 0
       },
       layer,
       priority: 10,
@@ -355,15 +355,15 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: TimelineObjectMetadata): TriCasterMixEffectTimelineObject[] {
+  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: TimelineObjectMetadata, start?: number): TriCasterMixEffectTimelineObject[] {
     const transitionEffectProperties: TriCasterTransitionEffectProperties = {
       input: sourceInput,
       transitionEffect: TriCasterTransition.FADE,
       durationInFrames
     }
     return [
-      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, transitionEffectProperties, metadata),
-      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, transitionEffectProperties, metadata)
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.PROGRAM, transitionEffectProperties, metadata, start),
+      this.createTransitionEffectTimelineObject(Tv2TriCasterLayer.CLEAN_FEED, transitionEffectProperties, metadata, start)
     ]
   }
 

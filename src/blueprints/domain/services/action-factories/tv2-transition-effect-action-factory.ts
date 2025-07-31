@@ -422,7 +422,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         break
       }
       case TransitionEffectType.BREAKER: {
-        action.data.pieceInterface.timelineObjects.push(...this.createTimelineObjectsForBreakerTransitionEffect(action.metadata, mediaPlayerSession))
+        action.data.pieceInterface.timelineObjects.push(...this.createTimelineObjectsForBreakerTransitionEffect(sourceInput, action.metadata, mediaPlayerSession))
         action.data.partInTransition = this.createPartInTransitionForBreakerTransitionEffect(action.metadata)
         piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, 0, mediaPlayerSession))
         break
@@ -441,21 +441,28 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return [programWithoutTransitionTimelineObject, cleanFeedWithoutTransitionTimelineObject]
   }
 
-  private createTimelineObjectsForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata, mediaPlayerSession?: string): Tv2BlueprintTimelineObject[] {
+  private createTimelineObjectsForBreakerTransitionEffect(sourceInput: number, breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata, mediaPlayerSession?: string): Tv2BlueprintTimelineObject[] {
     const breaker: Breaker = breakerActionMetadata.breaker
     const casparCgPreRollDuration: number = breakerActionMetadata.casparCgPreRollDuration
+    const start: number = this.frameTimeConverter.convertFramesToMilliseconds(breaker.startAlpha) + casparCgPreRollDuration
 
     const videoMixerTimelineEnable: TimelineEnable = {
-      start: this.frameTimeConverter.convertFramesToMilliseconds(breaker.startAlpha) + casparCgPreRollDuration,
+      start,
       duration: this.frameTimeConverter.convertFramesToMilliseconds(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
     }
 
     const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.videoMixerFillSource
-    const fileName: string = this.assetPathHelper.joinAssetToFolder(breakerActionMetadata.breaker.fileName, breakerActionMetadata.breakerFolder)
+    const fileName: string = this.assetPathHelper.joinAssetToFolder(breaker.fileName, breakerActionMetadata.breakerFolder)
+
+    const cutToSourceTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable, { mediaPlayerSession })
+    const transitionToSourceTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(sourceInput, 4, { mediaPlayerSession }, start)
+
+    const doesBreakerHaveAlphaForEntireDuration: boolean = breaker.startAlpha + breaker.endAlpha === breaker.durationInFrames
+    const mixEffectTimelineObjects: Tv2BlueprintTimelineObject[] = doesBreakerHaveAlphaForEntireDuration ? transitionToSourceTimelineObjects : [cutToSourceTimelineObject]
 
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable, { mediaPlayerSession }),
-      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable, { mediaPlayerSession }),
+      ...mixEffectTimelineObjects,
+      this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(sourceInput, videoMixerTimelineEnable, { mediaPlayerSession }),
       this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
       this.videoClipTimelineObjectFactory.createBreakerTimelineObject(fileName),
       this.audioMixerTimelineObjectFactory.createBreakerAudioTimelineObject()

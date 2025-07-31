@@ -314,11 +314,11 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     ]
   }
 
-  private createTransitionEffectTimelineObject(layer: Tv2AtemLayer, meContent: AtemMixEffectWithTransition, metadata?: TimelineObjectMetadata): AtemMixEffectTimelineObject {
+  private createTransitionEffectTimelineObject(layer: Tv2AtemLayer, meContent: AtemMixEffectWithTransition, metadata?: TimelineObjectMetadata, start?: number): AtemMixEffectTimelineObject {
     return {
       id: `${layer}_${meContent.transition}`,
       enable: {
-        start: 0
+        start: start ?? 0
       },
       layer,
       priority: 10,
@@ -331,7 +331,7 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
     }
   }
 
-  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: TimelineObjectMetadata): AtemMixEffectTimelineObject[] {
+  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: TimelineObjectMetadata, start?: number): AtemMixEffectTimelineObject[] {
     const meContent: AtemMixEffectWithTransition = {
       type: AtemMixEffectType.TRANSITION,
       input: sourceInput,
@@ -343,8 +343,8 @@ export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTime
       }
     }
     return [
-      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent, metadata),
-      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent, metadata)
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent, metadata, start),
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent, metadata, start)
     ]
   }
 
