@@ -457,8 +457,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const cutToSourceTimelineObject: Tv2BlueprintTimelineObject = this.videoMixerTimelineObjectFactory.createProgramTimelineObject(videoMixerInputSource, videoMixerTimelineEnable, { mediaPlayerSession })
     const transitionToSourceTimelineObjects: Tv2BlueprintTimelineObject[] = this.videoMixerTimelineObjectFactory.createMixTransitionEffectTimelineObjects(sourceInput, 4, { mediaPlayerSession }, start)
 
-    const doesBreakerHaveAlphaForEntireDuration: boolean = breaker.startAlpha + breaker.endAlpha === breaker.durationInFrames
-    const mixEffectTimelineObjects: Tv2BlueprintTimelineObject[] = doesBreakerHaveAlphaForEntireDuration ? transitionToSourceTimelineObjects : [cutToSourceTimelineObject]
+    const mixEffectTimelineObjects: Tv2BlueprintTimelineObject[] = this.doesBreakerHaveAlphaForEntireDuration(breaker) ? transitionToSourceTimelineObjects : [cutToSourceTimelineObject]
 
     return [
       ...mixEffectTimelineObjects,
@@ -467,6 +466,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       this.videoClipTimelineObjectFactory.createBreakerTimelineObject(fileName),
       this.audioMixerTimelineObjectFactory.createBreakerAudioTimelineObject()
     ]
+  }
+
+  private doesBreakerHaveAlphaForEntireDuration(breaker: Breaker): boolean {
+    return breaker.startAlpha + breaker.endAlpha === breaker.durationInFrames
   }
 
   private createPartInTransitionForEffect(durationInFrames: number): InTransition {
