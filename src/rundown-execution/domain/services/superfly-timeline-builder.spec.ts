@@ -3380,7 +3380,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 expect(lookaheadTimelineObject.enable.start).toBe(0)
               })
 
-              it('sets the end to be when the active group starts', () => {
+              it('sets the end to be tied to the active group', () => {
                 const timelineObject: TimelineObject = {
                   id: 'timelineObject',
                   layer: 'layerName',
@@ -3412,7 +3412,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   o => o.id === `${LOOKAHEAD_GROUP_ID}_${timelineObject.id}${LOOKAHEAD_GROUP_ID_ACTIVE_PIECE_POST_FIX}`
                 )!
                 expect(lookaheadTimelineObject.enable.end).toBe(
-                  `#${ACTIVE_GROUP_PREFIX}${activePart.id}.start`
+                  `#${ACTIVE_GROUP_PREFIX}${activePart.id}`
                 )
               })
 
