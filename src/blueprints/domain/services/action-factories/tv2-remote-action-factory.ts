@@ -148,7 +148,7 @@ export class Tv2RemoteActionFactory extends ActionFactory {
       rundownId: '',
       partId: '',
       layer: Tv2VideoMixerLayer.WALL_AUXILIARY,
-      pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
+      pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
       isUnsynced: false,
