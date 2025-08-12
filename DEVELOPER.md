@@ -138,7 +138,7 @@ The infrastructure submodule contains structures like:
 
 ### Module interaction
 
-_Contracts_ in the following table is used as a term for exposed structures, which can be interfaces, facades, services or the like.
+_Contracts_ is used as a term for exposed structures, which can be interfaces, facades, services or the like.
 Intra-module dependencies:
 
 | From \ To          | Domain     | Application | Infrastructure |
@@ -151,9 +151,9 @@ Inter-module dependencies:
 
 | From \ To          | External Domain | External Application | External Infrastructure |
 |:-------------------|:----------------|:---------------------|:------------------------|
-| **Domain**         | Interface       |                      |                         |
-| **Application**    |                 | Interface            |                         |
-| **Infrastructure** |                 |                      | Interface               |
+| **Domain**         | Contracts       |                      |                         |
+| **Application**    |                 | Contracts            |                         |
+| **Infrastructure** |                 |                      | Contracts               |
 
 All inter-module dependencies should be used with caution.
 
