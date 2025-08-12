@@ -441,7 +441,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     }
     const activePartTimelineObjectEnable: TimelineEnable = {
       start: 0,
-      end: `#${activeGroup.id}`,
+      end: `#${activeGroup.id}.start`,
     }
     return this.createLookaheadTimelineObjectsForPart(
       rundown.getActivePart(),
