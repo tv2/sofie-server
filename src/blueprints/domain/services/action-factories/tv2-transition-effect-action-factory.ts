@@ -423,9 +423,10 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         break
       }
       case TransitionEffectType.BREAKER: {
+        const start: number = this.frameTimeConverter.convertFramesToMilliseconds(action.metadata.breaker.startAlpha) + action.metadata.casparCgPreRollDuration
         action.data.pieceInterface.timelineObjects.push(...this.createTimelineObjectsForBreakerTransitionEffect(sourceInput, action.metadata, mediaPlayerSession))
         action.data.partInTransition = this.createPartInTransitionForBreakerTransitionEffect(action.metadata)
-        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, 0, mediaPlayerSession))
+        piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, start, mediaPlayerSession))
         break
       }
     }
