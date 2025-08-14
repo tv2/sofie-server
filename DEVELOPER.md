@@ -117,6 +117,10 @@ The domain submodule contains structures like:
 - Domain events
 - Repository interfaces
 
+> [!warning]
+> It is worth noting that the repository interfaces are defined in the domain layer, but not used. The reason for doing it this way is that the repository can exhibit domain rules through intent. An example could in a gaming system, a given set of use cases that specialises with gambling, require the users to be adults as they per law can’t have minors engaging in gambling. So instead of having the domain rule scattered out in the use cases, the repository for users could expose a method for only getting adult users.
+> For quick reference: Repositories are defined in the domain layer, implemented in infrastructure layer and used in the application layer.
+
 **Application**
 
 The application submodule contains structures like:
