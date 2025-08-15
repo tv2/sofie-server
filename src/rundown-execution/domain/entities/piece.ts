@@ -88,7 +88,7 @@ export class Piece {
   public resetFromIngestedPiece(ingestedPiece: IngestedPiece): void {
     this.start = ingestedPiece.start
     this.expectedDuration = ingestedPiece.duration
-    if (this.pieceLifespan === PieceLifespan.WITHIN_PART) {
+    if (this.pieceLifespan === PieceLifespan.WITHIN_PART || this.takenOffAirTimestamp > 0) {
       // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
       this.resetExecution()
     }
