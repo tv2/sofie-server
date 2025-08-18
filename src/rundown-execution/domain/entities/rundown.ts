@@ -468,10 +468,12 @@ export class Rundown extends BasicRundown {
   }
 
   private resetInfinitePiecesNoLongerPresent(newInfinitePieces: Map<string, Piece[]>): void {
+    const activePartId: string | undefined = this.getActiveCursor()?.part.id
     this.infinitePieces.forEach((infinitePiecesOnLayer: Piece[], layer: string) => {
       const newInfinitePiecesOnLayer: Piece[] = newInfinitePieces.get(layer) ?? []
       infinitePiecesOnLayer
         .filter(pieceOnLayer => newInfinitePiecesOnLayer.every(newPieceOnLayer => newPieceOnLayer.id !== pieceOnLayer.id))
+        .filter(pieceOnLayer => pieceOnLayer.getPartId() !== activePartId)
         .forEach(pieceNoLongerPresent => pieceNoLongerPresent.resetExecution())
     })
   }
