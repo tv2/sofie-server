@@ -26,10 +26,13 @@ import { Logger } from '../../../cross-cutting-concerns/application/interfaces/l
 import { PlayoutService } from '../interfaces/playout-service'
 import { InTransition } from '../../domain/value-objects/in-transition'
 import { TakeIsBlockedException } from '../exceptions/take-is-blocked-exception'
-import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
+import {
+  UnsupportedOperationException
+} from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { TakeMode } from '../../domain/enums/take-mode'
 import { PlayoutContentUpdateService } from '../interfaces/playout-content-service'
 import { ConfigurationRepository } from '../../domain/repositories/configuration-repository'
+import { PieceLifespan } from '../../domain/enums/piece-lifespan'
 
 describe(RundownTimelineService.name, () => {
   describe(`${RundownTimelineService.prototype.deleteRundown.name}`, () => {
@@ -1044,6 +1047,35 @@ describe(RundownTimelineService.name, () => {
         await testee.stopPiece(rundown.id, piece.id)
 
         verify(rundownRepository.saveRundown(rundown)).once()
+      })
+    })
+
+    describe('when the stopped piece is an infinite piece', () => {
+      it('emits updated infinite pieces event', async () => {
+        const rundownEventEmitter: RundownEventEmitter = mock<RundownEventEmitter>()
+        const piece = EntityTestFactory.createPiece({ pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE })
+        const part = EntityTestFactory.createPart({ isOnAir: true, pieces: [piece] })
+        const segment = EntityTestFactory.createSegment({ isOnAir: true, parts: [part] })
+        const rundown = EntityTestFactory.createRundown({
+          mode: RundownMode.ACTIVE,
+          alreadyActiveProperties: {
+            activeCursor: {
+              part,
+              segment,
+              owner: Owner.SYSTEM,
+            },
+            nextCursor: undefined,
+            infinitePieces: new Map()
+          }
+        })
+
+        const rundownRepository = mock<RundownRepository>()
+        when(rundownRepository.getRundown(rundown.id)).thenResolve(rundown)
+
+        const testee: RundownTimelineService = createTestee({ rundownRepository, rundownEventEmitter })
+        await testee.stopPiece(rundown.id, piece.id)
+
+        verify(rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)).once()
       })
     })
   })
