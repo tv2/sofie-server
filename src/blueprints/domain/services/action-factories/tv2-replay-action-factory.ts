@@ -6,7 +6,7 @@ import {
 } from '../../value-objects/tv2-studio-blueprint-configuration'
 import { PartActionType, PieceActionType } from '../../../../action-system/domain/enums/action-type'
 import { PartInterface } from '../../../../rundown-execution/domain/entities/part'
-import { Tv2ReplayAction, Tv2ReplayAuxAction} from '../../value-objects/tv2-action'
+import { Tv2ReplayAction, Tv2ReplayAuxAction } from '../../value-objects/tv2-action'
 import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../../rundown-execution/domain/enums/piece-lifespan'
 import { TransitionType } from '../../../../rundown-execution/domain/enums/transition-type'
@@ -341,8 +341,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
   }
 
   private createRouteToAuxiliaryActions(
-      configuration: Tv2BlueprintConfiguration,
-      replaySourceMapping: Tv2SourceMappingWithAudio,
+    configuration: Tv2BlueprintConfiguration,
+    replaySourceMapping: Tv2SourceMappingWithAudio,
   ): Action[] {
     return configuration.studio.auxiliarySources.map(auxiliarySourceMapping => this.createReplayRouteToAuxiliaryActions(auxiliarySourceMapping, replaySourceMapping))
   }
@@ -351,8 +351,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     const sanitizedRemoteId: string = this.sanitizeStringForId(replaySourceMapping.name)
     const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
     const replayPieceInterface: Tv2PieceInterface = this.createReplayAuxiliaryPieceInterface(
-        auxiliarySourceMapping,
-        replaySourceMapping
+      auxiliarySourceMapping,
+      replaySourceMapping
     )
 
     return {
@@ -396,8 +396,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
       tags: [],
       timelineObjects: [
         this.videoMixerTimelineObjectFactory.createAuxTimelineObject(
-            replaySourceMapping.videoMixerSource,
-            auxiliarySourceMapping.layerId
+          replaySourceMapping.videoMixerSource,
+          auxiliarySourceMapping.layerId
         ),
       ],
       metadata: {
