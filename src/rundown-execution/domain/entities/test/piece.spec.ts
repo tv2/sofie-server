@@ -146,7 +146,7 @@ describe(Piece.name, () => {
       expect(testee.getTimelineObjects()).toStrictEqual(ingestedPiece.timelineObjects)
     })
 
-    describe('the Piece is infinite Piece', () => {
+    describe('the piece is an active infinite piece', () => {
       it('it does not reset Piece.executedAt', () => {
         const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({})
         const executedAt: number = Date.now()
@@ -156,6 +156,22 @@ describe(Piece.name, () => {
         expect(testee.getExecutedAt()).not.toBe(0)
         testee.resetFromIngestedPiece(ingestedPiece)
         expect(testee.getExecutedAt()).toBe(executedAt)
+      })
+    })
+
+    describe('the piece is an infinite piece taken off air', () => {
+      it('it does not reset Piece.executedAt', () => {
+        const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({})
+        const executedAt: number = Date.now()
+        const takenOffAirTimestamp: number = executedAt + 1000
+
+        const testee: Piece = new Piece({ executedAt, takenOffAirTimestamp, pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE } as PieceInterface)
+
+        expect(testee.getExecutedAt()).toBeGreaterThan(0)
+        expect(testee.getTakenOffAirTimestamp()).toBeGreaterThan(0)
+        testee.resetFromIngestedPiece(ingestedPiece)
+        expect(testee.getExecutedAt()).toBe(0)
+        expect(testee.getTakenOffAirTimestamp()).toBe(0)
       })
     })
 
