@@ -1,9 +1,12 @@
 import { Action } from '../../../../action-system/domain/entities/action'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
-import { Tv2SourceMappingWithAudio } from '../../value-objects/tv2-studio-blueprint-configuration'
+import {
+  Tv2SourceAuxiliaryMapping,
+  Tv2SourceMappingWithAudio
+} from '../../value-objects/tv2-studio-blueprint-configuration'
 import { PartActionType, PieceActionType } from '../../../../action-system/domain/enums/action-type'
 import { PartInterface } from '../../../../rundown-execution/domain/entities/part'
-import { Tv2ReplayAction, Tv2ReplayAuxAction } from '../../value-objects/tv2-action'
+import { Tv2ReplayAction, Tv2ReplayAuxAction} from '../../value-objects/tv2-action'
 import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
 import { PieceLifespan } from '../../../../rundown-execution/domain/enums/piece-lifespan'
 import { TransitionType } from '../../../../rundown-execution/domain/enums/transition-type'
@@ -39,7 +42,8 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         this.createReplayActionWithVoiceOverAsNext(configuration, replaySource),
         this.createReplayActionWithVoiceOverAsOnAir(configuration, replaySource),
         this.createReplayStudioAuxAction(replaySource),
-        this.createReplayVizAuxAction(replaySource)
+        this.createReplayVizAuxAction(replaySource),
+        ...this.createRouteToAuxiliaryActions(configuration, replaySource)
       ]
 
       if (!EPSIO_REGEX.test(replaySource.name)) {
@@ -333,6 +337,76 @@ export class Tv2ReplayActionFactory extends ActionFactory {
         },
         outputLayer: OutputLayer.AUXILIARY
       }
+    }
+  }
+
+  private createRouteToAuxiliaryActions(
+      configuration: Tv2BlueprintConfiguration,
+      replaySourceMapping: Tv2SourceMappingWithAudio,
+  ): Action[] {
+    return configuration.studio.auxiliarySources.map(auxiliarySourceMapping => this.createReplayRouteToAuxiliaryActions(auxiliarySourceMapping, replaySourceMapping))
+  }
+
+  private createReplayRouteToAuxiliaryActions(auxiliarySourceMapping: Tv2SourceAuxiliaryMapping, replaySourceMapping: Tv2SourceMappingWithAudio): Action {
+    const sanitizedRemoteId: string = this.sanitizeStringForId(replaySourceMapping.name)
+    const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
+    const replayPieceInterface: Tv2PieceInterface = this.createReplayAuxiliaryPieceInterface(
+        auxiliarySourceMapping,
+        replaySourceMapping
+    )
+
+    return {
+      id: `routeRemoteSource_${sanitizedRemoteId}_to_aux${sanitizedAuxiliaryId}`,
+      name: `${replaySourceMapping.name} to SS ${auxiliarySourceMapping.auxiliaryId}`,
+      rank: 0,
+      description: `Routes ${replaySourceMapping.name} to SS ${auxiliarySourceMapping.auxiliaryId}.`,
+      type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+      data: {
+        pieceInterface: replayPieceInterface,
+      },
+      metadata: {
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: replaySourceMapping.name,
+        },
+        outputChannel: OutputChannel.UNKNOWN,
+      },
+    }
+  }
+
+  private createReplayAuxiliaryPieceInterface(auxiliarySourceMapping: Tv2SourceAuxiliaryMapping, replaySourceMapping: Tv2SourceMappingWithAudio): Tv2PieceInterface {
+    const sanitizedRemoteId: string = this.sanitizeStringForId(replaySourceMapping.name)
+    const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
+
+    return {
+      id: `routeReplaySourcePiece_${sanitizedRemoteId}_aux${sanitizedAuxiliaryId}`,
+      name: `${replaySourceMapping.name} \u2192 SS ${auxiliarySourceMapping.auxiliaryId}`,
+      rundownId: '',
+      partId: '',
+      layer: Tv2VideoMixerLayer.WALL_AUXILIARY,
+      pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+      transitionType: TransitionType.NO_TRANSITION,
+      isPlanned: false,
+      isUnsynced: false,
+      start: 0,
+      duration: 0,
+      preRollDuration: 0,
+      postRollDuration: 0,
+      takenOffAirTimestamp: 0,
+      tags: [],
+      timelineObjects: [
+        this.videoMixerTimelineObjectFactory.createAuxTimelineObject(
+            replaySourceMapping.videoMixerSource,
+            auxiliarySourceMapping.layerId
+        ),
+      ],
+      metadata: {
+        playoutContent: {
+          type: PlayoutContentType.REPLAY,
+          source: replaySourceMapping.name,
+        },
+        outputLayer: OutputLayer.AUXILIARY,
+      },
     }
   }
 }
