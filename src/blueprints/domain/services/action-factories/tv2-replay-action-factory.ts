@@ -344,10 +344,10 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     configuration: Tv2BlueprintConfiguration,
     replaySourceMapping: Tv2SourceMappingWithAudio,
   ): Action[] {
-    return configuration.studio.auxiliarySources.map(auxiliarySourceMapping => this.createReplayRouteToAuxiliaryActions(auxiliarySourceMapping, replaySourceMapping))
+    return configuration.studio.auxiliarySources.map(auxiliarySourceMapping => this.createReplayRouteToAuxiliaryAction(auxiliarySourceMapping, replaySourceMapping))
   }
 
-  private createReplayRouteToAuxiliaryActions(auxiliarySourceMapping: Tv2SourceAuxiliaryMapping, replaySourceMapping: Tv2SourceMappingWithAudio): Action {
+  private createReplayRouteToAuxiliaryAction(auxiliarySourceMapping: Tv2SourceAuxiliaryMapping, replaySourceMapping: Tv2SourceMappingWithAudio): Action {
     const sanitizedRemoteId: string = this.sanitizeStringForId(replaySourceMapping.name)
     const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
     const replayPieceInterface: Tv2PieceInterface = this.createReplayAuxiliaryPieceInterface(
