@@ -466,7 +466,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return [
       ...mixEffectTimelineObjects,
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable, { mediaPlayerSession }),
-      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true),
+      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true, { enable: { start: casparCgPreRollDuration } }),
       this.videoClipTimelineObjectFactory.createBreakerTimelineObject(fileName),
       this.audioMixerTimelineObjectFactory.createBreakerAudioTimelineObject()
     ]

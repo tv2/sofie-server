@@ -193,14 +193,14 @@ export class Tv2TriCasterVideoMixerTimelineObjectFactory implements Tv2VideoMixe
     }
   }
 
-  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean): TriCasterMixEffectTimelineObject {
+  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean, options?: { priority?: number, enable?: TimelineEnable }): TriCasterMixEffectTimelineObject {
     const downstreamKeyerNumber: number = downstreamKeyer.index + 1
     return {
       id: `${TRI_CASTER_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
-      enable: {
+      enable: options?.enable ?? {
         start: 0
       },
-      priority: 10,
+      priority: options?.priority ?? 10,
       layer: `${Tv2TriCasterLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
       content: {
         deviceType: DeviceType.TRICASTER,
