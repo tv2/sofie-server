@@ -616,7 +616,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
   private createGraphicsBackgroundLoopToAuxiliaryActions(configuration: Tv2BlueprintConfiguration): Tv2PieceAction[] {
     return configuration.studio.auxiliarySources.map((auxiliarySourceMapping) => {
       const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
-      const replayPieceInterface: Tv2PieceInterface = this.createGraphicsBackgroundLoopAuxiliaryPieceInterface(
+      const graphicsBackgroundLoopAuxiliaryPieceInterface: Tv2PieceInterface = this.createGraphicsBackgroundLoopAuxiliaryPieceInterface(
         auxiliarySourceMapping,
         configuration.studio.vizPilotGraphics.videoMixerSourceForFullscreenGraphicsBackground
       )
@@ -628,7 +628,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         description: `Routes the graphics background loop to SS ${auxiliarySourceMapping.auxiliaryId}.`,
         type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
         data: {
-          pieceInterface: replayPieceInterface,
+          pieceInterface: graphicsBackgroundLoopAuxiliaryPieceInterface,
         },
         metadata: {
           playoutContent: {
