@@ -348,7 +348,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
   }
 
   private createReplayRouteToAuxiliaryAction(auxiliarySourceMapping: Tv2SourceAuxiliaryMapping, replaySourceMapping: Tv2SourceMappingWithAudio): Action {
-    const sanitizedRemoteId: string = this.sanitizeStringForId(replaySourceMapping.name)
+    const sanitizedReplayId: string = this.sanitizeStringForId(replaySourceMapping.name)
     const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
     const replayPieceInterface: Tv2PieceInterface = this.createReplayAuxiliaryPieceInterface(
       auxiliarySourceMapping,
@@ -356,7 +356,7 @@ export class Tv2ReplayActionFactory extends ActionFactory {
     )
 
     return {
-      id: `routeRemoteSource_${sanitizedRemoteId}_to_aux${sanitizedAuxiliaryId}`,
+      id: `routeReplaySource_${sanitizedReplayId}_to_aux${sanitizedAuxiliaryId}`,
       name: `${replaySourceMapping.name} to SS ${auxiliarySourceMapping.auxiliaryId}`,
       rank: 0,
       description: `Routes ${replaySourceMapping.name} to SS ${auxiliarySourceMapping.auxiliaryId}.`,
@@ -375,11 +375,11 @@ export class Tv2ReplayActionFactory extends ActionFactory {
   }
 
   private createReplayAuxiliaryPieceInterface(auxiliarySourceMapping: Tv2SourceAuxiliaryMapping, replaySourceMapping: Tv2SourceMappingWithAudio): Tv2PieceInterface {
-    const sanitizedRemoteId: string = this.sanitizeStringForId(replaySourceMapping.name)
+    const sanitizedReplayId: string = this.sanitizeStringForId(replaySourceMapping.name)
     const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
 
     return {
-      id: `routeReplaySourcePiece_${sanitizedRemoteId}_aux${sanitizedAuxiliaryId}`,
+      id: `routeReplaySourcePiece_${sanitizedReplayId}_aux${sanitizedAuxiliaryId}`,
       name: `${replaySourceMapping.name} \u2192 SS ${auxiliarySourceMapping.auxiliaryId}`,
       rundownId: '',
       partId: '',
