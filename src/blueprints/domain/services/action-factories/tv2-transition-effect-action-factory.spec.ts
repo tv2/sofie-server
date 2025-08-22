@@ -30,6 +30,17 @@ import { PlayoutContentType } from '../../../../rundown-execution/domain/enums/p
 import { OutputChannel } from '../../../../rundown-execution/domain/enums/output-channel'
 import { PieceActionType } from '../../../../action-system/domain/enums/action-type'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
+import {
+  Tv2AtemVideoMixerTimelineObjectFactory
+} from '../timeline-object-factories/tv2-atem-video-mixer-timeline-object-factory'
+import { Tv2AtemLayer } from '../../value-objects/tv2-layers'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
+import {
+  AtemMixEffectType,
+  AtemMixEffectWithTransition,
+  AtemType
+} from '../../value-objects/timeline-state-resolver-types/atem-types'
+import { TimelineObject } from '../../../../rundown-execution/domain/entities/timeline-object'
 
 describe(Tv2TransitionEffectActionFactory.name, () => {
   describe(Tv2TransitionEffectActionFactory.prototype.getMutateActionMethods.name, () => {
@@ -62,17 +73,33 @@ describe(Tv2TransitionEffectActionFactory.name, () => {
 
         expect(result.durationInFrames).toBe(50)
       })
+
       it('has a duration of 250 frames when set to 250 frames ', () => {
         const mutatedAction: Action = getMutatedMixTransitionEffectAction(250)
         const result: Tv2MixTransitionEffectActionMetadata = mutatedAction.metadata as Tv2MixTransitionEffectActionMetadata
 
         expect(result.durationInFrames).toBe(250)
       })
+
       it('has a duration of 250 frames when set to 400 frames ', () => {
         const mutatedAction: Action = getMutatedMixTransitionEffectAction(400)
         const result: Tv2MixTransitionEffectActionMetadata = mutatedAction.metadata as Tv2MixTransitionEffectActionMetadata
 
         expect(result.durationInFrames).toBe(250)
+      })
+
+      describe('it creates downStreamKeyerTimelineObjects that starts after the CasparCgPreRollDuration', () => {
+        it('has a CasparCgPreRollDuration of 100, the enable.start = 100', () => {
+          testDskEnableStartIsEqualToCasparCgPreRollDuration(100)
+        })
+
+        it('has a CasparCgPreRollDuration of 250, the enable.start = 250', () => {
+          testDskEnableStartIsEqualToCasparCgPreRollDuration(250)
+        })
+
+        it('has a CasparCgPreRollDuration of 500, the enable.start = 500', () => {
+          testDskEnableStartIsEqualToCasparCgPreRollDuration(500)
+        })
       })
     })
   })
@@ -140,6 +167,37 @@ function getMutateActionWithMethods(transitionEffectActionFactory: Tv2Transition
     throw new Error('No MutateActionMethodsFound')
   }
   return mutateActionWithMethods
+}
+
+// Note: This is an integration test between Tv2TransitionEffectActionFactory and Tv2AtemVideoMixerTimelineObjectFactory.
+function testDskEnableStartIsEqualToCasparCgPreRollDuration(casparCgPreRollDuration: number): void {
+  const action: Tv2TransitionEffectAction = EntityTestFactory.createPieceAction({
+    metadata: createBreakerActionMetadata(10, casparCgPreRollDuration),
+  }) as Tv2TransitionEffectAction
+
+  const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory(instance(mock<Logger>()))
+  const testee: Tv2TransitionEffectActionFactory = createTestee({ videoMixerTimelineObjectFactory })
+
+  const mutateActionMethods: MutateActionWithPieceMethods = getMutateActionWithMethods(testee, action, MutateActionType.PIECE) as MutateActionWithPieceMethods
+  const timelineObject: TimelineObject = EntityTestFactory.createTimelineObject({
+    layer: Tv2AtemLayer.PROGRAM,
+    content: {
+      deviceType: DeviceType.ATEM,
+      type: AtemType.ME,
+      me: {
+        type: AtemMixEffectType.TRANSITION,
+        input: 1
+      } as AtemMixEffectWithTransition
+    },
+  })
+  const mutatedAction: Tv2TransitionEffectAction = mutateActionMethods.updateActionWithPiece(action, EntityTestFactory.createPiece({ timelineObjects: [timelineObject] })) as Tv2TransitionEffectAction
+  const dskTimelineObject: TimelineObject | undefined = mutatedAction.data.pieceInterface.timelineObjects.find(timelineObject => timelineObject.content.type === AtemType.DSK)
+
+  if (!dskTimelineObject) {
+    throw new Error('No DSK TimelineObject created')
+  }
+
+  expect(dskTimelineObject.enable.start).toBe(casparCgPreRollDuration)
 }
 
 function createTestee(params?: {
