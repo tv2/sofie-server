@@ -22,8 +22,8 @@ interface CoreShowStyleBlueprintConfiguration {
   GfxSchemaTemplates: CoreGraphicsSchema[]
   DVEStyles: CoreSplitScreenConfiguration[]
   BreakerConfig: CoreBreaker[]
-  Transitions: Transition[]
-  ShowstyleTransition: string
+  Transitions?: Transition[]
+  ShowstyleTransition?: string
   LYDConfig: CoreAudioBedConfiguration[]
 }
 
@@ -104,21 +104,21 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
       selectedGraphicsSetup: this.findSelectedGraphicsSetup(showStyleVariantBlueprintConfiguration, coreConfiguration.GfxDefaults, coreConfiguration.GfxSetups),
       splitScreenConfigurations: this.mapSplitScreenConfigurations(coreConfiguration.DVEStyles),
       breakerTransitionEffectConfigurations: this.mapBreakerTransitionEffectConfigurations(
-        coreConfiguration.ShowstyleTransition,
-        coreConfiguration.Transitions),
+        coreConfiguration.Transitions,
+        coreConfiguration.ShowstyleTransition),
       breakers: this.mapBreakers(coreConfiguration.BreakerConfig),
       audioBedConfigurations: this.mapAudioBedConfigurations(coreConfiguration.LYDConfig)
     }
   }
 
-  private mapBreakerTransitionEffectConfigurations(showstyleTransition: string, coreTransitions?: Transition[]): BreakerTransitionEffect[] {
-    if (!coreTransitions) {
-      return []
-    }
-
+  private mapBreakerTransitionEffectConfigurations(coreTransitions: Transition[] = [], showStyleTransition?: string): BreakerTransitionEffect[] {
     const transitions: string[] = coreTransitions.map(transition => transition.Transition).filter(transition => transition !== undefined)
 
-    return this.mapTransitionEffectConfigurations([...transitions, showstyleTransition])
+    if (showStyleTransition) {
+      transitions.push(showStyleTransition)
+    }
+
+    return this.mapTransitionEffectConfigurations(transitions)
   }
 
   private findShowStyleVariantBlueprintConfiguration(showStyleVariantId: string, showStyle: ShowStyle): Tv2ShowStyleVariantBlueprintConfiguration | undefined {
