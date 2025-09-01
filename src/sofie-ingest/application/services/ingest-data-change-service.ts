@@ -25,6 +25,7 @@ import { PieceRepository } from '../../../rundown-execution/domain/repositories/
 import { IngestedPiece } from '../../../rundown-execution/domain/entities/ingested-piece'
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { ConfigurationRepository } from '../../../rundown-execution/domain/repositories/configuration-repository'
+import { RundownMode } from '../../../rundown-execution/domain/enums/rundown-mode'
 
 interface DeletedInfo {
   readonly deletedPartsInfo: readonly DeletedPartInfo[]
@@ -204,7 +205,7 @@ export class IngestDataChangeService implements DataChangeService {
       })
 
       if (!ingestedRundown) {
-        if (rundown) {
+        if (rundown && rundown.getMode() === RundownMode.INACTIVE) {
           this.rundownEventEmitter.emitRundownDeleted(rundownId)
           await this.rundownRepository.deleteRundown(rundownId)
           await this.actionGenerationService.removeActionsForRundown(rundownId)
