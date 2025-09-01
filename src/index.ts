@@ -495,5 +495,11 @@ function createConfigurationDataChangeService(mongoDatabase: MongoDatabase, blue
   return new ConfigurationChangedService(blueprint, statusMessageService, configurationRepository, showStyleConfigurationDataChangeListener, showStyleVariantConfigurationChangedListener, logger)
 }
 
-const consoleLogger: Logger = new ConsoleLogger().tag('startup')
+const gitRevision: string = process.env.GIT_REVISION ?? ''
+
+const consoleLogger: Logger = new ConsoleLogger()
+  .tag('startup')
+  .metadata({
+    ...gitRevision ? { git_revision: gitRevision } : undefined,
+  })
 main(consoleLogger).catch(error => consoleLogger.data(error).error('Failed starting up Alba server.'))
