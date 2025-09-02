@@ -1,0 +1,3 @@
+export enum ConfigurationEventType {
+  SHELF_CONFIGURATION_UPDATED = 'SHELF_CONFIGURATION_UPDATED'
+}

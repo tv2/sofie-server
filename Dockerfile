@@ -26,4 +26,6 @@ EXPOSE 3005
 # WebSocket port
 EXPOSE 3006
 
+ARG GIT_REVISION
+ENV GIT_REVISION=${GIT_REVISION}
 CMD node --no-deprecation .

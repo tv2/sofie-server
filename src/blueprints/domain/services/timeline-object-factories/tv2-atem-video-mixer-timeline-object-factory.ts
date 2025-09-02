@@ -1,0 +1,386 @@
+import {
+  Tv2VideoMixerTimelineObjectFactory,
+  VideoMixerWipeTransitionSettings
+} from '../../interfaces/timeline-object-factories/tv2-video-mixer-timeline-object-factory'
+import { Tv2DownstreamKeyer } from '../../value-objects/tv2-studio-blueprint-configuration'
+import {
+  AtemAuxTimelineObject,
+  AtemDownstreamKeyerTimelineObject,
+  AtemMeWipePattern,
+  AtemMixEffectTimelineObject,
+  AtemMixEffectType,
+  AtemMixEffectUpstreamKeyersTimelineObject,
+  AtemMixEffectWithPreview,
+  AtemMixEffectWithTransition,
+  AtemSourceIndex,
+  AtemSuperSourcePropertiesTimelineObject,
+  AtemSuperSourceTimelineObject,
+  AtemTransition,
+  AtemType,
+  SuperSourceBorder,
+  SuperSourceProperties
+} from '../../value-objects/timeline-state-resolver-types/atem-types'
+import { Tv2AtemLayer } from '../../value-objects/tv2-layers'
+import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
+import { TimelineEnable } from '../../../../rundown-execution/domain/entities/timeline-enable'
+import {
+  SplitScreenBoxProperties,
+  SplitScreenLayoutProperties
+} from '../../value-objects/tv2-show-style-blueprint-configuration'
+import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
+import { Piece } from '../../../../rundown-execution/domain/entities/piece'
+import { TimelineObject, TimelineObjectMetadata } from '../../../../rundown-execution/domain/entities/timeline-object'
+import { Tv2BlueprintTimelineObject } from '../../value-objects/tv2-blueprint-timeline-object'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
+
+const ATEM_PREFIX: string = 'atem_'
+
+export class Tv2AtemVideoMixerTimelineObjectFactory implements Tv2VideoMixerTimelineObjectFactory {
+  private readonly logger: Logger
+
+  public constructor(logger: Logger) {
+    this.logger = logger.tag(Tv2AtemVideoMixerTimelineObjectFactory.name)
+  }
+
+  public createDownstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, onAir: boolean, options?: { priority?: number, enable?: TimelineEnable }): AtemDownstreamKeyerTimelineObject {
+    const downstreamKeyerNumber: number = downstreamKeyer.index + 1
+    return {
+      id: `${ATEM_PREFIX}downstreamKeyer${downstreamKeyerNumber}`,
+      enable: options?.enable ?? {
+        start: 0
+      },
+      priority: options?.priority ?? 10,
+      layer: `${Tv2AtemLayer.DOWNSTREAM_KEYER}_${downstreamKeyerNumber}`,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.DSK,
+        dsk: {
+          onAir,
+          sources: {
+            fillSource: downstreamKeyer.videoMixerFillSource,
+            cutSource: downstreamKeyer.videoMixerKeySource
+          },
+          properties: {
+            clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.videoMixerClip),
+            gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.videoMixerGain),
+            mask: {
+              enable: false
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * @return The percentage given converted to percentage used by Atem (1-1000)
+   */
+  private convertPercentageToAtemPercentageValue(percentage: number): number {
+    return percentage * 10
+  }
+
+  public createUpstreamKeyerTimelineObject(downstreamKeyer: Tv2DownstreamKeyer, enable: TimelineEnable): AtemMixEffectUpstreamKeyersTimelineObject {
+    const downstreamKeyerNumber: number = downstreamKeyer.index + 1
+    return {
+      id: `${ATEM_PREFIX}upstreamKeyer${downstreamKeyerNumber}`,
+      enable,
+      priority: 1,
+      layer: Tv2AtemLayer.CLEAN_UPSTREAM_KEYER,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.ME,
+        me: {
+          upstreamKeyers: [
+            {
+              upstreamKeyerId: downstreamKeyer.index,
+              onAir: true,
+              mixEffectKeyType: 0,
+              flyEnabled: false,
+              fillSource: downstreamKeyer.videoMixerFillSource,
+              cutSource: downstreamKeyer.videoMixerKeySource,
+              maskEnabled: false,
+              lumaSettings: {
+                clip: this.convertPercentageToAtemPercentageValue(downstreamKeyer.videoMixerClip),
+                gain: this.convertPercentageToAtemPercentageValue(downstreamKeyer.videoMixerGain),
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+
+  public createProgramTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): AtemMixEffectTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer(
+      `${ATEM_PREFIX}program`,
+      Tv2AtemLayer.PROGRAM,
+      enable,
+      {
+        type: AtemMixEffectType.PREVIEW,
+        programInput: sourceInput
+      },
+      metadata
+    )
+  }
+
+  public createProgramTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer(
+      `${ATEM_PREFIX}program`,
+      Tv2AtemLayer.PROGRAM,
+      enable,
+      {
+        type: AtemMixEffectType.TRANSITION,
+        input: sourceInput,
+        transition: AtemTransition.WIPE,
+        transitionSettings: this.createAtemMeWipeTransitionSettings(transitionSettings)
+      })
+  }
+
+  private createAtemMeWipeTransitionSettings(transitionSettings: VideoMixerWipeTransitionSettings): AtemMixEffectWithTransition['transitionSettings'] {
+    return {
+      wipe: {
+        rate: transitionSettings.durationInFrames,
+        pattern: AtemMeWipePattern.TOP_TO_BOTTOM_BAR,
+        reverseDirection: true,
+        borderSoftness: transitionSettings.borderSoftness
+      }
+    }
+  }
+
+  private createAtemMeTimelineObjectForLayer(id: string, layer: Tv2AtemLayer, enable: TimelineEnable, me: AtemMixEffectWithTransition | AtemMixEffectWithPreview, metadata?: TimelineObjectMetadata): AtemMixEffectTimelineObject {
+    return {
+      id: `${id}_${Date.now()}`,
+      enable,
+      priority: 2, // Old Blueprints uses priority 1. By setting it to 2 we know our TimelineObjects always take priority.
+      layer,
+      metaData: metadata,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.ME,
+        me
+      }
+    }
+  }
+
+  public createCleanFeedTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): AtemMixEffectTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer(
+      `${ATEM_PREFIX}clean_feed`,
+      Tv2AtemLayer.CLEAN_FEED,
+      enable,
+      {
+        type: AtemMixEffectType.PREVIEW,
+        programInput: sourceInput
+      },
+      metadata
+    )
+  }
+
+  public createCleanFeedTimelineObjectWithWipeTransition(sourceInput: number, enable: TimelineEnable, transitionSettings: VideoMixerWipeTransitionSettings): Tv2BlueprintTimelineObject {
+    return this.createAtemMeTimelineObjectForLayer(
+      `${ATEM_PREFIX}clean_feed`,
+      Tv2AtemLayer.CLEAN_FEED,
+      enable,
+      {
+        type: AtemMixEffectType.TRANSITION,
+        input: sourceInput,
+        transition: AtemTransition.WIPE,
+        transitionSettings: this.createAtemMeWipeTransitionSettings(transitionSettings)
+      })
+  }
+
+  public createLookaheadTimelineObject(sourceInput: number, enable: TimelineEnable, metadata?: TimelineObjectMetadata): AtemAuxTimelineObject {
+    return {
+      id: `${ATEM_PREFIX}lookahead`,
+      enable,
+      priority: 0,
+      layer: Tv2AtemLayer.LOOKAHEAD,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.AUX,
+        aux: {
+          input: sourceInput
+        }
+      },
+      ...metadata ? { metaData: metadata } : undefined
+    }
+  }
+
+  public createSplitScreenBoxesTimelineObject(boxes: SplitScreenBoxProperties[], priority: number = 1): AtemSuperSourceTimelineObject {
+    return {
+      id: `${ATEM_PREFIX}split_screen_boxes`,
+      enable: {
+        start: 0
+      },
+      priority,
+      layer: Tv2AtemLayer.SPLIT_SCREEN_BOXES,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.SUPER_SOURCE,
+        ssrc: {
+          boxes
+        }
+      }
+    }
+  }
+
+  public createSplitScreenPropertiesTimelineObject(configuration: Tv2BlueprintConfiguration, layoutProperties: SplitScreenLayoutProperties): AtemSuperSourcePropertiesTimelineObject {
+    const superSourceProperties: SuperSourceProperties = this.getSuperSourceProperties(layoutProperties)
+    const superSourceBorder: SuperSourceBorder = this.getSuperSourceBorder(layoutProperties)
+
+    return {
+      id: `${ATEM_PREFIX}split_screen_properties`,
+      enable: {
+        start: 0
+      },
+      priority: 1,
+      layer: Tv2AtemLayer.SPLIT_SCREEN,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.SUPER_SOURCE_PROPERTIES,
+        ssrcProps: {
+          artFillSource: configuration.studio.videoMixerBasicConfiguration.splitScreenArtFillSource,
+          artCutSource: configuration.studio.videoMixerBasicConfiguration.splitScreenArtKeySource,
+          artOption: 1,
+          ...superSourceProperties,
+          ...superSourceBorder
+        }
+      }
+    }
+  }
+
+  private getSuperSourceProperties(layoutProperties: SplitScreenLayoutProperties): SuperSourceProperties {
+    return layoutProperties.properties && !layoutProperties.properties.artPreMultiplied
+      ? {
+        artPreMultiplied: false,
+        artInvertKey: layoutProperties.properties.artInvertKey,
+        artClip: layoutProperties.properties.artClip * 10,
+        artGain: layoutProperties.properties.artGain * 10
+      }
+      : {
+        artPreMultiplied: true
+      }
+  }
+
+  private getSuperSourceBorder(layoutProperties: SplitScreenLayoutProperties): SuperSourceBorder {
+    return layoutProperties.border?.borderEnabled
+      ? {
+        ...layoutProperties.border
+      }
+      : {
+        borderEnabled: false
+      }
+  }
+
+  public getProgramLayer(): string {
+    return Tv2AtemLayer.PROGRAM
+  }
+
+  public getSplitScreenBoxesLayer(): string {
+    return Tv2AtemLayer.SPLIT_SCREEN_BOXES
+  }
+
+  public getSplitScreenSourceInput(): number {
+    return AtemSourceIndex.SUPER_SOURCE
+  }
+
+  public findProgramSourceInputFromPiece(piece: Piece): number | undefined {
+    const timelineObject: TimelineObject | undefined = piece.getTimelineObjects().find(timelineObject => timelineObject.layer === Tv2AtemLayer.PROGRAM)
+    if (!timelineObject) {
+      this.logger.data({ piece }).warn(`Unable to update the ATEM ME input, since no timeline object was found on the layer '${Tv2AtemLayer.PROGRAM}' on the piece with id '${piece.id}'.`)
+      return
+    }
+    const blueprintTimelineObject: Tv2BlueprintTimelineObject = timelineObject as Tv2BlueprintTimelineObject
+    if (blueprintTimelineObject.content.deviceType !== DeviceType.ATEM || blueprintTimelineObject.content.type !== AtemType.ME) {
+      this.logger.data({ piece, timelineObject }).warn('Unable to update ATEM ME input, since the timeline object is not targeting an ATEM ME.')
+      return
+    }
+
+    const atemMeTimelineObject: AtemMixEffectTimelineObject = blueprintTimelineObject as AtemMixEffectTimelineObject
+    if (atemMeTimelineObject.content.me.type === AtemMixEffectType.TRANSITION) {
+      return atemMeTimelineObject.content.me.input
+    }
+    return atemMeTimelineObject.content.me.programInput
+  }
+
+  public createCutTransitionEffectTimelineObjects(sourceInput: number, metadata?: TimelineObjectMetadata): AtemMixEffectTimelineObject[] {
+    const meContent: AtemMixEffectWithTransition = {
+      type: AtemMixEffectType.TRANSITION,
+      input: sourceInput,
+      transition: AtemTransition.CUT
+    }
+    return [
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent, metadata),
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent, metadata)
+    ]
+  }
+
+  private createTransitionEffectTimelineObject(layer: Tv2AtemLayer, meContent: AtemMixEffectWithTransition, metadata?: TimelineObjectMetadata, start?: number): AtemMixEffectTimelineObject {
+    return {
+      id: `${layer}_${meContent.transition}`,
+      enable: {
+        start: start ?? 0
+      },
+      layer,
+      priority: 10,
+      metaData: metadata,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.ME,
+        me: meContent
+      }
+    }
+  }
+
+  public createMixTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, metadata?: TimelineObjectMetadata, start?: number): AtemMixEffectTimelineObject[] {
+    const meContent: AtemMixEffectWithTransition = {
+      type: AtemMixEffectType.TRANSITION,
+      input: sourceInput,
+      transition: AtemTransition.MIX,
+      transitionSettings: {
+        mix: {
+          rate: durationInFrames
+        }
+      }
+    }
+    return [
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent, metadata, start),
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent, metadata, start)
+    ]
+  }
+
+  public createDipTransitionEffectTimelineObjects(sourceInput: number, durationInFrames: number, dipInput: number, metadata?: TimelineObjectMetadata): AtemMixEffectTimelineObject[] {
+    const meContent: AtemMixEffectWithTransition = {
+      type: AtemMixEffectType.TRANSITION,
+      input: sourceInput,
+      transition: AtemTransition.DIP,
+      transitionSettings: {
+        dip: {
+          rate: durationInFrames,
+          input: dipInput
+        }
+      }
+    }
+    return [
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.PROGRAM, meContent, metadata),
+      this.createTransitionEffectTimelineObject(Tv2AtemLayer.CLEAN_FEED, meContent, metadata)
+    ]
+  }
+
+  public createAuxTimelineObject(sourceInput: number, layer: string): AtemAuxTimelineObject {
+    return {
+      id: `${ATEM_PREFIX}${layer}_input_${sourceInput}_timelineObject`,
+      enable: {
+        start: 0
+      },
+      layer: `${ATEM_PREFIX}${layer}`,
+      priority: 1,
+      content: {
+        deviceType: DeviceType.ATEM,
+        type: AtemType.AUX,
+        aux: {
+          input: sourceInput
+        }
+      }
+    }
+  }
+}

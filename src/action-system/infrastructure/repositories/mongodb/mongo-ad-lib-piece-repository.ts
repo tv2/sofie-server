@@ -1,0 +1,75 @@
+import { BaseMongoRepository } from '../../../../cross-cutting-concerns/infrastructure/mongodb/base-mongo-repository'
+import { ActionManifestRepository } from '../../../domain/repositories/action-manifest-repository'
+import { ActionManifest } from '../../../domain/entities/action'
+import { MongoDatabase } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-database'
+import { Filter } from 'mongodb'
+import { MongoId } from '../../../../cross-cutting-concerns/infrastructure/value-objects/mongo-id'
+
+const AD_LIB_PIECES_COLLECTION: string = 'adLibPieces'
+
+interface MongoAdLibPiece {
+  _id: string
+  sourceLayerId: string
+  rundownId: string
+  name: string
+  _rank: number
+  expectedDuration: number | null
+  enable?: {
+    duration: number | null
+  }
+  lifespan: string | null
+  content?: {
+    path: string
+  }
+}
+
+export class MongoAdLibPieceRepository extends BaseMongoRepository<MongoAdLibPiece> implements ActionManifestRepository {
+  public constructor(mongoDatabase: MongoDatabase) {
+    super(mongoDatabase)
+  }
+
+  protected getCollectionName(): string {
+    return AD_LIB_PIECES_COLLECTION
+  }
+
+  public async getActionManifests(rundownId: string): Promise<ActionManifest[]> {
+    this.assertDatabaseConnection(this.getActionManifests.name)
+    const mongoAdLibPieces: MongoAdLibPiece[] = await this.getCollection().find<MongoAdLibPiece>({
+      rundownId: rundownId,
+      ...this.filterOutCommentatorManifests()
+    }).toArray()
+    return mongoAdLibPieces.map(adLibPiece => this.mapToActionManifest(adLibPiece))
+  }
+
+  // Todo: The filter is Tv2 specific. Remove filtering when we control ingest.
+  private filterOutCommentatorManifests(): Filter<MongoId> {
+    return { uniquenessId: { $not: { $regex: '.*_commentator$' } } }
+  }
+
+  private mapToActionManifest(adLibPiece: MongoAdLibPiece): ActionManifest {
+    return {
+      actionId: adLibPiece.sourceLayerId,
+      rundownId: adLibPiece.rundownId,
+      data: {
+        name: adLibPiece.name,
+        rank: adLibPiece._rank,
+        expectedDuration: this.getExpectedDuration(adLibPiece),
+        pieceLayer: adLibPiece.sourceLayerId,
+        lifespan: adLibPiece.lifespan ?? undefined,
+        content: adLibPiece.content
+      },
+    }
+  }
+
+  private getExpectedDuration(adLibPiece: MongoAdLibPiece): number | undefined {
+    if (adLibPiece.expectedDuration) {
+      return adLibPiece.expectedDuration
+    }
+
+    if (adLibPiece.enable?.duration) {
+      return adLibPiece.enable.duration
+    }
+
+    return undefined
+  }
+}
