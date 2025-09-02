@@ -286,7 +286,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
   }
 
   private createInsertSplitScreenInputActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2SplitScreenInsertSourceInputAction[] {
-    const cameraSources: Tv2SourceMappingWithAudio[] = blueprintConfiguration.studio.cameraSources.slice(0, 5)
+    const cameraSources: Tv2SourceMappingWithAudio[] = blueprintConfiguration.studio.cameraSources
     const remoteSources: Tv2SourceMappingWithAudio[] = blueprintConfiguration.studio.remoteSources
     const feedSources: Tv2SourceMappingWithAudio[] = blueprintConfiguration.studio.feedSources
     const replaySources: Tv2SourceMappingWithAudio[] = blueprintConfiguration.studio.replaySources
