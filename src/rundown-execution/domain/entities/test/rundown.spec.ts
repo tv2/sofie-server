@@ -725,22 +725,30 @@ describe(Rundown.name, () => {
         it('sets executedAt to zero for the Piece no longer being an infinite', () => {
           const layer: string = 'someLayer'
 
+          const firstPartId: string = 'firstPartId'
           const mockFirstPiece: Piece = EntityMockFactory.createPieceMock({
             id: 'p1',
+            partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
           const firstPiece: Piece = instance(mockFirstPiece)
           const firstPart: Part = EntityMockFactory.createPart({
+            id: firstPartId,
+            isOnAir: true,
             pieces: [firstPiece],
           })
 
+          const nextPartId: string = 'nextPartId'
           const nextPiece: Piece = EntityMockFactory.createPiece({
             id: 'p2',
+            partId: nextPartId,
             layer,
             pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           })
           const nextPart: Part = EntityMockFactory.createPart({
+            id: nextPartId,
+            isNext: true,
             pieces: [nextPiece],
           })
 

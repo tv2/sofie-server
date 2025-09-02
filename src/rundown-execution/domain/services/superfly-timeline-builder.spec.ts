@@ -1208,6 +1208,32 @@ describe(SuperflyTimelineBuilder.name, () => {
           })
         })
       })
+
+      describe('when a piece is taken off air', () => {
+        it('is not included in the active group on the timeline', () => {
+          const stoppedPiece: Piece = EntityTestFactory.createPiece({
+            id: 'stoppedPieceId',
+            executedAt: 1,
+            takenOffAirTimestamp: 2
+          })
+          const activePart: Part = EntityMockFactory.createPart({
+            pieces: [stoppedPiece, EntityTestFactory.createPiece()]
+          })
+          const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
+          const testee: TimelineBuilder = createTestee()
+
+          const result = testee.buildTimeline(rundown, createBasicConfiguration())
+
+          const activeGroup: TimelineObjectGroup = result.timelineGroups.find(group =>
+            group.id.includes(ACTIVE_GROUP_PREFIX)
+          )!
+          const controlGroups: TimelineObject[] = activeGroup.children.filter(child =>
+            child.id.includes(PIECE_CONTROL_INFIX)
+          )
+          const controlGroupIds: string[] = controlGroups.map(controlGroup => controlGroup.id)
+          expect(controlGroupIds).not.toContainEqual(`${activeGroup.id}${PIECE_CONTROL_INFIX}${stoppedPiece.id}`)
+        })
+      })
     })
 
     describe('Rundown has a previous Part', () => {

@@ -1,13 +1,14 @@
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Action, MutateActionMethods, MutateActionType } from '../../../../action-system/domain/entities/action'
-import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
+import { Tv2PieceLayer, Tv2VideoMixerLayer } from '../../value-objects/tv2-layers'
 import { TransitionType } from '../../../../rundown-execution/domain/enums/transition-type'
 import { PieceLifespan } from '../../../../rundown-execution/domain/enums/piece-lifespan'
 import { PartActionType, PieceActionType } from '../../../../action-system/domain/enums/action-type'
 import {
   Tv2DownstreamKeyer,
   Tv2DownstreamKeyerRole,
-  Tv2GraphicsType
+  Tv2GraphicsType,
+  Tv2SourceAuxiliaryMapping
 } from '../../value-objects/tv2-studio-blueprint-configuration'
 import { PartInterface } from '../../../../rundown-execution/domain/entities/part'
 import { GraphicsTemplate } from '../../value-objects/tv2-show-style-blueprint-configuration'
@@ -180,7 +181,8 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       this.createEmptyClearGraphicsAction(),
       this.createEmptyAllOutGraphicsAction(),
       ...this.createFullscreenGraphicsActions(blueprintConfiguration, elementTimelineObjectFactory, fullscreenGraphicsData),
-      ...this.createOverlayGraphicsActions(blueprintConfiguration, elementTimelineObjectFactory, overlayGraphicsData)
+      ...this.createOverlayGraphicsActions(blueprintConfiguration, elementTimelineObjectFactory, overlayGraphicsData),
+      ...this.createGraphicsBackgroundLoopToAuxiliaryActions(blueprintConfiguration)
     ]
   }
 
@@ -608,6 +610,67 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
         },
         outputChannel: OutputChannel.UNKNOWN
       }
+    }
+  }
+
+  private createGraphicsBackgroundLoopToAuxiliaryActions(configuration: Tv2BlueprintConfiguration): Tv2PieceAction[] {
+    return configuration.studio.auxiliarySources.map((auxiliarySourceMapping) => {
+      const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
+      const graphicsBackgroundLoopAuxiliaryPieceInterface: Tv2PieceInterface = this.createGraphicsBackgroundLoopAuxiliaryPieceInterface(
+        auxiliarySourceMapping,
+        configuration.studio.vizPilotGraphics.videoMixerSourceForFullscreenGraphicsBackground
+      )
+
+      return {
+        id: `graphicsBackgroundLoop_to_aux${sanitizedAuxiliaryId}`,
+        name: `Graphics background loop to SS ${auxiliarySourceMapping.auxiliaryId}`,
+        rank: 0,
+        description: `Routes the graphics background loop to SS ${auxiliarySourceMapping.auxiliaryId}.`,
+        type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
+        data: {
+          pieceInterface: graphicsBackgroundLoopAuxiliaryPieceInterface,
+        },
+        metadata: {
+          playoutContent: {
+            type: PlayoutContentType.UNKNOWN,
+          },
+          outputChannel: OutputChannel.UNKNOWN,
+        },
+      }
+    })
+  }
+
+  private createGraphicsBackgroundLoopAuxiliaryPieceInterface(auxiliarySourceMapping: Tv2SourceAuxiliaryMapping, graphicsBackgroundLoopVideoMixerSource: number): Tv2PieceInterface {
+    const sanitizedAuxiliaryId: string = this.sanitizeStringForId(auxiliarySourceMapping.auxiliaryId)
+
+    return {
+      id: `graphicsBackgroundLoopPiece_aux${sanitizedAuxiliaryId}`,
+      name: `Graphics background loop to SS ${auxiliarySourceMapping.auxiliaryId}`,
+      rundownId: '',
+      partId: '',
+      layer: Tv2VideoMixerLayer.WALL_AUXILIARY,
+      pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+      transitionType: TransitionType.NO_TRANSITION,
+      isPlanned: false,
+      isUnsynced: false,
+      start: 0,
+      duration: 0,
+      preRollDuration: 0,
+      postRollDuration: 0,
+      takenOffAirTimestamp: 0,
+      tags: [],
+      timelineObjects: [
+        this.videoMixerTimelineObjectFactory.createAuxTimelineObject(
+          graphicsBackgroundLoopVideoMixerSource,
+          auxiliarySourceMapping.layerId
+        ),
+      ],
+      metadata: {
+        playoutContent: {
+          type: PlayoutContentType.UNKNOWN,
+        },
+        outputLayer: OutputLayer.AUXILIARY,
+      },
     }
   }
 }

@@ -426,6 +426,9 @@ export class RundownTimelineService implements RundownService {
     }
     await this.buildAndPersistTimeline(rundown)
     this.rundownEventEmitter.emitPieceStoppedEvent(rundown, rundown.getActivePart().getSegmentId(), stoppedPiece)
+    if (stoppedPiece.isInfinitePiece()) {
+      this.rundownEventEmitter.emitInfinitePiecesUpdatedEvent(rundown)
+    }
     await this.saveRundown(rundown)
   }
 }

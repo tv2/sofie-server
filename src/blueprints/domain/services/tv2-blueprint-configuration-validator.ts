@@ -16,7 +16,8 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
     // Add validation as needed.
     return [
       ...this.validateShowStyleConfiguration(tv2BlueprintConfiguration.showStyle),
-      ...this.validateShowStyleVariants(configuration.showStyle.variants)
+      ...this.validateShowStyleVariants(configuration.showStyle.variants),
+      ...this.validateVideoMixerSourceForFullscreenGraphicsBackground(tv2BlueprintConfiguration)
     ]
   }
 
@@ -110,5 +111,21 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
 
   private sanitizeStringForId(value: string): string {
     return Buffer.from(value).toString('hex')
+  }
+
+  private validateVideoMixerSourceForFullscreenGraphicsBackground(configuration: Tv2BlueprintConfiguration): StatusMessage[] {
+    const videoMixerSourceForFullscreenGraphicsBackground: number | undefined = configuration.studio.vizPilotGraphics.videoMixerSourceForFullscreenGraphicsBackground
+    if (!!videoMixerSourceForFullscreenGraphicsBackground && videoMixerSourceForFullscreenGraphicsBackground > 0) {
+      return []
+    }
+    return [
+      {
+        id: 'missingVideoMixerSourceForFullscreenGraphicsBackground',
+        title: 'Missing video mixer source',
+        message: 'Missing a video mixer source for fullscreen graphics background',
+        statusCode: StatusCode.WARNING,
+        lastUpdatedTimestamp: Date.now()
+      }
+    ]
   }
 }

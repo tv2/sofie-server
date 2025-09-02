@@ -1,25 +1,15 @@
 import { ActionEventEmitter } from '../interfaces/action-event-emitter'
 import { ActionEventBuilder } from '../interfaces/action-event-builder'
-import { ActionEvent, ActionsUpdatedEvent } from '../value-objects/action-event'
+import { ActionsUpdatedEvent } from '../value-objects/action-event'
 import { Action } from '../../domain/entities/action'
-import { ActionEventObserver } from '../interfaces/action-event-observer'
+import { TypedEventEmitter } from '../../../cross-cutting-concerns/application/interfaces/typed-event-emitter'
 
-export class ActionEventService implements ActionEventEmitter, ActionEventObserver {
-  private readonly callbacks: ((actionEvent: ActionEvent) => void)[] = []
-
-  public constructor(private readonly actionEventBuilder: ActionEventBuilder) {
-  }
-
-  private emitActionEvents(actionEvent: ActionEvent): void {
-    this.callbacks.forEach(callback => callback(actionEvent))
+export class ActionEventService implements ActionEventEmitter {
+  public constructor(private readonly typedEventEmitter: TypedEventEmitter, private readonly actionEventBuilder: ActionEventBuilder) {
   }
 
   public emitActionsUpdatedEvent(actions: Action[], rundownId?: string): void {
     const event: ActionsUpdatedEvent = this.actionEventBuilder.buildActionsUpdatedEvent(actions, rundownId)
-    this.emitActionEvents(event)
-  }
-
-  public subscribeToActionEvents(onActionEventCallback: (actionEvent: ActionEvent) => void): void {
-    this.callbacks.push(onActionEventCallback)
+    this.typedEventEmitter.emitTypedEvent(event)
   }
 }
