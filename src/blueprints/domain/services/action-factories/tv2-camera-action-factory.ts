@@ -31,7 +31,6 @@ export class Tv2CameraActionFactory extends ActionFactory {
 
   public createCameraActions(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2CameraAction[] {
     return blueprintConfiguration.studio.cameraSources
-      .slice(0, 5)
       .flatMap(source => [
         this.createInsertCameraAsNextAction(blueprintConfiguration, source),
         this.createInsertCameraAsOnAirAction(blueprintConfiguration, source)
