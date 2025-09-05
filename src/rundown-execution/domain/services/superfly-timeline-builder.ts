@@ -526,11 +526,13 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
       .filter(piece => piece.getPartId() !== activePart.id)
       .filter(piece => !piece.hasEnded(now))
       .forEach((piece) => {
-        if (!piece.getExecutedAt()) {
-          throw new UnsupportedOperationException(
-            `Found infinite Piece '${piece.name}' with id '${piece.id}' without an "executedAt". Infinite Pieces must have an "executedAt"! ${piece.pieceLifespan}`
-          )
-        }
+        // NOTE: This is commented out in AG-705.
+        //       Please have a look at how we handle infinite pieces to fix the root cause and re-enable this check.
+        // if (!piece.getExecutedAt()) {
+        //   throw new UnsupportedOperationException(
+        //     `Found infinite Piece '${piece.name}' with id '${piece.id}' without an "executedAt". Infinite Pieces must have an "executedAt"! ${piece.pieceLifespan}`
+        //   )
+        // }
 
         const infiniteGroup: TimelineObjectGroup = {
           id: `${INFINITE_GROUP_PREFIX}${activePart.id}_${piece.id}`,
