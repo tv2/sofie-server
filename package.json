@@ -37,7 +37,7 @@
     "@types/got": "^9.6.12",
     "@types/jest": "^29.5.4",
     "@types/node": "^20.5.9",
-    "@types/ws": "^8.5.5",
+    "@types/ws": "^8.18.1",
     "@typestrong/ts-mockito": "^2.6.6",
     "cross-env": "^7.0.3",
     "dependency-cruiser": "^16.10.3",
@@ -58,7 +58,7 @@
     "mongodb": "^6.1.0",
     "reflect-metadata": "^0.1.13",
     "superfly-timeline": "^9.0.0",
-    "ws": "^8.17.1"
+    "ws": "^8.18.3"
   },
   "resolutions": {
     "cookie": ">=0.7.0"
