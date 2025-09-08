@@ -83,7 +83,7 @@ import {
   MongoShowStyleVariantRepository
 } from './rundown-execution/infrastructure/repositories/mongodb/mongo-show-style-variant-repository'
 import { BlueprintTimelineBuilder } from './rundown-execution/domain/services/blueprint-timeline-builder'
-import { SuperTimelineBuilder } from './rundown-execution/domain/services/super-timeline-builder'
+import { SuperflyTimelineBuilder } from './rundown-execution/domain/services/superfly-timeline-builder'
 import { RundownService } from './rundown-execution/application/interfaces/rundown-service'
 import { SofieIngestService } from './sofie-ingest/application/interfaces/sofie-ingest-service'
 import { Tv2InewsSofieIngestService } from './sofie-ingest/application/services/tv2-inews-sofie-ingest-service'
@@ -438,8 +438,8 @@ function createActionManifestRepository(mongoDatabase: MongoDatabase): ActionMan
 }
 
 function createTimelineBuilder(objectCloner: DeepObjectCloner, blueprint: Blueprint): TimelineBuilder {
-  const superTimelineBuilder: SuperTimelineBuilder = new SuperTimelineBuilder(objectCloner)
-  return new BlueprintTimelineBuilder(superTimelineBuilder, blueprint)
+  const superflyTimelineBuilder: SuperflyTimelineBuilder = new SuperflyTimelineBuilder(objectCloner)
+  return new BlueprintTimelineBuilder(superflyTimelineBuilder, blueprint)
 }
 
 function createPlayoutContentStateService(mongoDatabase: MongoDatabase, playoutContentEventEmitter: PlayoutContentEventEmitter): PlayoutContentStateService {

@@ -44,7 +44,7 @@ const LOOKAHEAD_PRIORITY: number = 0.1
 const BASELINE_PRIORITY: number = 0
 const LOW_PRIORITY: number = -1
 
-export class SuperTimelineBuilder implements TimelineBuilder {
+export class SuperflyTimelineBuilder implements TimelineBuilder {
   public constructor(private readonly objectCloner: DeepObjectCloner) {}
 
   public getBaseTimeline(_configuration: Configuration): Timeline {
@@ -54,7 +54,7 @@ export class SuperTimelineBuilder implements TimelineBuilder {
   public buildTimeline(rundown: Rundown, configuration: Configuration): Timeline {
     const studio: Studio = configuration.studio
     if (!studio) {
-      throw new MisconfigurationException(`No Studio provided when calling ${SuperTimelineBuilder.name}.${SuperTimelineBuilder.prototype.buildTimeline.name}`)
+      throw new MisconfigurationException(`No Studio provided when calling ${SuperflyTimelineBuilder.name}.${SuperflyTimelineBuilder.prototype.buildTimeline.name}`)
     }
 
     let timeline: Timeline = this.createTimelineWithBaseline(rundown)

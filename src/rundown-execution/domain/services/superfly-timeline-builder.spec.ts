@@ -1,5 +1,5 @@
 import { TimelineBuilder } from '../interfaces/timeline-builder'
-import { SuperTimelineBuilder } from './super-timeline-builder'
+import { SuperflyTimelineBuilder } from './superfly-timeline-builder'
 import { EntityMockFactory } from '../entities/test/entity-mock-factory'
 import { Part } from '../entities/part'
 import { Rundown } from '../entities/rundown'
@@ -37,8 +37,8 @@ const LOOKAHEAD_PRIORITY: number = 0.1
 const BASELINE_PRIORITY: number = 0
 const LOW_PRIORITY: number = -1
 
-describe(SuperTimelineBuilder.name, () => {
-  describe(SuperTimelineBuilder.prototype.buildTimeline.name, () => {
+describe(SuperflyTimelineBuilder.name, () => {
+  describe(SuperflyTimelineBuilder.prototype.buildTimeline.name, () => {
     describe('for baseline', () => {
       describe('it creates a group for the baseline', () => {
         it('sets the correct baseline group id', () => {
@@ -4402,14 +4402,14 @@ describe(SuperTimelineBuilder.name, () => {
   })
 })
 
-function createTestee(objectCloner?: DeepObjectCloner): SuperTimelineBuilder {
+function createTestee(objectCloner?: DeepObjectCloner): SuperflyTimelineBuilder {
   if (!objectCloner) {
     const objectClonerMock: DeepObjectCloner = mock<DeepObjectCloner>()
     when(objectClonerMock.deepClone(anything())).thenReturn({})
     objectCloner = instance(objectClonerMock)
   }
 
-  return new SuperTimelineBuilder(objectCloner)
+  return new SuperflyTimelineBuilder(objectCloner)
 }
 
 function createBasicConfiguration(layers?: StudioLayer[]): Configuration {
