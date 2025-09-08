@@ -257,10 +257,13 @@ export class Tv2RemoteActionFactory extends ActionFactory {
   ): Tv2BlueprintTimelineObject[] {
     const enable: TimelineEnable = { start: 0 }
     return [
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(
-        source.videoMixerSource,
-        enable
-      ),
+      {
+        classes: ['overridden_on_mix_minus'],
+        ...this.videoMixerTimelineObjectFactory.createProgramTimelineObject(
+          source.videoMixerSource,
+          enable
+        ),
+      },
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(
         source.videoMixerSource,
         enable
