@@ -304,7 +304,7 @@ async function main(logger: Logger): Promise<void> {
   const statusMessageEventService: StatusMessageEventService = new StatusMessageEventService(typedEventBus, crossCuttingConcernsEventBuilder)
 
   const actionSystemEventBuilder: ActionSystemEventBuilder = new ActionSystemEventBuilder()
-  const actionEventService: ActionEventService = new ActionEventService(actionSystemEventBuilder)
+  const actionEventService: ActionEventService = new ActionEventService(typedEventBus, actionSystemEventBuilder)
   const triggerEventService: TriggerEventService = new TriggerEventService(typedEventBus, actionSystemEventBuilder)
   const macroEventService: MacroEventService = new MacroEventService(typedEventBus, actionSystemEventBuilder)
 
@@ -313,10 +313,10 @@ async function main(logger: Logger): Promise<void> {
   const deviceEventService: DeviceEventService = new DeviceEventService(typedEventBus, sofieIngestEventBuilder)
 
   const rundownIngestEventBuilder: RundownIngestEventBuilder = new RundownIngestEventBuilder()
-  const healthStatusEventService: IngestHealthStatusEventService = new IngestHealthStatusEventService(rundownIngestEventBuilder)
+  const healthStatusEventService: IngestHealthStatusEventService = new IngestHealthStatusEventService(typedEventBus, rundownIngestEventBuilder)
 
   const inewsIngestConfigurationEventBuilder: InewsIngestConfigurationEventBuilder = new Tv2InewsIngestEventBuilder()
-  const inewsIngestConfigurationEventService: InewsIngestConfigurationEventService = new InewsIngestConfigurationEventService(inewsIngestConfigurationEventBuilder)
+  const inewsIngestConfigurationEventService: InewsIngestConfigurationEventService = new InewsIngestConfigurationEventService(typedEventBus, inewsIngestConfigurationEventBuilder)
 
   // Data change listeners
   const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService)
@@ -495,5 +495,11 @@ function createConfigurationDataChangeService(mongoDatabase: MongoDatabase, blue
   return new ConfigurationChangedService(blueprint, statusMessageService, configurationRepository, showStyleConfigurationDataChangeListener, showStyleVariantConfigurationChangedListener, logger)
 }
 
-const consoleLogger: Logger = new ConsoleLogger().tag('startup')
+const gitRevision: string = process.env.GIT_REVISION ?? ''
+
+const consoleLogger: Logger = new ConsoleLogger()
+  .tag('startup')
+  .metadata({
+    ...gitRevision ? { git_revision: gitRevision } : undefined,
+  })
 main(consoleLogger).catch(error => consoleLogger.data(error).error('Failed starting up Alba server.'))

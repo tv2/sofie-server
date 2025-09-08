@@ -123,8 +123,10 @@ export class SuperTimelineBuilder implements TimelineBuilder {
       }
     }
 
+    const now: number = Date.now()
     activeGroup.children = activePart
       .getPieces()
+      .filter(piece => !piece.hasEnded(now))
       .flatMap(piece => this.generateGroupsAndTimelineObjectsForPiece(piece, activePart, activeGroup))
     return activeGroup
   }
@@ -517,10 +519,12 @@ export class SuperTimelineBuilder implements TimelineBuilder {
   private createTimelineWithInfiniteGroups(rundown: Rundown, timeline: Timeline): Timeline {
     const activePart: Part = rundown.getActivePart()
     const infinitePieceTimelineObjectGroups: TimelineObjectGroup[] = []
+    const now: number = Date.now()
     rundown
       .getInfinitePieces()
       .filter(piece => piece.transitionType === TransitionType.NO_TRANSITION)
       .filter(piece => piece.getPartId() !== activePart.id || !activePart.containsPiece(piece.id))
+      .filter(piece => !piece.hasEnded(now))
       .forEach((piece) => {
         if (!piece.getExecutedAt()) {
           throw new UnsupportedOperationException(

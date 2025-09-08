@@ -118,9 +118,9 @@ export class Tv2RemoteActionFactory extends ActionFactory {
 
     return {
       id: `routeRemoteSource_${sanitizedRemoteId}_to_aux${sanitizedAuxiliaryId}`,
-      name: `${remoteSourceMapping.name} to AUX ${auxiliarySourceMapping.auxiliaryId}`,
+      name: `${remoteSourceMapping.name} to SS ${auxiliarySourceMapping.auxiliaryId}`,
       rank: 0,
-      description: `Routes ${remoteSourceMapping.name} to AUX ${auxiliarySourceMapping.auxiliaryId}.`,
+      description: `Routes ${remoteSourceMapping.name} to SS ${auxiliarySourceMapping.auxiliaryId}.`,
       type: PieceActionType.INSERT_PIECE_AS_ON_AIR,
       data: {
         pieceInterface: remotePieceInterface,
@@ -144,11 +144,11 @@ export class Tv2RemoteActionFactory extends ActionFactory {
 
     return {
       id: `routeRemoteSourcePiece_${sanitizedRemoteId}_aux${sanitizedAuxiliaryId}`,
-      name: `${remoteSourceMapping.name} \u2192 AUX ${auxiliarySourceMapping.auxiliaryId}`,
+      name: `${remoteSourceMapping.name} \u2192 SS ${auxiliarySourceMapping.auxiliaryId}`,
       rundownId: '',
       partId: '',
       layer: Tv2VideoMixerLayer.WALL_AUXILIARY,
-      pieceLifespan: PieceLifespan.SPANNING_UNTIL_SEGMENT_END,
+      pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
       transitionType: TransitionType.NO_TRANSITION,
       isPlanned: false,
       isUnsynced: false,
