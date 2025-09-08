@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@tv2media/eslint-config": "1.0.3",
-    "@types/cors": "^2.8.14",
+    "@types/cors": "^2.8.19",
     "@types/express": "^4.17.17",
     "@types/got": "^9.6.12",
     "@types/jest": "^29.5.4",
