@@ -169,7 +169,10 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       const splitScreenLayoutTimelineObjects: Tv2BlueprintTimelineObject[] = [
         this.videoMixerTimelineObjectFactory.createSplitScreenBoxesTimelineObject(boxes, LAYOUT_TIMELINE_OBJECT_PRIORITY),
         this.videoMixerTimelineObjectFactory.createSplitScreenPropertiesTimelineObject(blueprintConfiguration, splitScreenConfiguration.layoutProperties),
-        this.videoMixerTimelineObjectFactory.createProgramTimelineObject(splitScreenSource, timelineEnable),
+        {
+          classes: ['overridden_on_mix_minus'],
+          ...this.videoMixerTimelineObjectFactory.createProgramTimelineObject(splitScreenSource, timelineEnable),
+        },
         this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(splitScreenSource, timelineEnable),
         this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, timelineEnable),
         this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
@@ -527,7 +530,10 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     const splitScreenTimelineObjects: Tv2BlueprintTimelineObject[] = [
       this.videoMixerTimelineObjectFactory.createSplitScreenBoxesTimelineObject(boxes, PLANNED_SPLIT_SCREEN_TIMELINE_OBJECT_PRIORITY),
       this.videoMixerTimelineObjectFactory.createSplitScreenPropertiesTimelineObject(blueprintConfiguration, splitScreenConfiguration.layoutProperties),
-      this.videoMixerTimelineObjectFactory.createProgramTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
+      {
+        classes: ['overridden_on_mix_minus'],
+        ...this.videoMixerTimelineObjectFactory.createProgramTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
+      },
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
       this.videoMixerTimelineObjectFactory.createLookaheadTimelineObject(splitScreenSource, videoSwitcherTimelineEnable),
       this.graphicsSplitScreenTimelineObjectFactory.createSplitScreenKeyTimelineObject(this.assetPathHelper.joinAssetToFolder(splitScreenConfiguration.key, blueprintConfiguration.studio.splitScreenFolder?.name)),
@@ -792,6 +798,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       ...videoClipTimelineObject.metaData,
       mediaPlayerSession
     }
+
     return videoClipTimelineObject
   }
 
