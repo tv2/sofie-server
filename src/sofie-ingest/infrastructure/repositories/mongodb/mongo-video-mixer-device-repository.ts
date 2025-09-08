@@ -6,6 +6,7 @@ import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exc
 import { DeviceEventEmitter } from '../../../application/interfaces/device-event-emitter'
 import { ChangeStream, ChangeStreamDocument, ChangeStreamOptions } from 'mongodb'
 import { MongoChangeEvent } from '../../../../cross-cutting-concerns/infrastructure/mongodb/mongo-change-event'
+import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
 
 interface MongoDevice {
   _id: string
@@ -29,8 +30,15 @@ const VIDEO_MIXER_NAME: string = 'atem'
  * Once proper device settings are introduced in Alba this SHOULD be deleted!
  */
 export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDevice> implements VideoMixerDeviceRepository {
-  public constructor(mongoDatabase: MongoDatabase, private readonly deviceEventEmitter: DeviceEventEmitter) {
+  private readonly logger: Logger
+
+  public constructor(
+    mongoDatabase: MongoDatabase,
+    private readonly deviceEventEmitter: DeviceEventEmitter,
+    logger: Logger,
+  ) {
     super(mongoDatabase)
+    this.logger = logger.tag(this.constructor.name)
     mongoDatabase.onConnect(COLLECTION_NAME, () => this.listenForVideoMixerChanges())
   }
 
@@ -44,8 +52,12 @@ export class MongoVideoMixerDeviceRepository extends BaseMongoRepository<MongoDe
           if (!mongoDevice || !mongoDevice.settings || !mongoDevice.settings.devices) {
             return
           }
-          const videoMixerConfiguration: VideoMixerConfiguration = this.findVideoMixerConfiguration(mongoDevice)
-          this.deviceEventEmitter.emitVideoMixerConfigurationUpdated(videoMixerConfiguration)
+          try {
+            const videoMixerConfiguration: VideoMixerConfiguration = this.findVideoMixerConfiguration(mongoDevice)
+            this.deviceEventEmitter.emitVideoMixerConfigurationUpdated(videoMixerConfiguration)
+          } catch (error) {
+            this.logger.data(error).warn('Failed getting a video mixer configuration.')
+          }
           break
         }
         default: {

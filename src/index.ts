@@ -319,7 +319,7 @@ async function main(logger: Logger): Promise<void> {
   const inewsIngestConfigurationEventService: InewsIngestConfigurationEventService = new InewsIngestConfigurationEventService(typedEventBus, inewsIngestConfigurationEventBuilder)
 
   // Data change listeners
-  const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService)
+  const videoMixerDeviceRepository: VideoMixerDeviceRepository = new MongoVideoMixerDeviceRepository(mongoDatabase, deviceEventService, logger)
 
   // Shared resources
   const rundownAsyncLock: AsyncLock = new AsyncLock(logger)
