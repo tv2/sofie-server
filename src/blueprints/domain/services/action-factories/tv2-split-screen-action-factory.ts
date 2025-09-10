@@ -506,6 +506,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     const audioTimelineObjects: Tv2BlueprintTimelineObject[] = Object.values(audioTimelineObjectsForBoxes).flat()
 
     const metadata: PieceMetadata = {
+      outputLayer: OutputLayer.PROGRAM,
       playoutContent: {
         type: PlayoutContentType.SPLIT_SCREEN,
         layout: splitScreenConfiguration.name,
