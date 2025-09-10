@@ -523,7 +523,7 @@ export class SuperflyTimelineBuilder implements TimelineBuilder {
     rundown
       .getInfinitePieces()
       .filter(piece => piece.transitionType === TransitionType.NO_TRANSITION)
-      .filter(piece => piece.getPartId() !== activePart.id)
+      .filter(piece => piece.getPartId() !== activePart.id || !activePart.containsPiece(piece.id))
       .filter(piece => !piece.hasEnded(now))
       .forEach((piece) => {
         if (!piece.getExecutedAt()) {

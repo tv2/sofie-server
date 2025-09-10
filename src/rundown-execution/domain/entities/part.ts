@@ -442,4 +442,8 @@ export class Part {
     }
     return new Part(partInterface)
   }
+
+  public containsPiece(pieceId: string): boolean {
+    return this.pieces.some(piece => piece.id === pieceId)
+  }
 }

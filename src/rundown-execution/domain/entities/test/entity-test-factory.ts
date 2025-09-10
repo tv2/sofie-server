@@ -112,6 +112,12 @@ export class EntityTestFactory {
       isOnAir: false,
       ingestedPart: this.createIngestedPart(),
       pieces: [],
+      timings: {
+        delayStartOfPiecesDuration: 0,
+        postRollDuration: 0,
+        previousPartContinueIntoPartDuration: 0,
+        inTransitionStart: undefined
+      },
       ...partInterface,
     }
   }
