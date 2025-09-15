@@ -73,8 +73,7 @@ export class BlueprintTimelineBuilder implements TimelineBuilder {
       rundown.getShowStyleVariantId(),
       timeline,
       rundown.getActivePart(),
-      rundown.getPersistentState(),
-      rundown.getPreviousPart()
+      rundown.getPersistentState()
     )
   }
 }
