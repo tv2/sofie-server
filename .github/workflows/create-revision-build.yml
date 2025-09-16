@@ -1,0 +1,27 @@
+name: 'Create Revision Build'
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+
+jobs:
+  create-revision-build:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: write
+    steps:
+      - name: 'Create revision build'
+        uses: tv2/ag-github-actions/.github/actions/create-revision-build@v0.2.0
+        with:
+          docker_repo: tv2media/alba-server
+          docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
+          docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: 'Build migrations'
+        uses: tv2/ag-github-actions/.github/actions/create-revision-build@v0.2.0
+        with:
+           docker_repo: tv2media/alba-server-migrations
+           docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
+           docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
+           docker_context: './migrations'
