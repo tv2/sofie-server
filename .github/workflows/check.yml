@@ -6,10 +6,6 @@ on:
   push:
     branches: [main]
 
-concurrency:
-  group: '${{ github.workflow }}-${{ github.ref }}'
-  cancel-in-progress: true
-
 jobs:
   status:
     uses: tv2/ag-github-actions/.github/workflows/status-check.yml@v0.2.0
