@@ -30,7 +30,7 @@ export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
     // so this basically evaluates to all Pieces always being "active"
     // which means we can just do Part.getPieces()
 
-    endState.sisyfosPersistenceMetadata.sisyfosLayers = this.getAudioLayersToPePersisted(part, time, previousPart)
+    endState.sisyfosPersistenceMetadata.sisyfosLayers = this.getAudioLayersToBePersisted(part, time, previousPart)
 
     for (const piece of part.getPieces()) {
       if (piece.tags.includes(Tv2TallyTags.JINGLE_IS_LIVE)) {
@@ -46,7 +46,7 @@ export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
     return endState
   }
 
-  private getAudioLayersToPePersisted(part: Part, time: number, previousPart?: Part): string[] {
+  private getAudioLayersToBePersisted(part: Part, time: number, previousPart?: Part): string[] {
     const partPieceMetadata: SisyfosPersistenceMetadata | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetadata(part, time)
     const audioLayersToPersist: Set<string> = new Set(partPieceMetadata?.wantsToPersistAudio ? [...partPieceMetadata.sisyfosLayers] : [])
 
