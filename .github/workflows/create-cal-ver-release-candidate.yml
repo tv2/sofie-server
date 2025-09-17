@@ -11,10 +11,10 @@ jobs:
     steps:
       - name: 'Get next CalVer release version'
         id: 'next_release_version'
-        uses: 'tv2/ag-github-actions/.github/actions/get-next-cal-ver-release-version@v0.2.0'
+        uses: 'tv2/ag-github-actions/.github/actions/get-next-cal-ver-release-version@v0.4.0'
 
       - name: 'Call create release action'
-        uses: 'tv2/ag-github-actions/.github/actions/create-release-candidate@v0.2.0'
+        uses: 'tv2/ag-github-actions/.github/actions/create-release-candidate@v0.4.0'
         with:
           release_version: ${{ steps.next_release_version.outputs.release_version }}
           docker_repo: 'tv2media/alba-server'

@@ -8,7 +8,7 @@ on:
 
 jobs:
   status:
-    uses: tv2/ag-github-actions/.github/workflows/status-check.yml@v0.2.0
+    uses: tv2/ag-github-actions/.github/workflows/status-check.yml@v0.4.0
     with:
       node-version: '22.6'
     secrets:

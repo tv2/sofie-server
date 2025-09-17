@@ -11,7 +11,10 @@ const config: Config.InitialOptions = {
       'ts-jest',
       { tsconfig: './tsconfig.test.json' }
     ]
-  }
+  },
+  collectCoverage: true,
+  coverageDirectory: './coverage',
+  coverageReporters: ['json', 'json-summary', 'lcov', 'text'],
 }
 
 export default config
