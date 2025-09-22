@@ -1,5 +1,4 @@
 import { Tv2OnTimelineGenerateService } from './tv2-on-timeline-generate-service'
-import { Tv2SisyfosPersistentLayerFinder } from './tv2-sisyfos-persistent-layer-finder'
 import { anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { EntityMockFactory } from '../../../rundown-execution/domain/entities/test/entity-mock-factory'
@@ -26,39 +25,6 @@ const SHOW_STYLE_VARIANT_ID: string = 'showStyleVariantId'
 
 describe(Tv2OnTimelineGenerateService.name, () => {
   describe(`${Tv2OnTimelineGenerateService.prototype.onTimelineGenerate.name}`, () => {
-    describe('the active Part is from the same Segment as the previous Part', () => {
-      it('sets isNewSegment to false', () => {
-        const configuration: Configuration = {} as Configuration
-        const timeline: Timeline = createTimeline()
-        const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState()
-        const segmentId: string = 'segmentId'
-        const activePart: Part = EntityMockFactory.createPart({ segmentId })
-        const previousPart: Part = EntityMockFactory.createPart({ segmentId })
-
-        const testee: Tv2OnTimelineGenerateService = createTestee()
-        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, activePart, rundownPersistentState, previousPart)
-        const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
-
-        expect(result.isNewSegment).toBeFalsy()
-      })
-    })
-
-    describe('the active Part is from a different Segment than the previous Part', () => {
-      it('sets isNewSegment to true', () => {
-        const configuration: Configuration = {} as Configuration
-        const timeline: Timeline = createTimeline()
-        const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState()
-        const activePart: Part = EntityMockFactory.createPart({ segmentId: 'someSegmentId' })
-        const previousPart: Part = EntityMockFactory.createPart({ segmentId: 'someOtherSegmentId' })
-
-        const testee: Tv2OnTimelineGenerateService = createTestee()
-        const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, activePart, rundownPersistentState, previousPart)
-        const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
-
-        expect(result.isNewSegment).toBeTruthy()
-      })
-    })
-
     describe('there are no assigned mediaPlayerSessions', () => {
       describe('there are no TimelineObjects who wants to have use a MediaPlayer', () => {
         it('assigns no MediaPlayerSessions', () => {
@@ -70,7 +36,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(0)
@@ -92,7 +58,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
 
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
             expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -117,7 +83,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
               const part: Part = EntityMockFactory.createPart()
 
               const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-              const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+              const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
 
               const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
               expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -142,7 +108,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -165,7 +131,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -190,7 +156,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -216,7 +182,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -245,7 +211,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -271,7 +237,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -298,7 +264,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(0)
@@ -327,7 +293,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -361,7 +327,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -401,7 +367,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -442,7 +408,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -487,7 +453,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -532,7 +498,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -574,7 +540,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
@@ -615,7 +581,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
             const part: Part = EntityMockFactory.createPart()
 
             const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+            const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
             const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
             expect(result.activeMediaPlayerSessions).toHaveLength(2)
@@ -633,18 +599,11 @@ describe(Tv2OnTimelineGenerateService.name, () => {
 
 function createTestee(params?: {
   mediaPlayerIds?: string[]
-  sisyfosPersistentLayerFinder?: Tv2SisyfosPersistentLayerFinder
 }): Tv2OnTimelineGenerateService {
-  let sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder | undefined = params?.sisyfosPersistentLayerFinder
-  if (!params?.sisyfosPersistentLayerFinder) {
-    const sisyfosPersistentLayerFinderMock: Tv2SisyfosPersistentLayerFinder = mock(Tv2SisyfosPersistentLayerFinder)
-    when(sisyfosPersistentLayerFinderMock.findLayersToPersist(anything(), anything(), anything())).thenReturn([])
-    sisyfosPersistentLayerFinder = instance(sisyfosPersistentLayerFinderMock)
-  }
   const mediaPlayerIds: string[] = params && params.mediaPlayerIds ? params.mediaPlayerIds : []
   const configurationMapperMock: Tv2ConfigurationMapper = mock(Tv2ConfigurationMapper)
   when(configurationMapperMock.mapBlueprintConfiguration(anything(), SHOW_STYLE_VARIANT_ID)).thenReturn(createConfiguration(mediaPlayerIds))
-  return new Tv2OnTimelineGenerateService(instance(configurationMapperMock), sisyfosPersistentLayerFinder!)
+  return new Tv2OnTimelineGenerateService(instance(configurationMapperMock))
 }
 
 function createConfiguration(abMediaPlayerIds?: string[]): Tv2BlueprintConfiguration {
@@ -697,8 +656,7 @@ function createTimelineObjectGroup(timelineObjectGroup: Partial<TimelineObjectGr
 
 function createRundownPersistentState(activeMediaPlayerSessions?: Tv2MediaPlayerSession[]): Tv2RundownPersistentState {
   return {
-    activeMediaPlayerSessions: activeMediaPlayerSessions ?? [],
-    isNewSegment: false
+    activeMediaPlayerSessions: activeMediaPlayerSessions ?? []
   }
 }
 

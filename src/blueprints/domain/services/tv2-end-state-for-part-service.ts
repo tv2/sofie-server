@@ -1,9 +1,6 @@
 import { BlueprintGetEndStateForPart } from '../../../rundown-execution/domain/value-objects/blueprint'
-import { RundownPersistentState } from '../../../rundown-execution/domain/value-objects/rundown-persistent-state'
 import { Part } from '../../../rundown-execution/domain/entities/part'
-import { PartEndState } from '../../../rundown-execution/domain/value-objects/part-end-state'
 import { Tv2PartEndState } from '../value-objects/tv2-part-end-state'
-import { Tv2RundownPersistentState } from '../value-objects/tv2-rundown-persistent-state'
 import { Tv2TallyTags } from '../value-objects/tv2-tally-tags'
 import { Tv2FileContent } from '../value-objects/tv2-content'
 import { Tv2SisyfosPersistentLayerFinder } from './tv2-sisyfos-persistent-layer-finder'
@@ -20,8 +17,7 @@ export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
     part: Part,
     previousPart: Part | undefined,
     time: number,
-    rundownPersistentState: RundownPersistentState | undefined
-  ): PartEndState {
+  ): Tv2PartEndState {
     const endState: Tv2PartEndState = {
       sisyfosPersistenceMetadata: {
         sisyfosLayers: [],
@@ -34,17 +30,7 @@ export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
     // so this basically evaluates to all Pieces always being "active"
     // which means we can just do Part.getPieces()
 
-    const previousPersistentState: Tv2RundownPersistentState = (rundownPersistentState ?? this.getEmptyTv2RundownPersistentState()) as Tv2RundownPersistentState
-    const previousPartEndState: Tv2PartEndState | undefined = previousPart?.getEndState() as
-      | Tv2PartEndState
-      | undefined
-
-    endState.sisyfosPersistenceMetadata = this.calculateSisyfosPersistenceMetaData(
-      part,
-      previousPartEndState,
-      time,
-      previousPersistentState
-    )
+    endState.sisyfosPersistenceMetadata.sisyfosLayers = this.getAudioLayersToBePersisted(part, time, previousPart)
 
     for (const piece of part.getPieces()) {
       if (piece.tags.includes(Tv2TallyTags.JINGLE_IS_LIVE)) {
@@ -60,32 +46,16 @@ export class Tv2EndStateForPartService implements BlueprintGetEndStateForPart {
     return endState
   }
 
-  private getEmptyTv2RundownPersistentState(): Tv2RundownPersistentState {
-    return {
-      activeMediaPlayerSessions: [],
-      isNewSegment: false
-    }
-  }
+  private getAudioLayersToBePersisted(part: Part, time: number, previousPart?: Part): string[] {
+    const partPieceMetadata: SisyfosPersistenceMetadata | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetadata(part, time)
+    const audioLayersToPersist: Set<string> = new Set(partPieceMetadata?.wantsToPersistAudio ? [...partPieceMetadata.sisyfosLayers] : [])
 
-  private calculateSisyfosPersistenceMetaData(
-    part: Part,
-    previousPartEndState: Tv2PartEndState | undefined,
-    time: number,
-    rundownPersistentState: Tv2RundownPersistentState
-  ): SisyfosPersistenceMetadata {
-    const layersWantingToPersist: string[] = this.findLayersWantingToPersist(rundownPersistentState, previousPartEndState)
-    const sisyfosPersistenceMetadata: SisyfosPersistenceMetadata | undefined = this.sisyfosPersistentLayerFinder.findLastPlayingPieceMetadata(part, time)
-    return {
-      sisyfosLayers: sisyfosPersistenceMetadata?.wantsToPersistAudio
-        ? this.sisyfosPersistentLayerFinder.findLayersToPersistForPieceMetadata(sisyfosPersistenceMetadata, layersWantingToPersist)
-        : []
+    const arePartsFromSameSegment: boolean = part.getSegmentId() === previousPart?.getSegmentId()
+    if (arePartsFromSameSegment && partPieceMetadata?.acceptsPersistedAudio) {
+      const previousPartEndState: Tv2PartEndState | undefined = previousPart?.getEndState() as Tv2PartEndState | undefined
+      previousPartEndState?.sisyfosPersistenceMetadata.sisyfosLayers.forEach(layer => audioLayersToPersist.add(layer))
     }
-  }
 
-  private findLayersWantingToPersist(rundownPersistentState: Tv2RundownPersistentState, previousPartEndState: Tv2PartEndState | undefined): string[] {
-    if (rundownPersistentState.isNewSegment || !previousPartEndState?.sisyfosPersistenceMetadata) {
-      return []
-    }
-    return previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
+    return Array.from(audioLayersToPersist)
   }
 }

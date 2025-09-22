@@ -416,7 +416,7 @@ function createBlueprint(objectCloner: DeepObjectCloner, logger: Logger): Bluepr
 
   return new Tv2Blueprint(
     new Tv2EndStateForPartService(sisyfosPersistentLayerFinder),
-    new Tv2OnTimelineGenerateService(configurationMapper, sisyfosPersistentLayerFinder),
+    new Tv2OnTimelineGenerateService(configurationMapper),
     tv2ActionService,
     new Tv2BlueprintConfigurationValidator(configurationMapper),
     new Tv2BlueprintBaselinePiecesGenerator(new Tv2StudioBlueprintConfigurationMapper(), timelineObjectFactoryProvider)
