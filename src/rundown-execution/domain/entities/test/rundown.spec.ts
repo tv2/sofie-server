@@ -4,7 +4,7 @@ import { Part } from '../part'
 import { Piece } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
 import { EntityMockFactory } from './entity-mock-factory'
-import { capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
+import { anything, capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
 import { NotActivatedException } from '../../exceptions/not-activated-exception'
 import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { LastPartInSegmentException } from '../../exceptions/last-part-in-segment-exception'
@@ -722,7 +722,7 @@ describe(Rundown.name, () => {
           expect(layersToIgnore.has(layer)).toBeTruthy()
         })
 
-        it('sets executedAt to zero for the Piece no longer being an infinite', () => {
+        it('takes the Piece off Air for the Piece no longer being an infinite', () => {
           const layer: string = 'someLayer'
 
           const firstPartId: string = 'firstPartId'
@@ -780,7 +780,7 @@ describe(Rundown.name, () => {
 
           testee.takeNext()
 
-          verify(mockFirstPiece.resetExecution()).once()
+          verify(mockFirstPiece.takeOffAir(anything())).once()
         })
       })
     })
@@ -1181,6 +1181,7 @@ describe(Rundown.name, () => {
             id: 'firstPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+            executedAt: 10
           })
           const firstPart: Part = EntityTestFactory.createPart({
             id: 'firstPart',
@@ -1264,6 +1265,7 @@ describe(Rundown.name, () => {
             id: 'lastPiece',
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+            executedAt: 10
           })
           const lastPart: Part = EntityTestFactory.createPart({
             id: 'lastPart',
@@ -1898,6 +1900,7 @@ describe(Rundown.name, () => {
             partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
+            executedAt: 10
           })
           const segmentId: string = 'segment-id'
           const firstPart: Part = EntityTestFactory.createPart({
@@ -1977,6 +1980,7 @@ describe(Rundown.name, () => {
             partId: lastPartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
+            executedAt: 10
           })
           const lastPart: Part = EntityTestFactory.createPart({
             id: lastPartId,
@@ -2139,6 +2143,7 @@ describe(Rundown.name, () => {
             partId: firstPartId,
             layer,
             pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE,
+            executedAt: 10
           })
           const segmentId: string = 'segment-id'
           const firstPart: Part = EntityTestFactory.createPart({
@@ -2681,7 +2686,7 @@ describe(Rundown.name, () => {
       describe('it "skips" a Segment with a "spanningThenSticky" infinite Piece', () => {
         it('does not change the infinite Piece', () => {
           const firstPartId: string = 'first-part-id'
-          const firstPiece: Piece = EntityTestFactory.createPiece({ id: 'first-piece-id', partId: firstPartId, pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN })
+          const firstPiece: Piece = EntityTestFactory.createPiece({ id: 'first-piece-id', partId: firstPartId, pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN, executedAt: 10 })
           const firstSegmentId: string = 'first-segment-id'
           const firstPart: Part = EntityTestFactory.createPart({ id: firstPartId, segmentId: firstSegmentId, pieces: [firstPiece] })
           const firstSegment: Segment = EntityTestFactory.createSegment({ id: firstSegmentId, parts: [firstPart] })
@@ -2729,6 +2734,7 @@ describe(Rundown.name, () => {
               id: 'first-piece-id',
               partId: firstPartId,
               pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
+              executedAt: 10
             })
             const firstSegmentId: string = 'first-segment-id'
             const firstPart: Part = EntityTestFactory.createPart({ id: firstPartId, segmentId: firstSegmentId, pieces: [firstPiece] })
@@ -2743,6 +2749,7 @@ describe(Rundown.name, () => {
               id: 'last-piece-id',
               partId: lastPartId,
               pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
+              executedAt: 10
             })
             const lastSegmentId: string = 'last-segment-id'
             const lastPart: Part = EntityTestFactory.createPart({ id: lastPartId, segmentId: lastSegmentId, isOnAir: true, pieces: [lastPiece] })
@@ -2796,6 +2803,7 @@ describe(Rundown.name, () => {
               id: 'last-piece-id',
               partId: lastPartId,
               pieceLifespan: PieceLifespan.START_SPANNING_SEGMENT_THEN_STICKY_RUNDOWN,
+              executedAt: 10
             })
             const lastSegmentId: string = 'last-segment-id'
             const lastPart: Part = EntityTestFactory.createPart({ id: lastPartId, segmentId: lastSegmentId, isOnAir: true, pieces: [lastPiece] })
@@ -2947,7 +2955,7 @@ describe(Rundown.name, () => {
           const rundownId: string = 'randomRundownId'
           const pieceLayer: string = 'somePieceLayer'
           const baselinePiece: Piece = EntityTestFactory.createPiece({ id: 'baselinePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
-          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'infinitePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE })
+          const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'infinitePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE, executedAt: 10 })
 
           const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
           const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart' })
@@ -3014,11 +3022,11 @@ describe(Rundown.name, () => {
             expect(testee.getInfinitePieces()).not.toContain(baselinePiece)
           })
 
-          it('Resets the executedAt of the baseline Piece', () => {
+          it('Takes the baseline Piece off Air', () => {
             const rundownId: string = 'randomRundownId'
             const pieceLayer: string = 'somePieceLayer'
             const baselinePiece: Piece = EntityTestFactory.createPiece({ id: 'baselinePiece', executedAt: 1000, rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END })
-            const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'infinitePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE })
+            const infinitePiece: Piece = EntityTestFactory.createPiece({ id: 'infinitePiece', rundownId, layer: pieceLayer, pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE, executedAt: 1100 })
 
             const activePart: Part = EntityTestFactory.createPart({ id: 'activePart' })
             const nextPart: Part = EntityTestFactory.createPart({ id: 'nextPart', pieces: [infinitePiece] })
@@ -3044,9 +3052,9 @@ describe(Rundown.name, () => {
             }))
             testee.updateBaselinePieces([baselinePiece])
 
-            expect(baselinePiece.getExecutedAt()).toBeGreaterThan(0)
+            expect(baselinePiece.getTakenOffAirTimestamp()).toBe(0)
             testee.takeNext()
-            expect(baselinePiece.getExecutedAt()).toBe(0)
+            expect(baselinePiece.getTakenOffAirTimestamp()).toBeGreaterThan(0)
           })
         })
       })

@@ -428,7 +428,7 @@ export class Rundown extends BasicRundown {
     layersWithPieces = this.addSpanningPiecesNotOnLayersFromPreviousSegments(layersWithPieces)
 
     this.addBaselinePiecesNotOnLayers(layersWithPieces)
-    this.resetInfinitePiecesNoLongerPresent(layersWithPieces)
+    this.takeOffAirInfinitePiecesNoLongerPresent(layersWithPieces)
     this.setInfinitePieces(layersWithPieces)
   }
 
@@ -437,7 +437,7 @@ export class Rundown extends BasicRundown {
   }
 
   private isPieceOutlived(piece: Piece): boolean {
-    if (piece.hasEnded(Date.now())) {
+    if (!piece.isStarted() || piece.hasEnded(Date.now())) {
       return true
     }
     switch (piece.pieceLifespan) {
@@ -467,14 +467,15 @@ export class Rundown extends BasicRundown {
     }
   }
 
-  private resetInfinitePiecesNoLongerPresent(newInfinitePieces: Map<string, Piece[]>): void {
+  private takeOffAirInfinitePiecesNoLongerPresent(newInfinitePieces: Map<string, Piece[]>): void {
+    const now: number = Date.now()
     const activePartId: string | undefined = this.getActiveCursor()?.part.id
     this.infinitePieces.forEach((infinitePiecesOnLayer: Piece[], layer: string) => {
       const newInfinitePiecesOnLayer: Piece[] = newInfinitePieces.get(layer) ?? []
       infinitePiecesOnLayer
         .filter(pieceOnLayer => newInfinitePiecesOnLayer.every(newPieceOnLayer => newPieceOnLayer.id !== pieceOnLayer.id))
         .filter(pieceOnLayer => pieceOnLayer.getPartId() !== activePartId)
-        .forEach(pieceNoLongerPresent => pieceNoLongerPresent.resetExecution())
+        .forEach(pieceNoLongerPresent => pieceNoLongerPresent.takeOffAir(now))
     })
   }
 
@@ -581,6 +582,18 @@ export class Rundown extends BasicRundown {
 
     this.markNextSegment()
     this.markNextPart()
+
+    this.pruneInactiveInfinitePieces()
+  }
+
+  private pruneInactiveInfinitePieces(): void {
+    const now: number = Date.now()
+    const newLayersWithPieces: Map<string, Piece[]> = new Map()
+    this.infinitePieces.forEach((pieces, layer) => {
+      newLayersWithPieces.set(layer, pieces.filter(piece => piece.isStarted() && !piece.hasEnded(now)))
+    })
+
+    this.setInfinitePieces(newLayersWithPieces)
   }
 
   public setNextFromDirection(direction: SetNextDirection, owner?: Owner): void {
