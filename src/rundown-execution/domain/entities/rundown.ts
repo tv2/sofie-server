@@ -437,7 +437,7 @@ export class Rundown extends BasicRundown {
   }
 
   private isPieceOutlived(piece: Piece): boolean {
-    if (!piece.isStarted() || piece.hasEnded(Date.now())) {
+    if (!piece.hasStarted() || piece.hasEnded(Date.now())) {
       return true
     }
     switch (piece.pieceLifespan) {
@@ -590,7 +590,7 @@ export class Rundown extends BasicRundown {
     const now: number = Date.now()
     const newLayersWithPieces: Map<string, Piece[]> = new Map()
     this.infinitePieces.forEach((pieces, layer) => {
-      newLayersWithPieces.set(layer, pieces.filter(piece => piece.isStarted() && !piece.hasEnded(now)))
+      newLayersWithPieces.set(layer, pieces.filter(piece => piece.hasStarted() && !piece.hasEnded(now)))
     })
 
     this.setInfinitePieces(newLayersWithPieces)

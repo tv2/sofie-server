@@ -244,7 +244,7 @@ export class EntityMockFactory {
     })
 
     when(mockedPiece.getExecutedAt()).thenReturn(misc.executedAt ?? 0)
-    when(mockedPiece.isStarted()).thenReturn(!!misc.executedAt && misc.executedAt > 0)
+    when(mockedPiece.hasStarted()).thenReturn(!!misc.executedAt && misc.executedAt > 0)
 
     return mockedPiece
   }

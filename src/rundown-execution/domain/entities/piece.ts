@@ -123,10 +123,7 @@ export class Piece {
   }
 
   private isActiveInfinitePiece(): boolean {
-    if (this.pieceLifespan === PieceLifespan.WITHIN_PART) {
-      return false
-    }
-    return this.isStarted() && !this.hasEnded(Date.now())
+    return this.isInfinitePiece() && this.hasStarted() && !this.hasEnded(Date.now())
   }
 
   public getExecutedAt(): number {
@@ -218,12 +215,12 @@ export class Piece {
     this.insertedTimelineObjects.push(...timelineObjects)
   }
 
-  public isStarted(): boolean {
+  public hasStarted(): boolean {
     return this.executedAt > 0
   }
 
   public hasEnded(timestamp: number): boolean {
-    if (!this.isStarted()) {
+    if (!this.hasStarted()) {
       return false
     }
     const pieceDuration: number = this.expectedDuration || Infinity
