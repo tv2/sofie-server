@@ -8,7 +8,7 @@
 
 
 ## Change description
-<!-- Describe the changes introduces in the PR. -->
+<!-- Describe the changes introduced in the PR. -->
 <!-- Add diagrams (e.g. mermaid), photos and/or videos, when appropriate. -->
 
 
