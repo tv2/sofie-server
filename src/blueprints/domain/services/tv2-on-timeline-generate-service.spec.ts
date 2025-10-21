@@ -444,7 +444,7 @@ describe(Tv2OnTimelineGenerateService.name, () => {
           const part: Part = EntityMockFactory.createPart()
 
           const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
-          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState, undefined)
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
           const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
 
           expect(result.activeMediaPlayerSessions).toHaveLength(1)
