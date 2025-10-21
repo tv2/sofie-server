@@ -54,8 +54,8 @@ export class ActionController extends BaseController {
     try {
       const actionId: string = request.params.actionId
       const rundownId: string = request.params.rundownId
-      const body: ExecuteActionRequestBody = request.body
-      await this.actionService.executeAction(actionId, rundownId, body.actionArguments ?? undefined)
+      const body: ExecuteActionRequestBody | undefined = request.body
+      await this.actionService.executeAction(actionId, rundownId, body?.actionArguments ?? undefined)
       response.send(this.httpResponseFormatter.formatSuccessResponse(`Successfully executed action: ${actionId} on Rundown: ${rundownId}`))
     } catch (error) {
       this.httpErrorHandler.handleError(response, error as Exception)

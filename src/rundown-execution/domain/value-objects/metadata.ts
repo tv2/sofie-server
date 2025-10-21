@@ -10,10 +10,6 @@ export interface SisyfosPersistenceMetadata {
    */
   sisyfosLayers: string[]
   /**
-   * The layers this piece gathered from previous pieces and wants to persist into the next part
-   */
-  previousSisyfosLayers?: string[]
-  /**
    * Whether `sisyfosLayers` and `previousSisyfosLayers` may be persisted into the next part if accepted
    */
   wantsToPersistAudio?: boolean
@@ -21,10 +17,6 @@ export interface SisyfosPersistenceMetadata {
    * Whether `sisyfosLayers` and `previousSisyfosLayers` from the previous part may be persisted
    */
   acceptsPersistedAudio?: boolean
-  /**
-   * Whether the piece was inserted/updated by fast Camera/Live cutting within a part or fading down persisted levels
-   */
-  isModifiedOrInsertedByAction?: boolean
 }
 
 export interface PieceMetadata {

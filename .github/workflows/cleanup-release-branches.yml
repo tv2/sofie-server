@@ -1,0 +1,15 @@
+name: 'Cleanup Release Branches'
+
+on:
+  schedule:
+    - cron: '0 0 1 */6 *' # every six months
+  workflow_dispatch:
+
+jobs:
+  cleanup-release-branches:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 'Call cleanup release branches workflow'
+        uses: 'tv2/ag-github-actions/.github/actions/cleanup-release-branches@v0.4.0'

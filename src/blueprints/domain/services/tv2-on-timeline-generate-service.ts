@@ -5,8 +5,9 @@ import { Tv2SisyfosLayer } from '../value-objects/tv2-layers'
 import { Tv2MediaPlayerSession, Tv2RundownPersistentState } from '../value-objects/tv2-rundown-persistent-state'
 import { TimelineObject, TimelineObjectGroup } from '../../../rundown-execution/domain/entities/timeline-object'
 import { Tv2PartEndState } from '../value-objects/tv2-part-end-state'
-import { Tv2SisyfosPersistentLayerFinder } from './tv2-sisyfos-persistent-layer-finder'
-import { UnsupportedOperationException } from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
+import {
+  UnsupportedOperationException
+} from '../../../cross-cutting-concerns/domain/exceptions/unsupported-operation-exception'
 import { Tv2BlueprintTimelineObject } from '../value-objects/tv2-blueprint-timeline-object'
 import { Tv2MediaPlayer } from '../value-objects/tv2-studio-blueprint-configuration'
 import { Timeline } from '../../../rundown-execution/domain/entities/timeline'
@@ -20,7 +21,10 @@ import {
 import { A_B_SOURCE_INPUT_PLACEHOLDER, A_B_SOURCE_LAYERS } from '../value-objects/tv2-a-b-source-layers'
 import { Configuration } from '../../../rundown-execution/domain/entities/configuration'
 import { Tv2BlueprintConfiguration } from '../value-objects/tv2-blueprint-configuration'
-import { SisyfosChannelsTimelineObject, SisyfosType } from '../value-objects/timeline-state-resolver-types/sisyfos-types'
+import {
+  SisyfosChannelsTimelineObject,
+  SisyfosType
+} from '../value-objects/timeline-state-resolver-types/sisyfos-types'
 import { OnTimelineGenerateResult } from '../../../rundown-execution/domain/value-objects/on-timeline-generate-result'
 import { Tv2ConfigurationMapper } from './tv2-configuration-mapper'
 import {
@@ -39,8 +43,7 @@ const PREVIOUS_GROUP_PREFIX: string = 'previous_group_'
 
 export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate {
   public constructor(
-    private readonly configurationMapper: Tv2ConfigurationMapper,
-    private readonly sisyfosPersistentLayerFinder: Tv2SisyfosPersistentLayerFinder
+    private readonly configurationMapper: Tv2ConfigurationMapper
   ) {}
 
   public onTimelineGenerate(
@@ -48,18 +51,16 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     showStyleVariantId: string,
     timeline: Timeline,
     activePart: Part,
-    previousRundownPersistentState: RundownPersistentState | undefined,
-    previousPart: Part | undefined,
+    previousRundownPersistentState: RundownPersistentState | undefined
   ): OnTimelineGenerateResult {
     const blueprintConfiguration: Tv2BlueprintConfiguration = this.configurationMapper.mapBlueprintConfiguration(configuration, showStyleVariantId)
 
     const rundownPersistentState: Tv2RundownPersistentState = (previousRundownPersistentState ?? this.getEmptyTv2RundownPersistentState()) as Tv2RundownPersistentState
     const newRundownPersistentState: Tv2RundownPersistentState = {
-      activeMediaPlayerSessions: [],
-      isNewSegment: previousPart?.getSegmentId() !== activePart.getSegmentId(),
+      activeMediaPlayerSessions: []
     }
 
-    this.assignSisyfosPersistMetadata(newRundownPersistentState, activePart, previousPart, timeline)
+    this.assignSisyfosPersistMetadata(activePart, timeline)
 
     newRundownPersistentState.activeMediaPlayerSessions = this.assignMediaPlayerSessions(rundownPersistentState.activeMediaPlayerSessions, timeline, blueprintConfiguration)
 
@@ -68,18 +69,12 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
 
   private getEmptyTv2RundownPersistentState(): Tv2RundownPersistentState {
     return {
-      activeMediaPlayerSessions: [],
-      isNewSegment: false
+      activeMediaPlayerSessions: []
     }
   }
 
-  private assignSisyfosPersistMetadata(rundownPersistentState: Tv2RundownPersistentState, activePart: Part, previousPart: Part | undefined, timeline: Timeline): void {
-    if (rundownPersistentState.isNewSegment && !this.isAnySisyfosPieceInjectedIntoPart(activePart)) {
-      return
-    }
-
-    const sisyfosPersistedLevelsTimelineObject: TimelineObject
-      = this.createSisyfosPersistedLevelsTimelineObject(activePart, previousPart, rundownPersistentState)
+  private assignSisyfosPersistMetadata(activePart: Part, timeline: Timeline): void {
+    const sisyfosPersistedLevelsTimelineObject: TimelineObject = this.createSisyfosPersistedLevelsTimelineObject(activePart)
     const activeTimelineObjectGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
       timelineObject => timelineObject.id.includes(ACTIVE_GROUP_PREFIX)
     )
@@ -89,28 +84,10 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     activeTimelineObjectGroup.children.push(sisyfosPersistedLevelsTimelineObject)
   }
 
-  private isAnySisyfosPieceInjectedIntoPart(part: Part): boolean {
-    // TODO: This is a hacky way to check if a Piece is an AdLib. It should not be hidden away in meta data for Sisyfos...
-    return part.getPieces().some((piece) => {
-      return piece.metadata && piece.metadata.sisyfosPersistMetaData?.isModifiedOrInsertedByAction
-    })
-  }
+  private createSisyfosPersistedLevelsTimelineObject(part: Part): SisyfosChannelsTimelineObject {
+    const partEndState: Tv2PartEndState | undefined = part.getEndState() as Tv2PartEndState | undefined
+    const layersToPersist: string[] = partEndState?.sisyfosPersistenceMetadata.sisyfosLayers ?? []
 
-  private createSisyfosPersistedLevelsTimelineObject(
-    part: Part,
-    previousPart: Part | undefined,
-    rundownPersistentState: Tv2RundownPersistentState
-  ): SisyfosChannelsTimelineObject {
-    const previousPartEndState: Tv2PartEndState = previousPart?.getEndState() as Tv2PartEndState
-    const layersWantingToPersistFromPreviousPart: string[]
-        = previousPartEndState && !rundownPersistentState.isNewSegment
-          ? previousPartEndState.sisyfosPersistenceMetadata.sisyfosLayers
-          : []
-    const layersToPersist: string[] = this.sisyfosPersistentLayerFinder.findLayersToPersist(
-      part,
-      undefined,
-      layersWantingToPersistFromPreviousPart
-    )
     return {
       id: 'sisyfosPersistenceObject',
       enable: {

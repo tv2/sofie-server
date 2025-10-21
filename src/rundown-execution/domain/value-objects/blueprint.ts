@@ -16,8 +16,7 @@ export interface BlueprintOnTimelineGenerate {
     showStyleVariantId: string,
     timeline: Timeline,
     activePart: Part,
-    previousRundownPersistentState: RundownPersistentState | undefined,
-    previousPart: Part | undefined,
+    previousRundownPersistentState: RundownPersistentState | undefined
   ): OnTimelineGenerateResult
 }
 
@@ -25,8 +24,7 @@ export interface BlueprintGetEndStateForPart {
   getEndStateForPart(
     part: Part,
     previousPart: Part | undefined,
-    time: number,
-    rundownPersistentState: RundownPersistentState | undefined
+    time: number
   ): PartEndState
 }
 
