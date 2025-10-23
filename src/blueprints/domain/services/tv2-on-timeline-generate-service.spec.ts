@@ -419,6 +419,38 @@ describe(Tv2OnTimelineGenerateService.name, () => {
             expect(result.activeMediaPlayerSessions[1].mediaPlayer.id).toBe('1')
           })
         })
+
+        describe('there is an infinite group that wants to continue using the MediaPlayer', () => {
+          const mediaPlayerIds: string[] = ['1', '2']
+          const configuration: Configuration = {} as Configuration
+          const mediaPlayerSessionId: string = 'MediaPlayerSessionId'
+          const timeline: Timeline = createTimeline({
+            activeGroupTimelineObjects: [
+            ],
+            infiniteGroupTimelineObjects: [
+              createTimelineObject('infiniteGroupId', { mediaPlayerSession: mediaPlayerSessionId }),
+            ]
+          })
+
+          const activeMediaPlayerSessions: Tv2MediaPlayerSession[] = [
+            {
+              sessionId: mediaPlayerSessionId,
+              mediaPlayer: {
+                id: '1'
+              } as Tv2MediaPlayer
+            }
+          ]
+          const rundownPersistentState: Tv2RundownPersistentState = createRundownPersistentState(activeMediaPlayerSessions)
+          const part: Part = EntityMockFactory.createPart()
+
+          const testee: Tv2OnTimelineGenerateService = createTestee({ mediaPlayerIds })
+          const onTimelineGenerateResult: OnTimelineGenerateResult = testee.onTimelineGenerate(configuration, SHOW_STYLE_VARIANT_ID, timeline, part, rundownPersistentState)
+          const result: Tv2RundownPersistentState = onTimelineGenerateResult.rundownPersistentState as Tv2RundownPersistentState
+
+          expect(result.activeMediaPlayerSessions).toHaveLength(1)
+          expect(result.activeMediaPlayerSessions[0].sessionId).toBe(mediaPlayerSessionId)
+          expect(result.activeMediaPlayerSessions[0].mediaPlayer.id).toBe('1')
+        })
       })
     })
 

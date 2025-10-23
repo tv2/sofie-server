@@ -29,18 +29,6 @@ describe(Piece.name, () => {
     })
   })
 
-  describe(Piece.prototype.resetExecution.name, () => {
-    it('sets executedAt to zero', () => {
-      const testee: Piece = new Piece({} as PieceInterface)
-
-      testee.putOnAir(Date.now())
-      testee.resetExecution()
-
-      const result: number = testee.getExecutedAt()
-      expect(result).toEqual(0)
-    })
-  })
-
   describe(Piece.prototype.setPartId.name, () => {
     describe('Piece is planned', () => {
       it('throws an error', () => {
@@ -160,10 +148,14 @@ describe(Piece.name, () => {
     })
 
     describe('the piece is an infinite piece taken off air', () => {
-      it('it does not reset Piece.executedAt', () => {
+      it('it resets Piece.executedAt', () => {
+        jest.useFakeTimers()
+
         const ingestedPiece: IngestedPiece = EntityTestFactory.createIngestedPiece({})
         const executedAt: number = Date.now()
         const takenOffAirTimestamp: number = executedAt + 1000
+
+        jest.advanceTimersByTime(2000)
 
         const testee: Piece = new Piece({ executedAt, takenOffAirTimestamp, pieceLifespan: PieceLifespan.STICKY_UNTIL_SEGMENT_CHANGE } as PieceInterface)
 

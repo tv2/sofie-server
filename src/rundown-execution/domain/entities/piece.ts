@@ -88,10 +88,7 @@ export class Piece {
   public resetFromIngestedPiece(ingestedPiece: IngestedPiece): void {
     this.start = ingestedPiece.start
     this.expectedDuration = ingestedPiece.duration
-    if (this.pieceLifespan === PieceLifespan.WITHIN_PART || this.takenOffAirTimestamp > 0) {
-      // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset their "executedAt" here.
-      this.resetExecution()
-    }
+    this.resetExecution()
     this.originalTimelineObjects = [...ingestedPiece.timelineObjects]
   }
 
@@ -115,9 +112,18 @@ export class Piece {
     this.takenOffAirTimestamp = takenOffAirTimestamp
   }
 
-  public resetExecution(): void {
+  private resetExecution(): void {
+    if (this.isActiveInfinitePiece()) {
+      // Infinite Pieces might still be OnAir when their Part is reset, so we can't reset them here.
+      return
+    }
+
     this.executedAt = 0
     this.takenOffAirTimestamp = 0
+  }
+
+  private isActiveInfinitePiece(): boolean {
+    return this.isInfinitePiece() && this.hasStarted() && !this.hasEnded(Date.now())
   }
 
   public getExecutedAt(): number {
@@ -209,8 +215,12 @@ export class Piece {
     this.insertedTimelineObjects.push(...timelineObjects)
   }
 
+  public hasStarted(): boolean {
+    return this.executedAt > 0
+  }
+
   public hasEnded(timestamp: number): boolean {
-    if (!this.executedAt) {
+    if (!this.hasStarted()) {
       return false
     }
     const pieceDuration: number = this.expectedDuration || Infinity

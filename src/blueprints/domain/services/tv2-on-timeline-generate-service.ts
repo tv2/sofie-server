@@ -120,7 +120,8 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
       throw new UnsupportedOperationException('Missing the Active and/or Lookahead Groups. This shouldn\'t be possible!')
     }
 
-    const mediaPlayerSessionsInUse: Tv2MediaPlayerSession[] = this.findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions, activeGroup)
+    const mediaPlayerSessionsInUseForInfiniteGroups: Tv2MediaPlayerSession[] = infiniteGroups.flatMap(group => this.findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions, group))
+    const mediaPlayerSessionsInUse: Tv2MediaPlayerSession[] = [...this.findPreviousAssignedMediaPlayerSessionsStillInUseForGroup(assignedMediaPlayerSessions, activeGroup), ...mediaPlayerSessionsInUseForInfiniteGroups]
     const availableMediaPlayers: Tv2MediaPlayer[] = configuration.studio.mediaPlayers.filter(mediaPlayer => !mediaPlayerSessionsInUse.some(session => session.mediaPlayer.id === mediaPlayer.id))
 
     this.assignMediaPlayersForGroup(activeGroup, mediaPlayerSessionsInUse, availableMediaPlayers)
