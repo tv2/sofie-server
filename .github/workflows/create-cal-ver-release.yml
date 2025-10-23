@@ -1,0 +1,23 @@
+name: "Create CalVer Release"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-cal-ver-release:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: write
+    steps:
+      - name: 'Get next CalVer release version'
+        id: 'next_release_version'
+        uses: 'tv2/ag-github-actions/.github/actions/get-next-cal-ver-release-version@v0.4.0'
+
+      - name: 'Call create release action'
+        uses: 'tv2/ag-github-actions/.github/actions/create-release@v0.4.0'
+        with:
+          release_version: ${{ steps.next_release_version.outputs.release_version }}
+          docker_repo: 'tv2media/alba-server'
+          docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
+          docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
