@@ -124,6 +124,7 @@ interface CoreAudioBedSettings {
   fadeIn: number
   fadeOut: number
   volume: number
+  useAudioFilterSyntax?: boolean
 }
 
 export class Tv2StudioBlueprintConfigurationMapper {
@@ -295,7 +296,8 @@ export class Tv2StudioBlueprintConfigurationMapper {
       mediaDirectory: coreAudioBedFolder,
       fadeInDurationFrames: coreAudioBed.fadeIn,
       fadeOutDurationInFrames: coreAudioBed.fadeOut,
-      volume: coreAudioBed.volume
+      volume: coreAudioBed.volume,
+      useAudioFilterSyntax: coreAudioBed.useAudioFilterSyntax ?? false
     }
   }
 }
