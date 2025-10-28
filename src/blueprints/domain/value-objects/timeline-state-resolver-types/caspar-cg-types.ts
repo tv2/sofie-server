@@ -43,6 +43,7 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
       inTransition?: TimelineTransition
       outTransition?: TimelineTransition
     }
+    audioFilter?: string
   }
 }
 

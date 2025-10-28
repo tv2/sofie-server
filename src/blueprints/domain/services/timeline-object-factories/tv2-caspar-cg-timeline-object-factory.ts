@@ -40,6 +40,7 @@ import { FrameTimeConverter } from '../frame-time-converter'
 const HTML_GRAPHICS_INDEX_FILENAME: string = 'index'
 const ACTION_MANIFEST_DISPLAY_NAME_DATA_SEPARATOR: string = '\n - '
 const AUDIO_BED_CHANNEL_LAYOUT: string = 'bed'
+const AUDIO_BED_AUDIO_FILTER: string = 'pan=4c|c2=c0|c3=c1'
 
 export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimelineObjectFactory, Tv2GraphicsSplitScreenTimelineObjectFactory, Tv2VideoClipTimelineObjectFactory, Tv2AudioBedTimelineObjectFactory {
   public constructor(private readonly assetPathHelper: Tv2AssetPathHelper, private readonly frameTimeConverter: FrameTimeConverter) {}
@@ -333,7 +334,7 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
         deviceType: DeviceType.CASPAR_CG,
         type: CasparCgType.MEDIA,
         file: this.assetPathHelper.joinAssetToFolder(audioBedConfiguration.filename, audioBedSettings.mediaDirectory),
-        channelLayout: AUDIO_BED_CHANNEL_LAYOUT,
+        ...this.getAudioBedTrackLayoutConfiguration(blueprintConfiguration),
         loop: true,
         noStarttime: true,
         mixer: {
@@ -356,6 +357,13 @@ export class Tv2CasparCgTimelineObjectFactory implements Tv2GraphicsElementTimel
       },
       classes: ['lyd_on_air'], // TODO: Check if this is necessary.
     }
+  }
+
+  private getAudioBedTrackLayoutConfiguration(blueprintConfiguration: Tv2BlueprintConfiguration): Pick<CasparCgMediaTimelineObject['content'], 'channelLayout'> | Pick<CasparCgMediaTimelineObject['content'], 'audioFilter'> {
+    if (blueprintConfiguration.studio.audioBedSettings.useAudioFilterSyntax) {
+      return { audioFilter: AUDIO_BED_AUDIO_FILTER }
+    }
+    return { channelLayout: AUDIO_BED_CHANNEL_LAYOUT }
   }
 
   public createFadeAudioBedTimelineObject(fadeDurationInMilliseconds: number): CasparCgMediaTimelineObject {

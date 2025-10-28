@@ -43,7 +43,8 @@ export class Tv2BlueprintConfigurationTestFactory {
         mediaDirectory: 'audio',
         fadeInDurationFrames: 0,
         fadeOutDurationInFrames: 0,
-        volume: 100
+        volume: 100,
+        useAudioFilterSyntax: true
       },
       cameraSources: [],
       casparCgPreRollDuration: 0,
