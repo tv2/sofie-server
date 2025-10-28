@@ -28,9 +28,8 @@ export class Tv2Blueprint implements Blueprint {
     part: Part,
     previousPart: Part | undefined,
     time: number,
-    rundownPersistentState: RundownPersistentState | undefined
   ): PartEndState {
-    return this.endStateForPartService.getEndStateForPart(part, previousPart, time, rundownPersistentState)
+    return this.endStateForPartService.getEndStateForPart(part, previousPart, time)
   }
 
   public onTimelineGenerate(
@@ -38,8 +37,7 @@ export class Tv2Blueprint implements Blueprint {
     showStyleVariantId: string,
     timeline: Timeline,
     activePart: Part,
-    previousRundownPersistentState: RundownPersistentState | undefined,
-    previousPart: Part | undefined,
+    previousRundownPersistentState: RundownPersistentState | undefined
   ): {
       timeline: Timeline
       rundownPersistentState: RundownPersistentState
@@ -49,8 +47,7 @@ export class Tv2Blueprint implements Blueprint {
       showStyleVariantId,
       timeline,
       activePart,
-      previousRundownPersistentState,
-      previousPart
+      previousRundownPersistentState
     )
   }
 

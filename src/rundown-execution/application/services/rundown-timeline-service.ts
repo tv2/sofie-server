@@ -252,8 +252,7 @@ export class RundownTimelineService implements RundownService {
     return this.blueprint.getEndStateForPart(
       rundown.getActivePart(),
       rundown.getPreviousPart(),
-      Date.now(),
-      undefined
+      Date.now()
     )
   }
 

@@ -45,8 +45,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const baselineGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
             group => group.id === BASELINE_GROUP_ID
@@ -58,8 +57,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const baselineGroup: TimelineObjectGroup = timeline.timelineGroups.find(
             group => group.id === BASELINE_GROUP_ID
@@ -71,8 +69,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const baselineGroup: TimelineObjectGroup = timeline.timelineGroups.find(
             group => group.id === BASELINE_GROUP_ID
@@ -84,8 +81,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const baselineGroup: TimelineObjectGroup = timeline.timelineGroups.find(
             group => group.id === BASELINE_GROUP_ID
@@ -103,8 +99,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({}, { baselineTimelineObjects })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const baselineGroup: TimelineObjectGroup = timeline.timelineGroups.find(
             group => group.id === BASELINE_GROUP_ID
@@ -126,8 +121,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const expectedGroupIdForPart: string = `${ACTIVE_GROUP_PREFIX}${rundown.getActivePart().id}`
           const result: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
@@ -142,8 +136,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -156,8 +149,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -170,8 +162,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -186,8 +177,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -207,8 +197,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -229,8 +218,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -252,8 +240,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -301,8 +288,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -326,8 +312,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -351,8 +336,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -388,8 +372,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -419,8 +402,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -447,8 +429,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -472,8 +453,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -499,8 +479,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -530,8 +509,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                     const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                     const testee: TimelineBuilder = createTestee()
-                    const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                    const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                     const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                       group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -559,8 +537,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                     const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                     const testee: TimelineBuilder = createTestee()
-                    const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                    const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                     const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                       group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -587,8 +564,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -617,8 +593,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -644,8 +619,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -674,8 +648,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -703,8 +676,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -728,8 +700,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -753,8 +724,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -783,8 +753,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -805,8 +774,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -826,8 +794,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -849,8 +816,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -877,8 +843,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -904,8 +869,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -930,8 +894,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -958,8 +921,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -982,8 +944,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -1012,8 +973,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               )
 
               const testee: TimelineBuilder = createTestee(instance(objectCloner))
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -1051,8 +1011,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               )
 
               const testee: TimelineBuilder = createTestee(instance(objectCloner))
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -1102,8 +1061,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -1144,8 +1102,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -1192,8 +1149,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -1261,8 +1217,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const expectedGroupIdForPart: string = `${PREVIOUS_GROUP_PREFIX}${previousPart.id}`
           const result: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
@@ -1283,8 +1238,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1304,8 +1258,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1325,8 +1278,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1354,8 +1306,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroupId: string = `${ACTIVE_GROUP_PREFIX}${activePart.id}`
             const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
@@ -1380,8 +1331,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroupId: string = `${ACTIVE_GROUP_PREFIX}${activePart.id}`
             const result: TimelineObjectGroup = timeline.timelineGroups.find(group =>
@@ -1406,8 +1356,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1432,8 +1381,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1459,8 +1407,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1484,8 +1431,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1522,8 +1468,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1558,8 +1503,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1590,8 +1534,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1717,8 +1660,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1751,8 +1693,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1783,8 +1724,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1899,8 +1839,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1935,8 +1874,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1967,8 +1905,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -1999,8 +1936,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2033,8 +1969,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2059,8 +1994,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2084,8 +2018,7 @@ describe(SuperflyTimelineBuilder.name, () => {
               const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
               const testee: TimelineBuilder = createTestee()
-              const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
               const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                 group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2116,8 +2049,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2153,8 +2085,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2189,8 +2120,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2226,8 +2156,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2263,8 +2192,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2296,8 +2224,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2338,8 +2265,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 )
 
                 const testee: TimelineBuilder = createTestee(instance(objectCloner))
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2386,8 +2312,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 )
 
                 const testee: TimelineBuilder = createTestee(instance(objectCloner))
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2422,8 +2347,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
             group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2469,8 +2393,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2515,8 +2438,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const previousGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2537,8 +2459,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, previousPart: undefined })
 
         const testee: TimelineBuilder = createTestee()
-        const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+        const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
         const previousGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group =>
           group.id.includes(PREVIOUS_GROUP_PREFIX)
@@ -2562,8 +2483,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, nextPart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -2587,8 +2507,7 @@ describe(SuperflyTimelineBuilder.name, () => {
             const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, nextPart })
 
             const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+            const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
             const activeGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
               group.id.includes(ACTIVE_GROUP_PREFIX)
@@ -2615,8 +2534,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, nextPart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           expect(timeline.autoNext).not.toBeUndefined()
           const expectedDurationOfActivePart: number = activePart.expectedDuration ?? 0
@@ -2636,8 +2554,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, nextPart })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           expect(timeline.autoNext).toBeUndefined()
         })
@@ -2651,8 +2568,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, nextPart })
 
         const testee: TimelineBuilder = createTestee()
-        const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+        const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
         expect(timeline.autoNext).toBeUndefined()
       })
@@ -2668,8 +2584,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ infinitePieces: [infinitePiece] })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const infiniteGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group =>
             group.id.includes(INFINITE_GROUP_PREFIX)
@@ -2688,8 +2603,7 @@ describe(SuperflyTimelineBuilder.name, () => {
           const rundown: Rundown = EntityMockFactory.createActiveRundown({ infinitePieces: [infinitePiece] })
 
           const testee: TimelineBuilder = createTestee()
-          const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+          const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
           const infiniteGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group =>
             group.id.includes(INFINITE_GROUP_PREFIX)
@@ -2701,28 +2615,58 @@ describe(SuperflyTimelineBuilder.name, () => {
 
       describe('infinite Piece is not a "transition" Piece"', () => {
         describe('infinite Piece belongs to the active Part', () => {
-          it('does not create infinite groups for Piece', () => {
-            const activePartId: string = 'activePartId'
-            const infinitePiece: Piece = EntityMockFactory.createPiece({
-              partId: activePartId,
-              transitionType: TransitionType.NO_TRANSITION,
-              pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+          describe('infinite Piece is unplanned and is currently on the active Part', () => {
+            it('does not create infinite groups for Piece', () => {
+              const activePartId: string = 'activePartId'
+              const infinitePiece: Piece = EntityTestFactory.createPiece({
+                partId: activePartId,
+                transitionType: TransitionType.NO_TRANSITION,
+                pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+                isPlanned: false,
+                executedAt: Date.now()
+              })
+              const activePart: Part = EntityTestFactory.createPart({ id: activePartId, pieces: [infinitePiece] })
+              const rundown: Rundown = EntityMockFactory.createActiveRundown({
+                activePart,
+                infinitePieces: [infinitePiece],
+              })
+
+              const testee: TimelineBuilder = createTestee()
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
+
+              const infiniteGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group =>
+                group.id.includes(INFINITE_GROUP_PREFIX)
+              )
+
+              expect(infiniteGroup).toBeUndefined()
             })
-            const activePart: Part = EntityMockFactory.createPart({ id: activePartId })
-            const rundown: Rundown = EntityMockFactory.createActiveRundown({
-              activePart,
-              infinitePieces: [infinitePiece],
+          })
+
+          describe('infinite Piece is unplanned and is no longer on the active part', () => {
+            it('creates an infinite group for the Piece', () => {
+              const activePartId: string = 'activePartId'
+              const infinitePiece: Piece = EntityTestFactory.createPiece({
+                partId: activePartId,
+                transitionType: TransitionType.NO_TRANSITION,
+                pieceLifespan: PieceLifespan.STICKY_UNTIL_RUNDOWN_CHANGE,
+                isPlanned: false,
+                executedAt: Date.now()
+              })
+              const activePart: Part = EntityTestFactory.createPart({ id: activePartId, pieces: [] /* Purposely empty */ })
+              const rundown: Rundown = EntityMockFactory.createActiveRundown({
+                activePart,
+                infinitePieces: [infinitePiece],
+              })
+
+              const testee: TimelineBuilder = createTestee()
+              const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
+
+              const infiniteGroups: TimelineObjectGroup[] = timeline.timelineGroups.filter(group =>
+                group.id.includes(INFINITE_GROUP_PREFIX)
+              )
+
+              expect(infiniteGroups).toHaveLength(1)
             })
-
-            const testee: TimelineBuilder = createTestee()
-            const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
-
-            const infiniteGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(group =>
-              group.id.includes(INFINITE_GROUP_PREFIX)
-            )
-
-            expect(infiniteGroup).toBeUndefined()
           })
         })
 
@@ -2768,8 +2712,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const expectedInfinitePieceGroupId: string = `${INFINITE_GROUP_PREFIX}${activePart.id}_${infinitePiece.id}`
                 const infiniteGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
@@ -2797,8 +2740,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(INFINITE_GROUP_PREFIX)
@@ -2826,8 +2768,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(INFINITE_GROUP_PREFIX)
@@ -2856,8 +2797,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                 })
 
                 const testee: TimelineBuilder = createTestee()
-                const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                 const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                   group.id.includes(INFINITE_GROUP_PREFIX)
@@ -2887,8 +2827,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(INFINITE_GROUP_PREFIX)
@@ -2921,8 +2860,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   })
 
                   const testee: TimelineBuilder = createTestee()
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(INFINITE_GROUP_PREFIX)
@@ -2964,8 +2902,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   )
 
                   const testee: TimelineBuilder = createTestee(instance(objectCloner))
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(INFINITE_GROUP_PREFIX)
@@ -3013,8 +2950,7 @@ describe(SuperflyTimelineBuilder.name, () => {
                   )
 
                   const testee: TimelineBuilder = createTestee(instance(objectCloner))
-                  const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+                  const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
                   const infiniteGroup: TimelineObjectGroup = timeline.timelineGroups.find(group =>
                     group.id.includes(INFINITE_GROUP_PREFIX)
@@ -3080,8 +3016,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown({ activePart, infinitePieces })
 
         const testee: TimelineBuilder = createTestee()
-        const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+        const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
         const infiniteGroups: TimelineObjectGroup[] = timeline.timelineGroups.filter(group =>
           group.id.includes(INFINITE_GROUP_PREFIX)
@@ -3096,8 +3031,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
-        const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+        const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
         const infiniteGroups: TimelineObjectGroup[] = timeline.timelineGroups.filter(group =>
           group.id.includes(INFINITE_GROUP_PREFIX)
@@ -3112,8 +3046,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
-        const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+        const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
         const lookaheadGroup: TimelineObjectGroup | undefined = timeline.timelineGroups.find(
           group => group.id === LOOKAHEAD_GROUP_ID
@@ -3125,8 +3058,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
-        const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+        const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
         const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
           group => group.id === LOOKAHEAD_GROUP_ID
@@ -3138,8 +3070,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
-        const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+        const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
         const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
           group => group.id === LOOKAHEAD_GROUP_ID
@@ -3151,8 +3082,7 @@ describe(SuperflyTimelineBuilder.name, () => {
         const rundown: Rundown = EntityMockFactory.createActiveRundown()
 
         const testee: TimelineBuilder = createTestee()
-        const timeline: Timeline
-= testee.buildTimeline(rundown, createBasicConfiguration())
+        const timeline: Timeline = testee.buildTimeline(rundown, createBasicConfiguration())
 
         const lookaheadGroup: TimelineObjectGroup = timeline.timelineGroups.find(
           group => group.id === LOOKAHEAD_GROUP_ID
