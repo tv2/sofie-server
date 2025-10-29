@@ -105,4 +105,5 @@ export interface AudioBedSettings {
   fadeInDurationFrames: number
   fadeOutDurationInFrames: number
   volume: number
+  useAudioFilterSyntax: boolean
 }
