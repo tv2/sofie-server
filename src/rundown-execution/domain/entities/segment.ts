@@ -154,7 +154,7 @@ export class Segment {
     }
     const nextPart: Part | undefined = this.parts.slice(fromPartIndex + 1).find(part => !part.invalidity && !part.isOnAir())
     if (!nextPart) {
-      throw new LastPartInSegmentException(`The part '${fromPart.name}' with id "${fromPart.id}" is the last part in the segment "${this.name}" with id "${this.id}".`)
+      throw new LastPartInSegmentException(`The part '${fromPart.name}' with id '${fromPart.id}' is the last part in the segment '${this.name}' with id '${this.id}'.`)
     }
     return nextPart
   }
