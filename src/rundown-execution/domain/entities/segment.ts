@@ -101,7 +101,7 @@ export class Segment {
     if (!this.invalidity) {
       return
     }
-    throw new InvalidSegmentException(`Unable to do "${operationName}", since segment "${this.name}" with id is invalid.`)
+    throw new InvalidSegmentException(`Unable to do "${operationName}", since segment "${this.name}" with id '${this.id}' is invalid.`)
   }
 
   public takeOffAir(): void {
