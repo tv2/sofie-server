@@ -150,7 +150,7 @@ export class Segment {
   public findNextPartNotOnAir(fromPart: Part): Part {
     const fromPartIndex: number = this.parts.findIndex(part => part.id === fromPart.id)
     if (fromPartIndex === -1) {
-      throw new NotFoundException('Part does not exist in Segment')
+      throw new NotFoundException(`Part '${fromPart.name}' with id '${fromPart.id}' does not exist in Segment '${this.name}' with id '${this.id}'. Segment contains the following parts: ${this.parts.map(part => `${part.name} (${part.id})`).join(', ')}.`)
     }
     const nextPart: Part | undefined = this.parts.slice(fromPartIndex + 1).find(part => !part.invalidity && !part.isOnAir())
     if (!nextPart) {
@@ -162,7 +162,7 @@ export class Segment {
   public findPreviousValidPartNotOnAir(fromPart: Part): Part {
     const fromPartIndex: number = this.parts.findIndex(part => part.id === fromPart.id)
     if (fromPartIndex === -1) {
-      throw new NotFoundException('Part does not exist in Segment')
+      throw new NotFoundException(`Part '${fromPart.name}' with id '${fromPart.id}' does not exist in Segment '${this.name}' with id '${this.id}'. Segment contains the following parts: ${this.parts.map(part => `${part.name} (${part.id})`).join(', ')}.`)
     }
 
     const previousPart: Part | undefined = this.parts
