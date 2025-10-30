@@ -195,22 +195,22 @@ export class Part {
     this.pieces = pieces
   }
 
-  public insertPiece(unPlannedPiece: Piece): void {
-    if (unPlannedPiece.isPlanned) {
-      throw new UnsupportedOperationException(`Trying to insert a planned Piece ${unPlannedPiece.id} to Part ${this.id}.`)
+  public insertPiece(pieceToInsert: Piece): void {
+    if (pieceToInsert.isPlanned) {
+      throw new UnsupportedOperationException(`Unable to insert the planned piece '${pieceToInsert.name}' with id '${pieceToInsert.id}' into the part '${this.name}' with id '${this.id}'. Only unplanned parts can be inserted into parts.`)
     }
-    unPlannedPiece.setPartId(this.id)
+    pieceToInsert.setPartId(this.id)
     if (this.isPartOnAir) {
       const timeSincePutOnAir: number = Date.now() - this.executedAt
-      unPlannedPiece.setStart(timeSincePutOnAir)
-      unPlannedPiece.putOnAir(this.executedAt + timeSincePutOnAir)
-      unPlannedPiece.markAsInsertedOnAir()
+      pieceToInsert.setStart(timeSincePutOnAir)
+      pieceToInsert.putOnAir(this.executedAt + timeSincePutOnAir)
+      pieceToInsert.markAsInsertedOnAir()
 
-      this.stopOverlappingPiecesOnSameLayer(unPlannedPiece)
+      this.stopOverlappingPiecesOnSameLayer(pieceToInsert)
     } else {
-      this.removeOverlappingPiecesOnSameLayer(unPlannedPiece)
+      this.removeOverlappingPiecesOnSameLayer(pieceToInsert)
     }
-    this.pieces.push(unPlannedPiece)
+    this.pieces.push(pieceToInsert)
   }
 
   private stopOverlappingPiecesOnSameLayer(referencePiece: Piece): void {
@@ -234,7 +234,7 @@ export class Part {
   public replacePiece(pieceToBeReplaced: Piece, newPiece: Piece): void {
     const pieceIndex: number = this.pieces.findIndex(piece => piece.id === pieceToBeReplaced.id)
     if (pieceIndex < 0) {
-      throw new UnsupportedOperationException(`Can't replace Piece on Part ${this.id}. Piece ${pieceToBeReplaced.id} does not exist on Part.`)
+      throw new UnsupportedOperationException(`Unable to replace the piece '${pieceToBeReplaced.name}' with id '${pieceToBeReplaced.id}' with the piece '${newPiece.name}' with id '${newPiece.id}' on part '${this.name}' with id '${this.id}'. The piece to replace does not exist on the part.`)
     }
 
     if (pieceToBeReplaced.isPlanned) {
@@ -271,7 +271,7 @@ export class Part {
 
   public setSegmentId(segmentId: string): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperationException(`Can't update SegmentId for Part: ${this.id}. Only unplanned Parts are allowed to have their Segment id updated!`)
+      throw new UnsupportedOperationException(`Unable to update the segment id for the planned part '${this.name}' with id ${this.id}. Only unplanned Parts are allowed to have their segment id updated.`)
     }
     this.segmentId = segmentId
   }
@@ -348,7 +348,7 @@ export class Part {
 
   public getTimings(): PartTimings {
     if (!this.timings) {
-      throw new UnsupportedOperationException(`No Timings has been calculated for Part: ${this.id}`)
+      throw new UnsupportedOperationException(`No timings have been calculated for the part '${this.name}' with '${this.id}'.`)
     }
     return this.timings
   }
