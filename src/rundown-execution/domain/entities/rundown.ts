@@ -164,7 +164,7 @@ export class Rundown extends BasicRundown {
   private findFirstSegment(): Segment {
     const segment: Segment | undefined = this.segments.find(segment => segment.isValid())
     if (!segment) {
-      throw new NotFoundException(`Unable to find first valid Segment for Rundown ${this.id}`)
+      throw new NotFoundException(`Unable to find first valid Segment for Rundown '${this.name}' with id '${this.id}'.`)
     }
     return segment
   }

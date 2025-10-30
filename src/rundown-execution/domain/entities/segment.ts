@@ -75,7 +75,7 @@ export class Segment {
   public findFirstPartNotOnAir(): Part {
     const part: Part | undefined = this.parts.find(part => !part.invalidity && !part.isOnAir())
     if (!part) {
-      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid parts that is not on air.`)
+      throw new NotFoundException(`Segment '${this.name}' with id '${this.id}' has no valid off air parts.`)
     }
     return part
   }
@@ -101,7 +101,7 @@ export class Segment {
     if (!this.invalidity) {
       return
     }
-    throw new InvalidSegmentException(`Unable to do "${operationName}", since segment "${this.name}" is invalid.`)
+    throw new InvalidSegmentException(`Unable to do "${operationName}", since segment "${this.name}" with id is invalid.`)
   }
 
   public takeOffAir(): void {
@@ -150,11 +150,11 @@ export class Segment {
   public findNextPartNotOnAir(fromPart: Part): Part {
     const fromPartIndex: number = this.parts.findIndex(part => part.id === fromPart.id)
     if (fromPartIndex === -1) {
-      throw new NotFoundException(`Part '${fromPart.name}' with id '${fromPart.id}' does not exist in Segment '${this.name}' with id '${this.id}'. Segment contains the following parts: ${this.parts.map(part => `${part.name} (${part.id})`).join(', ')}.`)
+      throw new NotFoundException(`Part '${fromPart.name}' with id '${fromPart.id}' does not exist in segment '${this.name}' with id '${this.id}'. Segment contains the following parts: ${this.parts.map(part => `${part.name} (${part.id})`).join(', ')}.`)
     }
     const nextPart: Part | undefined = this.parts.slice(fromPartIndex + 1).find(part => !part.invalidity && !part.isOnAir())
     if (!nextPart) {
-      throw new LastPartInSegmentException(`The part "${fromPart.name}" with id "${fromPart.id}" is the last part in the segment "${this.name}" with id "${this.id}".`)
+      throw new LastPartInSegmentException(`The part '${fromPart.name}' with id "${fromPart.id}" is the last part in the segment "${this.name}" with id "${this.id}".`)
     }
     return nextPart
   }
@@ -162,7 +162,7 @@ export class Segment {
   public findPreviousValidPartNotOnAir(fromPart: Part): Part {
     const fromPartIndex: number = this.parts.findIndex(part => part.id === fromPart.id)
     if (fromPartIndex === -1) {
-      throw new NotFoundException(`Part '${fromPart.name}' with id '${fromPart.id}' does not exist in Segment '${this.name}' with id '${this.id}'. Segment contains the following parts: ${this.parts.map(part => `${part.name} (${part.id})`).join(', ')}.`)
+      throw new NotFoundException(`Part '${fromPart.name}' with id '${fromPart.id}' does not exist in segment '${this.name}' with id '${this.id}'. Segment contains the following parts: ${this.parts.map(part => `${part.name} (${part.id})`).join(', ')}.`)
     }
 
     const previousPart: Part | undefined = this.parts
@@ -171,7 +171,7 @@ export class Segment {
       .find(part => !part.invalidity && !part.isOnAir())
 
     if (!previousPart) {
-      throw new FirstPartInSegmentException(`The part "${fromPart.name}" with id "${fromPart.id}" is the first part in the segment "${this.name}" with id "${this.id}".`)
+      throw new FirstPartInSegmentException(`Unable to find a part in the segment '${this.name}' with id '${this.id}' that is before the part '${fromPart.name}' with id '${fromPart.id}' as it is the first.`)
     }
 
     return previousPart
@@ -180,7 +180,7 @@ export class Segment {
   public findPart(partId: string): Part {
     const part: Part | undefined = this.parts.find(part => part.id === partId)
     if (!part) {
-      throw new NotFoundException(`Part "${partId}" does not exist in Segment "${this.id}"`)
+      throw new NotFoundException(`Part '${partId}' does not exist in segment '${this.name}' with id '${this.id}'.`)
     }
     return part
   }
@@ -214,7 +214,7 @@ export class Segment {
   public updatePart(part: Part): void {
     const partIndex: number = this.parts.findIndex(p => p.id === part.id)
     if (partIndex < 0) {
-      throw new NotFoundException(`Part ${part.id} does not belong to Segment ${this.id}`)
+      throw new NotFoundException(`Part '${part.name}' with id '${part.id}' does not belong to segment '${this.name}' with id '${this.id}'.`)
     }
     this.parts[partIndex] = part
     this.parts.sort(this.compareParts)
@@ -299,27 +299,27 @@ export class Segment {
     this.parts = this.parts.filter(part => part.isPlanned)
   }
 
-  public insertPartAfterActivePart(part: Part): void {
-    const activePartIndex: number = this.parts.findIndex(p => p.isOnAir())
+  public insertPartAfterActivePart(partToInsert: Part): void {
+    const activePartIndex: number = this.parts.findIndex(part => part.isOnAir())
     if (activePartIndex < 0) {
-      throw new NotFoundException(`Not allowed to insert Part: ${part.id} into Segment: ${this.id} because Segment does not have the active Part.`)
+      throw new NotFoundException(`Unable to insert part '${partToInsert.name}' with id '${partToInsert.id}' into the segment '${this.name}' with id '${this.id}' because the segment does not have an active part.`)
     }
 
-    part.setSegmentId(this.id)
+    partToInsert.setSegmentId(this.id)
 
     const isActivePartLastPartInSegment: boolean = activePartIndex + 1 === this.parts.length
     if (isActivePartLastPartInSegment) {
-      this.parts.push(part)
+      this.parts.push(partToInsert)
       return
     }
 
     const isPartAfterActivePartAnUnplannedPart: boolean = !this.parts[activePartIndex + 1].isPlanned
     if (isPartAfterActivePartAnUnplannedPart) {
-      this.parts[activePartIndex + 1] = part
+      this.parts[activePartIndex + 1] = partToInsert
       return
     }
 
-    this.parts.splice(activePartIndex + 1, 0, part)
+    this.parts.splice(activePartIndex + 1, 0, partToInsert)
   }
 
   public getUnsyncedCopy(): Segment {
