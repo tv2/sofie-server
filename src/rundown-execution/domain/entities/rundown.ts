@@ -87,7 +87,7 @@ export class Rundown extends BasicRundown {
 
     if (rundown.alreadyActiveProperties) {
       if (rundown.mode === RundownMode.INACTIVE) {
-        throw new MisconfigurationException('Trying to instantiate an inactive Rundown as active')
+        throw new MisconfigurationException(`Trying to instantiate the inactive rundown '${this.name}' with id '${this.id}' as active.`)
       }
       this.activeCursor = rundown.alreadyActiveProperties.activeCursor
       this.nextCursor = rundown.alreadyActiveProperties.nextCursor
@@ -99,7 +99,7 @@ export class Rundown extends BasicRundown {
 
   public activate(): void {
     if (this.isActive()) {
-      throw new AlreadyActivatedException('Can\'t activate Rundown since it is already activated.')
+      throw new AlreadyActivatedException('Unable to activate the rundown since it is already activated.')
     }
     if (this.mode === RundownMode.REHEARSAL) {
       this.mode = RundownMode.ACTIVE
@@ -110,10 +110,10 @@ export class Rundown extends BasicRundown {
 
   public enterRehearsal(): void {
     if (this.isActive()) {
-      throw new AlreadyActivatedException('Can\'t set Rundown to rehearsal since it is already activated.')
+      throw new AlreadyActivatedException('Unable to set rundown to rehearsal since it is already activated.')
     }
     if (this.getMode() === RundownMode.REHEARSAL) {
-      throw new AlreadyRehearsalException('Can\'t set Rundown to rehearsal since it is already in rehearsal.')
+      throw new AlreadyRehearsalException('Unable to set rundown to rehearsal since it is already in rehearsal.')
     }
     this.initializeRundown(RundownMode.REHEARSAL)
   }
@@ -164,7 +164,7 @@ export class Rundown extends BasicRundown {
   private findFirstSegment(): Segment {
     const segment: Segment | undefined = this.segments.find(segment => segment.isValid())
     if (!segment) {
-      throw new NotFoundException(`Unable to find first valid Segment for Rundown '${this.name}' with id '${this.id}'.`)
+      throw new NotFoundException(`Unable to find first valid segment for rundown '${this.name}' with id '${this.id}'.`)
     }
     return segment
   }
@@ -251,12 +251,13 @@ export class Rundown extends BasicRundown {
   private findNextValidSegment(): Segment {
     const activeSegmentIndex: number = this.segments.findIndex(segment => segment.id === this.activeCursor?.segment?.id)
     if (activeSegmentIndex === -1) {
-      throw new NotFoundException('Active Segment does not exist in Rundown')
+      throw new NotFoundException('The rundown has no active segment.')
     }
 
     const nextValidSegment: Segment | undefined = this.segments.slice(activeSegmentIndex + 1).find(segment => segment.isValid())
     if (!nextValidSegment) {
-      throw new LastSegmentInRundownException(`Segment: ${this.activeCursor?.segment?.id} is the last valid Segment of Rundown: ${this.id}`)
+      const activeSegment: Segment = this.segments[activeSegmentIndex]
+      throw new LastSegmentInRundownException(`Unable to find next valid segment as the on air segment '${activeSegment.name}' with id '${activeSegment.id}' is the last valid segment of the rundown '${this.name}' with id '${this.id}'.`)
     }
 
     return nextValidSegment
@@ -296,7 +297,7 @@ export class Rundown extends BasicRundown {
 
   private assertNotUndefined<T>(value: T, nameOfType: string): asserts value is NonNullable<T> {
     if (!value) {
-      throw new UnsupportedOperationException(`Trying to fetch ${nameOfType} of Rundown before ${nameOfType} has been set`)
+      throw new UnsupportedOperationException(`Trying to fetch ${nameOfType} of rundown '${this.name}' with id '${this.id}' before ${nameOfType} has been set.`)
     }
   }
 
@@ -332,7 +333,7 @@ export class Rundown extends BasicRundown {
         throw exception
       }
       if (segmentIndexForPart + 1 === this.segments.length) {
-        throw new LastPartInRundownException(`Part: ${part.id} is the last Part of Rundown: ${this.id}.`)
+        throw new LastPartInRundownException(`Unable to find part after the part '${part.name}' with id '${part.id}' as it is the last part in the rundown '${this.name}' with id '${this.id}'.`)
       }
       return this.findFirstPartOfValidSegmentSkippingUnsyncedSegments(segmentIndexForPart + 1)
     }
@@ -341,9 +342,7 @@ export class Rundown extends BasicRundown {
   private getSegmentIndexForPart(part: Part): number {
     const segmentIndexForPart: number = this.segments.findIndex(segment => segment.id === part.getSegmentId())
     if (segmentIndexForPart < 0) {
-      throw new NotFoundException(
-        `Part: "${part.id}" does not belong to any Segments on Rundown: "${this.id}"`
-      )
+      throw new NotFoundException(`The part '${part.name}' with id '${part.id}' does not belong to any segment in the rundown '${this.name}' with id '${this.id}'.`)
     }
     return segmentIndexForPart
   }
@@ -557,16 +556,16 @@ export class Rundown extends BasicRundown {
 
     const nextSegment: Segment = this.findSegment(segmentId)
     if (nextSegment.invalidity) {
-      throw new InvalidSegmentException(`Unable to set segment "${nextSegment.name}" as next, since it is invalid.`)
+      throw new InvalidSegmentException(`Unable to set segment '${nextSegment.name}' with id '${nextSegment.id}' as next, since it is invalid.`)
     }
 
     const nextPart: Part = nextSegment.findPart(partId)
     if (nextPart.invalidity) {
-      throw new InvalidPartException(`Unable to set part "${nextPart.name}" as next, since it is invalid.`)
+      throw new InvalidPartException(`Unable to set part '${nextPart.name}' with id '${nextPart.id}' as next, since it is invalid.`)
     }
 
     if (nextPart.isOnAir()) {
-      throw new OnAirException('Can\'t set active part as next.')
+      throw new OnAirException('Unable to set the active part as next.')
     }
 
     if (this.nextCursor.segment.id !== segmentId) {
@@ -667,7 +666,7 @@ export class Rundown extends BasicRundown {
 
   private findCursorWithFirstPartInSegmentAfterSegmentIndex(segmentIndex: number): RundownCursor {
     if (segmentIndex === this.segments.length - 1) {
-      throw new LastSegmentInRundownException('Unable to find the first Part of the next Segment. We are on the last Segment of the Rundown')
+      throw new LastSegmentInRundownException('Unable to find the first part of the next segment as we are on the last segment of the rundown.')
     }
     try {
       const nextSegment: Segment = this.findFirstValidSegmentAfterIndex(segmentIndex)
@@ -688,7 +687,7 @@ export class Rundown extends BasicRundown {
         return segment
       }
     }
-    throw new LastSegmentInRundownException(`No valid Segments after SegmentIndex ${searchIndex}`)
+    throw new LastSegmentInRundownException(`No valid segments after the segment index ${searchIndex}.`)
   }
 
   private findCursorWithFirstPartInSegmentBeforeNextSegment(): RundownCursor {
@@ -701,7 +700,7 @@ export class Rundown extends BasicRundown {
 
   private findCursorWithFirstPartInSegmentBeforeSegmentIndex(segmentIndex: number): RundownCursor {
     if (segmentIndex === 0) {
-      throw new FirstSegmentInRundownException('Unable to set the first Part of the previous Segment. We are on the first Segment of the Rundown')
+      throw new FirstSegmentInRundownException('Unable to set the first part of the previous segment as we are on the first segment of the rundown.')
     }
     try {
       const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(segmentIndex)
@@ -722,7 +721,7 @@ export class Rundown extends BasicRundown {
         return segment
       }
     }
-    throw new FirstSegmentInRundownException(`No valid Segments before SegmentIndex ${searchIndex}`)
+    throw new FirstSegmentInRundownException(`No valid segments before the segment index ${searchIndex}.`)
   }
 
   private findCursorWithLastPartInSegmentBeforeNextSegment(): RundownCursor {
@@ -735,7 +734,7 @@ export class Rundown extends BasicRundown {
 
   private findCursorWithLastPartInSegmentBeforeSegmentIndex(segmentIndex: number): RundownCursor {
     if (segmentIndex === 0) {
-      throw new FirstSegmentInRundownException('Unable to set last Part in previous Segment. We are on the first Segment of the Rundown')
+      throw new FirstSegmentInRundownException('Unable to set last part in previous segment as we are on the first segment of the rundown.')
     }
     try {
       const previousSegment: Segment = this.findFirstValidSegmentBeforeIndex(segmentIndex)
@@ -752,7 +751,7 @@ export class Rundown extends BasicRundown {
   private findSegment(segmentId: string): Segment {
     const segment: Segment | undefined = this.segments.find(segment => segment.id === segmentId)
     if (!segment) {
-      throw new NotFoundException(`Segment "${segmentId}" does not exist in Rundown "${this.id}"`)
+      throw new NotFoundException(`Segment with id '${segmentId}' does not exist in the rundown '${this.name}' with id '${this.id}'.`)
     }
     return segment
   }
@@ -763,7 +762,7 @@ export class Rundown extends BasicRundown {
 
   public addSegment(segment: Segment): void {
     if (this.segments.some(s => s.id === segment.id)) {
-      throw new AlreadyExistException(`Unable to add Segment to Rundown. Segment ${segment.id} already exist on Rundown ${this.id}`)
+      throw new AlreadyExistException(`Unable to add segment '${segment.name}' with id '${segment.id}' to rundown '${this.name}' with id '${this.id}'. The segment already exists on the rundown.`)
     }
     this.segments.push(segment)
     this.segments.sort(this.compareSegments)
@@ -804,7 +803,7 @@ export class Rundown extends BasicRundown {
   public updateSegment(segment: Segment): void {
     const segmentIndex: number = this.segments.findIndex(s => s.id === segment.id)
     if (segmentIndex < 0) {
-      throw new NotFoundException(`Segment ${segment.id} does not belong to Rundown ${this.id}`)
+      throw new NotFoundException(`Segment with id '${segment.id}' does not belong to rundown '${this.name}' with id ${this.id}.`)
     }
 
     const oldSegment: Segment = this.segments[segmentIndex]
@@ -827,7 +826,7 @@ export class Rundown extends BasicRundown {
 
   public removeUnsyncedSegment(unsyncedSegment: Segment): void {
     if (unsyncedSegment.isOnAir()) {
-      throw new UnsupportedOperationException(`Trying to remove an unsynced Segment ${unsyncedSegment.id} from the Rundown while it is still on Air`)
+      throw new UnsupportedOperationException(`Trying to remove an unsynced segment '${unsyncedSegment.name}' with id '${unsyncedSegment.id}' from the rundown while it is still on air.`)
     }
     this.segments = this.segments.filter(segment => segment.id !== unsyncedSegment.id)
   }
@@ -860,7 +859,7 @@ export class Rundown extends BasicRundown {
     const unsyncedSegment: Segment = segmentToUnsync.getUnsyncedCopy()
     const unsyncedPart: Part | undefined = unsyncedSegment.getParts().find(part => part.isOnAir())
     if (!unsyncedPart) {
-      throw new NotFoundException(`Unsynced onAir Part not found in unsynced Segment ${unsyncedSegment.id}`)
+      throw new NotFoundException(`Unable to find an unsynced part that is on air in the unsynced segment '${unsyncedSegment.name}' with id ${unsyncedSegment.id}.`)
     }
     this.activeCursor = this.createCursor(this.activeCursor, { segment: unsyncedSegment, part: unsyncedPart })
     this.segments.push(unsyncedSegment)
@@ -901,7 +900,7 @@ export class Rundown extends BasicRundown {
   public removePartFromSegment(partId: string): Part | undefined {
     const segment: Segment | undefined = this.segments.find(segment => segment.getParts().some(part => part.id === partId))
     if (!segment) {
-      throw new NotFoundException(`Unable to find segment for part with id '${partId}' in rundown ${this.id}.`)
+      throw new NotFoundException(`Unable to find segment for part with id '${partId}' in rundown '${this.name}' with id ${this.id}.`)
     }
     const removedPart: Part | undefined = segment.removePart(partId)
     if (removedPart?.isOnAir()) {
@@ -1047,7 +1046,7 @@ export class Rundown extends BasicRundown {
       return
     }
 
-    throw new UnsupportedOperationException(`Can't replace Piece on Rundown ${this.id}. Piece ${pieceToBeReplaced.id} is neither on the active or next Part.`)
+    throw new UnsupportedOperationException(`Unable to replace the piece '${pieceToBeReplaced.name}' with id '${pieceToBeReplaced.id}' on rundown '${this.name}' with id '${this.id}' as it is neither on the on air or next part.`)
   }
 
   public getHistory(): Part[] {
@@ -1057,7 +1056,7 @@ export class Rundown extends BasicRundown {
   public findPartInHistory(predicate: (part: Part) => boolean): Part {
     const historicPart: Part | undefined = [...this.history, this.getActivePart().clone()].reverse().find(predicate)
     if (!historicPart) {
-      throw new NoPartInHistoryException(`Rundown ${this.id} does not contain a Part with the specified conditions in its history`)
+      throw new NoPartInHistoryException(`Rundown ${this.id} does not contain a part with the specified conditions in its history.`)
     }
     return historicPart
   }
