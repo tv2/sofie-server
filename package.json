@@ -57,7 +57,7 @@
     "got": "11.8.6",
     "mongodb": "^6.20.0",
     "reflect-metadata": "^0.2.2",
-    "superfly-timeline": "^9.0.0",
+    "superfly-timeline": "^9.2.0",
     "ws": "^8.18.3"
   },
   "resolutions": {
