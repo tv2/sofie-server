@@ -38,7 +38,7 @@
     "@types/jest": "^29.5.4",
     "@types/node": "^20.5.9",
     "@types/ws": "^8.18.1",
-    "@typestrong/ts-mockito": "^2.6.6",
+    "@typestrong/ts-mockito": "^2.7.12",
     "cross-env": "^7.0.3",
     "dependency-cruiser": "^16.10.3",
     "eslint": "^9.36.0",

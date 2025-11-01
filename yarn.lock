@@ -1124,11 +1124,12 @@
     "@typescript-eslint/types" "8.34.1"
     eslint-visitor-keys "^4.2.1"
 
-"@typestrong/ts-mockito@^2.6.6":
-  version "2.6.6"
-  resolved "https://registry.npmjs.org/@typestrong/ts-mockito/-/ts-mockito-2.6.6.tgz"
-  integrity sha512-S8nV5NgzejK2IIF/Prnd8U0nDmfviABazqMo8WqsNS4ZtUVeOXJzJF+kgKecKrxvuHylH8a2jUOzzawEk/oDqw==
+"@typestrong/ts-mockito@^2.7.12":
+  version "2.7.12"
+  resolved "https://registry.yarnpkg.com/@typestrong/ts-mockito/-/ts-mockito-2.7.12.tgz#7bde9e15e978767f1ff2cd20f0eee5cf193bf4d8"
+  integrity sha512-dvgtwC0MR2q6/GFZs3HvJzRjgLNb4N3/WiG/Ay6v8fyv6o4QkqoAQl9Lqzr+hK3G1MAazdCFxJiLjT79+51ysg==
   dependencies:
+    "@babel/parser" "^7.24.7"
     lodash "^4.17.5"
     safe-json-stringify "^1.2.0"
 
