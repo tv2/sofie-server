@@ -155,14 +155,14 @@ export class Piece {
 
   public setPartId(partId: string): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperationException(`Can't update PartId for Piece: ${this.id}. Only unplanned Pieces are allowed to have their Part id updated!`)
+      throw new UnsupportedOperationException(`Unable to update part id for the piece '${this.name}' with id '${this.id}'. Only unplanned pieces are allowed to have their part id updated.`)
     }
     this.partId = partId
   }
 
   public setStart(startTimestamp: number): void {
     if (this.isPlanned) {
-      throw new UnsupportedOperationException(`Trying to set the start of a planned Piece ${this.id}. Only unplanned Pieces are allowed to have their start updated!`)
+      throw new UnsupportedOperationException(`Unbale to set the start of the planned piece '${this.name}' with id '${this.id}'. Only unplanned pieces are allowed to have their start updated.`)
     }
     this.start = startTimestamp
   }
@@ -209,7 +209,7 @@ export class Piece {
     timelineObjects.forEach((timelineObjectToBeInserted) => {
       const containsDuplicateId: boolean = this.getTimelineObjects().some(timelineObject => timelineObject.id === timelineObjectToBeInserted.id)
       if (containsDuplicateId) {
-        throw new DuplicateIdException(`A TimelineObject with id '${timelineObjectToBeInserted.id}' already exist on Piece ${this.id}`)
+        throw new DuplicateIdException(`A timeline object with id '${timelineObjectToBeInserted.id}' already exists on the piece '${this.name}' with id '${this.id}'.`)
       }
     })
     this.insertedTimelineObjects.push(...timelineObjects)
