@@ -2,7 +2,7 @@ import { Tv2TransitionEffectActionFactory } from './tv2-transition-effect-action
 import {
   Tv2VideoMixerTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-video-mixer-timeline-object-factory'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import { Tv2CasparcgTimelineObjectFactory } from '../timeline-object-factories/tv2-casparcg-timeline-object-factory'
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-audio-mixer-timeline-object-factory'
@@ -90,27 +90,27 @@ describe(Tv2TransitionEffectActionFactory.name, () => {
 
       describe('it creates downStreamKeyerTimelineObjects that starts after the CasparCgPreRollDuration', () => {
         it('has a CasparCgPreRollDuration of 100, the enable.start = 100', () => {
-          testDskEnableStartIsEqualToCasparCgPreRollDuration(100)
+          testDskEnableStartIsEqualToCasparcgPreRollDuration(100)
         })
 
         it('has a CasparCgPreRollDuration of 250, the enable.start = 250', () => {
-          testDskEnableStartIsEqualToCasparCgPreRollDuration(250)
+          testDskEnableStartIsEqualToCasparcgPreRollDuration(250)
         })
 
         it('has a CasparCgPreRollDuration of 500, the enable.start = 500', () => {
-          testDskEnableStartIsEqualToCasparCgPreRollDuration(500)
+          testDskEnableStartIsEqualToCasparcgPreRollDuration(500)
         })
       })
     })
   })
 })
 
-function createBreakerActionMetadata(durationInFrames: number, casparCgPreRollDurationInMs: number): Tv2BreakerTransitionEffectActionMetadata {
+function createBreakerActionMetadata(durationInFrames: number, casparcgPreRollDurationInMs: number): Tv2BreakerTransitionEffectActionMetadata {
   return {
     breaker: {
       durationInFrames
     } as Breaker,
-    casparCgPreRollDuration: casparCgPreRollDurationInMs,
+    casparcgPreRollDuration: casparcgPreRollDurationInMs,
     breakerFolder: '',
     playoutContent: {
       type: PlayoutContentType.TRANSITION
@@ -170,9 +170,9 @@ function getMutateActionWithMethods(transitionEffectActionFactory: Tv2Transition
 }
 
 // Note: This is an integration test between Tv2TransitionEffectActionFactory and Tv2AtemVideoMixerTimelineObjectFactory.
-function testDskEnableStartIsEqualToCasparCgPreRollDuration(casparCgPreRollDuration: number): void {
+function testDskEnableStartIsEqualToCasparcgPreRollDuration(casparcgPreRollDuration: number): void {
   const action: Tv2TransitionEffectAction = EntityTestFactory.createPieceAction({
-    metadata: createBreakerActionMetadata(10, casparCgPreRollDuration),
+    metadata: createBreakerActionMetadata(10, casparcgPreRollDuration),
   }) as Tv2TransitionEffectAction
 
   const videoMixerTimelineObjectFactory: Tv2VideoMixerTimelineObjectFactory = new Tv2AtemVideoMixerTimelineObjectFactory(instance(mock<Logger>()))
@@ -197,12 +197,12 @@ function testDskEnableStartIsEqualToCasparCgPreRollDuration(casparCgPreRollDurat
     throw new Error('No DSK TimelineObject created')
   }
 
-  expect(dskTimelineObject.enable.start).toBe(casparCgPreRollDuration)
+  expect(dskTimelineObject.enable.start).toBe(casparcgPreRollDuration)
 }
 
 function createTestee(params?: {
   videoMixerTimelineObjectFactory?: Tv2VideoMixerTimelineObjectFactory
-  casparCgTimelineObjectFactory?: Tv2CasparCgTimelineObjectFactory
+  casparcgTimelineObjectFactory?: Tv2CasparcgTimelineObjectFactory
   audioMixerTimelineObjectFactory?: Tv2AudioMixerTimelineObjectFactory
   assetPathHelper?: Tv2AssetPathHelper
   frameTimeConverter?: FrameTimeConverter
@@ -210,7 +210,7 @@ function createTestee(params?: {
 }): Tv2TransitionEffectActionFactory {
   return new Tv2TransitionEffectActionFactory(
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
-    params?.casparCgTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory)),
+    params?.casparcgTimelineObjectFactory ?? instance(mock(Tv2CasparcgTimelineObjectFactory)),
     params?.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
     params?.assetPathHelper ?? instance(mock(Tv2AssetPathHelper)),
     params?.frameTimeConverter ?? instance(mock(FrameTimeConverter)),

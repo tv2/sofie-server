@@ -55,7 +55,7 @@ interface CoreGraphicsSchema {
   VizTemplate: string
   INewsSkemaColumn: string
   GfxSchemaTemplatesName: string
-  CasparCgDesignValues: string
+  CasparcgDesignValues: string
 }
 
 interface CoreSplitScreenConfiguration {
@@ -194,7 +194,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
         iNewsName: schema.VizTemplate,
         iNewsSchemaColumn: schema.INewsSkemaColumn,
         graphicsTemplateName: schema.GfxSchemaTemplatesName,
-        casparCgDesignValues: schema.CasparCgDesignValues ? JSON.parse(schema.CasparCgDesignValues) : []
+        casparcgDesignValues: schema.CasparcgDesignValues ? JSON.parse(schema.CasparcgDesignValues) : []
       }
     })
   }

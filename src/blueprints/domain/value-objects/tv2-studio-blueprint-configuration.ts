@@ -10,7 +10,7 @@ export interface Tv2StudioBlueprintConfiguration {
   mediaPlayers: Tv2MediaPlayer[]
   videoMixerType: VideoMixerType
   videoMixerBasicConfiguration: Tv2VideoMixerBasicConfiguration
-  casparCgPreRollDuration: number
+  casparcgPreRollDuration: number
   serverPostRollDuration: number
   splitScreenFolder?: Tv2FolderConfiguration
   jingleFolder?: Tv2FolderConfiguration

@@ -31,7 +31,7 @@ export class Tv2BlueprintConfigurationValidator implements BlueprintValidateConf
 
   private validateGraphicsSchemas(showStyleConfiguration: Tv2ShowStyleBlueprintConfiguration): StatusMessage[] {
     return showStyleConfiguration.graphicsSchemas.flatMap((schema) => {
-      return schema.casparCgDesignValues
+      return schema.casparcgDesignValues
         .filter(designValues => designValues.name?.includes(' '))
         .map((designValue) => {
           return {

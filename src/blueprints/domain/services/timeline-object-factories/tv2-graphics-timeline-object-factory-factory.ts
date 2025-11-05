@@ -2,7 +2,7 @@ import { Tv2GraphicsCommandTimelineObjectFactory } from '../../interfaces/timeli
 import { Tv2GraphicsElementTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-graphics-element-timeline-object-factory'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2GraphicsType } from '../../value-objects/tv2-studio-blueprint-configuration'
-import { Tv2CasparCgTimelineObjectFactory } from './tv2-caspar-cg-timeline-object-factory'
+import { Tv2CasparcgTimelineObjectFactory } from './tv2-casparcg-timeline-object-factory'
 import { Tv2VizTimelineObjectFactory } from './tv2-viz-timeline-object-factory'
 import { Tv2AssetPathHelper } from '../tv2-asset-path-helper'
 import {
@@ -25,7 +25,7 @@ export class Tv2GraphicsTimelineObjectFactoryFactory {
 
   public createGraphicsElementTimelineObjectFactory(blueprintConfiguration: Tv2BlueprintConfiguration): Tv2GraphicsElementTimelineObjectFactory {
     return this.isUsingHtmlGraphics(blueprintConfiguration)
-      ? new Tv2CasparCgTimelineObjectFactory(this.assetPathHelper, this.frameTimeConverter)
+      ? new Tv2CasparcgTimelineObjectFactory(this.assetPathHelper, this.frameTimeConverter)
       : new Tv2VizTimelineObjectFactory()
   }
 }

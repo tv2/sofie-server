@@ -8,7 +8,7 @@ import { Tv2StudioBlueprintConfiguration } from '../../value-objects/tv2-studio-
 import { Tv2AudioMixerTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-audio-mixer-timeline-object-factory'
 import { Tv2SisyfosAudioMixerTimelineObjectFactory } from './tv2-sisyfos-audio-mixer-timeline-object-factory'
 import { Tv2VideoClipTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-video-clip-timeline-object-factory'
-import { Tv2CasparCgTimelineObjectFactory } from './tv2-caspar-cg-timeline-object-factory'
+import { Tv2CasparcgTimelineObjectFactory } from './tv2-casparcg-timeline-object-factory'
 import { Tv2AssetPathHelper } from '../tv2-asset-path-helper'
 import { FrameTimeConverter } from '../frame-time-converter'
 import { Tv2AudioBedTimelineObjectFactory } from '../../interfaces/timeline-object-factories/tv2-audio-bed-timeline-object-factory'
@@ -52,7 +52,7 @@ export class TimelineObjectFactoryProvider {
   }
 
   public createVideoClipTimelineObjectFactory(): Tv2VideoClipTimelineObjectFactory {
-    return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
+    return new Tv2CasparcgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
   }
 
   private createAssetPathHelper(): Tv2AssetPathHelper {
@@ -64,7 +64,7 @@ export class TimelineObjectFactoryProvider {
   }
 
   public createAudioBedTimelineObjectFactory(): Tv2AudioBedTimelineObjectFactory {
-    return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
+    return new Tv2CasparcgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
   }
 
   public createGraphicsTimelineObjectFactoryFactory(): Tv2GraphicsTimelineObjectFactoryFactory {
@@ -72,7 +72,7 @@ export class TimelineObjectFactoryProvider {
   }
 
   public createGraphicsSplitScreenTimelineObjectFactory(): Tv2GraphicsSplitScreenTimelineObjectFactory {
-    return new Tv2CasparCgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
+    return new Tv2CasparcgTimelineObjectFactory(this.createAssetPathHelper(), this.createFrameTimeConverter())
   }
 
   public createRobotTimelineObjectFactory(): Tv2RobotTimelineObjectFactory {

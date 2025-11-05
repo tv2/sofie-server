@@ -370,7 +370,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       },
       outputChannel: OutputChannel.UNKNOWN,
       transitionEffectType: TransitionEffectType.BREAKER,
-      casparCgPreRollDuration: configuration.studio.casparCgPreRollDuration,
+      casparcgPreRollDuration: configuration.studio.casparcgPreRollDuration,
       downstreamKeyer: breakerDsk,
       breakerFolder: configuration.studio.jingleFolder?.name ?? '',
       breaker
@@ -425,7 +425,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
         break
       }
       case TransitionEffectType.BREAKER: {
-        const start: number = this.frameTimeConverter.convertFramesToMilliseconds(action.metadata.breaker.startAlpha) + action.metadata.casparCgPreRollDuration
+        const start: number = this.frameTimeConverter.convertFramesToMilliseconds(action.metadata.breaker.startAlpha) + action.metadata.casparcgPreRollDuration
         action.data.pieceInterface.timelineObjects.push(...this.createTimelineObjectsForBreakerTransitionEffect(sourceInput, action.metadata, mediaPlayerSession))
         action.data.partInTransition = this.createPartInTransitionForBreakerTransitionEffect(action.metadata)
         piece.insertTimelineObjects(this.createProgramWithoutTransitionTimelineObjects(sourceInput, start, mediaPlayerSession))
@@ -447,12 +447,12 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createTimelineObjectsForBreakerTransitionEffect(sourceInput: number, breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata, mediaPlayerSession?: string): Tv2BlueprintTimelineObject[] {
     const breaker: Breaker = breakerActionMetadata.breaker
-    const casparCgPreRollDuration: number = breakerActionMetadata.casparCgPreRollDuration
-    const start: number = this.frameTimeConverter.convertFramesToMilliseconds(breaker.startAlpha) + casparCgPreRollDuration
+    const casparcgPreRollDuration: number = breakerActionMetadata.casparcgPreRollDuration
+    const start: number = this.frameTimeConverter.convertFramesToMilliseconds(breaker.startAlpha) + casparcgPreRollDuration
 
     const videoMixerTimelineEnable: TimelineEnable = {
       start,
-      duration: this.frameTimeConverter.convertFramesToMilliseconds(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparCgPreRollDuration
+      duration: this.frameTimeConverter.convertFramesToMilliseconds(breaker.durationInFrames - breaker.startAlpha - breaker.endAlpha) + casparcgPreRollDuration
     }
 
     const videoMixerInputSource: number = breakerActionMetadata.downstreamKeyer.videoMixerFillSource
@@ -466,7 +466,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return [
       ...mixEffectTimelineObjects,
       this.videoMixerTimelineObjectFactory.createCleanFeedTimelineObject(videoMixerInputSource, videoMixerTimelineEnable, { mediaPlayerSession }),
-      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true, { enable: { start: casparCgPreRollDuration } }),
+      this.videoMixerTimelineObjectFactory.createDownstreamKeyerTimelineObject(breakerActionMetadata.downstreamKeyer, true, { enable: { start: casparcgPreRollDuration } }),
       this.videoClipTimelineObjectFactory.createBreakerTimelineObject(fileName),
       this.audioMixerTimelineObjectFactory.createBreakerAudioTimelineObject()
     ]
@@ -487,9 +487,9 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createPartInTransitionForBreakerTransitionEffect(breakerActionMetadata: Tv2BreakerTransitionEffectActionMetadata): InTransition {
     return {
-      blockTakeDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames) + breakerActionMetadata.casparCgPreRollDuration,
-      keepPreviousPartAliveDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparCgPreRollDuration,
-      delayPiecesDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparCgPreRollDuration
+      blockTakeDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames) + breakerActionMetadata.casparcgPreRollDuration,
+      keepPreviousPartAliveDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.startAlpha) + breakerActionMetadata.casparcgPreRollDuration,
+      delayPiecesDuration: this.frameTimeConverter.convertFramesToMilliseconds(breakerActionMetadata.breaker.durationInFrames - breakerActionMetadata.breaker.endAlpha) + breakerActionMetadata.casparcgPreRollDuration
     }
   }
 }

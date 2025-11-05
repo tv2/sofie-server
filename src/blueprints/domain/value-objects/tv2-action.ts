@@ -126,7 +126,7 @@ export interface Tv2BreakerTransitionEffectActionMetadata {
   playoutContent: TransitionPlayoutContent
   outputChannel: OutputChannel
   transitionEffectType: TransitionEffectType.BREAKER
-  casparCgPreRollDuration: number
+  casparcgPreRollDuration: number
   downstreamKeyer: Tv2DownstreamKeyer
   breakerFolder: string
   breaker: Breaker

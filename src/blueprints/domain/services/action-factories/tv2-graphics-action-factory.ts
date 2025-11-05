@@ -416,7 +416,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
 
   private getPreRollDuration(blueprintConfiguration: Tv2BlueprintConfiguration): number {
     return this.isUsingHtmlGraphics(blueprintConfiguration)
-      ? blueprintConfiguration.studio.casparCgPreRollDuration
+      ? blueprintConfiguration.studio.casparcgPreRollDuration
       : blueprintConfiguration.studio.vizPilotGraphics.preRollDurationInMs
   }
 
@@ -433,7 +433,7 @@ export class Tv2GraphicsActionFactory extends ActionFactory {
       )
     }
 
-    const enable: TimelineEnable = { start: blueprintConfiguration.studio.casparCgPreRollDuration }
+    const enable: TimelineEnable = { start: blueprintConfiguration.studio.casparcgPreRollDuration }
     const sourceInput: number = this.getDownstreamKeyerMatchingRole(blueprintConfiguration, Tv2DownstreamKeyerRole.FULL_GRAPHICS).videoMixerFillSource
     const transitionSettings: VideoMixerWipeTransitionSettings = {
       durationInFrames: blueprintConfiguration.studio.htmlGraphics.transitionSettings.wipeRate,

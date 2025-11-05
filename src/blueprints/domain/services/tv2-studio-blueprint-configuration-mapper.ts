@@ -140,7 +140,7 @@ export class Tv2StudioBlueprintConfigurationMapper {
       mediaPlayers: this.mapSources(coreConfiguration.ABMediaPlayers),
       videoMixerType: this.mapToVideoMixerType(coreConfiguration.SwitcherType),
       videoMixerBasicConfiguration: this.mapVideoMixerBasicConfiguration(coreConfiguration.SwitcherSource),
-      casparCgPreRollDuration: coreConfiguration.CasparPrerollDuration,
+      casparcgPreRollDuration: coreConfiguration.CasparPrerollDuration,
       serverPostRollDuration: coreConfiguration.ServerPostrollDuration,
       splitScreenFolder: this.mapSplitScreenFolder(coreConfiguration),
       jingleFolder: this.mapJingleFolder(coreConfiguration),

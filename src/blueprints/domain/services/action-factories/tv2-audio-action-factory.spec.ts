@@ -14,7 +14,7 @@ import { Tv2AudioAction } from '../../value-objects/tv2-action'
 import { FrameTimeConverter } from '../frame-time-converter'
 import { Tv2ActionManifestAudioBedData } from '../../value-objects/tv2-action-manifest-data'
 import { Logger } from '../../../../cross-cutting-concerns/application/interfaces/logger'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import { Tv2CasparcgTimelineObjectFactory } from '../timeline-object-factories/tv2-casparcg-timeline-object-factory'
 import { Tv2AssetPathHelper } from '../tv2-asset-path-helper'
 import { Tv2PieceLayer } from '../../value-objects/tv2-layers'
 
@@ -172,7 +172,7 @@ function createTestee(params: {
 } = {}): Tv2AudioActionFactory {
   return new Tv2AudioActionFactory(
     params.audioMixerTimelineObjectFactory ?? instance(mock<Tv2AudioMixerTimelineObjectFactory>()),
-    params.audioBedTimelineObjectFactory ?? new Tv2CasparCgTimelineObjectFactory(new Tv2AssetPathHelper(), new FrameTimeConverter(25)),
+    params.audioBedTimelineObjectFactory ?? new Tv2CasparcgTimelineObjectFactory(new Tv2AssetPathHelper(), new FrameTimeConverter(25)),
     params.frameTimeConverter ?? instance(mock(FrameTimeConverter)),
     params.logger ?? instance(createMockOfLogger())
   )

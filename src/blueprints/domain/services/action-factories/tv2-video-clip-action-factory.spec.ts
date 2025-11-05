@@ -5,7 +5,7 @@ import {
 import {
   Tv2AudioMixerTimelineObjectFactory
 } from '../../interfaces/timeline-object-factories/tv2-audio-mixer-timeline-object-factory'
-import { Tv2CasparCgTimelineObjectFactory } from '../timeline-object-factories/tv2-caspar-cg-timeline-object-factory'
+import { Tv2CasparcgTimelineObjectFactory } from '../timeline-object-factories/tv2-casparcg-timeline-object-factory'
 import { anyString, anything, instance, mock, when } from '@typestrong/ts-mockito'
 import { Tv2ActionManifestMapper } from '../tv2-action-manifest-mapper'
 import { Tv2VideoClipAction } from '../../value-objects/tv2-action'
@@ -81,7 +81,7 @@ function createTestee(params?: {
     params?.actionManifestMapper ?? new Tv2ActionManifestMapper(instance(createMockOfLogger())),
     params?.videoMixerTimelineObjectFactory ?? instance(mock<Tv2VideoMixerTimelineObjectFactory>()),
     params?.audioMixerTimelineObjectFactory ?? instance(createMockedTv2AudioMixerTimelineObjectFactory()),
-    params?.videoClipTimelineObjectFactory ?? instance(mock(Tv2CasparCgTimelineObjectFactory)),
+    params?.videoClipTimelineObjectFactory ?? instance(mock(Tv2CasparcgTimelineObjectFactory)),
   )
 }
 

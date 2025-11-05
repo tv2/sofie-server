@@ -232,7 +232,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
     }
 
     const videoMixerEnable: TimelineEnable = {
-      start: configuration.studio.casparCgPreRollDuration
+      start: configuration.studio.casparcgPreRollDuration
     }
 
     return {
@@ -249,7 +249,7 @@ export class Tv2VideoClipActionFactory extends ActionFactory {
       start: 0,
       duration: 0,
       takenOffAirTimestamp: 0,
-      preRollDuration: configuration.studio.casparCgPreRollDuration,
+      preRollDuration: configuration.studio.casparcgPreRollDuration,
       postRollDuration: 0,
       tags: [],
       timelineObjects: [

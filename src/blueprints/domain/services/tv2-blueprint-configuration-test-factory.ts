@@ -47,7 +47,7 @@ export class Tv2BlueprintConfigurationTestFactory {
         useAudioFilterSyntax: true
       },
       cameraSources: [],
-      casparCgPreRollDuration: 0,
+      casparcgPreRollDuration: 0,
       feedSources: [],
       graphicsFolder: {
         networkBasePath: '',
