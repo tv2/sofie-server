@@ -194,7 +194,7 @@ export class Tv2ShowStyleBlueprintConfigurationMapper {
         iNewsName: schema.VizTemplate,
         iNewsSchemaColumn: schema.INewsSkemaColumn,
         graphicsTemplateName: schema.GfxSchemaTemplatesName,
-        casparCgDesignValues: schema.CasparCgDesignValues ? JSON.parse(schema.CasparCgDesignValues) : []
+        casparcgDesignValues: schema.CasparCgDesignValues ? JSON.parse(schema.CasparCgDesignValues) : []
       }
     })
   }

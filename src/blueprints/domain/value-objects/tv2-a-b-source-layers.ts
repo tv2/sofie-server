@@ -1,4 +1,4 @@
-import { Tv2CasparCgLayer, Tv2SisyfosLayer } from './tv2-layers'
+import { Tv2CasparcgLayer, Tv2SisyfosLayer } from './tv2-layers'
 
 interface Tv2ABSourceLayers {
   caspar: {
@@ -15,7 +15,7 @@ export const A_B_SOURCE_INPUT_PLACEHOLDER: number = -1
 
 export const A_B_SOURCE_LAYERS: Tv2ABSourceLayers = {
   caspar: {
-    clipPending: Tv2CasparCgLayer.PLAYER_CLIP_PENDING,
+    clipPending: Tv2CasparcgLayer.PLAYER_CLIP_PENDING,
   },
   sisyfos: {
     clipPending: Tv2SisyfosLayer.SOURCE_CLIP_PENDING,

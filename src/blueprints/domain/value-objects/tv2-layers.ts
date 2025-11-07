@@ -60,7 +60,7 @@ export enum Tv2VideoMixerLayer {
   VIZ_OVERLAY_AUXILIARY = 'aux_viz_ovl_in_1'
 }
 
-export enum Tv2CasparCgLayer {
+export enum Tv2CasparcgLayer {
   PLAYER_CLIP_PENDING = 'casparcg_player_clip_pending',
   SPLIT_SCREEN_KEY = 'casparcg_dve_key',
   SPLIT_SCREEN_FRAME = 'casparcg_dve_frame',

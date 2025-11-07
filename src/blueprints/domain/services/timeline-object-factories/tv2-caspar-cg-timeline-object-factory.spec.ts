@@ -1,11 +1,11 @@
-import { Tv2CasparCgTimelineObjectFactory } from './tv2-caspar-cg-timeline-object-factory'
+import { Tv2CasparcgTimelineObjectFactory } from './tv2-casparcg-timeline-object-factory'
 import { Tv2AssetPathHelper } from '../tv2-asset-path-helper'
 import { FrameTimeConverter } from '../frame-time-converter'
 import { Tv2BlueprintConfiguration } from '../../value-objects/tv2-blueprint-configuration'
 import { Tv2BlueprintConfigurationTestFactory } from '../tv2-blueprint-configuration-test-factory'
 
-describe(Tv2CasparCgTimelineObjectFactory.name, () => {
-  describe(Tv2CasparCgTimelineObjectFactory.prototype.createAudioBedTimelineObject, () => {
+describe(Tv2CasparcgTimelineObjectFactory.name, () => {
+  describe(Tv2CasparcgTimelineObjectFactory.prototype.createAudioBedTimelineObject, () => {
     describe('when CasparCG 2.2 or later is used', () => {
       it('uses audio filter for audio track routing', () => {
         const configuration: Tv2BlueprintConfiguration = Tv2BlueprintConfigurationTestFactory.createTv2BlueprintConfiguration({
@@ -30,7 +30,7 @@ describe(Tv2CasparCgTimelineObjectFactory.name, () => {
             ]
           }
         })
-        const testee: Tv2CasparCgTimelineObjectFactory = createTestee()
+        const testee: Tv2CasparcgTimelineObjectFactory = createTestee()
 
         const result = testee.createAudioBedTimelineObject('my-audio-bed', configuration)
         expect(result.content.channelLayout).toBeUndefined()
@@ -62,7 +62,7 @@ describe(Tv2CasparCgTimelineObjectFactory.name, () => {
             ]
           }
         })
-        const testee: Tv2CasparCgTimelineObjectFactory = createTestee()
+        const testee: Tv2CasparcgTimelineObjectFactory = createTestee()
 
         const result = testee.createAudioBedTimelineObject('my-audio-bed', configuration)
         expect(result.content.audioFilter).toBeUndefined()
@@ -72,6 +72,6 @@ describe(Tv2CasparCgTimelineObjectFactory.name, () => {
   })
 })
 
-function createTestee(): Tv2CasparCgTimelineObjectFactory {
-  return new Tv2CasparCgTimelineObjectFactory(new Tv2AssetPathHelper(), new FrameTimeConverter(25))
+function createTestee(): Tv2CasparcgTimelineObjectFactory {
+  return new Tv2CasparcgTimelineObjectFactory(new Tv2AssetPathHelper(), new FrameTimeConverter(25))
 }

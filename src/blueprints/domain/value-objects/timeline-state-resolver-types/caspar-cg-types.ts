@@ -1,11 +1,11 @@
 import { DeviceType } from '../../../../sofie-ingest/domain/enums/device-type'
 import { TimelineObject } from '../../../../rundown-execution/domain/entities/timeline-object'
 
-export interface CasparCgTemplateTimelineObject<T> extends TimelineObject {
+export interface CasparcgTemplateTimelineObject<T> extends TimelineObject {
   content: {
     deviceType: DeviceType.CASPAR_CG
-    type: CasparCgType.TEMPLATE
-    templateType: CasparCgTemplateType
+    type: CasparcgType.TEMPLATE
+    templateType: CasparcgTemplateType
     name: string
     data: T
     useStopCommand: boolean
@@ -20,16 +20,16 @@ interface Mixer {
   // A lot more to be found in TSR.
 }
 
-export enum CasparCgTemplateType {
+export enum CasparcgTemplateType {
   // TSR needs the values to be lowercased.
   HTML = 'html',
   FLASH = 'flash'
 }
 
-export interface CasparCgMediaTimelineObject extends TimelineObject {
+export interface CasparcgMediaTimelineObject extends TimelineObject {
   content: {
     deviceType: DeviceType.CASPAR_CG
-    type: CasparCgType.MEDIA
+    type: CasparcgType.MEDIA
     file: string
     loop?: boolean
     seek?: number
@@ -48,13 +48,13 @@ export interface CasparCgMediaTimelineObject extends TimelineObject {
 }
 
 interface TimelineTransition {
-  type: CasparCgTransitionType
+  type: CasparcgTransitionType
   duration: number
-  easing: CasparCgTransitionEase
-  direction: CasparCgTransitionDirection
+  easing: CasparcgTransitionEase
+  direction: CasparcgTransitionDirection
 }
 
-export enum CasparCgTransitionType {
+export enum CasparcgTransitionType {
   MIX = 'MIX',
   CUT = 'CUT',
   PUSH = 'PUSH',
@@ -63,17 +63,17 @@ export enum CasparCgTransitionType {
   STING = 'STING'
 }
 
-export enum CasparCgTransitionEase {
+export enum CasparcgTransitionEase {
   LINEAR = 'LINEAR',
   // A lot more to be found in TSR.
 }
 
-export enum CasparCgTransitionDirection {
+export enum CasparcgTransitionDirection {
   LEFT = 'LEFT',
   RIGHT = 'RIGHT'
 }
 
-export enum CasparCgType {
+export enum CasparcgType {
   MEDIA = 'media',
   TEMPLATE = 'template',
   // More to be found in TSR.

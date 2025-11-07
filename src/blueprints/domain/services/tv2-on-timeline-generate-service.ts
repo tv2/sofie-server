@@ -196,8 +196,8 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
   private updateTimelineObjectWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
     switch (timelineObject.content.deviceType) {
       case DeviceType.CASPAR_CG: {
-        this.updateCasparCgProgramWithMediaPlayer(timelineObject, mediaPlayer)
-        this.updateCasparCgLookaheadWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateCasparcgProgramWithMediaPlayer(timelineObject, mediaPlayer)
+        this.updateCasparcgLookaheadWithMediaPlayer(timelineObject, mediaPlayer)
         break
       }
       case DeviceType.ATEM: { // TODO: Fully implement VideoSwitcher composition strategy
@@ -219,29 +219,29 @@ export class Tv2OnTimelineGenerateService implements BlueprintOnTimelineGenerate
     }
   }
 
-  private getCasparCgPlayerClipLayer(mediaPlayer: Tv2MediaPlayer): string {
+  private getCasparcgPlayerClipLayer(mediaPlayer: Tv2MediaPlayer): string {
     return `casparcg_player_clip_${mediaPlayer.name}`
   }
 
-  private updateCasparCgProgramWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+  private updateCasparcgProgramWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
     if (timelineObject.content.deviceType !== DeviceType.CASPAR_CG) {
       return
     }
     if (timelineObject.layer !== A_B_SOURCE_LAYERS.caspar.clipPending) {
       return
     }
-    timelineObject.layer = this.getCasparCgPlayerClipLayer(mediaPlayer)
+    timelineObject.layer = this.getCasparcgPlayerClipLayer(mediaPlayer)
   }
 
-  private updateCasparCgLookaheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
+  private updateCasparcgLookaheadWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {
     if (timelineObject.content.deviceType !== DeviceType.CASPAR_CG) {
       return
     }
     if (!timelineObject.lookaheadForLayer || timelineObject.lookaheadForLayer !== A_B_SOURCE_LAYERS.caspar.clipPending) {
       return
     }
-    timelineObject.layer = `${this.getCasparCgPlayerClipLayer(mediaPlayer)}_lookahead`
-    timelineObject.lookaheadForLayer = this.getCasparCgPlayerClipLayer(mediaPlayer)
+    timelineObject.layer = `${this.getCasparcgPlayerClipLayer(mediaPlayer)}_lookahead`
+    timelineObject.lookaheadForLayer = this.getCasparcgPlayerClipLayer(mediaPlayer)
   }
 
   private updateAtemProgramWithMediaPlayer(timelineObject: Tv2BlueprintTimelineObject, mediaPlayer: Tv2MediaPlayer): void {

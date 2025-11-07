@@ -35,10 +35,10 @@ export interface GraphicsSchema {
   iNewsName: string
   iNewsSchemaColumn: string
   graphicsTemplateName: string
-  casparCgDesignValues: CasparCgDesignValue[]
+  casparcgDesignValues: CasparcgDesignValue[]
 }
 
-export interface CasparCgDesignValue {
+export interface CasparcgDesignValue {
   name: string
   properties: string[]
   backgroundLoop: string
