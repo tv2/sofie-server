@@ -36,7 +36,7 @@ export class Tv2InewsIngestController extends BaseController {
 
   @AuditLog()
   @PutRequest('configurations')
-  public async saveINewsIngestConfiguration(request: Request, response: Response): Promise<void> {
+  public async saveInewsIngestConfiguration(request: Request, response: Response): Promise<void> {
     try {
       const inewsIngestConfigurationDto: InewsIngestConfigurationDto = request.body as InewsIngestConfigurationDto
       const inewsIngestConfiguration: InewsIngestConfiguration = {
