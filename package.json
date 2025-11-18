@@ -54,7 +54,7 @@
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "got": "11.8.6",
+    "got": "14.6.4",
     "mongodb": "^6.20.0",
     "reflect-metadata": "^0.2.2",
     "superfly-timeline": "^9.2.0",
