@@ -19,7 +19,7 @@ export class Tv2InewsSofieIngestService implements SofieIngestService {
     } catch (error) {
       if (error instanceof HttpError) {
         if (error.code === HttpErrorCode.CONNECTION_REFUSED) {
-          throw new ServiceUnavailableException('Unable to reingest data from inews. Check your inews connection.')
+          throw new ServiceUnavailableException('Unable to reingest data from iNews. Check your iNews connection.')
         }
         if (/does not exist in playlist/i.test(error.message)) {
           throw new NotFoundException('Unable to reingest data, since the rundown is not configured for ingest.')
