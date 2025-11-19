@@ -171,13 +171,13 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     return true
   }
 
-  private createPieceInterface(effectName: string, durationInFrames: number, pieceLayer: Tv2PieceLayer, piece: Partial<Tv2PieceInterface> = {}): Tv2PieceInterface {
+  private createPieceInterface(effectName: string, durationInFrames: number, piece: Partial<Tv2PieceInterface> = {}): Tv2PieceInterface {
     return {
       id: `${this.sanitizeStringForId(effectName)}TransitionActionPiece`,
       name: `${effectName}`,
       partId: '',
       rundownId: '',
-      layer: pieceLayer,
+      layer: Tv2PieceLayer.TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.IN_TRANSITION,
       isPlanned: false,
@@ -310,7 +310,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createMixTransitionEffectAction(actionType: PieceActionType, durationInFrames: number): Tv2TransitionEffectAction {
     const effectName: string = `Mix ${durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, Tv2PieceLayer.TRANSITION)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2MixTransitionEffectActionMetadata = {
       playoutContent: {
         type: PlayoutContentType.TRANSITION
@@ -324,7 +324,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
 
   private createDipTransitionEffectAction(actionType: PieceActionType, durationInFrames: number, configuredDipInput: number): Tv2TransitionEffectAction {
     const effectName: string = `Dip ${durationInFrames}`
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, Tv2PieceLayer.TRANSITION)
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES)
     const metadata: Tv2DipTransitionEffectActionMetadata = {
       playoutContent: {
         type: PlayoutContentType.TRANSITION
@@ -341,7 +341,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
     const breaker: Breaker = this.findBreakerFromConfiguration(transitionEffect, configuration)
     const effectName: string = `Effect ${breaker.name}`
     const jingleFolder: string = configuration.studio.jingleFolder?.name ? `${configuration.studio.jingleFolder.name}/` : ''
-    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, Tv2PieceLayer.JINGLE, {
+    const pieceInterface: Tv2PieceInterface = this.createPieceInterface(effectName, breaker.durationInFrames + POST_TRANSITION_DELAY_IN_FRAMES, {
       metadata: {
         playoutContent: {
           type: PlayoutContentType.TRANSITION
