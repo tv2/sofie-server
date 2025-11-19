@@ -3,7 +3,7 @@ import { Rundown, RundownInterface } from '../rundown'
 import { Part } from '../part'
 import { Piece } from '../piece'
 import { PieceLifespan } from '../../enums/piece-lifespan'
-import { capture, instance, mock, spy, verify, when } from '@typestrong/ts-mockito'
+import { capture, instance, mock, spy, verify } from '@typestrong/ts-mockito'
 import { NotActivatedException } from '../../exceptions/not-activated-exception'
 import { NotFoundException } from '../../../../cross-cutting-concerns/domain/exceptions/not-found-exception'
 import { LastPartInRundownException } from '../../exceptions/last-part-in-rundown-exception'
@@ -4069,14 +4069,11 @@ describe(Rundown.name, () => {
         const segmentId: string = 'segmentId'
         const segment: Segment = EntityTestFactory.createSegment({ id: segmentId })
         const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId })
-        const testee: Rundown = new Rundown({ segments: [instance(segment)] } as RundownInterface)
-
-        when(segment.id).thenReturn(segmentId)
+        const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
 
         testee.addPart(part)
 
-        const [partThatWasAdded] = capture(segment.addPart).last()
-        expect(partThatWasAdded).toBe(part)
+        expect(segment.getParts()[0]).toBe(part)
       })
 
       // It should also update the NextCursor, but that is being tested by "addSegment()".
@@ -4286,21 +4283,16 @@ describe(Rundown.name, () => {
     })
 
     describe('Part does have a Segment id for a Segment in the Rundown', () => {
-      it('adds the Part to the Segment', () => {
-        const segmentId: string = 'segmentId'
-        const segment: Segment = EntityTestFactory.createSegment({ id: segmentId })
-        const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId })
-        const testee: Rundown = new Rundown({ segments: [instance(segment)] } as RundownInterface)
+      describe('the part does not exist on the segment', () => {
+        it('throws an not found exception', () => {
+          const segmentId: string = 'segmentId'
+          const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId })
+          const segment: Segment = EntityTestFactory.createSegment({ id: segmentId })
+          const testee: Rundown = new Rundown({ segments: [segment] } as RundownInterface)
 
-        when(segment.id).thenReturn(segmentId)
-
-        testee.updatePart(part)
-
-        const [partThatWasUpdated] = capture(segment.updatePart).last()
-        expect(partThatWasUpdated).toBe(part)
+          expect(() => testee.updatePart(part)).toThrow(NotFoundException)
+        })
       })
-
-      // It should also update the NextCursor, but that is being tested by "addSegment()".
     })
   })
 
@@ -4317,16 +4309,14 @@ describe(Rundown.name, () => {
     describe('PartId does belong to a Part in the Rundown', () => {
       it('calls removePart on Segment', () => {
         const segmentId: string = 'segmentId'
-        const segment: Segment = EntityTestFactory.createSegment({ id: segmentId })
         const part: Part = EntityTestFactory.createPart({ id: 'partId', segmentId })
-        const testee: Rundown = new Rundown({ segments: [instance(segment)] } as RundownInterface)
-
-        when(segment.id).thenReturn(segmentId)
-        when(segment.getParts()).thenReturn([part])
+        const segment: Segment = EntityTestFactory.createSegment({ id: segmentId, parts: [part] })
+        const segmentSpy: Segment = spy(segment)
+        const testee: Rundown = new Rundown({ id: 'rundown-id', segments: [segment] } as RundownInterface)
 
         testee.removePartFromSegment(part.id)
 
-        const [partIdToBeRemoved] = capture(segment.removePart).last()
+        const [partIdToBeRemoved] = capture(segmentSpy.removePart).last()
         expect(partIdToBeRemoved).toBe(part.id)
       })
 
@@ -4342,10 +4332,9 @@ describe(Rundown.name, () => {
           pieceLifespan: PieceLifespan.SPANNING_UNTIL_RUNDOWN_END,
           layer: 'someLayer'
         })
-        when(infinitePiece.getUnsyncedCopy()).thenReturn(infinitePiece)
 
         const infinitePieceMap: Map<string, Piece[]> = new Map()
-        infinitePieceMap.set(infinitePiece.layer, [instance(infinitePiece)])
+        infinitePieceMap.set(infinitePiece.layer, [infinitePiece])
 
         const part: Part = EntityTestFactory.createPart({ id: partId })
         const segment: Segment = EntityTestFactory.createSegment({ parts: [part] })
@@ -4360,7 +4349,7 @@ describe(Rundown.name, () => {
 
         testee.removePartFromSegment(partId)
 
-        verify(infinitePiece.markAsUnsynced()).once()
+        expect(infinitePiece.isUnsynced()).toBeTruthy()
       })
 
       it('updates the Infinite Piece to be the unsynced copy', () => {
