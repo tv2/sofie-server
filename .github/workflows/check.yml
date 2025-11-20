@@ -10,6 +10,6 @@ jobs:
   status:
     uses: 'tv2/ag-github-actions/.github/workflows/status-check.yml@v0'
     with:
-      node-version: '22.6'
+      node-version: '24.11'
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
