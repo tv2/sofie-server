@@ -88,7 +88,7 @@ import { RundownService } from './rundown-execution/application/interfaces/rundo
 import { SofieIngestService } from './sofie-ingest/application/interfaces/sofie-ingest-service'
 import { Tv2InewsSofieIngestService } from './sofie-ingest/application/services/tv2-inews-sofie-ingest-service'
 import { HttpService } from './cross-cutting-concerns/application/interfaces/http-service'
-import { GotHttpService } from './cross-cutting-concerns/infrastructure/services/got-http-service'
+import { FetchHttpService } from './cross-cutting-concerns/infrastructure/services/fetch-http-service'
 import { PlayoutService } from './rundown-execution/application/interfaces/playout-service'
 import { PlayoutGatewayService } from './rundown-execution/application/services/playout-gateway-service'
 import { TimeoutCallbackScheduler } from './cross-cutting-concerns/application/services/timeout-callback-scheduler'
@@ -262,7 +262,7 @@ import {
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
   const objectCloner: DeepObjectCloner = new DeepPropertyObjectCloner()
-  const httpService: HttpService = new GotHttpService()
+  const httpService: HttpService = new FetchHttpService()
   const timeoutCallbackScheduler: CallbackScheduler = new TimeoutCallbackScheduler(logger)
 
   // Repository setup
