@@ -28,15 +28,14 @@
     "dump-database": "ts-node ./database/manager/mongo.ts --dump"
   },
   "engines": {
-    "node": ">=16.20"
+    "node": ">=24.11"
   },
   "devDependencies": {
     "@tv2media/eslint-config": "1.0.3",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
-    "@types/got": "^9.6.12",
     "@types/jest": "^29.5.4",
-    "@types/node": "^20.5.9",
+    "@types/node": "^24.10.1",
     "@types/ws": "^8.18.1",
     "@typestrong/ts-mockito": "^2.7.12",
     "cross-env": "^7.0.3",
@@ -46,15 +45,14 @@
     "nodemon": "^3.1.10",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.8.3",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@tv2media/logger": "^2.0.3",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "got": "14.6.4",
     "mongodb": "^6.20.0",
     "reflect-metadata": "^0.2.2",
     "superfly-timeline": "^9.2.0",
