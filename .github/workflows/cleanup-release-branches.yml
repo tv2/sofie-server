@@ -12,4 +12,4 @@ jobs:
       contents: write
     steps:
       - name: 'Call cleanup release branches workflow'
-        uses: 'tv2/ag-github-actions/.github/actions/cleanup-release-branches@v0.4.0'
+        uses: 'tv2/ag-github-actions/.github/actions/cleanup-release-branches@v0'

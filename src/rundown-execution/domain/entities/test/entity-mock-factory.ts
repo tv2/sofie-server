@@ -25,7 +25,7 @@ export class EntityMockFactory {
 
     when(mockedRundown.id).thenReturn(rundownInterface.id ?? 'rundownId')
     when(mockedRundown.name).thenReturn(rundownInterface.name ?? 'rundownName')
-    when(mockedRundown.isActive()).thenReturn(rundownInterface.mode === RundownMode.ACTIVE ?? false)
+    when(mockedRundown.isActive()).thenReturn(rundownInterface.mode === RundownMode.ACTIVE)
     when(mockedRundown.getLastTimeModified()).thenReturn(rundownInterface.modifiedAt ?? 0)
     when(mockedRundown.getSegments()).thenReturn(rundownInterface.segments ?? [])
 
