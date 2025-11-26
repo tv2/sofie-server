@@ -177,7 +177,7 @@ export class Tv2TransitionEffectActionFactory extends ActionFactory {
       name: `${effectName}`,
       partId: '',
       rundownId: '',
-      layer: Tv2PieceLayer.JINGLE,
+      layer: Tv2PieceLayer.TRANSITION,
       pieceLifespan: PieceLifespan.WITHIN_PART,
       transitionType: TransitionType.IN_TRANSITION,
       isPlanned: false,

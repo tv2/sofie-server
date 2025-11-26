@@ -4,6 +4,7 @@ export enum Tv2PieceLayer {
   REMOTE = 'studio0_live',
   JINGLE = 'studio0_jingle',
   AUDIO_BED = 'studio0_audio_bed',
+  TRANSITION = 'studio0_transition',
 
   GRAPHICS_IDENT = 'studio0_graphicsIdent',
   GRAPHICS_LOWER_THIRD = 'studio0_graphicsLower',
