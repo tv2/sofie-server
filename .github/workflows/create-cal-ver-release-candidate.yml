@@ -14,9 +14,9 @@ jobs:
         uses: 'tv2/ag-github-actions/.github/actions/get-next-cal-ver-release-version@v0'
 
       - name: 'Call create release action'
-        uses: 'tv2/ag-github-actions/.github/actions/create-release-candidate@v0'
+        uses: 'tv2/ag-github-actions/.github/actions/create-release-candidate@v1'
         with:
           release_version: ${{ steps.next_release_version.outputs.release_version }}
-          docker_repo: 'tv2media/alba-server'
+          docker_repos: 'tv2media/alba-server tv2media/alba-server-migrations'
           docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
           docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
