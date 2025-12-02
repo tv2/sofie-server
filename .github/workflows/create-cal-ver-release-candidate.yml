@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: 'Get next CalVer release version'
         id: 'next_release_version'
-        uses: 'tv2/ag-github-actions/.github/actions/get-next-cal-ver-release-version@v0'
+        uses: 'tv2/ag-github-actions/.github/actions/get-next-cal-ver-release-version@v1'
 
       - name: 'Call create release action'
         uses: 'tv2/ag-github-actions/.github/actions/create-release-candidate@v1'
