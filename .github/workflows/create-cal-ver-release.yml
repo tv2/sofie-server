@@ -11,13 +11,14 @@ jobs:
     steps:
       - name: 'Get next CalVer release version'
         id: 'next_release_version'
-        uses: 'tv2/ag-github-actions/.github/actions/get-next-cal-ver-release-version@v1'
+        uses: 'tv2/ag-github-actions/.github/actions/get-next-cal-ver-release-version@v2'
 
       - name: 'Call create release action'
-        uses: 'tv2/ag-github-actions/.github/actions/create-release@v1'
+        uses: 'tv2/ag-github-actions/.github/actions/create-release@v2'
         with:
           release_version: ${{ steps.next_release_version.outputs.release_version }}
           docker_repos: 'tv2media/alba-server tv2media/alba-server-migrations'
           docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
           docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          dx_token: ${{ secrets.DX_TOKEN }}
