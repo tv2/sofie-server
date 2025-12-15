@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "validate": "yarn validate-dependencies && yarn validate-fitness",
-    "validate-dependencies": "yarn audit --level moderate --groups dependencies --recursive",
+    "validate-dependencies": "yarn npm audit --severity moderate --environment production --recursive",
     "validate-fitness": "dependency-cruiser --validate ./.dependency-cruiser.js src",
     "clean": "rimraf dist",
     "reset": "rimraf --glob dist node_modules coverage *.log",
@@ -61,5 +61,5 @@
   "resolutions": {
     "cookie": ">=0.7.0"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@4.12.0"
 }
