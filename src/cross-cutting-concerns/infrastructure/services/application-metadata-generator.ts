@@ -8,7 +8,7 @@ export class ApplicationMetadataGenerator {
 
   private getGitRevisionMetadata(): object | undefined {
     const gitRevision: string = process.env.GIT_REVISION ?? ''
-    return gitRevision ? { gitRevision } : undefined
+    return gitRevision ? { git_revision: gitRevision } : undefined
   }
 
   private getServiceMetadata(): object {
