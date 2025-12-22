@@ -258,6 +258,9 @@ import { Tv2InewsIngestEventBuilder } from './tv2-inews-ingest/application/servi
 import {
   InewsIngestConfigurationEventService
 } from './tv2-inews-ingest/application/services/inews-ingest-configuration-event-service'
+import {
+  ApplicationMetadataGenerator
+} from './cross-cutting-concerns/infrastructure/services/application-metadata-generator'
 
 async function main(logger: Logger): Promise<void> {
   const uuidGenerator: UuidGenerator = new CryptoUuidGenerator()
@@ -495,11 +498,9 @@ function createConfigurationDataChangeService(mongoDatabase: MongoDatabase, blue
   return new ConfigurationChangedService(blueprint, statusMessageService, configurationRepository, showStyleConfigurationDataChangeListener, showStyleVariantConfigurationChangedListener, logger)
 }
 
-const gitRevision: string = process.env.GIT_REVISION ?? ''
+const applicationMetadataGenerator: ApplicationMetadataGenerator = new ApplicationMetadataGenerator()
 
 const consoleLogger: Logger = new ConsoleLogger()
   .tag('startup')
-  .metadata({
-    ...gitRevision ? { git_revision: gitRevision } : undefined,
-  })
+  .metadata(applicationMetadataGenerator.generateMetadata())
 main(consoleLogger).catch(error => consoleLogger.data(error).error('Failed starting up Alba server.'))
