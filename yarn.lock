@@ -771,10 +771,10 @@
     "@typescript-eslint/parser" "^8.34.1"
     typescript-eslint "^8.34.1"
 
-"@tv2media/logger@^2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@tv2media/logger/-/logger-2.0.3.tgz#2679f44c01a488a9ccde757bb4b784d5bc2abab8"
-  integrity sha512-xOKic7qUxxJZpj7siK5nmtzNAaH9NfowePrqWLOeV8oF5aPYUQ75jE95Ffuja5epmI2K0pZ6HzE3RFLe+225vw==
+"@tv2media/logger@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@tv2media/logger/-/logger-2.1.0.tgz#d6a077af6ec3cb77314902dcd7367619df81a6a3"
+  integrity sha512-dLX2NBsy4hMmK8h+05O0MiA1tSYliPrfu7AemX6DIi2+5glJt3yiClkYjStMSKOqfdaa/vJqrPCnvbppETOuRg==
 
 "@types/babel__core@^7.1.14":
   version "7.20.1"

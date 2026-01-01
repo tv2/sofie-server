@@ -49,7 +49,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@tv2media/logger": "^2.0.3",
+    "@tv2media/logger": "^2.1.0",
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
