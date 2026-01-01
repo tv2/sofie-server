@@ -33,7 +33,7 @@
   "devDependencies": {
     "@tv2media/eslint-config": "1.0.3",
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.5",
+    "@types/express": "^5.0.6",
     "@types/jest": "^29.5.4",
     "@types/node": "^24.10.1",
     "@types/ws": "^8.18.1",
@@ -52,7 +52,7 @@
     "@tv2media/logger": "^2.0.3",
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "mongodb": "^6.20.0",
     "reflect-metadata": "^0.2.2",
     "superfly-timeline": "^9.2.0",
