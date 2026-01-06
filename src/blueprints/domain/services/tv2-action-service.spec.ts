@@ -40,7 +40,7 @@ describe(Tv2ActionService.name, () => {
         expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.GRAPHICS } }) })]))
         expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.VIDEO_CLIP } }) })]))
         expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.UNKNOWN } }) })])) // Video mixer action
-        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.SPLIT_SCREEN, layout: '', inputPlayoutContents: [] } }) })]))
+        expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.SPLIT_SCREEN, layout: '', inputPlayoutContents: {} } }) })]))
         expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.REPLAY } }) })]))
         expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.ROBOT } }) })]))
       })
@@ -111,7 +111,7 @@ describe(Tv2ActionService.name, () => {
           expect(result).toEqual(expect.not.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.GRAPHICS } }) })]))
           expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.VIDEO_CLIP } }) })]))
           expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.UNKNOWN } }) })])) // Video mixer action
-          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.SPLIT_SCREEN, layout: '', inputPlayoutContents: [] } }) })]))
+          expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.SPLIT_SCREEN, layout: '', inputPlayoutContents: {} } }) })]))
           expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.REPLAY } }) })]))
           expect(result).toEqual(expect.arrayContaining([expect.objectContaining({ metadata: expect.objectContaining({ playoutContent: { type: PlayoutContentType.ROBOT } }) })]))
         })
@@ -341,7 +341,7 @@ function createMockOfTv2SplitScreenActionFactory(): Tv2SplitScreenActionFactory 
         playoutContent: {
           type: PlayoutContentType.SPLIT_SCREEN,
           layout: '',
-          inputPlayoutContents: []
+          inputPlayoutContents: {}
         },
         outputChannel: OutputChannel.UNKNOWN,
         actionSubtype: Tv2ActionSubtype.SPLIT_SCREEN_INSERT_SOURCE_TO_INPUT,
