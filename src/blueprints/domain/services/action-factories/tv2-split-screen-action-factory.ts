@@ -216,7 +216,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
     return {
       type: PlayoutContentType.SPLIT_SCREEN,
       layout,
-      inputPlayoutContents: []
+      inputPlayoutContents: {}
     }
   }
 
@@ -489,7 +489,7 @@ export class Tv2SplitScreenActionFactory extends ActionFactory {
       }
     })
 
-    const splitScreenSourcesPlayoutContent: Record<number, SplitScreenInputPlayoutContent> = []
+    const splitScreenSourcesPlayoutContent: Record<number, SplitScreenInputPlayoutContent> = {}
     const audioTimelineObjectsForBoxes: { [inputIndex: number]: Tv2BlueprintTimelineObject[] } = {}
 
     splitScreenManifestData.sources.forEach((source: Tv2SourceMappingWithAudio, input: SplitScreenBoxInput) => {
